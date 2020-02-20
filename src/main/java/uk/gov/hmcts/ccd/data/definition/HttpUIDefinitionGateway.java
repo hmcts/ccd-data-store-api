@@ -1,5 +1,12 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,16 +17,15 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.net.URI;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
 
 /**
  * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway
@@ -181,5 +187,54 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         return builder.build().encode().toUri();
     }
 
+    private URI withJurisdictionIds(String url, final List<String> jurisdictionIds) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url).queryParam("ids", String.join(",", jurisdictionIds));
+        return builder.build().encode().toUri();
+    }
 
+    public BannersResult getBanners(final List<String> jurisdictionIds) {
+        try {
+            final Instant start = Instant.now();
+            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            final BannersResult
+                bannersResult =
+                restTemplate.exchange(withJurisdictionIds(applicationParams.bannersURL(), jurisdictionIds),
+                    HttpMethod.GET,
+                    requestEntity,
+                    BannersResult.class).getBody();
+            final Duration duration = Duration.between(start, Instant.now());
+            LOG.debug("Rest API getBanners called for {}, finished in {}",
+                jurisdictionIds,
+                duration.toMillis());
+            return bannersResult;
+        } catch (final Exception e) {
+            throw new ServiceException(String.format(
+                "Problem getting banners for jurisdiction references: %s because of %s",
+                jurisdictionIds,
+                e.getMessage()));
+        }
+    }
+    
+    public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionIds) {
+        try {
+            final Instant start = Instant.now();
+            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            final JurisdictionUiConfigResult
+                jurisdictionUiConfigResult =
+                restTemplate.exchange(withJurisdictionIds(applicationParams.jurisdictionUiConfigsURL(), jurisdictionIds),
+                    HttpMethod.GET,
+                    requestEntity,
+                    JurisdictionUiConfigResult.class).getBody();
+            final Duration duration = Duration.between(start, Instant.now());
+            LOG.debug("Rest API getJurisdictionUiConfigs called for {}, finished in {}",
+                jurisdictionIds,
+                duration.toMillis());
+            return jurisdictionUiConfigResult;
+        } catch (final Exception e) {
+            throw new ServiceException(String.format(
+                "Problem getting jurisdiction UI configs for jurisdiction references: %s because of %s",
+                jurisdictionIds,
+                e.getMessage()));
+        }
+    }
 }

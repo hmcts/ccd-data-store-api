@@ -1,0 +1,20 @@
+{
+  "_guid_": "S-095",
+  "_extends_": "F-054_Base_Test_Data",
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
+  "specs": [
+    "an active profile in CCD",
+    "contains an valid user authorisation token that does not have access to the operation",
+    "code is HTTP-403"
+  ],
+  "user": {
+    "username": "auto.test.cnp@gmail.com",
+    "password": "[[$CCD_IMPORT_AUTOTEST_PASSWORD]]"
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message": "Access Denied"
+    }
+  }
+}

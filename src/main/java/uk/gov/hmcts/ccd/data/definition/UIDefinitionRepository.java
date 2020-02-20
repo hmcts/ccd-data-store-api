@@ -4,9 +4,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.springframework.beans.factory.annotation.Qualifier;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
@@ -57,5 +58,12 @@ public class UIDefinitionRepository {
         return cachedUiDefinitionGateway.getCaseTabCollection(version.getVersion(), caseTypeId);
     }
 
+    public BannersResult getBanners(final List<String> jurisdictionReferences) {
+        return cachedUiDefinitionGateway.getBanners(jurisdictionReferences);
+    }
+    
+    public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionReferences) {
+        return cachedUiDefinitionGateway.getJurisdictionUiConfigs(jurisdictionReferences);
+    }
 
 }

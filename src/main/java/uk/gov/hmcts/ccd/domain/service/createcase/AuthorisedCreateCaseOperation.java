@@ -52,9 +52,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
     }
 
     @Override
-    public CaseDetails createCaseDetails(final String uid,
-                                         String jurisdictionId,
-                                         String caseTypeId,
+    public CaseDetails createCaseDetails(String caseTypeId,
                                          CaseDataContent caseDataContent,
                                          Boolean ignoreWarning) {
         if (caseDataContent == null) {
@@ -72,9 +70,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         Map<String, JsonNode> data = caseDataContent.getData();
         verifyCreateAccess(event, data, caseType, userRoles);
 
-        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(uid,
-                                                                              jurisdictionId,
-                                                                              caseTypeId,
+        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId,
                                                                               caseDataContent,
                                                                               ignoreWarning);
         return verifyReadAccess(caseType, userRoles, caseDetails);

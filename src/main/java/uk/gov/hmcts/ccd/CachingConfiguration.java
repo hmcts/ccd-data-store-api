@@ -1,20 +1,19 @@
 package uk.gov.hmcts.ccd;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.config.NetworkConfig;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CachingConfiguration {
 
     @Autowired
     ApplicationParams applicationParams;
-
 
     @Bean
     public Config hazelCastConfig() {
@@ -24,11 +23,13 @@ public class CachingConfiguration {
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
-        configCaches(applicationParams.getDefinitionCacheMaxIdleSecs(), applicationParams.getLatestVersionTTLSecs(), config);
+        configCaches(config);
         return config;
     }
 
-    private void configCaches(int definitionCacheMaxIdle, int latestVersionTTL, Config config) {
+    private void configCaches(Config config) {
+        final int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
+        final int latestVersionTTL = applicationParams.getLatestVersionTTLSecs();
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", definitionCacheMaxIdle));
@@ -38,7 +39,10 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userCache", applicationParams.getUserCacheTTLSecs()));
+        config.addMapConfig(newMapConfigWithMaxIdle("bannersCache", latestVersionTTL));
+        config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionUiConfigsCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
+        config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", applicationParams.getJurisdictionTTLSecs()));
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {
@@ -51,8 +55,8 @@ public class CachingConfiguration {
 
     private MapConfig newMapConfig(final String name) {
         MapConfig mapConfig = new MapConfig().setName(name)
-            .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
-            .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy());
+                .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
+                .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy());
         return mapConfig;
     }
 

@@ -5,19 +5,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Definition of case type AUTOTEST1/AAT as code.
  */
 public interface AATCaseType {
     String JURISDICTION = "AUTOTEST1";
-    String JURISDICTION_AUTOTEST2 = "AUTOTEST2";
+    String JURISDICTION_AUTOTEST2 = "AUTOTEST2" ;
     String CASE_TYPE = "AAT";
     String AAT_PRIVATE_CASE_TYPE = "AAT_PRIVATE";
     String AAT_PRIVATE2_CASE_TYPE = "AAT_PRIVATE2";
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     class CaseData {
         @JsonProperty("TextField")
@@ -61,6 +64,9 @@ public interface AATCaseType {
 
         @JsonProperty("AddressUKField")
         private AddressUKField addressUKField;
+
+        @JsonProperty("DocumentField")
+        private DocumentField documentField;
     }
 
     interface State {
@@ -132,6 +138,7 @@ public interface AATCaseType {
     }
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
     class CollectionItem {
         @JsonProperty("id")
@@ -142,6 +149,7 @@ public interface AATCaseType {
     }
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
     class ComplexType {
         @JsonProperty("ComplexTextField")
@@ -153,6 +161,8 @@ public interface AATCaseType {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     class AddressUKField {
         @JsonProperty("AddressLine1")
         private String addressLine1;
@@ -174,5 +184,19 @@ public interface AATCaseType {
 
         @JsonProperty("Country")
         private String country;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    class DocumentField {
+        @JsonProperty("document_binary_url")
+        private String binaryUrl;
+
+        @JsonProperty("document_filename")
+        private String filename;
+
+        @JsonProperty("document_url")
+        private String url;
     }
 }

@@ -1,13 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_UK;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_CASELINK;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ORDER_SUMMARY;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
@@ -16,8 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.StringUtils;
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 public interface CommonField {
 
@@ -26,6 +20,8 @@ public interface CommonField {
     String getId();
 
     List<AccessControlList> getAccessControlLists();
+
+    String getDisplayContext();
 
     void setDisplayContext(String displayContext);
 
@@ -44,17 +40,8 @@ public interface CommonField {
     }
 
     @JsonIgnore
-    default boolean isCompound() {
+    default boolean isCompoundFieldType() {
         return isCollectionFieldType() || isComplexFieldType();
-    }
-
-    @JsonIgnore
-    default boolean isPredefinedComplexType() {
-        return PREDEFINED_COMPLEX_ADDRESS_GLOBAL.equalsIgnoreCase(getFieldType().getId()) ||
-            PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK.equalsIgnoreCase(getFieldType().getId()) ||
-            PREDEFINED_COMPLEX_ADDRESS_UK.equalsIgnoreCase(getFieldType().getId()) ||
-            PREDEFINED_COMPLEX_ORDER_SUMMARY.equalsIgnoreCase(getFieldType().getId()) ||
-            PREDEFINED_COMPLEX_CASELINK.equalsIgnoreCase(getFieldType().getId());
     }
 
     /**
@@ -82,7 +69,7 @@ public interface CommonField {
 
         Optional<CaseField> optionalCaseField = caseFields.stream().filter(e -> e.getId().equals(firstPathElement)).findFirst();
         if (optionalCaseField.isPresent()) {
-            CaseField caseField = optionalCaseField.get();
+            CommonField caseField = optionalCaseField.get();
 
             if (pathElements.size() == 1) {
                 return Optional.of(caseField);
@@ -96,4 +83,5 @@ public interface CommonField {
             return Optional.empty();
         }
     }
+
 }

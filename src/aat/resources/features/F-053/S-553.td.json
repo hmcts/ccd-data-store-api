@@ -1,0 +1,26 @@
+{
+  "_guid_": "S-553",
+  "_extends_": "F-053_Test_Data_Base",
+  "title": "must return negative response HTTP-404 when request contains a non-existing case type ID",
+  "specs": [
+    "an active profile in CCD",
+    "contains a non-existing case type ID",
+    "code is HTTP-404"
+  ],
+  "request": {
+    "pathVariables": {
+      "ctid": "non-existing case type ID"
+    }
+},
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "error" : "Not Found",
+       "message" : "Resource not found when getting case type version for 'non-existing case type ID'.",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

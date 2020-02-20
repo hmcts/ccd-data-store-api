@@ -1,0 +1,18 @@
+{
+  "_guid_": "S-562",
+  "_extends_": "F-054_Base_Test_Data",
+  "title": "must return negative response HTTP-404 when request contains a non-existing jurisdiction ID",
+  "specs": [
+    "an active profile in CCD",
+    "contains the ID of above created case with a non-existing jurisdiction ID",
+    "code is HTTP-404"
+  ],
+  "request": {
+    "pathVariables": {
+      "jid": "non-existing jurisdiction ID"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response"
+  }
+}

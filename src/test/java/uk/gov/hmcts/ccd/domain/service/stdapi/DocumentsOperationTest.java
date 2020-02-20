@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -41,12 +42,19 @@ public class DocumentsOperationTest extends BaseTest {
 
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
+
+    private CaseDetails caseDetails = new CaseDetails();
+    private Optional<CaseDetails> caseDetailsOptional = Optional.of(caseDetails);
     
     @Inject
     private DocumentsOperation documentsOperation;
 
     @Inject
     protected UIDService uidService;
+    public static final String TEST_CASE_TYPE = "TEST_CASE_TYPE";
+    public static final String TEST_JURISDICTION = "TEST_JURISDICTION";
+    public static final String TEST_CASE_REFERENCE = "1504259907353537";
+    public static final String TEST_URL = "/test-document-callback";
 
     @Before
     public void setUp() {
@@ -54,7 +62,20 @@ public class DocumentsOperationTest extends BaseTest {
         Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(documentsOperation, "securityUtils", securityUtils);
 
+        caseDetails.setJurisdiction(TEST_JURISDICTION);
+        caseDetails.setCaseTypeId(TEST_CASE_TYPE);
+
         setupUIDService();
+
+        final CaseDetailsRepository mockCaseDetailsRepository = Mockito.mock(DefaultCaseDetailsRepository.class);
+        Mockito.when(mockCaseDetailsRepository.findByReference(TEST_CASE_REFERENCE)).thenReturn(caseDetailsOptional);
+        ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
+
+        final CaseType caseType = new CaseType();
+        caseType.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
+        final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
+        Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
+        ReflectionTestUtils.setField(documentsOperation, "caseTypeService", mockCaseTypeService);
     }
 
     private void setupUIDService() {
@@ -66,54 +87,38 @@ public class DocumentsOperationTest extends BaseTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestExceptionIfCaseReferenceInvalid() throws Exception {
-        final String TEST_JURISDICTION = "TEST_JURISDICTION";
-        final String TEST_CASE_TYPE = "TEST_CASE_TYPE";
-
         final String TEST_CASE_REFERENCE = "Invalid";
 
-        documentsOperation.getPrintableDocumentsForCase(TEST_JURISDICTION, TEST_CASE_TYPE, TEST_CASE_REFERENCE);
+        documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
     }
 
     @Test
     public void shouldReturnNoDocumentsIfNoDocumentsRetrieved() throws Exception {
-        final String TEST_JURISDICTION = "TEST_JURISDICTION";
-        final String TEST_CASE_TYPE = "TEST_CASE_TYPE";
-        final String TEST_CASE_REFERENCE = "1504259907353537";
-        final String TEST_URL = "/test-document-callback";
-
-        final CaseDetailsRepository mockCaseDetailsRepository = Mockito.mock(DefaultCaseDetailsRepository.class);
-        Mockito.when(mockCaseDetailsRepository.findByReference(Long.valueOf(TEST_CASE_REFERENCE))).thenReturn(new CaseDetails());
-        ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
-
-        final CaseType caseType = new CaseType();
-        caseType.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
-        final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
-        Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
-        ReflectionTestUtils.setField(documentsOperation, "caseTypeService", mockCaseTypeService);
-
         stubFor(post(urlMatching(TEST_URL + ".*"))
-            .willReturn(okJson(mapper.writeValueAsString(new ArrayList<>())).withStatus(200)));
-        final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_JURISDICTION, TEST_CASE_TYPE, TEST_CASE_REFERENCE);
+                    .willReturn(okJson(mapper.writeValueAsString(new ArrayList<>())).withStatus(200)));
+
+        final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
         assertEquals("Incorrect number of documents", 0, results.size());
     }
 
     @Test
     public void shouldReturnDocumentsIfDocumentsRetrieved() throws Exception {
-        final String TEST_JURISDICTION = "TEST_JURISDICTION";
-        final String TEST_CASE_TYPE = "TEST_CASE_TYPE";
-        final String TEST_CASE_REFERENCE = "1504259907353537";
-        final String TEST_URL = "/test-document-callback";
+        final List<Document> TEST_DOCUMENTS = buildDocuments();
+        stubFor(post(urlMatching(TEST_URL + ".*"))
+                    .willReturn(okJson(mapper.writeValueAsString(TEST_DOCUMENTS)).withStatus(200)));
 
-        final CaseDetailsRepository mockCaseDetailsRepository = Mockito.mock(DefaultCaseDetailsRepository.class);
-        Mockito.when(mockCaseDetailsRepository.findByReference(Long.valueOf(TEST_CASE_REFERENCE))).thenReturn(new CaseDetails());
-        ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
+        final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
+        assertEquals("Incorrect number of documents", TEST_DOCUMENTS.size(), results.size());
 
-        final CaseType caseType = new CaseType();
-        caseType.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
-        final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
-        Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
-        ReflectionTestUtils.setField(documentsOperation, "caseTypeService", mockCaseTypeService);
+        for (int i = 0; i < results.size(); i++) {
+            assertEquals("Incorrect description", results.get(i).getDescription(), TEST_DOCUMENTS.get(i).getDescription());
+            assertEquals("Incorrect name",results.get(i).getName(), TEST_DOCUMENTS.get(i).getName());
+            assertEquals("Incorrect url",results.get(i).getUrl(), TEST_DOCUMENTS.get(i).getUrl());
+            assertEquals("Incorrect type",results.get(i).getType(), TEST_DOCUMENTS.get(i).getType());
+        }
+    }
 
+    private List<Document> buildDocuments() {
         final Document TEST_DOC_1 = new Document();
         TEST_DOC_1.setDescription("TEST_DOC_1_DESC");
         TEST_DOC_1.setName("TEST_DOC_1_NAME");
@@ -127,17 +132,6 @@ public class DocumentsOperationTest extends BaseTest {
         final List<Document> TEST_DOCUMENTS = new ArrayList<>();
         TEST_DOCUMENTS.add(TEST_DOC_1);
         TEST_DOCUMENTS.add(TEST_DOC_2);
-
-        stubFor(post(urlMatching(TEST_URL + ".*"))
-            .willReturn(okJson(mapper.writeValueAsString(TEST_DOCUMENTS)).withStatus(200)));
-        final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_JURISDICTION, TEST_CASE_TYPE, TEST_CASE_REFERENCE);
-        assertEquals("Incorrect number of documents", TEST_DOCUMENTS.size(), results.size());
-
-        for (int i = 0; i < results.size(); i++) {
-            assertEquals("Incorrect description", results.get(i).getDescription(), TEST_DOCUMENTS.get(i).getDescription());
-            assertEquals("Incorrect name",results.get(i).getName(), TEST_DOCUMENTS.get(i).getName());
-            assertEquals("Incorrect url",results.get(i).getUrl(), TEST_DOCUMENTS.get(i).getUrl());
-            assertEquals("Incorrect type",results.get(i).getType(), TEST_DOCUMENTS.get(i).getType());
-        }
+        return TEST_DOCUMENTS;
     }
 }

@@ -1,0 +1,31 @@
+{
+	"title": "must return 404 when request provides authentic credentials without authorised access to the operation",
+	"_guid_": "S-156",
+	"_extends_": "F-035_Base_Test_Data",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a valid user authorisation token without access to the operation",
+		"contains an HTTP-404 Not Found"
+	],
+
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][childContexts][S-156_Case_Creation_Data][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+		"headers": {
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+			"message": "[[ANYTHING_PRESENT]]",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
+}

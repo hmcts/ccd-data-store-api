@@ -1,0 +1,35 @@
+{
+  "_guid_": "Standard_Full_Case_Data",
+
+  "TextField": "Some Text",
+  "NumberField": "164528",
+  "YesOrNoField": "Yes",
+  "PhoneUKField": "07123456789",
+  "EmailField": "ccd@hmcts.net",
+  "MoneyGBPField": "4200",
+  "DateField": "2017-02-13",
+  "DateTimeField": "1988-07-07T22:20:00",
+  "TextAreaField": "Line1\nLine2",
+  "FixedListField": "VALUE3",
+  "MultiSelectListField": [ "OPTION2", "OPTION4" ],
+  "CollectionField": [{
+    "id": "CollectionField1",
+    "value": "Alias 1"
+  }, {
+    "id": "CollectionField2",
+    "value": "Alias 2"
+  }],
+  "ComplexField": {
+    "ComplexTextField": "Nested text",
+    "ComplexFixedListField": "VALUE2"
+  },
+  "AddressUKField": {
+    "AddressLine1": "102 Petty France",
+    "AddressLine2": "CCD",
+    "AddressLine3": "c/o HMCTS Reform",
+    "PostTown": "Westminster",
+    "County": "Greater London",
+    "PostCode": "SW1H 9AJ",
+    "Country": "UK"
+  }
+}

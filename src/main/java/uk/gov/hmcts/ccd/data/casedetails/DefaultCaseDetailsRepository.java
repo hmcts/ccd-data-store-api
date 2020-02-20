@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilderFactory;
@@ -8,14 +13,9 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CasePersistenceException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,12 +25,12 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 
 @Named
@@ -39,8 +39,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
-    public static final String QUALIFIER = "default";
 
+    public static final String QUALIFIER = "default";
+    private static final String UNIQUE_REFERENCE_KEY_CONSTRAINT = "case_data_reference_key";
     private final CaseDetailsMapper caseDetailsMapper;
 
     @PersistenceContext
@@ -66,17 +67,21 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     public CaseDetails set(final CaseDetails caseDetails) {
         final CaseDetailsEntity newCaseDetailsEntity = caseDetailsMapper.modelToEntity(caseDetails);
         newCaseDetailsEntity.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
-        CaseDetailsEntity mergedEntity = null;
+        CaseDetailsEntity mergedEntity;
         try {
             mergedEntity = em.merge(newCaseDetailsEntity);
             em.flush();
         } catch (StaleObjectStateException | OptimisticLockException e) {
-            LOG.info("Optimistic Lock Exception: Case data has been altered", e);
+            LOG.info("Optimistic Lock Exception: Case data has been altered, UUID={}", caseDetails.getReference(), e);
             throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
         } catch (PersistenceException e) {
-            LOG.warn("Failed to store case details", e);
-            if (e.getCause() instanceof ConstraintViolationException) {
-                throw new CaseConcurrencyException(e.getMessage());
+            if (e.getCause() instanceof ConstraintViolationException && isDuplicateReference(e)) {
+                LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",
+                    caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
+                throw new ReferenceKeyUniqueConstraintException(e.getMessage());
+            } else {
+                LOG.warn("Failed to store case details, UUID={}", caseDetails.getReference(), e);
+                throw new CasePersistenceException(e.getMessage());
             }
         }
         return caseDetailsMapper.entityToModel(mergedEntity);
@@ -157,10 +162,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return sr;
     }
 
-    public List<Object[]> getCasesCountByCaseType() {
-        return em.createNamedQuery(CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE).getResultList();
-    }
-
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     // be annotated with @NotNull
     private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
@@ -184,31 +185,12 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     private Query getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {
-        Query query;
-        if (dataSearchParams.isEmpty() && applicationParams.isJpaCriteriaSearchEnabled()) {
-            query = isCountQuery ? getCountQueryByMetaData(metadata) : getQueryByMetaData(metadata);
-        } else {
-            query = getQueryByParameters(metadata, dataSearchParams, isCountQuery);
-        }
-        return query;
+        return getQueryByParameters(metadata, dataSearchParams, isCountQuery);
     }
 
     private Query getQueryByParameters(MetaData metadata, final Map<String, String> requestData, boolean isCountQuery) {
         Map<String, String> fieldData = new HashMap<>(requestData);
         return this.queryBuilder.build(metadata, fieldData, isCountQuery);
-    }
-
-    private Query getCountQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.count(em, metadata)
-            .whereMetadata(metadata)
-            .build();
-    }
-
-    private Query getQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.select(em, metadata)
-            .whereMetadata(metadata)
-            .orderBy(metadata)
-            .build();
     }
 
     private void paginate(Query query, Optional<String> pageOpt) {
@@ -217,5 +199,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         int firstResult = (page - 1) * pageSize;
         query.setFirstResult(firstResult);
         query.setMaxResults(pageSize);
+    }
+
+    private boolean isDuplicateReference(PersistenceException e) {
+        return ((ConstraintViolationException) e.getCause()).getConstraintName()
+            .equals(UNIQUE_REFERENCE_KEY_CONSTRAINT);
     }
 }

@@ -83,8 +83,11 @@ public class ApplicationParams {
     @Value("${definition.cache.max-idle.secs}")
     private Integer definitionCacheMaxIdleSecs;
 
-    @Value("${definition.cache.latest-version-ttl.secs}")
+    @Value("${definition.cache.latest-version-ttl}")
     private Integer latestVersionTTLSecs;
+
+    @Value("${definition.cache.jurisdiction-ttl}")
+    private Integer jurisdictionTTL;
 
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
@@ -100,6 +103,9 @@ public class ApplicationParams {
 
     @Value("#{'${search.elastic.data.hosts}'.split(',')}")
     private List<String> elasticSearchDataHosts;
+
+    @Value("${search.elastic.request.timeout}")
+    private Integer elasticSearchRequestTimeout;
 
     @Value("#{'${search.blacklist}'.split(',')}")
     private List<String> searchBlackList;
@@ -118,9 +124,6 @@ public class ApplicationParams {
 
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
-
-    @Value("${ccd.case.search.jpa.criteria.enabled}")
-    private boolean jpaCriteriaSearchEnabled;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -198,6 +201,14 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/jurisdictions";
     }
 
+    public String bannersURL() {
+        return uiDefinitionHost + "/api/display/banners";
+    }
+    
+    public String jurisdictionUiConfigsURL() {
+    	return uiDefinitionHost + "/api/display/jurisdiction-ui-configs";
+    }
+
     public String searchInputDefinition(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/search-input-definition/" + encode(caseTypeId);
     }
@@ -260,6 +271,10 @@ public class ApplicationParams {
 
     public int getLatestVersionTTLSecs() {
         return latestVersionTTLSecs;
+    }
+
+    public int getJurisdictionTTLSecs() {
+        return jurisdictionTTL;
     }
 
     public Integer getUserCacheTTLSecs() {
@@ -326,7 +341,7 @@ public class ApplicationParams {
         return readFromAMCaseTypes;
     }
 
-    public boolean isJpaCriteriaSearchEnabled() {
-        return jpaCriteriaSearchEnabled;
+    public Integer getElasticSearchRequestTimeout() {
+        return elasticSearchRequestTimeout;
     }
 }

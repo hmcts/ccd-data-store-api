@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UISearchInputsResource extends ResourceSupport {
+public class UISearchInputsResource extends RepresentationModel {
 
     private UISearchInput[] searchInputs;
 

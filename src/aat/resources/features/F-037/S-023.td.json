@@ -1,0 +1,21 @@
+{
+  "title": "must return negative response when request provides authentic credentials without authorised access",
+  "_guid_": "S-023",
+  "_extends_": "F-037_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "does not provide an authorised access to the operation",
+    "contains a HTTP 403 Forbidden"
+  ],
+  "request": {
+    "headers": {
+      "ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message": "Access Denied"
+    }
+  }
+}

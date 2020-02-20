@@ -31,7 +31,7 @@ public class ElasticSearchConfiguration {
                                         .multiThreaded(true)
                                         .maxConnectionIdleTime(15, TimeUnit.SECONDS)
                                         .connTimeout(4000)
-                                        .readTimeout(6000)
+                                        .readTimeout(applicationParams.getElasticSearchRequestTimeout())
                                         .gson(gson)
                                         .discoveryEnabled(applicationParams.isElasticsearchNodeDiscoveryEnabled())
                                         .discoveryFrequency(applicationParams.getElasticsearchNodeDiscoveryFrequencyMillis(), TimeUnit.MILLISECONDS)

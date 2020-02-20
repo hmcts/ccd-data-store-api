@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
+import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
@@ -54,8 +55,9 @@ public class SearchQueryFactoryOperation {
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
 
+        Map<String, Object> parametersToBind = Maps.newHashMap();
         String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
-        String whereClausePart = secure(toClauses(criteria), metadata);
+        String whereClausePart = secure(toClauses(criteria), metadata, parametersToBind);
         String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
 
         String queryString = String.format(queryToFormat, whereClausePart, sortClause);
@@ -66,40 +68,40 @@ public class SearchQueryFactoryOperation {
         } else {
             query = entityManager.createNativeQuery(queryString, CaseDetailsEntity.class);
         }
+        parametersToBind.forEach((k, v) -> query.setParameter(k, v));
         addParameters(query, criteria);
         return query;
     }
 
-    private String secure(String clauses, MetaData metadata) {
-        return clauses + addUserCaseAccessClause() + addUserCaseStateAccessClause(metadata);
+    private String secure(String clauses, MetaData metadata, Map<String, Object> params) {
+        return clauses + addUserCaseAccessClause(params) + addUserCaseStateAccessClause(metadata, params);
     }
 
-    private String addUserCaseAccessClause() {
+    private String addUserCaseAccessClause(Map<String, Object> params) {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            return String.format(
-                " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '%s')",
-                userAuthorisation.getUserId()
-            );
+            params.put("user_id", userAuthorisation.getUserId());
+            return " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = :user_id)";
         }
         return "";
     }
 
-    private String addUserCaseStateAccessClause(MetaData metadata) {
+    private String addUserCaseStateAccessClause(MetaData metadata, Map<String, Object> params) {
         // restrict cases to the case states the user has access to
         List<String> caseStateIds = authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metadata.getJurisdiction(),
                                                                                                       metadata.getCaseTypeId(),
                                                                                                       CAN_READ);
         if (!caseStateIds.isEmpty()) {
-            return String.format(" AND state IN ('%s')", String.join("','", caseStateIds));
+            params.put("states", caseStateIds);
+            return " AND state IN (:states)";
         }
 
         return "";
     }
 
-    private void addParameters(final Query query, List<Criterion> critereon) {
+    private void addParameters(final Query query, List<Criterion> criterion) {
 
-        IntStream.range(0, critereon.size())
-                .forEach(position -> query.setParameter(position, critereon.get(position).getSoughtValue()));
+        IntStream.range(0, criterion.size())
+                .forEach(position -> query.setParameter(position, criterion.get(position).getSoughtValue()));
     }
 
     private String toClauses(final List<Criterion> criterion) {

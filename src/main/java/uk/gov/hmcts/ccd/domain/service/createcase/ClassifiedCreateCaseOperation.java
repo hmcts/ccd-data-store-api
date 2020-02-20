@@ -22,14 +22,10 @@ public class ClassifiedCreateCaseOperation implements CreateCaseOperation {
     }
 
     @Override
-    public CaseDetails createCaseDetails(String uid,
-                                         String jurisdictionId,
-                                         String caseTypeId,
+    public CaseDetails createCaseDetails(String caseTypeId,
                                          CaseDataContent caseDataContent,
                                          Boolean ignoreWarning) {
-        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(uid,
-                                                                              jurisdictionId,
-                                                                              caseTypeId,
+        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId,
                                                                               caseDataContent,
                                                                               ignoreWarning);
         if (null == caseDetails) {

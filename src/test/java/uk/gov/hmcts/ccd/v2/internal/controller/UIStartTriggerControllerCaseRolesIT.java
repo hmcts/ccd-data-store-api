@@ -63,6 +63,7 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
 
     @Test
     public void internalGetStartCaseTrigger_200_shouldAddFieldsWithCREATORCaseRole() throws Exception {
+
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         HttpHeaders headers = new HttpHeaders();

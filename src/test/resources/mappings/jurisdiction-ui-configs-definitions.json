@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/display/jurisdiction-ui-configs?ids=PROBATE,DIVORCE"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "configs": [
+        {
+          "id": "PROBATE",
+          "bannerDescription": "Probate Description",
+          "shuttered": true
+        },
+        {
+          "id": "DIVORCE",
+          "bannerDescription": "Divorce Description",
+          "shuttered": false
+        }
+      ]
+    }
+  }
+}

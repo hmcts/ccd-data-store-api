@@ -9,7 +9,7 @@
 [![HitCount](http://hits.dwyl.io/SP9gBJ/ccd-data-store-api.svg)](#ccd-data-store-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Store/search cases and provide workbaskets
+Store/search cases and provide workbaskets.
 
 ### Prerequisites
 
@@ -100,8 +100,8 @@ like to test your local environment you'll need to export the following variable
 #Smoke/Functional Tests
 export TEST_URL=http://localhost:4452
 export S2S_URL=http://localhost:4502
-export CCD_GW_SERVICE_NAME=ccd_gw
-export CCD_GW_SERVICE_SECRET=AAAAAAAAAAAAAAAC
+export BEFTA_S2S_CLIENT_ID=ccd_gw
+export BEFTA_S2S_CLIENT_SECRET=AAAAAAAAAAAAAAAC
 export CCD_CASEWORKER_AUTOTEST_EMAIL=someemail@blob.com
 export CCD_CASEWORKER_AUTOTEST_PASSWORD=XYZT
 ```

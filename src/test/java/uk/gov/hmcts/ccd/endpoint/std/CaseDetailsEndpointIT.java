@@ -54,6 +54,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -144,6 +146,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andReturn();
         assertEquals(mvcResult.getResponse().getContentAsString(), 409, mvcResult.getResponse().getStatus());
 
+        verify(uidService, times(3)).generateUID();
+
         // we should still have one case in DB
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -175,6 +179,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
         ).andReturn();
         assertEquals(mvcResult.getResponse().getContentAsString(), 409, mvcResult.getResponse().getStatus());
+
+        verify(uidService, times(3)).generateUID();
 
         // we should still have one case in DB
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -208,6 +214,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andReturn();
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
 
+        verify(uidService, times(3)).generateUID();
+
         // we should still have one case in DB
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 2, caseDetailsList.size());
@@ -239,6 +247,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
         ).andReturn();
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+
+        verify(uidService, times(3)).generateUID();
 
         // we should still have one case in DB
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
