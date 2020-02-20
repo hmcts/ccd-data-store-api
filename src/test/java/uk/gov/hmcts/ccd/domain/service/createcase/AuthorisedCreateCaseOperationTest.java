@@ -191,11 +191,9 @@ class AuthorisedCreateCaseOperationTest {
         doReturn(null).when(caseAccessService).getCaseCreationRoles();
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(null), eq(CAN_CREATE))).thenThrow(NullPointerException.class);
 
-        assertThrows(NullPointerException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
-                                                                                                      JURISDICTION_ID,
-                                                                                                      CASE_TYPE_ID,
-                                                                                                      EVENT_DATA,
-                                                                                                      IGNORE));
+        assertThrows(NullPointerException.class, () -> authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+                                                                                                       EVENT_DATA,
+                                                                                                       IGNORE));
     }
 
     @Test
@@ -204,11 +202,9 @@ class AuthorisedCreateCaseOperationTest {
 
         doReturn(new HashSet<>()).when(caseAccessService).getCaseCreationRoles();
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            EVENT_DATA,
-            IGNORE));
+        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+                                                                                                            EVENT_DATA,
+                                                                                                            IGNORE));
     }
 
     @Test

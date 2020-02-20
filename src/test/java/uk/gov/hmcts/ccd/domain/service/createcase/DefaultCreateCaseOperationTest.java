@@ -245,11 +245,7 @@ class DefaultCreateCaseOperationTest {
             .willReturn(savedCaseType);
         doThrow(RuntimeException.class).when(draftGateway).delete(draftId);
 
-        defaultCreateCaseOperation.createCaseDetails(UID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            eventData,
-            IGNORE_WARNING);
+        defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID, eventData, IGNORE_WARNING);
         verify(savedCaseType, times(1)).setIncompleteDeleteDraftResponse();
     }
 
