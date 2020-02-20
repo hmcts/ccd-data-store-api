@@ -1,18 +1,19 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.internal;
 
-import java.util.List;
-import java.util.Map;
-
 import static java.lang.Boolean.FALSE;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.UPDATE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.UPDATE;
 
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+
+import io.restassured.response.Response;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
@@ -50,7 +51,7 @@ class GetUICaseViewTest extends BaseTest {
             .body("case_id", equalTo(caseReference.toString()))
             .body("case_type.id", equalTo(CASE_TYPE))
             .body("case_type.jurisdiction.id", equalTo(JURISDICTION))
-            .body("metadataFields", hasSize(7))
+                .body("metadataFields", hasSize(8))
             // Tabs
             .body("tabs", hasSize(Tab.values().length))
             // State
