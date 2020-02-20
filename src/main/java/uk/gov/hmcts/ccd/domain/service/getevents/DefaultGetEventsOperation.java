@@ -24,6 +24,8 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     private final UIDService uidService;
     private static final String RESOURCE_NOT_FOUND //
         = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
+    private static final String CASE_RESOURCE_NOT_FOUND //
+        = "No case found ( case reference = '%s' )";
     private static final String CASE_EVENT_NOT_FOUND = "Case event not found";
 
     @Autowired
@@ -57,5 +59,19 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     public Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId) {
         return auditEventRepository.findByEventId(eventId).map(Optional::of)
             .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
+    }
+
+    @Override
+    public List<AuditEvent> getEvents(String caseReference) {
+        if (!uidService.validateUID(caseReference)) {
+            throw new BadRequestException("Case reference " + caseReference + " is not valid");
+        }
+
+        final CaseDetails caseDetails =
+            getCaseOperation.execute(caseReference)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    String.format(CASE_RESOURCE_NOT_FOUND, caseReference)));
+
+        return getEvents(caseDetails);
     }
 }
