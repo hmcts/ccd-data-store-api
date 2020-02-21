@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @RequestScope
 public class JurisdictionsResolverFromIdam implements JurisdictionsResolver {
 
-    public static final String QUALIFIER = "JurisdictionsResolverFromIdam";
+    public static final String QUALIFIER = "default";
 
     @Override
     public List<String> getJurisdictionsFromIdam(String[] roles) {
