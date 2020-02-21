@@ -22,9 +22,10 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip",
       "Content-Type": "application/json",
-      "Transfer-Encoding": "chunked",
+      "Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
       "Strict-Transport-Security":"[[ANY_STRING_NULLABLE]]"
     },
     "body" : {

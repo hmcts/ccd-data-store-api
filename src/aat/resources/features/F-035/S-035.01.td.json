@@ -22,8 +22,8 @@
     "_extends_": "Common_200_Response",
     "headers": {
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json",
-      "Transfer-Encoding": "chunked",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
+      "Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
       "Strict-Transport-Security":"[[ANY_STRING_NULLABLE]]"
     },
     "body" : {
