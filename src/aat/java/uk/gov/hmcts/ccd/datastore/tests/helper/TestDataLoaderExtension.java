@@ -1,16 +1,16 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper;
 
-import java.io.File;
-import java.util.function.Supplier;
-
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 
-import io.restassured.specification.RequestSpecification;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.function.Supplier;
+
+import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
@@ -19,9 +19,6 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 public class TestDataLoaderExtension extends BaseTest implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestDataLoaderExtension.class);
-
-    private static final String AUTO_TEST1_DEFINITION_FILE = "src/aat/resources/CCD_CNP_27_AUTOTEST1.xlsx";
-    private static final String AUTO_TEST2_DEFINITION_FILE = "src/aat/resources/CCD_CNP_27_AUTOTEST2.xlsx";
 
     private static boolean testExecutionStarted = false;
 
@@ -47,21 +44,6 @@ public class TestDataLoaderExtension extends BaseTest implements BeforeAllCallba
     }
 
     protected void loadData() {
-    }
-
-    protected void importDefinitions() {
-        importDefinition(AUTO_TEST1_DEFINITION_FILE);
-        importDefinition(AUTO_TEST2_DEFINITION_FILE);
-    }
-
-    private void importDefinition(String file) {
-        asAutoTestImporter()
-            .given()
-            .multiPart(new File(file))
-            .expect()
-            .statusCode(201)
-            .when()
-            .post("/import");
     }
 
     protected Long createCaseAndProgressState(Supplier<RequestSpecification> asUser, String caseType) {
