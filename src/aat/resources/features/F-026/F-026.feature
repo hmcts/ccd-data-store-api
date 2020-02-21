@@ -52,3 +52,38 @@ Feature: F-026: Get case data with UI layout
     Then a negative response is received
     And the response [has an HTTP-412 return code]
     And the response has all other details as expected
+
+  @S-026.01  #Get cases with Last State Modified Date field as a column
+  Scenario: must return the list of cases and status code 200 for correct inputs
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values,
+    And it is submitted to call the [Get case data with UI layout] operation of [CCD Data Store],
+    Then a positive response is received,
+    And the response [contains details of existing cases associated, along with an HTTP-200 OK],
+    And the response [contains Last State Modified Date as a column for UI layout]
+    And the response has all other details as expected.
+
+  @S-026.02 @Ignore @RDM-7739 #Get cases list from Last State Modified Date filter - when data list 1 or more
+  # Enable this after changing it to use Dynamic date instead of a static one
+  Scenario: must return the list of cases and status code 200 for correct inputs
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation] as in [S-026.02_GetToken]
+    And a case that has just been created as in [S-026.02_Case]
+    When a request is prepared with appropriate values,
+    And the request [has Last State Modified Date filter]
+    And it is submitted to call the [Get case data with UI layout] operation of [CCD Data Store],
+    Then a positive response is received,
+    And the response [contains details of existing cases associated, along with an HTTP-200 OK],
+    And the response [contains atleast one result item]
+    And the response has all other details as expected.
+
+  @S-026.03  #Get cases list from Last State Modified Date filter - when data list empty
+  Scenario: must return the list of cases and status code 200 for correct inputs
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values,
+    And the request [has Last State Modified Date filter]
+    And it is submitted to call the [Get case data with UI layout] operation of [CCD Data Store],
+    Then a positive response is received,
+    And the response [contains details of existing cases associated, along with an HTTP-200 OK],
+    And the response [contains empty results list]
+    And the response has all other details as expected.

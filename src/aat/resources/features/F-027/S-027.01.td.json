@@ -1,43 +1,34 @@
 {
-  "title": "must return case view when the case reference exists",
-  "_guid_": "S-165",
-  "_extends_": "F-065_Test_Data_Base",
-
+  "title": "must return status 200 along with the CaseView object successfully",
+  "_guid_": "S-027.01",
+  "_extends_": "F-027_Test_Data_Base",
   "specs": [
     "an active profile in CCD",
-    "contains a case that has just been created as in Standard_Full_Case_Creation_Data",
-    "contains details of the case just created, along with an HTTP-200 OK"
+    "uses the case-reference of the case just created",
+    "contains Last State Modified Date metadata field"
   ],
+  "user": {
+      "username": "befta.caseworker.3@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+  },
   "request": {
     "pathVariables": {
-      "cid": "[[DYNAMIC]]"
+      "uid": "[[DYNAMIC]]",
+      "jid": "BEFTA_JURISDICTION_3",
+      "ctid": "BEFTA_CASETYPE_3_4",
+      "cid": "${[scenarioContext][childContexts][S-027.01_Case][testData][actualResponse][body][id]}"
     }
   },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Vary" : "Accept-Encoding",
-      "Transfer-Encoding" : "chunked"
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Strict-Transport-Security":"[[ANY_STRING_NULLABLE]]"
     },
-    "body": {
-      "_links": {
-        "self": {
-          "href": "[[ANYTHING_PRESENT]]"
-        }
-      },
-      "case_id": "[[ANYTHING_PRESENT]]",
-      "case_type": {
-        "id": "AAT_AUTH_15",
-        "name": "Demo case AAT_AUTH_15",
-        "description": "Demonstrate everything CCD can do!",
-        "jurisdiction": {
-          "id": "AUTOTEST1",
-          "name": "Auto Test 1",
-          "description": "Content for the Test Jurisdiction."
-        },
-        "printEnabled": false
-      },
-      "tabs": "[[ANYTHING_PRESENT]]",
+    "body" : {
+      "tabs" : "[[ANYTHING_PRESENT]]",
       "metadataFields": [
         {
           "id": "[STATE]",
@@ -291,9 +282,55 @@
           ]
         }
       ],
-      "state": "[[ANYTHING_PRESENT]]",
-      "triggers": "[[ANYTHING_PRESENT]]",
-      "events": "[[ANYTHING_PRESENT]]"
+      "state" : {
+        "id" : "TODO",
+        "name" : "To do",
+        "description" : null,
+        "title_display" : null
+      },
+      "channels" : "[[ANYTHING_PRESENT]]",
+      "triggers" : [ {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : null,
+        "order" : "[[ANYTHING_PRESENT]]"
+      }, {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : null,
+        "order" : "[[ANYTHING_PRESENT]]"
+      }, {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : null,
+        "order" : "[[ANYTHING_PRESENT]]"
+      } ],
+      "events" : [ {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "timestamp" : "[[ANYTHING_PRESENT]]",
+        "summary" : "[[ANYTHING_PRESENT]]",
+        "comment" : "[[ANYTHING_PRESENT]]",
+        "event_id" : "[[ANYTHING_PRESENT]]",
+        "event_name" : "[[ANYTHING_PRESENT]]",
+        "user_id" : "[[ANYTHING_PRESENT]]",
+        "user_last_name" : "[[ANYTHING_PRESENT]]",
+        "user_first_name" : "[[ANYTHING_PRESENT]]",
+        "state_name" : "[[ANYTHING_PRESENT]]",
+        "state_id" : "[[ANYTHING_PRESENT]]",
+        "significant_item" : null
+      } ],
+      "case_id" : "[[ANYTHING_PRESENT]]",
+      "case_type" : {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : "[[ANYTHING_PRESENT]]",
+        "jurisdiction" : {
+          "id" : "[[ANYTHING_PRESENT]]",
+          "name" : "[[ANYTHING_PRESENT]]",
+          "description" : "[[ANYTHING_PRESENT]]"
+        },
+        "printEnabled" : false
+      }
     }
   }
 }

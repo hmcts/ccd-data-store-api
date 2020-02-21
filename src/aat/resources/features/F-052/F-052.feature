@@ -4,7 +4,7 @@ Feature: F-052: Get case data for a given case type for Citizen
 Background:
     Given an appropriate test context as detailed in the test data source
 
-  @S-070
+  @S-070  # Refactor this add actual Case data check, maybe best to create a case fist before checking for case data
   Scenario: must return 200 and a list of case data for the given search criteria
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
