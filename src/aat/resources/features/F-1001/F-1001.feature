@@ -1,50 +1,44 @@
 @F-1001
-Feature: F-1001: Get case document metadata for a given caseId and documentId
+Feature: F-1001: Get Document AM Data for a given Case ID and Document ID
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
   @S-1001
-  Scenario: must receive a document metadata and list of permissions for a valid Solicitor
+  Scenario: must successfully receive a document am data with a list of permissions
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
-    And a user with [an active solicitor profile with another specific variation of ACLs on the same case type]
     And a user with [an active Solicitor profile having full permissions on the same case type]
     And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And the request [has the case id just created where a document id is associated]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
+    And it is submitted to call the [Get Document AM Data] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [contains an HTTP 200 OK status code]
-    And the response [contains the document metadata and list of permissions]
+    And the response [contains the requested document am data]
     And the response has all other details as expected
 
   @S-1002
-  Scenario: must receive an empty list of permissions in response when Solicitor user doesn't have any access
+  Scenario: must successfully receive a document am data with an empty list of permissions
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
-    And a user with [an active solicitor profile with another specific variation of ACLs on the same case type]
     And a user with [an active Solicitor profile having full permissions on the same case type]
     And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And the request [has the case id just created where a document id is associated]
     And the request [contains active Solicitor profile who does not have any access]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
+    And it is submitted to call the [Get Document AM Data] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [contains an HTTP 200 OK status code]
-    And the response [contains the document metadata and an empty list of permissions]
+    And the response [contains the document am data and an empty list of permissions]
     And the response has all other details as expected
 
   @S-1003
-  Scenario: must receive an error response when document id does not exist
+  Scenario: must receive an error response for a non existing document id
     Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [has the case id just created]
-    And the request [has a document id which does not exist]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
+    And the request [has the case id just created but a document id which does not exist]
+    And it is submitted to call the [Get Document AM Data] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains an HTTP 404 status code]
     And the response has all other details as expected
 
   @S-1004
@@ -52,79 +46,34 @@ Feature: F-1001: Get case document metadata for a given caseId and documentId
     Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [has the case id just created]
-    And the request [has a document id which is not associated with that case id]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
+    And the request [has the case id just created but a document id which is not associated with that case id]
+    And it is submitted to call the [Get Document AM Data] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains an HTTP 404 status code]
     And the response has all other details as expected
 
   @S-1005
-  Scenario: must receive an error response when case id does not exist
+  Scenario: must receive an error response for a non existing case id
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [has a case id which does not exist]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
+    And the request [contains a non existing case id]
+    And it is submitted to call the [Get Document AM Data] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains an HTTP 404 status code]
     And the response has all other details as expected
 
+  #Generic Scenarios for Security
   @S-1006
   Scenario: must return 403 when request provides without valid authorisation
-    Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
-    And a user with [an active profile in CCD with READ access to a document]
-    When a request is prepared with appropriate values
-    And the request [has the case id just created where a document id is associated]
-    And the request [contains an invalid user token]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [contains an HTTP 403 Access Denied]
-    And the response has all other details as expected
 
   @S-1007
   Scenario: must return 403 when request provides without valid serviceAuthorisation
-    Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
-    Given a user with [an active profile in CCD with READ access to a document]
-    When a request is prepared with appropriate values
-    And the request [has the case id just created where a document id is associated]
-    And the request [contains an invalid s2s authorisation token]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [contains an HTTP 403 Access Denied]
-    And the response has all other details as expected
 
   @S-1008
   Scenario: must return 401 when request provides expired authentication
-    Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
-    And a user with [an active profile in CCD with READ access to a document]
-    When a request is prepared with appropriate values
-    And the request [has the case id just created where a document id is associated]
-    And the request [contains an expired user authorisation token]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [contains an HTTP 401 Unauthorised]
-    And the response has all other details as expected
-
-  @S-1012
-  Scenario: must return 401 when request provides expired s2s serviceAuthorisation
-    Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
-    And a user with [an active profile in CCD with READ access to a document]
-    When a request is prepared with appropriate values
-    And the request [has the case id just created where a document id is associated]
-    And the request [contains an expired s2s serviceAuthorisation token]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [contains an HTTP 401 Unauthorised]
-    And the response has all other details as expected
 
   @S-1009
+  Scenario: must return 401 when request provides expired s2s serviceAuthorisation
+
+  #Generic Scenarios for media type
+  @S-1010
   Scenario: must return 415 when request provides content type other than application/json
-    Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
-    And a user with [an active profile in CCD with READ access to a document]
-    When a request is prepared with appropriate values
-    And the request [has the case id just created where a document id is associated]
-    And the request [contains a content type header of application/xml]
-    And it is submitted to call the [get document metadata] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [contains an HTTP 415 Unsupported Media Type]
-    And the response has all other details as expected
+
