@@ -1,17 +1,15 @@
 {
-  "title": "must receive an empty list of permissions in response when Solicitor user doesn't have any access",
+  "title": "must successfully receive a document am data with an empty list of permissions",
 
   "_guid_": "S-1002",
   "_extends_": "F-1001_Test_Data_Base",
 
   "specs": [
     "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
-    "an active solicitor profile with another specific variation of ACLs on the same case type",
     "an active Solicitor profile having full permissions on the same case type",
     "has the case id just created where a document id is associated",
     "contains active Solicitor profile who does not have any access",
-    "contains an HTTP 200 OK status code",
-    "contains the document metadata and an empty list of permissions"
+    "contains the document am data and an empty list of permissions"
   ],
 
   "request": {

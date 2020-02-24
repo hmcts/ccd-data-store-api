@@ -60,7 +60,7 @@ Feature: F-1001: Get Document AM Data for a given Case ID and Document ID
     Then a negative response is received
     And the response has all other details as expected
 
-  #Generic Scenarios for Security
+  #Generic Scenarios for Security. No need to wrire for each feature
   @S-1006
   Scenario: must return 403 when request provides without valid authorisation
 
@@ -73,7 +73,7 @@ Feature: F-1001: Get Document AM Data for a given Case ID and Document ID
   @S-1009
   Scenario: must return 401 when request provides expired s2s serviceAuthorisation
 
-  #Generic Scenarios for media type
+  #Generic Scenarios for media type. No need to wrire for each feature
   @S-1010
   Scenario: must return 415 when request provides content type other than application/json
 
