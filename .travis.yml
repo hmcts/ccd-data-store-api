@@ -25,4 +25,4 @@ before_install:
 
 after_success:
   - 'bash <(curl -s https://codecov.io/bash) || echo "Codecov failed to upload"'
-  - test "$TRAVIS_BRANCH" = "master" && test "$TRAVIS_PULL_REQUEST" = "false" && sh ./publish-swagger-docs.sh 
+  - test "$TRAVIS_BRANCH" = "master" && sh ./publish-swagger-docs.sh 
