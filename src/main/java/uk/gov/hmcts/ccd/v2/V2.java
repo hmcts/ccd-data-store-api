@@ -36,7 +36,7 @@ public final class V2 {
         public static final String UI_BANNERS =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-banners.v2+json;charset=UTF-8";
 
-        public static final String UI_CASE_EVENTS = "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-events.v2+json;charset=UTF-8";
+        public static final String CASE_EVENTS = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8";
 
     }
 
