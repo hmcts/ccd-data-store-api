@@ -231,7 +231,7 @@ public class CaseController {
         }
     )
     @ApiOperation(
-        value = "Retrieve an event by case and event IDs for dynamic display",
+        value = "Retrieve an audit event by Case ID",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
@@ -246,7 +246,7 @@ public class CaseController {
         ),
         @ApiResponse(
             code = 404,
-            message = "Case event not found"
+            message = "Case audit events not found"
         )
     })
     public ResponseEntity<CaseEventsResource> getCaseEvents(@PathVariable("caseId") String caseId) {

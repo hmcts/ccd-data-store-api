@@ -26,7 +26,7 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
         = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
     private static final String CASE_RESOURCE_NOT_FOUND //
         = "No case found ( case reference = '%s' )";
-    private static final String CASE_EVENT_NOT_FOUND = "Case event not found";
+    private static final String CASE_EVENT_NOT_FOUND = "Case audit events not found";
 
     @Autowired
     public DefaultGetEventsOperation(CaseAuditEventRepository auditEventRepository, @Qualifier(
