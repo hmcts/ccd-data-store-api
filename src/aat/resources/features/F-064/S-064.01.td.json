@@ -18,6 +18,9 @@
   },
 	"expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]"
+    },
     "body" : {
       "workbasketInputs" : [ {
         "label" : "Search `Text` field",
