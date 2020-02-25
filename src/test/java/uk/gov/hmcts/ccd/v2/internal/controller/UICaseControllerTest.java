@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import com.google.common.collect.Lists;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,13 +12,10 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseEventsResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
 
@@ -55,9 +50,6 @@ class UICaseControllerTest {
     @Mock
     private CaseHistoryView caseHistoryView;
 
-    @Mock
-    private GetEventsOperation getEventsOperation;
-
     @InjectMocks
     private UICaseController caseController;
 
@@ -73,8 +65,6 @@ class UICaseControllerTest {
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
         when(getCaseViewOperation.execute(CASE_REFERENCE)).thenReturn(caseView);
         when(getCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID)).thenReturn(caseHistoryView);
-        List<AuditEvent> auditEvents = Lists.newArrayList(new AuditEvent(), new AuditEvent());
-        when(getEventsOperation.getEvents(CASE_REFERENCE)).thenReturn(auditEvents);
     }
 
     @Nested
@@ -143,40 +133,6 @@ class UICaseControllerTest {
 
             assertThrows(Exception.class,
                 () -> caseController.getCaseEvent(CASE_REFERENCE, EVENT_ID.toString()));
-        }
-    }
-
-    @Nested
-    @DisplayName("GET /internal/cases/{caseId}/events")
-    class GetEventsForCaseId {
-
-        @Test
-        @DisplayName("should return 200 when events found")
-        void caseFound() {
-            final ResponseEntity<UICaseEventsResource> response = caseController.getCaseEvents(CASE_REFERENCE);
-
-            assertAll(
-                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getAuditEvents().size(), is(2))
-            );
-        }
-
-        @Test
-        @DisplayName("should propagate BadRequestException when case reference not valid")
-        void caseReferenceNotValid() {
-            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
-
-            assertThrows(BadRequestException.class,
-                () -> caseController.getCaseEvents(CASE_REFERENCE));
-        }
-
-        @Test
-        @DisplayName("should propagate exception")
-        void shouldPropagateExceptionWhenThrown() {
-            when(getEventsOperation.getEvents(CASE_REFERENCE)).thenThrow(RuntimeException.class);
-
-            assertThrows(Exception.class,
-                () -> caseController.getCaseEvents(CASE_REFERENCE));
         }
     }
 

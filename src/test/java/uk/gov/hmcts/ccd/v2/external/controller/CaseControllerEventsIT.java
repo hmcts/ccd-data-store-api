@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.internal.controller;
+package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import javax.inject.Inject;
@@ -19,7 +19,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseEventsResource;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -28,8 +28,8 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class UICaseControllerIT extends WireMockBaseTest {
-    private static final String GET_CASE_EVENTS = "/internal/cases/1504259907353529/events";
+public class CaseControllerEventsIT extends WireMockBaseTest {
+    private static final String GET_CASE_EVENTS = "/cases/1504259907353529/events";
     private static final String UID_NO_EVENT_ACCESS = "1234";
     private static final String UID_WITH_EVENT_ACCESS = "2345";
 
@@ -81,7 +81,7 @@ public class UICaseControllerIT extends WireMockBaseTest {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        UICaseEventsResource saveCaseEventsResource = mapper.readValue(content, UICaseEventsResource.class);
+        CaseEventsResource saveCaseEventsResource = mapper.readValue(content, CaseEventsResource.class);
         assertNotNull("Saved Case Details should not be null", saveCaseEventsResource);
         assertEquals("Should not contain events with case role access", 1, saveCaseEventsResource.getAuditEvents().size());
     }
@@ -107,7 +107,7 @@ public class UICaseControllerIT extends WireMockBaseTest {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        UICaseEventsResource savedCaseEventsResource = mapper.readValue(content, UICaseEventsResource.class);
+        CaseEventsResource savedCaseEventsResource = mapper.readValue(content, CaseEventsResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseEventsResource);
         assertEquals("Should contain events with case role access", 2, savedCaseEventsResource.getAuditEvents().size());
 

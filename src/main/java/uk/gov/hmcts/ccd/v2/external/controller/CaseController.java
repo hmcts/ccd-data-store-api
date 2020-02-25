@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
@@ -22,11 +24,13 @@ import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 import javax.transaction.Transactional;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 
 import static org.springframework.http.ResponseEntity.status;
 
@@ -37,18 +41,22 @@ public class CaseController {
     private final CreateEventOperation createEventOperation;
     private final CreateCaseOperation createCaseOperation;
     private final UIDService caseReferenceService;
+    private final GetEventsOperation getEventsOperation;
+    private static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
 
     @Autowired
     public CaseController(
         @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
         @Qualifier("authorised") final CreateEventOperation createEventOperation,
         @Qualifier("authorised") final CreateCaseOperation createCaseOperation,
-        UIDService caseReferenceService
+        UIDService caseReferenceService,
+        @Qualifier("authorised") GetEventsOperation getEventsOperation
     ) {
         this.getCaseOperation = getCaseOperation;
         this.createEventOperation = createEventOperation;
         this.createCaseOperation = createCaseOperation;
         this.caseReferenceService = caseReferenceService;
+        this.getEventsOperation = getEventsOperation;
     }
 
     @GetMapping(
@@ -210,5 +218,44 @@ public class CaseController {
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
 
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
+    }
+
+
+    @GetMapping(
+        path = "/cases/{caseId}/events",
+        headers = {
+            V2.EXPERIMENTAL_HEADER
+        },
+        produces = {
+            V2.MediaType.CASE_EVENTS
+        }
+    )
+    @ApiOperation(
+        value = "Retrieve an event by case and event IDs for dynamic display",
+        notes = V2.EXPERIMENTAL_WARNING
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Success",
+            response = CaseEventsResource.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = ERROR_CASE_ID_INVALID
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "Case event not found"
+        )
+    })
+    public ResponseEntity<CaseEventsResource> getCaseEvents(@PathVariable("caseId") String caseId) {
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(ERROR_CASE_ID_INVALID);
+        }
+
+        final List<AuditEvent> auditEvents = getEventsOperation.getEvents(caseId);
+
+        return ResponseEntity.ok(new CaseEventsResource(caseId, auditEvents));
     }
 }

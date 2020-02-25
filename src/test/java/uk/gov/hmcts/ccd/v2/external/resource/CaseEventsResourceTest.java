@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.internal.resource;
+package uk.gov.hmcts.ccd.v2.external.resource;
 
 import com.google.common.collect.Lists;
 import java.util.List;
@@ -15,9 +15,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class UICaseEventsResourceTest {
+class CaseEventsResourceTest {
     private static final String REFERENCE = "1234123412341238";
-    private static final String LINK_SELF = String.format("/internal/cases/%s/events", REFERENCE);
+    private static final String LINK_SELF = String.format("/cases/%s/events", REFERENCE);
 
     @BeforeEach
     void setUp() {
@@ -28,7 +28,7 @@ class UICaseEventsResourceTest {
     @DisplayName("should copy empty audit events")
     void shouldCopyEmptyAuditEvents() {
         List<AuditEvent> auditEvents = Lists.newArrayList();
-        final UICaseEventsResource resource = new UICaseEventsResource(REFERENCE, auditEvents);
+        final CaseEventsResource resource = new CaseEventsResource(REFERENCE, auditEvents);
 
         assertAll(
             () -> assertThat(resource.getAuditEvents().size(), is(0))
@@ -39,7 +39,7 @@ class UICaseEventsResourceTest {
     @DisplayName("should copy audit events")
     void shouldCopyAuditEvents() {
         List<AuditEvent> auditEvents = Lists.newArrayList(new AuditEvent(), new AuditEvent());
-        final UICaseEventsResource resource = new UICaseEventsResource(REFERENCE, auditEvents);
+        final CaseEventsResource resource = new CaseEventsResource(REFERENCE, auditEvents);
 
         assertAll(
             () -> assertThat(resource.getAuditEvents().size(), is(2))
@@ -50,7 +50,7 @@ class UICaseEventsResourceTest {
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
         List<AuditEvent> auditEvents = Lists.newArrayList();
-        final UICaseEventsResource resource = new UICaseEventsResource(REFERENCE, auditEvents);
+        final CaseEventsResource resource = new CaseEventsResource(REFERENCE, auditEvents);
 
         Optional<Link> self = resource.getLink("self");
         assertThat(self.get().getHref(), equalTo(LINK_SELF));
