@@ -46,7 +46,7 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
         return getEvents(caseReference, () -> String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
     }
 
-    public List<AuditEvent> getEvents(String caseReference, Supplier<String> errorMessageSupplier) {
+    private List<AuditEvent> getEvents(String caseReference, Supplier<String> errorMessageSupplier) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference " + caseReference + " is not valid");
         }
