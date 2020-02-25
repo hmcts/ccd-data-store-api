@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.List;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -27,10 +28,8 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
-
-import javax.transaction.Transactional;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 import static org.springframework.http.ResponseEntity.status;
 
@@ -42,7 +41,6 @@ public class CaseController {
     private final CreateCaseOperation createCaseOperation;
     private final UIDService caseReferenceService;
     private final GetEventsOperation getEventsOperation;
-    private static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
 
     @Autowired
     public CaseController(
@@ -242,24 +240,24 @@ public class CaseController {
         ),
         @ApiResponse(
             code = 400,
-            message = ERROR_CASE_ID_INVALID
+            message = V2.Error.ERROR_CASE_ID_INVALID
         ),
         @ApiResponse(
             code = 422,
-            message = "Cannot find case type definition for case ID "
+            message = V2.Error.CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID
         ),
         @ApiResponse(
             code = 422,
-            message = "Cannot find user roles or case roles for the case ID"
+            message = V2.Error.ROLES_FOR_CASE_ID_NOT_FOUND
         ),
         @ApiResponse(
             code = 404,
-            message = "Case audit events not found"
+            message = V2.Error.CASE_AUDIT_EVENTS_NOT_FOUND
         )
     })
     public ResponseEntity<CaseEventsResource> getCaseEvents(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(ERROR_CASE_ID_INVALID);
+            throw new BadRequestException(V2.Error.ERROR_CASE_ID_INVALID);
         }
 
         final List<AuditEvent> auditEvents = getEventsOperation.getEvents(caseId);
