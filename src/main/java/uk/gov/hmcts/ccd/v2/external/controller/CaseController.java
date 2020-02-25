@@ -231,7 +231,7 @@ public class CaseController {
         }
     )
     @ApiOperation(
-        value = "Retrieve an audit event by Case ID",
+        value = "Retrieve audit events by case ID",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
