@@ -1,24 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpHeaders;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
@@ -46,27 +35,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 
-@ActiveProfiles("test")
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties =
     {
         "http.client.read.timeout=500"
     })
-@AutoConfigureWireMock(port = 0)
-@DirtiesContext
-public class CallbackInvokerWireMockTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+@Ignore
+public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Inject
-    private CallbackService callbackService;
-
-    @Inject
     private CallbackInvoker callbackInvoker;
-
-    @Value("${wiremock.server.port}")
-    protected Integer wiremockPort;
 
     private CallbackResponse callbackResponse;
     private CaseDetails caseDetails = new CaseDetails();
@@ -79,14 +57,10 @@ public class CallbackInvokerWireMockTest {
         // IDAM
         callbackResponse = aCallbackResponse().build();
         caseDetails = newCaseDetails().build();
-        final SecurityUtils securityUtils = Mockito.mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
-        ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
+
         testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
         caseEvent.setCallBackURLAboutToStartEvent(testUrl);
         caseEvent.setName("Test");
-        WireMock.resetAllScenarios();
-        WireMock.resetAllRequests();
     }
 
     // @Test FIXME: flakey one need some investigation - RDM-7504

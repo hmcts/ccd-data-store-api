@@ -62,7 +62,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 class DefaultUserRepositoryTest {
 
@@ -91,9 +91,6 @@ class DefaultUserRepositoryTest {
 
     @Mock
     private SecurityContext securityContext;
-
-    @Mock
-    private ServiceAndUserDetails principal;
 
     @InjectMocks
     private DefaultUserRepository userRepository;
@@ -359,51 +356,47 @@ class DefaultUserRepositoryTest {
         @Test
         @DisplayName("should retrieve user from IDAM")
         void shouldRetrieveUserFromIdam() {
-            IdamUser idamUser = new IdamUser();
-            when(restTemplate.exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class)))
-                .thenReturn(ResponseEntity.ok(idamUser));
+            String userId = "userId";
+            UserInfo userInfo = UserInfo.builder()
+                .uid(userId)
+                .build();
+            when(securityUtils.getUserInfo()).thenReturn(userInfo);
 
             IdamUser result = userRepository.getUser();
 
-            assertThat(result, is(idamUser));
-            verify(applicationParams).idamUserProfileURL();
-            verify(securityUtils).userAuthorizationHeaders();
-            verify(applicationParams).idamUserProfileURL();
-            verify(restTemplate).exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
+            assertThat(result.getId(), is(userId));
         }
 
         @Test
         @DisplayName("should throw exception when rest call fails")
         void shouldThrowExceptionWhenRestCallFails() {
-            when(applicationParams.idamUserProfileURL()).thenReturn("url");
-            doThrow(new RestClientException("Error")).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
+            doThrow(new RestClientException("Error")).when(securityUtils).getUserInfo();
 
             assertThrows(ServiceException.class, () -> userRepository.getUser());
         }
     }
 
     private void asCitizen() {
-        doReturn(newAuthorities(CITIZEN, PROBATE_PRIVATE_BETA)).when(principal)
+        doReturn(newAuthorities(CITIZEN, PROBATE_PRIVATE_BETA)).when(authentication)
                                                                .getAuthorities();
     }
 
     private void asLetterHolderCitizen() {
-        doReturn(newAuthorities(LETTER_HOLDER, PROBATE_PRIVATE_BETA)).when(principal)
+        doReturn(newAuthorities(LETTER_HOLDER, PROBATE_PRIVATE_BETA)).when(authentication)
                                                                      .getAuthorities();
     }
 
     private void asCaseworker() {
-        doReturn(newAuthorities(ROLE_CASEWORKER, ROLE_CASEWORKER_TEST, ROLE_CASEWORKER_CMC)).when(principal)
+        doReturn(newAuthorities(ROLE_CASEWORKER, ROLE_CASEWORKER_TEST, ROLE_CASEWORKER_CMC)).when(authentication)
                                                                                             .getAuthorities();
     }
 
     private void asOtherRoles() {
-        doReturn(newAuthorities("role1", "role2")).when(principal)
+        doReturn(newAuthorities("role1", "role2")).when(authentication)
                                                   .getAuthorities();
     }
 
     private void initSecurityContext() {
-        doReturn(principal).when(authentication).getPrincipal();
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
     }

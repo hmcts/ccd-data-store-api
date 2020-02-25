@@ -1,19 +1,27 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import com.google.common.collect.Lists;
-import java.util.List;
-import javax.inject.Inject;
-
+import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ccd.BaseTest;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-public class HttpUIDefinitionGatewayServiceExceptionTest extends BaseTest {
+import javax.inject.Inject;
+import java.util.List;
+
+public class HttpUIDefinitionGatewayServiceExceptionTest extends WireMockBaseTest {
 
     private static final int VERSION = 33;
 
     @Inject
     private HttpUIDefinitionGateway httpUIDefinitionGateway;
+
+
+    @Before
+    public void setUp() {
+        ReflectionTestUtils.setField(applicationParams, "uiDefinitionHost", "http://localhost:6666");
+    }
 
     @Test(expected = ServiceException.class)
     public void shouldGetServiceExceptionWhenGettingWorkbasketInputDefinitions() {

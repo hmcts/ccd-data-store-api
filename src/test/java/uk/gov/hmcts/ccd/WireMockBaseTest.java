@@ -21,7 +21,7 @@ public abstract class WireMockBaseTest extends BaseTest {
     protected Integer wiremockPort;
 
     @Inject
-    private ApplicationParams applicationParams;
+    protected ApplicationParams applicationParams;
 
     @Before
     public void initMock() throws IOException {

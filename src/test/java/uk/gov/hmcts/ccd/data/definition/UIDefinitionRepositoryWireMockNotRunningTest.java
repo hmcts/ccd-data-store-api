@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.data.definition;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -10,7 +10,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @org.junit.Ignore("Fixed by Mario's PR")
-public class UIDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
+public class UIDefinitionRepositoryWireMockNotRunningTest extends WireMockBaseTest {
 
     @Autowired
     private UIDefinitionRepository uiDefinitionRepository;

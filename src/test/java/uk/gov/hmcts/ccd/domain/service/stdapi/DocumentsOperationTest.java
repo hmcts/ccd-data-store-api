@@ -17,15 +17,11 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpHeaders;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -35,13 +31,9 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-@AutoConfigureWireMock(port = 0)
-@DirtiesContext
-public class DocumentsOperationTest extends BaseTest {
+@Ignore
+public class DocumentsOperationTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
-
-    @Value("${wiremock.server.port}")
-    protected Integer wiremockPort;
 
     private CaseDetails caseDetails = new CaseDetails();
     private Optional<CaseDetails> caseDetailsOptional = Optional.of(caseDetails);
@@ -58,8 +50,6 @@ public class DocumentsOperationTest extends BaseTest {
 
     @Before
     public void setUp() {
-        final SecurityUtils securityUtils = Mockito.mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(documentsOperation, "securityUtils", securityUtils);
 
         caseDetails.setJurisdiction(TEST_JURISDICTION);

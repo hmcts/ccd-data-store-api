@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.ccd.BaseTest;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.Arrays;
@@ -13,10 +15,15 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
+public class CaseDefinitionRepositoryWireMockNotRunningTest extends WireMockBaseTest {
 
     @Autowired
     private CaseDefinitionRepository caseDefinitionRepository;
+
+    @Before
+    public void setUp() {
+        ReflectionTestUtils.setField(applicationParams, "caseDefinitionHost", "http://localhost:6666");
+    }
 
     @Test
     public void shouldFailToGetCaseTypesForJurisdiction() {

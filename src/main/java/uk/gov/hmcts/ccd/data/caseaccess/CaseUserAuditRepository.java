@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserAuditEntity.Action;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -19,6 +19,9 @@ public class CaseUserAuditRepository {
     @PersistenceContext
     private EntityManager em;
 
+    @Inject
+    private SecurityUtils securityUtils;
+
     public void auditGrant(Long caseId, String userId, String caseRole) {
         em.persist(getEntity(caseId, userId, caseRole, GRANT));
     }
@@ -28,12 +31,11 @@ public class CaseUserAuditRepository {
     }
 
     private CaseUserAuditEntity getEntity(Long caseId, String userId, String caseRole, Action action) {
-        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         CaseUserAuditEntity entity = new CaseUserAuditEntity();
         entity.setCaseDataId(caseId);
         entity.setUserId(userId);
         entity.setCaseRole(caseRole);
-        entity.setChangedById(principal.getUsername());
+        entity.setChangedById(securityUtils.getUserId());
         entity.setAction(action);
         return entity;
     }

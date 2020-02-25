@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.user;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 @Repository
 @Qualifier(DefaultUserRepository.QUALIFIER)
@@ -70,28 +71,29 @@ public class DefaultUserRepository implements UserRepository {
 
     @Override
     public IDAMProperties getUserDetails() {
-        final HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
-        return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IDAMProperties.class).getBody();
+        UserInfo userInfo = securityUtils.getUserInfo();
+        IDAMProperties idamProperties = toIdamProperties(userInfo);
+        return idamProperties;
     }
 
     @Override
+    // TODO: we should remove this cache as IdamRepository doing same.
     @Cacheable(value = "userCache", key = "@securityUtils.getUserToken()")
     public IdamUser getUser() {
         try {
-            HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
-            return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IdamUser.class).getBody();
+            UserInfo userInfo = securityUtils.getUserInfo();
+            return toIdamUser(userInfo);
         } catch (RestClientException e) {
             LOG.error("Failed to retrieve user", e);
-            throw new ServiceException("Problem retrieving user from IDAM: " + securityUtils.getUserId());
+            throw new ServiceException("Problem retrieving user from IDAM: " + securityUtils.getUserSubject());
         }
     }
 
     @Override
     public Set<String> getUserRoles() {
         LOG.debug("retrieving user roles");
-        final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return serviceAndUser.getAuthorities()
-            .stream()
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        return authorities.stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toSet());
     }
@@ -150,8 +152,7 @@ public class DefaultUserRepository implements UserRepository {
 
     @Override
     public String getUserId() {
-        final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return serviceAndUser.getUsername();
+        return securityUtils.getUserId();
     }
 
     private Set<SecurityClassification> getClassificationsForUserRoles(List<String> roles) {
@@ -165,6 +166,25 @@ public class DefaultUserRepository implements UserRepository {
     private boolean filterRole(final String jurisdictionId, final String role) {
         return startsWithIgnoreCase(role, String.format(RELEVANT_ROLES, jurisdictionId))
             || ArrayUtils.contains(AuthCheckerConfiguration.getCitizenRoles(), role);
+    }
+
+    private IDAMProperties toIdamProperties(UserInfo userInfo) {
+        IDAMProperties idamProperties = new IDAMProperties();
+        idamProperties.setId(userInfo.getUid());
+        idamProperties.setEmail(userInfo.getSub());
+        idamProperties.setForename(userInfo.getGivenName());
+        idamProperties.setSurname(userInfo.getFamilyName());
+        idamProperties.setRoles(userInfo.getRoles().toArray(new String[0]));
+        return idamProperties;
+    }
+
+    private IdamUser toIdamUser(UserInfo userInfo) {
+        IdamUser idamUser = new IdamUser();
+        idamUser.setId(userInfo.getUid());
+        idamUser.setEmail(userInfo.getSub());
+        idamUser.setForename(userInfo.getGivenName());
+        idamUser.setSurname(userInfo.getFamilyName());
+        return idamUser;
     }
 
 }
