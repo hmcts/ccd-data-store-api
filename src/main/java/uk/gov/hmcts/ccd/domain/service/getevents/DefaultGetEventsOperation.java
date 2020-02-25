@@ -53,7 +53,7 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
 
         final CaseDetails caseDetails =
             getCaseOperation.execute(caseReference)
-                .orElseThrow(() -> new ResourceNotFoundException( errorMessageSupplier.get()));
+                .orElseThrow(() -> new ResourceNotFoundException(errorMessageSupplier.get()));
         return getEvents(caseDetails);
     }
 
