@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.getevents;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -11,9 +14,6 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Qualifier("default")
@@ -43,15 +43,17 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
 
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
+        return getEvents(caseReference, () -> String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
+    }
+
+    public List<AuditEvent> getEvents(String caseReference, Supplier<String> errorMessageSupplier) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference " + caseReference + " is not valid");
         }
 
         final CaseDetails caseDetails =
             getCaseOperation.execute(caseReference)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                    String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference)));
-
+                .orElseThrow(() -> new ResourceNotFoundException( errorMessageSupplier.get()));
         return getEvents(caseDetails);
     }
 
@@ -63,15 +65,6 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
 
     @Override
     public List<AuditEvent> getEvents(String caseReference) {
-        if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference " + caseReference + " is not valid");
-        }
-
-        final CaseDetails caseDetails =
-            getCaseOperation.execute(caseReference)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                    String.format(CASE_RESOURCE_NOT_FOUND, caseReference)));
-
-        return getEvents(caseDetails);
+        return getEvents(caseReference, () -> String.format(CASE_RESOURCE_NOT_FOUND, caseReference));
     }
 }
