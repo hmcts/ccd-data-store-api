@@ -85,7 +85,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
 
         Set<String> accessRoles = caseAccessService.getAccessRoles(caseId);
         if (accessRoles == null || accessRoles.isEmpty()) {
-            throw new ValidationException("Cannot find user roles for the user");
+            throw new ValidationException("Cannot find user roles or case roles for the case ID " + caseId);
         }
 
         return verifyReadAccess(events, accessRoles, caseType);
