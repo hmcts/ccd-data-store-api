@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface JurisdictionsResolver {
 
-    List<String> getJurisdictionsFromIdam(String[] roles);
+    List<String> getJurisdictions();
 }
