@@ -58,10 +58,10 @@ public class ClassifiedGetEventsOperation implements GetEventsOperation {
     }
 
     private List<AuditEvent> secureEvents(List<AuditEvent> events, String caseReference) {
-        if (null == events || events.size() == 0) {
+        CaseDetails caseDetails = getCaseOperation.execute(caseReference).orElse(null);
+        if (null == events || events.size() == 0 || null == caseDetails) {
             return Lists.newArrayList();
         }
-        CaseDetails caseDetails = getCaseOperation.execute(caseReference).orElse(null);
         return classificationService.applyClassification(caseDetails.getJurisdiction(), events);
     }
 
