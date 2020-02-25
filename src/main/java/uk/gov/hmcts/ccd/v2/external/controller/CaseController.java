@@ -245,6 +245,14 @@ public class CaseController {
             message = ERROR_CASE_ID_INVALID
         ),
         @ApiResponse(
+            code = 422,
+            message = "Cannot find case type definition for case ID "
+        ),
+        @ApiResponse(
+            code = 422,
+            message = "Cannot find user roles or case roles for the case ID"
+        ),
+        @ApiResponse(
             code = 404,
             message = "Case audit events not found"
         )
