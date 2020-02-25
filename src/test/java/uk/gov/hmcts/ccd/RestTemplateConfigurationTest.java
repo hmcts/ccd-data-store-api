@@ -1,17 +1,21 @@
 package uk.gov.hmcts.ccd;
 
-import java.io.IOException;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
+
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.protocol.HTTP.CONTENT_TYPE;
 import static org.hamcrest.Matchers.contains;
@@ -19,63 +23,25 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static wiremock.com.google.common.collect.Lists.newArrayList;
 import static wiremock.org.apache.http.entity.ContentType.TEXT_PLAIN;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
-
-import javax.inject.Inject;
-
-@ActiveProfiles("test")
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = {"http.client.connection.timeout=1500",
     "http.client.max.total=1",
     "http.client.read.timeout=1500",
     "http.client.seconds.idle.connection=1",
     "http.client.max.client_per_route=2",
     "http.client.validate.after.inactivity=1"})
-@AutoConfigureWireMock(port = 0)
-@DirtiesContext
-@Ignore
-public class RestTemplateConfigurationTest {
+public class RestTemplateConfigurationTest extends WireMockBaseTest {
 
     @Autowired
     private RestTemplate restTemplate;
-    @Inject
-    private ApplicationParams applicationParams;
-
-    @Value("${wiremock.server.port}")
-    protected Integer wiremockPort;
 
     private static final String RESPONSE_BODY = "Of course la la land";
     private static final String URL = "/ng/itb";
     private static final String MIME_TYPE = TEXT_PLAIN.getMimeType();
-
-    @Before
-    public void initMock() throws IOException {
-        final String hostUrl = "http://localhost:" + wiremockPort;
-        ReflectionTestUtils.setField(applicationParams, "idamHost", hostUrl);
-    }
 
     @Test
     public void restTemplateShouldBeUsable() {

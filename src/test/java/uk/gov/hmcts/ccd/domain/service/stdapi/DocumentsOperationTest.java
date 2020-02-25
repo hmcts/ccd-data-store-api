@@ -31,7 +31,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-@Ignore
 public class DocumentsOperationTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 

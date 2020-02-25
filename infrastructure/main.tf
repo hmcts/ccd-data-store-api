@@ -32,6 +32,8 @@ locals {
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
 
+  oidc_issuer = "https://forgerock-am.service.core-compute-idam-${var.env}.internal:8443/openam/oauth2/hmcts"
+
   custom_redirect_uri = "${var.frontend_url}/oauth2redirect"
   default_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
   oauth2_redirect_uri = "${var.frontend_url != "" ? local.custom_redirect_uri : local.default_redirect_uri}"
@@ -131,6 +133,7 @@ module "ccd-data-store-api" {
     CCD_DM_DOMAIN                       = "${local.dm_valid_domain}"
 
     IDAM_USER_URL                       = "${var.idam_api_url}"
+    OIDC_ISSUER                         = "${local.oidc_issuer}"
     IDAM_S2S_URL                        = "${local.s2s_url}"
     DATA_STORE_IDAM_KEY                 = "${data.azurerm_key_vault_secret.ccd_data_s2s_key.value}"
 

@@ -346,13 +346,6 @@ class DefaultUserRepositoryTest {
     @Nested
     @DisplayName("getUser()")
     class GetUser {
-        private static final String URL = "url";
-
-        @BeforeEach
-        void setUp() {
-            when(applicationParams.idamUserProfileURL()).thenReturn(URL);
-        }
-
         @Test
         @DisplayName("should retrieve user from IDAM")
         void shouldRetrieveUserFromIdam() {
