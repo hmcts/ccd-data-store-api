@@ -194,7 +194,7 @@ class CaseServiceTest {
         @Test
         @DisplayName("should return caseDetails")
         void populateCurrentCaseDetailsWithEventFields() throws Exception {
-            Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
+            Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{\n"
                     + "  \"PersonFirstName\": \"First Name\",\n"
                     + "  \"PersonLastName\": \"Last Name\"\n"
@@ -210,7 +210,6 @@ class CaseServiceTest {
             CaseDataContent caseDataContent = newCaseDataContent()
                 .withData(data)
                 .withCaseReference(CASE_REFERENCE)
-                .withEventData(eventData)
                 .build();
             CaseDetails caseDetails = buildCaseDetails();
             caseDetails.setId("299");

@@ -69,12 +69,9 @@ public class MidEventCallback {
                 if (StringUtils.isNotEmpty(content.getCaseReference())) {
                     CaseDetails caseDetails = caseService.getCaseDetails(caseType.getJurisdictionId(), content.getCaseReference());
                     caseDetailsBefore = caseService.clone(caseDetails);
-                    currentOrNewCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content,
-                        caseDetails);
-
+                    currentOrNewCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails);
                 } else {
-                    currentOrNewCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
-                        content.getEventData() == null ? content.getData() : content.getEventData());
+                    currentOrNewCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(), content.getData());
                 }
 
                 CaseDetails caseDetailsFromMidEventCallback = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
