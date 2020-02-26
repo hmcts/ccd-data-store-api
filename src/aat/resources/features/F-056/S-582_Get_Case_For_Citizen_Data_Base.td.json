@@ -31,6 +31,7 @@
         "state": "TODO",
         "version": "[[ANYTHING_PRESENT]]",
         "case_type_id": "BEFTA_CASETYPE_2_1",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
         "created_date": "[[ANYTHING_PRESENT]]",
         "last_modified": "[[ANYTHING_PRESENT]]",
         "security_classification": "PUBLIC",

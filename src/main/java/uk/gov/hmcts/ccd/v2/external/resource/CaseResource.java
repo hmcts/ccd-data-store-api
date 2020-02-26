@@ -40,6 +40,9 @@ public class CaseResource extends RepresentationModel {
     @JsonProperty("last_modified_on")
     private LocalDateTime lastModifiedOn;
 
+    @JsonProperty("last_state_modified_on")
+    private LocalDateTime lastStateModifiedOn;
+
     @JsonProperty("state")
     private String state;
 
@@ -97,6 +100,7 @@ public class CaseResource extends RepresentationModel {
         this.caseType = caseDetails.getCaseTypeId();
         this.createdOn = caseDetails.getCreatedDate();
         this.lastModifiedOn = caseDetails.getLastModified();
+        this.lastStateModifiedOn = caseDetails.getLastStateModifiedDate();
         this.state = caseDetails.getState();
         this.securityClassification = caseDetails.getSecurityClassification();
         this.data = caseDetails.getData();
