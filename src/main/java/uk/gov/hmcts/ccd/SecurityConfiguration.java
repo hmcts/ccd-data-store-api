@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.ccd.security.JwtAuthorityExtractor;
-import uk.gov.hmcts.ccd.security.filters.PathParamSecurityFilter;
+import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
 import uk.gov.hmcts.ccd.security.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 
@@ -33,16 +33,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private String issuerOverride;
 
     private final ServiceAuthFilter serviceAuthFilter;
-    private final PathParamSecurityFilter pathParamSecurityFilter;
+    private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
     private final JwtAuthorityExtractor jwtAuthorityExtractor;
 
     @Inject
     public SecurityConfiguration(final JwtAuthorityExtractor jwtAuthorityExtractor,
                                  final AuthTokenValidator authTokenValidator,
-                                 final PathParamSecurityFilter pathParamSecurityFilter,
+                                 final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter,
                                  @Value("#{'${casedatastore.authorised.services}'.split(',')}")
                                          List<String> authorisedServices) {
-        this.pathParamSecurityFilter = pathParamSecurityFilter;
+        this.v1EndpointsPathParamSecurityFilter = v1EndpointsPathParamSecurityFilter;
         this.serviceAuthFilter = new ServiceAuthFilter(authTokenValidator, authorisedServices);
         this.jwtAuthorityExtractor = jwtAuthorityExtractor;
     }
@@ -64,7 +64,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
-            .addFilterAfter(pathParamSecurityFilter, BearerTokenAuthenticationFilter.class)
+            .addFilterAfter(v1EndpointsPathParamSecurityFilter, BearerTokenAuthenticationFilter.class)
             .sessionManagement().sessionCreationPolicy(STATELESS).and()
             .csrf().disable()
             .formLogin().disable()

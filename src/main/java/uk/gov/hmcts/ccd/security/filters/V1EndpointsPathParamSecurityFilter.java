@@ -21,19 +21,18 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Component
-// Remove this filter once CCD moved to V2 endpoints only.
-public class PathParamSecurityFilter extends OncePerRequestFilter {
+public class V1EndpointsPathParamSecurityFilter extends OncePerRequestFilter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PathParamSecurityFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(V1EndpointsPathParamSecurityFilter.class);
 
     private final Function<HttpServletRequest, Optional<String>> userIdExtractor;
     private final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor;
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public PathParamSecurityFilter(Function<HttpServletRequest, Optional<String>> userIdExtractor,
-                                   Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
-                                   SecurityUtils securityUtils) {
+    public V1EndpointsPathParamSecurityFilter(Function<HttpServletRequest, Optional<String>> userIdExtractor,
+                                              Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
+                                              SecurityUtils securityUtils) {
         this.userIdExtractor = userIdExtractor;
         this.authorizedRolesExtractor = authorizedRolesExtractor;
         this.securityUtils = securityUtils;

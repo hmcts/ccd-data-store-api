@@ -212,6 +212,7 @@ dependencies {
     compile "org.springframework.security:spring-security-config"
     compile "org.springframework.boot:spring-boot-starter-oauth2-client"
     compile "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '7.9'
     implementation "io.github.openfeign:feign-httpclient:10.7.0"
     
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
