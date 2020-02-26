@@ -133,7 +133,9 @@ public class CompoundAccessControlService {
         if (correspondingNewNode.isPresent()) {
             JsonNode newNode = correspondingNewNode.get();
             for (CaseField field : caseField.getFieldType().getCollectionFieldType().getComplexFields()) {
-                if (field.isCompoundFieldType() && existingNode.get(VALUE) != null && existingNode.get(VALUE).get(field.getId()) != null
+                if (field.isCompoundFieldType()
+                    && existingNode.get(VALUE) != null && existingNode.get(VALUE).get(field.getId()) != null
+                    && newNode.get(VALUE) != null && newNode.get(VALUE).get(field.getId()) != null
                     && isDeleteDeniedForChildren(existingNode.get(VALUE).get(field.getId()), newNode.get(VALUE).get(field.getId()), field, userRoles)) {
                     currentNodeOrAnyChildNodeDeletedWithoutAccess = true;
                     LOG.info("Simple child {} of {} has been deleted item but no Delete ACL", field.getId(), caseField.getId());
