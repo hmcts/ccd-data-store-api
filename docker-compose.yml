@@ -41,6 +41,7 @@ services:
     environment:
       - DATA_STORE_DB_USERNAME=data_store
       - DATA_STORE_DB_PASSWORD=data_store
+      - POSTGRES_HOST_AUTH_METHOD=trust
     ports:
       - 5452:5432
     volumes:
