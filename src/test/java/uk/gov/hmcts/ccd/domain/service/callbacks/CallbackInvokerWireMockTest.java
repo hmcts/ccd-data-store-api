@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -39,7 +38,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
     {
         "http.client.read.timeout=500"
     })
-@Ignore
 public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 
