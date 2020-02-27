@@ -68,7 +68,7 @@ Feature: F-057: Get the pagination metadata for a case data search for Citizen
     # Enable this after changing it to use Dynamic date instead of a static one
   Scenario: must return pagination metadata successfully for correct Last State Modified State input
 
-  @S-057.02 # Pagination data with Last State Modified Date filter - no results
+  @S-594 # Pagination data with Last State Modified Date filter - no results
   Scenario: must return pagination metadata successfully for correct inputs
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values

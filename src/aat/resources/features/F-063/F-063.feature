@@ -44,7 +44,7 @@ Feature: F-063: Retrieve search input details for dynamic display
     And the response [contains a HTTP 404 Not Found]
     And the response has all other details as expected
 
-   @S-063.01  # test to check search input that includes LAST_STATE_MODIFIED_DATE
+   @S-595  # test to check search input that includes LAST_STATE_MODIFIED_DATE
    Scenario: should retrieve search inputs for dynamic display that includes LAST_STATE_MODIFIED_DATE
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
