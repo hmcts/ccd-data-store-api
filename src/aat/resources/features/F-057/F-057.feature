@@ -63,3 +63,17 @@ Feature: F-057: Get the pagination metadata for a case data search for Citizen
     Then a negative response is received
     And the response [has the 400 return code]
     And the response has all other details as expected
+
+  @S-057.01 @Ignore @RDM-7739 # Pagination data with Last State Modified Date filter - with results
+    # Enable this after changing it to use Dynamic date instead of a static one
+  Scenario: must return pagination metadata successfully for correct Last State Modified State input
+
+  @S-057.02 # Pagination data with Last State Modified Date filter - no results
+  Scenario: must return pagination metadata successfully for correct inputs
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [provides correct inputs]
+    And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [has the 200 return code]
+    And the response has all other details as expected

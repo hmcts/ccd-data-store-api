@@ -41,6 +41,7 @@
       "case_type" : "BEFTA_CASETYPE_2_1",
       "created_on" : "[[ANYTHING_PRESENT]]",
       "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
       "state" : "TODO",
       "security_classification" : "PUBLIC",
       "data" : {
