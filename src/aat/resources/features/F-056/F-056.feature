@@ -52,7 +52,7 @@ Feature: F-056: Submit event creation as a Citizen
     And the response [includes the case detail for the updated case, along with a HTTP 200 OK]
     And the response has all other details as expected
 
-  @S-582
+  @S-584
   Scenario: must update successfully the respective fields with ACL permissions for a Citizen
     Given a user with [an active citizen profile in CCD with update permissions for certain fields but not for others in a given case type]
     And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Citizen_Case_Creation]
