@@ -4,7 +4,7 @@ Feature: F-101: Grant access to case by updating User Roles
   Background:
     Given an appropriate test context as detailed in the test data source
 
-@S-525-1
+@S-525
   Scenario: must return 204 when grant is successful for a user to a valid case ID
     Given a user with [an active solicitor profile in CCD]
     And a user with [another active solicitor profile in CCD]
@@ -17,7 +17,7 @@ Feature: F-101: Grant access to case by updating User Roles
     And the response [has the 204 return code]
     And the response has all other details as expected
 
-@S-525-2
+@S-531
   Scenario: must return 204 when revoke is successful for a user to a valid case ID
     Given a user with [an active solicitor profile in CCD]
     And a user with [another active solicitor profile in CCD]
