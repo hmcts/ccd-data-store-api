@@ -44,8 +44,8 @@ Feature: F-057: Get the pagination metadata for a case data search for Citizen
     And the response [has the 403 return code]
     And the response has all other details as expected
 
-  @S-521
-  Scenario: must return appropriate negative response when casefields do not start with “case.”
+  @S-542
+  Scenario: must return appropriate negative response when casefield does not start with “case.”
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide a valid case-field which starts with “case.”]
@@ -54,8 +54,8 @@ Feature: F-057: Get the pagination metadata for a case data search for Citizen
     And the response [has the 400 return code]
     And the response has all other details as expected
 
-  @S-522
-  Scenario: must return appropriate negative response when request does not provide a invalid security classification
+  @S-543
+  Scenario: must return appropriate negative response when request provides an invalid security classification
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide a valid security classification]
