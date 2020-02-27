@@ -23,7 +23,7 @@ Feature: F-101: Grant access to case by updating User Roles
     And a user with [another active solicitor profile in CCD]
     And a successful call [to create a token for case creation] as in [F101_GetToken]
     And another successful call [to create a full case for solicitor] as in [F101_Case_Data_Solicitor]
-    And another successful call [to grant access to a case] as in [S-525-2-Grant]
+    And another successful call [to grant access to a case] as in [S-531-Grant]
     When a request is prepared with appropriate values
     And the request [uses the first solicitor to call the api and the second one to be granted access to the case just created]
     And it is submitted to call the [Revoke access to a case] operation of [CCD Data Store]
