@@ -53,7 +53,7 @@ Feature: F-026: Get case data with UI layout
     And the response [has an HTTP-412 return code]
     And the response has all other details as expected
 
-  @S-026.01 @RDM-7793 # Get cases with Last State Modified Date field as a column
+  @S-587 @RDM-7793 # Get cases with Last State Modified Date field as a column
     # Also update this with data ordering when FW support is available
   Scenario: must return the list of cases and status code 200 for correct inputs
     Given a user with [an active profile in CCD]
@@ -64,7 +64,7 @@ Feature: F-026: Get case data with UI layout
     And the response [contains Last State Modified Date as a column for UI layout]
     And the response has all other details as expected.
 
-  @S-026.02 @Ignore @RDM-7739 @RDM-7793 #Get cases list from Last State Modified Date filter - when data list 1 or more
+  @S-588 @Ignore @RDM-7739 @RDM-7793 #Get cases list from Last State Modified Date filter - when data list 1 or more
   # Enable this after changing it to use Dynamic date instead of a static one
   # Also update this with data ordering when FW support is available
   Scenario: must return the list of cases and status code 200 for correct inputs
@@ -79,7 +79,7 @@ Feature: F-026: Get case data with UI layout
     And the response [contains atleast one result item]
     And the response has all other details as expected.
 
-  @S-026.03  #Get cases list from Last State Modified Date filter - when data list empty
+  @S-589  #Get cases list from Last State Modified Date filter - when data list empty
   Scenario: must return the list of cases and status code 200 for correct inputs
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values,

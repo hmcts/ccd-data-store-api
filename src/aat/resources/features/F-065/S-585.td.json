@@ -1,20 +1,20 @@
 {
-  "title": "must return the case view having only the respective fields with READ access when case is created by a less privileged Solicitor",
+  "title": "Must return the case view with only the respective fields with READ access for Solicitors",
   "_extends_": "F-065_Test_Data_Base",
-  "_guid_": "S-581",
+  "_guid_": "S-585",
   "specs": [
     "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
     "another active Solicitor profile with different variation of ACLs on the same case type",
-    "is prepared on behalf of the user creating the case above",
-    "contains values for all fields under the case type for Solicitor 1"
+    "is prepared on behalf of the privileged user creating the case above",
+    "contains values for all fields under the case type for Solicitor 2"
   ],
   "user": {
-    "username": "befta.caseworker.2.solicitor.1@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+    "username": "befta.caseworker.2.solicitor.2@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
   },
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
     }
   },
   "expectedResponse": {

@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-582_Update_Case_For_Citizen_Data_Base",
+  "_guid_": "S-584_Update_Case_For_Citizen_Data_Base",
   "productName": "CCD Data Store",
   "operationName": "Submit event creation as a Citizen",
   "method": "POST",
@@ -30,7 +30,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][childContexts][S-582-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][childContexts][S-584-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}",
       "ignore_warning": false
     }
   },

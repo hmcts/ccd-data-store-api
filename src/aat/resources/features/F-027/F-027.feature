@@ -54,7 +54,7 @@ Feature: F-027: Fetch a case for display for Case Worker
     And the response [has the 403 return code]
     And the response has all other details as expected
 
-  @S-027.01
+  @S-590
   Scenario: must return status 200 along with the case-view object successfully
     Given a user with [an active profile in CCD]
     And a successful call [to create a token for case creation] as in [S-027.01_GetToken]

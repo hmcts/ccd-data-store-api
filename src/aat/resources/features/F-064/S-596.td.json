@@ -1,32 +1,28 @@
 {
-  "title": "should retrieve search inputs for dynamic display",
-
-  "_guid_": "S-063.01",
-  "_extends_": "F-063_Base_Test_Data",
-
-  "specs": [
-    "an active profile in CCD",
-    "contains a valid case type",
-    "contains the correct search inputs for the given case type, along with an HTTP 200 OK",
-    "body has LAST_STATE_MODIFIED_DATE as one of the items"
-  ],
+  "_guid_": "S-596",
+  "_extends_": "F-064_Test_Data_Base",
+  "title": "must retrieve workbasket input details for dynamic display successfully",
+	"specs": [
+		"an active profile in CCD",
+		"code is HTTP-200 OK",
+    "body contrains LAST_STATE_MODIFIED_DATE field as one of input fields"
+	],
   "user": {
-      "username": "befta.caseworker.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+    "username": "befta.caseworker.3@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
   },
   "request": {
     "pathVariables": {
       "ctid": "BEFTA_CASETYPE_3_4"
     }
   },
-  "expectedResponse": {
+	"expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-search-input-details.v2+json;charset=UTF-8",
       "Content-Encoding" : "[[ANYTHING_PRESENT]]"
     },
     "body" : {
-      "searchInputs" : [ {
+      "workbasketInputs" : [ {
         "label" : "Search `Text` field",
         "order" : 1,
         "field" : {
@@ -69,5 +65,5 @@
         }
       }
     }
-  }
+	}
 }
