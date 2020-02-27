@@ -50,6 +50,7 @@ import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.hamcrest.core.Every.everyItem;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -646,6 +647,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
         assertEquals("state3", savedCaseDetails.getState());
+        assertNotNull(savedCaseDetails.getLastStateModifiedDate());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
@@ -1355,6 +1357,76 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
         JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldUpdateLastStateModifiedTimeWhenAnEventTriggeredStateTransition() throws Exception {
+
+        final String CASE_REFERENCE = "1504259907353545";
+        final String SUMMARY = "Case event summary";
+        final String DESCRIPTION = "Case event description";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
+        event.setEventId(PRE_STATES_EVENT_ID);
+        event.setSummary(SUMMARY);
+        event.setDescription(DESCRIPTION);
+        caseDetailsToSave.setEvent(event);
+
+        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = " + CASE_REFERENCE, this::mapCaseData);
+        assertEquals("CaseCreated", initialCaseDetails.getState());
+        assertNotNull(initialCaseDetails.getLastStateModifiedDate());
+
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = " + CASE_REFERENCE, this::mapCaseData);
+        assertNotNull(updatedCaseDetails);
+        assertEquals("state4", updatedCaseDetails.getState());
+        assertNotEquals(initialCaseDetails.getLastStateModifiedDate(), updatedCaseDetails.getLastStateModifiedDate());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldNotUpdateLastStateModifiedTimeWhenAnEventNotTriggeredStateTransition() throws Exception {
+
+        final String caseTypeUrlPortion = "bookcase-default-post-state";
+        final String caseReference = "1557845948403939";
+        final String summary = "Case event summary";
+        final String description = "Case event description";
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
+            + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
+        event.setEventId(TEST_EVENT_ID);
+        event.setSummary(summary);
+        event.setDescription(description);
+
+        final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+        caseDetailsToSave.setEvent(event);
+
+        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = " + caseReference, this::mapCaseData);
+        assertEquals("CaseCreated", initialCaseDetails.getState());
+        assertNotNull(initialCaseDetails.getLastStateModifiedDate());
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = " + caseReference, this::mapCaseData);
+        assertNotNull(updatedCaseDetails);
+        assertEquals("CaseCreated", updatedCaseDetails.getState());
+        assertEquals(initialCaseDetails.getLastStateModifiedDate(), updatedCaseDetails.getLastStateModifiedDate());
     }
 
     @Test
