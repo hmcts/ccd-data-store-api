@@ -30,7 +30,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][childContexts][S-582-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][childContexts][S-584-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}",
       "ignore_warning": false
     }
   },

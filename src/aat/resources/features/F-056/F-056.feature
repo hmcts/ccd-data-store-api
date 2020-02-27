@@ -57,15 +57,15 @@ Feature: F-056: Submit event creation as a Citizen
     Given a user with [an active citizen profile in CCD with update permissions for certain fields but not for others in a given case type]
     And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Citizen_Case_Creation]
     And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data]
-    And another successful call [to get an update event token for the case just created] as in [S-582-Prerequisite_Citizen_Token_For_Update_Case]
+    And another successful call [to get an update event token for the case just created] as in [S-584-Prerequisite_Citizen_Token_For_Update_Case]
     When a request is prepared with appropriate values
     And the request [is made to update the document metadata in DocumentField2, which the user has update permissions for]
     And it is submitted to call the [Submit event creation as a Citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response [contains updated values for DocumentField2]
     And the response has all other details as expected
-    And another successful call [to get an update event token for the case just created] as in [S-582-Prerequisite_Citizen_Token_For_Update_Case]
-    And a call [to update the values for DocumentField4 from the same case, which the user does not have update permissions for] will get the expected response as in [S-582_Later_Case_Update_By_Citizen]
+    And another successful call [to get an update event token for the case just created] as in [S-584-Prerequisite_Citizen_Token_For_Update_Case]
+    And a call [to update the values for DocumentField4 from the same case, which the user does not have update permissions for] will get the expected response as in [S-584_Later_Case_Update_By_Citizen]
 
 
 

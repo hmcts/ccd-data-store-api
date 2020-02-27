@@ -21,7 +21,7 @@
           "document_filename" : "Screenshot 2019-11-14 at 1.57.32 pm.png --> updated by Citizen who doesn't have Update permission"
         }
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][S-582-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-584-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}"
     }
   },
   "expectedResponse": {
