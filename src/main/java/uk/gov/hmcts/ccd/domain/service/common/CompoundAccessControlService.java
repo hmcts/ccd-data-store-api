@@ -24,8 +24,6 @@ import org.springframework.stereotype.Service;
 public class CompoundAccessControlService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompoundAccessControlService.class);
-    public static final String A_CHILD_HAS_DATA_DELETED_WITHOUT_DELETE_ACL = "A child {} item has been deleted but no Delete ACL";
-    public static final String A_CHILD_OF_HAS_DATA_DELETED_WITHOUT_DELETE_ACL = "A child {} of {} has been deleted but no Delete ACL";
     public static final String A_CHILD_OF_HAS_DATA_UPDATE_WITHOUT_UPDATE_ACL = "A child {} of {} has data update without Update ACL";
     public static final String SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL = "Simple child {} of {} has data update but no Update ACL";
 
@@ -107,56 +105,48 @@ public class CompoundAccessControlService {
         if (caseField.isCollectionFieldType() && existingData.size() > 0) {
             deleteDenied = StreamSupport
                 .stream(existingData.spliterator(), false)
-                .anyMatch(existingNode -> isCurrentCollectionNodeOrAnyChildNodeDeletedWithoutAccess(newData, caseField, userRoles, existingNode));
+                .anyMatch(existingNode -> isCurrentNodeOrAnyChildNodeDeletedWithoutAccess(newData, caseField, userRoles, existingNode));
         } else {
-            deleteDenied = isCurrentComplexNodeOrAnyChildNodeDeletedWithoutAccess(existingData, newData, caseField, userRoles);
+            deleteDenied = isAnyChildOfComplexNodeDeletedWithoutAccess(existingData, newData, caseField, userRoles);
         }
         return deleteDenied;
     }
 
-    private boolean isCurrentComplexNodeOrAnyChildNodeDeletedWithoutAccess(final JsonNode existingData, final JsonNode newData, final CaseField caseField, final Set<String> userRoles) {
-        boolean currentComplexNodeOrAnyChildNodeDeletedWithoutAccess = false;
-        if (newData != null) {
-            if (existingData.isObject() && existingData.size() > 0 && newData.isObject() && newData.size() > 0) {
-                for (CaseField field : caseField.getFieldType().getComplexFields()) {
-                    if (field.isCompoundFieldType() && existingData.get(field.getId()) != null && newData.get(field.getId()) != null
-                        && isDeleteDeniedForChildren(existingData.get(field.getId()), newData.get(field.getId()), field, userRoles)) {
-                        currentComplexNodeOrAnyChildNodeDeletedWithoutAccess = true;
-                        LOG.info(A_CHILD_OF_HAS_DATA_DELETED_WITHOUT_DELETE_ACL, field.getId(), caseField.getId());
-                        break;
-                    }
+    private boolean isAnyChildOfComplexNodeDeletedWithoutAccess(final JsonNode existingData, final JsonNode newData, final CaseField caseField, final Set<String> userRoles) {
+        boolean deleteDeniedForAnyChildNode = false;
+        if (existingData.isObject() && existingData.size() > 0 && newData.isObject() && newData.size() > 0) {
+            for (CaseField field : caseField.getFieldType().getComplexFields()) {
+                if (field.isCompoundFieldType() && existingData.get(field.getId()) != null && newData.get(field.getId()) != null
+                    && isDeleteDeniedForChildren(existingData.get(field.getId()), newData.get(field.getId()), field, userRoles)) {
+                    deleteDeniedForAnyChildNode = true;
+                    LOG.info(A_CHILD_OF_HAS_DATA_UPDATE_WITHOUT_UPDATE_ACL, field.getId(), caseField.getId());
+                    break;
                 }
             }
-        } else {
-            if (!hasAccessControlList(userRoles, CAN_DELETE, caseField.getAccessControlLists())) {
-                LOG.info(A_CHILD_HAS_DATA_DELETED_WITHOUT_DELETE_ACL, caseField.getId());
-                currentComplexNodeOrAnyChildNodeDeletedWithoutAccess = true;
-            }
         }
-        return currentComplexNodeOrAnyChildNodeDeletedWithoutAccess;
+        return deleteDeniedForAnyChildNode;
     }
 
-    private boolean isCurrentCollectionNodeOrAnyChildNodeDeletedWithoutAccess(final JsonNode newData, final CaseField caseField, final Set<String> userRoles, final JsonNode existingNode) {
-        boolean currentCollectionNodeOrAnyChildNodeDeletedWithoutAccess = false;
+    private boolean isCurrentNodeOrAnyChildNodeDeletedWithoutAccess(final JsonNode newData, final CaseField caseField, final Set<String> userRoles, final JsonNode existingNode) {
+        boolean currentNodeOrAnyChildNodeDeletedWithoutAccess = false;
         Optional<JsonNode> correspondingNewNode = findCorrespondingNode(newData, existingNode.get("id"));
         if (correspondingNewNode.isPresent()) {
             JsonNode newNode = correspondingNewNode.get();
             for (CaseField field : caseField.getFieldType().getCollectionFieldType().getComplexFields()) {
-                if (field.isCompoundFieldType()
-                    && existingNode.get(VALUE) != null && existingNode.get(VALUE).get(field.getId()) != null
+                if (field.isCompoundFieldType() && existingNode.get(VALUE) != null && existingNode.get(VALUE).get(field.getId()) != null
                     && isDeleteDeniedForChildren(existingNode.get(VALUE).get(field.getId()), newNode.get(VALUE).get(field.getId()), field, userRoles)) {
-                    currentCollectionNodeOrAnyChildNodeDeletedWithoutAccess = true;
-                    LOG.info(A_CHILD_OF_HAS_DATA_DELETED_WITHOUT_DELETE_ACL, field.getId(), caseField.getId());
+                    currentNodeOrAnyChildNodeDeletedWithoutAccess = true;
+                    LOG.info("Simple child {} of {} has been deleted item but no Delete ACL", field.getId(), caseField.getId());
                     break;
                 }
             }
         } else {
             if (!hasAccessControlList(userRoles, CAN_DELETE, caseField.getAccessControlLists())) {
-                LOG.info(A_CHILD_HAS_DATA_DELETED_WITHOUT_DELETE_ACL, caseField.getId());
-                currentCollectionNodeOrAnyChildNodeDeletedWithoutAccess = true;
+                LOG.info("A child {} item has been deleted item but no Delete ACL", caseField.getId());
+                currentNodeOrAnyChildNodeDeletedWithoutAccess = true;
             }
         }
-        return currentCollectionNodeOrAnyChildNodeDeletedWithoutAccess;
+        return currentNodeOrAnyChildNodeDeletedWithoutAccess;
     }
 
     private boolean itemUpdatedAndHasUpdateAccess(JsonNode existingData, JsonNode newData, CaseField caseField, Set<String> userRoles) {
