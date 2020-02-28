@@ -651,7 +651,8 @@ class CallbackInvokerTest {
                         callbackResponse), eq(caseDetails), eq(allFieldsDataClassification)),
                     () -> assertThat(argumentDataClassification.getAllValues(),
                         contains(currentDataClassification, Maps.newHashMap())),
-                    () -> assertEquals(callbackResponse.getState(), "toto")
+                    () -> assertEquals(callbackResponse.getState(), "toto"),
+                    () -> assertThat(caseDetails.getData().containsKey("state"), is(false))
                 );
             }
 
