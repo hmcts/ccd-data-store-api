@@ -1,5 +1,5 @@
 {
-	"_guid_": "S-048.01",
+	"_guid_": "S-592",
 	"_extends_": "Base_Expecting_200",
 	"title": "must return pagination metadata successfully for correct inputs",
 

@@ -62,7 +62,7 @@ Feature: F-048: Get the pagination metadata for a case data search for Case Work
     And the response [contains an error message : unknown security classification]
     And the response has all the details as expected
 
-  @S-048.01 @Ignore @RDM-7739 # Pagination data with Last State Modified Date filter - with results
+  @S-592 @Ignore @RDM-7739 # Pagination data with Last State Modified Date filter - with results
     # Enable this after changing it to use Dynamic date instead of a static one
   Scenario: must return pagination metadata successfully for correct Last State Modified State input
     Given a user with [a detailed profile in CCD]
@@ -75,7 +75,7 @@ Feature: F-048: Get the pagination metadata for a case data search for Case Work
     And the response [returns the pagination metadata]
     And the response has all the details as expected
 
-  @S-048.02  # Pagination data with Last State Modified Date filter - no results
+  @S-593  # Pagination data with Last State Modified Date filter - no results
   Scenario: must return pagination metadata successfully for correct Last State Modified State input
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values

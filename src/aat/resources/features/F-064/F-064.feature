@@ -59,7 +59,7 @@ Feature: F-064: Retrieve workbasket input details for dynamic display
     And the response [code is HTTP-400]
     And the response has all the details as expected
 
-  @S-064.01
+  @S-596
   Scenario: must retrieve workbasket input details for dynamic display successfully
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values

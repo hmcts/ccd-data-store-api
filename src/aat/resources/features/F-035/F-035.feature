@@ -56,7 +56,7 @@ Feature: F-035: Retrieve a case by id
     And the response [contains an HTTP-404 Not Found]
     And the response has all other details as expected
 
- @S-035.01
+ @S-591
   Scenario: must return status 200 along with the case-view object successfully
     Given a user with [an active profile in CCD]
     And a successful call [to create a token for case creation] as in [S-035.01_GetToken]
