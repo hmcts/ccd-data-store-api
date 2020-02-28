@@ -46,6 +46,7 @@
         "case_type_id" : "BEFTA_CASETYPE_1_1",
         "created_date" : null,
         "last_modified" : null,
+        "last_state_modified_date" : null,
         "security_classification" : null,
         "case_data" : { },
         "data_classification" : { },

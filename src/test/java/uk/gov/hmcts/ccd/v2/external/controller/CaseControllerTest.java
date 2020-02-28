@@ -159,11 +159,15 @@ class CaseControllerTest {
         @Test
         @DisplayName("should return 201 when case created")
         void caseEventCreated() {
+            LocalDateTime stateModified = LocalDateTime.now();
+            when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
+
             final ResponseEntity<CaseResource> response = caseController.createCase(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
-                () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE))
+                () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE)),
+                () -> assertThat(response.getBody().getLastStateModifiedOn(), is(stateModified))
             );
         }
 

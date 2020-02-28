@@ -15,6 +15,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
@@ -160,6 +161,7 @@ public class QueryEndpoint {
         metadata.setCaseReference(param(params, CASE_REFERENCE.getParameterName()));
         metadata.setCreatedDate(param(params, CREATED_DATE.getParameterName()));
         metadata.setLastModified(param(params, LAST_MODIFIED_DATE.getParameterName()));
+        metadata.setLastStateModifiedDate(param(params, LAST_STATE_MODIFIED_DATE.getParameterName()));
         metadata.setSecurityClassification(param(params, SECURITY_CLASSIFICATION.getParameterName()));
         metadata.setPage(param(params, PAGE_PARAM));
         metadata.setSortDirection(param(params, SORT_PARAM));
