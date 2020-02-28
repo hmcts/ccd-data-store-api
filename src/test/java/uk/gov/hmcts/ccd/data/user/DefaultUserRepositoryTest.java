@@ -48,7 +48,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -358,14 +357,6 @@ class DefaultUserRepositoryTest {
             IdamUser result = userRepository.getUser();
 
             assertThat(result.getId(), is(userId));
-        }
-
-        @Test
-        @DisplayName("should throw exception when rest call fails")
-        void shouldThrowExceptionWhenRestCallFails() {
-            doThrow(new RestClientException("Error")).when(securityUtils).getUserInfo();
-
-            assertThrows(ServiceException.class, () -> userRepository.getUser());
         }
     }
 

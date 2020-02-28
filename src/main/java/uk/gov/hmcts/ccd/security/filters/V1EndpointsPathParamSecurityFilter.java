@@ -45,7 +45,7 @@ public class V1EndpointsPathParamSecurityFilter extends OncePerRequestFilter {
         Collection<String> authorizedRoles = authorizedRolesExtractor.apply(request);
         Optional<String> userIdOptional = userIdExtractor.apply(request);
 
-        if (!authorizedRoles.isEmpty() || userIdOptional.isPresent()) {
+        if (securityUtils.isAuthenticated() && (!authorizedRoles.isEmpty() || userIdOptional.isPresent())) {
             try {
                 verifyRoleAndUserId(authorizedRoles, userIdOptional);
             } catch (UnauthorizedException ex) {

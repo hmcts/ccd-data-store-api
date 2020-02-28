@@ -42,6 +42,8 @@ public class V1EndpointsPathParamSecurityFilterTest {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         filterChain = new MockFilterChain();
+
+        given(securityUtils.isAuthenticated()).willReturn(true);
     }
 
     @Test

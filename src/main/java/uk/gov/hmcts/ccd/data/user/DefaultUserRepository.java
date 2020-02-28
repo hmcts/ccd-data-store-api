@@ -19,14 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -72,21 +70,13 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public IDAMProperties getUserDetails() {
         UserInfo userInfo = securityUtils.getUserInfo();
-        IDAMProperties idamProperties = toIdamProperties(userInfo);
-        return idamProperties;
+        return  toIdamProperties(userInfo);
     }
 
     @Override
-    // TODO: we should remove this cache as IdamRepository doing same.
-    @Cacheable(value = "userCache", key = "@securityUtils.getUserToken()")
     public IdamUser getUser() {
-        try {
-            UserInfo userInfo = securityUtils.getUserInfo();
-            return toIdamUser(userInfo);
-        } catch (RestClientException e) {
-            LOG.error("Failed to retrieve user", e);
-            throw new ServiceException("Problem retrieving user from IDAM: " + securityUtils.getUserSubject());
-        }
+        UserInfo userInfo = securityUtils.getUserInfo();
+        return toIdamUser(userInfo);
     }
 
     @Override

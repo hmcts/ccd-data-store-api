@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,6 +59,10 @@ public class SecurityUtils {
     public String getUserSubject() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return jwt.getSubject();
+    }
+
+    public boolean isAuthenticated() {
+        return Objects.nonNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
     private String getUserBearerToken() {
