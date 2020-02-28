@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-582_Get_Case_For_Case_Worker_Data_Base",
+  "_guid_": "S-584_Get_Case_For_Case_Worker_Data_Base",
   "productName": "CCD Data Store",
   "operationName": "Get Case for Citizen",
   "method": "GET",
@@ -31,6 +31,7 @@
         "state": "TODO",
         "version": "[[ANYTHING_PRESENT]]",
         "case_type_id": "BEFTA_CASETYPE_2_1",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
         "created_date": "[[ANYTHING_PRESENT]]",
         "last_modified": "[[ANYTHING_PRESENT]]",
         "security_classification": "PUBLIC",

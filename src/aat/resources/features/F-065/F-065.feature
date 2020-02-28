@@ -69,8 +69,8 @@
       And the response [has an HTTP-401 Unauthorized]
       And the response has all other details as expected
 
-    @S-580
-    Scenario: Must return the case view with only the respective fields with READ access for Solicitors
+    @S-585
+    Scenario: must return the case view with only the respective fields with READ access for Solicitors
       Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
       And a user with [another active Solicitor profile with different variation of ACLs on the same case type]
       And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
@@ -84,7 +84,7 @@
       And a call [to get the same case by Solicitor 1] will get the expected response as in [F-065_Later_Case_Read_By_Solicitor_1]
       And a call [to get the same case by Solicitor 3] will get the expected response as in [F-065_Later_Case_Read_By_Solicitor_3]
 
-    @S-581
+    @S-586
     Scenario: must return the case view having only the respective fields with READ access when case is created by a less privileged Solicitor
       Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
       And a user with [another active Solicitor profile with different variation of ACLs on the same case type]

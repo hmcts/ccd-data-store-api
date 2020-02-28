@@ -1,7 +1,7 @@
 {
   "title": "must update successfully the respective fields with ACL permissions for a Citizen",
-  "_extends_": "S-582_Update_Case_For_Citizen_Data_Base",
-  "_guid_": "S-582",
+  "_extends_": "S-584_Update_Case_For_Citizen_Data_Base",
+  "_guid_": "S-584",
   "specs": [
     "an active citizen profile in CCD with update permissions for certain fields but not for others in a given case type",
     "is made to update the document metadata in DocumentField2, which the user has update permissions for",
@@ -15,8 +15,8 @@
     "body": {
       "data": {
         "DocumentField2": {
-          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
           "document_filename": "Elastic Search test Case.png --> updated by Citizen"
         }
       }
@@ -37,20 +37,21 @@
       "state": "TODO",
       "version": "[[ANYTHING_PRESENT]]",
       "case_type_id": "BEFTA_CASETYPE_2_1",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "created_date": "[[ANYTHING_PRESENT]]",
       "last_modified": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
         "_extends_": "Befta_Citizen_Case_Data",
         "DocumentField2": {
-          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
           "document_filename": "Elastic Search test Case.png --> updated by Citizen"
         },
         "DocumentField4": {
-          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
           "document_filename": "Screenshot 2019-11-14 at 1.57.32 pm.png",
-          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary"
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary"
         }
       },
       "data_classification": {
