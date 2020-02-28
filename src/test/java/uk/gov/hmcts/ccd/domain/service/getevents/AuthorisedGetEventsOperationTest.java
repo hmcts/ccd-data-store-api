@@ -104,7 +104,7 @@ class AuthorisedGetEventsOperationTest {
         doReturn(classifiedEvents).when(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
         doReturn(classifiedEvents).when(getEventsOperation).getEvents(CASE_REFERENCE);
         doReturn(Lists.newArrayList()).when(getEventsOperation).getEvents(CASE_REFERENCE_INVALID);
-        doReturn(null).when(getEventsOperation).getEvents(CASE_REFERENCE_INVALID_NULL);
+        doReturn(Lists.newArrayList()).when(getEventsOperation).getEvents(CASE_REFERENCE_INVALID_NULL);
 
         authorisedEvents = newArrayList(new AuditEvent());
 
