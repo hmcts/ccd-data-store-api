@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
-import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class CaseFieldPostProcessor implements CaseFieldProcessor {
@@ -24,28 +24,48 @@ public class CaseFieldPostProcessor implements CaseFieldProcessor {
         this.dateTimeFormatParser = dateTimeFormatParser;
     }
 
-    public void process(Map<String, JsonNode> data, List<CaseEventField> caseEventFields) {
+    public void process(Map<String, JsonNode> data, List<CaseEventField> caseEventFields, CaseType caseType) {
+        List<CaseField> caseFields = caseType.getCaseFields();
+
         caseEventFields.forEach(f -> {
             if (f.getDisplayContext() == DisplayContext.COMPLEX.name()) {
                 f.getCaseEventFieldComplex();
                 // TODO: Recurse
             }
-
             String displayContextParameter = f.getDisplayContextParameter();
+
             if (!Strings.isNullOrEmpty(displayContextParameter) && isDateTimeDisplayContextParameter(displayContextParameter)) {
-                // TODO: Get the display context parameter value
-                JsonNode node = data.get(f.getCaseFieldId());
-                String value = node.textValue();
+                Optional<DisplayContextParameter> param = DisplayContextParameterType.getDisplayContextParameterFor(f.getDisplayContextParameter());
 
-                try {
-                    dateTimeFormatParser.parseDateTimeFormat(displayContextParameter, value);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                Optional<CaseField> field = caseType.getCaseField(f.getCaseFieldId());
+                field.ifPresent(f2 -> {
+                    // TODO: Handle error when parsing - show expected format
+                    if (f2.getFieldType().getType().equals(FieldType.DATETIME)) {
+                        JsonNode node = data.get(f.getCaseFieldId());
+                        String value = node.textValue();
 
-                // TODO: Confirm defaults are set/correct
-                TextNode newNode = new TextNode(dateTimeFormatParser.convertDateTimeToIso8601(displayContextParameter, value));
-                data.replace(f.getCaseFieldId(), newNode);
+                        try {
+                            dateTimeFormatParser.parseDateTimeFormat(param.get().getValue(), value);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        TextNode newNode = new TextNode(dateTimeFormatParser.convertDateTimeToIso8601(param.get().getValue(), value));
+                        data.replace(f.getCaseFieldId(), newNode);
+                    } else if (f2.getFieldType().getType().equals(FieldType.DATE)) {
+                        JsonNode node = data.get(f.getCaseFieldId());
+                        String value = node.textValue();
+
+                        try {
+                            dateTimeFormatParser.parseDateTimeFormat(param.get().getValue(), value);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        TextNode newNode = new TextNode(dateTimeFormatParser.convertDateToIso8601(param.get().getValue(), value));
+                        data.replace(f.getCaseFieldId(), newNode);
+                    }
+                });
             }
         });
     }

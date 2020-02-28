@@ -26,6 +26,8 @@ public class FieldType implements Serializable {
     public static final String PREDEFINED_COMPLEX_ADDRESS_UK = "AddressUK";
     public static final String PREDEFINED_COMPLEX_ORDER_SUMMARY = "OrderSummary";
     public static final String PREDEFINED_COMPLEX_CASELINK = "CaseLink";
+    public static final String DATETIME = "DateTime";
+    public static final String DATE = "Date";
 
     private String id = null;
     private String type = null;

@@ -107,11 +107,9 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         eventTokenService.validateToken(token, userRepository.getUserId(), eventTrigger, caseType.getJurisdiction(), caseType);
 
         Map<String, JsonNode> data = caseDataContent.getData();
-        validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
-
         List<CaseEventField> caseEventFields = eventTrigger.getCaseFields();
-        
-        caseFieldProcessor.process(data, caseEventFields);
+        caseFieldProcessor.process(data, caseEventFields, caseType);
+        validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 
         final CaseDetails newCaseDetails = new CaseDetails();
 
