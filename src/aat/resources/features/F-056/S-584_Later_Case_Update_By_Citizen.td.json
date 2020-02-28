@@ -1,7 +1,7 @@
 {
   "title": "Update the case by Citizen",
-  "_extends_": "S-582_Update_Case_For_Citizen_Data_Base",
-  "_guid_": "S-582_Later_Case_Update_By_Citizen",
+  "_extends_": "S-584_Update_Case_For_Citizen_Data_Base",
+  "_guid_": "S-584_Later_Case_Update_By_Citizen",
   "specs": [
     "to update the values for DocumentField4 from the same case, which the user does not have update permissions for"
   ],
@@ -21,7 +21,7 @@
           "document_filename" : "Screenshot 2019-11-14 at 1.57.32 pm.png --> updated by Citizen who doesn't have Update permission"
         }
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][S-582-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-584-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}"
     }
   },
   "expectedResponse": {
