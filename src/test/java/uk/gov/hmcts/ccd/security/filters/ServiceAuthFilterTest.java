@@ -47,7 +47,7 @@ public class ServiceAuthFilterTest {
 
         serviceAuthFilter.doFilterInternal(request, response, filterChain);
 
-        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(response.getStatus()).isEqualTo(403);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class ServiceAuthFilterTest {
 
         serviceAuthFilter.doFilterInternal(request, response, filterChain);
 
-        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(response.getStatus()).isEqualTo(403);
     }
 
     @Test

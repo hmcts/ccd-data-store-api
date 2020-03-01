@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import uk.gov.hmcts.ccd.security.JwtAuthorityExtractor;
 import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
 import uk.gov.hmcts.ccd.security.filters.ServiceAuthFilter;
@@ -70,14 +71,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .formLogin().disable()
             .logout().disable()
             .exceptionHandling()
-            .accessDeniedHandler((request, response, exc) -> response.sendError(HttpServletResponse.SC_FORBIDDEN))
-            .authenticationEntryPoint((request, response, exc) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
             .and()
             .authorizeRequests()
+            .antMatchers("/error").permitAll()
             .anyRequest()
             .authenticated()
             .and()
             .oauth2ResourceServer()
+            .accessDeniedHandler((request, response, exc) -> response.sendError(HttpServletResponse.SC_FORBIDDEN))
+            .authenticationEntryPoint(new Http403ForbiddenEntryPoint())
             .jwt()
             .jwtAuthenticationConverter(jwtAuthorityExtractor)
             .and()
