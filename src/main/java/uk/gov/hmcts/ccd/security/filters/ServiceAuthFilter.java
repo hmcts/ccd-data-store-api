@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.security.filters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import uk.gov.hmcts.ccd.security.exception.UnauthorizedException;
 import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
