@@ -50,7 +50,7 @@ public class V1EndpointsPathParamSecurityFilter extends OncePerRequestFilter {
                 verifyRoleAndUserId(authorizedRoles, userIdOptional);
             } catch (UnauthorizedException ex) {
                 LOG.warn("Unauthorised roles or userId in the request path", ex);
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.sendError(HttpStatus.FORBIDDEN.value(), "Access Denied");
                 return;
             }
         }
