@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.callbacks;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -106,12 +107,10 @@ public class CallbackResponse {
     }
 
     public void updateCallbackStateBasedOnPriority() {
-        if ((this.getState() == null || this.getState().isEmpty())
-            && this.getData() != null) {
-
-            final Optional<String> newCaseState = filterCaseState(this.getData());
-            if (newCaseState.isPresent()) {
-                this.setState(newCaseState.get());
+        if (this.getData() != null) {
+            final Optional<String> dataCaseState = filterCaseState(this.getData());
+            if (Strings.isNullOrEmpty(this.getState()) && dataCaseState.isPresent()) {
+                this.setState(dataCaseState.get());
             }
         }
     }

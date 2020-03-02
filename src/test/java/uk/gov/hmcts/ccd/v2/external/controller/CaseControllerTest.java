@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.google.common.collect.Lists;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
@@ -22,13 +24,16 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 @DisplayName("CaseController")
@@ -51,6 +56,9 @@ class CaseControllerTest {
     @Mock
     private CaseDetails caseDetails;
 
+    @Mock
+    private GetEventsOperation getEventsOperation;
+
     @InjectMocks
     private CaseController caseController;
 
@@ -64,6 +72,8 @@ class CaseControllerTest {
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseDetails));
         when(createEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT)).thenReturn(caseDetails);
         when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING)).thenReturn(caseDetails);
+        List<AuditEvent> auditEvents = Lists.newArrayList(new AuditEvent(), new AuditEvent());
+        when(getEventsOperation.getEvents(CASE_REFERENCE)).thenReturn(auditEvents);
     }
 
     @Nested
@@ -169,6 +179,40 @@ class CaseControllerTest {
 
             assertThrows(Exception.class,
                 () -> caseController.createCase(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /cases/{caseId}/events")
+    class GetEventsForCaseId {
+
+        @Test
+        @DisplayName("should return 200 when events found")
+        void caseFound() {
+            final ResponseEntity<CaseEventsResource> response = caseController.getCaseEvents(CASE_REFERENCE);
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getBody().getAuditEvents().size(), is(2))
+            );
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when case reference not valid")
+        void caseReferenceNotValid() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.getCaseEvents(CASE_REFERENCE));
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(getEventsOperation.getEvents(CASE_REFERENCE)).thenThrow(RuntimeException.class);
+
+            assertThrows(Exception.class,
+                () -> caseController.getCaseEvents(CASE_REFERENCE));
         }
     }
 }

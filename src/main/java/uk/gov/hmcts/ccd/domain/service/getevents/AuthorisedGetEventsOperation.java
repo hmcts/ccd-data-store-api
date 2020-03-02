@@ -52,6 +52,11 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     }
 
     @Override
+    public List<AuditEvent> getEvents(String caseReference) {
+        return secureEvents(getEventsOperation.getEvents(caseReference));
+    }
+
+    @Override
     public Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId) {
         return getEventsOperation.getEvent(jurisdiction, caseTypeId, eventId).flatMap(
             event -> secureEvent(caseTypeId, event));
@@ -59,6 +64,13 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
 
     private Optional<AuditEvent> secureEvent(String caseTypeId, AuditEvent event) {
         return secureEvents(caseTypeId, event.getCaseDataId(), singletonList(event)).stream().findFirst();
+    }
+
+    private List<AuditEvent> secureEvents(List<AuditEvent> events) {
+        if (events == null || events.size() == 0) {
+            return Lists.newArrayList();
+        }
+        return secureEvents(events.get(0).getCaseTypeId(), events.get(0).getCaseDataId(),  events);
     }
 
     private List<AuditEvent> secureEvents(String caseTypeId, String caseId, List<AuditEvent> events) {
@@ -73,7 +85,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
 
         Set<String> accessRoles = caseAccessService.getAccessRoles(caseId);
         if (accessRoles == null || accessRoles.isEmpty()) {
-            throw new ValidationException("Cannot find user roles for the user");
+            throw new ValidationException("Cannot find user roles or case roles for the case ID " + caseId);
         }
 
         return verifyReadAccess(events, accessRoles, caseType);
