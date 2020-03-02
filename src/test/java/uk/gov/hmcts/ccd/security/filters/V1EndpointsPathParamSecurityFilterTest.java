@@ -62,7 +62,7 @@ public class V1EndpointsPathParamSecurityFilterTest {
     }
 
     @Test
-    public void shouldReturn401ResponseWhenUserIdIsNotSame() throws Exception {
+    public void shouldReturn403ResponseWhenUserIdIsNotSame() throws Exception {
         UserInfo userInfo = UserInfo.builder()
             .uid("invalidUser")
             .roles(Lists.newArrayList("caseworker-autotest1"))
@@ -73,11 +73,11 @@ public class V1EndpointsPathParamSecurityFilterTest {
 
         filter.doFilterInternal(request, response, filterChain);
 
-        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(response.getStatus()).isEqualTo(403);
     }
 
     @Test
-    public void shouldReturn401ResponseWhenRoleNotMatches() throws Exception {
+    public void shouldReturn403ResponseWhenRoleNotMatches() throws Exception {
         UserInfo userInfo = UserInfo.builder()
             .uid("user123")
             .roles(Lists.newArrayList("caseworker-autotest123"))
@@ -89,11 +89,11 @@ public class V1EndpointsPathParamSecurityFilterTest {
 
         filter.doFilterInternal(request, response, filterChain);
 
-        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(response.getStatus()).isEqualTo(403);
     }
 
     @Test
-    public void shouldReturn401ResponseWhenCitizenPathRequestNotHavingValidRole() throws Exception {
+    public void shouldReturn403ResponseWhenCitizenPathRequestNotHavingValidRole() throws Exception {
         UserInfo userInfo = UserInfo.builder()
             .uid("user123")
             .roles(Lists.newArrayList("caseworker-autotest1"))
@@ -105,6 +105,6 @@ public class V1EndpointsPathParamSecurityFilterTest {
 
         filter.doFilterInternal(request, response, filterChain);
 
-        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(response.getStatus()).isEqualTo(403);
     }
 }
