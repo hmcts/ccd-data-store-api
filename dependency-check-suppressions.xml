@@ -134,4 +134,11 @@
         <cve>CVE-2019-10782</cve>
     </suppress>
 
+    <!-- FIXME : RDM-???? -->
+    <suppress>
+        <notes>Temporary suppression for on-going developments</notes>
+        <cve>CVE-2020-1938</cve>
+        <cve>CVE-2020-8840</cve>
+    </suppress>
+
 </suppressions>
