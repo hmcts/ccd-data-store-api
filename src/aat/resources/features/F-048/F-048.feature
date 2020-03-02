@@ -24,7 +24,7 @@ Feature: F-048: Get the pagination metadata for a case data search for Case Work
     And the response [contains an error message : Unknown sort direction]
     And the response has all the details as expected
 
-  @S-134 @Ignore # re-writing as part of RDM-6847
+  @S-134 @Ignore # re-write as part of RDM-6847
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
@@ -33,7 +33,7 @@ Feature: F-048: Get the pagination metadata for a case data search for Case Work
     Then a negative response is received
     And the response has all the details as expected
 
-  @S-135 @Ignore # re-writing as part of RDM-6847
+  @S-135 @Ignore # re-write as part of RDM-6847
   Scenario: must return negative response when request provides authentic credentials without authorized access to the operation
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
