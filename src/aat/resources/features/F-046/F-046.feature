@@ -36,7 +36,7 @@ Feature: F-046: Revoke access to case
     And the response [has a 401 Unauthorized code]
     And the response has all other details as expected
 
-  @S-225
+  @S-225 @Ignore # re-writing as part of RDM-6847
   Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values

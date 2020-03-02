@@ -15,7 +15,7 @@ Feature: F-028: Fetch an event trigger in the context of a case for Case Worker
     And the response [has the 200 return code]
     And the response has all the details as expected
 
-  @S-045
+  @S-045 @Ignore # re-writing as part of RDM-6847
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -25,7 +25,7 @@ Feature: F-028: Fetch an event trigger in the context of a case for Case Worker
     And the response [has the 403 return code]
     And the response has all the details as expected
 
-  @S-046
+  @S-046 @Ignore # re-writing as part of RDM-6847
   Scenario: must return negative response when request provides authentic credentials without authorized access to the operation
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values

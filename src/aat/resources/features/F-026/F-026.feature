@@ -23,7 +23,7 @@ Feature: F-026: Get case data with UI layout
     And the response [contains an empty SearchResultView, along with an HTTP-200 OK],
     And the response has all other details as expected.
 
-  @S-074
+  @S-074 @Ignore # re-writing as part of RDM-6847
   Scenario: must return appropriate negative response when request does not provide valid authentication credentials
     Given  a user with     [an active profile in CCD]
     When   a request is prepared with appropriate values
@@ -33,7 +33,7 @@ Feature: F-026: Get case data with UI layout
     And    the response    [has an HTTP-403 return code]
     And    the response has all other details as expected
 
-  @S-075
+  @S-075 @Ignore # re-writing as part of RDM-6847
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
     Given  a user with     [an active profile in CCD],
     When   a request is prepared with appropriate values,

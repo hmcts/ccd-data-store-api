@@ -25,7 +25,7 @@ Feature: F-036: Retrieve a trigger for case by ID
     And the response [contains HTTP 400 Bad Request]
     And the response has all other details as expected
 
-  @S-201
+  @S-201 @Ignore # re-writing as part of RDM-6847
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
@@ -36,7 +36,7 @@ Feature: F-036: Retrieve a trigger for case by ID
     And the response [contains HTTP 403 Unauthorized]
     And the response has all other details as expected
 
-  @S-202
+  @S-202 @Ignore # re-writing as part of RDM-6847
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
