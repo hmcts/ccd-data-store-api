@@ -35,7 +35,7 @@ Feature: F-047: Get case ids
     And the response [contains an HTTP-401 Unauthorized]
     And the response has all other details as expected
 
-  @S-100
+  @S-100 @Ignore # re-writing as part of RDM-6847
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values

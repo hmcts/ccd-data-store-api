@@ -14,7 +14,7 @@ Feature: F-029: Fetch an event trigger in the context of a case type
     And the response [has the 200 return code]
     And the response has all other details as expected
 
-  @S-050
+  @S-050 @Ignore # re-writing as part of RDM-6847
   Scenario: must return appropriate negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -24,7 +24,7 @@ Feature: F-029: Fetch an event trigger in the context of a case type
     And the response [has the 403 return code]
     And the response has all other details as expected
 
-   @S-051
+   @S-051 @Ignore # re-writing as part of RDM-6847
      Scenario: must return appropriate negative response when request contains an unauthorized access
      Given a user with [an active profile in CCD]
      When a request is prepared with appropriate values

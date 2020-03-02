@@ -17,7 +17,7 @@ Feature: F-037: Submit event for an existing case (V2)
     And the response [contains the case detail for the updated case, along with a HTTP 200 OK]
     And the response has all other details as expected
 
-  @S-022
+  @S-022 @Ignore # re-writing as part of RDM-6847
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -27,7 +27,7 @@ Feature: F-037: Submit event for an existing case (V2)
     And the response [contains a HTTP 403 Forbidden]
     And the response has all other details as expected
 
-  @S-023
+  @S-023 @Ignore # re-writing as part of RDM-6847
   Scenario: must return negative response when request provides authentic credentials without authorised access
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values

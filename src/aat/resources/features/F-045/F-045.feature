@@ -25,7 +25,7 @@ Feature: F-045: Grant access to case
     And the response [has the 404 return code]
     And the response has all other details as expected
 
-  @S-153
+  @S-153 @Ignore # re-writing as part of RDM-6847
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -35,7 +35,7 @@ Feature: F-045: Grant access to case
     And the response [has the 403 return code]
     And the response has all other details as expected
 
-  @S-154
+  @S-154 @Ignore # re-writing as part of RDM-6847
   Scenario: must return negative response when request does not provide an authorized access
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
