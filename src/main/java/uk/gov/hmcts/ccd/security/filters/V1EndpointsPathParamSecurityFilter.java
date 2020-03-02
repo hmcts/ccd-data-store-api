@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.security.filters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -49,7 +50,8 @@ public class V1EndpointsPathParamSecurityFilter extends OncePerRequestFilter {
                 verifyRoleAndUserId(authorizedRoles, userIdOptional);
             } catch (UnauthorizedException ex) {
                 LOG.warn("Unauthorised roles or userId in the request path", ex);
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                return;
             }
         }
         filterChain.doFilter(request, response);
