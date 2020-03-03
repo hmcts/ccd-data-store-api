@@ -48,6 +48,7 @@ The following environment variables are required:
 
 ### Building
 
+
 The project uses [Gradle](https://gradle.org/).
 
 To build project please execute the following:
