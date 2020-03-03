@@ -10,8 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
-import uk.gov.hmcts.ccd.security.JwtAuthorityExtractor;
+import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.filters.ServiceAuthFilter;
 import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
 import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
@@ -33,17 +34,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final ServiceAuthFilter serviceAuthFilter;
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
-    private final JwtAuthorityExtractor jwtAuthorityExtractor;
+    private JwtAuthenticationConverter jwtAuthenticationConverter;
+
 
     @Inject
-    public SecurityConfiguration(final JwtAuthorityExtractor jwtAuthorityExtractor,
+    public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
                                  final AuthTokenValidator authTokenValidator,
                                  final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter,
                                  @Value("#{'${casedatastore.authorised.services}'.split(',')}")
                                          List<String> authorisedServices) {
         this.v1EndpointsPathParamSecurityFilter = v1EndpointsPathParamSecurityFilter;
         this.serviceAuthFilter = new ServiceAuthFilter(authTokenValidator, authorisedServices);
-        this.jwtAuthorityExtractor = jwtAuthorityExtractor;
+        jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     }
 
     @Override
@@ -76,7 +79,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .and()
             .oauth2ResourceServer()
             .jwt()
-            .jwtAuthenticationConverter(jwtAuthorityExtractor)
+            .jwtAuthenticationConverter(jwtAuthenticationConverter)
             .and()
             .and()
             .oauth2Client();
