@@ -23,7 +23,7 @@ Feature: F-059: Validate a set of fields as Citizen
     And the response [has the 422 return code]
     And the response has all other details as expected
 
-  @S-306
+  @S-306 @Ignore # re-write as part of RDM-6847
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -33,7 +33,7 @@ Feature: F-059: Validate a set of fields as Citizen
     And the response [has the 403 return code]
     And the response has all other details as expected
 
-  @S-305
+  @S-305 @Ignore # re-write as part of RDM-6847
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
