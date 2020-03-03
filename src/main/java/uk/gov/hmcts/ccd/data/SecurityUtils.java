@@ -56,11 +56,6 @@ public class SecurityUtils {
         return jwt.getTokenValue();
     }
 
-    public String getUserSubject() {
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return jwt.getSubject();
-    }
-
     public boolean isAuthenticated() {
         return Objects.nonNull(SecurityContextHolder.getContext().getAuthentication());
     }

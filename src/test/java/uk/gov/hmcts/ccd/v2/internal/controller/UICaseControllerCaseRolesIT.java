@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_CASE = "/internal/cases/1504259907353529";
     private static final String UID_NO_EVENT_ACCESS = "1234";
-    private static final String UID_WITH_EVENT_ACCESS = "2345";
+    private static final String UID_WITH_EVENT_ACCESS = "123";
 
     private static final int NUMBER_OF_CASES = 1;
 
@@ -90,7 +90,6 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
 
         assertCaseDataResultSetSize();
-        MockUtils.setSecurityAuthorities(UID_WITH_EVENT_ACCESS, authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         UserInfo userInfo = UserInfo.builder()
             .uid(UID_WITH_EVENT_ACCESS)
