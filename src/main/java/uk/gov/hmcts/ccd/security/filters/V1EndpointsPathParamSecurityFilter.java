@@ -2,9 +2,7 @@ package uk.gov.hmcts.ccd.security.filters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.exception.UnauthorizedException;
@@ -20,7 +18,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Component
 public class V1EndpointsPathParamSecurityFilter extends OncePerRequestFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(V1EndpointsPathParamSecurityFilter.class);
@@ -29,7 +26,6 @@ public class V1EndpointsPathParamSecurityFilter extends OncePerRequestFilter {
     private final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor;
     private final SecurityUtils securityUtils;
 
-    @Autowired
     public V1EndpointsPathParamSecurityFilter(Function<HttpServletRequest, Optional<String>> userIdExtractor,
                                               Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
                                               SecurityUtils securityUtils) {

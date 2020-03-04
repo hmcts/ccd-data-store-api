@@ -12,11 +12,17 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -38,8 +44,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Inject
     public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
                                  final ServiceAuthFilter serviceAuthFilter,
-                                 final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter) {
-        this.v1EndpointsPathParamSecurityFilter = v1EndpointsPathParamSecurityFilter;
+                                 final Function<HttpServletRequest, Optional<String>> userIdExtractor,
+                                 final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
+                                 final SecurityUtils securityUtils) {
+        this.v1EndpointsPathParamSecurityFilter = new V1EndpointsPathParamSecurityFilter(
+            userIdExtractor, authorizedRolesExtractor, securityUtils);
         this.serviceAuthFilter = serviceAuthFilter;
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
