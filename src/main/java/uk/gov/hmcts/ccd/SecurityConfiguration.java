@@ -13,12 +13,10 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.ccd.security.filters.ServiceAuthFilter;
 import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
-import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
+import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 
 import javax.inject.Inject;
-import java.util.List;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -39,12 +37,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Inject
     public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
-                                 final AuthTokenValidator authTokenValidator,
-                                 final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter,
-                                 @Value("#{'${casedatastore.authorised.services}'.split(',')}")
-                                         List<String> authorisedServices) {
+                                 final ServiceAuthFilter serviceAuthFilter,
+                                 final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter) {
         this.v1EndpointsPathParamSecurityFilter = v1EndpointsPathParamSecurityFilter;
-        this.serviceAuthFilter = new ServiceAuthFilter(authTokenValidator, authorisedServices);
+        this.serviceAuthFilter = serviceAuthFilter;
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     }
