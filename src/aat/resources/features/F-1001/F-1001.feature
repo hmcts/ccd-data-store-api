@@ -60,20 +60,23 @@ Feature: F-1001: Get Document AM Data for a given Case ID and Document ID
     Then a negative response is received
     And the response has all other details as expected
 
-  #Generic Scenarios for Security. No need to wrire for each feature
   @S-1006
-  Scenario: must return 403 when request provides without valid authorisation
+  Scenario: must receive an error response for a malformed document ID
+    Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
+    When a request is prepared with appropriate values
+    And the request [contains a malformed document ID]
+    And it is submitted to call the [Get Document AM Data] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all the details as expected
 
+  #Generic Scenarios for Security
   @S-1007
-  Scenario: must return 403 when request provides without valid serviceAuthorisation
+  Scenario: generic scenario for Unauthorized
 
   @S-1008
-  Scenario: must return 401 when request provides expired authentication
+  Scenario: generic scenario for Forbidden
 
+  #Generic Scenarios for media type
   @S-1009
-  Scenario: must return 401 when request provides expired s2s serviceAuthorisation
-
-  #Generic Scenarios for media type. No need to wrire for each feature
-  @S-1010
-  Scenario: must return 415 when request provides content type other than application/json
+  Scenario: generic scenario for Unsupported Media Type
 

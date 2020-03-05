@@ -14,7 +14,7 @@
     "_extends_": "Common_Request",
     "pathVariables": {
       "caseId": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
-      "docId": "5c14f8ef-887b-41e0-ad01-23959c082311"
+      "documentId": "${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}"
     }
   },
 
