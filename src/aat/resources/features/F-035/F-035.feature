@@ -55,3 +55,15 @@ Feature: F-035: Retrieve a case by id
     Then a negative response is received
     And the response [contains an HTTP-404 Not Found]
     And the response has all other details as expected
+
+ @S-591
+  Scenario: must return status 200 along with the case-view object successfully
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation] as in [S-035.01_GetToken]
+    And a case that has just been created as in [S-035.01_Case]
+    When a request is prepared with appropriate values
+    And the request [uses the case-reference of the case just created]
+    And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains Last State Modified Date metadata field]
+    And the response has all other details as expected

@@ -137,6 +137,7 @@
     <!-- FIXME : RDM-???? -->
     <suppress>
         <notes>Temporary suppression for on-going developments</notes>
+        <cve>CVE-2020-1938</cve>
         <cve>CVE-2020-8840</cve>
     </suppress>
 

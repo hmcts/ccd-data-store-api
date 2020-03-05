@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getevents;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,8 @@ class AuthorisedGetEventsOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "CaseTypeId";
     private static final String CASE_REFERENCE = "999999";
+    private static final String CASE_REFERENCE_INVALID = "9999991";
+    private static final String CASE_REFERENCE_INVALID_NULL = "9999992";
     private static final Long EVENT_ID = 100L;
     private static final String CASE_ID = "12345";
 
@@ -87,7 +90,11 @@ class AuthorisedGetEventsOperationTest {
         caseDetails.setId(CASE_ID);
         AuditEvent auditEvent = new AuditEvent();
         auditEvent.setCaseDataId(CASE_ID);
-        classifiedEvents = newArrayList(auditEvent, new AuditEvent());
+        auditEvent.setCaseTypeId(CASE_TYPE_ID);
+        AuditEvent auditEvent1 = new AuditEvent();
+        auditEvent1.setCaseDataId(CASE_ID);
+        auditEvent1.setCaseTypeId(CASE_TYPE_ID);
+        classifiedEvents = newArrayList(auditEvent, auditEvent1);
         event = new AuditEvent();
         event.setCaseDataId(CASE_ID);
 
@@ -95,6 +102,9 @@ class AuthorisedGetEventsOperationTest {
         doReturn(CASE_USER_ROLES).when(caseAccessService).getAccessRoles(anyString());
         doReturn(classifiedEvents).when(getEventsOperation).getEvents(caseDetails);
         doReturn(classifiedEvents).when(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        doReturn(classifiedEvents).when(getEventsOperation).getEvents(CASE_REFERENCE);
+        doReturn(Lists.newArrayList()).when(getEventsOperation).getEvents(CASE_REFERENCE_INVALID);
+        doReturn(Lists.newArrayList()).when(getEventsOperation).getEvents(CASE_REFERENCE_INVALID_NULL);
 
         authorisedEvents = newArrayList(new AuditEvent());
 
@@ -198,6 +208,43 @@ class AuthorisedGetEventsOperationTest {
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ),
             () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents, caseType.getEvents(), CASE_USER_ROLES),
             () -> assertThat(outputs, is(authorisedEvents))
+        );
+    }
+
+    @Test
+    @DisplayName("should apply authorization when case reference is received")
+    void shouldApplyAuthorisationForCaseReference() {
+        final List<AuditEvent> outputs = authorisedOperation.getEvents(CASE_REFERENCE);
+
+        InOrder inOrder = inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
+        assertAll(() -> inOrder.verify(getEventsOperation).getEvents(CASE_REFERENCE),
+            () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
+            () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ),
+            () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents, caseType.getEvents(), CASE_USER_ROLES),
+            () -> assertThat(outputs, is(authorisedEvents))
+        );
+    }
+
+    @Test
+    @DisplayName("should return empty events list when no event data found")
+    void shouldReturnEmptyListForCaseReference() {
+        final List<AuditEvent> outputs = authorisedOperation.getEvents(CASE_REFERENCE_INVALID);
+
+        assertAll(
+            () -> assertThat(outputs, is(notNullValue())),
+            () -> assertThat(outputs.size(), is(0))
+        );
+    }
+
+    @Test
+    @DisplayName("should return empty events list when event data returns null")
+    void shouldReturnEmptyListWhenGetEventsReturnsNull() {
+        final List<AuditEvent> outputs = authorisedOperation.getEvents(CASE_REFERENCE_INVALID_NULL);
+
+        assertAll(
+            () -> assertThat(outputs, is(notNullValue())),
+            () -> assertThat(outputs.size(), is(0))
         );
     }
 

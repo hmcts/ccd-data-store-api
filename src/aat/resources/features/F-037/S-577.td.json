@@ -17,8 +17,8 @@
     "body": {
       "data": {
         "DocumentField2":{
-          "document_url":"http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url":"http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
           "document_filename":"Elastic Search test Case.png --> updated by Solicitor 2"
         }
       }
@@ -41,13 +41,14 @@
       "case_type" : "BEFTA_CASETYPE_2_1",
       "created_on" : "[[ANYTHING_PRESENT]]",
       "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
       "state" : "TODO",
       "security_classification" : "PUBLIC",
       "data" : {
         "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data",
         "DocumentField2" : {
-          "document_url" : "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url" : "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
           "document_filename" : "Elastic Search test Case.png --> updated by Solicitor 2"
         }
       },
