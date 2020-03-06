@@ -61,7 +61,7 @@ Feature: F-1001: Get Document AM Data for a given Case ID and Document ID
 
   @S-1006
   Scenario: must receive an error response for a malformed document ID
-    Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
+    Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains a malformed document ID]
     And it is submitted to call the [Get Document AM Data] operation of [CCD Data Store]

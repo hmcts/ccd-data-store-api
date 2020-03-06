@@ -1,0 +1,21 @@
+{
+  "title": "must receive an error response for a malformed document ID",
+
+  "_guid_": "S-1006",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a malformed document ID"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "documentId": "8de9957b-d7a6-40a1-@£$&-6aac30d33644"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response"
+  }
+}
