@@ -1,0 +1,26 @@
+{
+  "title": "must receive an error response when document id is not associated with case id",
+
+  "_guid_": "S-1004",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "has the case id just created but a document id which is not associated with that case id"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "docId": "1d9e2f5f-2114-4748-b01c-70481000ce6d"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "errorMessage": "Resource Not found",
+      "errorDescription": "The request document is not found"
+    }
+  }
+
+}
