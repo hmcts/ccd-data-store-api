@@ -18,9 +18,6 @@
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "body": {
-      "ResponseCode": "404",
-      "status": "RESOURCE_NOT_FOUND",
-      "timeStamp": "[[ANYTHING_PRESENT]]",
       "errorMessage": "Resource Not found",
       "errorDescription": "The request document is not found"
     }

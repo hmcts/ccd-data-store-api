@@ -18,17 +18,16 @@ Feature: F-1001: Get Document AM Data for a given Case ID and Document ID
     And the response has all other details as expected
 
   @S-1002
-  Scenario: must successfully receive a document am data with an empty list of permissions
+  Scenario: must receive an error response for an active Solicitor profile who does not have READ access
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
     And a user with [an active Solicitor profile having full permissions on the same case type]
     And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And the request [has the case id just created where a document id is associated]
-    And the request [contains active Solicitor profile who does not have any access]
+    And the request [contains active Solicitor profile who does not have READ access]
     And it is submitted to call the [Get Document AM Data] operation of [CCD Data Store]
-    Then a positive response is received
-    And the response [contains the document am data and an empty list of permissions]
+    Then a negative response is received
     And the response has all other details as expected
 
   @S-1003

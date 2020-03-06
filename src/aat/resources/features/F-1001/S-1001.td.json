@@ -14,24 +14,25 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "ResponseCode": "200",
-      "status": "OK",
-      "timeStamp": "[[ANYTHING_PRESENT]]",
-      "ResponseBody": {
-        "caseDocumentMetadata": {
-          "caseId": "1234567890123456",
-          "caseTypeId": "123",
-          "jurisdictionId": "BEFTA2",
-          "documents": [
-            {
-              "url": "http://dm-store-aat.service.core-compute-aat.internal/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
-              "name": "Screenshot 2019-11-14 at 1.57.32 pm.png",
-              "type": "png",
-              "description": "sample",
-              "id": "e56f0aea-4a5f-46d5-82d3-01b536420870",
-              "hasedtoken": null,
-              "permissions": "{C,R,U}"
-            }
+      "_links": {
+        "self": {
+          "href": "http://localhost:4452/cases/1583170755994880/documents/e97f6615-e73a-4b43-a832-65ee5a2da7e9"
+        }
+      },
+      "documentMetadata": {
+        "caseId": "1583170755994880",
+        "caseTypeId": "BEFTA_CASETYPE_2_1",
+        "jurisdictionId": "BEFTA_JURISDICTION_2",
+        "document": {
+          "url": "http://dm-store:8080/documents/e97f6615-e73a-4b43-a832-65ee5a2da7e9",
+          "name": "Screenshot 2020-02-17 at 12.51.46.png",
+          "type": "Document",
+          "description": null,
+          "id": "e97f6615-e73a-4b43-a832-65ee5a2da7e9",
+          "permissions": [
+            "CREATE",
+            "READ",
+            "UPDATE"
           ]
         }
       }
