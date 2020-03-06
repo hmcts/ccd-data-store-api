@@ -8,7 +8,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 public class CaseDocumentNotFoundException extends ResourceNotFoundException {
 
     public CaseDocumentNotFoundException(String message) {
-        //super(String.format("No document found for this case reference: %s", caseReference));
         super(message);
     }
 
