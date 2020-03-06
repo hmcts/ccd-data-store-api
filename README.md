@@ -65,7 +65,7 @@ docker-compose build
 ```
 
 The above will build both the application and database images.  
-If you want to build only one of them just specify the name assigned in docker compose file, e.g. :
+If you want to build only one of them just specify the name assigned in docker compose file, e.g.:
 
 ```bash
 docker-compose build ccd-data-store-api
