@@ -70,5 +70,7 @@ public final class V2 {
         public static final String ROLES_FOR_CASE_ID_NOT_FOUND = "Cannot find user roles or case roles for the case ID";
         public static final String CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID = "Cannot find case type definition for case ID";
         public static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+        public static final String CASE_DOCUMENT_NOT_FOUND = "Case document not found";
+        public static final String CASE_DOCUMENT_ID_INVALID = "Case document Id is not valid";
     }
 }
