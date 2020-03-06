@@ -61,6 +61,7 @@ public class DefaultGetCaseDocumentOperation implements GetCaseDocumentOperation
 
     @Override
     public CaseDocumentMetadata execute(String caseId, String documentId) {
+
         if (!documentIdValidationService.validateUUID(documentId)) {
             throw new BadRequestException(BAD_REQUEST_EXCEPTION_DOCUMENT_INVALID);
         }
@@ -120,19 +121,23 @@ public class DefaultGetCaseDocumentOperation implements GetCaseDocumentOperation
         Set<String> roles = getUserRoles(caseDetails.getId());
 
         //Check the documentField found
-        if(documentCaseField.isPresent() && !roles.isEmpty()){
-            //retrieve all ACL on the user roles
-            for (String role : roles) {
-                return documentCaseField.get().getAccessControlLists()
-                    .stream()
-                    .filter(acl -> acl.getRole().equalsIgnoreCase(role))
-                    .findFirst();
+        if(documentCaseField.isPresent()){
+            if (!roles.isEmpty()){
+                //retrieve all ACL on the user roles
+                Optional<AccessControlList> userACLOnCaseField = Optional.empty();
+                for (String role : roles) {
+                    userACLOnCaseField = documentCaseField.get().getAccessControlLists().stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
+                }
+                return userACLOnCaseField;
+
+            }else {
+                throw new CaseDocumentNotFoundException(
+                    String.format("No valid user role found for this case reference: %s", caseDetails.getReferenceAsString()));
             }
         }else {
             throw new CaseDocumentNotFoundException(
                 String.format("No document found for this case reference: %s", caseDetails.getReferenceAsString()));
         }
-        return Optional.empty();
     }
 
     private Set<String> getUserRoles(String caseId) {
@@ -144,7 +149,6 @@ public class DefaultGetCaseDocumentOperation implements GetCaseDocumentOperation
     private String getDocumentCaseField(Map<String, JsonNode> caseData, String documentId) {
         for (Map.Entry<String, JsonNode> entry : caseData.entrySet()) {
             if (entry.getValue().getNodeType().toString().equals("OBJECT") && entry.getValue().toString().contains(documentId)) {
-                //System.out.println("Key found :" + entry.getKey());
                 return entry.getKey();
             }
         }
