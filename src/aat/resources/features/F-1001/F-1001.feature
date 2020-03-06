@@ -69,13 +69,13 @@ Feature: F-1001: Get Document AM Data for a given Case ID and Document ID
     And the response has all the details as expected
 
   #Generic Scenarios for Security
-  @S-1007
+  @S-1007 @Ignore
   Scenario: generic scenario for Unauthorized
 
-  @S-1008
+  @S-1008 @Ignore
   Scenario: generic scenario for Forbidden
 
   #Generic Scenarios for media type
-  @S-1009
+  @S-1009 @Ignore
   Scenario: generic scenario for Unsupported Media Type
 
