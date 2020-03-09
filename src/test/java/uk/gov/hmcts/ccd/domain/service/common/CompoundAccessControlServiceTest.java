@@ -1155,6 +1155,142 @@ class CompoundAccessControlServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("Compound Field - nested complex fields")
+    class CompoundFieldComplexUnderCollectionFieldTests {
+
+        @Test
+        @DisplayName("Should grant access when a nested complex child node is deleted and has the required ACLs - whole node deleted")
+        void shouldGrantAccessWhenNestedComplexChildDeletedAndDeleteACLExists() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withDelete(true)
+                .build()));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
+            JsonNode existingData = generatePeopleDataWithPerson(p1);
+
+            String p2 = existingPersonStart + name + personEnd;
+            JsonNode newData = generatePeopleDataWithPerson(p2); // i.e. with deleted BirthInfo
+
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+        }
+
+        @Test
+        @DisplayName("Should grant access when a nested complex child node is deleted and has the required fine grained ACLs - whole node deleted")
+        void shouldGrantAccessWhenNestedComplexChildDeletedAndFineGrainedDeleteACLExists() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withDelete(true)
+                .build()));
+            people.setComplexACLs(asList(
+                aComplexACL()
+                    .withListElementCode("BirthInfo")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withDelete(true)
+                    .build()));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
+            JsonNode existingData = generatePeopleDataWithPerson(p1);
+
+            String p2 = existingPersonStart + name + personEnd;
+            JsonNode newData = generatePeopleDataWithPerson(p2); // i.e. with deleted BirthInfo
+
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+        }
+
+        @Test
+        @DisplayName("Should be OK with empty nested complex child in new data")
+        void shouldBeOKWithEmptyNestedComplexFieldInNewData() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withDelete(true)
+                .build()));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
+            JsonNode existingData = generatePeopleDataWithPerson(p1);
+
+            String p2 = existingPersonStart + name + ",    \"BirthInfo\": {}" + personEnd;
+            JsonNode newData = generatePeopleDataWithPerson(p2);
+
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+        }
+
+        @Test
+        @DisplayName("Should be OK with empty nested complex child in existing data")
+        void shouldBeOKWithEmptyNestedComplexFieldInExistingData() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withDelete(true)
+                .build()));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + name + ",    \"BirthInfo\": {}" + personEnd;
+            JsonNode existingData = generatePeopleDataWithPerson(p1);
+
+            String p2 = existingPersonStart + name + "," + birthInfo + personEnd;
+            JsonNode newData = generatePeopleDataWithPerson(p2);
+
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+        }
+
+        @Test
+        @DisplayName("Should be OK with null nested complex child in new data")
+        void shouldBeOKWithNullNestedComplexFieldInNewData() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withDelete(true)
+                .build()));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
+            JsonNode existingData = generatePeopleDataWithPerson(p1);
+
+            String p2 = existingPersonStart + name + ",    \"BirthInfo\": null" + personEnd;
+            JsonNode newData = generatePeopleDataWithPerson(p2);
+
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+        }
+
+        @Test
+        @DisplayName("Should be OK with null nested complex child in existing data")
+        void shouldBeOKWithNullNestedComplexFieldInExistingData() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withDelete(true)
+                .build()));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + name + ",    \"BirthInfo\": null" + personEnd;
+            JsonNode existingData = generatePeopleDataWithPerson(p1);
+
+            String p2 = existingPersonStart + name + "," + birthInfo + personEnd;
+            JsonNode newData = generatePeopleDataWithPerson(p2);
+
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+        }
+    }
 
     @Nested
     @DisplayName("Compound Field - Collection Under Complex Tests")
