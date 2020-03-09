@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.processor.CaseFieldProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.CaseDataProcessor;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -91,7 +91,7 @@ class DefaultCreateCaseOperationTest {
     @Mock
     private DraftGateway draftGateway;
     @Mock
-    private CaseFieldProcessor caseFieldProcessor;
+    private CaseDataProcessor caseDataProcessor;
 
     private DefaultCreateCaseOperation defaultCreateCaseOperation;
 
@@ -124,7 +124,7 @@ class DefaultCreateCaseOperationTest {
                                                                     caseTypeService,
                                                                     callbackInvoker,
                                                                     validateCaseFieldsOperation,
-                                                                    caseFieldProcessor,
+                                                                    caseDataProcessor,
                                                                     draftGateway);
         data = buildJsonNodeData();
         given(userRepository.getUser()).willReturn(IDAM_USER);

@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.processor.CaseFieldProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.CaseDataProcessor;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -31,7 +31,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -51,7 +50,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final CallbackInvoker callbackInvoker;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final DraftGateway draftGateway;
-    private final CaseFieldProcessor caseFieldProcessor;
+    private final CaseDataProcessor caseDataProcessor;
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -64,7 +63,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
                                       final ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                      final CaseFieldProcessor caseFieldProcessor,
+                                      final CaseDataProcessor caseDataProcessor,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -76,7 +75,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.caseDataService = caseDataService;
         this.callbackInvoker = callbackInvoker;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
-        this.caseFieldProcessor = caseFieldProcessor;
+        this.caseDataProcessor = caseDataProcessor;
         this.draftGateway = draftGateway;
     }
 
@@ -107,8 +106,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         eventTokenService.validateToken(token, userRepository.getUserId(), eventTrigger, caseType.getJurisdiction(), caseType);
 
         Map<String, JsonNode> data = caseDataContent.getData();
-        List<CaseEventField> caseEventFields = eventTrigger.getCaseFields();
-        caseFieldProcessor.process(data, caseEventFields, caseType);
+        caseDataContent.setData(caseDataProcessor.process(data, caseType, eventTrigger));
+
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 
         final CaseDetails newCaseDetails = new CaseDetails();
@@ -117,7 +116,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setJurisdiction(caseType.getJurisdictionId());
         newCaseDetails.setState(eventTrigger.getPostState());
         newCaseDetails.setSecurityClassification(caseType.getSecurityClassification());
-        newCaseDetails.setData(caseSanitiser.sanitise(caseType, data));
+        newCaseDetails.setData(caseSanitiser.sanitise(caseType, caseDataContent.getData()));
         newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
 
         final IdamUser idamUser = userRepository.getUser();

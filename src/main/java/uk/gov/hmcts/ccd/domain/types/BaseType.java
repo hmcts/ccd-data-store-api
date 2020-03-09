@@ -38,7 +38,7 @@ public class BaseType {
         BASE_TYPES.put(baseType.getType().toUpperCase(), baseType);
     }
 
-    static BaseType get(final String type) {
+    public static BaseType get(final String type) {
         if (!BaseType.initialised) {
             BaseType.initialise();
         }
@@ -46,7 +46,7 @@ public class BaseType {
         return BASE_TYPES.get(type.toUpperCase());
     }
 
-    static Boolean contains(final String type) {
+    public static Boolean contains(final String type) {
         if (!BaseType.initialised) {
             BaseType.initialise();
         }
@@ -54,7 +54,7 @@ public class BaseType {
         return BASE_TYPES.keySet().contains(type.toUpperCase());
     }
 
-    String getType() {
+    public String getType() {
         return type;
     }
 
