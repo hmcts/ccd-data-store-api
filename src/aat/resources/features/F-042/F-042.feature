@@ -49,7 +49,7 @@ Feature: F-042: Trigger "aboutToStart" event as a Case worker
     And the response [contains a HTTP 422 Forbidden]
     And the response has all other details as expected
 
-  @S-244
+  @S-244 @Ignore # re-write as part of RDM-6847
   Scenario: must return a negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Case_Creation_Using_Caseworker1_Role]
@@ -60,7 +60,7 @@ Feature: F-042: Trigger "aboutToStart" event as a Case worker
     And the response [contains a HTTP 403 Forbidden]
     And the response has all other details as expected
 
-  @S-245
+  @S-245 @Ignore # re-write as part of RDM-6847
   Scenario: must return a negative response when request provides authentic credentials without authorized access to the operation
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Case_Creation_Using_Caseworker1_Role]
