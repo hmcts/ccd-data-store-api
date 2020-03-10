@@ -92,8 +92,9 @@ class CaseDocumentControllerTest {
         when(caseDocumentController.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID))
             .thenThrow(RuntimeException.class);
 
-        assertThrows(RuntimeException.class,
-                     () -> caseDocumentController.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID));
+        assertThrows(
+            RuntimeException.class, () -> caseDocumentController
+                .getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID));
     }
 
 }

@@ -44,11 +44,12 @@ public class GetCaseDocumentOperation {
     public static final String BAD_REQUEST_EXCEPTION_DOCUMENT_INVALID = "DocumentId is not valid";
 
     @Autowired
-    public GetCaseDocumentOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
-                                    final CaseTypeService caseTypeService,
-                                    @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                                    @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
-                                    DocumentIdValidationService documentIdValidationService) {
+    public GetCaseDocumentOperation(
+        @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
+        final CaseTypeService caseTypeService,
+        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+        @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
+        DocumentIdValidationService documentIdValidationService) {
 
         this.getCaseOperation = getCaseOperation;
         this.caseTypeService = caseTypeService;
@@ -97,9 +98,10 @@ public class GetCaseDocumentOperation {
                     .type(DOCUMENT_CASE_FIELD_CHILD_TYPE)
                     .permissions(getDocumentPermissions(userACLOnCaseField.get()))
                     .build();
-            }else {
+            } else {
                 throw new CaseDocumentNotFoundException(
-                    String.format("No document found for this case reference: %s", caseDetails.getReferenceAsString()));
+                    String.format("No document found for this case reference: %s",
+                        caseDetails.getReferenceAsString()));
             }
 
         } else {
@@ -119,22 +121,26 @@ public class GetCaseDocumentOperation {
         Set<String> roles = getUserRoles(caseDetails.getId());
 
         //Check the documentField found
-        if(documentCaseField.isPresent()){
-            if (!roles.isEmpty()){
+        if (documentCaseField.isPresent()) {
+            if (!roles.isEmpty()) {
                 //retrieve all ACL on the user roles
                 Optional<AccessControlList> userACLOnCaseField = Optional.empty();
                 for (String role : roles) {
-                    userACLOnCaseField = documentCaseField.get().getAccessControlLists().stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
-                    if (userACLOnCaseField.isPresent()){
+                    userACLOnCaseField = documentCaseField.get().getAccessControlLists()
+                        .stream()
+                        .filter(acl -> acl.getRole().equalsIgnoreCase(role))
+                        .findFirst();
+                    if (userACLOnCaseField.isPresent()) {
                         return userACLOnCaseField;
                     }
                 }
                 return userACLOnCaseField;
-            }else {
+            } else {
                 throw new CaseDocumentNotFoundException(
-                    String.format("No valid user role found for this case reference: %s", caseDetails.getReferenceAsString()));
+                    String.format("No valid user role found for this case reference: %s",
+                        caseDetails.getReferenceAsString()));
             }
-        }else {
+        } else {
             throw new CaseDocumentNotFoundException(
                 String.format("No document found for this case reference: %s", caseDetails.getReferenceAsString()));
         }
@@ -148,7 +154,8 @@ public class GetCaseDocumentOperation {
 
     private String getDocumentCaseField(Map<String, JsonNode> caseData, String documentId) {
         for (Map.Entry<String, JsonNode> entry : caseData.entrySet()) {
-            if (entry.getValue().getNodeType().toString().equals("OBJECT") && entry.getValue().toString().contains(documentId)) {
+            if (entry.getValue().getNodeType().toString()
+                .equals("OBJECT") && entry.getValue().toString().contains(documentId)) {
                 return entry.getKey();
             }
         }

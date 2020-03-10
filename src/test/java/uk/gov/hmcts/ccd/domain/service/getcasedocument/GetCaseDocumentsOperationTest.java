@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 
-public class GetCaseDocumentsOperationTest{
+public class GetCaseDocumentsOperationTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     public static final String TEST_CASE_TYPE = "TEST_CASE_TYPE";
@@ -55,12 +55,15 @@ public class GetCaseDocumentsOperationTest{
 
 
     //private CaseDetails caseDetails = new CaseDetails();
-    private Optional<CaseDetails> caseDetails ;
+    private Optional<CaseDetails> caseDetails;
     private final CaseType caseType = new CaseType();
-    private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3);
+    private final Set<String> userRoles = Sets
+        .newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3);
     private final List<String> caseRoles = Collections.emptyList();
-    private final CaseDocumentMetadata caseDocumentMetadata = CaseDocumentMetadata.builder().caseId("CaseId").caseTypeId("CaseTypeId").build();
-//    private CaseField DocumentCaseField = newCaseField().withId("DocumentField1").withFieldType(aFieldType().withId("DocumentField1").withType("Document").build()).build();
+    private final CaseDocumentMetadata caseDocumentMetadata =
+        CaseDocumentMetadata.builder().caseId("CaseId").caseTypeId("CaseTypeId").build();
+    //private CaseField DocumentCaseField = newCaseField().withId("DocumentField1")
+    // .withFieldType(aFieldType().withId("DocumentField1").withType("Document").build()).build();
 
     @BeforeEach
     public void setUp() {
@@ -74,7 +77,7 @@ public class GetCaseDocumentsOperationTest{
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION);
         doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(TEST_DOCUMENT_ID);
         doReturn(Boolean.FALSE).when(documentIdValidationService).validateDocumentUUID(TEST_DOCUMENT_INVALID);
-//        caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation,caseTypeService,userRepository,caseUserRepository,documentIdValidationService);
+    //caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation,caseTypeService,userRepository,caseUserRepository,documentIdValidationService);
     }
 
 

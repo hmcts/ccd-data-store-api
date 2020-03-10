@@ -16,16 +16,16 @@ public class DocumentIdValidationService {
      * @return boolean result for validation
      */
 
-    public boolean validateDocumentUUID(String documentId){
+    public boolean validateDocumentUUID(String documentId) {
         if (documentId == null) {
             return false;
         }
-        try{
+        try {
             UUID id = UUID.fromString(documentId);
-            if(!id.toString().equals(documentId)){
+            if (!id.toString().equals(documentId)) {
                 return false;
             }
-        }catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             return false;
         }
         return true;
