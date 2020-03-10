@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.resource;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.hateoas.RepresentationModel;
@@ -14,6 +15,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper=true)
 public class DocumentsResource extends RepresentationModel {
 
     List<Document> documentResources;

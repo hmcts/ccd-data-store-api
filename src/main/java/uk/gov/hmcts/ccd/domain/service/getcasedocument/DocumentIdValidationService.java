@@ -16,7 +16,10 @@ public class DocumentIdValidationService {
      * @return boolean result for validation
      */
 
-    public boolean validateUUID(String documentId){
+    public boolean validateDocumentUUID(String documentId){
+        if (documentId == null) {
+            return false;
+        }
         try{
             UUID id = UUID.fromString(documentId);
             if(!id.toString().equals(documentId)){
