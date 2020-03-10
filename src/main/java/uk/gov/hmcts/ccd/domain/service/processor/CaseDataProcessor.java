@@ -12,11 +12,11 @@ import java.util.Map;
 @Service
 public class CaseDataProcessor {
 
-    private final List<FieldProcessor> processors;
+    private final List<AbstractFieldProcessor> fieldProcessors;
 
     @Autowired
-    public CaseDataProcessor(List<FieldProcessor> processors) {
-        this.processors = processors;
+    public CaseDataProcessor(List<AbstractFieldProcessor> fieldProcessors) {
+         this.fieldProcessors = fieldProcessors;
     }
 
     public Map<String, JsonNode> process(final Map<String, JsonNode> data,
@@ -29,7 +29,7 @@ public class CaseDataProcessor {
             CaseEventField caseEventField = event.getCaseEventField(entry.getKey()).get();
 
             JsonNode result = entry.getValue();
-            for (FieldProcessor processor : processors) {
+            for (AbstractFieldProcessor processor : fieldProcessors) {
                 result = processor.execute(result, caseField, caseEventField);
             }
 

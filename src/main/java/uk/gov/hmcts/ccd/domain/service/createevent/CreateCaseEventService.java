@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.processor.CaseDataProcessor;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
@@ -70,6 +71,7 @@ public class CreateCaseEventService {
     private final SecurityClassificationService securityClassificationService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
+    private final CaseDataProcessor caseDataProcessor;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -86,7 +88,8 @@ public class CreateCaseEventService {
                                   final UIDService uidService,
                                   final SecurityClassificationService securityClassificationService,
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                  final UserAuthorisation userAuthorisation) {
+                                  final UserAuthorisation userAuthorisation,
+                                  final CaseDataProcessor caseDataProcessor) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -102,6 +105,7 @@ public class CreateCaseEventService {
         this.securityClassificationService = securityClassificationService;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.userAuthorisation = userAuthorisation;
+        this.caseDataProcessor = caseDataProcessor;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -117,6 +121,7 @@ public class CreateCaseEventService {
         eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
 
         validatePreState(caseDetails, eventTrigger);
+        content.setData(caseDataProcessor.process(content.getData(), caseType, eventTrigger));
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
             caseDetailsBefore,
