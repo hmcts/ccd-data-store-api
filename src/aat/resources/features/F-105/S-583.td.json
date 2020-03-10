@@ -1,0 +1,103 @@
+{
+  "_guid_": "S-583",
+  "_extends_": "F-105_Test_Data_Base",
+  "title": "Get jurisdictions available to the user",
+  "specs": [
+    "an active profile in CCD having create case access for a jurisdiction",
+    "has CREATE as case access parameter",
+    "contains HTTP 200 Ok status code",
+    "contains the list of jurisdictions a user has access to"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "access": "create"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "arrayInMap": [
+        {
+          "id": "AUTOTEST1",
+          "name": "Auto Test 1",
+          "description": "Content for the Test Jurisdiction.",
+          "caseTypes":[
+            {
+              "__operator__": "equivalent",
+              "__ordering__": "unordered"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_AAT_PRIVATE_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_AAT_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_MAPPER_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_AllDataTypes2_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_MultiplePages_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_ComplexCollectionComplex_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_Tabs_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_CaseProgression_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_Regex_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_Conditionals_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_ComplexCRUD_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_NoCases_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_WBSortOrder_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_Questions2_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_AAT_AUTH_15_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_AAT_AUTH_3_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_AAT_AUTH_5_CaseType_Response"
+            },
+            {
+              "_extends_": "CCD_AUTOTEST1_AAT_AUTH_1_CaseType_Response"
+            },
+            {
+              "id": "CaseRoles2",
+              "description": "Test case 2 for Case Roles",
+              "version": null,
+              "name": "Case Roles 2",
+              "jurisdiction": null,
+              "events": [],
+              "states": [],
+              "searchAliasFields": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

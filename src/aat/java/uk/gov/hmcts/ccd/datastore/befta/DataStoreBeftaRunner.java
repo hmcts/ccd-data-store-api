@@ -12,7 +12,8 @@ import uk.gov.hmcts.befta.BeftaMain;
 @RunWith(Cucumber.class)
 @CucumberOptions(plugin = "json:target/cucumber.json",
     glue = "uk.gov.hmcts.befta.player",
-    features = {"classpath:features"})
+    features = {"classpath:features"},
+    tags = "not @Ignore and @focus")
 public class DataStoreBeftaRunner {
 
     @BeforeClass

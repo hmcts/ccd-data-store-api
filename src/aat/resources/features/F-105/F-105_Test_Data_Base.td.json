@@ -1,0 +1,29 @@
+{
+  "_guid_": "F-105_Test_Data_Base",
+  "title": "Case Roles Access Management",
+  "productName": "CCD Data Store",
+  "operationName": "Get jurisdictions available to the user",
+  "method": "GET",
+  "uri": "/aggregated/caseworkers/{uid}/jurisdictions",
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]"
+    },
+    "queryParams": {
+      "access": "create"
+    }
+  },
+  "user": {
+    "username": "auto.test.cnp+fe.judge@gmail.com",
+    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+  },
+  "expectedResponse": {
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

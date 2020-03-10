@@ -255,8 +255,7 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '1.1.1'
-
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '1.1.2-SNAPSHOT'
 }
 // end::dependencies[]
 
@@ -653,7 +652,7 @@ task functional(type: Test) {
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore and @focus', '--glue',
                     'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
         }
     }
