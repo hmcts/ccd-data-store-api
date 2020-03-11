@@ -16,23 +16,23 @@
     "body": {
       "_links": {
         "self": {
-          "href": "http://localhost:4452/cases/1583170755994880/documents/e97f6615-e73a-4b43-a832-65ee5a2da7e9"
+          "href": "{{DATA_STORE_BASE_URL}}/cases/${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4"
         }
       },
       "documentMetadata": {
-        "caseId": "1583170755994880",
+        "caseId": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
         "caseTypeId": "BEFTA_CASETYPE_2_1",
         "jurisdictionId": "BEFTA_JURISDICTION_2",
         "document": {
-          "url": "http://dm-store:8080/documents/e97f6615-e73a-4b43-a832-65ee5a2da7e9",
-          "name": "Screenshot 2020-02-17 at 12.51.46.png",
+          "url": "{{DM_STORE_BASE_URL}}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4",
+          "name": "Screenshot 2019-11-13 at 3.24.26 pm.png",
           "type": "Document",
           "description": null,
-          "id": "e97f6615-e73a-4b43-a832-65ee5a2da7e9",
+          "id": "e636eef3-839a-48cd-96f0-dad43e66f5c4",
           "permissions": [
-            "CREATE",
             "READ",
-            "UPDATE"
+            "UPDATE",
+            "CREATE"
           ]
         }
       }

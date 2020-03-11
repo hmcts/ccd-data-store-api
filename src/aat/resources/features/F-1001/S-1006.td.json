@@ -5,17 +5,29 @@
   "_extends_": "F-1001_Test_Data_Base",
 
   "specs": [
-    "an active profile in CCD",
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
     "contains a malformed document ID"
   ],
 
   "request": {
     "pathVariables": {
+      "caseId": "1583927314536134",
       "documentId": "8de9957b-d7a6-40a1-@£$&-6aac30d33644"
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response"
+    "_extends_": "Common_400_Response",
+    "headers" : {
+      "Connection" : "close"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message" : "DocumentId is not valid",
+      "path" : "/cases/1583927314536134/documents/8de9957b-d7a6-40a1-%40%C2%A3%24%26-6aac30d33644",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
   }
 }

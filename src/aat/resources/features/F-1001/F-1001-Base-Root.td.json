@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-1001-Base-Root",
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "request": {
+    "headers": {
+      "ServiceAuthorization": "[[DYNAMIC]]",
+      "Authorization": "[[DYNAMIC]]",
+      "Content-Type": "application/json",
+      "experimental": "true"
+    }
+  }
+}

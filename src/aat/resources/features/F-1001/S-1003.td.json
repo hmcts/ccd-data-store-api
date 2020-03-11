@@ -5,21 +5,25 @@
   "_extends_": "F-1001_Test_Data_Base",
 
   "specs": [
-    "an active profile in CCD",
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
     "has the case id just created but a document id which does not exist"
   ],
 
   "request": {
     "pathVariables": {
-      "docId": "dummyNonExistingDocId"
+      "documentId": "00000000-0000-0000-0000-000000000000"
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "body": {
-      "errorMessage": "Resource Not found",
-      "errorDescription": "The request document is not found"
+      "exception" : "uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentNotFoundException",
+      "message" : "No document found for this case reference: ${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "path" : "/cases/${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}/documents/00000000-0000-0000-0000-000000000000",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
     }
   }
 }

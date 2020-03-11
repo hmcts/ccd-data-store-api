@@ -5,21 +5,26 @@
   "_extends_": "F-1001_Test_Data_Base",
 
   "specs": [
-    "an active profile in CCD",
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
     "contains a non existing case id"
   ],
 
   "request": {
     "pathVariables": {
-      "caseId": "dummyCaseIdDoesNotExist"
+      "caseId": "0000000000000000"
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_404_Response",
+
     "body": {
-      "errorMessage": "Resource Not found",
-      "errorDescription": "The request document is not found"
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "No case found",
+      "path" : "/cases/0000000000000000/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
     }
   }
 }

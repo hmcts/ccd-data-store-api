@@ -1,20 +1,18 @@
 {
   "_guid_": "F-1001_Test_Data_Base",
+  "_extends_": "F-1001-Base-Root",
+
   "productName": "CCD Data Store",
   "operationName": "Get Document AM Data",
   "method": "GET",
-  "uri": "/cases/{caseId}/documents/{docId}",
+  "uri": "/cases/{caseId}/documents/{documentId}",
 
-  "user": {
-    "username": "befta.caseworker.2.solicitor.1@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
-  },
 
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
       "caseId": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
-      "documentId": "${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}"
+      "documentId": "e636eef3-839a-48cd-96f0-dad43e66f5c4"
     }
   },
 
