@@ -35,6 +35,7 @@
       "case_type": "[[ANYTHING_PRESENT]]",
       "created_on": "[[ANYTHING_PRESENT]]",
       "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
       "state": "[[ANYTHING_PRESENT]]",
       "security_classification": "[[ANYTHING_PRESENT]]",
       "data": {

@@ -28,6 +28,7 @@
       "state" : "TODO",
       "version" : "[[ANYTHING_PRESENT]]",
       "case_type_id" : "AAT_AUTH_15",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "created_date" : "[[ANYTHING_PRESENT]]",
       "last_modified" : "[[ANYTHING_PRESENT]]",
       "security_classification" : "PUBLIC",

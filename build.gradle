@@ -217,7 +217,7 @@ dependencies {
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
     // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
-    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10.2"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10.3"
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
@@ -255,7 +255,8 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
-    testCompile group: 'uk.gov.hmcts', name: 'ccd-api-test-automation-fw', version: '1.0.29'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '1.1.2'
+
 }
 // end::dependencies[]
 
@@ -269,7 +270,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:24.1.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.30') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.31') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -623,7 +624,7 @@ task smoke(type: Test) {
 
     doFirst {
         javaexec {
-            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreTestDataLoader"
+            main = "uk.gov.hmcts.ccd.datastore.befta.TestDataLoaderMain"
             classpath += sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = ['']
         }
