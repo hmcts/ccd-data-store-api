@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
@@ -68,20 +69,21 @@ public class DateTimeFormatProcessor extends AbstractFieldProcessor {
     }
 
     @Override
-    protected JsonNode executeComplex(JsonNode complexNode, List<CaseField> complexCaseFields, CaseEventField caseEventField) {
+    protected JsonNode executeComplex(JsonNode complexNode, List<CaseField> complexCaseFields, CaseEventField caseEventField, WizardPageField wizardPageField, String fieldPrefix) {
         ObjectNode newNode = MAPPER.createObjectNode();
 
         complexCaseFields.stream().forEach(complexCaseField -> {
-            final String displayContextParameter = getComplexDisplayContextParameter(caseEventField, complexCaseField);
             final BaseType complexFieldType = BaseType.get(complexCaseField.getFieldType().getType());
             final String fieldId = complexCaseField.getId();
             final JsonNode caseFieldNode = complexNode.get(fieldId);
+            final String fieldPath = fieldPrefix + FIELD_SEPARATOR + fieldId;
 
             if (complexFieldType == BaseType.get(COLLECTION)) {
                 newNode.set(fieldId, executeCollection(caseFieldNode, complexCaseField));
             } else if (complexFieldType == BaseType.get(COMPLEX)) {
-                newNode.set(fieldId, executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), caseEventField));
+                newNode.set(fieldId, executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, fieldPath));
             } else {
+                final String displayContextParameter = getComplexDisplayContextParameter(caseEventField, complexCaseField);
                 newNode.set(fieldId,
                     isDateTimeDCP(displayContextParameter)
                         && complexFieldType == BaseType.get(DATETIME) ?

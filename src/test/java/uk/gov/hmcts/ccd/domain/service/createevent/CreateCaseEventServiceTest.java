@@ -148,7 +148,7 @@ class CreateCaseEventServiceTest {
         doReturn(postState).when(caseTypeService).findState(caseType, POST_STATE);
         doReturn(user).when(userRepository).getUser();
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
-        doReturn(data).when(caseDataProcessor).process(any(), any(), any());
+        doReturn(data).when(caseDataProcessor).process(any(), any(), any(CaseEvent.class));
         given(callbackInvoker.invokeAboutToSubmitCallback(any(),
             any(),
             any(),

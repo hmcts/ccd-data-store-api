@@ -16,25 +16,25 @@ public class BaseType {
     private final String type;
     private final String regularExpression;
 
-    BaseType(final FieldType fieldType) {
+    public BaseType(final FieldType fieldType) {
         type = fieldType.getType();
         regularExpression = fieldType.getRegularExpression();
     }
 
-    static void setCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
+    public static void setCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
         BaseType.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     /**
      * This needs to be lazily initialised as it would prevent startup of the application otherwise.
      */
-    static void initialise() {
+    public static void initialise() {
         BaseType.caseDefinitionRepository.getBaseTypes()
             .forEach(fieldType -> BaseType.register(new BaseType(fieldType)));
         BaseType.initialised = Boolean.TRUE;
     }
 
-    static void register(final BaseType baseType) {
+    public static void register(final BaseType baseType) {
         BASE_TYPES.put(baseType.getType().toUpperCase(), baseType);
     }
 

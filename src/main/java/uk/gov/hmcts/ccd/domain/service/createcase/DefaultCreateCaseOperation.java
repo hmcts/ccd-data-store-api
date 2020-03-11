@@ -22,7 +22,6 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.processor.CaseDataProcessor;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -49,7 +48,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final CallbackInvoker callbackInvoker;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final DraftGateway draftGateway;
-    private final CaseDataProcessor caseDataProcessor;
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -62,7 +60,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
                                       final ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                      final CaseDataProcessor caseDataProcessor,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -74,7 +71,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.caseDataService = caseDataService;
         this.callbackInvoker = callbackInvoker;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
-        this.caseDataProcessor = caseDataProcessor;
         this.draftGateway = draftGateway;
     }
 
@@ -103,8 +99,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
         String token = caseDataContent.getToken();
         eventTokenService.validateToken(token, userRepository.getUserId(), eventTrigger, caseType.getJurisdiction(), caseType);
-
-        caseDataContent.setData(caseDataProcessor.process(caseDataContent.getData(), caseType, eventTrigger));
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 

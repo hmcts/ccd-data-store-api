@@ -6,6 +6,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 
 import java.util.List;
@@ -15,13 +16,16 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 public abstract class AbstractFieldProcessor {
 
+    protected static final String EMPTY_STRING = "";
+    protected static final String FIELD_SEPARATOR = ".";
+
     private final CaseViewFieldBuilder caseViewFieldBuilder;
 
     public AbstractFieldProcessor(CaseViewFieldBuilder caseViewFieldBuilder) {
         this.caseViewFieldBuilder = caseViewFieldBuilder;
     }
 
-    public JsonNode execute(JsonNode node, CaseField caseField, CaseEventField caseEventField) {
+    public JsonNode execute(JsonNode node, CaseField caseField, CaseEventField caseEventField, WizardPageField wizardPageField) {
         CaseViewField caseViewField = caseViewFieldBuilder.build(caseField, caseEventField);
 
         if (!BaseType.contains(caseViewField.getFieldType().getType())) {
@@ -31,7 +35,7 @@ public abstract class AbstractFieldProcessor {
         final BaseType fieldType = BaseType.get(caseViewField.getFieldType().getType());
 
         if (BaseType.get(COMPLEX) == fieldType) {
-            return executeComplex(node, caseField.getFieldType().getComplexFields(), caseEventField);
+            return executeComplex(node, caseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, caseField.getId());
         } else if (BaseType.get(COLLECTION) == fieldType) {
             return executeCollection(node, caseViewField);
         } else {
@@ -43,5 +47,5 @@ public abstract class AbstractFieldProcessor {
 
     protected abstract JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField);
 
-    protected abstract JsonNode executeComplex(JsonNode complexNode, List<CaseField> complexCaseFields, CaseEventField caseEventField);
+    protected abstract JsonNode executeComplex(JsonNode complexNode, List<CaseField> complexCaseFields, CaseEventField caseEventField, WizardPageField wizardPageField, String fieldPrefix);
 }
