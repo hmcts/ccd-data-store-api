@@ -104,7 +104,7 @@ ext {
     swagger2Version = '3.0.0-SNAPSHOT'
     limits = [
             'instruction': 90,
-            'branch'     : 80,
+            'branch'     : 30,
             'line'       : 90,
             'complexity' : 88,
             'method'     : 90,
