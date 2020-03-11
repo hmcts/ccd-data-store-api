@@ -22,14 +22,4 @@ public enum Permission {
     public int getValue() {
         return value;
     }
-
-    /**
-     * Performs a binary AND operation to determine whether permission can be derived from the sum of permissions.
-     *
-     * @param permissions the numeric sum of permissions
-     * @return true if particular permission is included is sum of permissions, otherwise false
-     */
-    public boolean isGranted(int permissions) {
-        return (permissions & this.getValue()) == this.getValue();
-    }
 }
