@@ -36,4 +36,11 @@ public class DocumentIdValidationServiceTest {
 
         assertFalse(documentIdValidationService.validateDocumentUUID(documentId));
     }
+
+    @Test
+    public void shouldReturnFalseForWrongDocumentId() {
+        String documentId = "a780ee98-3136-4b19-bf56-a46f8da1bc9";
+
+        assertFalse(documentIdValidationService.validateDocumentUUID(documentId));
+    }
 }
