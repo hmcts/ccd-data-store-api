@@ -58,6 +58,7 @@ public class CaseDetailsEntity {
     public static final String REFERENCE_FIELD_COL = "reference";
     public static final String CREATED_DATE_FIELD_COL = "created_date";
     public static final String LAST_MODIFIED_FIELD_COL = "last_modified";
+    public static final String LAST_STATE_MODIFIED_DATE_FIELD_COL = "last_state_modified_date";
     public static final String SECURITY_CLASSIFICATION_FIELD_COL = "security_classification";
 
 
@@ -76,6 +77,8 @@ public class CaseDetailsEntity {
     private LocalDateTime createdDate;
     @Column(name = LAST_MODIFIED_FIELD_COL)
     private LocalDateTime lastModified;
+    @Column(name = LAST_STATE_MODIFIED_DATE_FIELD_COL)
+    private LocalDateTime lastStateModifiedDate;
     // TODO Rename to state_id
     @Column(name = STATE_FIELD_COL, nullable = false)
     private String state;
@@ -178,5 +181,13 @@ public class CaseDetailsEntity {
 
     public void setVersion(final Integer version) {
         this.version = version;
+    }
+
+    public LocalDateTime getLastStateModifiedDate() {
+        return lastStateModifiedDate;
+    }
+
+    public void setLastStateModifiedDate(LocalDateTime lastStateModifiedDate) {
+        this.lastStateModifiedDate = lastStateModifiedDate;
     }
 }
