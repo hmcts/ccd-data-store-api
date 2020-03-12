@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
 public class UserService {
@@ -72,7 +73,7 @@ public class UserService {
             workbasketDefault.setCaseTypeId(userDefault.getWorkBasketDefaultCaseType());
             workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
             userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
-        } catch (ApiException ae) {
+        } catch (ResourceNotFoundException ae) {
             LOGGER.debug("User Profile not exists for userId {}", userId, ae);
         }
 
