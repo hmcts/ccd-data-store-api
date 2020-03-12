@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
@@ -23,10 +22,8 @@ import java.util.*;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
 
 @Component
-public class DateTimeFormatProcessor extends AbstractFieldProcessor {
+public class DateTimeFormatProcessor extends FieldProcessor {
 
-    private static final String DATETIMEDISPLAY_PREFIX = "#DATETIMEDISPLAY(";
-    private static final String DATETIMEENTRY_PREFIX = "#DATETIMEENTRY(";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final DateTimeFormatParser dateTimeFormatParser;
@@ -41,7 +38,7 @@ public class DateTimeFormatProcessor extends AbstractFieldProcessor {
     @Override
     protected JsonNode executeSimple(JsonNode node, CaseViewField caseViewField, BaseType baseType) {
         if (!Strings.isNullOrEmpty(node.asText())
-            && isDateTimeDCP(caseViewField.getDisplayContextParameter())
+            && hasDateTimeEntryDCP(caseViewField.getDisplayContextParameter())
             && baseType == BaseType.get(DATETIME)) {
             return createTextNode(caseViewField.getDisplayContextParameter(), node.asText());
         }
@@ -52,7 +49,7 @@ public class DateTimeFormatProcessor extends AbstractFieldProcessor {
     protected JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField) {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
 
-        if (isDateTimeDCP(caseViewField.getDisplayContextParameter())
+        if (hasDateTimeEntryDCP(caseViewField.getDisplayContextParameter())
             && collectionFieldType == BaseType.get(DATETIME)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
@@ -83,11 +80,12 @@ public class DateTimeFormatProcessor extends AbstractFieldProcessor {
             } else if (complexFieldType == BaseType.get(COMPLEX)) {
                 newNode.set(fieldId, executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, fieldPath));
             } else {
-                final String displayContextParameter = getComplexDisplayContextParameter(caseEventField, complexCaseField);
+                // TODO: Get override
                 newNode.set(fieldId,
-                    isDateTimeDCP(displayContextParameter)
+                    !isNullOrEmpty(caseFieldNode)
+                        && hasDateTimeEntryDCP(complexCaseField.getDisplayContextParameter())
                         && complexFieldType == BaseType.get(DATETIME) ?
-                        createTextNode(displayContextParameter, complexNode.get(fieldId).asText()) :
+                        createTextNode(complexCaseField.getDisplayContextParameter(), complexNode.get(fieldId).asText()) :
                         caseFieldNode);
             }
         });
@@ -96,22 +94,24 @@ public class DateTimeFormatProcessor extends AbstractFieldProcessor {
     }
 
     private TextNode createTextNode(String displayContextParameter, String valueToConvert) {
-        return new TextNode(dateTimeFormatParser
-            .convertDateTimeToIso8601(DisplayContextParameterType
-            .getDisplayContextParameterFor(displayContextParameter).get().getValue(), valueToConvert));
+        return new TextNode(dateTimeFormatParser.convertDateTimeToIso8601(
+            DisplayContextParameter
+                .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY).get().getValue()
+            , valueToConvert)
+        );
     }
 
-    private String getComplexDisplayContextParameter(CaseEventField caseEventField, CaseField complexCaseField) {
-        return caseEventField.getCaseEventFieldComplex().stream()
-            .filter(complexFieldOverride -> complexCaseField.getId().equals(complexFieldOverride.getReference()))
-            .findAny()
-            .map(CaseEventFieldComplex::getDisplayContextParameter)
-            .orElseGet(complexCaseField::getDisplayContextParameter);
+    private boolean hasDateTimeEntryDCP(String displayContextParameter) {
+        return !Strings.isNullOrEmpty(displayContextParameter) &&
+            DisplayContextParameter
+                .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
+                .isPresent();
     }
 
-    private boolean isDateTimeDCP(String displayContextParameter) {
-        return !Strings.isNullOrEmpty(displayContextParameter) && (
-            displayContextParameter.startsWith(DATETIMEDISPLAY_PREFIX) ||
-                displayContextParameter.startsWith(DATETIMEENTRY_PREFIX));
+    private boolean isNullOrEmpty(final JsonNode node) {
+        return node == null
+            || node.isNull()
+            || (node.isTextual() && (null == node.asText() || node.asText().trim().length() == 0))
+            || (node.isObject() && node.toString().equals("{}"));
     }
 }
