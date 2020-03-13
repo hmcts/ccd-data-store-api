@@ -66,7 +66,9 @@ public class DateTimeFormatProcessor extends FieldProcessor {
     }
 
     private TextNode createNode(String displayContextParameter, String valueToConvert, BaseType baseType, String fieldPath) {
-        String format = getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY).get().getValue();
+        String format = getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
+            .map(DisplayContextParameter::getValue)
+            .orElse("");
         try {
             if (baseType == BaseType.get(DATETIME)) {
                 return new TextNode(dateTimeFormatParser.convertDateTimeToIso8601(format, valueToConvert));
