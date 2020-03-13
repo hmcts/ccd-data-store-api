@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 @Service
 public class CaseDataProcessor {
 
-    private final List<AbstractFieldProcessor> fieldProcessors;
+    private final List<FieldProcessor> fieldProcessors;
     private final UIDefinitionRepository uiDefinitionRepository;
     private final EventTriggerService eventTriggerService;
 
     @Autowired
-    public CaseDataProcessor(final List<AbstractFieldProcessor> fieldProcessors,
+    public CaseDataProcessor(final List<FieldProcessor> fieldProcessors,
                              final UIDefinitionRepository uiDefinitionRepository,
                              final EventTriggerService eventTriggerService) {
          this.fieldProcessors = fieldProcessors;
@@ -46,12 +46,12 @@ public class CaseDataProcessor {
         Map<String, JsonNode> processedData = new HashMap<>();
 
         data.entrySet().stream().forEach(entry -> {
-            Optional<CaseField> caseField = caseType.getCaseField(entry.getKey());
-            Optional<CaseEventField> caseEventField = event.getCaseEventField(entry.getKey());
+            final Optional<CaseField> caseField = caseType.getCaseField(entry.getKey());
+            final Optional<CaseEventField> caseEventField = event.getCaseEventField(entry.getKey());
 
             JsonNode result = entry.getValue();
             if (!isNullOrEmpty(result) && caseField.isPresent() && caseEventField.isPresent()) {
-                for (AbstractFieldProcessor processor : fieldProcessors) {
+                for (FieldProcessor processor : fieldProcessors) {
                     result = processor.execute(result, caseField.get(), caseEventField.get(),
                         wizardPageFields.stream().filter(f -> f.getCaseFieldId().equals(caseField.get().getId())).findAny().get());
                 }

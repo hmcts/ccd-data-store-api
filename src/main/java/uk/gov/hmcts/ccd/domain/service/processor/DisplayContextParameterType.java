@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.google.common.base.Strings;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,14 +16,22 @@ public enum DisplayContextParameterType {
     private static final int TYPE_GROUP = 1;
     private static final int VALUE_GROUP = 2;
 
-    public static Optional<DisplayContextParameter> getDisplayContextParameterFor(String displayContextParameter) {
-        Optional<DisplayContextParameterType> type = getParameterTypeFor(displayContextParameter);
-        Optional<String> value = getParameterValueFor(displayContextParameter);
+    public static List<DisplayContextParameter> getDisplayContextParameterFor(String displayContextParameter) {
+        List<DisplayContextParameter> displayContextParameterTypeList = new ArrayList<>();
 
-        if (!type.isPresent() || !value.isPresent()) {
-            return Optional.empty();
+        String[] displayContextParameters = displayContextParameter.split(",");
+        for (String s : displayContextParameters) {
+            Optional<DisplayContextParameterType> type = getParameterTypeFor(s);
+            Optional<String> value = getParameterValueFor(s);
+
+            if (!type.isPresent() || !value.isPresent()) {
+                displayContextParameterTypeList.add(new DisplayContextParameter(null, null));
+            } else {
+                displayContextParameterTypeList.add(new DisplayContextParameter(type.get(), value.get()));
+            }
+
         }
-        return Optional.of(new DisplayContextParameter(type.get(), value.get()));
+        return displayContextParameterTypeList;
     }
 
     public static Optional<DisplayContextParameterType> getParameterTypeFor(String displayContextParameter) {

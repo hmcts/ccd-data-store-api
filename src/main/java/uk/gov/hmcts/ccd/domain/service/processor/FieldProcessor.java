@@ -14,14 +14,13 @@ import java.util.List;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
-public abstract class AbstractFieldProcessor {
+public abstract class FieldProcessor {
 
-    protected static final String EMPTY_STRING = "";
     protected static final String FIELD_SEPARATOR = ".";
 
     private final CaseViewFieldBuilder caseViewFieldBuilder;
 
-    public AbstractFieldProcessor(CaseViewFieldBuilder caseViewFieldBuilder) {
+    public FieldProcessor(CaseViewFieldBuilder caseViewFieldBuilder) {
         this.caseViewFieldBuilder = caseViewFieldBuilder;
     }
 

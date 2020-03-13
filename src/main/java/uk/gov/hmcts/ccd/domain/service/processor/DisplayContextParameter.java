@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
+import java.util.Optional;
+
 public class DisplayContextParameter {
 
     private DisplayContextParameterType type;
@@ -17,5 +19,12 @@ public class DisplayContextParameter {
 
     public String getValue() {
         return value;
+    }
+
+    public static Optional<DisplayContextParameter> getDisplayContextParameterOfType(String displayContextParameter,
+                                                                                     DisplayContextParameterType type) {
+        return DisplayContextParameterType.getDisplayContextParameterFor(displayContextParameter).stream()
+            .filter(param -> param.getType() == type)
+            .findAny();
     }
 }
