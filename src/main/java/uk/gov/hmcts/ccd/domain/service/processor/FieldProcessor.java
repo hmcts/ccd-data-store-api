@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
@@ -11,11 +13,11 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 
 import java.util.List;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
 
 public abstract class FieldProcessor {
 
+    protected static final ObjectMapper MAPPER = new ObjectMapper();
     protected static final String FIELD_SEPARATOR = ".";
 
     private final CaseViewFieldBuilder caseViewFieldBuilder;
@@ -36,15 +38,45 @@ public abstract class FieldProcessor {
         if (BaseType.get(COMPLEX) == fieldType) {
             return executeComplex(node, caseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, caseField.getId());
         } else if (BaseType.get(COLLECTION) == fieldType) {
-            return executeCollection(node, caseViewField);
+            return executeCollection(node, caseViewField, caseField.getId());
         } else {
-            return executeSimple(node, caseViewField, fieldType);
+            return executeSimple(node, caseViewField, fieldType, caseField.getId());
         }
     }
 
-    protected abstract JsonNode executeSimple(JsonNode node, CaseViewField caseViewField, BaseType baseType);
+    protected JsonNode executeComplex(JsonNode complexNode,
+                                      List<CaseField> complexCaseFields,
+                                      CaseEventField caseEventField,
+                                      WizardPageField wizardPageField,
+                                      String fieldPrefix) {
+        ObjectNode newNode = MAPPER.createObjectNode();
 
-    protected abstract JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField);
+        complexCaseFields.stream().forEach(complexCaseField -> {
+            final BaseType complexFieldType = BaseType.get(complexCaseField.getFieldType().getType());
+            final String fieldId = complexCaseField.getId();
+            final JsonNode caseFieldNode = complexNode.get(fieldId);
+            final String fieldPath = fieldPrefix + FIELD_SEPARATOR + fieldId;
 
-    protected abstract JsonNode executeComplex(JsonNode complexNode, List<CaseField> complexCaseFields, CaseEventField caseEventField, WizardPageField wizardPageField, String fieldPrefix);
+            if (complexFieldType == BaseType.get(COLLECTION)) {
+                newNode.set(fieldId, executeCollection(caseFieldNode, complexCaseField, fieldPath));
+            } else if (complexFieldType == BaseType.get(COMPLEX)) {
+                newNode.set(fieldId, executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, fieldPath));
+            } else {
+                newNode.set(fieldId, executeSimple(caseFieldNode, complexCaseField, complexFieldType, fieldPath));
+            }
+        });
+
+        return newNode;
+    }
+
+    protected abstract JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath);
+
+    protected abstract JsonNode executeCollection(JsonNode collectionNode, CommonField field, String fieldPath);
+
+    protected boolean isNullOrEmpty(final JsonNode node) {
+        return node == null
+            || node.isNull()
+            || (node.isTextual() && (null == node.asText() || node.asText().trim().length() == 0))
+            || (node.isObject() && node.toString().equals("{}"));
+    }
 }

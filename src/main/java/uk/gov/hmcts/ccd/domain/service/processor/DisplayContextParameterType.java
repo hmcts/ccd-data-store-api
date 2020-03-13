@@ -16,24 +16,6 @@ public enum DisplayContextParameterType {
     private static final int TYPE_GROUP = 1;
     private static final int VALUE_GROUP = 2;
 
-    public static List<DisplayContextParameter> getDisplayContextParameterFor(String displayContextParameter) {
-        List<DisplayContextParameter> displayContextParameterTypeList = new ArrayList<>();
-
-        String[] displayContextParameters = displayContextParameter.split(",");
-        for (String s : displayContextParameters) {
-            Optional<DisplayContextParameterType> type = getParameterTypeFor(s);
-            Optional<String> value = getParameterValueFor(s);
-
-            if (!type.isPresent() || !value.isPresent()) {
-                displayContextParameterTypeList.add(new DisplayContextParameter(null, null));
-            } else {
-                displayContextParameterTypeList.add(new DisplayContextParameter(type.get(), value.get()));
-            }
-
-        }
-        return displayContextParameterTypeList;
-    }
-
     public static Optional<DisplayContextParameterType> getParameterTypeFor(String displayContextParameter) {
         Matcher m = PATTERN.matcher(displayContextParameter);
         if (m.matches()) {

@@ -1,30 +1,27 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
+import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
+import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.*;
 
 @Component
 public class DateTimeFormatProcessor extends FieldProcessor {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final List<String> SUPPORTED_TYPES = Arrays.asList(DATETIME, DATE);
 
     private final DateTimeFormatParser dateTimeFormatParser;
 
@@ -36,26 +33,25 @@ public class DateTimeFormatProcessor extends FieldProcessor {
     }
 
     @Override
-    protected JsonNode executeSimple(JsonNode node, CaseViewField caseViewField, BaseType baseType) {
-        if (!Strings.isNullOrEmpty(node.asText())
-            && hasDateTimeEntryDCP(caseViewField.getDisplayContextParameter())
-            && baseType == BaseType.get(DATETIME)) {
-            return createTextNode(caseViewField.getDisplayContextParameter(), node.asText());
-        }
-        return node;
+    protected JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath) {
+        return !isNullOrEmpty(node)
+            && hasDisplayContextParameterType(field.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
+            && isSupportedBaseType(baseType) ?
+            createNode(field.getDisplayContextParameter(), node.asText(), baseType, fieldPath) :
+            node;
     }
 
     @Override
-    protected JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField) {
+    protected JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField, String fieldPath) {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
 
-        if (hasDateTimeEntryDCP(caseViewField.getDisplayContextParameter())
-            && collectionFieldType == BaseType.get(DATETIME)) {
+        if (hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
+            && isSupportedBaseType(collectionFieldType)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                    createTextNode(caseViewField.getDisplayContextParameter(), item.get(CollectionValidator.VALUE).asText()));
+                    createNode(caseViewField.getDisplayContextParameter(), item.get(CollectionValidator.VALUE).asText(), collectionFieldType, fieldPath));
                 newNode.add(newItem);
             });
 
@@ -65,53 +61,25 @@ public class DateTimeFormatProcessor extends FieldProcessor {
         return collectionNode;
     }
 
-    @Override
-    protected JsonNode executeComplex(JsonNode complexNode, List<CaseField> complexCaseFields, CaseEventField caseEventField, WizardPageField wizardPageField, String fieldPrefix) {
-        ObjectNode newNode = MAPPER.createObjectNode();
+    private boolean isSupportedBaseType(BaseType baseType) {
+        return SUPPORTED_TYPES.contains(baseType.getType());
+    }
 
-        complexCaseFields.stream().forEach(complexCaseField -> {
-            final BaseType complexFieldType = BaseType.get(complexCaseField.getFieldType().getType());
-            final String fieldId = complexCaseField.getId();
-            final JsonNode caseFieldNode = complexNode.get(fieldId);
-            final String fieldPath = fieldPrefix + FIELD_SEPARATOR + fieldId;
-
-            if (complexFieldType == BaseType.get(COLLECTION)) {
-                newNode.set(fieldId, executeCollection(caseFieldNode, complexCaseField));
-            } else if (complexFieldType == BaseType.get(COMPLEX)) {
-                newNode.set(fieldId, executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, fieldPath));
+    private TextNode createNode(String displayContextParameter, String valueToConvert, BaseType baseType, String fieldPath) {
+        String format = getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY).get().getValue();
+        try {
+            if (baseType == BaseType.get(DATETIME)) {
+                return new TextNode(dateTimeFormatParser.convertDateTimeToIso8601(format, valueToConvert));
             } else {
-                // TODO: Get override
-                newNode.set(fieldId,
-                    !isNullOrEmpty(caseFieldNode)
-                        && hasDateTimeEntryDCP(complexCaseField.getDisplayContextParameter())
-                        && complexFieldType == BaseType.get(DATETIME) ?
-                        createTextNode(complexCaseField.getDisplayContextParameter(), complexNode.get(fieldId).asText()) :
-                        caseFieldNode);
+                return new TextNode(dateTimeFormatParser.convertDateToIso8601(format, valueToConvert));
             }
-        });
-
-        return newNode;
-    }
-
-    private TextNode createTextNode(String displayContextParameter, String valueToConvert) {
-        return new TextNode(dateTimeFormatParser.convertDateTimeToIso8601(
-            DisplayContextParameter
-                .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY).get().getValue()
-            , valueToConvert)
-        );
-    }
-
-    private boolean hasDateTimeEntryDCP(String displayContextParameter) {
-        return !Strings.isNullOrEmpty(displayContextParameter) &&
-            DisplayContextParameter
-                .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
-                .isPresent();
-    }
-
-    private boolean isNullOrEmpty(final JsonNode node) {
-        return node == null
-            || node.isNull()
-            || (node.isTextual() && (null == node.asText() || node.asText().trim().length() == 0))
-            || (node.isObject() && node.toString().equals("{}"));
+        } catch (Exception e) {
+            throw new DataProcessingException().withDetails(
+                String.format("Unable to process field %s with value %s. Expected format: %s",
+                    fieldPath,
+                    valueToConvert,
+                    format)
+            );
+        }
     }
 }
