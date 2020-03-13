@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class CompoundAccessControlService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompoundAccessControlService.class);
+    public static final String A_CHILD_OF_HAS_DATA_DETELE_WITHOUT_DELETE_ACL = "A child {} of {} has been deleted but no Delete ACL";
     public static final String A_CHILD_OF_HAS_DATA_UPDATE_WITHOUT_UPDATE_ACL = "A child {} of {} has data update without Update ACL";
     public static final String SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL = "Simple child {} of {} has data update but no Update ACL";
 
@@ -114,12 +115,12 @@ public class CompoundAccessControlService {
 
     private boolean isAnyChildOfComplexNodeDeletedWithoutAccess(final JsonNode existingData, final JsonNode newData, final CaseField caseField, final Set<String> userRoles) {
         boolean deleteDeniedForAnyChildNode = false;
-        if (existingData.isObject() && existingData.size() > 0 && newData.isObject() && newData.size() > 0) {
+        if (existingData.isObject() && existingData.size() > 0 && newData != null && newData.isObject() && newData.size() > 0) {
             for (CaseField field : caseField.getFieldType().getComplexFields()) {
                 if (field.isCompoundFieldType() && existingData.get(field.getId()) != null && newData.get(field.getId()) != null
                     && isDeleteDeniedForChildren(existingData.get(field.getId()), newData.get(field.getId()), field, userRoles)) {
                     deleteDeniedForAnyChildNode = true;
-                    LOG.info(A_CHILD_OF_HAS_DATA_UPDATE_WITHOUT_UPDATE_ACL, field.getId(), caseField.getId());
+                    LOG.info(A_CHILD_OF_HAS_DATA_DETELE_WITHOUT_DELETE_ACL, field.getId(), caseField.getId());
                     break;
                 }
             }
@@ -136,13 +137,13 @@ public class CompoundAccessControlService {
                 if (field.isCompoundFieldType() && existingNode.get(VALUE) != null && existingNode.get(VALUE).get(field.getId()) != null
                     && isDeleteDeniedForChildren(existingNode.get(VALUE).get(field.getId()), newNode.get(VALUE).get(field.getId()), field, userRoles)) {
                     currentNodeOrAnyChildNodeDeletedWithoutAccess = true;
-                    LOG.info("Simple child {} of {} has been deleted item but no Delete ACL", field.getId(), caseField.getId());
+                    LOG.info(A_CHILD_OF_HAS_DATA_DETELE_WITHOUT_DELETE_ACL, field.getId(), caseField.getId());
                     break;
                 }
             }
         } else {
             if (!hasAccessControlList(userRoles, CAN_DELETE, caseField.getAccessControlLists())) {
-                LOG.info("A child {} item has been deleted item but no Delete ACL", caseField.getId());
+                LOG.info("A child {} item has been deleted but no Delete ACL", caseField.getId());
                 currentNodeOrAnyChildNodeDeletedWithoutAccess = true;
             }
         }
