@@ -174,6 +174,33 @@ class DefaultCreateCaseOperationTest {
     }
 
     @Test
+    @DisplayName("Should throws ValidationException when event Trigger pres states is null")
+    void shouldThrowValidationException_whenEventTriggerPreStatesIsNUll() {
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
+        given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.FALSE);
+        assertThrows(ValidationException.class,
+            () -> defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+                eventData,
+                IGNORE_WARNING),
+            "Cannot create case because of cti is not defined as case type for jid");
+    }
+
+
+    @Test
+    @DisplayName("Should throws ValidationException when event Trigger pre state is null")
+    void shouldThrowValidationException_whenEventTriggerPreStateIsNUll() {
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
+        given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.FALSE);
+        given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
+        assertThrows(ValidationException.class,
+            () -> defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+                eventData,
+                IGNORE_WARNING),
+            "Cannot create case because of cti is not defined as case type for jid");
+    }
+
+
+    @Test
     @DisplayName("Should throws ValidationException when event id is not known for case type")
     void shouldThrowValidationException_whenEventIdIsUnknown() {
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
