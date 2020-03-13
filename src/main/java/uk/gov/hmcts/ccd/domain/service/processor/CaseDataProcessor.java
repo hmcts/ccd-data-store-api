@@ -53,7 +53,7 @@ public class CaseDataProcessor {
             if (!isNullOrEmpty(result) && caseField.isPresent() && caseEventField.isPresent()) {
                 for (FieldProcessor processor : fieldProcessors) {
                     result = processor.execute(result, caseField.get(), caseEventField.get(),
-                        wizardPageFields.stream().filter(f -> f.getCaseFieldId().equals(caseField.get().getId())).findAny().get());
+                        wizardPageFields.stream().filter(f -> f.getCaseFieldId().equals(caseField.get().getId())).findAny().orElse(null));
                 }
             }
 
