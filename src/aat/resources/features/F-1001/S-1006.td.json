@@ -24,7 +24,6 @@
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "message" : "DocumentId is not valid",
-      "path" : "/cases/1583927314536134/documents/8de9957b-d7a6-40a1-%40%C2%A3%24%26-6aac30d33644",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

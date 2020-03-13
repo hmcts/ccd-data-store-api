@@ -16,7 +16,7 @@
     "body": {
       "_links": {
         "self": {
-          "href": "{{DATA_STORE_BASE_URL}}/cases/${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4"
+          "href": "{{DATA_STORE_BASE_URL}}/cases/${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}"
         }
       },
       "documentMetadata": {
@@ -24,11 +24,11 @@
         "caseTypeId": "BEFTA_CASETYPE_2_1",
         "jurisdictionId": "BEFTA_JURISDICTION_2",
         "document": {
-          "url": "{{DM_STORE_BASE_URL}}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4",
+          "url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}",
           "name": "Screenshot 2019-11-13 at 3.24.26 pm.png",
           "type": "Document",
           "description": null,
-          "id": "e636eef3-839a-48cd-96f0-dad43e66f5c4",
+          "id": "${[scenarioContext][testData][request][pathVariables][documentId]}",
           "permissions": [
             "READ",
             "UPDATE",
