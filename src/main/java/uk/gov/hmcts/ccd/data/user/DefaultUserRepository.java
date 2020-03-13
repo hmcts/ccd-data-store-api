@@ -126,7 +126,7 @@ public class DefaultUserRepository implements UserRepository {
             LOG.error("Failed to retrieve user profile", e);
             final List<String> headerMessages = Optional.ofNullable(e.getResponseHeaders())
                 .map(headers -> headers.get("Message")).orElse(null);
-            final String message = headerMessages != null ? headerMessages.get(0) : e.getMessage();
+            final String message = headerMessages != null ? headerMessages.get(0) : "Rest Client Response Exception";
             if (message != null) {
                 if (HttpStatus.NOT_FOUND.value() == e.getRawStatusCode()) {
                     throw new ResourceNotFoundException(message);

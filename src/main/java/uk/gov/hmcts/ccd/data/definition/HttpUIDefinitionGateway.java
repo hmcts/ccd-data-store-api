@@ -69,10 +69,10 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                     duration.toMillis());
             return searchResult;
         } catch (final Exception e) {
+            LOG.warn("Problem getting SearchResult definition because of {}", e.getMessage());
             throw new ServiceException(String.format(
-                    "Problem getting SearchResult definition for case type: %s because of %s",
-                    caseTypeId,
-                    e.getMessage()));
+                    "Problem getting SearchResult definition for case type: %s",
+                    caseTypeId));
         }
     }
 
@@ -93,10 +93,10 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                     duration.toMillis());
             return definition;
         } catch (final Exception e) {
+            LOG.warn("Problem getting SearchInputs definition because of {}", e.getMessage());
             throw new ServiceException(String.format(
-                    "Problem getting SearchInputs definition for case type: %s because of %s",
-                    caseTypeId,
-                    e.getMessage()));
+                    "Problem getting SearchInputs definition for case type: %s",
+                    caseTypeId));
         }
     }
 
@@ -117,10 +117,10 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                     duration.toMillis());
             return definition;
         } catch (final Exception e) {
+            LOG.warn("Problem getting WorkbasketInputs definition because of {}", e.getMessage());
             throw new ServiceException(String.format(
-                    "Problem getting WorkbasketInputs definition for case type: %s because of %s",
-                    caseTypeId,
-                    e.getMessage()));
+                    "Problem getting WorkbasketInputs definition for case type: %s",
+                    caseTypeId));
         }
     }
 
@@ -175,10 +175,10 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                     duration.toMillis());
             return searchResult;
         } catch (final Exception e) {
+            LOG.warn("Problem getting WorkBasketResult definition because of {}", e.getMessage());
             throw new ServiceException(String.format(
-                    "Problem getting WorkBasketResult definition for case type: %s because of %s",
-                    caseTypeId,
-                    e.getMessage()));
+                    "Problem getting WorkBasketResult definition for case type: %s",
+                    caseTypeId));
         }
     }
 
@@ -208,13 +208,13 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                 duration.toMillis());
             return bannersResult;
         } catch (final Exception e) {
+            LOG.warn("Problem getting banners for jurisdiction references because of {}", e.getMessage());
             throw new ServiceException(String.format(
-                "Problem getting banners for jurisdiction references: %s because of %s",
-                jurisdictionIds,
-                e.getMessage()));
+                "Problem getting banners for jurisdiction references: %s",
+                jurisdictionIds));
         }
     }
-    
+
     public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionIds) {
         try {
             final Instant start = Instant.now();
@@ -231,10 +231,10 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                 duration.toMillis());
             return jurisdictionUiConfigResult;
         } catch (final Exception e) {
+            LOG.warn("Problem getting banners UI configs for jurisdiction references because of {}", e.getMessage());
             throw new ServiceException(String.format(
-                "Problem getting jurisdiction UI configs for jurisdiction references: %s because of %s",
-                jurisdictionIds,
-                e.getMessage()));
+                "Problem getting jurisdiction UI configs for jurisdiction references: %s",
+                jurisdictionIds));
         }
     }
 }

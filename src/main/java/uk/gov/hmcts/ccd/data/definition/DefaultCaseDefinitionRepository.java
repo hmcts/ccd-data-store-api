@@ -74,9 +74,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Error while retrieving base type", e);
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:" + jurisdictionId + " because of " + e.getMessage());
+                LOG.warn("Resource not found because of {}", e.getMessage());
+                throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction: {}" + jurisdictionId);
             } else {
-                throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId + " because of " + e.getMessage());
+                LOG.warn("Problem getting case type for Jurisdiction because of {}", e.getMessage());
+                throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId);
             }
         }
     }
@@ -100,9 +102,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Error while retrieving case type", e);
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting case type definition for " + caseTypeId + " because of " + e.getMessage());
+                LOG.debug("Resource not found because of {}", e.getMessage());
+                throw new ResourceNotFoundException("Resource not found when getting case type definition for " + caseTypeId);
             } else {
-                throw new ServiceException("Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
+                LOG.debug("Problem getting case type definition  because of {}", e.getMessage());
+                throw new ServiceException("Problem getting case type definition for " + caseTypeId);
             }
         }
     }
@@ -116,9 +120,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Error while retrieving base types", e);
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Problem getting base types definition from definition store because of " + e.getMessage());
+                throw new ResourceNotFoundException("Problem getting base types definition from definition store");
             } else {
-                throw new ServiceException("Problem getting base types definition from definition store because of " + e.getMessage());
+                throw new ServiceException("Problem getting base types definition from definition store");
             }
         }
     }
@@ -134,11 +138,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                LOG.debug("No classification found for user role {} because of ", userRole, e);
+                LOG.debug("No classification found for user role {} because of {}", userRole, e.getMessage());
                 return null;
             } else {
-                LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
-                throw new ServiceException("Error while retrieving classification for user role " + userRole + " because of " + e.getMessage());
+                LOG.warn("Error while retrieving classification for user role {} because of {}", userRole, e.getMessage());
+                throw new ServiceException("Error while retrieving classification for user role " + userRole);
             }
         }
     }
@@ -154,8 +158,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             queryParams.put("roles", StringUtils.join(userRoles, ","));
             return Arrays.asList(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET, requestEntity, UserRole[].class, queryParams).getBody());
         } catch (Exception e) {
-            LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
-            throw new ServiceException("Error while retrieving classification for user roles " + userRoles + " because of " + e.getMessage());
+            LOG.warn("Error while retrieving classification for user roles {} because of {}", userRoles, e.getMessage());
+            throw new ServiceException("Error while retrieving classification for user roles " + userRoles);
         }
     }
 
@@ -176,10 +180,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type version", e);
             if (e instanceof HttpClientErrorException && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                LOG.warn("Resource not found when getting case type version because of {}", e.getMessage());
                 throw new ResourceNotFoundException(
-                        "Resource not found when getting case type version for '" + caseTypeId + "'.", e);
+                        "Resource not found when getting case type version for '" + caseTypeId);
             } else {
-                throw new ServiceException("Problem getting case type version for '" + caseTypeId + "'.", e);
+                LOG.warn("Problem getting case type version for because of {}", e.getMessage());
+                throw new ServiceException("Problem getting case type version for '" + caseTypeId);
             }
         }
     }
@@ -218,7 +224,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                         jurisdictionIds);
                 return new ArrayList<>();
             } else {
-                throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
+                throw new ServiceException("Problem retrieving jurisdictions definition ");
             }
         }
     }

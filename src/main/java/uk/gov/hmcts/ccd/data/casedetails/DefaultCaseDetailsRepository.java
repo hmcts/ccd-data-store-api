@@ -78,10 +78,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             if (e.getCause() instanceof ConstraintViolationException && isDuplicateReference(e)) {
                 LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",
                     caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
-                throw new ReferenceKeyUniqueConstraintException(e.getMessage());
+                throw new ReferenceKeyUniqueConstraintException("Constraint violation for this case id");
             } else {
                 LOG.warn("Failed to store case details, UUID={}", caseDetails.getReference(), e);
-                throw new CasePersistenceException(e.getMessage());
+                throw new CasePersistenceException("Impossible to persist this case");
             }
         }
         return caseDetailsMapper.entityToModel(mergedEntity);

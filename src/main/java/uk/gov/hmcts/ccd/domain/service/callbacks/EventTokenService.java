@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -26,6 +28,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EventTokenService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(EventTokenService.class);
+
     private static final CaseDetails EMPTY_CASE = new CaseDetails();
 
     static {
@@ -90,7 +95,8 @@ public class EventTokenService {
                 toString(claims.get(EventTokenProperties.ENTITY_VERSION)));
 
         } catch (ExpiredJwtException | SignatureException e) {
-            throw new EventTokenException(e.getMessage());
+            LOG.info("Token Exception {}", e.getMessage());
+            throw new EventTokenException("Token not valid");
         }
     }
 

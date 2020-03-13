@@ -18,6 +18,8 @@ import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.lambda.Unchecked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
 @Slf4j
 public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchCaseSearchOperation.class);
 
     public static final String QUALIFIER = "ElasticsearchCaseSearchOperation";
     static final String MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE = "root_cause";
@@ -72,7 +76,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         try {
             return jestClient.execute(multiSearch);
         } catch (IOException e) {
-            throw new ServiceException("Exception executing search : " + e.getMessage(), e);
+            LOG.warn("Exception during search", e);
+            throw new ServiceException("Exception executing search");
         }
     }
 

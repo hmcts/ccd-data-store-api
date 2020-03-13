@@ -68,8 +68,8 @@ public class DocumentsOperation {
             LOG.error(String.format(
                 "Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s",
                 jurisdictionId, caseTypeId, caseReference), e);
-            throw new ServiceException(String.format("Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s, because of %s",
-                jurisdictionId, caseTypeId, caseReference, e));
+            throw new ServiceException(String.format("Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s",
+                jurisdictionId, caseTypeId, caseReference));
         }
     }
 

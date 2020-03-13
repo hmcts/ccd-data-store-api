@@ -72,7 +72,7 @@ public class DefaultDraftGateway implements DraftGateway {
             return getDraftId(responseHeaders);
         } catch (Exception e) {
             LOG.warn("Error while saving draft", e);
-            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         }
     }
 
@@ -88,10 +88,10 @@ public class DefaultDraftGateway implements DraftGateway {
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
-            throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+            throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         } catch (Exception e) {
             LOG.warn("Error while updating draftId={}", draftId, e);
-            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         }
         final DraftResponse draftResponse = new DraftResponse();
         draftResponse.setId(draftId);
@@ -111,10 +111,10 @@ public class DefaultDraftGateway implements DraftGateway {
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
-            throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+            throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         } catch (Exception e) {
             LOG.warn("Error while getting draftId={}", draftId, e);
-            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         }
         return assembleDraft(draft, getDraftExceptionConsumer());
     }
@@ -137,10 +137,10 @@ public class DefaultDraftGateway implements DraftGateway {
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
-            throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+            throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         } catch (Exception e) {
             LOG.warn("Error while deleting draftId=" + draftId, e);
-            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         }
     }
 
@@ -157,14 +157,14 @@ public class DefaultDraftGateway implements DraftGateway {
                 .collect(Collectors.toList());
         } catch (Exception e) {
             LOG.warn("Error while getting drafts", e);
-            throw new DraftAccessException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+            throw new DraftAccessException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         }
     }
 
     private Consumer<Exception> getDraftExceptionConsumer() {
         return (Exception e) -> {
             LOG.warn("Error while deserializing draft data content", e);
-            throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE, e);
+            throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE);
         };
     }
 
