@@ -32,15 +32,15 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
 
     @Override
     public final Map<String, JsonNode> validateCaseDetails(String caseTypeId, CaseDataContent content) {
-        if (content == null || content.getEvent().getEventId() == null) {
+        if (content == null || content.getEvent() == null || content.getEventId() == null) {
             throw new ValidationException("Cannot validate case field because of event is not specified");
         }
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {
-            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
+            throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
         if (!hasEventId(caseType, content.getEventId())) {
-            throw new ValidationException("Cannot validate case field because of event" + content.getEventId() + " is not found in case type definition");
+            throw new ValidationException("Cannot validate case field because of event " + content.getEventId() + " is not found in case type definition");
         }
         content.setData(caseDataProcessor.process(content.getData(), caseType, content.getEventId()));
         caseTypeService.validateData(content.getData(), caseType);
