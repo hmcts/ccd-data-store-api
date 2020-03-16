@@ -10,17 +10,22 @@
     "contains active Solicitor profile who does not have READ access"
   ],
 
-  "request": {
-    "pathVariables": {
-      "docId": "76976634-374f-472b-a819-a3a938b4cc83"
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.1@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "body": {
-      "errorMessage": "Resource Not found",
-      "errorDescription": "The request document is not found"
+      "exception" : "uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentNotFoundException",
+      "message" : "No document found for this case reference: ${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "path" : "/cases/${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
     }
   }
 }
