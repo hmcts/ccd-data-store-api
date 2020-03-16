@@ -63,8 +63,7 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
     }
 
     private boolean filterDistinctFieldsByRole(final Set<String> addedFields, final CriteriaInput criteriaInput, final Set<String> userRoles) {
-        String id = StringUtils.isEmpty(criteriaInput.getField().getElementPath()) ? criteriaInput.getField().getId() :
-            criteriaInput.getField().getId() + criteriaInput.getField().getElementPath();
+        String id = buildFieldId(criteriaInput);
         if (addedFields.contains(id)) {
             return false;
         } else {
@@ -75,5 +74,10 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
                 return false;
             }
         }
+    }
+
+    private String buildFieldId(CriteriaInput criteriaInput) {
+        return StringUtils.isEmpty(criteriaInput.getField().getElementPath()) ? criteriaInput.getField().getId() :
+            criteriaInput.getField().getId() + '.' + criteriaInput.getField().getElementPath();
     }
 }

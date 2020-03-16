@@ -80,8 +80,7 @@ public class MergeDataToSearchResultOperation {
     }
 
     private boolean filterDistinctFieldsByRole(final HashSet<String> addedFields, final SearchResultField resultField) {
-        String id = org.apache.commons.lang.StringUtils.isEmpty(resultField.getCaseFieldPath()) ? resultField.getCaseFieldId() :
-            resultField.getCaseFieldId() + resultField.getCaseFieldPath();
+        String id = buildCaseFieldId(resultField);
         if (addedFields.contains(id)) {
             return false;
         } else {
