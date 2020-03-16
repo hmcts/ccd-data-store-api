@@ -16,8 +16,8 @@ public class DateTimeFormatParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(DateTimeFormatParser.class);
 
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public void parseDateTimeFormat(String dateTimeFormat, String value) throws Exception {
         try {
@@ -42,7 +42,7 @@ public class DateTimeFormatParser {
             .toFormatter();
 
         LocalDateTime dateTime = LocalDateTime.parse(value, inputFormat);
-        return dateTime.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+        return dateTime.format(DATE_TIME_FORMAT);
     }
 
     public String convertDateToIso8601(String dateFormat, String value) {
@@ -54,6 +54,16 @@ public class DateTimeFormatParser {
             .toFormatter();
 
         LocalDate date = LocalDate.parse(value, inputFormat);
-        return date.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
+        return date.format(DATE_FORMAT);
+    }
+
+    public String convertIso8601ToDateTime(String dateTimeFormat, String value) {
+        LocalDateTime dateTime = LocalDateTime.parse(value, DATE_TIME_FORMAT);
+        return dateTime.format(DateTimeFormatter.ofPattern(dateTimeFormat));
+    }
+
+    public String convertIso8601ToDate(String dateFormat, String value) {
+        LocalDate date = LocalDate.parse(value, DATE_FORMAT);
+        return date.format(DateTimeFormatter.ofPattern(dateFormat));
     }
 }
