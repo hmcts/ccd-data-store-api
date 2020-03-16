@@ -13,6 +13,9 @@
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers" : {
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-documents.v2+json;charset=UTF-8"
+    },
     "body": {
       "_links": {
         "self": {
