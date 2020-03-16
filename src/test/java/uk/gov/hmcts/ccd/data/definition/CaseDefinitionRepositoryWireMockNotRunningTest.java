@@ -25,7 +25,7 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
             assertThrows(ServiceException.class,
                          () -> caseDefinitionRepository.getCaseTypesForJurisdiction("nor_defined"));
         assertThat(exception.getMessage(),
-                   startsWith("Problem getting case types for the Jurisdiction:nor_defined because of "));
+                   startsWith("Problem getting case types for the Jurisdiction"));
     }
 
     @Test
@@ -33,7 +33,7 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
         final ServiceException
             exception =
             assertThrows(ServiceException.class, () -> caseDefinitionRepository.getCaseType("anything"));
-        assertThat(exception.getMessage(), startsWith("Problem getting case type definition for anything because of "));
+        assertThat(exception.getMessage(), startsWith("Problem getting case type definition for anything"));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
             exception =
             assertThrows(ServiceException.class, () -> caseDefinitionRepository.getBaseTypes());
         assertThat(exception.getMessage(),
-                   startsWith("Problem getting base types definition from definition store because of "));
+                   startsWith("Problem getting base types definition from definition store"));
     }
 
     @Test
@@ -54,6 +54,6 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
             assertThrows(ServiceException.class,
                 () -> caseDefinitionRepository.getClassificationsForUserRoleList(userRoles));
         assertThat(exception.getMessage(),
-                   startsWith("Error while retrieving classification for user roles " + userRoles + " because of "));
+                   startsWith("Error while retrieving classification for user roles " + userRoles));
     }
 }

@@ -94,7 +94,7 @@ public class DefaultCaseDefinitionRepositoryTest {
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getBaseTypes());
-        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store because of"));
+        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store"));
     }
 
     @Test
@@ -103,7 +103,7 @@ public class DefaultCaseDefinitionRepositoryTest {
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getBaseTypes());
-        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store because of"));
+        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store"));
     }
 
     @Test(expected = ResourceNotFoundException.class)
@@ -120,7 +120,7 @@ public class DefaultCaseDefinitionRepositoryTest {
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
         ServiceException exception = assertThrows(ServiceException.class, () -> caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
-        assertThat(exception.getMessage(), startsWith("Error while retrieving classification for user role nor_defined because of "));
+        assertThat(exception.getMessage(), startsWith("Error while retrieving classification for user role nor_defined"));
     }
 
 
