@@ -1,0 +1,59 @@
+{
+	"_guid_": "S-new.2",
+	"_extends_": "F-new_Test_Data_Base",
+
+	"title": "must accept null for date when it is optional and has displayformat set",
+
+	"specs": [
+		"an active profile in CCD",
+    "contains null value for a formatted Date field",
+		"has 200 return code"
+	],
+  "request": {
+    "body": {
+      "data": {
+        "TextField": "s",
+        "NumberField": "23",
+        "YesOrNoField": "Yes",
+        "DateField": "2020-12-20",
+        "DateTimeField": null
+      }
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "_links": {
+        "self": {
+          "href": "http://localhost:4452/case-types/BEFTA_CASETYPE_3_4/cases{?ignore-warning}"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_JURISDICTION_3",
+      "case_type": "BEFTA_CASETYPE_3_4",
+      "created_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "state": "TODO",
+      "security_classification": "PUBLIC",
+      "data": {
+        "YesOrNoField": "Yes",
+        "TextField": "s",
+        "DateField": "2020-12-20",
+        "DateTimeField": null,
+        "NumberField": "23"
+      },
+      "data_classification": {
+        "YesOrNoField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "DateTimeField": "PUBLIC",
+        "NumberField": "PUBLIC"
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+	"_guid_": "S-034.2",
+	"_extends_": "F-034_Test_Data_Base_2",
+
+	"title": "must accept null for date when it is optional and has displayformat set",
+
+	"specs": [
+		"an active profile in CCD",
+    "contains null value for a formatted Date field",
+		"has 200 return code"
+	],
+  "request": {
+    "body": {
+      "data": {
+        "TextField": "s",
+        "NumberField": "23",
+        "YesOrNoField": "Yes",
+        "DateField": "2020-12-20",
+        "DateTimeField": null
+      }
+    }
+  },
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Type": "application/json",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+        "data" : {
+          "YesOrNoField" : "Yes",
+          "TextField" : "s",
+          "DateField" : "2020-12-20",
+          "DateTimeField" : null,
+          "NumberField" : "23"
+        },
+      "_links" : "[[ANYTHING_PRESENT]]"
+    }
+	}
+}

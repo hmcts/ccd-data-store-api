@@ -17,9 +17,6 @@
 			"ctid": "AAT"
 		},
 		"body": {
-			"data": {
-				"_extends_": "F-050_Common_Data_In_Body"
-			},
 			"event": {
 				"id": "CREATE",
 				"summary": "",
