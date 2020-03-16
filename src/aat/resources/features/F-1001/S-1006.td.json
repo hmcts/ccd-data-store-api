@@ -18,9 +18,6 @@
 
   "expectedResponse": {
     "_extends_": "Common_400_Response",
-    "headers" : {
-      "Connection" : "close"
-    },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "message" : "DocumentId is not valid",

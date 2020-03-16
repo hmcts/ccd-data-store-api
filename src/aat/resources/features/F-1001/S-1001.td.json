@@ -16,7 +16,7 @@
     "body": {
       "_links": {
         "self": {
-          "href": "{{DATA_STORE_BASE_URL}}/cases/${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}"
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}"
         }
       },
       "documentMetadata": {
