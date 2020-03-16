@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,45 +13,41 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 public class GetCaseDocumentsOperationTest {
-
-    private static final ObjectMapper mapper = new ObjectMapper();
-    public static final String TEST_CASE_TYPE = "TEST_CASE_TYPE";
-    public static final String TEST_JURISDICTION = "TEST_JURISDICTION";
-    public static final String TEST_CASE_REFERENCE = "1504259907353537";
-    public static final String TEST_DOCUMENT_ID = "a780ee98-3136-4be9-bf56-a46f8da1bc97";
-    public static final String TEST_DOCUMENT_INVALID = "a780ee98-3136-4be9-bf56-a46f8da1bc9@";
-    private static final String USER_ID = "26";
-    private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
-    private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
-    private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
-    private static final String CASE_REFERENCE = "1234123412341238";
-    private static final String CASE_TYPE_ID = "BEFTA_CASETYPE_2_1";
-    private static final String JURISDICTION_ID = "BEFTA_JURISDICTION_2";
-    private static final String CASE_DOCUMENT_ID = "a780ee98-3136-4be9-bf56-a46f8da1bc97";
-    private static final String DOCUMENT_URL = "http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97";
-    private static final String DOCUMENT_NAME = "Sample_document.txt";
-    private static final String DOCUMENT_TYPE = "Document";
 
     @Mock
     private GetCaseOperation getCaseOperation;
@@ -62,18 +60,43 @@ public class GetCaseDocumentsOperationTest {
     @Mock
     private DocumentIdValidationService documentIdValidationService;
 
-    @Mock
     private GetCaseDocumentOperation caseDocumentsOperation;
 
+    private static final String CASE_REFERENCE = "1234123412341238";
+    private static final String CASE_TYPE_ID = "BEFTA_CASETYPE_2_1";
+    private static final String JURISDICTION_ID = "BEFTA_JURISDICTION_2";
+    private static final String CASE_DOCUMENT_ID = "a780ee98-3136-4be9-bf56-a46f8da1bc97";
+    private static final String CASE_DOCUMENT_ID_INVALID = "a780ee98-3136-4be9-bf56-a46f8da1bc9@";
+    private static final String DOCUMENT_URL = "http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97";
+    private static final String DOCUMENT_NAME = "Sample_document.txt";
+    private static final String DOCUMENT_TYPE = "Document";
+    private static final String USER_ID = "test_user_id";
 
-    private CaseDetails caseDetails = new CaseDetails();
-    private Optional<CaseDetails> caseDetailsOptional;
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private final TypeReference jsonMap = new TypeReference<HashMap<String, JsonNode>>() {};
     private final CaseType caseType = new CaseType();
-    private final Set<String> userRoles = Sets
-        .newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3);
+    private final Set<String> userRoles = Sets.newHashSet("role1", "role2");
     private final List<String> caseRoles = Collections.emptyList();
-    private final CaseDocumentMetadata caseDocumentMetadata =
-        CaseDocumentMetadata.builder().caseId("CaseId").caseTypeId("CaseTypeId").build();
+    private static final AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
+    private static final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true).withUpdate(false).withDelete(true).build();
+    private static final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false).withUpdate(true).withDelete(false).build();
+    private static final FieldType documentFieldType = aFieldType().withId("Document").withType("Document").build();
+    private static final CaseField CASE_FIELD = newCaseField()
+        .withFieldType(documentFieldType)
+        .withId("DocumentField1")
+        .withAcl(acl1)
+        .withAcl(acl2)
+        .withAcl(acl3)
+        .build();
+
+    private CaseDetails caseDetails;
+    private Optional<CaseDetails> caseDetailsOptional;
+    private final CaseDocumentMetadata caseDocumentMetadata = CaseDocumentMetadata.builder()
+        .caseId("CaseId")
+        .caseTypeId("CaseTypeId")
+        .build();
     private final CaseDocument caseDocument = CaseDocument.builder()
         .id(CASE_DOCUMENT_ID)
         .url(DOCUMENT_URL)
@@ -81,64 +104,106 @@ public class GetCaseDocumentsOperationTest {
         .type(DOCUMENT_TYPE)
         .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
         .build();
-    private String documentCaseField = "DocumentField1";
-    Map<String, JsonNode> caseData = caseDetails.getData();
 
-    //private CaseField DocumentCaseField = newCaseField().withId("DocumentField1")
-    // .withFieldType(aFieldType().withId("DocumentField1").withType("Document").build()).build();
+    private final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+        "{  \"DocumentField1\": { "
+            +
+            "           \"document_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97\","
+            +
+            "           \"document_binary_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97/binary\","
+            +
+            "           \"document_filename\": \"bin1.pdf\""
+            +
+            "       }\n,"
+            +
+            "       \"DocumentField2\": {"
+            +
+            "           \"document_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932\","
+            +
+            "           \"document_binary_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932/binary\","
+            +
+            "           \"document_filename\": \"bin2.pdf\""
+            +
+            "       }\n"
+            +
+            "    }\n"
+    ), jsonMap);
+
+    public GetCaseDocumentsOperationTest() throws IOException {
+    }
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         caseDetailsOptional = Optional.of(new CaseDetails());
-        doReturn(caseDetailsOptional).when(getCaseOperation).execute(TEST_CASE_REFERENCE);
         doReturn(userRoles).when(userRepository).getUserRoles();
         doReturn(USER_ID).when(userRepository).getUserId();
-        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(TEST_CASE_REFERENCE), USER_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION);
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(TEST_DOCUMENT_ID);
-        doReturn(Boolean.FALSE).when(documentIdValidationService).validateDocumentUUID(TEST_DOCUMENT_INVALID);
-    //caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation,caseTypeService,userRepository,caseUserRepository,documentIdValidationService);
+        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
+        caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation,caseTypeService,userRepository,caseUserRepository,documentIdValidationService);
     }
 
-
     @Nested
-    @DisplayName("getDocumentMetadata")
-    class getDocumentMetadata {
+    @DisplayName("getCaseDocumentMetadata")
+    class GetCaseDocumentMetadata {
+
+        @Test
+        @DisplayName("should throw Bad Request exception when document Id is invalid")
+        void shouldThrowBadRequestWhenDocumentIdInvalid() {
+            doReturn(Boolean.FALSE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_INVALID);
+            assertAll(
+                () -> assertThrows(BadRequestException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID_INVALID)),
+                () -> verify(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_INVALID)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw Bad Request exception when document Id is null")
+        void shouldThrowBadRequestWhenDocumentIdNull() {
+            doReturn(Boolean.FALSE).when(documentIdValidationService).validateDocumentUUID(null);
+            assertThrows(BadRequestException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,null));
+        }
+
+        @Test
+        @DisplayName("should throw CaseNotFoundException when case does not exist")
+        void shouldThrowCaseNotFoundWhenCaseNotExist() {
+            doReturn(caseDetailsOptional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
+            assertThrows(CaseNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID));
+
+        }
+
         @Test
         @DisplayName("should return CaseDocumentMetadata")
-        void shouldCallGetDocumentMetadata() {
-            doReturn(caseDocumentMetadata).when(caseDocumentsOperation).getCaseDocumentMetadata(TEST_CASE_REFERENCE,TEST_DOCUMENT_ID);
-            //doReturn(new CaseDocument()).when(caseDocumentsOperation).getCaseDocument(new CaseDetails(),TEST_DOCUMENT_ID);
-            CaseDocumentMetadata result = caseDocumentsOperation.getCaseDocumentMetadata(TEST_CASE_REFERENCE,TEST_DOCUMENT_ID);
+        void shouldCallGetCaseDocumentMetadata() {
+
+            caseDetails = new CaseDetails();
+            caseDetails.setJurisdiction(JURISDICTION_ID);
+            caseDetails.setCaseTypeId(CASE_TYPE_ID);
+            caseDetails.setId(CASE_REFERENCE);
+            caseDetails.setReference(new Long(CASE_REFERENCE));
+            caseDetails.setState("state1");
+            caseDetails.setData(data);
+
+            doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+            caseType.setCaseFields(singletonList(CASE_FIELD));
+            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+
+            CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID);
             assertAll(
-                () -> assertThat(result.getCaseId(), is(caseDocumentMetadata.getCaseId())),
-                () -> assertThat(result.getCaseTypeId(), is(caseDocumentMetadata.getCaseTypeId()))
+                () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
+                () -> assertThat(caseDocumentMetadata.getCaseTypeId(), is(caseDetails.getCaseTypeId())),
+                () -> assertThat(caseDocumentMetadata.getJurisdictionId(), is(caseDetails.getJurisdiction()))
             );
         }
 
-        @Test
-        @DisplayName("should return CaseDocument")
-        void shouldCallGetCaseDocument() {
-            doReturn(caseDocument).when(caseDocumentsOperation).getCaseDocument(caseDetails,TEST_DOCUMENT_ID);
-            CaseDocument result = caseDocumentsOperation.getCaseDocument(caseDetails,TEST_DOCUMENT_ID);
-            assertAll(
-                () -> assertThat(result.getId(), is(caseDocument.getId())),
-                () -> assertThat(result.getUrl(), is(caseDocument.getUrl())),
-                () -> assertThat(result.getName(), is(caseDocument.getName())),
-                () -> assertThat(result.getType(), is(caseDocument.getType()))
-            );
-        }
-
-        @Test
-        @DisplayName("should return Document CaseField")
-        void shouldCallGetDocumentCaseField() {
-            doReturn(documentCaseField).when(caseDocumentsOperation).getDocumentCaseField(caseData,TEST_DOCUMENT_ID);
-            String result = caseDocumentsOperation.getDocumentCaseField(caseData,TEST_DOCUMENT_ID);
-            assertAll(
-                () -> assertThat(result, is(documentCaseField))
-            );
+        private Map<String, JsonNode> buildData(String... dataFieldIds) {
+            Map<String, JsonNode> dataMap = new HashMap<>();
+            asList(dataFieldIds).forEach(dataFieldId -> {
+                dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId));
+            });
+            return dataMap;
         }
 
     }

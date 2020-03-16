@@ -68,12 +68,15 @@ public class GetCaseDocumentOperation {
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
             .orElseThrow(() -> new CaseNotFoundException(caseId));
 
-        return CaseDocumentMetadata.builder()
-            .caseId(caseDetails.getReferenceAsString())
-            .caseTypeId(caseDetails.getCaseTypeId())
-            .jurisdictionId(caseDetails.getJurisdiction())
-            .document(getCaseDocument(caseDetails, documentId))
-            .build();
+        if (!caseDetails.getReferenceAsString().isEmpty()) {
+            return CaseDocumentMetadata.builder()
+                .caseId(caseDetails.getReferenceAsString())
+                .caseTypeId(caseDetails.getCaseTypeId())
+                .jurisdictionId(caseDetails.getJurisdiction())
+                .document(getCaseDocument(caseDetails, documentId))
+                .build();
+        }
+        throw new CaseNotFoundException(caseId);
     }
 
     public CaseDocument getCaseDocument(CaseDetails caseDetails, String documentId) {
@@ -110,7 +113,7 @@ public class GetCaseDocumentOperation {
         }
     }
 
-    public Optional<AccessControlList> getCaseFieldACLByUserRoles(CaseDetails caseDetails, String documentField) {
+    private Optional<AccessControlList> getCaseFieldACLByUserRoles(CaseDetails caseDetails, String documentField) {
         //get the caseTypeId and JID
         String caseTypeId = caseDetails.getCaseTypeId();
         String jurisdictionId = caseDetails.getJurisdiction();
@@ -146,13 +149,13 @@ public class GetCaseDocumentOperation {
         }
     }
 
-    public Set<String> getUserRoles(String caseId) {
+    private Set<String> getUserRoles(String caseId) {
         return Sets.union(userRepository.getUserRoles(),
             new HashSet<>(caseUserRepository
                 .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())));
     }
 
-    public String getDocumentCaseField(Map<String, JsonNode> caseData, String documentId) {
+    private String getDocumentCaseField(Map<String, JsonNode> caseData, String documentId) {
         for (Map.Entry<String, JsonNode> entry : caseData.entrySet()) {
             if (entry.getValue().getNodeType().toString()
                 .equals("OBJECT") && entry.getValue().toString().contains(documentId)) {
@@ -163,7 +166,7 @@ public class GetCaseDocumentOperation {
     }
 
 
-    public List<Permission> getDocumentPermissions(AccessControlList userACL) {
+    private List<Permission> getDocumentPermissions(AccessControlList userACL) {
         final List<Permission> permissions = new ArrayList<>();
 
         if (userACL.isRead()) {
