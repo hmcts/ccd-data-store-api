@@ -8,31 +8,28 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CaseDataProcessor {
+public class FieldProcessorService {
 
-    private final List<FieldProcessor> fieldProcessors;
+    private final List<CaseDataFieldProcessor> caseDataFieldProcessors;
     private final UIDefinitionRepository uiDefinitionRepository;
     private final EventTriggerService eventTriggerService;
 
     @Autowired
-    public CaseDataProcessor(final List<FieldProcessor> fieldProcessors,
-                             final UIDefinitionRepository uiDefinitionRepository,
-                             final EventTriggerService eventTriggerService) {
-         this.fieldProcessors = fieldProcessors;
+    public FieldProcessorService(final List<CaseDataFieldProcessor> caseDataFieldProcessors,
+                                 final UIDefinitionRepository uiDefinitionRepository,
+                                 final EventTriggerService eventTriggerService) {
+         this.caseDataFieldProcessors = caseDataFieldProcessors;
          this.uiDefinitionRepository = uiDefinitionRepository;
          this.eventTriggerService = eventTriggerService;
     }
 
-    public Map<String, JsonNode> process(final Map<String, JsonNode> data,
-                                         final CaseType caseType,
-                                         final CaseEvent event) {
+    public Map<String, JsonNode> processData(final Map<String, JsonNode> data,
+                                             final CaseType caseType,
+                                             final CaseEvent event) {
         if (MapUtils.isEmpty(data)) {
             return data;
         }
@@ -51,7 +48,7 @@ public class CaseDataProcessor {
 
             JsonNode result = entry.getValue();
             if (!isNullOrEmpty(result) && caseField.isPresent() && caseEventField.isPresent()) {
-                for (FieldProcessor processor : fieldProcessors) {
+                for (CaseDataFieldProcessor processor : caseDataFieldProcessors) {
                     result = processor.execute(result, caseField.get(), caseEventField.get(),
                         wizardPageFields.stream().filter(f -> f.getCaseFieldId().equals(caseField.get().getId())).findAny().orElse(null));
                 }
@@ -63,10 +60,10 @@ public class CaseDataProcessor {
         return processedData;
     }
 
-    public Map<String, JsonNode> process(final Map<String, JsonNode> data,
-                                         final CaseType caseType,
-                                         final String eventId) {
-        return process(data, caseType, eventTriggerService.findCaseEvent(caseType, eventId));
+    public Map<String, JsonNode> processData(final Map<String, JsonNode> data,
+                                             final CaseType caseType,
+                                             final String eventId) {
+        return processData(data, caseType, eventTriggerService.findCaseEvent(caseType, eventId));
     }
 
     private boolean isNullOrEmpty(final JsonNode node) {

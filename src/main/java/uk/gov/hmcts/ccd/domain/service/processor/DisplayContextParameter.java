@@ -48,9 +48,11 @@ public class DisplayContextParameter {
 
     public static Optional<DisplayContextParameter> getDisplayContextParameterOfType(String displayContextParameter,
                                                                                      DisplayContextParameterType type) {
-        return getDisplayContextParameterFor(displayContextParameter).stream()
-            .filter(param -> param.getType() == type)
-            .findAny();
+        return Strings.isNullOrEmpty(displayContextParameter) ?
+            Optional.empty() :
+            getDisplayContextParameterFor(displayContextParameter).stream()
+                .filter(param -> param.getType() == type)
+                .findAny();
     }
 
     public static boolean hasDisplayContextParameterType(String displayContextParameter, DisplayContextParameterType type) {

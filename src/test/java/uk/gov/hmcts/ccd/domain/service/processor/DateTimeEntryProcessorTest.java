@@ -24,13 +24,13 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 
-class DateTimeFormatProcessorTest {
+class DateTimeEntryProcessorTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String ID = "FieldId";
 
     @InjectMocks
-    private DateTimeFormatProcessor dateTimeFormatProcessor;
+    private DateTimeEntryProcessor dateTimeEntryProcessor;
 
     @Mock
     private DateTimeFormatParser dateTimeFormatParser;
@@ -62,7 +62,7 @@ class DateTimeFormatProcessorTest {
         Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "13/03/2020")).thenReturn("2020-03-13T00:00:00.000");
 
-        JsonNode result = dateTimeFormatProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -84,7 +84,7 @@ class DateTimeFormatProcessorTest {
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "13/03/2020")).thenReturn("2020-03-13T00:00:00.000");
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "25/12/1995")).thenReturn("1995-12-25T00:00:00.000");
 
-        JsonNode result = dateTimeFormatProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isArray(), is(true)),
