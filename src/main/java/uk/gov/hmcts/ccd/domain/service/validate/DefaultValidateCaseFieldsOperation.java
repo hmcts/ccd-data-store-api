@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.processor.CaseDataProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
@@ -19,15 +19,15 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseTypeService caseTypeService;
-    private final CaseDataProcessor caseDataProcessor;
+    private final FieldProcessorService fieldProcessorService;
 
     @Inject DefaultValidateCaseFieldsOperation(
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
         final CaseTypeService caseTypeService,
-        final CaseDataProcessor caseDataProcessor) {
+        final FieldProcessorService fieldProcessorService) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseTypeService = caseTypeService;
-        this.caseDataProcessor = caseDataProcessor;
+        this.fieldProcessorService = fieldProcessorService;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         if (!hasEventId(caseType, content.getEventId())) {
             throw new ValidationException("Cannot validate case field because of event " + content.getEventId() + " is not found in case type definition");
         }
-        content.setData(caseDataProcessor.process(content.getData(), caseType, content.getEventId()));
+        content.setData(fieldProcessorService.processData(content.getData(), caseType, content.getEventId()));
         caseTypeService.validateData(content.getData(), caseType);
         return content.getData();
     }

@@ -79,4 +79,8 @@ public abstract class FieldProcessor {
             || (node.isTextual() && (null == node.asText() || node.asText().trim().length() == 0))
             || (node.isObject() && node.toString().equals("{}"));
     }
+
+    protected boolean isSupportedBaseType(BaseType baseType, List<String> supportedTypes) {
+        return supportedTypes.contains(baseType.getType());
+    }
 }
