@@ -29,6 +29,10 @@ public interface CommonField {
 
     void setDisplayContextParameter(String displayContextParameter);
 
+    Object getDisplayValue();
+
+    void setDisplayValue(Object displayValue);
+
     @JsonIgnore
     default boolean isCollectionFieldType() {
         return FieldType.COLLECTION.equalsIgnoreCase(getFieldType().getType());

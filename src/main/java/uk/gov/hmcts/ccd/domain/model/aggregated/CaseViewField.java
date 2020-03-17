@@ -35,6 +35,8 @@ public class CaseViewField implements CommonField {
     private String displayContext;
     @JsonProperty("display_context_parameter")
     private String displayContextParameter;
+    @JsonProperty("display_value")
+    private Object displayValue;
     @JsonProperty("show_condition")
     private String showCondition;
     @JsonProperty("show_summary_change_option")
@@ -155,6 +157,14 @@ public class CaseViewField implements CommonField {
 
     public void setDisplayContextParameter(String displayContextParameter) {
         this.displayContextParameter = displayContextParameter;
+    }
+
+    public Object getDisplayValue() {
+        return displayValue;
+    }
+
+    public void setDisplayValue(Object displayValue) {
+        this.displayValue = displayValue;
     }
 
     public List<AccessControlList> getAccessControlLists() {

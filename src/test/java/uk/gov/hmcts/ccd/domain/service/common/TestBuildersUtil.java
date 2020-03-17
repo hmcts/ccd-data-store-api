@@ -1116,6 +1116,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseFieldBuilder withDisplayValue(final String displayValue) {
+            caseField.setDisplayValue(displayValue);
+            return this;
+        }
+
         public CaseField build() {
             caseField.setAccessControlLists(accessControlLists);
             caseField.setComplexACLs(complexACLs);

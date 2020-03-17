@@ -5,6 +5,7 @@ import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 
@@ -15,16 +16,31 @@ import java.util.stream.Collectors;
 public class FieldProcessorService {
 
     private final List<CaseDataFieldProcessor> caseDataFieldProcessors;
+    private final List<CaseViewFieldProcessor> caseViewFieldProcessors;
     private final UIDefinitionRepository uiDefinitionRepository;
     private final EventTriggerService eventTriggerService;
 
     @Autowired
     public FieldProcessorService(final List<CaseDataFieldProcessor> caseDataFieldProcessors,
+                                 final List<CaseViewFieldProcessor> caseViewFieldProcessors,
                                  final UIDefinitionRepository uiDefinitionRepository,
                                  final EventTriggerService eventTriggerService) {
-         this.caseDataFieldProcessors = caseDataFieldProcessors;
-         this.uiDefinitionRepository = uiDefinitionRepository;
-         this.eventTriggerService = eventTriggerService;
+        this.caseDataFieldProcessors = caseDataFieldProcessors;
+        this.caseViewFieldProcessors = caseViewFieldProcessors;
+        this.uiDefinitionRepository = uiDefinitionRepository;
+        this.eventTriggerService = eventTriggerService;
+    }
+
+    public List<CaseViewField> processCaseViewFields(final List<CaseViewField> fields) {
+        return fields.stream().map(this::processCaseViewField).collect(Collectors.toList());
+    }
+
+    public CaseViewField processCaseViewField(final CaseViewField field) {
+        CaseViewField result = field;
+        for (CaseViewFieldProcessor processor : caseViewFieldProcessors) {
+            result = processor.execute(result);
+        }
+        return result;
     }
 
     public Map<String, JsonNode> processData(final Map<String, JsonNode> data,

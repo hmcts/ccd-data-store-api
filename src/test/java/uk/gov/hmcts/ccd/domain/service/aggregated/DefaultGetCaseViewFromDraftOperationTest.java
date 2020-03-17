@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -36,8 +37,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation.DELETE;
@@ -86,6 +86,9 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     @Mock
     private CompoundFieldOrderService compoundFieldOrderService;
+
+    @Mock
+    private FieldProcessorService fieldProcessorService;
 
     private GetCaseViewOperation getDraftViewOperation;
 
@@ -145,6 +148,8 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
         doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
 
+        doAnswer(invocation -> invocation.getArgument(0)).when(fieldProcessorService).processCaseViewField(any());
+
         getDraftViewOperation = new DefaultGetCaseViewFromDraftOperation(getCaseOperation,
             uiDefinitionRepository,
             caseTypeService,
@@ -152,7 +157,8 @@ class DefaultGetCaseViewFromDraftOperationTest {
             draftGateway,
             draftResponseToCaseDetailsBuilder,
             objectMapperService,
-            compoundFieldOrderService);
+            compoundFieldOrderService,
+            fieldProcessorService);
     }
 
     @Test
