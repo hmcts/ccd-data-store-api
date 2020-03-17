@@ -1442,6 +1442,7 @@ public class TestBuildersUtil {
             this.caseTypeTabFields = newArrayList();
             this.caseTypeTab = new CaseTypeTab();
             this.caseTypeTab.setTabFields(caseTypeTabFields);
+            this.caseTypeTab.setDisplayContextParameter(null);
         }
 
         public CaseTypeTabBuilder withTabField(CaseTypeTabField field) {
