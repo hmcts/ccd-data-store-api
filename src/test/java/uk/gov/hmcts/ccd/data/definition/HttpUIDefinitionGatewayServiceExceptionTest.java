@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.data.definition;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
+import java.util.List;
+import javax.inject.Inject;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;

@@ -17,6 +17,15 @@ import lombok.NonNull;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIStartTriggerController;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.hateoas.RepresentationModel;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.v2.internal.controller.UIStartTriggerController;
+
+import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.methodOn;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
