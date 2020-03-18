@@ -51,6 +51,9 @@ public abstract class FieldProcessor {
                                       String fieldPrefix) {
         ObjectNode newNode = MAPPER.createObjectNode();
         complexCaseFields.stream().forEach(complexCaseField -> {
+            if (complexNode == null) {
+                return;
+            }
             final BaseType complexFieldType = BaseType.get(complexCaseField.getFieldType().getType());
             final String fieldId = complexCaseField.getId();
             final JsonNode caseFieldNode = complexNode.get(fieldId);
@@ -59,10 +62,7 @@ public abstract class FieldProcessor {
             if (complexFieldType == BaseType.get(COLLECTION)) {
                 newNode.set(fieldId, executeCollection(caseFieldNode, complexCaseField, fieldPath));
             } else if (complexFieldType == BaseType.get(COMPLEX)) {
-                JsonNode newComplexNode = executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, fieldPath);
-                if (!isNullOrEmpty(newComplexNode)) {
-                    newNode.set(fieldId, newComplexNode);
-                }
+                newNode.set(fieldId, executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, fieldPath));
             } else {
                 newNode.set(fieldId, executeSimple(caseFieldNode, complexCaseField, complexFieldType, fieldPath));
             }
