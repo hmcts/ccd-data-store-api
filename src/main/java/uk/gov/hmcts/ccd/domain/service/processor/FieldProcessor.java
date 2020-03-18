@@ -49,8 +49,11 @@ public abstract class FieldProcessor {
                                       CaseEventField caseEventField,
                                       WizardPageField wizardPageField,
                                       String fieldPrefix) {
-        ObjectNode newNode = MAPPER.createObjectNode();
+        if (isNullOrEmpty(complexNode)) {
+            return complexNode;
+        }
 
+        ObjectNode newNode = MAPPER.createObjectNode();
         complexCaseFields.stream().forEach(complexCaseField -> {
             final BaseType complexFieldType = BaseType.get(complexCaseField.getFieldType().getType());
             final String fieldId = complexCaseField.getId();
