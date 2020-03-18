@@ -72,7 +72,7 @@ public class MergeDataToSearchResultOperation {
 
     private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseField caseField) {
         return new SearchResultViewColumn(
-            searchResultField.buildCaseFieldId(),
+            searchResultField.getFullId(),
             buildCaseFieldType(searchResultField, caseField),
             searchResultField.getLabel(),
             searchResultField.getDisplayOrder(),
@@ -80,7 +80,7 @@ public class MergeDataToSearchResultOperation {
     }
 
     private boolean filterDistinctFieldsByRole(final HashSet<String> addedFields, final SearchResultField resultField) {
-        String id = resultField.buildCaseFieldId();
+        String id = resultField.getFullId();
         if (addedFields.contains(id)) {
             return false;
         } else {
