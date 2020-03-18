@@ -11,8 +11,6 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class CaseDocument {
     private String url;

@@ -32,7 +32,7 @@ public class CaseDocumentController {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.CASE_DOCUMENTS
+            V2.MediaType.CASE_DOCUMENT
         }
     )
     @ApiOperation(
@@ -42,7 +42,7 @@ public class CaseDocumentController {
     @ApiResponses({
         @ApiResponse(
             code = 200,
-            message = "Success",
+            message = "OK",
             response = CaseDocumentResource.class
         ),
         @ApiResponse(
@@ -65,7 +65,8 @@ public class CaseDocumentController {
     public ResponseEntity<CaseDocumentResource> getCaseDocumentMetadata(@PathVariable("caseId") String caseId,
                                                                         @PathVariable("documentId") String documentId) {
 
-        final CaseDocumentMetadata documentMetadata = this.getCaseDocumentOperation.getCaseDocumentMetadata(caseId,documentId);
+        final CaseDocumentMetadata documentMetadata =
+            this.getCaseDocumentOperation.getCaseDocumentMetadata(caseId, documentId);
         return ResponseEntity.ok(new CaseDocumentResource(caseId, documentId, documentMetadata));
     }
 }

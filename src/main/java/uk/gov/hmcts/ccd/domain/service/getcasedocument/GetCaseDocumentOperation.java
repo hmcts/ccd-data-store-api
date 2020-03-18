@@ -38,9 +38,9 @@ public class GetCaseDocumentOperation {
     private final CaseUserRepository caseUserRepository;
     private final DocumentIdValidationService documentIdValidationService;
 
-    public static final String DOCUMENT_CASE_FIELD_CHILD_URL = "document_url";
-    public static final String DOCUMENT_CASE_FIELD_CHILD_NAME = "document_filename";
-    public static final String DOCUMENT_CASE_FIELD_CHILD_TYPE = "Document";
+    public static final String DOCUMENT_CASE_FIELD_URL_ATTRIBUTE = "document_url";
+    public static final String DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE = "document_filename";
+    public static final String DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE = "Document";
     public static final String BAD_REQUEST_EXCEPTION_DOCUMENT_INVALID = "DocumentId is not valid";
 
     @Autowired
@@ -68,15 +68,17 @@ public class GetCaseDocumentOperation {
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
             .orElseThrow(() -> new CaseNotFoundException(caseId));
 
-        if (!caseDetails.getReferenceAsString().isEmpty()) {
-            return CaseDocumentMetadata.builder()
-                .caseId(caseDetails.getReferenceAsString())
-                .caseTypeId(caseDetails.getCaseTypeId())
-                .jurisdictionId(caseDetails.getJurisdiction())
-                .document(getCaseDocument(caseDetails, documentId))
-                .build();
+        if (caseDetails.getReferenceAsString().isEmpty()){
+            throw new CaseNotFoundException(caseId);
         }
-        throw new CaseNotFoundException(caseId);
+
+        return CaseDocumentMetadata.builder()
+            .caseId(caseDetails.getReferenceAsString())
+            .caseTypeId(caseDetails.getCaseTypeId())
+            .jurisdictionId(caseDetails.getJurisdiction())
+            .document(getCaseDocument(caseDetails, documentId))
+            .build();
+
     }
 
     public CaseDocument getCaseDocument(CaseDetails caseDetails, String documentId) {
@@ -96,9 +98,9 @@ public class GetCaseDocumentOperation {
                 //build caseDocument and set permissions
                 return CaseDocument.builder()
                     .id(documentId)
-                    .url(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_CHILD_URL).asText())
-                    .name(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_CHILD_NAME).asText())
-                    .type(DOCUMENT_CASE_FIELD_CHILD_TYPE)
+                    .url(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText())
+                    .name(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE).asText())
+                    .type(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE)
                     .permissions(getDocumentPermissions(userACLOnCaseField.get()))
                     .build();
             } else {
@@ -157,6 +159,9 @@ public class GetCaseDocumentOperation {
 
     private String getDocumentCaseField(Map<String, JsonNode> caseData, String documentId) {
         for (Map.Entry<String, JsonNode> entry : caseData.entrySet()) {
+            if (!entry.getValue().isNull()){
+                return null;
+            }
             if (entry.getValue().getNodeType().toString()
                 .equals("OBJECT") && entry.getValue().toString().contains(documentId)) {
                 return entry.getKey();
