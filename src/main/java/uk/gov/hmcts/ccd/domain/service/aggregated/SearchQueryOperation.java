@@ -111,7 +111,7 @@ public class SearchQueryOperation {
 
     private SortOrderField toSortOrderField(SearchResultField searchResultField) {
         return SortOrderField.sortOrderWith()
-            .caseFieldId(searchResultField.buildCaseFieldId())
+            .caseFieldId(searchResultField.getFullId())
             .metadata(searchResultField.isMetadata())
             .direction(searchResultField.getSortOrder().getDirection())
             .build();
