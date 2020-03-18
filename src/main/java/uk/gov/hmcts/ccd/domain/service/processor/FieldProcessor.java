@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
 
@@ -49,8 +50,10 @@ public abstract class FieldProcessor {
                                       CaseEventField caseEventField,
                                       WizardPageField wizardPageField,
                                       String fieldPrefix) {
+        if (complexNode == null) {
+            return null;
+        }
         ObjectNode newNode = MAPPER.createObjectNode();
-
         complexCaseFields.stream().forEach(complexCaseField -> {
             final BaseType complexFieldType = BaseType.get(complexCaseField.getFieldType().getType());
             final String fieldId = complexCaseField.getId();
@@ -60,7 +63,9 @@ public abstract class FieldProcessor {
             if (complexFieldType == BaseType.get(COLLECTION)) {
                 newNode.set(fieldId, executeCollection(caseFieldNode, complexCaseField, fieldPath));
             } else if (complexFieldType == BaseType.get(COMPLEX)) {
-                newNode.set(fieldId, executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, fieldPath));
+                Optional.ofNullable(
+                    executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), caseEventField, wizardPageField, fieldPath))
+                    .ifPresent(result -> newNode.set(fieldId, result));
             } else {
                 newNode.set(fieldId, executeSimple(caseFieldNode, complexCaseField, complexFieldType, fieldPath));
             }
