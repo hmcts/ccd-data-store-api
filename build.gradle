@@ -29,6 +29,7 @@ plugins {
     id 'com.github.spotbugs' version '1.6.9'
     id 'net.ltgt.apt' version '0.21'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.14'
+    id "info.solidsoft.pitest" version '1.4.0'
 }
 
 apply plugin: 'java'
@@ -281,6 +282,79 @@ dependencyManagement {
         }
     }
 }
+
+pitest {
+
+    targetClasses = ['uk.gov.hmcts.ccd.config.*',
+                     'uk.gov.hmcts.ccd.AuthCheckerConfiguration',
+                     'uk.gov.hmcts.ccd.exception.*',
+                     'uk.gov.hmcts.ccd.infrastructure.*',
+                     'uk.gov.hmcts.ccd.data.*',
+                     'uk.gov.hmcts.ccd.domain.*']
+
+    targetTests = ['uk.gov.hmcts.ccd.config.*',
+                   'uk.gov.hmcts.ccd.AuthCheckingConfigurationTest',
+                   'uk.gov.hmcts.ccd.infrastructure.user.*',
+                   'uk.gov.hmcts.ccd.data.caseaccess.[!DefaultCaseUserRepositoryTest].*',
+                   'uk.gov.hmcts.ccd.data.casedetails.query.*',
+                   'uk.gov.hmcts.ccd.data.casedetails.search.*',
+                   'uk.gov.hmcts.ccd.data.casedetails.[!CaseAuditEventRepositoryTest].*',
+                   'uk.gov.hmcts.ccd.data.casedetails.[!DefaultCaseDetailsRepositoryTest].*',
+                   'uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepositoryTest',
+                   'uk.gov.hmcts.ccd.data.draft.*',
+                   'uk.gov.hmcts.ccd.data.JSONBConverterTest',
+                   'uk.gov.hmcts.ccd.data.SecurityUtilsTest',
+                   'uk.gov.hmcts.ccd.domain.model.*',
+                   'uk.gov.hmcts.ccd.domain.service.aggregated.*',
+                   'uk.gov.hmcts.ccd.domain.service.callbacks.CallbackServiceTest',
+                   'uk.gov.hmcts.ccd.domain.service.caseaccess.*',
+                   'uk.gov.hmcts.ccd.domain.service.common.*',
+                   'uk.gov.hmcts.ccd.domain.service.createcase.*',
+                   'uk.gov.hmcts.ccd.domain.service.createevent.*',
+                   'uk.gov.hmcts.ccd.domain.service.getcase.*',
+                   'uk.gov.hmcts.ccd.domain.service.getdraft.*',
+                   'uk.gov.hmcts.ccd.domain.service.getevents.*',
+                   'uk.gov.hmcts.ccd.domain.service.search.*',
+                   'uk.gov.hmcts.ccd.domain.service.startevent.*',
+                   'uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvokerTest',
+                   'uk.gov.hmcts.ccd.domain.service.stdapi.PrintableDocumentListOperationTest',
+                   'uk.gov.hmcts.ccd.domain.service.upsertdraft.*',
+                   'uk.gov.hmcts.ccd.domain.service.validate.*',
+                   'uk.gov.hmcts.ccd.domain.types.sanitiser.client.*',
+                   'uk.gov.hmcts.ccd.domain.types.sanitiser.*',
+                   'uk.gov.hmcts.ccd.domain.types.[!CaseDataValidatorTest].*',
+                   'uk.gov.hmcts.ccd.test.*',
+                   'uk.gov.hmcts.ccd.v2.external.controller.[!CaseControllerTestIT].*',
+                   'uk.gov.hmcts.ccd.v2.external.controller.[!DocumentControllerITest].*',
+                   'uk.gov.hmcts.ccd.v2.external.controller.[!StartTriggerControllerCaseRolesIT].*',
+                   'uk.gov.hmcts.ccd.v2.internal.controller.[!UICaseControllerCaseRolesIT].*',
+                   'uk.gov.hmcts.ccd.v2.internal.controller.[!UIStartTriggerControllerCaseRolesIT].*',
+                   'uk.gov.hmcts.ccd.v2.external.resource.*',
+                   'uk.gov.hmcts.ccd.v2.internal.resource.*'
+    ]
+    excludedClasses = ['uk.gov.hmcts.ccd.CoreCaseDataApplication',
+                       'uk.gov.hmcts.ccd.PersistenceIT'
+    ]
+
+    enableDefaultIncrementalAnalysis = true
+    historyInputLocation = ['build/reports/pitest/fastermutationtesting']
+    historyOutputLocation = ['build/reports/pitest/fastermutationtestingoutput']
+    threads = 15
+    testSourceSets = [sourceSets.test]
+    mainSourceSets = [sourceSets.main]
+    fileExtensionsToFilter.addAll('xml','json')
+    outputFormats = ['XML', 'HTML','CSV']
+    mutationThreshold = 4
+    coverageThreshold = 4
+    maxMutationsPerClass = 15
+    jvmArgs = ['-Xms1G','-Xmx3G']
+    timestampedReports = false
+    failWhenNoMutations = false
+    detectInlinedCode = true
+
+}
+project.tasks['pitest'].group = "Verification"
+
 
 task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
