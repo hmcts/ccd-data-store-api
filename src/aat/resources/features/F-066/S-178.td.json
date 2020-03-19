@@ -1,0 +1,31 @@
+{
+  "title": "must return negative response when request contains a non-existing case reference",
+	"_guid_": "S-178",
+	"_extends_": "F-066_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing case reference",
+		"includes a HTTP 404 'Not Found'"
+	],
+  "request": {
+    "pathVariables": {
+      "cid": "1234567890123456"
+    }
+  },
+	"expectedResponse": {
+    "_extends_": "Common_404_Response",
+		"headers": {
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip",
+      "Connection" : "close"
+    },
+    "body" : {
+      "exception" : "[[ANYTHING_PRESENT]]",
+      "message" : "Case ID is not valid",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

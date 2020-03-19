@@ -7,11 +7,12 @@ import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION_
 import static uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchBaseTest.assertElasticsearchEnabled;
 import static uk.gov.hmcts.ccd.datastore.tests.util.TestUtils.withRetries;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
@@ -38,8 +39,6 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
     protected void loadData() {
         assertElasticsearchEnabled();
 
-        LOG.info("importing definitions");
-        importDefinitions();
         withRetries(RETRY_POLL_DELAY_MILLIS, RETRY_POLL_INTERVAL_MILLIS, "ES index verification", () -> verifyIndex(AAT_PRIVATE_INDEX_ALIAS));
         withRetries(RETRY_POLL_DELAY_MILLIS, RETRY_POLL_INTERVAL_MILLIS, "ES index verification", () -> verifyIndex(AAT_PRIVATE2_INDEX_ALIAS));
 

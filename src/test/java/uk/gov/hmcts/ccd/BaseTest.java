@@ -22,6 +22,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
@@ -170,6 +171,10 @@ public abstract class BaseTest {
         final Timestamp modifiedAt = resultSet.getTimestamp("last_modified");
         if (null != modifiedAt) {
             caseDetails.setLastModified(modifiedAt.toLocalDateTime());
+        }
+        final Timestamp lastStateModified = resultSet.getTimestamp(CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL);
+        if (null != lastStateModified) {
+            caseDetails.setLastStateModifiedDate(lastStateModified.toLocalDateTime());
         }
         try {
             caseDetails.setData(mapper.convertValue(

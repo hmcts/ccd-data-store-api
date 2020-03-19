@@ -1,0 +1,65 @@
+{
+  "title": "must return successfully all and only the respective fields with READ access for a Case Worker and a Solicitor",
+  "_extends_": "S-577_Update_Case_For_Case_Worker_Data_Base",
+  "_guid_": "S-577",
+  "specs": [
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "an active solicitor profile with another specific variation of ACLs on the same case type",
+    "an active Solicitor profile having full permissions on the same case type",
+    "prompts an update to DocumentField2, made by the privileged user who just created the case",
+    "contains updated values for DocumentField2"
+  ],
+  "user": {
+    "username": "befta.caseworker.2.solicitor.2@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+  },
+  "request": {
+    "body": {
+      "data": {
+        "DocumentField2":{
+          "document_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_filename":"Elastic Search test Case.png --> updated by Solicitor 2"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "Vary" : "Accept-Encoding"
+    },
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_JURISDICTION_2",
+      "case_type" : "BEFTA_CASETYPE_2_1",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "state" : "TODO",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data",
+        "DocumentField2" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_filename" : "Elastic Search test Case.png --> updated by Solicitor 2"
+        }
+      },
+      "data_classification" : {
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}

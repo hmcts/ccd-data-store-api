@@ -42,7 +42,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     public static final String QUALIFIER = "default";
     private static final String UNIQUE_REFERENCE_KEY_CONSTRAINT = "case_data_reference_key";
-
     private final CaseDetailsMapper caseDetailsMapper;
 
     @PersistenceContext
@@ -73,7 +72,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             mergedEntity = em.merge(newCaseDetailsEntity);
             em.flush();
         } catch (StaleObjectStateException | OptimisticLockException e) {
-            LOG.info("Optimistic Lock Exception: Case data has been altered", e);
+            LOG.info("Optimistic Lock Exception: Case data has been altered, UUID={}", caseDetails.getReference(), e);
             throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException && isDuplicateReference(e)) {
@@ -81,7 +80,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                     caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
                 throw new ReferenceKeyUniqueConstraintException(e.getMessage());
             } else {
-                LOG.warn("Failed to store case details", e);
+                LOG.warn("Failed to store case details, UUID={}", caseDetails.getReference(), e);
                 throw new CasePersistenceException(e.getMessage());
             }
         }

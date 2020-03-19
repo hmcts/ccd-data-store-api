@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-558",
+  "_extends_": "F-064_Test_Data_Base",
+  "title": "must retrieve workbasket input details for dynamic display successfully",
+	"specs": [
+		"an active profile in CCD",
+		"code is HTTP-200 OK"
+	],
+	"expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "workbasketInputs" : [ {
+        "label" : "Search `Text` field",
+        "order" : 1,
+        "field" : {
+          "id" : "TextField",
+          "elementPath" : null,
+          "metadata" : false,
+          "field_type" : {
+            "id" : "Text",
+            "type" : "Text",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          }
+        }
+      } ],
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+	}
+}

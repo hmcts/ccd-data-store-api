@@ -57,6 +57,20 @@ class GetUIDefinitionTest extends BaseTest {
             .body("self.href", equalTo(String.format("%s/internal/case-types/AAT/search-inputs", aat.getTestUrl())));
     }
 
+    @Test
+    @DisplayName("should retrieve jurisdiction when exists")
+    void shouldRetrieveJurisdictionsWhenExist() {
+
+        whenCallingGetJurisdictions("create")
+            .then()
+            .log().ifError()
+            .statusCode(200)
+            .assertThat()
+
+            .rootPath("_links")
+            .body("self.href", equalTo(String.format("%s/internal/jurisdictions?access=create", aat.getTestUrl())));
+    }
+
     private Response whenCallingGetWorkbasketInputs(String caseTypeId) {
         return asAutoTestCaseworker(FALSE)
             .get()
@@ -79,5 +93,17 @@ class GetUIDefinitionTest extends BaseTest {
 
             .when()
             .get("/internal/case-types/{caseTypeId}/search-inputs");
+    }
+
+    private Response whenCallingGetJurisdictions(String access) {
+        return asAutoTestCaseworker(FALSE)
+            .get()
+            .given()
+            .queryParam("access", access)
+            .accept(V2.MediaType.UI_JURISDICTIONS)
+            .header("experimental", "true")
+
+            .when()
+            .get("/internal/jurisdictions");
     }
 }

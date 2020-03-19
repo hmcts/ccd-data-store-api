@@ -10,9 +10,11 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
 
+import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +45,8 @@ class UISearchInputsResourceTest {
     void shouldLinkToSelf() {
         final UISearchInputsResource resource = new UISearchInputsResource(searchInputs, CASE_TYPE_ID);
 
-        assertThat(resource.getLink("self").getHref(), equalTo(LINK_SELF));
+        Optional<Link> self = resource.getLink("self");
+        assertThat(self.get().getHref(), equalTo(LINK_SELF));
     }
 
 }

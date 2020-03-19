@@ -1,0 +1,31 @@
+{
+	"_guid_": "S-282",
+	"_extends_": "F-044_Test_Data_Base",
+	"title": "must return 409 when case is altered out of the transaction",
+	"specs": [
+		"an active profile in CCD",
+		"contains a case Id that has just been updated above",
+		"contains token created above which is no longer valid for current version of case",
+		"contains an HTTP 409 'Conflict'"
+	],
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+		},
+		"body": {
+			"event_token": "${[scenarioContext][childContexts][F-044-Prerequisite][testData][actualResponse][body][token]}"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_409_Response",
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException",
+			"timestamp": "[[ANYTHING_PRESENT]]",
+			"message": "The case data has been altered outside of this transaction.",
+			"path": "[[ANYTHING_PRESENT]]",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
+}
