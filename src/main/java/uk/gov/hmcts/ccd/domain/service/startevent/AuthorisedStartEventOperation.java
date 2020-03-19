@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -33,10 +34,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 @Qualifier("authorised")
 public class AuthorisedStartEventOperation implements StartEventOperation {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
-
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private final StartEventOperation startEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -65,8 +63,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     @Override
     public StartEventTrigger triggerStartForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForCaseType(caseTypeId,
-                                                                                        eventTriggerId,
-                                                                                        ignoreWarning));
+            eventTriggerId,
+            ignoreWarning));
     }
 
     @Override
@@ -78,8 +76,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
         return caseDetailsRepository.findByReference(caseReference)
             .map(caseDetails -> verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForCase(caseReference,
-                                                                                                                      eventTriggerId,
-                                                                                                                      ignoreWarning)))
+                eventTriggerId,
+                ignoreWarning)))
             .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
@@ -89,7 +87,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         return verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForDraft(draftReference,
-                                                                                                      ignoreWarning));
+            ignoreWarning));
     }
 
     private CaseType getCaseType(String caseTypeId) {
@@ -133,7 +131,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                     userRoles,
                     CAN_READ,
                     false),
-                STRING_JSON_MAP));
+                new TypeReference<HashMap<String, JsonNode>>() {
+                }));
             caseDetails.setDataClassification(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
@@ -141,7 +140,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                     userRoles,
                     CAN_READ,
                     true),
-                STRING_JSON_MAP));
+                new TypeReference<HashMap<String, JsonNode>>() {
+                }));
         }
         return startEventTrigger;
     }

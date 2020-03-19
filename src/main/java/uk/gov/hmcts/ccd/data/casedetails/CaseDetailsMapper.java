@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import javax.inject.Named;
@@ -14,9 +15,9 @@ import java.util.stream.Collectors;
 @Named
 @Singleton
 public class CaseDetailsMapper {
+
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
-    };
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
 
     public CaseDetails entityToModel(final CaseDetailsEntity caseDetailsEntity) {
         if (caseDetailsEntity == null) {
@@ -35,8 +36,10 @@ public class CaseDetailsMapper {
         caseDetails.setSecurityClassification(caseDetailsEntity.getSecurityClassification());
         caseDetails.setVersion(caseDetailsEntity.getVersion());
         if (caseDetailsEntity.getData() != null) {
-            caseDetails.setData(mapper.convertValue(caseDetailsEntity.getData(), STRING_JSON_MAP_TYPE));
-            caseDetails.setDataClassification(mapper.convertValue(caseDetailsEntity.getDataClassification(), STRING_JSON_MAP_TYPE));
+            caseDetails.setData(mapper.convertValue(caseDetailsEntity.getData(), new TypeReference<HashMap<String, JsonNode>>() {
+            }));
+            caseDetails.setDataClassification(mapper.convertValue(caseDetailsEntity.getDataClassification(), new TypeReference<HashMap<String, JsonNode>>() {
+            }));
         }
         return caseDetails;
     }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
@@ -17,9 +18,7 @@ import java.util.stream.Collectors;
 @Named
 @Singleton
 public class CaseAuditEventMapper {
-    private static final ObjectMapper mapper = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
-    };
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
 
     public AuditEvent entityToModel(final CaseAuditEventEntity caseAuditEventEntity) {
         final AuditEvent auditEvent = new AuditEvent();
@@ -36,9 +35,9 @@ public class CaseAuditEventMapper {
         auditEvent.setUserLastName(caseAuditEventEntity.getUserLastName());
         auditEvent.setSecurityClassification(caseAuditEventEntity.getSecurityClassification());
         if (caseAuditEventEntity.getData() != null) {
-            auditEvent.setData(mapper.convertValue(caseAuditEventEntity.getData(), STRING_JSON_MAP_TYPE));
-            auditEvent.setDataClassification(mapper.convertValue(caseAuditEventEntity.getDataClassification(),
-                                                                 STRING_JSON_MAP_TYPE));
+            auditEvent.setData(MAPPER.convertValue(caseAuditEventEntity.getData(), new TypeReference<HashMap<String, JsonNode>>() {}));
+            auditEvent.setDataClassification(MAPPER.convertValue(caseAuditEventEntity.getDataClassification(),
+                                                                 new TypeReference<HashMap<String, JsonNode>>() {}));
         }
         auditEvent.setEventId(caseAuditEventEntity.getEventId());
         auditEvent.setEventName(caseAuditEventEntity.getEventName());
@@ -69,11 +68,11 @@ public class CaseAuditEventMapper {
         newCaseAuditEventEntity.setUserFirstName(auditEvent.getUserFirstName());
         newCaseAuditEventEntity.setSecurityClassification(auditEvent.getSecurityClassification());
         if (auditEvent.getData() == null) {
-            newCaseAuditEventEntity.setData(mapper.createObjectNode());
-            newCaseAuditEventEntity.setDataClassification(mapper.createObjectNode());
+            newCaseAuditEventEntity.setData(MAPPER.createObjectNode());
+            newCaseAuditEventEntity.setDataClassification(MAPPER.createObjectNode());
         } else {
-            newCaseAuditEventEntity.setData(mapper.convertValue(auditEvent.getData(), JsonNode.class));
-            newCaseAuditEventEntity.setDataClassification(mapper.convertValue(auditEvent.getDataClassification(),
+            newCaseAuditEventEntity.setData(MAPPER.convertValue(auditEvent.getData(), JsonNode.class));
+            newCaseAuditEventEntity.setDataClassification(MAPPER.convertValue(auditEvent.getDataClassification(),
                                                                               JsonNode.class));
         }
         newCaseAuditEventEntity.setEventId(auditEvent.getEventId());

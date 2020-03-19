@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -63,8 +64,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
 public abstract class BaseTest {
-    protected static final ObjectMapper mapper = new ObjectMapper();
-    protected static final TypeReference STRING_NODE_TYPE = new TypeReference<HashMap<String, JsonNode>>() {};
+    protected static final ObjectMapper mapper = JacksonUtils.MAPPER_INSTANCE;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
 
     protected static final MediaType JSON_CONTENT_TYPE = new MediaType(
@@ -179,7 +179,7 @@ public abstract class BaseTest {
         try {
             caseDetails.setData(mapper.convertValue(
                 mapper.readTree(resultSet.getString("data")),
-                STRING_NODE_TYPE));
+                new TypeReference<HashMap<String, JsonNode>>() {}));
         } catch (IOException e) {
             fail("Incorrect JSON structure: " + resultSet.getString("data"));
         }
@@ -231,7 +231,7 @@ public abstract class BaseTest {
         try {
             auditEvent.setData(mapper.convertValue(
                 mapper.readTree(resultSet.getString("data")),
-                STRING_NODE_TYPE));
+                new TypeReference<HashMap<String, JsonNode>>() {}));
         } catch (IOException e) {
             fail("Incorrect JSON structure: " + resultSet.getString("DATA"));
         }

@@ -25,8 +25,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 public class CaseDataService {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
     private static final String DEFAULT_CLASSIFICATION = "";
@@ -38,7 +36,7 @@ public class CaseDataService {
                                                                    final Map<String, JsonNode> currentDataClassification) {
         final JsonNode clonedDataClassification = cloneAndConvertDataMap(caseData);
         deduceDefaultClassifications(clonedDataClassification, MAPPER.convertValue(currentDataClassification, JsonNode.class), caseType.getCaseFields(), EMPTY_STRING);
-        return MAPPER.convertValue(clonedDataClassification, STRING_JSON_MAP);
+        return MAPPER.convertValue(clonedDataClassification, new TypeReference<HashMap<String, JsonNode>>() {});
     }
 
     private void deduceDefaultClassifications(final JsonNode dataNode,

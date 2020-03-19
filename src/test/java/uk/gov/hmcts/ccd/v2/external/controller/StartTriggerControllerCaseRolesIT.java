@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
@@ -93,8 +95,8 @@ public class StartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/CaseRolesCase"))

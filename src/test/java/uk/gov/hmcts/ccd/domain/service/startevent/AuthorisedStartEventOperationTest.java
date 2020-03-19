@@ -1,19 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import java.util.*;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -43,11 +29,33 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+
 class AuthorisedStartEventOperationTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_REFERENCE = "1234123412341234";
@@ -113,9 +121,11 @@ class AuthorisedStartEventOperationTest {
             "classificationTestValue");
 
         classifiedCaseDetails = new CaseDetails();
-        classifiedCaseDetails.setData(MAPPER.convertValue(classifiedCaseDetailsNode, STRING_JSON_MAP));
+        classifiedCaseDetails.setData(MAPPER.convertValue(classifiedCaseDetailsNode, new TypeReference<HashMap<String, JsonNode>>() {
+        }));
         classifiedCaseDetails.setDataClassification(MAPPER.convertValue(classifiedCaseDetailsClassificationNode,
-            STRING_JSON_MAP));
+            new TypeReference<HashMap<String, JsonNode>>() {
+            }));
         classifiedStartEvent = new StartEventTrigger();
         classifiedStartEvent.setCaseDetails(classifiedCaseDetails);
 
@@ -311,10 +321,12 @@ class AuthorisedStartEventOperationTest {
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
                 () -> assertThat(output.getCaseDetails().getData(),
-                    is(equalTo(MAPPER.convertValue(authorisedCaseDetailsNode, STRING_JSON_MAP)))),
+                    is(equalTo(MAPPER.convertValue(authorisedCaseDetailsNode, new TypeReference<HashMap<String, JsonNode>>() {
+                    })))),
                 () -> assertThat(output.getCaseDetails().getDataClassification(),
                     is(equalTo(MAPPER.convertValue(authorisedCaseDetailsClassificationNode,
-                        STRING_JSON_MAP)))),
+                        new TypeReference<HashMap<String, JsonNode>>() {
+                        })))),
                 () -> inOrder.verify(uidService).validateUID(CASE_REFERENCE),
                 () -> inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE),
                 () -> inOrder.verify(classifiedStartEventOperation).triggerStartForCase(CASE_REFERENCE,

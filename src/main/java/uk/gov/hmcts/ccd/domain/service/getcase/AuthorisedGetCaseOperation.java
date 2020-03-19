@@ -4,13 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -21,15 +18,17 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 @Qualifier("authorised")
 public class AuthorisedGetCaseOperation implements GetCaseOperation {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
-
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private final GetCaseOperation getCaseOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
@@ -41,7 +40,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                       final AccessControlService accessControlService,
                                       @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                      @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository) {
+                                      @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository) {
         this.getCaseOperation = getCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
@@ -95,7 +94,8 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
                 userRoles,
                 CAN_READ,
                 false),
-            STRING_JSON_MAP));
+            new TypeReference<HashMap<String, JsonNode>>() {
+            }));
         caseDetails.setDataClassification(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
@@ -103,7 +103,8 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
                 userRoles,
                 CAN_READ,
                 true),
-            STRING_JSON_MAP));
+            new TypeReference<HashMap<String, JsonNode>>() {
+            }));
 
         return Optional.of(caseDetails);
     }

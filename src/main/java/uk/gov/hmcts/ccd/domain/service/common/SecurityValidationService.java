@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -16,16 +17,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.*;
+import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.caseHasClassificationEqualOrLowerThan;
+import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
+import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getSecurityClassification;
 
 @Service
 public class SecurityValidationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityValidationService.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data validation error (c)";
@@ -36,9 +37,10 @@ public class SecurityValidationService {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
 
             validateObject(MAPPER.convertValue(callbackResponse.getDataClassification(), JsonNode.class),
-                           MAPPER.convertValue(defaultDataClassification, JsonNode.class));
+                MAPPER.convertValue(defaultDataClassification, JsonNode.class));
 
-            caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), STRING_JSON_MAP));
+            caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), new TypeReference<HashMap<String, JsonNode>>() {
+            }));
         } else {
             LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for caseReference={}, jurisdiction={} and caseType={}",
                 callbackResponse.getSecurityClassification(),
@@ -66,8 +68,8 @@ public class SecurityValidationService {
             if (callbackClassificationValue.has(CLASSIFICATION)) {
                 if (!isValidClassification(callbackClassificationValue.get(CLASSIFICATION), defaultClassificationItem.get(CLASSIFICATION))) {
                     LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
-                             callbackClassificationValue,
-                             defaultClassificationItem);
+                        callbackClassificationValue,
+                        defaultClassificationItem);
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
                 if (callbackClassificationValue.has(VALUE)) {
@@ -88,8 +90,8 @@ public class SecurityValidationService {
             } else {
                 if (!isValidClassification(callbackClassificationValue, defaultClassificationItem)) {
                     LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
-                             MAPPER.convertValue(callbackClassificationMap, JsonNode.class),
-                             defaultDataClassification);
+                        MAPPER.convertValue(callbackClassificationMap, JsonNode.class),
+                        defaultDataClassification);
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
             }

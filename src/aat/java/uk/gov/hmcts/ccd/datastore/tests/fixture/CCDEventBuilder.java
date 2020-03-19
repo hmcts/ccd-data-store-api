@@ -1,24 +1,22 @@
 package uk.gov.hmcts.ccd.datastore.tests.fixture;
 
-import java.util.HashMap;
-import java.util.function.Supplier;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CCDHelper;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
+import java.util.HashMap;
+import java.util.function.Supplier;
+
 public class CCDEventBuilder {
     private static final CCDHelper CCD_HELPER = new CCDHelper();
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
-    };
-
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private final String jurisdictionId;
     private final String caseTypeId;
     private String eventId;
@@ -81,7 +79,8 @@ public class CCDEventBuilder {
 
         final CaseDataContent caseDataContent = new CaseDataContent();
         caseDataContent.setEvent(event);
-        caseDataContent.setData(MAPPER.convertValue(data, STRING_JSON_MAP_TYPE));
+        caseDataContent.setData(MAPPER.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {
+        }));
         caseDataContent.setToken(token);
 
         return caseDataContent;
@@ -94,22 +93,23 @@ public class CCDEventBuilder {
 
         final CaseDataContent caseDataContent = new CaseDataContent();
         caseDataContent.setEvent(event);
-        caseDataContent.setData(MAPPER.convertValue(data, STRING_JSON_MAP_TYPE));
+        caseDataContent.setData(MAPPER.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {
+        }));
 
         if (isUpdate()) {
             return CCD_HELPER.updateCase(asUser,
-                                         jurisdictionId,
-                                         caseTypeId,
-                                         caseReference,
-                                         eventId,
-                                         caseDataContent);
+                jurisdictionId,
+                caseTypeId,
+                caseReference,
+                eventId,
+                caseDataContent);
         }
 
         return CCD_HELPER.createCase(asUser,
-                                     jurisdictionId,
-                                     caseTypeId,
-                                     eventId,
-                                     caseDataContent);
+            jurisdictionId,
+            caseTypeId,
+            eventId,
+            caseDataContent);
     }
 
     public Long submitAndGetReference() {

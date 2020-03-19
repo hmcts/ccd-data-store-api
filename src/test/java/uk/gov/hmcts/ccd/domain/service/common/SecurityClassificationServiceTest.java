@@ -31,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -43,7 +44,7 @@ public class SecurityClassificationServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String JURISDICTION_ID = "PROBATE";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
 
     private SecurityClassificationService securityClassificationService;
 
@@ -314,8 +315,6 @@ public class SecurityClassificationServiceTest {
         private static final String VALUE = "value";
         private static final String ID = "id";
         private CaseDetails caseDetails;
-        private final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-        };
         private final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
         @BeforeEach
@@ -341,7 +340,7 @@ public class SecurityClassificationServiceTest {
                 "{  \"Note1\": \"note1\"\n," +
                     "       \"Note2\": \"note2\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
@@ -360,13 +359,13 @@ public class SecurityClassificationServiceTest {
                 "{  \"Note1\": \"note1\"\n," +
                     "       \"Note2\": \"note2\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Note1\": \"nonClassification\"\n," +
                     "       \"Note2\": \"nonClassification\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
@@ -385,13 +384,13 @@ public class SecurityClassificationServiceTest {
                 "{  \"Note1\": \"note1\"\n," +
                     "       \"Note2\": \"note2\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Note1\": \"RESTRICTED\"\n," +
                     "       \"Note2\": \"PUBLIC\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
@@ -410,13 +409,13 @@ public class SecurityClassificationServiceTest {
                 "{  \"Note1\": \"note1\"\n," +
                     "       \"Note2\": \"note2\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Note1\": \"RESTRICTED\"\n," +
                     "       \"Note2\": \"RESTRICTED\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -442,13 +441,13 @@ public class SecurityClassificationServiceTest {
                     "         \"V1\",\n" +
                     "         \"V2\"\n" +
                     "      ]}\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"OrderType1\": \"PUBLIC\"," +
                     "       \"OrderType2\": \"RESTRICTED\"," +
                     "       \"OrderType3\": \"PRIVATE\"}\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -476,12 +475,12 @@ public class SecurityClassificationServiceTest {
                     "         \"ChildOrder\",\n" +
                     "         \"SpecialIssueOrder\"\n" +
                     "      ]}\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"OrderType1\": \"RESTRICTED\"," +
                     "       \"OrderType2\": \"RESTRICTED\"}\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -504,7 +503,7 @@ public class SecurityClassificationServiceTest {
                     "           \"Note4\": \"note4\"\n" +
                     "       }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Note1\": { \n" +
@@ -519,7 +518,7 @@ public class SecurityClassificationServiceTest {
                     "           } \n" +
                     "        } \n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
@@ -542,7 +541,7 @@ public class SecurityClassificationServiceTest {
                     "            }\n" +
                     "       }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Field\": {  \n" +
@@ -571,7 +570,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "      }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -603,7 +602,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "       }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Field\": {  \n" +
@@ -625,7 +624,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "       }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -649,7 +648,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "       }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Field\": {  \n" +
@@ -671,7 +670,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "       }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -712,11 +711,11 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"PRIVATE\" }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -779,7 +778,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": {\n" +
@@ -826,7 +825,7 @@ public class SecurityClassificationServiceTest {
                     "     ]\n" +
                     "   }\n" +
                     " }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -859,7 +858,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Aliases\": {\n" +
@@ -880,7 +879,7 @@ public class SecurityClassificationServiceTest {
                     "     ]\n" +
                     "   }\n" +
                     " }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
@@ -984,7 +983,7 @@ public class SecurityClassificationServiceTest {
                             "     ]\n" +
                             "   }\n" +
                             " }\n"
-                    ), STRING_JSON_MAP);
+                    ), new TypeReference<HashMap<String, JsonNode>>() {});
         }
 
         private Map<String, JsonNode> nestedCollectionData() throws IOException {
@@ -1022,7 +1021,7 @@ public class SecurityClassificationServiceTest {
                             "         }\n" +
                             "      ]\n" +
                             "    }\n"
-                    ), STRING_JSON_MAP);
+                    ), new TypeReference<HashMap<String, JsonNode>>() {});
         }
 
         @Test
@@ -1040,7 +1039,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Aliases\": {\n" +
@@ -1057,7 +1056,7 @@ public class SecurityClassificationServiceTest {
                     "     ]\n" +
                     "   }\n" +
                     " }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
@@ -1095,7 +1094,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{  \n" +
@@ -1130,7 +1129,7 @@ public class SecurityClassificationServiceTest {
                     "       ]\n" +
                     "     }\n" +
                     "   }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -1181,7 +1180,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{  \n" +
@@ -1203,7 +1202,7 @@ public class SecurityClassificationServiceTest {
                     "       ]\n" +
                     "     }\n" +
                     "   }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -1235,7 +1234,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": {  \n" +
@@ -1251,7 +1250,7 @@ public class SecurityClassificationServiceTest {
                     "         ]\n" +
                     "      }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -1298,7 +1297,7 @@ public class SecurityClassificationServiceTest {
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": {  \n" +
@@ -1333,7 +1332,7 @@ public class SecurityClassificationServiceTest {
                     "         ]\n" +
                     "      }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -1387,7 +1386,7 @@ public class SecurityClassificationServiceTest {
                     "         \"ChildOrder\",\n" +
                     "         \"SpecialIssueOrder\"\n" +
                     "      ]}\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{ \"Det3\":\"PUBLIC\",\n" +
@@ -1429,7 +1428,7 @@ public class SecurityClassificationServiceTest {
                     "      \"ChildRiskReason1\":\"PUBLIC\",\n" +
                     "      \"ChildRiskReason2\":\"PUBLIC\",\n" +
                     "      \"OrderType\":\"RESTRICTED\"}\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
@@ -1475,7 +1474,7 @@ public class SecurityClassificationServiceTest {
                 "{  \"Note1\": \"RESTRICTED\"\n," +
                     "       \"Note2\": \"PUBLIC\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -1489,13 +1488,13 @@ public class SecurityClassificationServiceTest {
         @DisplayName("should return empty details if empty details passed in")
         void shouldReturnEmptyDetailsIfEmptyDetailsPassedIn() throws IOException {
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree("{}"),
-                                                                   STRING_JSON_MAP);
+                                                                   new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Note1\": \"RESTRICTED\"\n," +
                     "       \"Note2\": \"PUBLIC\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -1512,7 +1511,7 @@ public class SecurityClassificationServiceTest {
                 "{  \"Note1\": true\n," +
                     "       \"Note2\": false\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = null;
             caseDetails.setDataClassification(dataClassification);
@@ -1531,10 +1530,10 @@ public class SecurityClassificationServiceTest {
                 "{  \"Note1\": true\n," +
                     "       \"Note2\": false\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree("{}"),
-                                                                                 STRING_JSON_MAP);
+                                                                                 new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -1551,13 +1550,13 @@ public class SecurityClassificationServiceTest {
                 "{  \"Note1\": 42\n," +
                     "       \"Note2\": 56\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Note1\": \"RESTRICTED\"\n," +
                     "       \"Note2\": \"PUBLIC\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -1577,13 +1576,13 @@ public class SecurityClassificationServiceTest {
                 "{  \"Note1\": true\n," +
                     "       \"Note2\": false\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Note1\": \"RESTRICTED\"\n," +
                     "       \"Note2\": \"PUBLIC\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 
@@ -1611,13 +1610,13 @@ public class SecurityClassificationServiceTest {
                     "           \"document_filename\": \"Document 2\"" +
                     "       }\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setData(data);
             final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Document1\": \"RESTRICTED\"\n," +
                     "       \"Document2\": \"PUBLIC\"\n" +
                     "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             caseDetails.setDataClassification(dataClassification);
 
 

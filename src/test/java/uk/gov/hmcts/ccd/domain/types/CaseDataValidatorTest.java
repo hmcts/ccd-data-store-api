@@ -55,7 +55,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "  }\n" +
             "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
         assertEquals(result.toString(), 0, result.size());
     }
@@ -74,7 +74,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "    }\n" +
             "  }\n" +
             "}";
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
         assertEquals(result.toString(), 2, result.size());
     }
@@ -90,7 +90,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "    }\n" +
                 "  }\n" +
                 "}";
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
         assertEquals(result.toString(), 1, result.size());
 
@@ -110,7 +110,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "    }\n" +
                 "  }\n" +
                 "}";
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
         assertEquals(result.toString(), 1, result.size());
 
@@ -125,7 +125,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "{\n" +
             "  \"PersonGender\" : \"\"\n" +
             "}";
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
         assertEquals(result.toString(), 1, result.size());
 
@@ -156,7 +156,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "    }\n" +
             "  }\n" +
             "}";
-        final Map<String, JsonNode> values = MAPPER.readValue(data, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(data, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
         assertEquals(result.toString(), 1, result.size());
     }
@@ -177,7 +177,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "  ]\n" +
             "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
         assertEquals(result.toString(), 0, result.size());
     }
@@ -198,7 +198,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "  ]\n" +
                 "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
         assertEquals(results.toString(), 1, results.size());
 
@@ -229,7 +229,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "  ]\n" +
                 "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
         assertEquals(results.toString(), 1, results.size());
 
@@ -245,7 +245,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "  \"Initials\" : [ { \"value\": \"A\" }, { \"value\": \"B\" } ]\n" +
             "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
         assertEquals(results.toString(), 0, results.size());
     }
@@ -258,7 +258,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "  \"Initials\" : [ { \"value\": \"TooLong\" }, { \"value\": \"B\" } ]\n" +
             "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
         assertEquals(results.toString(), 1, results.size());
 
@@ -274,7 +274,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "  \"Initials\" : [ { \"value\": \"TooLong\" }, { \"value\": \"TooLong\" } ]\n" +
                 "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
         assertEquals(results.toString(), 2, results.size());
 
@@ -293,7 +293,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "  \"Initials\" : [ { \"x\": \"TooLong\" }, { \"y\": \"TooLong\" } ]\n" +
                 "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
         assertEquals(results.toString(), 2, results.size());
 
@@ -312,7 +312,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "  \"Initials\" : [ \"x\", \"y\" ]\n" +
                 "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
         final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
         assertEquals(results.toString(), 2, results.size());
 
@@ -338,7 +338,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "}]";
         final List<CaseField> caseFields = MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
 
         assertEquals(0, caseDataValidator.validate(values, caseFields).size());
     }
@@ -360,10 +360,10 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "}]";
         final List<CaseField> caseFields = MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
 
-        final Map<String, JsonNode> invalidMaxVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}", STRING_NODE_TYPE);
+        final Map<String, JsonNode> invalidMaxVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}", new TypeReference<HashMap<String, JsonNode>>() {});
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(invalidMaxVal, caseFields).size());
 
-        final Map<String, JsonNode> invalidMinVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test\"}", STRING_NODE_TYPE);
+        final Map<String, JsonNode> invalidMinVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test\"}", new TypeReference<HashMap<String, JsonNode>>() {});
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(invalidMinVal, caseFields).size());
     }
 }

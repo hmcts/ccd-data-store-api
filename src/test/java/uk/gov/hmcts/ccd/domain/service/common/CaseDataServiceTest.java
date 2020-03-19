@@ -27,15 +27,15 @@ import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 class CaseDataServiceTest {
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private static final CaseDataService caseDataService = new CaseDataService();
     private CaseType caseType;
 
@@ -237,7 +237,7 @@ class CaseDataServiceTest {
                 "   ]\n" +
                 "  }\n" +
                 "}\n"
-        ), STRING_JSON_MAP);
+        ), new TypeReference<HashMap<String, JsonNode>>() {});
 
         final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(caseType, DATA, Maps.newHashMap());
         final String expectedResult = "{  \n" +
@@ -337,7 +337,7 @@ class CaseDataServiceTest {
                 "           }\n" +
                 "       ]\n" +
                 "  }\n"
-        ), STRING_JSON_MAP);
+        ), new TypeReference<HashMap<String, JsonNode>>() {});
         // first to set default classification
         final Map<String, JsonNode> defaultClassifications = caseDataService.getDefaultSecurityClassifications(caseType, DATA, Maps.newHashMap());
         final String expectedDefaultResult = "{  \n" +
@@ -422,7 +422,7 @@ class CaseDataServiceTest {
                 "           }\n" +
                 "       ]\n" +
                 "}\n"
-        ), STRING_JSON_MAP);
+        ), new TypeReference<HashMap<String, JsonNode>>() {});
         setCaseType(PUBLIC);
 
         // ACT

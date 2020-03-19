@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -31,15 +31,25 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 class AuthorisedSearchOperationTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -109,8 +119,10 @@ class AuthorisedSearchOperationTest {
         ((ObjectNode) authorisedDataClassificationNode1).put("classificationTestField11", "classificationTestValue11");
 
         classifiedCase1 = new CaseDetails();
-        classifiedCase1.setData(MAPPER.convertValue(classifiedDataNode1, STRING_JSON_MAP));
-        classifiedCase1.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode1, STRING_JSON_MAP));
+        classifiedCase1.setData(MAPPER.convertValue(classifiedDataNode1, new TypeReference<HashMap<String, JsonNode>>() {
+        }));
+        classifiedCase1.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode1, new TypeReference<HashMap<String, JsonNode>>() {
+        }));
 
         caseFields.addAll(getCaseFieldsWithIds("dataTestField21", "dataTestField22", "classificationTestField21", "classificationTestField22"));
 
@@ -127,8 +139,10 @@ class AuthorisedSearchOperationTest {
         ((ObjectNode) authorisedDataClassificationNode2).put("classificationTestField21", "classificationTestValue21");
 
         classifiedCase2 = new CaseDetails();
-        classifiedCase2.setData(MAPPER.convertValue(classifiedDataNode2, STRING_JSON_MAP));
-        classifiedCase2.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode2, STRING_JSON_MAP));
+        classifiedCase2.setData(MAPPER.convertValue(classifiedDataNode2, new TypeReference<HashMap<String, JsonNode>>() {
+        }));
+        classifiedCase2.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode2, new TypeReference<HashMap<String, JsonNode>>() {
+        }));
 
         doReturn(Arrays.asList(classifiedCase1, classifiedCase2)).when(nextOperationInChain).execute(metaData, criteria);
         doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase1.getState()), eq(caseType), eq(USER_ROLES), eq(CAN_READ));
@@ -209,13 +223,17 @@ class AuthorisedSearchOperationTest {
             () -> assertThat(output, hasSize(2)),
             () -> assertThat(output, hasItems(classifiedCase1, classifiedCase2)),
             () -> assertThat(output.get(0).getData(),
-                is(equalTo(MAPPER.convertValue(authorisedDataNode1, STRING_JSON_MAP)))),
+                is(equalTo(MAPPER.convertValue(authorisedDataNode1, new TypeReference<HashMap<String, JsonNode>>() {
+                })))),
             () -> assertThat(output.get(0).getDataClassification(),
-                is(equalTo(MAPPER.convertValue(authorisedDataClassificationNode1, STRING_JSON_MAP)))),
+                is(equalTo(MAPPER.convertValue(authorisedDataClassificationNode1, new TypeReference<HashMap<String, JsonNode>>() {
+                })))),
             () -> assertThat(output.get(1).getData(),
-                is(equalTo(MAPPER.convertValue(authorisedDataNode2, STRING_JSON_MAP)))),
+                is(equalTo(MAPPER.convertValue(authorisedDataNode2, new TypeReference<HashMap<String, JsonNode>>() {
+                })))),
             () -> assertThat(output.get(1).getDataClassification(),
-                is(equalTo(MAPPER.convertValue(authorisedDataClassificationNode2, STRING_JSON_MAP)))),
+                is(equalTo(MAPPER.convertValue(authorisedDataClassificationNode2, new TypeReference<HashMap<String, JsonNode>>() {
+                })))),
             () -> inOrder.verify(nextOperationInChain).execute(metaData, criteria),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(userRepository).getUserRoles(),

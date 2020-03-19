@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -29,10 +30,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIE
 @Qualifier("authorised")
 public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
-
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private final CreateCaseOperation createCaseOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
@@ -92,7 +90,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ, false),
-                STRING_JSON_MAP));
+                new TypeReference<HashMap<String, JsonNode>>() {}));
             caseDetails.setDataClassification(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
@@ -100,7 +98,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
                     userRoles,
                     CAN_READ,
                     true),
-                STRING_JSON_MAP));
+                new TypeReference<HashMap<String, JsonNode>>() {}));
         }
         return caseDetails;
     }

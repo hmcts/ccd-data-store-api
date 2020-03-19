@@ -73,8 +73,6 @@ public class AccessControlServiceTest {
     private static final String EVENT_ID_WITHOUT_ACCESS = "EVENT_ID_WITHOUT_ACCESS";
     private static final String EVENT_ID_WITHOUT_ACCESS_2 = "EVENT_ID_WITHOUT_ACCESS_2";
     private static final String EVENT_ID_WITH_ACCESS_2 = "EVENT_ID_WITH_ACCESS_2";
-    static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final ObjectMapper MAPPER = new ObjectMapper();
     static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
@@ -375,7 +373,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"SomeText\" }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -402,7 +400,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -441,7 +439,7 @@ public class AccessControlServiceTest {
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\", "
                     + "   \"Addresses2\": \"someText\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -469,7 +467,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -509,7 +507,7 @@ public class AccessControlServiceTest {
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\", "
                     + "   \"Addresses2\": \"someText\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -528,7 +526,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -559,7 +557,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -584,7 +582,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -637,7 +635,7 @@ public class AccessControlServiceTest {
                     + "         }\n"
                     + "      ]\n"
                     + "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -662,7 +660,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[] }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -696,7 +694,7 @@ public class AccessControlServiceTest {
                     + "          \"Note\": \"someNote11\"\n"
                     + "       }\n"
                     + "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -721,7 +719,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{} }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -1334,7 +1332,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"SomeText\" }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1361,7 +1359,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1387,7 +1385,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1416,7 +1414,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1446,7 +1444,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"addresses\": \"someText\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1476,7 +1474,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1506,7 +1504,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1536,7 +1534,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1567,7 +1565,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1602,7 +1600,7 @@ public class AccessControlServiceTest {
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null,\n"
                     + "       \"Addresses2\": \"\" }"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1662,7 +1660,7 @@ public class AccessControlServiceTest {
                     + "         }\n"
                     + "      ]\n"
                     + "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1873,7 +1871,7 @@ public class AccessControlServiceTest {
                     + "      \"Addresses2\": [],\n"
                     + "      \"Addresses3\": null\n"
                     + "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1919,7 +1917,7 @@ public class AccessControlServiceTest {
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[] }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1954,7 +1952,7 @@ public class AccessControlServiceTest {
                     + "           \"Note\": \"someNote11\"\n"
                     + "       }\n"
                     + "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1992,7 +1990,7 @@ public class AccessControlServiceTest {
                     + "           \"Note\": \"\"\n"
                     + "       }\n"
                     + "    }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -2022,7 +2020,7 @@ public class AccessControlServiceTest {
             List<CaseField> caseFields = newArrayList();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{} }\n"
-            ), STRING_JSON_MAP);
+            ), new TypeReference<HashMap<String, JsonNode>>() {});
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -3574,7 +3572,7 @@ public class AccessControlServiceTest {
     }
 
     private JsonNode getJsonNode(String content) throws IOException {
-        final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(content), STRING_JSON_MAP);
+        final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(content), new TypeReference<HashMap<String, JsonNode>>() {});
         return MAPPER.convertValue(newData, JsonNode.class);
     }
 
@@ -3782,7 +3780,7 @@ public class AccessControlServiceTest {
                 person2 +
                 "  ]\n"
                 + "}"
-        ), STRING_JSON_MAP);
+        ), new TypeReference<HashMap<String, JsonNode>>() {});
 
         return MAPPER.convertValue(data, JsonNode.class);
     }

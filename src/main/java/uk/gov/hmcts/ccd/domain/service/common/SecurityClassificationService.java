@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -29,9 +30,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils
 @Service
 public class SecurityClassificationService {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
@@ -68,7 +67,7 @@ public class SecurityClassificationService {
                     JsonNode data = filterNestedObject(MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
                                                        MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
                                                        securityClassification);
-                    caseDetails.setData(MAPPER.convertValue(data, STRING_JSON_MAP));
+                    caseDetails.setData(MAPPER.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}));
                     return cd;
                 }));
     }

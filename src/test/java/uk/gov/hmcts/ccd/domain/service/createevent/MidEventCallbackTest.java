@@ -38,8 +38,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 class MidEventCallbackTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final String JURISDICTION_ID = "jurisdictionId";
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
@@ -127,7 +125,7 @@ class MidEventCallbackTest {
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}"), new TypeReference<HashMap<String, JsonNode>>() {});
         CaseDetails updatedCaseDetails = caseDetails(data);
         CaseDataContent content = newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS)
             .build();
@@ -176,7 +174,7 @@ class MidEventCallbackTest {
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}"), new TypeReference<HashMap<String, JsonNode>>() {});
         CaseDetails updatedCaseDetails = caseDetails(eventData);
 
         CaseDataContent content = newCaseDataContent()
@@ -221,19 +219,19 @@ class MidEventCallbackTest {
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}"), new TypeReference<HashMap<String, JsonNode>>() {});
 
         Map<String, JsonNode> existingData = MAPPER.convertValue(MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonMiddleName\": \"Middle Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}"), new TypeReference<HashMap<String, JsonNode>>() {});
         Map<String, JsonNode> combineData = MAPPER.convertValue(MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\",\n"
                 + "  \"PersonMiddleName\": \"Middle Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}"), new TypeReference<HashMap<String, JsonNode>>() {});
         CaseDetails existingCaseDetails = caseDetails(existingData);
         CaseDetails combineCaseDetails = caseDetails(combineData);
         CaseDataContent content = newCaseDataContent()

@@ -53,8 +53,7 @@ public class DefaultObjectMapperService implements ObjectMapperService {
     @Override
     public Map<String, JsonNode> convertJsonNodeToMap(JsonNode node) {
         try {
-            TypeReference typeReference = new TypeReference<HashMap<String, JsonNode>>() {};
-            return objectMapper.convertValue(node, typeReference);
+            return objectMapper.convertValue(node, new TypeReference<HashMap<String, JsonNode>>() {});
         } catch (IllegalArgumentException e) {
             throw new ServiceException("Unable to convert JSON node to map", e);
         }

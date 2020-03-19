@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -28,7 +29,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 @Qualifier("authorised")
 public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
 
@@ -94,7 +95,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                     userRoles,
                     CAN_READ,
                     false),
-                STRING_JSON_MAP));
+                new TypeReference<HashMap<String, JsonNode>>() {}));
             caseDetails.setDataClassification(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
@@ -102,7 +103,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                     userRoles,
                     CAN_READ,
                     true),
-                STRING_JSON_MAP));
+                new TypeReference<HashMap<String, JsonNode>>() {}));
         }
         return caseDetails;
     }

@@ -274,12 +274,12 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
@@ -335,12 +335,12 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("https://www.npmjs.com/package/supertest");
@@ -403,12 +403,12 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("https://www.npmjs.com/package/supertest");
@@ -437,12 +437,12 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
@@ -496,12 +496,12 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
@@ -556,12 +556,12 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_WITH_MISSING_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_WITH_MISSING_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
@@ -586,11 +586,11 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -612,11 +612,11 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -636,11 +636,11 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -662,11 +662,11 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -686,7 +686,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         stubForErrorCallbackResponse(URL_BEFORE_COMMIT);
@@ -705,7 +705,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         caseDetailsToSave.setToken(generateEventTokenNewCase(USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_ID));
 
         stubForErrorCallbackResponse("/before-commit.*");
@@ -761,7 +761,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -773,7 +773,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
         final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
-        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
+        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}), startEventTrigger.getCaseDetails().getData());
         assertTrue("No token", !startEventTrigger.getToken().isEmpty());
     }
 
@@ -783,7 +783,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -801,7 +801,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -843,7 +843,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -856,7 +856,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
         final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
-        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
+        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}), startEventTrigger.getCaseDetails().getData());
         assertTrue("No token", !startEventTrigger.getToken().isEmpty());
     }
 
@@ -902,7 +902,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -914,7 +914,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
         final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
-        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
+        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}), startEventTrigger.getCaseDetails().getData());
         assertTrue("No token", !startEventTrigger.getToken().isEmpty());
     }
 
@@ -924,7 +924,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -936,7 +936,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
         final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
-        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
+        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}), startEventTrigger.getCaseDetails().getData());
         assertTrue("No token", !startEventTrigger.getToken().isEmpty());
     }
 
@@ -946,7 +946,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -964,7 +964,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -992,12 +992,12 @@ public class CallbackTest extends WireMockBaseTest {
         final String token = generateEventToken(jdbcTemplate, USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
-        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -1057,11 +1057,11 @@ public class CallbackTest extends WireMockBaseTest {
         final String token = generateEventToken(jdbcTemplate, USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
@@ -1125,7 +1125,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String token = generateEventToken(jdbcTemplate, USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubForErrorCallbackResponse("/before-commit.*");
 
@@ -1157,7 +1157,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String token = generateEventToken(jdbcTemplate, USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubForErrorCallbackResponse("/before-commit.*");
 
@@ -1193,10 +1193,10 @@ public class CallbackTest extends WireMockBaseTest {
         final String token = generateEventToken(jdbcTemplate, USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE,  EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -1235,10 +1235,10 @@ public class CallbackTest extends WireMockBaseTest {
         final String token = generateEventToken(jdbcTemplate, USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE,  EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -1272,7 +1272,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String token = generateEventToken(jdbcTemplate, OTHER_USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -1301,7 +1301,7 @@ public class CallbackTest extends WireMockBaseTest {
         final String token = generateEventToken(jdbcTemplate, OTHER_USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -1329,12 +1329,12 @@ public class CallbackTest extends WireMockBaseTest {
         String token = generateEventToken(jdbcTemplate, USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
         callbackResponse.setSecurityClassification(PUBLIC);
-        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}));
 
         stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
