@@ -4,7 +4,7 @@ Feature: [SAMPLE] Get default settings for user
   Background:
     Given an appropriate test context as detailed in the test data source
 
-  @S-000
+  @S-000 @Ignore
   Scenario: [SAMPLE] must return default user setting successfully for a user having a profile in CCD
     Given a successful call [to retrieve a user profile] as in [S-000-Prerequisite]
     And a user with [a detailed profile in CCD]
