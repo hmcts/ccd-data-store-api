@@ -1116,8 +1116,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseFieldBuilder withDisplayValue(final String displayValue) {
-            caseField.setDisplayValue(displayValue);
+        public CaseFieldBuilder withFormattedValue(final String formattedValue) {
+            caseField.setFormattedValue(formattedValue);
             return this;
         }
 

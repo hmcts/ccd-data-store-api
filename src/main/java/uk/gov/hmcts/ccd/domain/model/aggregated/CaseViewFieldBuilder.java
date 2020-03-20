@@ -39,7 +39,7 @@ public class CaseViewFieldBuilder {
         field.setShowSummaryContentOption(eventField.getShowSummaryContentOption());
         field.setAccessControlLists(caseField.getAccessControlLists());
         field.setMetadata(caseField.isMetadata());
-        field.setDisplayValue(caseField.getDisplayValue());
+        field.setFormattedValue(caseField.getFormattedValue());
 
         caseField.propagateACLsToNestedFields();
 

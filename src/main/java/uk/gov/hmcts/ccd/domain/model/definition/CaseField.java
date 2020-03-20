@@ -52,8 +52,8 @@ public class CaseField implements Serializable, CommonField {
     private String displayContext;
     @JsonProperty("display_context_parameter")
     private String displayContextParameter;
-    @JsonProperty("display_value")
-    private Object displayValue;
+    @JsonProperty("formatted_value")
+    private Object formattedValue;
 
     public String getId() {
         return id;
@@ -183,12 +183,12 @@ public class CaseField implements Serializable, CommonField {
         this.displayContextParameter = displayContextParameter;
     }
 
-    public Object getDisplayValue() {
-        return displayValue;
+    public Object getFormattedValue() {
+        return formattedValue;
     }
 
-    public void setDisplayValue(Object displayValue) {
-        this.displayValue = displayValue;
+    public void setFormattedValue(Object formattedValue) {
+        this.formattedValue = formattedValue;
     }
 
     @JsonIgnore

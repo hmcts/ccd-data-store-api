@@ -69,7 +69,7 @@ public class CaseViewFieldBuilderTest {
         CASE_FIELD.setLabel("First name");
         CASE_FIELD.setSecurityLabel("LO1");
         CASE_FIELD.setMetadata(false);
-        CASE_FIELD.setDisplayValue("DisplayValue");
+        CASE_FIELD.setFormattedValue("DisplayValue");
 
         CASE_FIELD_2.setId("PersonLastName");
 
@@ -117,7 +117,7 @@ public class CaseViewFieldBuilderTest {
             assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
             assertThat(field.getShowSummaryContentOption(), is(3));
             assertThat(field.isMetadata(), is(false));
-            assertThat(field.getDisplayValue(), is(CASE_FIELD.getDisplayValue()));
+            assertThat(field.getFormattedValue(), is(CASE_FIELD.getFormattedValue()));
 
             CaseViewField metadataField = fieldBuilder.build(CASE_FIELD_3, EVENT_FIELD_3);
             assertThat(metadataField.isMetadata(), is(true));

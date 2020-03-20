@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
@@ -33,7 +35,7 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
     }
 
     @Override
-    protected JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath) {
+    protected JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath, WizardPageComplexFieldOverride override, CaseViewField topLevelField) {
         return !isNullOrEmpty(node)
             && hasDisplayContextParameterType(field.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
             && isSupportedBaseType(baseType, SUPPORTED_TYPES) ?
@@ -42,7 +44,7 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
     }
 
     @Override
-    protected JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField, String fieldPath) {
+    protected JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField, String fieldPath, WizardPageComplexFieldOverride override, CaseViewField topLevelField) {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
 
         if (hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)

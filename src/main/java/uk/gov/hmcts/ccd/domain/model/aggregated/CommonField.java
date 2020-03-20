@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 import java.util.Arrays;
@@ -29,9 +30,9 @@ public interface CommonField {
 
     void setDisplayContextParameter(String displayContextParameter);
 
-    Object getDisplayValue();
+    Object getFormattedValue();
 
-    void setDisplayValue(Object displayValue);
+    void setFormattedValue(Object formattedValue);
 
     @JsonIgnore
     default boolean isCollectionFieldType() {
@@ -46,6 +47,13 @@ public interface CommonField {
     @JsonIgnore
     default boolean isCompoundFieldType() {
         return isCollectionFieldType() || isComplexFieldType();
+    }
+
+    default DisplayContext displayContextType() {
+        return Optional.ofNullable(getDisplayContext())
+            .filter(dc -> !dc.equals("HIDDEN"))
+            .map(DisplayContext::valueOf)
+            .orElse(null);
     }
 
     /**

@@ -50,7 +50,7 @@ public class CaseEventTriggerBuilder {
         caseEventTrigger.setCaseId(caseReference);
         caseEventTrigger.setCaseFields(
             fieldProcessorService.processCaseViewFields(
-                mergeEventFields(startEventTrigger.getCaseDetails(), caseType, eventTrigger))
+                mergeEventFields(startEventTrigger.getCaseDetails(), caseType, eventTrigger), caseType, eventTrigger)
         );
         caseEventTrigger.setEventToken(startEventTrigger.getToken());
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
