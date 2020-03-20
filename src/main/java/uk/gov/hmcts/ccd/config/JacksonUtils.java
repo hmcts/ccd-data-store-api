@@ -27,8 +27,4 @@ public class JacksonUtils {
         return new TypeReference<HashMap<String, JsonNode>>() {
         };
     }
-
-    private JacksonUtils(){
-
-    }
 }
