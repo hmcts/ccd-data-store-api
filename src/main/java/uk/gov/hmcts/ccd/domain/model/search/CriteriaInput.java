@@ -40,7 +40,7 @@ public class CriteriaInput {
         this.role = role;
     }
 
-    public String getFullId() {
+    public String buildCaseFieldId() {
         if (this.field != null) {
             return StringUtils.isEmpty(this.field.getElementPath()) ? this.field.getId() :
                 this.field.getId() + '.' + this.field.getElementPath();

@@ -92,7 +92,7 @@ public class SearchResultField implements Serializable {
         this.sortOrder = sortOrder;
     }
 
-    public String getFullId() {
+    public String buildCaseFieldId() {
         if (StringUtils.isNotBlank(getCaseFieldPath())) {
             return getCaseFieldId() + '.' + getCaseFieldPath();
         }
