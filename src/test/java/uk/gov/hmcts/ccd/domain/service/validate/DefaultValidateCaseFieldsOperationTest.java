@@ -36,7 +36,7 @@ class DefaultValidateCaseFieldsOperationTest {
     @Mock
     private CaseTypeService caseTypeService;
     @Mock
-    private CaseDataProcessor caseDataProcessor;
+    private FieldProcessorService fieldProcessorService;
     @Mock
     private CaseType caseType;
     @Mock
@@ -58,7 +58,7 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(event).when(caseDataContent).getEvent();
         doReturn(eventId).when(caseDataContent).getEventId();
 
-        validateCaseFieldsOperation = new DefaultValidateCaseFieldsOperation(caseDefinitionRepository, caseTypeService, caseDataProcessor);
+        validateCaseFieldsOperation = new DefaultValidateCaseFieldsOperation(caseDefinitionRepository, caseTypeService, fieldProcessorService);
     }
 
     @Test

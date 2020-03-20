@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.*;
-import uk.gov.hmcts.ccd.domain.service.processor.CaseDataProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
@@ -85,7 +85,7 @@ class CreateCaseEventServiceTest {
     @Mock
     private UserAuthorisation userAuthorisation;
     @Mock
-    private CaseDataProcessor caseDataProcessor;
+    private FieldProcessorService fieldProcessorService;
     @Mock
     private Clock clock;
 
@@ -161,7 +161,7 @@ class CreateCaseEventServiceTest {
         doReturn(postState).when(caseTypeService).findState(caseType, POST_STATE);
         doReturn(user).when(userRepository).getUser();
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
-        doReturn(data).when(caseDataProcessor).process(any(), any(), any(CaseEvent.class));
+        doReturn(data).when(fieldProcessorService).processData(any(), any(), any(CaseEvent.class));
         given(callbackInvoker.invokeAboutToSubmitCallback(any(),
             any(),
             any(),

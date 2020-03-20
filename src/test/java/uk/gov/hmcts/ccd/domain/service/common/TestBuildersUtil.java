@@ -1116,6 +1116,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseFieldBuilder withFormattedValue(final String formattedValue) {
+            caseField.setFormattedValue(formattedValue);
+            return this;
+        }
+
         public CaseField build() {
             caseField.setAccessControlLists(accessControlLists);
             caseField.setComplexACLs(complexACLs);
@@ -1442,6 +1447,7 @@ public class TestBuildersUtil {
             this.caseTypeTabFields = newArrayList();
             this.caseTypeTab = new CaseTypeTab();
             this.caseTypeTab.setTabFields(caseTypeTabFields);
+            this.caseTypeTab.setDisplayContextParameter(null);
         }
 
         public CaseTypeTabBuilder withTabField(CaseTypeTabField field) {

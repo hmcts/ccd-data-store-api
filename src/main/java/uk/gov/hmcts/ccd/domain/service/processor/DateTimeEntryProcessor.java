@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
@@ -19,34 +21,34 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
 import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.*;
 
 @Component
-public class DateTimeFormatProcessor extends FieldProcessor {
+public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
 
     private static final List<String> SUPPORTED_TYPES = Arrays.asList(DATETIME, DATE);
 
     private final DateTimeFormatParser dateTimeFormatParser;
 
     @Autowired
-    public DateTimeFormatProcessor(CaseViewFieldBuilder caseViewFieldBuilder,
-                                   DateTimeFormatParser dateTimeFormatParser) {
+    public DateTimeEntryProcessor(CaseViewFieldBuilder caseViewFieldBuilder,
+                                  DateTimeFormatParser dateTimeFormatParser) {
         super(caseViewFieldBuilder);
         this.dateTimeFormatParser = dateTimeFormatParser;
     }
 
     @Override
-    protected JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath) {
+    protected JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath, WizardPageComplexFieldOverride override, CaseViewField topLevelField) {
         return !isNullOrEmpty(node)
             && hasDisplayContextParameterType(field.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
-            && isSupportedBaseType(baseType) ?
+            && isSupportedBaseType(baseType, SUPPORTED_TYPES) ?
             createNode(field.getDisplayContextParameter(), node.asText(), baseType, fieldPath) :
             node;
     }
 
     @Override
-    protected JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField, String fieldPath) {
+    protected JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField, String fieldPath, WizardPageComplexFieldOverride override, CaseViewField topLevelField) {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
 
         if (hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
-            && isSupportedBaseType(collectionFieldType)) {
+            && isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
@@ -59,10 +61,6 @@ public class DateTimeFormatProcessor extends FieldProcessor {
         }
 
         return collectionNode;
-    }
-
-    private boolean isSupportedBaseType(BaseType baseType) {
-        return SUPPORTED_TYPES.contains(baseType.getType());
     }
 
     private TextNode createNode(String displayContextParameter, String valueToConvert, BaseType baseType, String fieldPath) {

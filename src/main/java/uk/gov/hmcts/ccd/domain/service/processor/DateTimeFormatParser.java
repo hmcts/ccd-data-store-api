@@ -16,8 +16,8 @@ public class DateTimeFormatParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(DateTimeFormatParser.class);
 
-    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public void parseDateTimeFormat(String dateTimeFormat, String value) throws Exception {
         try {
