@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -98,7 +97,6 @@ class AuthorisedCreateCaseOperationTest {
         doReturn(classifiedCase).when(classifiedCreateCaseOperation).createCaseDetails(CASE_TYPE_ID,
                                                                                        EVENT_DATA,
                                                                                        IGNORE);
-        JsonNode authorisedCaseNode = MAPPER.createObjectNode();
         caseType.setEvents(events);
         caseType.setJurisdiction(newJurisdiction().withJurisdictionId(JURISDICTION_ID).build());
         caseType.setCaseFields(caseFields);
@@ -108,7 +106,8 @@ class AuthorisedCreateCaseOperationTest {
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ))).thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
-        when(accessControlService.filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ), anyBoolean())).thenReturn(authorisedCaseNode);
+        when(accessControlService.filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ), anyBoolean()))
+            .thenReturn(MAPPER.createObjectNode());
     }
 
     @Test
@@ -159,7 +158,8 @@ class AuthorisedCreateCaseOperationTest {
             () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(classifiedCreateCaseOperation).createCaseDetails(CASE_TYPE_ID, EVENT_DATA, IGNORE),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-            () -> inOrder.verify(accessControlService, times(2)).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ), anyBoolean())
+            () -> inOrder.verify(accessControlService, times(2))
+                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ), anyBoolean())
         );
     }
 
@@ -189,12 +189,12 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doThrow(new ValidationException("Cannot find user roles for the user")).when(caseAccessService).getCaseCreationRoles();
+        doReturn(null).when(caseAccessService).getCaseCreationRoles();
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(null), eq(CAN_CREATE))).thenThrow(NullPointerException.class);
 
-        assertThrows(ValidationException.class, () -> authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
-                                                                                                      EVENT_DATA,
-                                                                                                      IGNORE));
+        assertThrows(NullPointerException.class, () -> authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+                                                                                                       EVENT_DATA,
+                                                                                                       IGNORE));
     }
 
     @Test
@@ -204,8 +204,8 @@ class AuthorisedCreateCaseOperationTest {
         doReturn(new HashSet<>()).when(caseAccessService).getCaseCreationRoles();
 
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
-            EVENT_DATA,
-            IGNORE));
+                                                                                                            EVENT_DATA,
+                                                                                                            IGNORE));
     }
 
     @Test
