@@ -28,7 +28,7 @@ public enum DisplayContextParameterType {
         return Optional.empty();
     }
 
-    public static Optional<String> getParameterValueFor(String displayContextParameter) throws IllegalArgumentException {
+    public static Optional<String> getParameterValueFor(String displayContextParameter) {
         Matcher m = PATTERN.matcher(displayContextParameter);
         if (m.matches() && !Strings.isNullOrEmpty(m.group(VALUE_GROUP))) {
             return Optional.of(m.group(VALUE_GROUP));

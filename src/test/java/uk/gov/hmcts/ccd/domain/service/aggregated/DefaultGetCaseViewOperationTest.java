@@ -167,7 +167,6 @@ class DefaultGetCaseViewOperationTest {
                                                                                                                            .withType(
                                                                                                                                CASE_HISTORY_VIEWER)
                                                                                                                            .build())
-                                                                                                        .withDisplayContextParameter(null)
                                                                                                         .build())
                                                                                      .build())
                                                                    .build())
@@ -201,7 +200,6 @@ class DefaultGetCaseViewOperationTest {
                                                                                                                            .withType(
                                                                                                                                "NotACaseHistoryViewer")
                                                                                                                            .build())
-                                                                                                        .withDisplayContextParameter(null)
                                                                                                         .build())
                                                                                      .build())
                                                                    .build())

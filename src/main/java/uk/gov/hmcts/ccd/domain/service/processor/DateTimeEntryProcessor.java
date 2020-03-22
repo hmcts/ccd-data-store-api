@@ -66,7 +66,11 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
     private TextNode createNode(String displayContextParameter, String valueToConvert, BaseType baseType, String fieldPath) {
         String format = getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
             .map(DisplayContextParameter::getValue)
-            .orElse("");
+            .orElseThrow(() -> new DataProcessingException().withDetails(
+                String.format("Unable to obtain datetime format for field %s with display context parameter %s",
+                    fieldPath,
+                    displayContextParameter)
+            ));
         try {
             if (baseType == BaseType.get(DATETIME)) {
                 return new TextNode(dateTimeFormatParser.convertDateTimeToIso8601(format, valueToConvert));

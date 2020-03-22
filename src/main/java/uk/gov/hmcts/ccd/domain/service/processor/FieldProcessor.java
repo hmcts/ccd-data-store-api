@@ -43,7 +43,7 @@ public abstract class FieldProcessor {
         }
     }
 
-    protected JsonNode executeComplex(JsonNode complexNode,
+    private JsonNode executeComplex(JsonNode complexNode,
                                       List<CaseField> complexCaseFields,
                                       WizardPageField wizardPageField,
                                       String fieldPrefix,
