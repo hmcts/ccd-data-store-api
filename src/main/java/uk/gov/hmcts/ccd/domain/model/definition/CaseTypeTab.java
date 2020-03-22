@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
