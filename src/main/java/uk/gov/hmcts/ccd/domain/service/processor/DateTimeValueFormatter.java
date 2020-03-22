@@ -22,7 +22,7 @@ import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.
 import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.hasDisplayContextParameterType;
 
 @Component
-public class DateTimeDisplayProcessor extends CaseViewFieldProcessor {
+public class DateTimeValueFormatter extends CaseViewFieldProcessor {
 
     private static final List<String> SUPPORTED_TYPES = Arrays.asList(DATETIME, DATE);
     private static final Map<DisplayContext, DisplayContextParameterType> ENUM_MAP = new EnumMap<>(DisplayContext.class);
@@ -36,8 +36,8 @@ public class DateTimeDisplayProcessor extends CaseViewFieldProcessor {
     }
 
     @Autowired
-    public DateTimeDisplayProcessor(DateTimeFormatParser dateTimeFormatParser,
-                                    CaseViewFieldBuilder caseViewFieldBuilder) {
+    public DateTimeValueFormatter(DateTimeFormatParser dateTimeFormatParser,
+                                  CaseViewFieldBuilder caseViewFieldBuilder) {
         super(caseViewFieldBuilder);
         this.dateTimeFormatParser = dateTimeFormatParser;
     }

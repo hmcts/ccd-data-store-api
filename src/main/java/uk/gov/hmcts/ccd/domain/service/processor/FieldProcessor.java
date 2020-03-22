@@ -25,7 +25,7 @@ public abstract class FieldProcessor {
         this.caseViewFieldBuilder = caseViewFieldBuilder;
     }
 
-    public JsonNode execute(JsonNode node, CaseField caseField, CaseEventField caseEventField, WizardPageField wizardPageField) {
+    protected JsonNode execute(JsonNode node, CaseField caseField, CaseEventField caseEventField, WizardPageField wizardPageField) {
         CaseViewField caseViewField = caseViewFieldBuilder.build(caseField, caseEventField);
 
         if (!BaseType.contains(caseViewField.getFieldType().getType())) {
@@ -43,7 +43,7 @@ public abstract class FieldProcessor {
         }
     }
 
-    private JsonNode executeComplex(JsonNode complexNode,
+    protected JsonNode executeComplex(JsonNode complexNode,
                                       List<CaseField> complexCaseFields,
                                       WizardPageField wizardPageField,
                                       String fieldPrefix,

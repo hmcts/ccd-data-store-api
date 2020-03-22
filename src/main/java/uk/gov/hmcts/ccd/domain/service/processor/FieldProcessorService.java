@@ -39,15 +39,6 @@ public class FieldProcessorService {
             .collect(Collectors.toList());
     }
 
-    public CaseViewField processCaseViewField(final CaseViewField field,
-                                              final List<WizardPageField> wizardPageFields) {
-        CaseViewField result = field;
-        for (CaseViewFieldProcessor processor : caseViewFieldProcessors) {
-            result = processor.execute(result, wizardPageField(wizardPageFields, field.getId()));
-        }
-        return result;
-    }
-
     public CaseViewField processCaseViewField(final CaseViewField field) {
         CaseViewField result = field;
         for (CaseViewFieldProcessor processor : caseViewFieldProcessors) {
@@ -88,6 +79,15 @@ public class FieldProcessorService {
                                              final CaseType caseType,
                                              final String eventId) {
         return processData(data, caseType, eventTriggerService.findCaseEvent(caseType, eventId));
+    }
+
+    private CaseViewField processCaseViewField(final CaseViewField field,
+                                               final List<WizardPageField> wizardPageFields) {
+        CaseViewField result = field;
+        for (CaseViewFieldProcessor processor : caseViewFieldProcessors) {
+            result = processor.execute(result, wizardPageField(wizardPageFields, field.getId()));
+        }
+        return result;
     }
 
     private List<WizardPageField> getWizardPageFields(String caseTypeId, String eventId) {
