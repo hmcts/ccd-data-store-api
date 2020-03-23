@@ -216,7 +216,7 @@ public class GetCaseDocumentOperation {
 
     private String getDocumentCaseField(Map<String, JsonNode> caseData, String documentId) {
         for (Map.Entry<String, JsonNode> entry : caseData.entrySet()) {
-            if (!entry.getValue().isNull()){
+            if (entry.getValue().isNull()){
                 return null;
             }
             if (entry.getValue().getNodeType().toString()
