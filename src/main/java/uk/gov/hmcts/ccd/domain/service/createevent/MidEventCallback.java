@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import java.util.Map;
-import java.util.Optional;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,6 +25,8 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 public class MidEventCallback {
@@ -73,6 +75,9 @@ public class MidEventCallback {
                 } else {
                     currentOrNewCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(), content.getData());
                 }
+                currentOrNewCaseDetails = removeNextPageFieldData(currentOrNewCaseDetails,
+                                                                wizardPageOptional.get().getOrder(),
+                                                                caseTypeId, event.getEventId());
 
                 CaseDetails caseDetailsFromMidEventCallback = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
                     caseType,
@@ -85,6 +90,35 @@ public class MidEventCallback {
             }
         }
         return dataJsonNode(content.getData());
+    }
+
+    private CaseDetails removeNextPageFieldData(CaseDetails currentCaseDetails, Integer order, String caseTypeId, String eventId) {
+        if (order != null) {
+            Set<String> wizardPageFields = uiDefinitionRepository
+                .getWizardPageCollection(caseTypeId, eventId)
+                .stream()
+                .filter(wizardPage -> wizardPage.getOrder() > order)
+                .map(wizardPage -> getWizardPageFieldNames(wizardPage))
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+            currentCaseDetails.getData().entrySet().removeIf(entry -> !wizardPageFields.contains(entry.getKey()));
+        }
+        return currentCaseDetails;
+    }
+
+    public Set<String> getWizardPageFieldNames(WizardPage wizardPage) {
+        Set<String> wizardPageFields = wizardPage.getWizardPageFields()
+            .stream()
+            .map(wizardPageField -> wizardPageField.getCaseFieldId())
+            .collect(Collectors.toSet());
+
+        Set<String> complexFieldOverRides = wizardPage.getWizardPageFields().stream()
+            .map(wizardPageField -> wizardPageField.getComplexFieldOverrides())
+            .flatMap(List::stream)
+            .map(wizardPageComplexFieldOverride -> wizardPageComplexFieldOverride.getComplexFieldElementId())
+            .collect(Collectors.toSet());
+        wizardPageFields.addAll(complexFieldOverRides);
+        return wizardPageFields;
     }
 
     private JsonNode dataJsonNode(Map<String, JsonNode> data) {
