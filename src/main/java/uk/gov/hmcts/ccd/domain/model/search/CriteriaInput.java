@@ -1,10 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CriteriaInput {
     private String label;
     private int order;
     private Field field;
     private String role;
+    @JsonProperty("display_context_parameter")
+    private String displayContextParameter;
 
     public String getLabel() {
         return label;
@@ -36,5 +40,13 @@ public class CriteriaInput {
 
     public void setRole(final String role) {
         this.role = role;
+    }
+
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
+    }
+
+    public void setDisplayContextParameter(String displayContextParameter) {
+        this.displayContextParameter = displayContextParameter;
     }
 }

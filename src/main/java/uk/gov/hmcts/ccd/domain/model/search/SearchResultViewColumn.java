@@ -12,6 +12,8 @@ public class SearchResultViewColumn {
     private String label;
     private Integer order;
     private boolean metadata;
+    @JsonProperty("display_context_parameter")
+    private String displayContextParameter;
 
     public SearchResultViewColumn() {
         // Default constructor for JSON mapper
@@ -21,12 +23,14 @@ public class SearchResultViewColumn {
                                   final FieldType caseFieldType,
                                   final String label,
                                   final Integer order,
-                                  final boolean metadata) {
+                                  final boolean metadata,
+                                  final String displayContextParameter) {
         this.caseFieldId = caseFieldId;
         this.caseFieldType = caseFieldType;
         this.label = label;
         this.order = order;
         this.metadata = metadata;
+        this.displayContextParameter = displayContextParameter;
     }
 
     public String getCaseFieldId() {
@@ -47,5 +51,9 @@ public class SearchResultViewColumn {
 
     public boolean isMetadata() {
         return metadata;
+    }
+
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
     }
 }

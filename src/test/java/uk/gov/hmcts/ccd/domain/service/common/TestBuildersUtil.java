@@ -1328,6 +1328,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public WorkbasketInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.workbasketInput.setDisplayContextParameter(displayContextParameter);
+            return this;
+        }
+
         public WorkbasketInput build() {
             return this.workbasketInput;
         }
@@ -1353,6 +1358,11 @@ public class TestBuildersUtil {
             Field f = new Field();
             f.setId(fieldId);
             this.searchInput.setField(f);
+            return this;
+        }
+
+        public SearchInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.searchInput.setDisplayContextParameter(displayContextParameter);
             return this;
         }
 

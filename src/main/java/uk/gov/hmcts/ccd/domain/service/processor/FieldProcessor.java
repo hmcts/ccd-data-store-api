@@ -80,7 +80,7 @@ public abstract class FieldProcessor {
 
     protected abstract JsonNode executeCollection(JsonNode collectionNode, CommonField field, String fieldPath, WizardPageComplexFieldOverride override, CaseViewField topLevelField);
 
-    protected boolean isNullOrEmpty(final JsonNode node) {
+    public static boolean isNullOrEmpty(final JsonNode node) {
         return node == null
             || node.isNull()
             || (node.isTextual() && (null == node.asText() || node.asText().trim().length() == 0))
