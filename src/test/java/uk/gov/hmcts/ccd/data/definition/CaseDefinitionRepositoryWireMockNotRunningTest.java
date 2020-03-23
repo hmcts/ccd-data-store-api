@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Ignore;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -28,7 +29,6 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends WireMockBase
     }
 
     @Test
-    @Ignore
     public void shouldFailToGetCaseTypesForJurisdiction() {
         final ServiceException
             exception =
@@ -39,7 +39,6 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends WireMockBase
     }
 
     @Test
-    @Ignore
     public void shouldFailToGetCaseType() {
         final ServiceException
             exception =
@@ -48,7 +47,6 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends WireMockBase
     }
 
     @Test
-    @Ignore
     public void shouldFailToGetBaseTypes() {
         when(caseDefinitionRepository.getBaseTypes()).thenCallRealMethod();
         final ServiceException
