@@ -63,15 +63,17 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
     }
 
     private boolean filterDistinctFieldsByRole(final Set<String> addedFields, final CriteriaInput criteriaInput, final Set<String> userRoles) {
-        if (addedFields.contains(criteriaInput.getField().getId())) {
+        String id = criteriaInput.buildCaseFieldId();
+        if (addedFields.contains(id)) {
             return false;
         } else {
             if (StringUtils.isEmpty(criteriaInput.getRole()) || userRoles.contains(criteriaInput.getRole())) {
-                addedFields.add(criteriaInput.getField().getId());
+                addedFields.add(id);
                 return true;
             } else {
                 return false;
             }
         }
     }
+
 }

@@ -1,11 +1,29 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+
+import java.util.Arrays;
+import java.util.List;
+
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
@@ -32,22 +50,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACL
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
-
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 
 class AccessControlServiceFilterTest {
     private static final String EVENT_ID_1 = "EVENT_ID_1";
@@ -1149,6 +1151,162 @@ class AccessControlServiceFilterTest {
                 () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields(), hasSize(1)),
                 () -> assertThat(eventTrigger.getCaseFields(), hasItem(caseViewField2))
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("updateCollectionDisplayContextParameter for Event Triggers Tests")
+    class UpdateCollectionDisplayContextParameterByAccessTests {
+
+        @Test
+        @DisplayName("Should set #COLLECTION(allowInsert,allowDelete) in DisplayContextParameter of a collection " +
+            "caseField when create and delete ACLs are set")
+        void updateCollectionDisplayContextParameterWhenFieldHasCreateDeleteRoles() {
+
+            final CaseViewField caseViewField1 = aViewField()
+                .withId("People")
+                .withFieldType(aFieldType()
+                    .withId("G339483948")
+                    .withType(COLLECTION)
+                    .build())
+                .withACL(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .withDelete(true)
+                    .withUpdate(false)
+                    .build())
+                .build();
+            caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
+            caseViewField1.getFieldType().getChildren().stream()
+                .filter(e -> e.getId().equals("Addresses")).findFirst()
+                .get().setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withCreate(true)
+                .withDelete(true)
+                .withUpdate(false)
+                .build()));
+
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(caseViewField1)
+                .withWizardPage(newWizardPage()
+                        .withId("Page One")
+                        .withField(caseViewField1)
+                        .build()
+                               )
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
+                caseEventTrigger,
+                USER_ROLES);
+
+            assertThat("There should be only one caseField", eventTrigger.getCaseFields(), hasSize(1));
+
+            CaseViewField people = eventTrigger.getCaseFields().stream()
+                .filter(e -> e.getId().equals("People")).findFirst().get();
+
+            assertAll(
+                () -> assertNotNull(people),
+                () -> assertTrue(people.getDisplayContextParameter().contains("#COLLECTION(")),
+                () -> assertTrue(people.getDisplayContextParameter().contains("allowInsert")),
+                () -> assertTrue(people.getDisplayContextParameter().contains("allowDelete"))
+                     );
+
+            CaseField addresses = people.getFieldType().getChildren().stream()
+                .filter(e -> e.getId().equals("Addresses")).findFirst()
+                .get();
+
+            assertAll(
+                () -> assertTrue(addresses.getDisplayContextParameter().contains("#COLLECTION(")),
+                () -> assertTrue(addresses.getDisplayContextParameter().contains("allowInsert")),
+                () -> assertTrue(addresses.getDisplayContextParameter().contains("allowDelete"))
+                     );
+        }
+
+        @Test
+        @DisplayName("Should set #COLLECTION(allowInsert,allowDelete) in DisplayContextParameter of a collection " +
+            "caseField when an update ACL is set")
+        void updateCollectionDisplayContextParameterWhenFieldHasUpdateRole() {
+
+            final CaseViewField caseViewField1 = aViewField()
+                .withId("People")
+                .withFieldType(aFieldType()
+                    .withId("G339483948")
+                    .withType(COLLECTION)
+                    .build())
+                .withACL(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(false)
+                    .withDelete(false)
+                    .withUpdate(true)
+                    .build())
+                .build();
+            caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
+
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(caseViewField1)
+                .withWizardPage(newWizardPage()
+                        .withId("Page One")
+                        .withField(caseViewField1)
+                        .build()
+                               )
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
+                caseEventTrigger,
+                USER_ROLES);
+
+            CaseViewField people = eventTrigger.getCaseFields().stream()
+                .filter(e -> e.getId().equals("People")).findFirst().get();
+
+            assertAll(
+                () -> assertNotNull(people),
+                () -> assertTrue(people.getDisplayContextParameter().contains("#COLLECTION(")),
+                () -> assertTrue(people.getDisplayContextParameter().contains("allowInsert")),
+                () -> assertTrue(people.getDisplayContextParameter().contains("allowDelete"))
+                     );
+        }
+
+        @Test
+        @DisplayName("Should set #COLLECTION() in DisplayContextParameter of a collection caseField when no ACL set")
+        void updateCollectionDisplayContextParameterWhenFieldHasNoCreateDeleteUpdateRoles() {
+
+            final CaseViewField caseViewField1 = aViewField()
+                .withId("People")
+                .withFieldType(aFieldType()
+                    .withId("G339483948")
+                    .withType(COLLECTION)
+                    .build())
+                .withACL(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(false)
+                    .withDelete(false)
+                    .withUpdate(false)
+                    .build())
+                .build();
+            caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
+
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(caseViewField1)
+                .withWizardPage(newWizardPage()
+                        .withId("Page One")
+                        .withField(caseViewField1)
+                        .build()
+                               )
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
+                caseEventTrigger,
+                USER_ROLES);
+
+            CaseViewField people = eventTrigger.getCaseFields().stream()
+                .filter(e -> e.getId().equals("People")).findFirst().get();
+
+            assertAll(
+                () -> assertNotNull(people),
+                () -> assertTrue(people.getDisplayContextParameter().contains("#COLLECTION(")),
+                () -> assertFalse(people.getDisplayContextParameter().contains("allowInsert")),
+                () -> assertFalse(people.getDisplayContextParameter().contains("allowDelete"))
+                     );
         }
     }
 
