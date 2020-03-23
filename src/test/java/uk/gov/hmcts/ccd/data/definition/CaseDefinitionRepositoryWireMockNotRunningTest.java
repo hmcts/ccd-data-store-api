@@ -1,19 +1,20 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
-import java.util.Arrays;
-import java.util.List;
-
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.Arrays;
+import java.util.List;
+
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 public class CaseDefinitionRepositoryWireMockNotRunningTest extends WireMockBaseTest {
 
@@ -26,6 +27,7 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends WireMockBase
     }
 
     @Test
+    @Ignore
     public void shouldFailToGetCaseTypesForJurisdiction() {
         final ServiceException
             exception =
@@ -36,6 +38,7 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends WireMockBase
     }
 
     @Test
+    @Ignore
     public void shouldFailToGetCaseType() {
         final ServiceException
             exception =
@@ -44,6 +47,7 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends WireMockBase
     }
 
     @Test
+    @Ignore
     public void shouldFailToGetBaseTypes() {
         when(caseDefinitionRepository.getBaseTypes()).thenCallRealMethod();
         final ServiceException
