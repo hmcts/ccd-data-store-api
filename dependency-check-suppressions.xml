@@ -6,36 +6,6 @@
         <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
-        <notes><![CDATA[
-            A permission issue was found in Elasticsearch versions before 5.6.15 and 6.6.1 when Field Level Security and Document Level
-            Security are disabled and the _aliases, _shrink, or _split endpoints are used . If the elasticsearch.yml file has xpack.security.dls_fls.enabled set to false,
-            certain permission checks are skipped when users perform one of the actions mentioned above, to make existing data available under a new index/alias name.
-            This could result in an attacker gaining additional permissions against a restricted index.
-            https://www.elastic.co/community/security
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-        <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-        <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-        <!-- Temporary suppression to ignore until it's fixed in master -->
-        <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-    </suppress>
-    <!--These javascript CVEs relate to Liquibase's web based admin UI which we don't use or expose-->
-    <suppress>
-        <notes><![CDATA[file name: liquibase-core-3.6.3.jar: bootstrap.*]]></notes>
-        <packageUrl regex="true">^pkg:javascript/bootstrap@.*$</packageUrl>
-        <cve>CVE-2019-8331</cve>
-        <cve>CVE-2018-14040</cve>
-        <cve>CVE-2018-14041</cve>
-        <cve>CVE-2018-14042</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[file name: liquibase-core-3.6.3.jar: jquery-1.11.0.min.js]]></notes>
-        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
-        <cve>CVE-2019-11358</cve>
-        <cve>CVE-2015-9251</cve>
-    </suppress>
-    <suppress>
    <notes><![CDATA[
    file name: spring-aspects-5.1.6.RELEASE.jar
    ]]></notes>
@@ -126,13 +96,6 @@
    ]]></notes>
         <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
         <cve>CVE-2020-5398</cve>
-    </suppress>
-
-    <!-- FIXME : RDM-78578 -->
-    <suppress>
-        <notes>Temporary suppression for on-going developments</notes>
-        <cpe>cpe:2.3:a:checkstyle:checkstyle:*:*:*:*:*:*:*:*</cpe>
-        <cve>CVE-2019-10782</cve>
     </suppress>
 
     <!-- FIXME : RDM-???? -->
