@@ -30,7 +30,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIE
 public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
 
     private final CreateCaseOperation createCaseOperation;
