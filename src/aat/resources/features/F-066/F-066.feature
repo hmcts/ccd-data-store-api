@@ -14,7 +14,7 @@ Feature: F-066: Retrieve a start event trigger by ID for dynamic display
     And the response [includes the event start trigger for the case just created, along with a HTTP 200 OK]
     And the response has all other details as expected
 
-  @S-175
+  @S-175 @Ignore # re-write as part of RDM-6847
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -24,7 +24,7 @@ Feature: F-066: Retrieve a start event trigger by ID for dynamic display
     And the response [includes a HTTP 403 Forbidden]
     And the response has all other details as expected
 
-  @S-176
+  @S-176  @Ignore # re-write as part of RDM-6847
   Scenario: must return negative response when request provides authentic credentials without authorised access
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values

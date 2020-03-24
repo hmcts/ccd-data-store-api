@@ -1,17 +1,18 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
-import java.util.Arrays;
-import java.util.List;
-
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Arrays;
+import java.util.List;
+
+import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
 

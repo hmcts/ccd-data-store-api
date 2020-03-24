@@ -25,11 +25,15 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
@@ -79,6 +83,10 @@ class CreateCaseEventServiceTest {
     private CaseService caseService;
     @Mock
     private UserAuthorisation userAuthorisation;
+    @Mock
+    private Clock clock;
+
+    private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
 
     @InjectMocks
     private CreateCaseEventService createEventService;
@@ -102,7 +110,7 @@ class CreateCaseEventServiceTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         event = buildEvent();
@@ -129,12 +137,17 @@ class CreateCaseEventServiceTest {
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
-        caseDetailsBefore = mock(CaseDetails.class);
+        caseDetails.setLastStateModifiedDate(LAST_MODIFIED);
+        caseDetailsBefore = caseDetails.shallowClone();
         postState = new CaseState();
         postState.setId(POST_STATE);
         IdamUser user = new IdamUser();
         user.setId("123");
 
+        doReturn(fixedClock.instant()).when(clock).instant();
+        doReturn(fixedClock.getZone()).when(clock).getZone();
+
+        doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseType);
         doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseType, EVENT_ID);
@@ -161,11 +174,36 @@ class CreateCaseEventServiceTest {
     }
 
     @Test
-    @DisplayName("should not interact with before case details copy")
-    void shouldNotInteractWithBeforeCaseDetails() {
-        createCaseEvent();
+    @DisplayName("should update Last state modified")
+    void shouldUpdateLastStateModifiedWhenStateTransitionOccurred() {
+        caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
+        caseDetailsBefore.setState(PRE_STATE_ID);
 
-        verifyZeroInteractions(caseDetailsBefore);
+        CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isEqualTo(LocalDateTime.now(clock));
+    }
+
+    @Test
+    @DisplayName("should not update Last state modified")
+    void shouldNotUpdateLastStateModifiedWhenStateTransitionNotOccurred() {
+        caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
+        caseDetailsBefore.setState(PRE_STATE_ID);
+        eventTrigger = new CaseEvent();
+        eventTrigger.setPostState(PRE_STATE_ID);
+
+        CaseState state = new CaseState();
+        state.setId(PRE_STATE_ID);
+
+        doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseType, EVENT_ID);
+        doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, eventTrigger);
+        doReturn(state).when(caseTypeService).findState(caseType, PRE_STATE_ID);
+
+        CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(PRE_STATE_ID);
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isEqualTo(LAST_MODIFIED);
     }
 
     @Test

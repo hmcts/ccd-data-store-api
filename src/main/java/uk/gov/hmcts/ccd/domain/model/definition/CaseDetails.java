@@ -24,6 +24,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_T
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.JURISDICTION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_PAYMENT_HISTORY_VIEWER;
@@ -51,6 +52,9 @@ public class CaseDetails implements Cloneable {
 
     @JsonProperty("last_modified")
     private LocalDateTime lastModified;
+
+    @JsonProperty("last_state_modified_date")
+    private LocalDateTime lastStateModifiedDate;
 
     private String state;
 
@@ -195,6 +199,14 @@ public class CaseDetails implements Cloneable {
         return callbackResponseStatus;
     }
 
+    public LocalDateTime getLastStateModifiedDate() {
+        return lastStateModifiedDate;
+    }
+
+    public void setLastStateModifiedDate(LocalDateTime lastStateModifiedDate) {
+        this.lastStateModifiedDate = lastStateModifiedDate;
+    }
+
     /**
      * @deprecated Will be removed in version 2.x. Use {@link CaseDetails#dataClassification} instead.
      */
@@ -295,6 +307,7 @@ public class CaseDetails implements Cloneable {
             metadata.put(CASE_REFERENCE.getReference(), getReference() != null ? getReference() : getId());
             metadata.put(CREATED_DATE.getReference(), getCreatedDate());
             metadata.put(LAST_MODIFIED_DATE.getReference(), getLastModified());
+            metadata.put(LAST_STATE_MODIFIED_DATE.getReference(), getLastStateModifiedDate());
             metadata.put(SECURITY_CLASSIFICATION.getReference(), getSecurityClassification());
         }
         return metadata;

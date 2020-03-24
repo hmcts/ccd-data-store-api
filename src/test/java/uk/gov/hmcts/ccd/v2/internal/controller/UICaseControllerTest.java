@@ -1,13 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +18,14 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @DisplayName("UICaseController")
 class UICaseControllerTest {
@@ -135,4 +135,5 @@ class UICaseControllerTest {
                 () -> caseController.getCaseEvent(CASE_REFERENCE, EVENT_ID.toString()));
         }
     }
+
 }

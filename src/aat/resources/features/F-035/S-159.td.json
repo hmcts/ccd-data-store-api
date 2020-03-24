@@ -28,6 +28,7 @@
       "jurisdiction" : "AUTOTEST1",
       "case_type" : "AAT_AUTH_15",
       "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
       "last_modified_on" : "[[ANYTHING_PRESENT]]",
       "state" : "TODO",
       "security_classification" : "PUBLIC",
