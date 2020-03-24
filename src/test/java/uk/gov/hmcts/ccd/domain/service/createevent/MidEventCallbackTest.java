@@ -275,6 +275,41 @@ class MidEventCallbackTest {
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, combineData));
     }
 
+    @Test
+    @DisplayName("should filter case data content when wizard page order exists")
+    void shouldFilterCaseDataContentWhenWizardPageOrderExists() {
+        given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
+            .willReturn(asList(wizardPageWithCallback));
+        CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
+            .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
+        CaseDetails existingCaseDetails = caseDetails(data);
+        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE)).thenReturn(existingCaseDetails);
+        when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
+        wizardPageWithCallback.setOrder(1);
+
+        given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
+            caseType,
+            caseEvent,
+            existingCaseDetails,
+            caseDetails,
+            IGNORE_WARNINGS)).willReturn(caseDetails);
+
+        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails)).willReturn(caseDetails);
+
+
+        midEventCallback.invoke(CASE_TYPE_ID,
+            build,
+            "createCase1"
+        );
+
+        verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
+            caseType,
+            caseEvent,
+            existingCaseDetails,
+            caseDetails,
+            IGNORE_WARNINGS);
+    }
+
     private CaseDetails caseDetails(Map<String, JsonNode> data) {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
