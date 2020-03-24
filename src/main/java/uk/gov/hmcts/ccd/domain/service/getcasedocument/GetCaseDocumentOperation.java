@@ -22,13 +22,7 @@ import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,24 +87,38 @@ public class GetCaseDocumentOperation {
         //Step1
         //Extract the list of complex case Fields having document casefields or comlex casefields
         //Step4 : Add all the document field list together
-        List<CaseField> finalDocumentCaseFields = Collections.<CaseField>emptyList();
+        List<CaseField> finalDocumentCaseFields = new ArrayList<>();
         List<CaseField> complexCaseFieldList = caseType.getCaseFields()
             .stream()
-            .filter(f -> ("complex".equalsIgnoreCase(f.getFieldType().getType())) &&
-                (f.getFieldType().getComplexFields().size() > 0))
-            .flatMap(x -> (x.getFieldType().getComplexFields())
-                .stream()
-                .filter(y -> ("document".equalsIgnoreCase(y.getFieldType().getType())) ||
-                    ("complex".equalsIgnoreCase(y.getFieldType().getType()))))
+            .filter
+                (y -> ("Document".equalsIgnoreCase(y.getFieldType().getType())) ||
+                ("Complex".equalsIgnoreCase(y.getFieldType().getType())) ||
+                ("Collection".equalsIgnoreCase(y.getFieldType().getType())))
             .collect(Collectors.toList());
 
+        extractDocumentFields(complexCaseFieldList, finalDocumentCaseFields);
+        System.out.println(finalDocumentCaseFields);
+
         //If this list contains any caseField with complex caseField again then repeat the above step to extract the full list of document casefields.
-        finalDocumentCaseFields.addAll(complexCaseFieldList);
+        //finalDocumentCaseFields.addAll(complexCaseFieldList);
         //<more logic to come>
+
+
+
+/*
+        List<String> collectionCaseFields =
+            caseType.getCaseFields()
+            .stream()
+            .map(f->new String(f.getFieldType().getType()))
+                .distinct()
+            .collect(Collectors.toList());
+*/
+
+
 
         //Step2
         // Collection Case fields having collection field type as document.
-        List<CaseField> collectionCaseFields = caseType.getCaseFields()
+        List<CaseField> collectionCaseFields3 = caseType.getCaseFields()
             .stream()
             .filter(f -> ("collection".equalsIgnoreCase(f.getFieldType().getType())) &&
                 (("document".equalsIgnoreCase(f.getFieldType().getCollectionFieldType().getType())) ||
@@ -118,7 +126,7 @@ public class GetCaseDocumentOperation {
             .collect(Collectors.toList());
 
         //If this list contains collection casefield again then repeat the above step to extract the full list of document casefields.
-        finalDocumentCaseFields.addAll(collectionCaseFields);
+        //finalDocumentCaseFields.addAll(collectionCaseFields);
         //<more logic to come>
 
         //Step3 List of root level document case field.
@@ -169,6 +177,36 @@ public class GetCaseDocumentOperation {
         } else {
             throw new CaseDocumentNotFoundException(
                 String.format("No document found for this case reference: %s", caseDetails.getReferenceAsString()));
+        }
+    }
+
+    private void extractDocumentFields(List<CaseField> complexCaseFieldList2, List<CaseField> finalDocumentCaseFields) {
+        for (CaseField caseField : complexCaseFieldList2) {
+            switch (caseField.getFieldType().getType()) {
+                case "Document":
+                    finalDocumentCaseFields.add(caseField);
+                    break;
+                case "Complex":
+                    extractDocumentFields(caseField.getFieldType().getComplexFields(), finalDocumentCaseFields);
+                    break;
+                case "Collection":
+                    extractDocumentFields(caseField.getFieldType().getComplexFields(), finalDocumentCaseFields);
+                    break;
+            }
+        }
+    }
+
+    private void extractDocumentField(CaseField caseField, List<CaseField> finalDocumentCaseFields) {
+        switch (caseField.getFieldType().getType()) {
+            case "Document":
+                finalDocumentCaseFields.add(caseField);
+                break;
+            case "Complex":
+                extractDocumentFields(caseField.getFieldType().getComplexFields(), finalDocumentCaseFields);
+                break;
+            case "Collection":
+                extractDocumentFields(caseField.getFieldType().getComplexFields(), finalDocumentCaseFields);
+                break;
         }
     }
 
