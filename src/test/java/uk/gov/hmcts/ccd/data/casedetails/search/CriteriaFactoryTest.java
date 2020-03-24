@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,7 @@ public class CriteriaFactoryTest {
     private static final String FIELD_DATA_1 = "case.complex.simple.value";
     private static final String FIELD_DATA_1_CONVERTED = "'{complex,simple,value}'";
     private static final String FIELD_DATA_1_VALUE = "simple";
+    public static final String LAST_STATE_MODIFIED_VALUE = "2020-09-12";
 
     Map<String, String> params = new HashMap<String, String>();
     private CriterionFactory subject;
@@ -71,6 +74,19 @@ public class CriteriaFactoryTest {
         assertTrue(criterion instanceof MetaDataCriterion);
         assertEquals(criterion.getField(), META_DATA_1);
         assertEquals(criterion.getSoughtValue(), META_DATA_1_VALUE);
+    }
+
+    @Test
+    public void checkLastStateModifiedDateMetaDataTest() {
+        MetaData metaData = new MetaData(META_DATA_0_VALUE, META_DATA_1_VALUE);
+        metaData.setLastStateModifiedDate(Optional.of(LAST_STATE_MODIFIED_VALUE));
+
+        List<Criterion> result = subject.build(metaData, params);
+        assertEquals(3, result.size());
+        assertThat(result).filteredOn(m -> m.getField() == "date(last_state_modified_date)")
+            .hasSize(1)
+            .extracting(e -> e.getSoughtValue())
+            .containsOnly(LAST_STATE_MODIFIED_VALUE);
     }
 
 }

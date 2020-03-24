@@ -4,7 +4,7 @@ Feature: F-056: Submit event creation as a Citizen
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-284
+  @S-284 @Ignore # re-write as part of RDM-6847
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -14,7 +14,7 @@ Feature: F-056: Submit event creation as a Citizen
     And the response [contains a HTTP 403 Forbidden]
     And the response has all other details as expected
 
-  @S-285
+  @S-285 @Ignore # re-write as part of RDM-6847
   Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -52,20 +52,20 @@ Feature: F-056: Submit event creation as a Citizen
     And the response [includes the case detail for the updated case, along with a HTTP 200 OK]
     And the response has all other details as expected
 
-  @S-582
+  @S-584
   Scenario: must update successfully the respective fields with ACL permissions for a Citizen
     Given a user with [an active citizen profile in CCD with update permissions for certain fields but not for others in a given case type]
     And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Citizen_Case_Creation]
     And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data]
-    And another successful call [to get an update event token for the case just created] as in [S-582-Prerequisite_Citizen_Token_For_Update_Case]
+    And another successful call [to get an update event token for the case just created] as in [S-584-Prerequisite_Citizen_Token_For_Update_Case]
     When a request is prepared with appropriate values
     And the request [is made to update the document metadata in DocumentField2, which the user has update permissions for]
     And it is submitted to call the [Submit event creation as a Citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response [contains updated values for DocumentField2]
     And the response has all other details as expected
-    And another successful call [to get an update event token for the case just created] as in [S-582-Prerequisite_Citizen_Token_For_Update_Case]
-    And a call [to update the values for DocumentField4 from the same case, which the user does not have update permissions for] will get the expected response as in [S-582_Later_Case_Update_By_Citizen]
+    And another successful call [to get an update event token for the case just created] as in [S-584-Prerequisite_Citizen_Token_For_Update_Case]
+    And a call [to update the values for DocumentField4 from the same case, which the user does not have update permissions for] will get the expected response as in [S-584_Later_Case_Update_By_Citizen]
 
 
 

@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
@@ -499,6 +500,7 @@ public class CaseDetailsEndpoint {
         metadata.setCaseReference(param(queryParameters, CASE_REFERENCE.getParameterName()));
         metadata.setCreatedDate(param(queryParameters, CREATED_DATE.getParameterName()));
         metadata.setLastModified(param(queryParameters, LAST_MODIFIED_DATE.getParameterName()));
+        metadata.setLastStateModifiedDate(param(queryParameters, LAST_STATE_MODIFIED_DATE.getParameterName()));
         metadata.setSecurityClassification(param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()));
         metadata.setPage(param(queryParameters, PAGE_PARAM));
         metadata.setSortDirection(param(queryParameters, SORT_PARAM));

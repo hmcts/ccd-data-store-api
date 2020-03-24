@@ -11,6 +11,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
@@ -22,6 +23,7 @@ public class MetaData {
                                                                                CASE_REFERENCE.getParameterName(),
                                                                                CREATED_DATE.getParameterName(),
                                                                                LAST_MODIFIED_DATE.getParameterName(),
+                                                                               LAST_STATE_MODIFIED_DATE.getParameterName(),
                                                                                SECURITY_CLASSIFICATION.getParameterName(),
                                                                                PAGE_PARAM, SORT_PARAM);
 
@@ -33,6 +35,7 @@ public class MetaData {
         CASE_REFERENCE("case_reference", CaseDetailsEntity.REFERENCE_FIELD_COL),
         CREATED_DATE("created_date", CaseDetailsEntity.CREATED_DATE_FIELD_COL),
         LAST_MODIFIED_DATE("last_modified_date", CaseDetailsEntity.LAST_MODIFIED_FIELD_COL),
+        LAST_STATE_MODIFIED_DATE("last_state_modified_date", CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL),
         SECURITY_CLASSIFICATION("security_classification", CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL);
 
         private final String parameterName;
@@ -62,6 +65,7 @@ public class MetaData {
     private Optional<String> caseReference = Optional.empty();
     private Optional<String> createdDate = Optional.empty();
     private Optional<String> lastModified = Optional.empty();
+    private Optional<String> lastStateModifiedDate = Optional.empty();
     private Optional<String> securityClassification = Optional.empty();
     private Optional<String> page = Optional.empty();
     private Optional<String> sortDirection = Optional.empty();
@@ -106,6 +110,14 @@ public class MetaData {
 
     public void setLastModified(Optional<String> lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public Optional<String> getLastStateModifiedDate() {
+        return lastStateModifiedDate;
+    }
+
+    public void setLastStateModifiedDate(Optional<String> lastStateModifiedDate) {
+        this.lastStateModifiedDate = lastStateModifiedDate;
     }
 
     public Optional<String> getLastModified() {
@@ -171,6 +183,7 @@ public class MetaData {
             Objects.equals(caseReference, metaData.caseReference) &&
             Objects.equals(createdDate, metaData.createdDate) &&
             Objects.equals(lastModified, metaData.lastModified) &&
+            Objects.equals(lastStateModifiedDate, metaData.lastStateModifiedDate) &&
             Objects.equals(securityClassification, metaData.securityClassification) &&
             Objects.equals(page, metaData.page) &&
             Objects.equals(sortDirection, metaData.sortDirection);
@@ -184,6 +197,7 @@ public class MetaData {
                             caseReference,
                             createdDate,
                             lastModified,
+                            lastStateModifiedDate,
                             securityClassification,
                             page,
                             sortDirection);

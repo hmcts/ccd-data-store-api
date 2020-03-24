@@ -23,7 +23,7 @@ Feature: F-064: Retrieve workbasket input details for dynamic display
     And the response [code is HTTP-401 Unauthorised]
     And the response has all other details as expected
 
-  @S-218
+  @S-218 @Ignore # re-write as part of RDM-6847
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -58,3 +58,13 @@ Feature: F-064: Retrieve workbasket input details for dynamic display
     Then a negative response is received
     And the response [code is HTTP-400]
     And the response has all the details as expected
+
+  @S-596
+  Scenario: must retrieve workbasket input details for dynamic display successfully
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And it is submitted to call the [retrieve workbasket input details for dynamic display] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [code is HTTP-200 OK]
+    And the response [body contrains LAST_STATE_MODIFIED_DATE field as one of input fields]
+    And the response has all other details as expected

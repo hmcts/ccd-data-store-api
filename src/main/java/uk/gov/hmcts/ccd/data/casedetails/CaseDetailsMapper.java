@@ -29,6 +29,7 @@ public class CaseDetailsMapper {
         caseDetails.setCaseTypeId(caseDetailsEntity.getCaseType());
         caseDetails.setJurisdiction(caseDetailsEntity.getJurisdiction());
         caseDetails.setCreatedDate(caseDetailsEntity.getCreatedDate());
+        caseDetails.setLastStateModifiedDate(caseDetailsEntity.getLastStateModifiedDate());
         caseDetails.setLastModified(caseDetailsEntity.getLastModified());
         caseDetails.setState(caseDetailsEntity.getState());
         caseDetails.setSecurityClassification(caseDetailsEntity.getSecurityClassification());
@@ -49,6 +50,7 @@ public class CaseDetailsMapper {
         newCaseDetailsEntity.setId(getLongId(caseDetails));
         newCaseDetailsEntity.setReference(caseDetails.getReference());
         newCaseDetailsEntity.setCreatedDate(caseDetails.getCreatedDate());
+        newCaseDetailsEntity.setLastStateModifiedDate(caseDetails.getLastStateModifiedDate());
         newCaseDetailsEntity.setJurisdiction(caseDetails.getJurisdiction());
         newCaseDetailsEntity.setCaseType(caseDetails.getCaseTypeId());
         newCaseDetailsEntity.setState(caseDetails.getState());
