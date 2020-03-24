@@ -155,3 +155,17 @@ Feature: F-044: Submit event creation as Case worker
     @S-122 @Ignore
     Scenario: should update a single case field
     <already implemented previously. will be refactored later.>
+
+  @S-044.1
+  Scenario: must submit the event creation successfully for formatted date inputs
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation] as in [S-044-1_GetToken]
+    And a successful call [to create a case] as in [S-044-TEMP_CreateCase]
+    And a successful call [to get an event token for the case just created] as in [S-044-1_GetToken_Update]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created]
+    And the request [contains Update token created as in S-044-1_GetToken_Update]
+    And it is submitted to call the [submit event with date having formatted value] operation of [CCD data store]
+    Then a positive response is received
+#    And the response [contains the updated case details, along with an HTTP 201 Created]
+#    And the response has all other details as expected

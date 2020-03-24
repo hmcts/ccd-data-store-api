@@ -1,0 +1,85 @@
+{
+  "_guid_": "S-044-TEMP_CreateCase",
+  "productName": "CCD Data Store",
+  "operationName": "Submit case creation as Case worker",
+  "specs": [
+    "to create a case"
+  ],
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+  "user": {
+    "username": "befta.caseworker.3@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "BEFTA_JURISDICTION_3",
+      "ctid": "BEFTA_CASETYPE_3_4"
+    },
+    "body": {
+      "data": {
+        "TextField": "test",
+        "NumberField": "33",
+        "YesOrNoField": "No"
+      },
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][parentContext][childContexts][S-044-1_GetToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true,
+      "event_data": {
+        "TextField": "test",
+        "NumberField": "33",
+        "YesOrNoField": "No"
+      }
+    }
+  },
+  "expectedResponse": {
+      "_extends_": "Common_201_Response",
+      "headers": {
+        "Content-Length": "[[ANY_NULLABLE]]",
+        "Content-Encoding": "[[ANY_NULLABLE]]",
+        "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
+        "Connection": "[[ANYTHING_PRESENT]]",
+        "Keep-Alive": "[[ANYTHING_PRESENT]]",
+        "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+        "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+      },
+      "body" : {
+        "id": "[[ANYTHING_PRESENT]]",
+        "jurisdiction": "BEFTA_JURISDICTION_3",
+        "state": "TODO",
+        "version": 0,
+        "case_type_id": "BEFTA_CASETYPE_3_4",
+        "created_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+        "last_modified": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+        "last_state_modified_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+        "security_classification": "PUBLIC",
+        "case_data": {
+          "YesOrNoField": "No",
+          "TextField": "test",
+          "NumberField": "33"
+        },
+        "data_classification": {
+          "YesOrNoField": "PUBLIC",
+          "TextField": "PUBLIC",
+          "NumberField": "PUBLIC"
+        },
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": {
+          "YesOrNoField": "PUBLIC",
+          "TextField": "PUBLIC",
+          "NumberField": "PUBLIC"
+        }
+      }
+    }
+}

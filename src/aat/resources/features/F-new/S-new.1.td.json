@@ -12,11 +12,22 @@
   "request": {
     "body": {
       "data": {
-        "TextField": "s",
-        "NumberField": "23",
-        "YesOrNoField": "Yes",
-        "DateField": "2020-12-20",
-        "DateTimeField": "2020-12-12"
+        "TextField": "test",
+        "NumberField": "33",
+        "YesOrNoField": "No",
+        "DateField": "03-2020",
+        "DateTimeField": "2019-02-20T19:49",
+        "StandardDate": "2020-02-19",
+        "StandardDateTime": "2019-03-21T11:43:23.000"
+      },
+      "event_data": {
+        "TextField": "test",
+        "NumberField": 33,
+        "YesOrNoField": "No",
+        "DateField": "03-2020",
+        "DateTimeField": "2019-02-20T19:49",
+        "StandardDate": "2020-02-19",
+        "StandardDateTime": "2019-03-21T11:43:23.000"
       }
     }
   },

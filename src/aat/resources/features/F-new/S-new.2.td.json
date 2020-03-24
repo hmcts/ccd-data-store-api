@@ -12,11 +12,22 @@
   "request": {
     "body": {
       "data": {
-        "TextField": "s",
-        "NumberField": "23",
-        "YesOrNoField": "Yes",
-        "DateField": "2020-12-20",
-        "DateTimeField": null
+        "TextField": "test",
+        "NumberField": "33",
+        "YesOrNoField": "No",
+        "DateField": null,
+        "DateTimeField": null,
+        "StandardDate": "2020-02-19",
+        "StandardDateTime": "2019-03-21T11:43:23.000"
+      },
+      "event_data": {
+        "TextField": "test",
+        "NumberField": 33,
+        "YesOrNoField": "No",
+        "DateField": null,
+        "DateTimeField": null,
+        "StandardDate": "2020-02-19",
+        "StandardDateTime": "2019-03-21T11:43:23.000"
       }
     }
   },
@@ -35,19 +46,23 @@
       "last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
       "state": "TODO",
       "security_classification": "PUBLIC",
-      "data": {
-        "YesOrNoField": "Yes",
-        "TextField": "s",
-        "DateField": "2020-12-20",
-        "DateTimeField": null,
-        "NumberField": "23"
+      "data" : {
+        "YesOrNoField" : "No",
+        "StandardDateTime" : "2019-03-21T11:43:23.000",
+        "TextField" : "test",
+        "StandardDate" : "2020-02-19",
+        "DateField" : null,
+        "DateTimeField" : null,
+        "NumberField" : "33"
       },
-      "data_classification": {
-        "YesOrNoField": "PUBLIC",
-        "TextField": "PUBLIC",
-        "DateField": "PUBLIC",
-        "DateTimeField": "PUBLIC",
-        "NumberField": "PUBLIC"
+      "data_classification" : {
+        "YesOrNoField" : "PUBLIC",
+        "StandardDateTime" : "PUBLIC",
+        "TextField" : "PUBLIC",
+        "StandardDate" : "PUBLIC",
+        "DateField" : "PUBLIC",
+        "DateTimeField" : "PUBLIC",
+        "NumberField" : "PUBLIC"
       },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
