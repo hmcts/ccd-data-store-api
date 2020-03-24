@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,17 +14,21 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 @Service
 public class GetCaseDocumentOperation {
@@ -33,11 +38,13 @@ public class GetCaseDocumentOperation {
     private final UserRepository userRepository;
     private final CaseUserRepository caseUserRepository;
     private final DocumentIdValidationService documentIdValidationService;
+    private final AccessControlService accessControlService;
 
     public static final String DOCUMENT_CASE_FIELD_URL_ATTRIBUTE = "document_url";
     public static final String DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE = "document_filename";
     public static final String DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE = "Document";
     public static final String BAD_REQUEST_EXCEPTION_DOCUMENT_INVALID = "DocumentId is not valid";
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     public GetCaseDocumentOperation(
@@ -45,13 +52,15 @@ public class GetCaseDocumentOperation {
         final CaseTypeService caseTypeService,
         @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
         @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
-        DocumentIdValidationService documentIdValidationService) {
+        DocumentIdValidationService documentIdValidationService
+        , AccessControlService accessControlService) {
 
         this.getCaseOperation = getCaseOperation;
         this.caseTypeService = caseTypeService;
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
         this.documentIdValidationService = documentIdValidationService;
+        this.accessControlService = accessControlService;
     }
 
 
@@ -86,8 +95,14 @@ public class GetCaseDocumentOperation {
         final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
         //Step1
         //Extract the list of complex case Fields having document casefields or comlex casefields
-        //Step4 : Add all the document field list together
         List<CaseField> finalDocumentCaseFields = new ArrayList<>();
+        //Step2
+        // Collection Case fields having collection field type as document.
+
+        //If this list contains collection casefield again then repeat the above step to extract the full list of document casefields.
+        //finalDocumentCaseFields.addAll(collectionCaseFields);
+        //<more logic to come>
+
         List<CaseField> complexCaseFieldList = caseType.getCaseFields()
             .stream()
             .filter
@@ -99,44 +114,9 @@ public class GetCaseDocumentOperation {
         extractDocumentFields(complexCaseFieldList, finalDocumentCaseFields);
         System.out.println(finalDocumentCaseFields);
 
-        //If this list contains any caseField with complex caseField again then repeat the above step to extract the full list of document casefields.
-        //finalDocumentCaseFields.addAll(complexCaseFieldList);
-        //<more logic to come>
+        //Retrieve the full list of available JSON node on which user is having read permissions (as per get case API).  ListB
 
-
-
-/*
-        List<String> collectionCaseFields =
-            caseType.getCaseFields()
-            .stream()
-            .map(f->new String(f.getFieldType().getType()))
-                .distinct()
-            .collect(Collectors.toList());
-*/
-
-
-
-        //Step2
-        // Collection Case fields having collection field type as document.
-        List<CaseField> collectionCaseFields3 = caseType.getCaseFields()
-            .stream()
-            .filter(f -> ("collection".equalsIgnoreCase(f.getFieldType().getType())) &&
-                (("document".equalsIgnoreCase(f.getFieldType().getCollectionFieldType().getType())) ||
-                ("collection".equalsIgnoreCase(f.getFieldType().getCollectionFieldType().getType()))))
-            .collect(Collectors.toList());
-
-        //If this list contains collection casefield again then repeat the above step to extract the full list of document casefields.
-        //finalDocumentCaseFields.addAll(collectionCaseFields);
-        //<more logic to come>
-
-        //Step3 List of root level document case field.
-        List<CaseField> documentCaseFields = caseType.getCaseFields()
-            .stream()
-            .filter(f -> "Document".equalsIgnoreCase(f.getFieldType().getType()))
-            .collect(Collectors.toList());
-        finalDocumentCaseFields.addAll(documentCaseFields);
-
-
+        JsonNode readPermission = getFieldsWithReadPermission(caseDetails, finalDocumentCaseFields);
         //Step5: Get the list of json fields from casedata object and extarct list of node names.
 
         //Step6: perform an intersaction of both these list to find out the common fields.
@@ -196,18 +176,16 @@ public class GetCaseDocumentOperation {
         }
     }
 
-    private void extractDocumentField(CaseField caseField, List<CaseField> finalDocumentCaseFields) {
-        switch (caseField.getFieldType().getType()) {
-            case "Document":
-                finalDocumentCaseFields.add(caseField);
-                break;
-            case "Complex":
-                extractDocumentFields(caseField.getFieldType().getComplexFields(), finalDocumentCaseFields);
-                break;
-            case "Collection":
-                extractDocumentFields(caseField.getFieldType().getComplexFields(), finalDocumentCaseFields);
-                break;
-        }
+    private JsonNode getFieldsWithReadPermission(CaseDetails caseDetails, List<CaseField> documentFields) {
+        Set<String> roles = getUserRoles(caseDetails.getId());
+        JsonNode filteredFields = accessControlService.filterCaseFieldsByAccess(
+            MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+            documentFields,
+            roles,
+            CAN_READ,
+            true);
+
+      return filteredFields;
     }
 
     private Optional<AccessControlList> getCaseFieldACLByUserRoles(CaseDetails caseDetails, String documentField) {
