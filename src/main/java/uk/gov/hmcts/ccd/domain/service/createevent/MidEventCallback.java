@@ -106,7 +106,7 @@ public class MidEventCallback {
         return currentCaseDetails;
     }
 
-    public Set<String> getWizardPageFieldNames(WizardPage wizardPage) {
+    private Set<String> getWizardPageFieldNames(WizardPage wizardPage) {
         Set<String> wizardPageFields = wizardPage.getWizardPageFields()
             .stream()
             .map(wizardPageField -> wizardPageField.getCaseFieldId())
