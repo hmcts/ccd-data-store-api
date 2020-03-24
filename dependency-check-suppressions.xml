@@ -138,6 +138,8 @@
     <suppress>
         <notes>Temporary suppression for on-going developments</notes>
         <cve>CVE-2020-8840</cve>
+        <cve>CVE-2020-10672</cve>
+        <cve>CVE-2020-10673</cve>
     </suppress>
 
 </suppressions>
