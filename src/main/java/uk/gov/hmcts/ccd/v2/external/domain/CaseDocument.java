@@ -1,18 +1,14 @@
 package uk.gov.hmcts.ccd.v2.external.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @EqualsAndHashCode
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class CaseDocument {
     private String url;

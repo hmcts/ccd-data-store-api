@@ -1,30 +1,20 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
-import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
-import uk.gov.hmcts.ccd.v2.external.domain.Permission;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,20 +25,58 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Sets;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
+import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
+import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 
 public class GetCaseDocumentsOperationTest {
 
+    public static final String CONTENT = "{  \"DocumentField1\": { "
+                                         +
+                                         "           \"document_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97\","
+                                         +
+                                         "           \"document_binary_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97/binary\","
+                                         +
+                                         "           \"document_filename\": \"bin1.pdf\""
+                                         +
+                                         "       }\n,"
+                                         +
+                                         "       \"DocumentField2\": {"
+                                         +
+                                         "           \"document_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932\","
+                                         +
+                                         "           \"document_binary_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932/binary\","
+                                         +
+                                         "           \"document_filename\": \"bin2.pdf\""
+                                         +
+                                         "       }\n"
+                                         +
+                                         "    }\n";
     @Mock
     private GetCaseOperation getCaseOperation;
     @Mock
@@ -59,6 +87,8 @@ public class GetCaseDocumentsOperationTest {
     private CaseTypeService caseTypeService;
     @Mock
     private DocumentIdValidationService documentIdValidationService;
+    @Mock
+    private AccessControlService accessControlService;
 
     private GetCaseDocumentOperation caseDocumentsOperation;
 
@@ -72,10 +102,13 @@ public class GetCaseDocumentsOperationTest {
     private static final String DOCUMENT_TYPE = "Document";
     private static final String USER_ID = "test_user_id";
 
+    private final List<CaseField> caseFields = Lists.newArrayList();
+
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private final TypeReference jsonMap = new TypeReference<HashMap<String, JsonNode>>() {};
+    private final TypeReference jsonMap = new TypeReference<HashMap<String, JsonNode>>() {
+    };
     private final CaseType caseType = new CaseType();
     private final Set<String> userRoles = Sets.newHashSet("role1", "role2");
     private final List<String> caseRoles = Collections.emptyList();
@@ -94,40 +127,20 @@ public class GetCaseDocumentsOperationTest {
     private CaseDetails caseDetails;
     private Optional<CaseDetails> caseDetailsOptional;
     private final CaseDocumentMetadata caseDocumentMetadata = CaseDocumentMetadata.builder()
-        .caseId("CaseId")
-        .caseTypeId("CaseTypeId")
-        .build();
+                                                                                  .caseId("CaseId")
+                                                                                  .caseTypeId("CaseTypeId")
+                                                                                  .build();
     private final CaseDocument caseDocument = CaseDocument.builder()
-        .id(CASE_DOCUMENT_ID)
-        .url(DOCUMENT_URL)
-        .name(DOCUMENT_NAME)
-        .type(DOCUMENT_TYPE)
-        .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
-        .build();
+                                                          .id(CASE_DOCUMENT_ID)
+                                                          .url(DOCUMENT_URL)
+                                                          .name(DOCUMENT_NAME)
+                                                          .type(DOCUMENT_TYPE)
+                                                          .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
+                                                          .build();
 
     private final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-        "{  \"DocumentField1\": { "
-            +
-            "           \"document_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97\","
-            +
-            "           \"document_binary_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97/binary\","
-            +
-            "           \"document_filename\": \"bin1.pdf\""
-            +
-            "       }\n,"
-            +
-            "       \"DocumentField2\": {"
-            +
-            "           \"document_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932\","
-            +
-            "           \"document_binary_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932/binary\","
-            +
-            "           \"document_filename\": \"bin2.pdf\""
-            +
-            "       }\n"
-            +
-            "    }\n"
-    ), jsonMap);
+        CONTENT
+                                                                                  ), jsonMap);
 
     public GetCaseDocumentsOperationTest() throws IOException {
     }
@@ -141,7 +154,8 @@ public class GetCaseDocumentsOperationTest {
         doReturn(USER_ID).when(userRepository).getUserId();
         doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
         doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
-        caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation,caseTypeService,userRepository,caseUserRepository,documentIdValidationService);
+        caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation, caseTypeService, userRepository, caseUserRepository,
+                                                              documentIdValidationService, accessControlService);
     }
 
     @Nested
@@ -153,29 +167,29 @@ public class GetCaseDocumentsOperationTest {
         void shouldThrowBadRequestWhenDocumentIdInvalid() {
             doReturn(Boolean.FALSE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_INVALID);
             assertAll(
-                () -> assertThrows(BadRequestException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID_INVALID)),
+                () -> assertThrows(BadRequestException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID_INVALID)),
                 () -> verify(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_INVALID)
-            );
+                     );
         }
 
         @Test
         @DisplayName("should throw Bad Request exception when document Id is null")
         void shouldThrowBadRequestWhenDocumentIdNull() {
             doReturn(Boolean.FALSE).when(documentIdValidationService).validateDocumentUUID(null);
-            assertThrows(BadRequestException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,null));
+            assertThrows(BadRequestException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, null));
         }
 
         @Test
         @DisplayName("should throw CaseNotFoundException when case does not exist")
         void shouldThrowCaseNotFoundWhenCaseNotExist() {
             doReturn(caseDetailsOptional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
-            assertThrows(CaseNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID));
+            assertThrows(CaseNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
 
         }
 
         @Test
         @DisplayName("should return CaseDocumentMetadata")
-        void shouldCallGetCaseDocumentMetadata() {
+        void shouldCallGetCaseDocumentMetadata() throws IOException {
 
             caseDetails = new CaseDetails();
             caseDetails.setJurisdiction(JURISDICTION_ID);
@@ -184,18 +198,26 @@ public class GetCaseDocumentsOperationTest {
             caseDetails.setReference(new Long(CASE_REFERENCE));
             caseDetails.setState("state1");
             caseDetails.setData(data);
+            JsonNode jsonNode = mock(JsonNode.class);
+            JsonNode classifiedDataNode1 = JSON_NODE_FACTORY.objectNode();
 
             doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
             caseType.setCaseFields(singletonList(CASE_FIELD));
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+            doReturn(new ObjectMapper().readTree(CONTENT)).when(accessControlService).filterCaseFieldsByAccess(
+                ArgumentMatchers.any(JsonNode.class),
+                ArgumentMatchers.any(List.class),
+                ArgumentMatchers.any(Set.class),
+                eq(CAN_READ),
+                anyBoolean());
 
-            CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID);
+            CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
             assertAll(
                 () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
                 () -> assertThat(caseDocumentMetadata.getCaseTypeId(), is(caseDetails.getCaseTypeId())),
                 () -> assertThat(caseDocumentMetadata.getJurisdictionId(), is(caseDetails.getJurisdiction()))
-            );
+                     );
         }
 
         private Map<String, JsonNode> buildData(String... dataFieldIds) {
