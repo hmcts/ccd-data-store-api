@@ -29,7 +29,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
 
     private final CreateEventOperation createEventOperation;

@@ -314,7 +314,7 @@ public class SecurityClassificationServiceTest {
         private static final String VALUE = "value";
         private static final String ID = "id";
         private CaseDetails caseDetails;
-        private final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+        private final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
         };
         private final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 

@@ -72,7 +72,7 @@ public class MergeDataToSearchResultOperation {
 
     private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseField caseField) {
         return new SearchResultViewColumn(
-            buildCaseFieldId(searchResultField),
+            searchResultField.buildCaseFieldId(),
             buildCaseFieldType(searchResultField, caseField),
             searchResultField.getLabel(),
             searchResultField.getDisplayOrder(),
@@ -80,23 +80,16 @@ public class MergeDataToSearchResultOperation {
     }
 
     private boolean filterDistinctFieldsByRole(final HashSet<String> addedFields, final SearchResultField resultField) {
-        if (addedFields.contains(resultField.getCaseFieldId())) {
+        String id = resultField.buildCaseFieldId();
+        if (addedFields.contains(id)) {
             return false;
         } else {
             if (StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole())) {
-                addedFields.add(resultField.getCaseFieldId());
+                addedFields.add(id);
                 return true;
             } else {
                 return false;
             }
-        }
-    }
-
-    private String buildCaseFieldId(SearchResultField searchResultField) {
-        if (StringUtils.isNotBlank(searchResultField.getCaseFieldPath())) {
-            return searchResultField.getCaseFieldId() + '.' + searchResultField.getCaseFieldPath();
-        } else {
-            return searchResultField.getCaseFieldId();
         }
     }
 
