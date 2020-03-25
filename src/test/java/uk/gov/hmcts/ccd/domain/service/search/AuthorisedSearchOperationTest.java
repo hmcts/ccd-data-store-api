@@ -50,8 +50,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 
 class AuthorisedSearchOperationTest {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     private static final String CASE_TYPE_ID = "GrantOnly";

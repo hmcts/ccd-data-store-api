@@ -571,7 +571,7 @@
           "security_label": "PUBLIC",
           "order": null,
           "display_context": "OPTIONAL",
-          "display_context_parameter": null,
+          "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
@@ -651,7 +651,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               },
               {
                 "id": "ComplexFixedListField",
@@ -710,7 +711,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               },
               {
                 "id": "ComplexNestedField",
@@ -767,7 +769,8 @@
                         }
                       ],
                       "complexACLs": [],
-                      "display_context": null
+                      "display_context": null,
+                      "display_context_parameter": null
                     },
                     {
                       "id": "[[ANYTHING_PRESENT]]",
@@ -817,7 +820,8 @@
                         }
                       ],
                       "complexACLs": [],
-                      "display_context": null
+                      "display_context": null,
+                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)"
                     }
                   ],
                   "collection_field_type": null
@@ -845,7 +849,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               }
             ],
             "collection_field_type": null
@@ -937,7 +942,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               },
               {
                 "id": "AddressLine2",
@@ -978,7 +984,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               },
               {
                 "id": "AddressLine3",
@@ -1019,7 +1026,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               },
               {
                 "id": "PostTown",
@@ -1060,7 +1068,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               },
               {
                 "id": "County",
@@ -1101,7 +1110,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               },
               {
                 "id": "PostCode",
@@ -1142,7 +1152,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               },
               {
                 "id": "Country",
@@ -1183,7 +1194,8 @@
                   }
                 ],
                 "complexACLs": [],
-                "display_context": null
+                "display_context": null,
+                "display_context_parameter": null
               }
             ],
             "collection_field_type": null

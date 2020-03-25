@@ -29,10 +29,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 @Qualifier("authorised")
 public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
 
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
     private final CreateEventOperation createEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final GetCaseOperation getCaseOperation;
