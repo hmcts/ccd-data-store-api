@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation.Q
 public class AuthorisedSearchOperation implements SearchOperation {
     public static final String QUALIFIER = "authorised";
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
 
     private final SearchOperation searchOperation;
