@@ -117,6 +117,10 @@ public class GetCaseDocumentOperation {
                     ("Collection".equalsIgnoreCase(y.getFieldType().getType())))
             .collect(Collectors.toList());
 
+        if (complexCaseFieldList.isEmpty()) {
+            throw new CaseDocumentNotFoundException(String.format("No document field found for CaseType : %s", caseType.getId()));
+        }
+
         extractDocumentFields(complexCaseFieldList, documentCaseFields);
 
         JsonNode fieldsWithReadPermission = getFieldsWithReadPermission(caseDetails, documentCaseFields)
@@ -163,15 +167,15 @@ public class GetCaseDocumentOperation {
         return null;
     }
 
-    private void extractDocumentFields(List<CaseField> complexCaseFieldList, List<CaseField> finalDocumentCaseFields) {
+    private void extractDocumentFields(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {
         for (CaseField caseField : complexCaseFieldList) {
             switch (caseField.getFieldType().getType()) {
                 case "Document":
-                    finalDocumentCaseFields.add(caseField);
+                    documentCaseFields.add(caseField);
                     break;
                 case "Complex":
                 case "Collection":
-                    extractDocumentFields(caseField.getFieldType().getComplexFields(), finalDocumentCaseFields);
+                    extractDocumentFields(caseField.getFieldType().getComplexFields(), documentCaseFields);
                     break;
             }
         }
