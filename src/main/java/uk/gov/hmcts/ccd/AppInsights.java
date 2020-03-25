@@ -2,9 +2,13 @@ package uk.gov.hmcts.ccd;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
+import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
+import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class AppInsights {
@@ -31,6 +35,20 @@ public class AppInsights {
 
     public void trackException(Exception e) {
         telemetry.trackException(e);
+    }
+
+    public void trackException(Exception e, Map<String, String> customProperties, SeverityLevel severityLevel) {
+        ExceptionTelemetry exceptionTelemetry = new ExceptionTelemetry(e);
+
+        if (severityLevel != null) {
+            exceptionTelemetry.setSeverityLevel(severityLevel);
+        }
+
+        if (customProperties != null && !customProperties.isEmpty()) {
+            exceptionTelemetry.getContext().getProperties().putAll(customProperties);
+        }
+
+        telemetry.trackException(exceptionTelemetry);
     }
 
     public void trackDependency(String dependencyName, String commandName, long duration, boolean success) {
