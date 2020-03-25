@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 public class CCDEventBuilder {
     private static final CCDHelper CCD_HELPER = new CCDHelper();
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
     };
 
     private final String jurisdictionId;
