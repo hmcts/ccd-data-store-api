@@ -5,9 +5,12 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,6 +19,7 @@ import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -98,7 +102,7 @@ public class GetCaseDocumentOperation {
         final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
         //Step1
         //Extract the list of complex case Fields having document casefields or comlex casefields
-        List<CaseField> finalDocumentCaseFields = new ArrayList<>();
+        List<CaseField> documentCaseFields = new ArrayList<>();
         //Step2
         // Collection Case fields having collection field type as document.
 
@@ -109,27 +113,25 @@ public class GetCaseDocumentOperation {
         List<CaseField> complexCaseFieldList = caseType.getCaseFields()
             .stream()
             .filter(y -> ("Document" .equalsIgnoreCase(y.getFieldType().getType())) ||
-                    ("Complex" .equalsIgnoreCase(y.getFieldType().getType())) ||
-                    ("Collection" .equalsIgnoreCase(y.getFieldType().getType())))
+                    ("Complex".equalsIgnoreCase(y.getFieldType().getType())) ||
+                    ("Collection".equalsIgnoreCase(y.getFieldType().getType())))
             .collect(Collectors.toList());
 
-        extractDocumentFields(complexCaseFieldList, finalDocumentCaseFields);
+        extractDocumentFields(complexCaseFieldList, documentCaseFields);
 
-        //Retrieve the full list of available JSON node on which user is having read permissions (as per get case API).  ListB
-
-        JsonNode fieldsWithReadPermission = getFieldsWithReadPermission(caseDetails, finalDocumentCaseFields)
+        JsonNode fieldsWithReadPermission = getFieldsWithReadPermission(caseDetails, documentCaseFields)
             .orElseThrow(
                 (() -> new CaseDocumentNotFoundException("User does not has read permissions on any document field")));
-        JsonNode documentNode = getDocumentFieldNode(documentId, fieldsWithReadPermission);
 
-        //get child fields and set to caseDocument object
-        if (documentNode != null) {
+        String documentNode = getDocumentFieldNode(documentId, fieldsWithReadPermission);
+
+        if (!StringUtils.isEmpty(documentNode)) {
             //build caseDocument and set permissions
             return CaseDocument.builder()
                 .id(documentId)
-                .url(documentNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText())
-                .name(documentNode.get(DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE).asText())
-                .type(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE)
+                .url(documentNode)
+                //.name(documentNode.get(DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE).asText())
+                //.type(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE)
                 .permissions(Arrays.asList(Permission.READ))
                 .build();
         } else {
@@ -139,11 +141,23 @@ public class GetCaseDocumentOperation {
         }
     }
 
-    private JsonNode getDocumentFieldNode(String documentId, JsonNode readPermission) {
+    private String getDocumentFieldNode(String documentId, JsonNode readPermission) {
+        String urlPatternString = "^(?:\\/\\/|[^\\/]+)*\\/documents\\/[a-zA-Z0-9-]{36}";
+
+        Pattern pattern = Pattern.compile(urlPatternString);
         for (JsonNode jsonNode : readPermission) {
-            JsonNode textNode = jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
-            if (textNode.asText().substring(textNode.asText().length() - 36).equals(documentId)) {
-                return jsonNode;
+            //Find thr document ID within the caseField JSON Node
+            //1. Match from a. URL key or b. description key
+            //We need to validate whether documentId is part of URL pattern and key of that node contains "url" word.
+
+            Iterator<Map.Entry<String, JsonNode>> iterator = jsonNode.fields();
+            while (iterator.hasNext()) {
+                Map.Entry<String, JsonNode> entry = iterator.next();
+                if (entry.getValue().asText().contains(documentId)
+                    && entry.getKey().toUpperCase().contains("URL")
+                    && pattern.matcher(entry.getValue().asText()).matches()) {
+                    return entry.getValue().asText();
+                }
             }
         }
         return null;
@@ -156,8 +170,6 @@ public class GetCaseDocumentOperation {
                     finalDocumentCaseFields.add(caseField);
                     break;
                 case "Complex":
-                    extractDocumentFields(caseField.getFieldType().getComplexFields(), finalDocumentCaseFields);
-                    break;
                 case "Collection":
                     extractDocumentFields(caseField.getFieldType().getComplexFields(), finalDocumentCaseFields);
                     break;
