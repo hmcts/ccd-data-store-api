@@ -20,7 +20,6 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
@@ -28,7 +27,7 @@ import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 public class GetCaseDocumentOperation {
@@ -112,52 +111,37 @@ public class GetCaseDocumentOperation {
             .collect(Collectors.toList());
 
         extractDocumentFields(complexCaseFieldList, finalDocumentCaseFields);
-        System.out.println(finalDocumentCaseFields);
 
         //Retrieve the full list of available JSON node on which user is having read permissions (as per get case API).  ListB
 
         JsonNode readPermission = getFieldsWithReadPermission(caseDetails, finalDocumentCaseFields);
-        //Step5: Get the list of json fields from casedata object and extarct list of node names.
-
-        //Step6: perform an intersaction of both these list to find out the common fields.
-
-        //Step7: Loop through the common list of Json node fields to search documentId in specific url child field.
-
-        //Step8: get the list of fields from which this document is found and extract the ACL for each field and perform union to build caseDocument.
-
-
-        //final Optional<CaseField> documentCaseField = caseType.getCaseField(documentField);
-
-        //retrieve the case data from details
-        Map<String, JsonNode> caseData = caseDetails.getData();
-
-        //get document field name
-        String documentField = getDocumentCaseField(caseData, documentId);
+        JsonNode documentNode = getDocumentFieldNode(documentId, readPermission);
 
         //get child fields and set to caseDocument object
-        if (documentField != null) {
-
-            Optional<AccessControlList> userACLOnCaseField = getCaseFieldACLByUserRoles(caseDetails, documentField);
-            if (userACLOnCaseField.isPresent()) {
-
-                //build caseDocument and set permissions
-                return CaseDocument.builder()
-                    .id(documentId)
-                    .url(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText())
-                    .name(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE).asText())
-                    .type(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE)
-                    .permissions(getDocumentPermissions(userACLOnCaseField.get()))
-                    .build();
-            } else {
-                throw new CaseDocumentNotFoundException(
-                    String.format("No document found for this case reference: %s",
-                        caseDetails.getReferenceAsString()));
-            }
-
+        if (documentNode != null) {
+            //build caseDocument and set permissions
+            return CaseDocument.builder()
+                .id(documentId)
+                .url(documentNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText())
+                .name(documentNode.get(DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE).asText())
+                .type(documentNode.get(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE).asText())
+                .permissions(Arrays.asList(Permission.READ))
+                .build();
         } else {
             throw new CaseDocumentNotFoundException(
-                String.format("No document found for this case reference: %s", caseDetails.getReferenceAsString()));
+                String.format("No document found for this case reference: %s",
+                    caseDetails.getReferenceAsString()));
         }
+    }
+
+    private JsonNode getDocumentFieldNode(String documentId, JsonNode readPermission) {
+        for (JsonNode jsonNode : readPermission) {
+            JsonNode textNode = jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
+            if (textNode.asText().substring(textNode.asText().length() - 36).equals(documentId)) {
+                return jsonNode;
+            }
+        }
+        return null;
     }
 
     private void extractDocumentFields(List<CaseField> complexCaseFieldList2, List<CaseField> finalDocumentCaseFields) {
@@ -178,14 +162,13 @@ public class GetCaseDocumentOperation {
 
     private JsonNode getFieldsWithReadPermission(CaseDetails caseDetails, List<CaseField> documentFields) {
         Set<String> roles = getUserRoles(caseDetails.getId());
-        JsonNode filteredFields = accessControlService.filterCaseFieldsByAccess(
-            MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+
+        return accessControlService.filterCaseFieldsByAccess(
+            MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
             documentFields,
             roles,
             CAN_READ,
             true);
-
-      return filteredFields;
     }
 
     private Optional<AccessControlList> getCaseFieldACLByUserRoles(CaseDetails caseDetails, String documentField) {
