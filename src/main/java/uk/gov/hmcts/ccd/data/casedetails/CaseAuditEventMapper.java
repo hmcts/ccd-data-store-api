@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class CaseAuditEventMapper {
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
     };
 
     public AuditEvent entityToModel(final CaseAuditEventEntity caseAuditEventEntity) {
