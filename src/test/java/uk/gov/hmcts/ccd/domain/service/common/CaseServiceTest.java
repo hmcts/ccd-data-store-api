@@ -47,7 +47,7 @@ class CaseServiceTest {
     private static final String CASE_ID = "299";
     private final Map<String, JsonNode> data = new HashMap<>();
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private CaseDataService caseDataService;
 
