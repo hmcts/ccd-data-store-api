@@ -10,7 +10,6 @@ import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -72,7 +71,7 @@ public class GetCaseDocumentOperation {
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
             .orElseThrow(() -> new CaseNotFoundException(caseId));
 
-        if (caseDetails.getReferenceAsString().isEmpty()){
+        if (caseDetails.getReferenceAsString().isEmpty()) {
             throw new CaseNotFoundException(caseId);
         }
 
@@ -104,18 +103,17 @@ public class GetCaseDocumentOperation {
 
         List<CaseField> complexCaseFieldList = caseType.getCaseFields()
             .stream()
-            .filter
-                (y -> ("Document".equalsIgnoreCase(y.getFieldType().getType())) ||
-                ("Complex".equalsIgnoreCase(y.getFieldType().getType())) ||
-                ("Collection".equalsIgnoreCase(y.getFieldType().getType())))
+            .filter(y -> ("Document" .equalsIgnoreCase(y.getFieldType().getType())) ||
+                    ("Complex" .equalsIgnoreCase(y.getFieldType().getType())) ||
+                    ("Collection" .equalsIgnoreCase(y.getFieldType().getType())))
             .collect(Collectors.toList());
 
         extractDocumentFields(complexCaseFieldList, finalDocumentCaseFields);
 
         //Retrieve the full list of available JSON node on which user is having read permissions (as per get case API).  ListB
 
-        JsonNode readPermission = getFieldsWithReadPermission(caseDetails, finalDocumentCaseFields);
-        JsonNode documentNode = getDocumentFieldNode(documentId, readPermission);
+        JsonNode fieldsWithReadPermission = getFieldsWithReadPermission(caseDetails, finalDocumentCaseFields);
+        JsonNode documentNode = getDocumentFieldNode(documentId, fieldsWithReadPermission);
 
         //get child fields and set to caseDocument object
         if (documentNode != null) {
@@ -124,7 +122,7 @@ public class GetCaseDocumentOperation {
                 .id(documentId)
                 .url(documentNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText())
                 .name(documentNode.get(DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE).asText())
-                .type(documentNode.get(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE).asText())
+                .type(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE)
                 .permissions(Arrays.asList(Permission.READ))
                 .build();
         } else {
@@ -162,49 +160,11 @@ public class GetCaseDocumentOperation {
 
     private JsonNode getFieldsWithReadPermission(CaseDetails caseDetails, List<CaseField> documentFields) {
         Set<String> roles = getUserRoles(caseDetails.getId());
-
         return accessControlService.filterCaseFieldsByAccess(
             MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
             documentFields,
             roles,
-            CAN_READ,
-            true);
-    }
-
-    private Optional<AccessControlList> getCaseFieldACLByUserRoles(CaseDetails caseDetails, String documentField) {
-        //get the caseTypeId and JID
-        String caseTypeId = caseDetails.getCaseTypeId();
-        String jurisdictionId = caseDetails.getJurisdiction();
-        //retrieve the caseType and the documentCaseField
-        final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
-        final Optional<CaseField> documentCaseField = caseType.getCaseField(documentField);
-        //get the users role
-        Set<String> roles = getUserRoles(caseDetails.getId());
-
-        //Check the documentField found
-        if (documentCaseField.isPresent()) {
-            if (!roles.isEmpty()) {
-                //retrieve all ACL on the user roles
-                Optional<AccessControlList> userACLOnCaseField = Optional.empty();
-                for (String role : roles) {
-                    userACLOnCaseField = documentCaseField.get().getAccessControlLists()
-                        .stream()
-                        .filter(acl -> acl.getRole().equalsIgnoreCase(role))
-                        .findFirst();
-                    if (userACLOnCaseField.isPresent()) {
-                        return userACLOnCaseField;
-                    }
-                }
-                return userACLOnCaseField;
-            } else {
-                throw new CaseDocumentNotFoundException(
-                    String.format("No valid user role found for this case reference: %s",
-                        caseDetails.getReferenceAsString()));
-            }
-        } else {
-            throw new CaseDocumentNotFoundException(
-                String.format("No document found for this case reference: %s", caseDetails.getReferenceAsString()));
-        }
+            CAN_READ, true);
     }
 
     private Set<String> getUserRoles(String caseId) {
@@ -212,40 +172,4 @@ public class GetCaseDocumentOperation {
             new HashSet<>(caseUserRepository
                 .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())));
     }
-
-    private String getDocumentCaseField(Map<String, JsonNode> caseData, String documentId) {
-        for (Map.Entry<String, JsonNode> entry : caseData.entrySet()) {
-            if (entry.getValue().isNull()){
-                return null;
-            }
-            if (entry.getValue().getNodeType().toString()
-                .equals("OBJECT") && entry.getValue().toString().contains(documentId)) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
-
-    private List<Permission> getDocumentPermissions(AccessControlList userACL) {
-        final List<Permission> permissions = new ArrayList<>();
-
-        if (userACL.isRead()) {
-            permissions.add(Permission.READ);
-        }
-
-        if (userACL.isUpdate()) {
-            permissions.add(Permission.UPDATE);
-        }
-
-        if (userACL.isCreate()) {
-            permissions.add(Permission.CREATE);
-        }
-
-        if (userACL.isDelete()) {
-            permissions.add(Permission.DELETE);
-        }
-        return permissions;
-    }
-
 }
