@@ -24,7 +24,7 @@ public class SecurityValidationService {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityValidationService.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 
 public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_NODE_TYPE = new TypeReference<HashMap<String, JsonNode>>() {};
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_NODE_TYPE = new TypeReference<HashMap<String, JsonNode>>() {};
     private static final String CASE_FIELD_JSON = "/tests/CaseDataValidator_CaseField.json";
     private static String CASE_FIELDS_STRING;
 
