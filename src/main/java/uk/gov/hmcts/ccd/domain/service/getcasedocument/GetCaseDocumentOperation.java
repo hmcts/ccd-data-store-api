@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
@@ -22,11 +32,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 public class GetCaseDocumentOperation {
@@ -112,7 +117,9 @@ public class GetCaseDocumentOperation {
 
         //Retrieve the full list of available JSON node on which user is having read permissions (as per get case API).  ListB
 
-        JsonNode fieldsWithReadPermission = getFieldsWithReadPermission(caseDetails, finalDocumentCaseFields);
+        JsonNode fieldsWithReadPermission = getFieldsWithReadPermission(caseDetails, finalDocumentCaseFields)
+            .orElseThrow(
+                (() -> new CaseDocumentNotFoundException("User does not has read permissions on any document field")));
         JsonNode documentNode = getDocumentFieldNode(documentId, fieldsWithReadPermission);
 
         //get child fields and set to caseDocument object
@@ -142,8 +149,8 @@ public class GetCaseDocumentOperation {
         return null;
     }
 
-    private void extractDocumentFields(List<CaseField> complexCaseFieldList2, List<CaseField> finalDocumentCaseFields) {
-        for (CaseField caseField : complexCaseFieldList2) {
+    private void extractDocumentFields(List<CaseField> complexCaseFieldList, List<CaseField> finalDocumentCaseFields) {
+        for (CaseField caseField : complexCaseFieldList) {
             switch (caseField.getFieldType().getType()) {
                 case "Document":
                     finalDocumentCaseFields.add(caseField);
@@ -158,13 +165,13 @@ public class GetCaseDocumentOperation {
         }
     }
 
-    private JsonNode getFieldsWithReadPermission(CaseDetails caseDetails, List<CaseField> documentFields) {
+    private Optional<JsonNode> getFieldsWithReadPermission(CaseDetails caseDetails, List<CaseField> documentFields) {
         Set<String> roles = getUserRoles(caseDetails.getId());
-        return accessControlService.filterCaseFieldsByAccess(
+        return Optional.of(accessControlService.filterCaseFieldsByAccess(
             MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
             documentFields,
             roles,
-            CAN_READ, true);
+            CAN_READ, true));
     }
 
     private Set<String> getUserRoles(String caseId) {
