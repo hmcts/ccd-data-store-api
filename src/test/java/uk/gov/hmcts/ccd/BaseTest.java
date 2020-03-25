@@ -66,7 +66,7 @@ import static org.mockito.Mockito.*;
 @TestPropertySource(locations = "classpath:test.properties")
 public abstract class BaseTest {
     protected static final ObjectMapper mapper = new ObjectMapper();
-    protected static final TypeReference STRING_NODE_TYPE = new TypeReference<HashMap<String, JsonNode>>() {};
+    protected static final TypeReference<HashMap<String, JsonNode>> STRING_NODE_TYPE = new TypeReference<HashMap<String, JsonNode>>() {};
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
 
     protected static final MediaType JSON_CONTENT_TYPE = new MediaType(
