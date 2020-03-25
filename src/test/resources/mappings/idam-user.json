@@ -13,7 +13,7 @@
       "email" : "Cloud.Strife@test.com",
       "forename" : "Cloud",
       "surname": "Strife",
-      "roles" : ["caseworker"],
+      "roles" : ["caseworker", "caseworker-PROBATE-public", "caseworker-DIVORCE", "caseworker-SSCS"],
       "defaultService" : "ccd"
     }
   }
