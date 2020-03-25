@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class CriteriaInput {
     private String label;
     private int order;
@@ -40,6 +42,14 @@ public class CriteriaInput {
 
     public void setRole(final String role) {
         this.role = role;
+    }
+
+    public String buildCaseFieldId() {
+        if (this.field != null) {
+            return StringUtils.isEmpty(this.field.getElementPath()) ? this.field.getId() :
+                this.field.getId() + '.' + this.field.getElementPath();
+        }
+        return null;
     }
 
     public String getDisplayContextParameter() {

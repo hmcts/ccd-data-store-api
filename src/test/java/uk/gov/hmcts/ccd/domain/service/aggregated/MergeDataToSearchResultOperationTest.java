@@ -61,9 +61,10 @@ class MergeDataToSearchResultOperationTest {
 
     private static final String FAMILY_DETAILS = "FamilyDetails";
     private static final String FATHER_NAME_VALUE = "Simmon";
+    private static final String MOTHER_NAME_VALUE = "Hanna";
     private static final String POSTCODE_VALUE = "SW1P 4ER";
     private static final String FAMILY_DETAILS_VALUE = "{\"FatherName\":\"" + FATHER_NAME_VALUE + "\"," +
-        "\"MotherName\":\"Hanna\"," +
+        "\"MotherName\":\"" + MOTHER_NAME_VALUE + "\"," +
         "\"FamilyAddress\":{" +
         "\"County\":\"\"," +
         "\"Country\":\"United Kingdom\"," +
@@ -179,6 +180,26 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
                  );
+    }
+
+    @Test
+    @DisplayName("should get Workbasket Results with defined complex field columns")
+    void getWorkbasketViewWithComplexFields() {
+        SearchResult searchResult = aSearchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1),
+                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME),
+                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME))
+            .build();
+
+        final SearchResultView searchResultView = classUnderTest.execute(caseType, searchResult, caseDetailsList, NO_ERROR);
+        assertAll(
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getLabel(), is(CASE_FIELD_1)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getLabel(), is(FATHER_NAME)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getLabel(), is(MOTHER_NAME)),
+            () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
+        );
     }
 
     @Test
@@ -319,6 +340,26 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
             () -> assertThat(searchResultView.getResultError(), is(TIMEOUT_ERROR))
                  );
+    }
+
+    @Test
+    @DisplayName("should get Search Results with defined complex field columns")
+    void getSearchViewWithComplexFields() {
+        SearchResult searchResult = aSearchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2),
+                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME),
+                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME))
+            .build();
+
+        final SearchResultView searchResultView = classUnderTest.execute(caseType, searchResult, caseDetailsList, NO_ERROR);
+        assertAll(
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getLabel(), is(CASE_FIELD_2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getLabel(), is(FATHER_NAME)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getLabel(), is(MOTHER_NAME)),
+            () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
+        );
     }
 
     @Test

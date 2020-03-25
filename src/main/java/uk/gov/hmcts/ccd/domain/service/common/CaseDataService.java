@@ -25,7 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 public class CaseDataService {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
