@@ -141,7 +141,7 @@ configurations {
 }
 
 checkstyle {
-    maxWarnings = 2934 // In the Ideal world this should be 0
+    maxWarnings = 5000 // In the Ideal world this should be 0
     toolVersion = '8.18'
 }
 
@@ -208,7 +208,6 @@ dependencies {
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
     }
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
-    compile("org.springframework.boot:spring-boot-devtools")
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
@@ -256,8 +255,7 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '1.1.1'
-
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '1.2.3'
 }
 // end::dependencies[]
 
@@ -271,7 +269,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:24.1.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.30') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.31') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
