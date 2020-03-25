@@ -13,8 +13,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
+
+import java.util.Optional;
 
 @DisplayName("CaseResource")
 class UIStartTriggerResourceTest {
@@ -92,7 +95,8 @@ class UIStartTriggerResourceTest {
         void shouldLinkToSelf() {
             final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCaseType(caseEventTrigger, CASE_TYPE_ID, ignoreWarning);
 
-            assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForCase));
+            Optional<Link> self = uiStartTriggerResource.getLink("self");
+            assertThat(self.get().getHref(), equalTo(linkSelfForCase));
         }
 
     }
@@ -129,7 +133,8 @@ class UIStartTriggerResourceTest {
         void shouldLinkToSelf() {
             final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCase(caseEventTrigger, caseReference.toString(), ignoreWarning);
 
-            assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForEvent));
+            Optional<Link> self = uiStartTriggerResource.getLink("self");
+            assertThat(self.get().getHref(), equalTo(linkSelfForEvent));
         }
 
     }
@@ -166,7 +171,8 @@ class UIStartTriggerResourceTest {
         void shouldLinkToSelf() {
             final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forDraft(caseEventTrigger, draftReference, ignoreWarning);
 
-            assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForEvent));
+            Optional<Link> self = uiStartTriggerResource.getLink("self");
+            assertThat(self.get().getHref(), equalTo(linkSelfForEvent));
         }
 
     }

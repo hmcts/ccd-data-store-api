@@ -1,0 +1,30 @@
+{
+  "_guid_": "F-032_Case_Creation_Data_With_Document",
+  "_extends_": "Standard_Full_Case_Creation_Data",
+
+  "request": {
+    "body": {
+      "data": {
+        "_extends_": "Standard_Full_Case_Data_With_Document"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "_extends_": "Standard_Full_Case_Data_With_Document",
+        "DocumentField" : {
+          "document_url" : "[[ANYTHING_PRESENT]]",
+          "document_binary_url" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "data_classification": {
+        "DocumentField": "PUBLIC"
+      },
+      "security_classifications": {
+        "DocumentField": "PUBLIC"
+      }
+    }
+  }
+}

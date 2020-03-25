@@ -1,0 +1,44 @@
+{
+  "title": "Update the case by Citizen",
+  "_extends_": "S-584_Update_Case_For_Citizen_Data_Base",
+  "_guid_": "S-584_Later_Case_Update_By_Citizen",
+  "specs": [
+    "to update the values for DocumentField4 from the same case, which the user does not have update permissions for"
+  ],
+  "user": {
+    "username": "befta.citizen.2@gmail.com",
+    "password": "[[$CCD_BEFTA_CITIZEN_2_PWD]]"
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "DocumentField4":{
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary",
+          "document_filename" : "Screenshot 2019-11-14 at 1.57.32 pm.png --> updated by Citizen who doesn't have Update permission"
+        }
+      },
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-584-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Encoding" : "gzip"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 404,
+      "error" : "Not Found",
+      "message" : "No field found",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

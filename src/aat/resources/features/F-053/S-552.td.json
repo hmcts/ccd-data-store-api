@@ -1,0 +1,25 @@
+{
+	"_guid_": "S-552",
+	"_extends_": "F-053_Test_Data_Base",
+	"title": "must return negative response HTTP-400 when request contains a non-existing jurisdiction ID",
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing jurisdiction ID",
+		"code is HTTP-400"
+	],
+	"request": {
+		"pathVariables": {
+			"jid": "non-existing jurisdiction ID"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_400_Response",
+		"body": {
+			"exception": "[[ANYTHING_PRESENT]]",
+			"message": "Missing start trigger token",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
+}

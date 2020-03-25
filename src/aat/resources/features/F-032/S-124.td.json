@@ -1,0 +1,32 @@
+{
+  "title": "must retrieve printable documents successfully for correct inputs",
+
+  "_guid_": "S-124",
+  "_extends_": "F-032_Base_Test_Data",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains the case data of the case just created",
+    "contains a link to the printable documents that were uploaded to the case just created, along with a HTTP 200 OK"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "arrayInMap": [
+        {
+          "url": "[[ANYTHING_PRESENT]]",
+          "name": "CCD Print",
+          "type": "CCD Print Type",
+          "description": "Printing for CCD"
+        }
+      ]
+    },
+    "data" : {
+      "DocumentField" : {
+        "document_url" : "[[ANYTHING_PRESENT]]",
+        "document_binary_url" : "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}

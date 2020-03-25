@@ -8,8 +8,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.mvc.TypeConstrainedMappingJackson2HttpMessageConverter;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.mvc.TypeConstrainedMappingJackson2HttpMessageConverter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -33,7 +33,6 @@ public class HalConfig {
 
     private static final MediaType[] HAL_MEDIA_TYPES = new MediaType[]{
         MediaTypes.HAL_JSON,
-        MediaTypes.HAL_JSON_UTF8,
         APPLICATION_JSON_EXTENDED,
         APPLICATION_JSON_EXTENDED_UTF8,
         APPLICATION_HAL_JSON_EXTENDED,
@@ -83,7 +82,7 @@ public class HalConfig {
         private Stream<MappingJackson2HttpMessageConverter> findHalConverters(List<HttpMessageConverter<?>> converters) {
             return converters.stream()
                              .filter(converter -> converter instanceof TypeConstrainedMappingJackson2HttpMessageConverter
-                                 && converter.canWrite(ResourceSupport.class, MediaTypes.HAL_JSON))
+                                 && converter.canWrite(RepresentationModel.class, MediaTypes.HAL_JSON))
                              .map(converter -> (MappingJackson2HttpMessageConverter) converter);
         }
     }

@@ -5,9 +5,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -64,7 +66,8 @@ class UICaseViewResourceTest {
     void shouldLinkToSelf() {
         final UICaseViewResource resource = new UICaseViewResource(caseView);
 
-        assertThat(resource.getLink("self").getHref(), equalTo(LINK_SELF));
+        Optional<Link> self = resource.getLink("self");
+        assertThat(self.get().getHref(), equalTo(LINK_SELF));
     }
 
     private void mockArrays() {

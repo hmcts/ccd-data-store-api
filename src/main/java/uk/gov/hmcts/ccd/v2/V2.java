@@ -35,6 +35,13 @@ public final class V2 {
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-search-input-details.v2+json;charset=UTF-8";
         public static final String UI_BANNERS =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-banners.v2+json;charset=UTF-8";
+        public static final String UI_JURISDICTION_CONFIGS =
+            "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-jurisdiction-configs.v2+json;charset=UTF-8";
+
+        public static final String UI_JURISDICTIONS =
+            "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-jurisdictions.v2+json;charset=UTF-8";
+
+        public static final String CASE_EVENTS = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8";
 
     }
 
@@ -59,5 +66,9 @@ public final class V2 {
         public static final String GRANT_FORBIDDEN = "Grant action is reserved to users with entire jurisdiction access";
         public static final String CASE_FIELD_INVALID = "Cannot validate case field";
         public static final String CALLBACK_EXCEPTION = "Unsuccessful callback";
+        public static final String CASE_AUDIT_EVENTS_NOT_FOUND = "Case audit events not found";
+        public static final String ROLES_FOR_CASE_ID_NOT_FOUND = "Cannot find user roles or case roles for the case ID";
+        public static final String CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID = "Cannot find case type definition for case ID";
+        public static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
     }
 }

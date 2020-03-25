@@ -1,0 +1,32 @@
+{
+  "title": "must return 404 when case type does not exist",
+
+  "_guid_": "S-561",
+  "_extends_": "F-063_Base_Test_Data",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case type that does not exist",
+    "contains a HTTP 404 Not Found"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "non-existing case type"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "Resource not found when getting case type version for 'non-existing case type'.",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

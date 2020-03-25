@@ -1,0 +1,45 @@
+{
+  "title": "must return successfully all and only the respective documents with read access for solicitors",
+
+  "_guid_": "S-123",
+  "_extends_": "F-032_Base_Test_Data",
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+
+  "specs": [
+    "an active solicitor 1 profile in CCD with read permissions on limited documents for a given case type",
+    "another active solicitor 2 profile in CCD with all permissions on all documents for a given case type",
+    "another active solicitor 3 profile in CCD with read permissions on different limited documents for a given case type",
+    "is made by solicitor 2 who just created the case",
+    "contains a link to all of the printable documents that were uploaded to the case just created, along with a HTTP 200 OK"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_JURISDICTION_2",
+      "ctid": "BEFTA_CASETYPE_2_1"
+    },
+    "body": {
+      "id": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "arrayInMap": [
+        {
+          "url": "[[ANYTHING_PRESENT]]",
+          "name": "CCD Print",
+          "type": "CCD Print Type",
+          "description": "Printing for CCD"
+        }
+      ]
+    }
+  }
+}
