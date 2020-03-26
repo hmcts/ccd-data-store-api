@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Sets;
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -192,13 +191,54 @@ public class GetCaseDocumentsOperationTest {
             caseDetails.setReference(new Long(CASE_REFERENCE));
             caseDetails.setState("state1");
             caseDetails.setData(MAPPER.convertValue(MAPPER.readTree(
-                CONTENT), jsonMap));
+                "{  \"DocumentField1\": { "
+                +
+                "           \"document_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97\","
+                +
+                "           \"document_binary_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97/binary\","
+                +
+                "           \"document_filename\": \"bin1.pdf\""
+                +
+                "       }\n,"
+                +
+                "       \"DocumentField2\": {"
+                +
+                "           \"document_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932\","
+                +
+                "           \"document_binary_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932/binary\","
+                +
+                "           \"document_filename\": \"bin2.pdf\""
+                +
+                "       }\n"
+                +
+                "    }\n"), jsonMap));
 
             doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
             caseType.setCaseFields(singletonList(CASE_FIELD));
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-            doReturn(new ObjectMapper().readTree(CONTENT)).when(accessControlService).filterCaseFieldsByAccess(
+
+            doReturn(new ObjectMapper().readTree("{  \"DocumentField1\": { "
+                                                 +
+                                                 "           \"document_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97\","
+                                                 +
+                                                 "           \"document_binary_url\": \"http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97/binary\","
+                                                 +
+                                                 "           \"document_filename\": \"bin1.pdf\""
+                                                 +
+                                                 "       }\n,"
+                                                 +
+                                                 "       \"DocumentField2\": {"
+                                                 +
+                                                 "           \"document_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932\","
+                                                 +
+                                                 "           \"document_binary_url\": \"http://dm-store:8080/documents/ae51935b-b093-4c49-b6b6-9685c75ad932/binary\","
+                                                 +
+                                                 "           \"document_filename\": \"bin2.pdf\""
+                                                 +
+                                                 "       }\n"
+                                                 +
+                                                 "    }\n")).when(accessControlService).filterCaseFieldsByAccess(
                 ArgumentMatchers.any(JsonNode.class),
                 ArgumentMatchers.any(List.class),
                 ArgumentMatchers.any(Set.class),
@@ -222,6 +262,4 @@ public class GetCaseDocumentsOperationTest {
         }
 
     }
-
-
 }
