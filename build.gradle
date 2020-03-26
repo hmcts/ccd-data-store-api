@@ -141,7 +141,7 @@ configurations {
 }
 
 checkstyle {
-    maxWarnings = 5000 // In the Ideal world this should be 0
+    maxWarnings = 3000 // In the Ideal world this should be 0
     toolVersion = '8.18'
 }
 
