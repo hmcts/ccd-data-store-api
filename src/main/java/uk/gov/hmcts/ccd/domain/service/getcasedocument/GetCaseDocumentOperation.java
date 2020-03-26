@@ -59,8 +59,8 @@ public class GetCaseDocumentOperation {
         final CaseTypeService caseTypeService,
         @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
         @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
-        DocumentIdValidationService documentIdValidationService
-        , AccessControlService accessControlService) {
+        DocumentIdValidationService documentIdValidationService,
+        AccessControlService accessControlService) {
 
         this.getCaseOperation = getCaseOperation;
         this.caseTypeService = caseTypeService;
@@ -95,47 +95,33 @@ public class GetCaseDocumentOperation {
 
     public CaseDocument getCaseDocument(CaseDetails caseDetails, String documentId) {
 
-        //Retrieve the caseType and list of casefield containing document casefield
-        //get the caseTypeId and JID & corresponding casetype
         String caseTypeId = caseDetails.getCaseTypeId();
         String jurisdictionId = caseDetails.getJurisdiction();
         final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
-        //Step1
-        //Extract the list of complex case Fields having document casefields or comlex casefields
+
         List<CaseField> documentCaseFields = new ArrayList<>();
-        //Step2
-        // Collection Case fields having collection field type as document.
-
-        //If this list contains collection casefield again then repeat the above step to extract the full list of document casefields.
-        //finalDocumentCaseFields.addAll(collectionCaseFields);
-        //<more logic to come>
-
         List<CaseField> complexCaseFieldList = caseType.getCaseFields()
             .stream()
-            .filter(y -> ("Document" .equalsIgnoreCase(y.getFieldType().getType())) ||
-                    ("Complex".equalsIgnoreCase(y.getFieldType().getType())) ||
-                    ("Collection".equalsIgnoreCase(y.getFieldType().getType())))
+            .filter(caseField -> ("Document".equalsIgnoreCase(caseField.getFieldType().getType())) ||
+                                 ("Complex".equalsIgnoreCase(caseField.getFieldType().getType())) ||
+                                 ("Collection".equalsIgnoreCase(caseField.getFieldType().getType())))
             .collect(Collectors.toList());
 
         if (complexCaseFieldList.isEmpty()) {
             throw new CaseDocumentNotFoundException(String.format("No document field found for CaseType : %s", caseType.getId()));
         }
 
-        extractDocumentFields(complexCaseFieldList, documentCaseFields);
+        extractDocumentFieldsFromCaseDefinition(complexCaseFieldList, documentCaseFields);
+        JsonNode documentFieldsWithReadPermission = getDocumentFieldsWithReadPermission(caseDetails, documentCaseFields)
+            .orElseThrow((() -> new CaseDocumentNotFoundException("User does not has read permissions on any document field")));
 
-        JsonNode fieldsWithReadPermission = getFieldsWithReadPermission(caseDetails, documentCaseFields)
-            .orElseThrow(
-                (() -> new CaseDocumentNotFoundException("User does not has read permissions on any document field")));
+        String documentUrl = getDocumentUrl(documentId, documentFieldsWithReadPermission);
 
-        String documentNode = getDocumentFieldNode(documentId, fieldsWithReadPermission);
-
-        if (!StringUtils.isEmpty(documentNode)) {
+        if (!StringUtils.isEmpty(documentUrl)) {
             //build caseDocument and set permissions
             return CaseDocument.builder()
                 .id(documentId)
-                .url(documentNode)
-                //.name(documentNode.get(DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE).asText())
-                //.type(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE)
+                .url(documentUrl)
                 .permissions(Arrays.asList(Permission.READ))
                 .build();
         } else {
@@ -145,15 +131,11 @@ public class GetCaseDocumentOperation {
         }
     }
 
-    private String getDocumentFieldNode(String documentId, JsonNode readPermission) {
+    private String getDocumentUrl(String documentId, JsonNode readPermission) {
         String urlPatternString = "^(?:\\/\\/|[^\\/]+)*\\/documents\\/[a-zA-Z0-9-]{36}";
-
         Pattern pattern = Pattern.compile(urlPatternString);
-        for (JsonNode jsonNode : readPermission) {
-            //Find thr document ID within the caseField JSON Node
-            //1. Match from a. URL key or b. description key
-            //We need to validate whether documentId is part of URL pattern and key of that node contains "url" word.
 
+        for (JsonNode jsonNode : readPermission) {
             Iterator<Map.Entry<String, JsonNode>> iterator = jsonNode.fields();
             while (iterator.hasNext()) {
                 Map.Entry<String, JsonNode> entry = iterator.next();
@@ -167,7 +149,7 @@ public class GetCaseDocumentOperation {
         return null;
     }
 
-    private void extractDocumentFields(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {
+    private void extractDocumentFieldsFromCaseDefinition(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {
         for (CaseField caseField : complexCaseFieldList) {
             switch (caseField.getFieldType().getType()) {
                 case "Document":
@@ -175,13 +157,13 @@ public class GetCaseDocumentOperation {
                     break;
                 case "Complex":
                 case "Collection":
-                    extractDocumentFields(caseField.getFieldType().getComplexFields(), documentCaseFields);
+                    extractDocumentFieldsFromCaseDefinition(caseField.getFieldType().getComplexFields(), documentCaseFields);
                     break;
             }
         }
     }
 
-    private Optional<JsonNode> getFieldsWithReadPermission(CaseDetails caseDetails, List<CaseField> documentFields) {
+    private Optional<JsonNode> getDocumentFieldsWithReadPermission(CaseDetails caseDetails, List<CaseField> documentFields) {
         Set<String> roles = getUserRoles(caseDetails.getId());
         return Optional.of(accessControlService.filterCaseFieldsByAccess(
             MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
