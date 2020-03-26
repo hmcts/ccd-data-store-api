@@ -16,7 +16,7 @@ Background:
 
 
   @S-109
-  Scenario: must return appropriate user setting from idam role for a user not having a profile in CCD
+  Scenario: must return a list of jurisdictions for a valid user with no CCD user profile
     Given a user with [no profile in CCD]
     When a request is prepared with appropriate values
     And it is submitted to call the [Get default settings for user] operation of [CCD Data Store]
