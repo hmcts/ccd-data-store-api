@@ -1,0 +1,43 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <!-- conditional drop to remove index manually created in some environments -->
+    <changeSet id="rdm-6916-drop" author="matt.nayler@hmcts.net">
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="idx_case_event_created_date"
+                   schemaName="public"
+                   tableName="case_event" />
+        </preConditions>
+        <dropIndex indexName="idx_case_event_created_date"
+                   schemaName="public"
+                   tableName="case_event" />
+    </changeSet>
+
+
+    <changeSet id="rdm-6916" author="matt.nayler@hmcts.net">
+
+        <createIndex indexName="idx_case_event_created_date"
+                     schemaName="public"
+                     tableName="case_event">
+            <column name="created_date"/>
+        </createIndex>
+
+        <createIndex indexName="idx_case_event_case_type_id"
+                     schemaName="public"
+                     tableName="case_event">
+            <column name="case_type_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_case_event_event_id_state_id"
+                     schemaName="public"
+                     tableName="case_event">
+            <column name="event_id"/>
+            <column name="state_id"/>
+        </createIndex>
+
+    </changeSet>
+
+
+</databaseChangeLog>
