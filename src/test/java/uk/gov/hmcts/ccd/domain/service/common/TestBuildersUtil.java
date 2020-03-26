@@ -983,11 +983,6 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public WizardPageComplexFieldOverrideBuilder withDisplayContextParameter(String displayContextParameter) {
-            this.wizardPageComplexFieldOverride.setDisplayContextParameter(displayContextParameter);
-            return this;
-        }
-
         public WizardPageComplexFieldOverride build() {
             return this.wizardPageComplexFieldOverride;
         }
