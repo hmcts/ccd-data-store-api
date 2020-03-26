@@ -30,7 +30,7 @@
       "user": {
         "idam": {
           "id": "${[scenarioContext][theInvokingUser][id]}",
-          "email": "befta.caseworker.1.noprofile@gmail.com",
+          "email": "${[scenarioContext][theInvokingUser][username]}",
           "forename": "testfirstname",
           "surname": "testsurname",
           "roles": [ "caseworker", "caseworker-befta_jurisdiction_1" ],
