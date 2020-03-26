@@ -32,7 +32,8 @@
           "uid": "123",
           "roles": [
             "caseworker",
-            "caseworker-test"
+            "caseworker-test",
+            "caseworker-PROBATE-public", "caseworker-DIVORCE", "caseworker-SSCS"
           ],
           "name": "Cloud Strife",
           "given_name": "Cloud",
