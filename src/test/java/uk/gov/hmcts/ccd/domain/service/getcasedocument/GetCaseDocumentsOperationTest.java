@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
@@ -102,8 +102,6 @@ public class GetCaseDocumentsOperationTest {
     private static final String DOCUMENT_TYPE = "Document";
     private static final String USER_ID = "test_user_id";
 
-    private final List<CaseField> caseFields = Lists.newArrayList();
-
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -137,10 +135,6 @@ public class GetCaseDocumentsOperationTest {
                                                           .type(DOCUMENT_TYPE)
                                                           .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
                                                           .build();
-
-    private final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-        CONTENT
-                                                                                  ), jsonMap);
 
     public GetCaseDocumentsOperationTest() throws IOException {
     }
@@ -197,9 +191,8 @@ public class GetCaseDocumentsOperationTest {
             caseDetails.setId(CASE_REFERENCE);
             caseDetails.setReference(new Long(CASE_REFERENCE));
             caseDetails.setState("state1");
-            caseDetails.setData(data);
-            JsonNode jsonNode = mock(JsonNode.class);
-            JsonNode classifiedDataNode1 = JSON_NODE_FACTORY.objectNode();
+            caseDetails.setData(MAPPER.convertValue(MAPPER.readTree(
+                CONTENT), jsonMap));
 
             doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
