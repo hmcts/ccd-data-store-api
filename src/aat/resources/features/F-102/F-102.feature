@@ -50,13 +50,3 @@ Feature: F-102: Get jurisdictions available to the user
     And the response [contains HTTP 400 Bad Request]
     And the response [contains an error message : Access can only be 'create', 'read' or 'update']
     And the response has all other details as expected
-
-  @S-580
-  Scenario: must return a list of jurisdictions for a valid user with no user profile
-    Given a user with [appropriate idam roles but no CCD user profile]
-    When a request is prepared with appropriate values
-    And the request [has CREATE as case access parameter]
-    And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
-    Then a positive response is received
-    And the response [contains the list of jurisdictions a user has access to]
-    And the response has all other details as expected
