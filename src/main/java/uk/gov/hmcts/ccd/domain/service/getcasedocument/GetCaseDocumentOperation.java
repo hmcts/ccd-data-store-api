@@ -159,6 +159,8 @@ public class GetCaseDocumentOperation {
                 case COLLECTION:
                     extractDocumentFieldsFromCaseDefinition(caseField.getFieldType().getComplexFields(), documentCaseFields);
                     break;
+                default:
+                    break;
             }
         }
     }
