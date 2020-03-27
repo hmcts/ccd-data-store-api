@@ -198,7 +198,7 @@ class MidEventCallbackTest {
             null,
             caseDetails,
             IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
-        when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).thenReturn(caseDetails);
+        when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData)).thenReturn(caseDetails);
         given(caseService.populateCurrentCaseDetailsWithEventFields(content, updatedCaseDetails)).willReturn(null);
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
@@ -215,8 +215,8 @@ class MidEventCallbackTest {
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
             () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, caseDetails, IGNORE_WARNINGS),
-            () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData),
-            () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data));
+            () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
+            () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData));
     }
 
     @Test
