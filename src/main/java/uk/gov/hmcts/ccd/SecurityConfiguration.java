@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd;
 
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +26,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -40,6 +40,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
     private JwtAuthenticationConverter jwtAuthenticationConverter;
 
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-ui.html",
+            "/webjars/springfox-swagger-ui/**",
+            "/swagger-resources/**",
+            "/v2/**",
+            "/health",
+            "/health/liveness",
+            "/status/health",
+            "/loggers/**",
+            "/"
+    };
 
     @Inject
     public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
@@ -56,15 +67,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/swagger-ui.html",
-            "/webjars/springfox-swagger-ui/**",
-            "/swagger-resources/**",
-            "/v2/**",
-            "/health",
-            "/health/liveness",
-            "/status/health",
-            "/loggers/**",
-            "/");
+        web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
     @Override
