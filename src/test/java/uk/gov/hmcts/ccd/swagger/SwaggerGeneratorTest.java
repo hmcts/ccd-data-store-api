@@ -4,9 +4,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -24,7 +24,7 @@ public class SwaggerGeneratorTest extends WireMockBaseTest {
     @Autowired
     private WebApplicationContext webAppContext;
 
-    @BeforeEach
+    @Before
     public void setup() {
         this.mvc = webAppContextSetup(webAppContext).build();
     }
@@ -32,7 +32,7 @@ public class SwaggerGeneratorTest extends WireMockBaseTest {
     @DisplayName("Generate swagger documentation")
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-    void generateDocs() throws Exception {
+    public void generateDocs() throws Exception {
         ResultActions perform = mvc.perform(get("/v2/api-docs"));
         byte[] specs = perform
             .andExpect(status().isOk())
