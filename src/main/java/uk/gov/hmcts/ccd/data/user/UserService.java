@@ -1,12 +1,15 @@
 package uk.gov.hmcts.ccd.data.user;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -16,7 +19,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
 public class UserService {
@@ -26,24 +28,22 @@ public class UserService {
     private UserRepository userRepository;
     private CaseDefinitionRepository caseDefinitionRepository;
     private JurisdictionMapper jurisdictionMapper;
-    private JurisdictionsResolver jurisdictionsResolver;
 
     @Inject
     public UserService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
-                       JurisdictionMapper jurisdictionMapper,
-                       @Qualifier(IDAMJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
+                       JurisdictionMapper jurisdictionMapper) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.jurisdictionMapper = jurisdictionMapper;
-        this.jurisdictionsResolver = jurisdictionsResolver;
     }
 
     public UserProfile getUserProfile() {
 
         IDAMProperties idamProperties = userRepository.getUserDetails();
         String userId = idamProperties.getEmail();
-        List<String> jurisdictionIds = jurisdictionsResolver.getJurisdictions();
+        UserDefault userDefault = userRepository.getUserDefaultSettings(userId);
+        List<String> jurisdictionIds = userDefault.getJurisdictionsId();
 
         List<Jurisdiction> jurisdictions = new ArrayList<>();
 
@@ -55,26 +55,22 @@ public class UserService {
             }
         });
 
-        return createUserProfile(idamProperties, userId, jurisdictions);
+        return createUserProfile(idamProperties, userDefault, jurisdictions);
     }
 
-    private UserProfile createUserProfile(IDAMProperties idamProperties, String userId, List<Jurisdiction> jurisdictionsDefinition) {
+    private UserProfile createUserProfile(IDAMProperties idamProperties, UserDefault userDefault, List<Jurisdiction> jurisdictionsDefinition) {
 
         JurisdictionDisplayProperties[] resultJurisdictions = toResponse(jurisdictionsDefinition);
+
+        WorkbasketDefault workbasketDefault = new WorkbasketDefault();
+        workbasketDefault.setJurisdictionId(userDefault.getWorkBasketDefaultJurisdiction());
+        workbasketDefault.setCaseTypeId(userDefault.getWorkBasketDefaultCaseType());
+        workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
 
         UserProfile userProfile = new UserProfile();
         userProfile.setJurisdictions(resultJurisdictions);
         userProfile.getUser().setIdamProperties(idamProperties);
-        try {
-            UserDefault userDefault = userRepository.getUserDefaultSettings(userId);
-            WorkbasketDefault workbasketDefault = new WorkbasketDefault();
-            workbasketDefault.setJurisdictionId(userDefault.getWorkBasketDefaultJurisdiction());
-            workbasketDefault.setCaseTypeId(userDefault.getWorkBasketDefaultCaseType());
-            workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
-            userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
-        } catch (ResourceNotFoundException ae) {
-            LOGGER.debug("User Profile not exists for userId {}", userId, ae);
-        }
+        userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
 
         return userProfile;
     }
