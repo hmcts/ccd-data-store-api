@@ -17,7 +17,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class SwaggerPublisherTest extends WireMockBaseTest {
+public class SwaggerGeneratorTest extends WireMockBaseTest {
 
     private MockMvc mvc;
 
