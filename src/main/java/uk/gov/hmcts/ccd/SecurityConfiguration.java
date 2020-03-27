@@ -33,6 +33,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/loggers/**",
             "/"
     };
+
     @Inject
     public SecurityConfiguration(final RequestAuthorizer<User> userRequestAuthorizer,
                                  final RequestAuthorizer<Service> serviceRequestAuthorizer,
