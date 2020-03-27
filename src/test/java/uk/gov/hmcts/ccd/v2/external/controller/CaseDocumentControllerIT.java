@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -159,3 +160,4 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
     }
 
 }
+*/
