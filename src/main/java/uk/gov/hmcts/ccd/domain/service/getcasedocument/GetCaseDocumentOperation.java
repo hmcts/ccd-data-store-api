@@ -47,9 +47,9 @@ public class GetCaseDocumentOperation {
     private final DocumentIdValidationService documentIdValidationService;
     private final AccessControlService accessControlService;
 
-    public static final String DOCUMENT_CASE_FIELD_URL_ATTRIBUTE = "document_url";
-    public static final String DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE = "document_filename";
-    public static final String DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE = "Document";
+    public static final String COMPLEX = "Complex";
+    public static final String COLLECTION = "Collection";
+    public static final String DOCUMENT = "Document";
     public static final String BAD_REQUEST_EXCEPTION_DOCUMENT_INVALID = "DocumentId is not valid";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -102,9 +102,9 @@ public class GetCaseDocumentOperation {
         List<CaseField> documentCaseFields = new ArrayList<>();
         List<CaseField> complexCaseFieldList = caseType.getCaseFields()
             .stream()
-            .filter(caseField -> ("Document".equalsIgnoreCase(caseField.getFieldType().getType())) ||
-                                 ("Complex".equalsIgnoreCase(caseField.getFieldType().getType())) ||
-                                 ("Collection".equalsIgnoreCase(caseField.getFieldType().getType())))
+            .filter(caseField -> (DOCUMENT.equalsIgnoreCase(caseField.getFieldType().getType())) ||
+                                 (COMPLEX.equalsIgnoreCase(caseField.getFieldType().getType())) ||
+                                 (COLLECTION.equalsIgnoreCase(caseField.getFieldType().getType())))
             .collect(Collectors.toList());
 
         if (complexCaseFieldList.isEmpty()) {
@@ -152,11 +152,11 @@ public class GetCaseDocumentOperation {
     private void extractDocumentFieldsFromCaseDefinition(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {
         for (CaseField caseField : complexCaseFieldList) {
             switch (caseField.getFieldType().getType()) {
-                case "Document":
+                case DOCUMENT:
                     documentCaseFields.add(caseField);
                     break;
-                case "Complex":
-                case "Collection":
+                case COMPLEX:
+                case COLLECTION:
                     extractDocumentFieldsFromCaseDefinition(caseField.getFieldType().getComplexFields(), documentCaseFields);
                     break;
             }
