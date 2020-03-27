@@ -71,6 +71,40 @@ class DateTimeEntryProcessorTest {
     }
 
     @Test
+    void shouldReturnProcessedNodeForSimpleFieldNullDisplayContextParameter() throws IOException {
+        setUpBaseType("DateTime");
+        String json = "{\"DateTimeField\":\"2020-03-13T00:00:00.000\"}";
+        JsonNode node = MAPPER.readTree(json).get("DateTimeField");
+        CaseViewField caseViewField = caseViewField(ID, null, fieldType());
+        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
+        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601(null, "2020-03-13T00:00:00.000")).thenReturn("2020-03-13T00:00:00.000");
+
+        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+
+        assertAll(
+            () -> assertThat(result.isTextual(), is(true)),
+            () -> assertThat(result.asText(), is("2020-03-13T00:00:00.000"))
+        );
+    }
+
+    @Test
+    void shouldReturnProcessedNodeForSimpleFieldIncorrectDisplayContextParameter() throws IOException {
+        setUpBaseType("DateTime");
+        String json = "{\"DateTimeField\":\"2020-03-13T00:00:00.000\"}";
+        JsonNode node = MAPPER.readTree(json).get("DateTimeField");
+        CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
+        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
+        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "2020-03-13T00:00:00.000")).thenReturn("2020-03-13T00:00:00.000");
+
+        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+
+        assertAll(
+            () -> assertThat(result.isTextual(), is(true)),
+            () -> assertThat(result.asText(), is("2020-03-13T00:00:00.000"))
+        );
+    }
+
+    @Test
     void shouldReturnProcessedNodeForCollectionField() throws IOException {
         setUpBaseType("Collection");
         String json = "{\"CollectionField\":[{\"id\":\"id1\",\"value\":\"13/03/2020\"},{\"id\":\"id2\",\"value\":\"25/12/1995\"}]}";
