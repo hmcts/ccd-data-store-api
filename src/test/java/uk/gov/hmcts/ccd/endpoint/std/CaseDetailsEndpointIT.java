@@ -4,6 +4,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,19 +33,21 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -65,11 +75,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 
 public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE = "TestAddressBookCase";
+    private static final String CASE_TYPE_VALIDATE = "TestAddressBookCaseValidate";
     private static final String CASE_TYPE_NO_CREATE_CASE_ACCESS = "TestAddressBookCaseNoCreateCaseAccess";
     private static final String CASE_TYPE_NO_UPDATE_CASE_ACCESS = "TestAddressBookCaseNoUpdateCaseAccess";
     private static final String CASE_TYPE_NO_CREATE_EVENT_ACCESS = "TestAddressBookCaseNoCreateEventAccess";
@@ -93,6 +106,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final int NUMBER_OF_CASES = 18;
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
     private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
+    private static final String MID_EVENT_CALL_BACK = "/event-callback/mid-event";
 
     @Inject
     private WebApplicationContext wac;
@@ -4248,6 +4262,119 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
+            "\"D8Document\":{" +
+            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+            "}" +
+            "}";
+    }
+
+    @Test
+    public void shouldReturnFilteredDataWhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+        final JsonNode DATA = mapper.readTree(exampleCaseData());
+        final JsonNode EVENT_DATA = mapper.readTree(exampleEventData());
+        WizardPageCollection wizardPageCollection = createWizardPageCollection();
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        final String DESCRIPTION = "A very long comment.......";
+        final String SUMMARY = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(SUMMARY)
+                .withDescription(DESCRIPTION)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(EVENT_DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_VALIDATE + "/validate?pageId=createCaseInfoPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK)));
+        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK))
+                                              .withRequestBody(equalToJson(requestBodyJson())));
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseData() + "}");
+        final String EXPECTED_RESPONSE = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            EXPECTED_RESPONSE,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    private String requestBodyJson() {
+       return "{\"case_details\":{\"id\":null,\"jurisdiction\":\"PROBATE\",\"state\":null,\"version\":null," +
+           "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null," +
+           "\"last_state_modified_date\":null,\"security_classification\":null,\"case_data\":{\"PersonLastName" +
+           "\":\"_ Roof\",\"PersonFirstName\":\"_ George\"," +
+           "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}}," +
+           "\"data_classification\":null,\"after_submit_callback_response\":null," +
+           "\"callback_response_status_code\":null,\"callback_response_status\":null," +
+           "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null," +
+           "\"security_classifications\":null},\"case_details_before\":null," +
+           "\"event_id\":\"TEST_EVENT\",\"ignore_warning\":false}";
+    }
+
+    private WizardPageCollection createWizardPageCollection() {
+        WizardPageCollection wizardPageCollection = new WizardPageCollection();
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseInfoPage",
+                                            "PersonFirstName",
+                                            "PersonLastName", 1));
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseNextPage",
+                "CaseNumber",
+                "TelephoneNumber", 2));
+        return wizardPageCollection;
+    }
+
+    private WizardPage createWizardPage(String pageName, String caseFieldName1, String caseFieldName2, Integer pageOrder) {
+        final CaseViewField caseViewField1 = aViewField()
+            .withId(caseFieldName1)
+            .withOrder(1)
+            .build();
+        final CaseViewField caseViewField2 = aViewField()
+            .withId(caseFieldName2)
+            .withOrder(2)
+            .build();
+
+        return newWizardPage()
+            .withId(pageName)
+            .withOrder(pageOrder)
+            .withField(caseViewField1)
+            .withField(caseViewField2)
+            .withCallBackURLMidEvent("http://localhost:" + getPort() + MID_EVENT_CALL_BACK)
+            .build();
+    }
+
+    private String expectedCaseData() {
+        return "{" +
+            "\"PersonLastName\":\"Roof\"," +
+            "\"PersonFirstName\":\"George\"" +
+            "}";
+    }
+
+    private String exampleCaseData() {
+        return "{" +
+            "\"PersonLastName\":\"Roof\"," +
+            "\"PersonFirstName\":\"George\"," +
+            "\"D8Document\":{" +
+            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+            "}" +
+            "}";
+    }
+
+    private String exampleEventData() {
+        return "{" +
+            "\"PersonLastName\":\"_ Roof\"," +
+            "\"PersonFirstName\":\"_ George\"," +
+            "\"CaseNumber\":\"_ 1234567\"," +
+            "\"TelephoneNumber\":\"_ 07865645667\"," +
             "\"D8Document\":{" +
             "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
             "}" +

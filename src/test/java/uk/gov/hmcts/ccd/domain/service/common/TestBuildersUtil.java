@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.omg.CORBA.OBJ_ADAPTER;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -553,7 +554,7 @@ public class TestBuildersUtil {
             this.jurisdictionUiConfig.setShuttered(shuttered);
             return this;
         }
-        
+
         public JurisdictionUiConfigBuilder withId(String id) {
             this.jurisdictionUiConfig.setId(id);
             return this;
@@ -1031,11 +1032,21 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public WizardPageBuilder withOrder(Integer order) {
+            wizardPage.setOrder(order);
+            return this;
+        }
+
+        public WizardPageBuilder withCallBackURLMidEvent(String callBackURLMidEvent) {
+            wizardPage.setCallBackURLMidEvent(callBackURLMidEvent);
+            return this;
+        }
+
         public WizardPageBuilder withField(CaseViewField caseField) {
             WizardPageField wizardPageField = new WizardPageField();
             wizardPageField.setCaseFieldId(caseField.getId());
             wizardPageField.setPageColumnNumber(1);
-            wizardPageField.setOrder(1);
+            wizardPageField.setOrder(caseField.getOrder() != null ? caseField.getOrder() : 1);
             wizardPageField.setComplexFieldOverrides(emptyList());
             wizardPageFields.add(wizardPageField);
             return this;
@@ -1217,6 +1228,16 @@ public class TestBuildersUtil {
 
         public CaseViewFieldBuilder withId(String id) {
             caseViewField.setId(id);
+            return this;
+        }
+
+        public CaseViewFieldBuilder withValue(Object value) {
+            caseViewField.setValue(value);
+            return this;
+        }
+
+        public CaseViewFieldBuilder withOrder(Integer order) {
+            caseViewField.setOrder(order);
             return this;
         }
 
