@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/data/case-type/TestAddressBookCaseValidate"
+    "url": "/api/data/case-type/TestAddressBookCaseValidateMultiPage"
   },
   "response": {
     "status": 200,
@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "id": "TestAddressBookCaseValidate",
+      "id": "TestAddressBookCaseValidateMultiPage",
       "version": {
         "number": 1,
         "live_from": "2017-01-01"
@@ -264,7 +264,7 @@
       "case_fields": [
         {
           "id": "PersonFirstName",
-          "case_type_id": "TestAddressBookCaseValidate",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
           "label": "First name",
           "security_classification": "PUBLIC",
           "acls": [
@@ -289,8 +289,8 @@
         },
         {
           "id": "CaseNumber",
-          "case_type_id": "TestAddressBookCaseValidate",
-          "label": "Case Number",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
+          "label": "First name",
           "security_classification": "PUBLIC",
           "acls": [
             {
@@ -314,8 +314,108 @@
         },
         {
           "id": "TelephoneNumber",
-          "case_type_id": "TestAddressBookCaseValidate",
-          "label": "Telephone Number",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
+          "label": "First name",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        },
+        {
+          "id": "CaseField31",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
+          "label": "Case Field 31",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        },
+        {
+          "id": "CaseField32",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
+          "label": "Case Field 32",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        },
+        {
+          "id": "CaseField41",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
+          "label": "Case Field 41",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        },
+        {
+          "id": "CaseField42",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
+          "label": "Case Field 42",
           "security_classification": "PUBLIC",
           "acls": [
             {
@@ -339,7 +439,7 @@
         },
         {
           "id": "PersonLastName",
-          "case_type_id": "TestAddressBookCaseValidate",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
           "label": "Last name",
           "security_classification": "PUBLIC",
           "acls": [
@@ -364,7 +464,7 @@
         },
         {
           "id": "PersonAddress",
-          "case_type_id": "TestAddressBookCaseValidate",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
           "label": "Address",
           "security_classification": "PUBLIC",
           "acls": [
@@ -436,7 +536,7 @@
         },
         {
           "id": "Aliases",
-          "case_type_id": "TestAddressBookCaseValidate",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
           "label": "Aliases",
           "security_classification": "PUBLIC",
           "acls": [
@@ -465,7 +565,7 @@
         },
         {
           "id": "D8Document",
-          "case_type_id": "TestAddressBookCaseValidate",
+          "case_type_id": "TestAddressBookCaseValidateMultiPage",
           "label": "Document",
           "security_classification": "PUBLIC",
           "acls": [
