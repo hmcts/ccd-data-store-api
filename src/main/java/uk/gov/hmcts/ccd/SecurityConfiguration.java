@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd;
 
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -7,20 +9,30 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import javax.inject.Inject;
+
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.service.Service;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerServiceAndUserFilter;
-
-import javax.inject.Inject;
-
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final AuthCheckerServiceAndUserFilter authCheckerFilter;
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-ui.html",
+            "/webjars/springfox-swagger-ui/**",
+            "/swagger-resources/**",
+            "/v2/**",
+            "/health",
+            "/health/liveness",
+            "/status/health",
+            "/loggers/**",
+            "/"
+    };
 
     @Inject
     public SecurityConfiguration(final RequestAuthorizer<User> userRequestAuthorizer,
@@ -32,15 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/swagger-ui.html",
-                                   "/webjars/springfox-swagger-ui/**",
-                                   "/swagger-resources/**",
-                                   "/v2/**",
-                                   "/health",
-                                   "/health/liveness",
-                                   "/status/health",
-                                   "/loggers/**",
-                                   "/");
+        web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
     @Override
