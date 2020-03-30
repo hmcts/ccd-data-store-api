@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -170,7 +171,8 @@ public class GetCaseDocumentsOperationTest {
 
         }
 
-       /* @Test
+       */
+/* @Test
         @DisplayName("should return CaseDocumentMetadata")
         void shouldCallGetCaseDocumentMetadata() {
 
@@ -193,7 +195,8 @@ public class GetCaseDocumentsOperationTest {
                 () -> assertThat(caseDocumentMetadata.getCaseTypeId(), is(caseDetails.getCaseTypeId())),
                 () -> assertThat(caseDocumentMetadata.getJurisdictionId(), is(caseDetails.getJurisdiction()))
             );
-        }*/
+        }*//*
+
 
         private Map<String, JsonNode> buildData(String... dataFieldIds) {
             Map<String, JsonNode> dataMap = new HashMap<>();
@@ -207,3 +210,4 @@ public class GetCaseDocumentsOperationTest {
 
 
 }
+*/
