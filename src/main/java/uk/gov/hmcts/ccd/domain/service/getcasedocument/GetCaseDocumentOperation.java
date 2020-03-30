@@ -154,18 +154,29 @@ public class GetCaseDocumentOperation {
     }
 
     private void extractDocumentFieldsFromCaseDefinition(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {
-        for (CaseField caseField : complexCaseFieldList) {
-            switch (caseField.getFieldType().getType()) {
-                case DOCUMENT:
-                    documentCaseFields.add(caseField);
-                    break;
-                case COMPLEX:
-                case COLLECTION:
-                    //collection can have documents , another complex, another collection,
-                    extractDocumentFieldsFromCaseDefinition(caseField.getFieldType().getComplexFields(), documentCaseFields);
-                    break;
-                default:
-                    break;
+        if (complexCaseFieldList != null && complexCaseFieldList.size() > 0) {
+            for (CaseField caseField : complexCaseFieldList) {
+                switch (caseField.getFieldType().getType()) {
+                    case DOCUMENT:
+                        documentCaseFields.add(caseField);
+                        break;
+                    case COMPLEX:
+                    case COLLECTION:
+                        if(caseField.getFieldType().getCollectionFieldType() != null) {
+                            if (caseField.getFieldType().getCollectionFieldType().getComplexFields() != null) {
+                                extractDocumentFieldsFromCaseDefinition(
+                                    caseField.getFieldType().getCollectionFieldType().getComplexFields(), documentCaseFields);
+                            }
+                            if (caseField.getFieldType().getCollectionFieldType().getCollectionFieldType() != null) {
+                                extractDocumentFieldsFromCaseDefinition(
+                                    caseField.getFieldType().getCollectionFieldType().getCollectionFieldType().getComplexFields(), documentCaseFields);
+                            }
+                        }
+                        extractDocumentFieldsFromCaseDefinition(caseField.getFieldType().getComplexFields(), documentCaseFields);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
