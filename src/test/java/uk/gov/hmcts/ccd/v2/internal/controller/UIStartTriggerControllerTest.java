@@ -128,9 +128,6 @@ class UIStartTriggerControllerTest {
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
                         .getComplexFieldOverrides().get(0),
                     hasProperty("showCondition", CoreMatchers.nullValue())),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldOverrides().get(0),
-                    hasProperty("displayContextParameter", CoreMatchers.nullValue())),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
