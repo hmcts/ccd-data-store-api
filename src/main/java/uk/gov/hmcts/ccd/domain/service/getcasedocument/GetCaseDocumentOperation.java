@@ -165,7 +165,6 @@ public class GetCaseDocumentOperation {
                     String.format("No document found for this case reference: %s",
                         caseDetails.getReferenceAsString()));
             }
-
         } else {
             throw new CaseDocumentNotFoundException(
                 String.format("No document found for this case reference: %s", caseDetails.getReferenceAsString()));
