@@ -6,29 +6,26 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 
-import lombok.extern.slf4j.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 public class DateTimeFormatParser {
 
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public String convertDateTimeToIso8601(String dateTimeFormat, String value) {
         LocalDateTime dateTime;
         try {
-            dateTimeFormat = ((dateTimeFormat == null) ? DATE_TIME_FORMAT : dateTimeFormat);
-            DateTimeFormatter inputFormat = getDateTimeFormatter(dateTimeFormat);
+            DateTimeFormatter inputFormat = (dateTimeFormat == null) ? DATE_TIME_FORMAT : getDateTimeFormatter(dateTimeFormat);
             dateTime = LocalDateTime.parse(value, inputFormat);
         } catch (Exception e) {
             log.warn("Failed to parse following dateTime value {} with format {} attempting to parse with {}", value, dateTimeFormat, DATE_TIME_FORMAT);
-            dateTimeFormat = DATE_TIME_FORMAT;
-            DateTimeFormatter inputFormat = getDateTimeFormatter(dateTimeFormat);
-            dateTime = LocalDateTime.parse(value, inputFormat);
+            dateTime = LocalDateTime.parse(value, DATE_TIME_FORMAT);
         }
-        return dateTime.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+        return dateTime.format(DATE_TIME_FORMAT);
     }
 
     private DateTimeFormatter getDateTimeFormatter(String dateTimeFormat) {
@@ -47,16 +44,13 @@ public class DateTimeFormatParser {
     public String convertDateToIso8601(String dateFormat, String value) {
         LocalDate date;
         try {
-            dateFormat = ((dateFormat == null) ? DATE_FORMAT : dateFormat);
-            DateTimeFormatter inputFormat = getDateFormatter(dateFormat);
+            DateTimeFormatter inputFormat = (dateFormat == null) ? DATE_FORMAT : getDateFormatter(dateFormat);
             date = LocalDate.parse(value, inputFormat);
         } catch (Exception e) {
             log.warn("Failed to parse following date value {} with format {} attempting to parse with {}", value, dateFormat, DATE_FORMAT);
-            dateFormat = DATE_FORMAT;
-            DateTimeFormatter inputFormat = getDateFormatter(dateFormat);
-            date = LocalDate.parse(value, inputFormat);
+            date = LocalDate.parse(value, DATE_FORMAT);
         }
-        return date.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
+        return date.format(DATE_FORMAT);
     }
 
     private DateTimeFormatter getDateFormatter(String dateFormat) {
