@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -176,8 +176,16 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields(),
+                is(not(sameInstance(searchResultView.getSearchResultViewItems().get(0).getCaseFieldsFormatted())))),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields(),
+                is(not(sameInstance(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted())))),
             () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
             () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFieldsFormatted().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()),
+                is(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted().get(STATE.getReference()))),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
                  );
     }

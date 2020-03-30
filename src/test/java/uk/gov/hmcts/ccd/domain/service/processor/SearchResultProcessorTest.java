@@ -48,7 +48,7 @@ class SearchResultProcessorTest {
         caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
         caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
         caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
-        SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields);
+        SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields));
         viewItems.add(item);
     }
 
@@ -65,8 +65,11 @@ class SearchResultProcessorTest {
         assertAll(
             () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
             () -> assertThat(itemResult.getCaseFields().size(), is(3)),
-            () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATE_FIELD)).asText(), is("01/10/2020")),
-            () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATETIME_FIELD)).asText(), is("30121985")),
+            () -> assertThat(((TextNode)itemResult.getCaseFieldsFormatted().get(DATE_FIELD)).asText(), is("01/10/2020")),
+            () -> assertThat(((TextNode)itemResult.getCaseFieldsFormatted().get(DATETIME_FIELD)).asText(), is("30121985")),
+            () -> assertThat(((TextNode)itemResult.getCaseFieldsFormatted().get(TEXT_FIELD)).asText(), is("Text Value")),
+            () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATE_FIELD)).asText(), is("2020-10-01")),
+            () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATETIME_FIELD)).asText(), is("1985-12-30")),
             () -> assertThat(((TextNode)itemResult.getCaseFields().get(TEXT_FIELD)).asText(), is("Text Value"))
         );
     }

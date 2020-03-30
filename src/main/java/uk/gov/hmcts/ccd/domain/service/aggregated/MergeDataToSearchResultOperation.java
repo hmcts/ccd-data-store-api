@@ -114,7 +114,7 @@ public class MergeDataToSearchResultOperation {
         Map<String, Object> caseFields = prepareData(searchResult, caseData, caseMetadata, labels);
 
         String caseId = caseDetails.hasCaseReference() ? caseDetails.getReferenceAsString() : caseDetails.getId();
-        return new SearchResultViewItem(caseId, caseFields);
+        return new SearchResultViewItem(caseId, caseFields, new HashMap<>(caseFields));
     }
 
     private Map<String, Object> prepareData(SearchResult searchResult,

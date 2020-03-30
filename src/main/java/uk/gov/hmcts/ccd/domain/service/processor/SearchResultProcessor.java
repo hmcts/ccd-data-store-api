@@ -46,7 +46,7 @@ public class SearchResultProcessor {
     private SearchResultViewItem processSearchResultViewItem(SearchResultViewItem viewItem, SearchResultViewColumn viewColumn) {
         return DisplayContextParameter.getDisplayContextParameterOfType(viewColumn.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEDISPLAY)
             .map(dcp ->  {
-                viewItem.getCaseFields().replace(viewColumn.getCaseFieldId(),
+                viewItem.getCaseFieldsFormatted().replace(viewColumn.getCaseFieldId(),
                     processNode(viewItem.getCaseFields().get(viewColumn.getCaseFieldId()), dcp.getValue(), viewColumn.getCaseFieldType()));
                 return viewItem;
             })
