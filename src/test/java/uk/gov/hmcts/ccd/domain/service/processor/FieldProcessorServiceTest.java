@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 class FieldProcessorServiceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {};
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {};
     private static final String CASE_TYPE_ID = "CaseType";
     private static final String EVENT_ID = "EventId";
     private static final String ID1 = "ID1";
