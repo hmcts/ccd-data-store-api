@@ -5,12 +5,9 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,6 +47,8 @@ public class GetCaseDocumentOperation {
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
     public static final String DOCUMENT = "Document";
+    public static final String DOCUMENT_CASE_FIELD_URL_ATTRIBUTE = "document_url";
+    public static final String DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE = "document_binary_url";
     public static final String BAD_REQUEST_EXCEPTION_DOCUMENT_INVALID = "DocumentId is not valid";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -93,25 +92,25 @@ public class GetCaseDocumentOperation {
 
     }
 
-    public CaseDocument getCaseDocument(CaseDetails caseDetails, String documentId) {
+    private CaseDocument getCaseDocument(CaseDetails caseDetails, String documentId) {
 
         String caseTypeId = caseDetails.getCaseTypeId();
         String jurisdictionId = caseDetails.getJurisdiction();
         final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
 
         List<CaseField> documentCaseFields = new ArrayList<>();
-        List<CaseField> complexCaseFieldList = caseType.getCaseFields()
+        List<CaseField> documentAndComplexFields = caseType.getCaseFields()
             .stream()
             .filter(caseField -> (DOCUMENT.equalsIgnoreCase(caseField.getFieldType().getType())) ||
                                  (COMPLEX.equalsIgnoreCase(caseField.getFieldType().getType())) ||
                                  (COLLECTION.equalsIgnoreCase(caseField.getFieldType().getType())))
             .collect(Collectors.toList());
 
-        if (complexCaseFieldList.isEmpty()) {
+        if (documentAndComplexFields.isEmpty()) {
             throw new CaseDocumentNotFoundException(String.format("No document field found for CaseType : %s", caseType.getId()));
         }
 
-        extractDocumentFieldsFromCaseDefinition(complexCaseFieldList, documentCaseFields);
+        extractDocumentFieldsFromCaseDefinition(documentAndComplexFields, documentCaseFields);
         JsonNode documentFieldsWithReadPermission = getDocumentFieldsWithReadPermission(caseDetails, documentCaseFields)
             .orElseThrow((() -> new CaseDocumentNotFoundException("User does not has read permissions on any document field")));
 
@@ -131,23 +130,16 @@ public class GetCaseDocumentOperation {
         }
     }
 
-    private String getDocumentUrl(String documentId, JsonNode readPermission) {
-        String urlPatternString = "^(?:\\/\\/|[^\\/]+)*\\/documents\\/[a-zA-Z0-9-]{36}";
-        Pattern pattern = Pattern.compile(urlPatternString);
-
-        for (JsonNode jsonNode : readPermission) {
-            //within jsonNode, get the documentId exists
-            //directly check for binary_url key //extract the document ID
-
-
-            Iterator<Map.Entry<String, JsonNode>> iterator = jsonNode.fields();
-            while (iterator.hasNext()) {
-                Map.Entry<String, JsonNode> entry = iterator.next();
-                if (entry.getValue().asText().contains(documentId)
-                    && entry.getKey().toUpperCase().contains("URL")
-                    && pattern.matcher(entry.getValue().asText()).matches()) {
-                    return entry.getValue().asText();
-                }
+    private String getDocumentUrl(String documentId, JsonNode documentFieldsWithReadPermission) {
+        for (JsonNode jsonNode : documentFieldsWithReadPermission) {
+            if (jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null
+                && jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE).asText().contains(documentId)) {
+                String binaryUrl = jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE).asText();
+                return binaryUrl.substring(binaryUrl.length() - 43, binaryUrl.length() - 7);
+            } else if (jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null
+                       && jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText().contains(documentId)) {
+                String documentUrl = jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText();
+                return documentUrl.substring(documentUrl.length() - 36);
             }
         }
         return null;
