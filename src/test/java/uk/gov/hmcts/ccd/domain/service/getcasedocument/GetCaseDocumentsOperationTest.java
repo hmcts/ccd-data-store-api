@@ -229,6 +229,25 @@ public class GetCaseDocumentsOperationTest {
                      );
         }
 
+        @Test
+        @DisplayName("should throw CaseDocumentNotFoundException for no qualifying document fields")
+        void shouldThrowCaseDocumentNotFoundException() throws IOException {
+
+            caseDetails = new CaseDetails();
+            caseDetails.setJurisdiction(JURISDICTION_ID);
+            caseDetails.setCaseTypeId(CASE_TYPE_ID);
+            caseDetails.setId(CASE_REFERENCE);
+            caseDetails.setReference(new Long(CASE_REFERENCE));
+            caseDetails.setState("state1");
+
+            doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+            caseType.setCaseFields(Collections.emptyList());
+            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+
+            assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
+        }
+
         private Map<String, JsonNode> buildData(String... dataFieldIds) {
             Map<String, JsonNode> dataMap = new HashMap<>();
             asList(dataFieldIds).forEach(dataFieldId -> {
