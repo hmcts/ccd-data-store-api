@@ -1,5 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +30,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class GetCaseDocumentOperation {
@@ -68,18 +68,18 @@ public class GetCaseDocumentOperation {
         }
 
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
-            .orElseThrow(() -> new CaseNotFoundException(caseId));
+                                                             .orElseThrow(() -> new CaseNotFoundException(caseId));
 
-        if (caseDetails.getReferenceAsString().isEmpty()){
+        if (caseDetails.getReferenceAsString().isEmpty()) {
             throw new CaseNotFoundException(caseId);
         }
 
         return CaseDocumentMetadata.builder()
-            .caseId(caseDetails.getReferenceAsString())
-            .caseTypeId(caseDetails.getCaseTypeId())
-            .jurisdictionId(caseDetails.getJurisdiction())
-            .document(getCaseDocument(caseDetails, documentId))
-            .build();
+                                   .caseId(caseDetails.getReferenceAsString())
+                                   .caseTypeId(caseDetails.getCaseTypeId())
+                                   .jurisdictionId(caseDetails.getJurisdiction())
+                                   .document(getCaseDocument(caseDetails, documentId))
+                                   .build();
 
     }
 
@@ -95,14 +95,14 @@ public class GetCaseDocumentOperation {
         //Step4 : Add all the document field list together
         List<CaseField> finalDocumentCaseFields = Collections.<CaseField>emptyList();
         List<CaseField> complexCaseFieldList = caseType.getCaseFields()
-            .stream()
-            .filter(f -> ("complex".equalsIgnoreCase(f.getFieldType().getType())) &&
-                (f.getFieldType().getComplexFields().size() > 0))
-            .flatMap(x -> (x.getFieldType().getComplexFields())
-                .stream()
-                .filter(y -> ("document".equalsIgnoreCase(y.getFieldType().getType())) ||
-                    ("complex".equalsIgnoreCase(y.getFieldType().getType()))))
-            .collect(Collectors.toList());
+                                                       .stream()
+                                                       .filter(f -> ("complex".equalsIgnoreCase(f.getFieldType().getType())) &&
+                                                                    (f.getFieldType().getComplexFields().size() > 0))
+                                                       .flatMap(x -> (x.getFieldType().getComplexFields())
+                                                           .stream()
+                                                           .filter(y -> ("document".equalsIgnoreCase(y.getFieldType().getType())) ||
+                                                                        ("complex".equalsIgnoreCase(y.getFieldType().getType()))))
+                                                       .collect(Collectors.toList());
 
         //If this list contains any caseField with complex caseField again then repeat the above step to extract the full list of document casefields.
         finalDocumentCaseFields.addAll(complexCaseFieldList);
@@ -111,11 +111,11 @@ public class GetCaseDocumentOperation {
         //Step2
         // Collection Case fields having collection field type as document.
         List<CaseField> collectionCaseFields = caseType.getCaseFields()
-            .stream()
-            .filter(f -> ("collection".equalsIgnoreCase(f.getFieldType().getType())) &&
-                (("document".equalsIgnoreCase(f.getFieldType().getCollectionFieldType().getType())) ||
-                ("collection".equalsIgnoreCase(f.getFieldType().getCollectionFieldType().getType()))))
-            .collect(Collectors.toList());
+                                                       .stream()
+                                                       .filter(f -> ("collection".equalsIgnoreCase(f.getFieldType().getType())) &&
+                                                                    (("document".equalsIgnoreCase(f.getFieldType().getCollectionFieldType().getType())) ||
+                                                                     ("collection".equalsIgnoreCase(f.getFieldType().getCollectionFieldType().getType()))))
+                                                       .collect(Collectors.toList());
 
         //If this list contains collection casefield again then repeat the above step to extract the full list of document casefields.
         finalDocumentCaseFields.addAll(collectionCaseFields);
@@ -123,9 +123,9 @@ public class GetCaseDocumentOperation {
 
         //Step3 List of root level document case field.
         List<CaseField> documentCaseFields = caseType.getCaseFields()
-            .stream()
-            .filter(f -> "Document".equalsIgnoreCase(f.getFieldType().getType()))
-            .collect(Collectors.toList());
+                                                     .stream()
+                                                     .filter(f -> "Document".equalsIgnoreCase(f.getFieldType().getType()))
+                                                     .collect(Collectors.toList());
         finalDocumentCaseFields.addAll(documentCaseFields);
 
 
@@ -154,16 +154,16 @@ public class GetCaseDocumentOperation {
 
                 //build caseDocument and set permissions
                 return CaseDocument.builder()
-                    .id(documentId)
-                    .url(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText())
-                    .name(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE).asText())
-                    .type(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE)
-                    .permissions(getDocumentPermissions(userACLOnCaseField.get()))
-                    .build();
+                                   .id(documentId)
+                                   .url(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText())
+                                   .name(caseData.get(documentField).get(DOCUMENT_CASE_FIELD_NAME_ATTRIBUTE).asText())
+                                   .type(DOCUMENT_CASE_FIELD_TYPE_ATTRIBUTE)
+                                   .permissions(getDocumentPermissions(userACLOnCaseField.get()))
+                                   .build();
             } else {
                 throw new CaseDocumentNotFoundException(
                     String.format("No document found for this case reference: %s",
-                        caseDetails.getReferenceAsString()));
+                                  caseDetails.getReferenceAsString()));
             }
         } else {
             throw new CaseDocumentNotFoundException(
@@ -188,9 +188,9 @@ public class GetCaseDocumentOperation {
                 Optional<AccessControlList> userACLOnCaseField = Optional.empty();
                 for (String role : roles) {
                     userACLOnCaseField = documentCaseField.get().getAccessControlLists()
-                        .stream()
-                        .filter(acl -> acl.getRole().equalsIgnoreCase(role))
-                        .findFirst();
+                                                          .stream()
+                                                          .filter(acl -> acl.getRole().equalsIgnoreCase(role))
+                                                          .findFirst();
                     if (userACLOnCaseField.isPresent()) {
                         return userACLOnCaseField;
                     }
@@ -199,7 +199,7 @@ public class GetCaseDocumentOperation {
             } else {
                 throw new CaseDocumentNotFoundException(
                     String.format("No valid user role found for this case reference: %s",
-                        caseDetails.getReferenceAsString()));
+                                  caseDetails.getReferenceAsString()));
             }
         } else {
             throw new CaseDocumentNotFoundException(
@@ -209,17 +209,17 @@ public class GetCaseDocumentOperation {
 
     private Set<String> getUserRoles(String caseId) {
         return Sets.union(userRepository.getUserRoles(),
-            new HashSet<>(caseUserRepository
-                .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())));
+                          new HashSet<>(caseUserRepository
+                                            .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())));
     }
 
     private String getDocumentCaseField(Map<String, JsonNode> caseData, String documentId) {
         for (Map.Entry<String, JsonNode> entry : caseData.entrySet()) {
-            if (entry.getValue().isNull()){
+            if (entry.getValue().isNull()) {
                 return null;
             }
             if (entry.getValue().getNodeType().toString()
-                .equals("OBJECT") && entry.getValue().toString().contains(documentId)) {
+                     .equals("OBJECT") && entry.getValue().toString().contains(documentId)) {
                 return entry.getKey();
             }
         }
