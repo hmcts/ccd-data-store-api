@@ -154,7 +154,7 @@ public class GetCaseDocumentOperation {
                         break;
                     case COMPLEX:
                     case COLLECTION:
-                        if(caseField.getFieldType().getCollectionFieldType() != null) {
+                        if (caseField.getFieldType().getCollectionFieldType() != null) {
                             if (caseField.getFieldType().getCollectionFieldType().getComplexFields() != null) {
                                 extractDocumentFieldsFromCaseDefinition(
                                     caseField.getFieldType().getCollectionFieldType().getComplexFields(), documentCaseFields);

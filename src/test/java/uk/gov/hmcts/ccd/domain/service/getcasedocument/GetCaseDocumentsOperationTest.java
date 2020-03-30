@@ -1,8 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
@@ -27,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
@@ -151,7 +156,7 @@ public class GetCaseDocumentsOperationTest {
 
         }
 
-        /*@Test
+        @Test
         @DisplayName("should return CaseDocumentMetadata")
         void shouldCallGetCaseDocumentMetadata() throws IOException {
 
@@ -186,7 +191,7 @@ public class GetCaseDocumentsOperationTest {
 
             doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-            caseType.setCaseFields(singletonList(CASE_FIELD));
+            caseType.setCaseFields(Collections.singletonList(CASE_FIELD));
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             doReturn(new ObjectMapper().readTree("{  \"DocumentField1\": { "
@@ -213,7 +218,7 @@ public class GetCaseDocumentsOperationTest {
                 ArgumentMatchers.any(JsonNode.class),
                 ArgumentMatchers.any(List.class),
                 ArgumentMatchers.any(Set.class),
-                eq(CAN_READ),
+                eq(AccessControlService.CAN_READ),
                 anyBoolean());
 
             CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
@@ -222,7 +227,7 @@ public class GetCaseDocumentsOperationTest {
                 () -> assertThat(caseDocumentMetadata.getCaseTypeId(), is(caseDetails.getCaseTypeId())),
                 () -> assertThat(caseDocumentMetadata.getJurisdictionId(), is(caseDetails.getJurisdiction()))
                      );
-        }*/
+        }
 
         private Map<String, JsonNode> buildData(String... dataFieldIds) {
             Map<String, JsonNode> dataMap = new HashMap<>();
