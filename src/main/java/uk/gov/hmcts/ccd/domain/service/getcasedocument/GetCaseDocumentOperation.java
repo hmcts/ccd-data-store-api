@@ -93,7 +93,7 @@ public class GetCaseDocumentOperation {
         //Step1
         //Extract the list of complex case Fields having document casefields or comlex casefields
         //Step4 : Add all the document field list together
-        List<CaseField> finalDocumentCaseFields = Collections.<CaseField>emptyList();
+        List<CaseField> finalDocumentCaseFields = new ArrayList<>();
         List<CaseField> complexCaseFieldList = caseType.getCaseFields()
                                                        .stream()
                                                        .filter(f -> ("complex".equalsIgnoreCase(f.getFieldType().getType())) &&
