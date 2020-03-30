@@ -2,9 +2,11 @@ package uk.gov.hmcts.ccd.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+
 
 public class JacksonUtils {
 
@@ -19,4 +21,13 @@ public class JacksonUtils {
         .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
         .build();
 
+
+    public static final <T> TypeReference<T> getNewTypeReference() {
+        return new TypeReference<T>() {
+        };
+    }
+
+    public static <T> T convertValue(Object from) {
+        return MAPPER_INSTANCE.convertValue(from, getNewTypeReference());
+    }
 }
