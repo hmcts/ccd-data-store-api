@@ -136,6 +136,10 @@ public class GetCaseDocumentOperation {
         Pattern pattern = Pattern.compile(urlPatternString);
 
         for (JsonNode jsonNode : readPermission) {
+            //within jsonNode, get the documentId exists
+            //directly check for binary_url key //extract the document ID
+
+
             Iterator<Map.Entry<String, JsonNode>> iterator = jsonNode.fields();
             while (iterator.hasNext()) {
                 Map.Entry<String, JsonNode> entry = iterator.next();
@@ -157,6 +161,7 @@ public class GetCaseDocumentOperation {
                     break;
                 case COMPLEX:
                 case COLLECTION:
+                    //collection can have documents , another complex, another collection,
                     extractDocumentFieldsFromCaseDefinition(caseField.getFieldType().getComplexFields(), documentCaseFields);
                     break;
                 default:
