@@ -4238,35 +4238,35 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private String exampleDataWithInvalidPostcode() {
-        return "{" +
-            "\"PersonAddress\":{" +
-            "\"Country\":\"_ Wales\"," +
-            "\"Postcode\":\"W11225DF\"," +
-            "\"AddressLine1\":\"_ Flat 9\"," +
-            "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
-            "\"AddressLine3\":\"_ ButtonVillie\"}," +
-            "\"PersonLastName\":\"_ Roof\"," +
-            "\"PersonFirstName\":\"_ George\"," +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}" +
-            "}";
+        return "{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"W11225DF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine2\":\"_ 2 Hubble Avenue\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
     }
 
     private String exampleData() {
-        return "{" +
-            "\"PersonAddress\":{" +
-            "\"Country\":\"_ Wales\"," +
-            "\"Postcode\":\"W11 5DF\"," +
-            "\"AddressLine1\":\"_ Flat 9\"," +
-            "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
-            "\"AddressLine3\":\"_ ButtonVillie\"}," +
-            "\"PersonLastName\":\"_ Roof\"," +
-            "\"PersonFirstName\":\"_ George\"," +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}" +
-            "}";
+        return "{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"W11 5DF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine2\":\"_ 2 Hubble Avenue\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+            "}"
+            + "}";
     }
 
     @Test
@@ -4358,51 +4358,51 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private String requestBodyJsonMultiPage() {
-        return "{\n" +
-            "  \"case_details\" : {\n" +
-            "    \"id\" : null,\n" +
-            "    \"jurisdiction\" : \"PROBATE\",\n" +
-            "    \"state\" : null,\n" +
-            "    \"version\" : null,\n" +
-            "    \"case_type_id\" : \"TestAddressBookCaseValidateMultiPage\",\n" +
-            "    \"created_date\" : null,\n" +
-            "    \"last_modified\" : null,\n" +
-            "    \"last_state_modified_date\" : null,\n" +
-            "    \"security_classification\" : null,\n" +
-            "    \"case_data\" : {\n" +
-            "      \"PersonLastName\" : \"_ Roof\",\n" +
-            "      \"CaseNumber\" : \"_ 1234567\",\n" +
-            "      \"PersonFirstName\" : \"_ George\",\n" +
-            "      \"TelephoneNumber\" : \"_ 07865645667\",\n" +
-            "      \"D8Document\" : {\n" +
-            "        \"document_url\" : \"http://localhost:" + this.getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"\n" +
-            "      }\n" +
-            "    },\n" +
-            "    \"data_classification\" : null,\n" +
-            "    \"after_submit_callback_response\" : null,\n" +
-            "    \"callback_response_status_code\" : null,\n" +
-            "    \"callback_response_status\" : null,\n" +
-            "    \"delete_draft_response_status_code\" : null,\n" +
-            "    \"delete_draft_response_status\" : null,\n" +
-            "    \"security_classifications\" : null\n" +
-            "  },\n" +
-            "  \"case_details_before\" : null,\n" +
-            "  \"event_id\" : \"TEST_EVENT\",\n" +
-            "  \"ignore_warning\" : false\n" +
-            "}";
+        return "{\n"
+            + "  \"case_details\" : {\n"
+            + "    \"id\" : null,\n"
+            + "    \"jurisdiction\" : \"PROBATE\",\n"
+            + "    \"state\" : null,\n"
+            + "    \"version\" : null,\n"
+            + "    \"case_type_id\" : \"TestAddressBookCaseValidateMultiPage\",\n"
+            + "    \"created_date\" : null,\n"
+            + "    \"last_modified\" : null,\n"
+            + "    \"last_state_modified_date\" : null,\n"
+            + "    \"security_classification\" : null,\n"
+            + "    \"case_data\" : {\n"
+            + "      \"PersonLastName\" : \"_ Roof\",\n"
+            + "      \"CaseNumber\" : \"_ 1234567\",\n"
+            + "      \"PersonFirstName\" : \"_ George\",\n"
+            + "      \"TelephoneNumber\" : \"_ 07865645667\",\n"
+            + "      \"D8Document\" : {\n"
+            + "        \"document_url\" : \"http://localhost:" + this.getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"\n"
+            + "      }\n"
+            + "    },\n"
+            + "    \"data_classification\" : null,\n"
+            + "    \"after_submit_callback_response\" : null,\n"
+            + "    \"callback_response_status_code\" : null,\n"
+            + "    \"callback_response_status\" : null,\n"
+            + "    \"delete_draft_response_status_code\" : null,\n"
+            + "    \"delete_draft_response_status\" : null,\n"
+            + "    \"security_classifications\" : null\n"
+            + "  },\n"
+            + "  \"case_details_before\" : null,\n"
+            + "  \"event_id\" : \"TEST_EVENT\",\n"
+            + "  \"ignore_warning\" : false\n"
+            + "}";
     }
 
     private String requestBodyJson() {
-       return "{\"case_details\":{\"id\":null,\"jurisdiction\":\"PROBATE\",\"state\":null,\"version\":null," +
-           "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null," +
-           "\"last_state_modified_date\":null,\"security_classification\":null,\"case_data\":{\"PersonLastName" +
-           "\":\"_ Roof\",\"PersonFirstName\":\"_ George\"," +
-           "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}}," +
-           "\"data_classification\":null,\"after_submit_callback_response\":null," +
-           "\"callback_response_status_code\":null,\"callback_response_status\":null," +
-           "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null," +
-           "\"security_classifications\":null},\"case_details_before\":null," +
-           "\"event_id\":\"TEST_EVENT\",\"ignore_warning\":false}";
+       return "{\"case_details\":{\"id\":null,\"jurisdiction\":\"PROBATE\",\"state\":null,\"version\":null,"
+           + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
+           + "\"last_state_modified_date\":null,\"security_classification\":null,\"case_data\":{\"PersonLastName"
+           + "\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
+           + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}},"
+           + "\"data_classification\":null,\"after_submit_callback_response\":null,"
+           + "\"callback_response_status_code\":null,\"callback_response_status\":null,"
+           + "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null,"
+           + "\"security_classifications\":null},\"case_details_before\":null,"
+           + "\"event_id\":\"TEST_EVENT\",\"ignore_warning\":false}";
     }
 
     private WizardPageCollection createWizardPageCollection(String eventCallBackURI) {
@@ -4438,66 +4438,66 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private String expectedCaseData() {
-        return "{" +
-            "\"PersonLastName\":\"Roof\"," +
-            "\"PersonFirstName\":\"George\"" +
-            "}";
+        return "{"
+            + "\"PersonLastName\":\"Roof\","
+            + "\"PersonFirstName\":\"George\""
+            + "}";
     }
 
     private String expectedCaseDataMultiPage() {
-        return "{\n" +
-            "\t\"PersonLastName\": \"Roof\",\n" +
-            "\t\"CaseNumber\": \"1234567\",\n" +
-            "\t\"PersonFirstName\": \"George\",\n" +
-            "\t\"TelephoneNumber\": \"07865645667\"\n" +
-            "}";
+        return "{\n"
+            + "\t\"PersonLastName\": \"Roof\",\n"
+            + "\t\"CaseNumber\": \"1234567\",\n"
+            + "\t\"PersonFirstName\": \"George\",\n"
+            + "\t\"TelephoneNumber\": \"07865645667\"\n"
+            + "}";
     }
 
     private String secondPageData() {
-        return "{" +
-            "\"CaseNumber\":\"_ 1234567\"," +
-            "\"TelephoneNumber\":\"_ 07865645667\"," +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}" +
-            "}";
+        return "{"
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
     }
 
     private String exampleEventDataMultiPages() {
-        return "{" +
-            "\"PersonLastName\":\"_ Roof\"," +
-            "\"PersonFirstName\":\"_ George\"," +
-            "\"CaseNumber\":\"_ 1234567\"," +
-            "\"TelephoneNumber\":\"_ 07865645667\"," +
-            "\"CaseField31\":\"_ Test123\"," +
-            "\"CaseField32\":\"_ Test765\"," +
-            "\"CaseField41\":\"_ Test987\"," +
-            "\"CaseField42\":\"_ Test567\"," +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}" +
-            "}";
+        return "{"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"CaseField31\":\"_ Test123\","
+            + "\"CaseField32\":\"_ Test765\","
+            + "\"CaseField41\":\"_ Test987\","
+            + "\"CaseField42\":\"_ Test567\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
     }
 
     private String exampleCaseData() {
-        return "{" +
-            "\"PersonLastName\":\"Roof\"," +
-            "\"PersonFirstName\":\"George\"," +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}" +
-            "}";
+        return "{"
+            + "\"PersonLastName\":\"Roof\","
+            + "\"PersonFirstName\":\"George\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
     }
 
     private String exampleEventData() {
-        return "{" +
-            "\"PersonLastName\":\"_ Roof\"," +
-            "\"PersonFirstName\":\"_ George\"," +
-            "\"CaseNumber\":\"_ 1234567\"," +
-            "\"TelephoneNumber\":\"_ 07865645667\"," +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}" +
-            "}";
+        return "{"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
     }
 }
