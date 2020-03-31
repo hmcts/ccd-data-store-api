@@ -22,7 +22,7 @@ import java.nio.file.Paths;
 @SpringJUnitWebConfig
 @SpringBootTest
 @AutoConfigureMockMvc
-public class SwaggerPublisherTest {
+public class SwaggerGeneratorTest {
 
     private MockMvc mvc;
 
@@ -33,7 +33,6 @@ public class SwaggerPublisherTest {
     public void setup() {
         this.mvc = webAppContextSetup(webAppContext).build();
     }
-
 
     @DisplayName("Generate swagger documentation")
     @Test

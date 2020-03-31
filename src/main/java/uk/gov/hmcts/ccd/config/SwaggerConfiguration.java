@@ -26,8 +26,9 @@ public class SwaggerConfiguration {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2).select()
-                .apis(RequestHandlerSelectors.basePackage(CoreCaseDataApplication.class.getPackage().getName())).build()
-                .useDefaultResponseMessages(false);
+            .apis(RequestHandlerSelectors.basePackage(CoreCaseDataApplication.class.getPackage().getName()))
+            .build()
+            .useDefaultResponseMessages(false);
     }
 
     @Bean
@@ -38,7 +39,7 @@ public class SwaggerConfiguration {
             .apis(RequestHandlerSelectors.basePackage(CaseDetailsEndpoint.class.getPackage().getName()))
             .build()
             .useDefaultResponseMessages(false)
-                .apiInfo(apiInfo());
+            .apiInfo(apiInfo());
     }
 
     private ApiInfo apiInfo() {
