@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -64,8 +65,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<HttpError> handleCaseValidationException(HttpServletRequest request, CaseValidationException exception) {
 
         // read field IDs from CaseValidationException.details (i.e. avoid using full error details as this may contain user data)
-        String detailsJson =  this.objectMapperService.convertObjectToString(exception.getDetails());
-        List<String> fieldIds = JsonPath.read(detailsJson, "$..field_errors[*].id");
+        List<String> fieldIds = new ArrayList<>();
+        if (exception.getDetails() != null) {
+            String detailsJson = this.objectMapperService.convertObjectToString(exception.getDetails());
+            fieldIds = JsonPath.read(detailsJson, "$..field_errors[*].id");
+        }
 
         Map<String, String> customProperties = new HashMap<>();
         customProperties.put("CaseValidationError field IDs", Arrays.toString(fieldIds.toArray()));
