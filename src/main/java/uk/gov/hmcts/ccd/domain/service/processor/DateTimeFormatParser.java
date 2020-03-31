@@ -54,8 +54,8 @@ public class DateTimeFormatParser {
         return new DateTimeFormatterBuilder()
             .appendPattern(dateTimeFormat)
             .parseDefaulting(ChronoField.YEAR_OF_ERA, LocalDate.now().getYear())
-            .parseDefaulting(ChronoField.MONTH_OF_YEAR, LocalDate.now().getMonthValue())
-            .parseDefaulting(ChronoField.DAY_OF_MONTH, LocalDate.now().getDayOfMonth())
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
@@ -67,8 +67,8 @@ public class DateTimeFormatParser {
         return new DateTimeFormatterBuilder()
             .appendPattern(dateFormat)
             .parseDefaulting(ChronoField.YEAR_OF_ERA, LocalDate.now().getYear())
-            .parseDefaulting(ChronoField.MONTH_OF_YEAR, LocalDate.now().getMonthValue())
-            .parseDefaulting(ChronoField.DAY_OF_MONTH, LocalDate.now().getDayOfMonth())
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
             .toFormatter();
     }
 }
