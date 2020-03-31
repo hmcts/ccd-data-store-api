@@ -26,7 +26,7 @@ public class SecurityValidationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityValidationService.class);
 
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data validation error (c)";

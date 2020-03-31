@@ -55,7 +55,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 
 class AuthorisedStartEventOperationTest {
 
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_REFERENCE = "1234123412341234";

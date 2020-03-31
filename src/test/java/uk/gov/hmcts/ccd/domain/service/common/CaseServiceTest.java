@@ -47,7 +47,7 @@ class CaseServiceTest {
     private static final String OTHER_NAME = "John";
     private static final String CASE_ID = "299";
     private final Map<String, JsonNode> data = new HashMap<>();
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private CaseDataService caseDataService;
 
     @Mock

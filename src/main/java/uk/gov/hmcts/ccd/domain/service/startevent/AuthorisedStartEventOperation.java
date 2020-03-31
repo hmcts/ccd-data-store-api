@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 @Qualifier("authorised")
 public class AuthorisedStartEventOperation implements StartEventOperation {
 
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final StartEventOperation startEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDetailsRepository caseDetailsRepository;

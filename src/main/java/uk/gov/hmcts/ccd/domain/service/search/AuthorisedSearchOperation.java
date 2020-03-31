@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation.Q
 @Qualifier(QUALIFIER)
 public class AuthorisedSearchOperation implements SearchOperation {
     public static final String QUALIFIER = "authorised";
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
 
     private final SearchOperation searchOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;

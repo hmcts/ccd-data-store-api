@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @Named
 @Singleton
 public class CaseAuditEventMapper {
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
 
     public AuditEvent entityToModel(final CaseAuditEventEntity caseAuditEventEntity) {
         final AuditEvent auditEvent = new AuditEvent();

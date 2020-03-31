@@ -1,23 +1,19 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @Named
 @Singleton
 public class CaseDetailsMapper {
-
-    private static final ObjectMapper mapper = new ObjectMapper();
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
 
     public CaseDetails entityToModel(final CaseDetailsEntity caseDetailsEntity) {
         if (caseDetailsEntity == null) {
@@ -36,10 +32,8 @@ public class CaseDetailsMapper {
         caseDetails.setSecurityClassification(caseDetailsEntity.getSecurityClassification());
         caseDetails.setVersion(caseDetailsEntity.getVersion());
         if (caseDetailsEntity.getData() != null) {
-            caseDetails.setData(mapper.convertValue(caseDetailsEntity.getData(), new TypeReference<HashMap<String, JsonNode>>() {
-            }));
-            caseDetails.setDataClassification(mapper.convertValue(caseDetailsEntity.getDataClassification(), new TypeReference<HashMap<String, JsonNode>>() {
-            }));
+            caseDetails.setData(JacksonUtils.convertValue(caseDetailsEntity.getData()));
+            caseDetails.setDataClassification(JacksonUtils.convertValue(caseDetailsEntity.getDataClassification()));
         }
         return caseDetails;
     }
@@ -60,10 +54,10 @@ public class CaseDetailsMapper {
         newCaseDetailsEntity.setSecurityClassification(caseDetails.getSecurityClassification());
         newCaseDetailsEntity.setVersion(caseDetails.getVersion());
         if (caseDetails.getData() == null) {
-            newCaseDetailsEntity.setData(mapper.createObjectNode());
+            newCaseDetailsEntity.setData(MAPPER.createObjectNode());
         } else {
-            newCaseDetailsEntity.setData(mapper.convertValue(caseDetails.getData(), JsonNode.class));
-            newCaseDetailsEntity.setDataClassification(mapper.convertValue(caseDetails.getDataClassification(), JsonNode.class));
+            newCaseDetailsEntity.setData(MAPPER.convertValue(caseDetails.getData(), JsonNode.class));
+            newCaseDetailsEntity.setDataClassification(MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class));
         }
         return newCaseDetailsEntity;
     }

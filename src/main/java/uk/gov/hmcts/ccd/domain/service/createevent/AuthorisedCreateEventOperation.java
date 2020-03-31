@@ -30,7 +30,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
 
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final CreateEventOperation createEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final GetCaseOperation getCaseOperation;

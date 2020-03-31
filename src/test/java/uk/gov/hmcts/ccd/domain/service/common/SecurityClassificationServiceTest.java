@@ -44,7 +44,7 @@ public class SecurityClassificationServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String JURISDICTION_ID = "PROBATE";
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
 
     private SecurityClassificationService securityClassificationService;
 

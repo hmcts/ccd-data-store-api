@@ -27,7 +27,7 @@ import java.util.HashMap;
 @RestController
 @RequestMapping(path = "/case-types")
 public class CaseDataValidatorController {
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final MidEventCallback midEventCallback;
 

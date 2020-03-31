@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class CaseDataValidatorTest extends WireMockBaseTest {
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private static final String CASE_FIELD_JSON = "/tests/CaseDataValidator_CaseField.json";
     private static String CASE_FIELDS_STRING;
 

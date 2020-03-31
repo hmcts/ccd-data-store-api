@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class CompoundAccessControlServiceTest {
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private CompoundAccessControlService compoundAccessControlService;
     private static final String newAddress1 = "      {\n"
         + "        \"value\": {\n"

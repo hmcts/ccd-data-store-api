@@ -30,7 +30,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIE
 @Qualifier("authorised")
 public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final CreateCaseOperation createCaseOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;

@@ -58,7 +58,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 @DirtiesContext
 public class CallbackInvokerWireMockTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final ObjectMapper mapper = JacksonUtils.MAPPER_INSTANCE;
+    private static final ObjectMapper mapper = JacksonUtils.MAPPER;
 
     @Inject
     private CallbackService callbackService;
