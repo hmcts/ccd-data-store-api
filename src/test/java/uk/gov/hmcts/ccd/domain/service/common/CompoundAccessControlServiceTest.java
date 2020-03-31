@@ -1,5 +1,18 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+
+import java.io.IOException;
+import java.util.Map;
+
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -22,22 +35,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 
 class CompoundAccessControlServiceTest {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
@@ -1590,13 +1587,13 @@ class CompoundAccessControlServiceTest {
             people += args[i] + (i == args.length - 1 ? "" : ",");
         }
         people = people + peopleEnd;
-        final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(people), new TypeReference<HashMap<String, JsonNode>>() {});
+        final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(people));
 
         return MAPPER.convertValue(data, JsonNode.class);
     }
 
     static JsonNode generateJsonNodeWithData(String stringData) throws IOException {
-        final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(stringData), new TypeReference<HashMap<String, JsonNode>>() {});
+        final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(stringData));
 
         return MAPPER.convertValue(data, JsonNode.class);
     }

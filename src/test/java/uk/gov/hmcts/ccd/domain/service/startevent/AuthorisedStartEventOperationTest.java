@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
@@ -29,7 +27,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +52,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 
 class AuthorisedStartEventOperationTest {
 
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_REFERENCE = "1234123412341234";
@@ -121,11 +117,8 @@ class AuthorisedStartEventOperationTest {
             "classificationTestValue");
 
         classifiedCaseDetails = new CaseDetails();
-        classifiedCaseDetails.setData(MAPPER.convertValue(classifiedCaseDetailsNode, new TypeReference<HashMap<String, JsonNode>>() {
-        }));
-        classifiedCaseDetails.setDataClassification(MAPPER.convertValue(classifiedCaseDetailsClassificationNode,
-            new TypeReference<HashMap<String, JsonNode>>() {
-            }));
+        classifiedCaseDetails.setData(JacksonUtils.convertValue(classifiedCaseDetailsNode));
+        classifiedCaseDetails.setDataClassification(JacksonUtils.convertValue(classifiedCaseDetailsClassificationNode));
         classifiedStartEvent = new StartEventTrigger();
         classifiedStartEvent.setCaseDetails(classifiedCaseDetails);
 
@@ -321,12 +314,9 @@ class AuthorisedStartEventOperationTest {
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
                 () -> assertThat(output.getCaseDetails().getData(),
-                    is(equalTo(MAPPER.convertValue(authorisedCaseDetailsNode, new TypeReference<HashMap<String, JsonNode>>() {
-                    })))),
+                    is(equalTo(JacksonUtils.convertValue(authorisedCaseDetailsNode)))),
                 () -> assertThat(output.getCaseDetails().getDataClassification(),
-                    is(equalTo(MAPPER.convertValue(authorisedCaseDetailsClassificationNode,
-                        new TypeReference<HashMap<String, JsonNode>>() {
-                        })))),
+                    is(equalTo(JacksonUtils.convertValue(authorisedCaseDetailsClassificationNode)))),
                 () -> inOrder.verify(uidService).validateUID(CASE_REFERENCE),
                 () -> inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE),
                 () -> inOrder.verify(classifiedStartEventOperation).triggerStartForCase(CASE_REFERENCE,

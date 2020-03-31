@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
@@ -21,8 +20,6 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
-
-import java.util.HashMap;
 
 @RestController
 @RequestMapping(path = "/case-types")
@@ -77,8 +74,7 @@ public class CaseDataValidatorController {
             content,
             pageId);
 
-        content.setData(MAPPER.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {
-        }));
+        content.setData(JacksonUtils.convertValue(data));
         return ResponseEntity.ok(new CaseDataResource(content, caseTypeId, pageId));
     }
 }

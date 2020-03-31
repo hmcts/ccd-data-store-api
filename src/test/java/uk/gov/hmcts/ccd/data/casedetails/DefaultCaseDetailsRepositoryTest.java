@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
@@ -14,6 +12,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
@@ -90,10 +89,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         caseDetails.setState("CaseCreated");
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
         try {
-            caseDetails.setData(mapper.convertValue(
-                mapper.readTree("{\"Alliases\": [], \"HasOtherInfo\": \"Yes\"}"),
-                new TypeReference<HashMap<String, JsonNode>>() {
-                }));
+            caseDetails.setData(JacksonUtils.convertValue(
+                mapper.readTree("{\"Alliases\": [], \"HasOtherInfo\": \"Yes\"}")));
         } catch (IOException e) {
             e.printStackTrace();
         }
