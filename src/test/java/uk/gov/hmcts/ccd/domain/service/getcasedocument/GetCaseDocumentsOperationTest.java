@@ -89,9 +89,27 @@ public class GetCaseDocumentsOperationTest {
     private static final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true).withUpdate(false).withDelete(true).build();
     private static final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false).withUpdate(true).withDelete(false).build();
     private static final FieldType documentFieldType = aFieldType().withId("Document").withType("Document").build();
+    private static final FieldType collectionFieldType = aFieldType().withId("collectionField1").withType("Collection").build();
+    private static final FieldType complexFieldType = aFieldType().withId("complexField1").withType("Complex").build();
     private static final CaseField CASE_FIELD = newCaseField()
         .withFieldType(documentFieldType)
         .withId("DocumentField1")
+        .withAcl(acl1)
+        .withAcl(acl2)
+        .withAcl(acl3)
+        .build();
+
+    private static final CaseField COLLECTION_FIELD = newCaseField()
+        .withFieldType(collectionFieldType)
+        .withId("collectionField1")
+        .withAcl(acl1)
+        .withAcl(acl2)
+        .withAcl(acl3)
+        .build();
+
+    private static final CaseField COMPLEX_FIELD = newCaseField()
+        .withFieldType(complexFieldType)
+        .withId("complexField1")
         .withAcl(acl1)
         .withAcl(acl2)
         .withAcl(acl3)
@@ -191,7 +209,7 @@ public class GetCaseDocumentsOperationTest {
 
             doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-            caseType.setCaseFields(Collections.singletonList(CASE_FIELD));
+            caseType.setCaseFields(Arrays.asList(CASE_FIELD, COLLECTION_FIELD, COMPLEX_FIELD));
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             doReturn(new ObjectMapper().readTree("{  \"DocumentField1\": { "
@@ -248,6 +266,20 @@ public class GetCaseDocumentsOperationTest {
             assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
         }
 
+        @Test
+        @DisplayName("should throw CaseNotFoundException if case is not found")
+        void shouldThrowCaseNotFoundException() throws IOException {
+
+            caseDetails = new CaseDetails();
+            caseDetails.setJurisdiction(JURISDICTION_ID);
+            caseDetails.setCaseTypeId(CASE_TYPE_ID);
+            //caseDetails.setId(CASE_REFERENCE);
+            //caseDetails.setReference(new Long(CASE_REFERENCE));
+            caseDetails.setState("state1");
+
+            assertThrows(CaseNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
+        }
+
         private Map<String, JsonNode> buildData(String... dataFieldIds) {
             Map<String, JsonNode> dataMap = new HashMap<>();
             asList(dataFieldIds).forEach(dataFieldId -> {
@@ -255,6 +287,5 @@ public class GetCaseDocumentsOperationTest {
             });
             return dataMap;
         }
-
     }
 }

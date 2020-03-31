@@ -79,7 +79,7 @@ public class GetCaseDocumentOperation {
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
             .orElseThrow(() -> new CaseNotFoundException(caseId));
 
-        if (caseDetails.getReferenceAsString().isEmpty()) {
+        if (caseDetails.getReferenceAsString() == null) {
             throw new CaseNotFoundException(caseId);
         }
 
@@ -146,7 +146,7 @@ public class GetCaseDocumentOperation {
     }
 
     private void extractDocumentFieldsFromCaseDefinition(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {
-        if (complexCaseFieldList != null && complexCaseFieldList.size() > 0) {
+        if (complexCaseFieldList != null && !complexCaseFieldList.isEmpty()) {
             for (CaseField caseField : complexCaseFieldList) {
                 switch (caseField.getFieldType().getType()) {
                     case DOCUMENT:
