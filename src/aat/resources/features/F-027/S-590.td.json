@@ -32,6 +32,10 @@
       "tabs" : "[[ANYTHING_PRESENT]]",
       "metadataFields": [
         {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
+        {
           "id": "[STATE]",
           "label": "State",
           "hidden": false,
