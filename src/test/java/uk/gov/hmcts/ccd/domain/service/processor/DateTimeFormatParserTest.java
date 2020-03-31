@@ -75,4 +75,24 @@ class DateTimeFormatParserTest {
             () -> assertThat(result, is("2000-10-20"))
         );
     }
+
+    @Test
+    void shouldDefaultMonthAndDayTo1WhenNotProvidedInDateFormat() {
+        final String dateTimeFormat = "yyyy";
+        final String value = "2000";
+        final String result = dateTimeFormatParser.convertDateToIso8601(dateTimeFormat, value);
+        assertAll(
+            () -> assertThat(result, is("2000-01-01"))
+        );
+    }
+
+    @Test
+    void shouldDefaultMonthAndDayTo1WhenNotProvidedInDateTimeFormat() {
+        final String dateTimeFormat = "yyyy";
+        final String value = "2000";
+        final String result = dateTimeFormatParser.convertDateTimeToIso8601(dateTimeFormat, value);
+        assertAll(
+            () -> assertThat(result, is("2000-01-01T00:00:00.000"))
+        );
+    }
 }
