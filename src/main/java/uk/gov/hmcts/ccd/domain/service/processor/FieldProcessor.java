@@ -47,7 +47,7 @@ public abstract class FieldProcessor {
                                       List<CaseField> complexCaseFields,
                                       WizardPageField wizardPageField,
                                       String fieldPrefix,
-                                      CaseViewField topLevelField) {
+                                      CommonField topLevelField) {
         if (complexNode == null) {
             return null;
         }
@@ -76,9 +76,9 @@ public abstract class FieldProcessor {
         return newNode;
     }
 
-    protected abstract JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath, WizardPageComplexFieldOverride override, CaseViewField topLevelField);
+    protected abstract JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath, WizardPageComplexFieldOverride override, CommonField topLevelField);
 
-    protected abstract JsonNode executeCollection(JsonNode collectionNode, CommonField field, String fieldPath, WizardPageComplexFieldOverride override, CaseViewField topLevelField);
+    protected abstract JsonNode executeCollection(JsonNode collectionNode, CommonField field, String fieldPath, WizardPageComplexFieldOverride override, CommonField topLevelField);
 
     public static boolean isNullOrEmpty(final JsonNode node) {
         return node == null
