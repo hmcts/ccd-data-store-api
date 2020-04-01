@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.HashMap;
 import java.util.Set;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -124,24 +122,20 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         }
 
         if (caseDetails != null) {
-            caseDetails.setData(MAPPER.convertValue(
+            caseDetails.setData(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,
-                    false),
-                new TypeReference<HashMap<String, JsonNode>>() {
-                }));
-            caseDetails.setDataClassification(MAPPER.convertValue(
+                    false)));
+            caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,
-                    true),
-                new TypeReference<HashMap<String, JsonNode>>() {
-                }));
+                    true)));
         }
         return startEventTrigger;
     }

@@ -334,8 +334,6 @@ class CaseDataServiceTest {
                 "       ]\n" +
                 "  }\n"
         );
-        // ARRANGE
-        //final Map<String, JsonNode> DATA = MAPPER.convertValue(treeValue, JacksonUtils.getNewTypeReference(JacksonUtils.EMPTY_MAP.getClass()));
 
         final Map<String, JsonNode> DATA = JacksonUtils.convertValue(treeValue);
         // first to set default classification

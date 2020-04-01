@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,9 +16,9 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
@@ -69,8 +68,8 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         verifyCreateAccess(event, data, caseType, userRoles);
 
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId,
-                                                                              caseDataContent,
-                                                                              ignoreWarning);
+            caseDataContent,
+            ignoreWarning);
         return verifyReadAccess(caseType, userRoles, caseDetails);
     }
 
@@ -84,21 +83,20 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
                 return null;
             }
 
-            caseDetails.setData(MAPPER.convertValue(
+            caseDetails.setData(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
                     caseType.getCaseFields(),
                     userRoles,
-                    CAN_READ, false),
-                new TypeReference<HashMap<String, JsonNode>>() {}));
-            caseDetails.setDataClassification(MAPPER.convertValue(
+                    CAN_READ, false)));
+            caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,
-                    true),
-                new TypeReference<HashMap<String, JsonNode>>() {}));
+                    true)
+            ));
         }
         return caseDetails;
     }

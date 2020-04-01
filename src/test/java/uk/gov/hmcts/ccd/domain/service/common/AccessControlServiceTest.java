@@ -1,5 +1,32 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Sets;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,35 +63,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACL
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
-
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 
 public class AccessControlServiceTest {
 
@@ -371,9 +369,9 @@ public class AccessControlServiceTest {
                     .withId("Addresses")
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"SomeText\" }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -398,9 +396,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -436,10 +434,10 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\", "
                     + "   \"Addresses2\": \"someText\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -465,9 +463,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -504,10 +502,10 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\", "
                     + "   \"Addresses2\": \"someText\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -524,9 +522,9 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldsIfFieldNotPresentInDefinition() throws IOException {
             CaseType caseType = newCaseType()
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -555,9 +553,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -580,9 +578,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -611,7 +609,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[  \n"
                     + "         {  \n"
                     + "            \"value\":{  \n"
@@ -635,7 +633,7 @@ public class AccessControlServiceTest {
                     + "         }\n"
                     + "      ]\n"
                     + "    }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -658,9 +656,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[] }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -689,12 +687,12 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{  \n"
                     + "          \"Note\": \"someNote11\"\n"
                     + "       }\n"
                     + "    }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -717,9 +715,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{} }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             assertThat(
@@ -1330,9 +1328,9 @@ public class AccessControlServiceTest {
                     .withId("Addresses")
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"SomeText\" }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1357,9 +1355,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1383,9 +1381,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1412,9 +1410,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1442,9 +1440,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"addresses\": \"someText\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1472,9 +1470,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1502,9 +1500,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1532,9 +1530,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1563,9 +1561,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1597,10 +1595,10 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null,\n"
                     + "       \"Addresses2\": \"\" }"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1635,7 +1633,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{\n"
                     + "         \"Addresses\":[  \n"
                     + "         {  \n"
@@ -1660,7 +1658,7 @@ public class AccessControlServiceTest {
                     + "         }\n"
                     + "      ]\n"
                     + "    }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1844,7 +1842,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{    \n"
                     + "         \"Addresses\":[  \n"
                     + "         {  \n"
@@ -1871,7 +1869,7 @@ public class AccessControlServiceTest {
                     + "      \"Addresses2\": [],\n"
                     + "      \"Addresses3\": null\n"
                     + "    }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1915,9 +1913,9 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[] }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1947,12 +1945,12 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{  \n"
                     + "           \"Note\": \"someNote11\"\n"
                     + "       }\n"
                     + "    }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -1984,13 +1982,13 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null,\n"
                     + "      \"Addresses2\":{  \n"
                     + "           \"Note\": \"\"\n"
                     + "       }\n"
                     + "    }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -2018,9 +2016,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
             List<CaseField> caseFields = newArrayList();
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{} }\n"
-            ), new TypeReference<HashMap<String, JsonNode>>() {});
+            ));
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
@@ -3572,7 +3570,7 @@ public class AccessControlServiceTest {
     }
 
     private JsonNode getJsonNode(String content) throws IOException {
-        final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(content), new TypeReference<HashMap<String, JsonNode>>() {});
+        final Map<String, JsonNode> newData = JacksonUtils.convertValue(MAPPER.readTree(content));
         return MAPPER.convertValue(newData, JsonNode.class);
     }
 
@@ -3772,7 +3770,7 @@ public class AccessControlServiceTest {
     }
 
     static JsonNode generatePeopleData() throws IOException {
-        final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+        final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
             "{\n"
                 + "  \"People\": [\n" +
                 person1 +
@@ -3780,7 +3778,7 @@ public class AccessControlServiceTest {
                 person2 +
                 "  ]\n"
                 + "}"
-        ), new TypeReference<HashMap<String, JsonNode>>() {});
+        ));
 
         return MAPPER.convertValue(data, JsonNode.class);
     }

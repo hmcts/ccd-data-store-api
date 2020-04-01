@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -39,8 +37,7 @@ public class SecurityValidationService {
             validateObject(MAPPER.convertValue(callbackResponse.getDataClassification(), JsonNode.class),
                 MAPPER.convertValue(defaultDataClassification, JsonNode.class));
 
-            caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), new TypeReference<HashMap<String, JsonNode>>() {
-            }));
+            caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
         } else {
             LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for caseReference={}, jurisdiction={} and caseType={}",
                 callbackResponse.getSecurityClassification(),

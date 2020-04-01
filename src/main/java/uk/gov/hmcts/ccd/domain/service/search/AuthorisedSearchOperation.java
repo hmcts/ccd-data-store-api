@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,24 +94,20 @@ public class AuthorisedSearchOperation implements SearchOperation {
             return Optional.empty();
         }
 
-        caseDetails.setData(MAPPER.convertValue(
+        caseDetails.setData(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
                 caseType.getCaseFields(),
                 userRoles,
                 CAN_READ,
-                false),
-            new TypeReference<HashMap<String, JsonNode>>() {
-            }));
-        caseDetails.setDataClassification(MAPPER.convertValue(
+                false)));
+        caseDetails.setDataClassification(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
                 caseType.getCaseFields(),
                 userRoles,
                 CAN_READ,
-                true),
-            new TypeReference<HashMap<String, JsonNode>>() {
-            }));
+                true)));
 
         return Optional.of(caseDetails);
     }

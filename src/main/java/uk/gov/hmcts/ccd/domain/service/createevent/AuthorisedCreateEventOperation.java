@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
@@ -24,6 +17,17 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.Map;
+import java.util.Set;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 @Service
 @Qualifier("authorised")
@@ -72,7 +76,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails, caseType, userRoles);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference,
-                                                                             content);
+            content);
         return verifyReadAccess(caseType, userRoles, caseDetails);
     }
 
@@ -80,34 +84,33 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
         if (caseDetails != null) {
             if (!accessControlService.canAccessCaseTypeWithCriteria(
-                                caseType,
-                                userRoles,
-                                CAN_READ)) {
+                caseType,
+                userRoles,
+                CAN_READ)) {
                 return null;
             }
 
-            caseDetails.setData(MAPPER.convertValue(
+            caseDetails.setData(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,
-                    false),
-                new TypeReference<HashMap<String, JsonNode>>() {}));
-            caseDetails.setDataClassification(MAPPER.convertValue(
+                    false)));
+
+            caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,
-                    true),
-                new TypeReference<HashMap<String, JsonNode>>() {}));
+                    true)));
         }
         return caseDetails;
     }
 
     private void verifyUpsertAccess(Event event, Map<String, JsonNode> newData, CaseDetails existingCaseDetails, CaseType caseType, Set<String> userRoles) {
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType,userRoles,CAN_UPDATE)) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_UPDATE)) {
             throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
         }
         if (!accessControlService.canAccessCaseStateWithCriteria(existingCaseDetails.getState(), caseType, userRoles, CAN_UPDATE)) {
@@ -115,10 +118,10 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         }
 
         if (event == null || !accessControlService.canAccessCaseEventWithCriteria(
-                            event.getEventId(),
-                            caseType.getEvents(),
-                            userRoles,
-                            CAN_CREATE)) {
+            event.getEventId(),
+            caseType.getEvents(),
+            userRoles,
+            CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
 

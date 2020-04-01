@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -87,24 +85,20 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
             return Optional.empty();
         }
 
-        caseDetails.setData(MAPPER.convertValue(
+        caseDetails.setData(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
                 caseType.getCaseFields(),
                 userRoles,
                 CAN_READ,
-                false),
-            new TypeReference<HashMap<String, JsonNode>>() {
-            }));
-        caseDetails.setDataClassification(MAPPER.convertValue(
+                false)));
+        caseDetails.setDataClassification(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
                 caseType.getCaseFields(),
                 userRoles,
                 CAN_READ,
-                true),
-            new TypeReference<HashMap<String, JsonNode>>() {
-            }));
+                true)));
 
         return Optional.of(caseDetails);
     }
