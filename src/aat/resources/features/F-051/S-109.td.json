@@ -40,6 +40,10 @@
       "channels": null,
       "jurisdictions": [
         {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
+        {
           "id": "BEFTA_JURISDICTION_1",
           "name": "BEFTA_JURISDICTION_1",
           "description": "Content for the Test Jurisdiction.",
