@@ -8,6 +8,10 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,11 +24,11 @@ public class DateTimeFormatParser {
     static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public String convertDateTimeToIso8601(String dateTimeFormat, String value) {
-        return convert(dateTimeFormat == null ? DATE_TIME_FORMAT : dateTimeFormat, DATE_TIME_FORMAT, value);
+        return convert(Arrays.asList(dateTimeFormat, DATE_TIME_FORMAT), DATE_TIME_FORMAT, value);
     }
 
     public String convertDateToIso8601(String dateFormat, String value) {
-        return convert(dateFormat == null ? DATE_FORMAT : dateFormat, DATE_FORMAT, value);
+        return convert(Arrays.asList(dateFormat, DATE_FORMAT), DATE_FORMAT, value);
     }
 
     public String convertIso8601ToDateTime(String dateTimeFormat, String value) {
@@ -37,18 +41,26 @@ public class DateTimeFormatParser {
         return date.format(DateTimeFormatter.ofPattern(dateFormat));
     }
 
-    private String convert(String inputFormat, String outputFormat, String value) {
-        DateTimeFormatter inputFormatter = getFormatter(inputFormat);
+    private String convert(List<String> permittedInputFormats, String outputFormat, String value) {
+        List<DateTimeFormatter> inputFormatters = permittedInputFormats.stream()
+            .map(this::getFormatter)
+            .collect(Collectors.toList());
         DateTimeFormatter outputFormatter = getFormatter(outputFormat);
+        TemporalAccessor parsed = null;
 
-        ParsePosition parsePosition = new ParsePosition(0);
-        TemporalAccessor parsed = inputFormatter.parseUnresolved(value, parsePosition);
-        if (parsed == null || isInvalidParseResult(value, parsePosition)) {
-            log.warn("Failed to parse following date value {} with format {} attempting to parse with {}", value, inputFormat, outputFormat);
-            parsePosition = new ParsePosition(0);
-            parsed = outputFormatter.parseUnresolved(value, parsePosition);
-            if (parsed == null || isInvalidParseResult(value, parsePosition)) {
-                throw new DateTimeParseException(String.format("Failed to parse value '%s' against format '%s'", value, inputFormat), value, 0);
+        Iterator<DateTimeFormatter> iterator = inputFormatters.iterator();
+        while (iterator.hasNext()) {
+            DateTimeFormatter inputFormatter = iterator.next();
+
+            ParsePosition parsePosition = new ParsePosition(0);
+            parsed = inputFormatter.parseUnresolved(value, parsePosition);
+
+            if (parsed != null && isValidParseResult(value, parsePosition)) {
+                break;
+            } else if (!iterator.hasNext()) {
+                throw new DateTimeParseException(
+                    String.format("Failed to parse value '%s' against formats: %s",
+                        value, String.join(", ", permittedInputFormats)), value, 0);
             }
         }
 
@@ -68,7 +80,7 @@ public class DateTimeFormatParser {
             .toFormatter();
     }
 
-    private boolean isInvalidParseResult(String value, ParsePosition parsePosition) {
-        return parsePosition.getIndex() != value.length();
+    private boolean isValidParseResult(String value, ParsePosition parsePosition) {
+        return parsePosition.getIndex() == value.length();
     }
 }
