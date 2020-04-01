@@ -238,7 +238,7 @@ class DateTimeValueFormatterTest {
         }
 
         @Test
-        void shouldThrowDataProcessingExceptionWhenDateCannotBeConverted() {
+        void shouldThrowDataProcessingExceptionWhenDateTimeCannotBeConverted() {
             setUpBaseType(DATETIME_FIELD_TYPE);
             TextNode value = new TextNode("INVALID");
             CaseViewField caseViewField = caseViewField(ID, "#DATETIMEDISPLAY(dd/MM/yyyy)", fieldType(DATETIME_FIELD_TYPE), value, DisplayContext.READONLY.name());
@@ -249,7 +249,25 @@ class DateTimeValueFormatterTest {
             );
 
             assertAll(
-                () -> assertThat(exception.getDetails(), is("Unable to process field FieldId with value INVALID. Expected format: dd/MM/yyyy"))
+                () -> assertThat(exception.getDetails(),
+                    is("Unable to process field FieldId with value INVALID. Expected format to be either dd/MM/yyyy or yyyy-MM-dd'T'HH:mm:ss.SSS"))
+            );
+        }
+
+        @Test
+        void shouldThrowDataProcessingExceptionWhenDateCannotBeConverted() {
+            setUpBaseType(DATE_FIELD_TYPE);
+            TextNode value = new TextNode("INVALID");
+            CaseViewField caseViewField = caseViewField(ID, "#DATETIMEDISPLAY(dd/MM/yyyy)", fieldType(DATE_FIELD_TYPE), value, DisplayContext.READONLY.name());
+            when(dateTimeFormatParser.convertIso8601ToDate("dd/MM/yyyy", "INVALID")).thenThrow(DateTimeException.class);
+
+            DataProcessingException exception = assertThrows(DataProcessingException.class,
+                () -> dateTimeValueFormatter.execute(caseViewField)
+            );
+
+            assertAll(
+                () -> assertThat(exception.getDetails(),
+                    is("Unable to process field FieldId with value INVALID. Expected format to be either dd/MM/yyyy or yyyy-MM-dd"))
             );
         }
     }

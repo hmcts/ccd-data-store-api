@@ -79,10 +79,11 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
             }
         } catch (Exception e) {
             throw new DataProcessingException().withDetails(
-                String.format("Unable to process field %s with value %s. Expected format: %s",
+                String.format("Unable to process field %s with value %s. Expected format to be either %s or %s",
                     fieldPath,
                     valueToConvert,
-                    format)
+                    format,
+                    baseType == BaseType.get(DATETIME) ? DateTimeFormatParser.DATE_TIME_FORMAT : DateTimeFormatParser.DATE_FORMAT)
             );
         }
     }
