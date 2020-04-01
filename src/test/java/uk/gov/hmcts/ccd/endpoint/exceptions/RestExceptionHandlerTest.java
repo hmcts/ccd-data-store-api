@@ -41,6 +41,7 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -175,7 +176,6 @@ public class RestExceptionHandlerTest {
 
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
-        assertExtraApiExceptionResponseProperties(result, expectedException);
     }
 
     @Test
@@ -194,7 +194,6 @@ public class RestExceptionHandlerTest {
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
         assertExtraApiExceptionResponseProperties(result, expectedException);
-        //assertThat(response.getBody().getDetails(), is(notNullValue()));
         result.andExpect(jsonPath("$.details").exists());
     }
 
@@ -214,8 +213,7 @@ public class RestExceptionHandlerTest {
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
         assertExtraApiExceptionResponseProperties(result, expectedException);
-        //assertThat(response.getBody().getCallbackErrors().size(), is(equalTo(2)));
-        result.andExpect(jsonPath("$.callbackErrors").exists());
+        result.andExpect(jsonPath("$.callbackErrors[*]", hasSize(2)));
     }
 
     @Test
@@ -234,8 +232,7 @@ public class RestExceptionHandlerTest {
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
         assertExtraApiExceptionResponseProperties(result, expectedException);
-        //assertThat(response.getBody().getCallbackWarnings().size(), is(equalTo(2)));
-        result.andExpect(jsonPath("$.callbackWarnings").exists());
+        result.andExpect(jsonPath("$.callbackWarnings[*]", hasSize(2)));
     }
 
     @Test
@@ -287,7 +284,6 @@ public class RestExceptionHandlerTest {
 
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
-        assertExtraApiExceptionResponseProperties(result, expectedException);
     }
 
     @Test
@@ -339,6 +335,7 @@ public class RestExceptionHandlerTest {
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
         assertExtraApiExceptionResponseProperties(result, expectedException);
+        result.andExpect(jsonPath("$.details").doesNotExist());
     }
 
     @Test
@@ -357,6 +354,7 @@ public class RestExceptionHandlerTest {
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
         assertExtraApiExceptionResponseProperties(result, expectedException);
+        result.andExpect(jsonPath("$.details").exists());
     }
 
     @Test
@@ -449,7 +447,7 @@ public class RestExceptionHandlerTest {
     private void assertExtraApiExceptionResponseProperties(ResultActions result, ApiException expectedException) throws Exception {
 
         // load extra properties
-        Serializable exceptionDetails = expectedException.getDetails();
+        Serializable exceptionDetails = expectedException.getDetails(); // NB: expecting test to be a simple string
         List<String> exceptionCallbackErrors = expectedException.getCallbackErrors();
         List<String> exceptionCallbackWarnings = expectedException.getCallbackWarnings();
 
