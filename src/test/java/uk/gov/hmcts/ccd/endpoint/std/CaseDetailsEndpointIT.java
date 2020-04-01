@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -23,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -32,7 +32,6 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 
 import javax.inject.Inject;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,8 +127,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        }));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
         caseDetailsToSave.setToken(token);
@@ -162,8 +160,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        }));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
         caseDetailsToSave.setToken(token);
@@ -196,8 +193,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        }));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
         caseDetailsToSave.setToken(token);
@@ -230,8 +226,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        }));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
         caseDetailsToSave.setToken(token);
@@ -291,8 +286,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
-        Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
@@ -315,8 +309,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
         assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        Map sanitizedData = mapper.convertValue(SANITIZED_DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map sanitizedData = JacksonUtils.convertValue(SANITIZED_DATA);
         assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
         assertEquals("Incorrect security classification size", 5, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
@@ -332,7 +325,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "  \"Aliases\": {\"classification\": \"PUBLIC\", \"value\": [{\"id\": \"1\", \"classification\": \"PUBLIC\"}, {\"id\": \"2\", \"classification\": \"PUBLIC\"}]}," +
             "  \"D8Document\":\"PUBLIC\"" +
             "}");
-        JsonNode actualClassification = mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class);
+        JsonNode actualClassification = JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification());
         assertEquals("Incorrect security classifications", expectedClassification, actualClassification);
         assertEquals("state3", savedCaseDetails.getState());
 
@@ -394,8 +387,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         triggeringEvent.setDescription(LONG_COMMENT);
         triggeringEvent.setSummary(SHORT_COMMENT);
         caseDetailsToSave.setEvent(triggeringEvent);
-        Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -415,8 +407,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
         assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        Map sanitizedData = mapper.convertValue(SANITIZED_DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map sanitizedData = JacksonUtils.convertValue(SANITIZED_DATA);
         assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
         assertEquals("Incorrect security classification size", 4, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
@@ -431,7 +422,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "  \"PersonFirstName\":\"PUBLIC\"," +
             "  \"D8Document\":\"PUBLIC\"" +
             "}");
-        JsonNode actualClassification = mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class);
+        JsonNode actualClassification = JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification());
         assertEquals("Incorrect security classifications", expectedClassification, actualClassification);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
@@ -468,16 +459,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine1\": \"Address Line 1\",\n"
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
-                +     "\"D8Document\":{"
-                +     "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
+                + "\"D8Document\":{"
+                + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
                 + "}\n"
         );
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
-        Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
@@ -519,8 +509,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         triggeringEvent.setDescription(LONG_COMMENT);
         triggeringEvent.setSummary(SHORT_COMMENT);
         caseDetailsToSave.setEvent(triggeringEvent);
-        Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -555,8 +544,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
-        Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
@@ -598,8 +586,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         triggeringEvent.setDescription(LONG_COMMENT);
         triggeringEvent.setSummary(SHORT_COMMENT);
         caseDetailsToSave.setEvent(triggeringEvent);
-        Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -1075,9 +1062,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals(4, caseDetails.getDataClassification().size());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
-            assertEquals("PUBLIC",  caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine1").asText());
-            assertEquals("PUBLIC",  caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asText());
         }
 
@@ -1249,10 +1236,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .orElse(null);
         assertNotNull(savedCaseDetails);
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        assertEquals("Incorrect Data content: Data should not have changed", mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        }), savedCaseDetails.getData());
+        assertEquals("Incorrect Data content: Data should not have changed", JacksonUtils.convertValue(DATA), savedCaseDetails.getData());
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
-        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification()).toString(), JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
@@ -1271,7 +1257,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
-        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, JacksonUtils.convertValueJsonNode(caseAuditEvent.getDataClassification()).toString(), JSONCompareMode.LENIENT);
     }
 
 
@@ -1334,10 +1320,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .orElse(null);
         assertNotNull(savedCaseDetails);
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        assertEquals("Incorrect Data content: Data should not have changed", mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        }), savedCaseDetails.getData());
+        assertEquals("Incorrect Data content: Data should not have changed", JacksonUtils.convertValue(DATA), savedCaseDetails.getData());
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
-        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification()).toString(), JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
@@ -1356,7 +1341,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
-        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, JacksonUtils.convertValueJsonNode(caseAuditEvent.getDataClassification()).toString(), JSONCompareMode.LENIENT);
     }
 
     @Test
@@ -1480,7 +1465,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
             .contentType(JSON_CONTENT_TYPE)
@@ -1553,7 +1538,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
             .contentType(JSON_CONTENT_TYPE)
@@ -1627,7 +1612,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
             .contentType(JSON_CONTENT_TYPE)
@@ -1701,7 +1686,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
             .contentType(JSON_CONTENT_TYPE)
@@ -2442,11 +2427,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"ButtonVillie\"}," +
             "\"PersonLastName\":\"Roof\"," +
             "\"PersonFirstName\":\"George\"}");
-        final Map<String, JsonNode> expectedData = mapper.convertValue(INITIAL_DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        final Map<String, JsonNode> expectedData = JacksonUtils.convertValue(INITIAL_DATA);
 
-        caseDetailsToSave.setData(mapper.convertValue(INVALID_DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        }));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(INVALID_DATA));
 
         final String token = generateEventToken(template,
             UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, PRE_STATES_EVENT_ID);
@@ -2500,11 +2483,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"ButtonVillie\"}," +
             "\"PersonLastName\":\"Roof\"," +
             "\"PersonFirstName\":\"George\"}");
-        final Map<String, JsonNode> expectedData = mapper.convertValue(INITIAL_DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        final Map<String, JsonNode> expectedData = JacksonUtils.convertValue(INITIAL_DATA);
 
-        caseDetailsToSave.setData(mapper.convertValue(INVALID_DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        }));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(INVALID_DATA));
 
         final String token = generateEventToken(template,
             UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, PRE_STATES_EVENT_ID);
@@ -2767,8 +2748,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  }\n" +
                 "}\n"
         );
-        Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
 
 
@@ -2818,8 +2798,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  }\n" +
                 "}\n"
         );
-        Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_NO_READ_FIELD_ACCESS, CREATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -2899,8 +2878,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  }\n" +
                 "}\n"
         );
-        Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -2939,7 +2917,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
             .contentType(JSON_CONTENT_TYPE)
@@ -2976,7 +2954,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
             .contentType(JSON_CONTENT_TYPE)
@@ -3014,7 +2992,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenPostCreateCaseEventWithNoUpdateCaseAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353578";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_UPDATE_CASE_ACCESS  + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_UPDATE_CASE_ACCESS + "/cases/" + caseReference + "/events";
         final String summary = "Case event summary";
         final String description = "Case event description";
 
@@ -3036,7 +3014,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
 
         mockMvc.perform(post(URL)
@@ -3048,7 +3026,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenPostCreateCaseEventWithNoCreateEventAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353586";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_EVENT_ACCESS  + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_EVENT_ACCESS + "/cases/" + caseReference + "/events";
         final String summary = "Case event summary";
         final String description = "Case event description";
 
@@ -3070,7 +3048,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
 
         mockMvc.perform(post(URL)
@@ -3153,7 +3131,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenPostCreateCaseEventWithNoCreateFieldAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353594";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_FIELD_ACCESS  + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_FIELD_ACCESS + "/cases/" + caseReference + "/events";
         final String summary = "Case event summary";
         final String description = "Case event description";
 
@@ -3175,7 +3153,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
 
         mockMvc.perform(post(URL)
@@ -3187,7 +3165,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenPostCreateCaseEventWithNoUpdateFieldAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353602";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_UPDATE_FIELD_ACCESS  + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_UPDATE_FIELD_ACCESS + "/cases/" + caseReference + "/events";
         final String summary = "Case event summary";
         final String description = "Case event description";
 
@@ -3209,7 +3187,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"AddressLine3\":\"_ ButtonVillie\"}," +
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"}");
-        caseDetailsToSave.setData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
 
         mockMvc.perform(post(URL)
@@ -3245,7 +3223,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
             assertEquals(1504259907353628L, caseDetails.getReference().longValue());
 
-            JsonNode nodeData = mapper.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode nodeData = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(nodeData.has("PersonFirstName"), CoreMatchers.is(false)),
                 () -> assertThat(nodeData.get("PersonLastName"), CoreMatchers.is(getTextNode("Parker"))),
@@ -3260,7 +3238,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 () -> assertThat(nodeData.get("D8Document").get("document_binary_url"), CoreMatchers.is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary"))),
                 () -> assertThat(nodeData.get("D8Document").get("document_filename"), CoreMatchers.is(getTextNode("Seagulls_Square.jpg")))
             );
-            JsonNode nodeClassification = mapper.convertValue(caseDetails.getDataClassification(), JsonNode.class);
+            JsonNode nodeClassification = JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification());
             assertAll(
                 () -> assertThat(nodeClassification.has("PersonFirstName"), CoreMatchers.is(false)),
                 () -> assertThat(nodeClassification.get("PersonLastName"), CoreMatchers.is(getTextNode("PUBLIC"))),
@@ -3303,7 +3281,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "    \"document_filename\": \"Seagulls_Square.jpg\"" +
             "}" +
             "}");
-        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
         final String EXPECTED_CLASSIFICATION_STRING = "{" +
             "  \"PersonAddress\":{" +
             "    \"classification\": \"PUBLIC\"," +
@@ -3342,13 +3320,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .orElse(null);
         assertNotNull(savedCaseDetails);
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        Map sanitizedData = mapper.convertValue(SANITIZED_DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map sanitizedData = JacksonUtils.convertValue(SANITIZED_DATA);
         assertThat(
             "Incorrect Data content: Data should have changed",
             savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
-        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification()).toString(), JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
@@ -3367,7 +3344,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
-        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, JacksonUtils.convertValueJsonNode(caseAuditEvent.getDataClassification()).toString(), JSONCompareMode.LENIENT);
     }
 
     private void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinary(String userRole) throws Exception {
@@ -3406,7 +3383,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary\"" +
             "}" +
             "}");
-        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
         final String token = generateEventToken(template,
             UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -3430,8 +3407,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .orElse(null);
         assertNotNull(savedCaseDetails);
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        Map sanitizedData = mapper.convertValue(SANITIZED_DATA, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        Map sanitizedData = JacksonUtils.convertValue(SANITIZED_DATA);
         assertThat(
             "Incorrect Data content: Data should have changed",
             savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
@@ -3450,7 +3426,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withDescription(DESCRIPTION)
                 .build())
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
-            .withData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
             .build();
 
@@ -3479,7 +3455,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withDescription(DESCRIPTION)
                 .build())
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
-            .withData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
             .build();
 
@@ -3511,7 +3487,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withDescription(DESCRIPTION)
                 .build())
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
-            .withData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
             .build();
 
@@ -3540,7 +3516,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withDescription(DESCRIPTION)
                 .build())
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
-            .withData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
             .build();
 
@@ -3561,7 +3537,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200_whenSearchAsSolicitor() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -3596,7 +3572,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200_whenSearchWithParamsAsCaseWorker() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -3624,7 +3600,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldSearchCaseDetailsByReference() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -3681,7 +3657,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldSearchCaseDetailsBySecurityClassification() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -3756,7 +3732,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldSearchCaseDetailsByCreationDate() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -3833,7 +3809,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldSearchCaseDetailsByLastModified() throws Exception {
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
@@ -3891,7 +3867,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturnEmptyResult_whenSearchWithNonMatchingCriteriaAsCaseWorker() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -3909,7 +3885,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturnPaginatedResults() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -3972,7 +3948,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturnPaginatedSearchMetadata() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -4038,7 +4014,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturnPaginatedSearchMetadataForCitizen() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -4059,7 +4035,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn400_whenSearchWithBadRequestParamAsCaseWorker() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -4072,7 +4048,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200_whenSearchParamsAreSanitizedAsCaseWorker() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -4214,7 +4190,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
      * that state filtering is correct.
      */
     private void assertCaseDataResultSetSize() {
-        final int count = template.queryForObject("SELECT count(1) as n FROM case_data",Integer.class);
+        final int count = template.queryForObject("SELECT count(1) as n FROM case_data", Integer.class);
         assertEquals("Incorrect case data size", NUMBER_OF_CASES, count);
     }
 

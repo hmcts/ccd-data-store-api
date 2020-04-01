@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -195,20 +194,18 @@ class CaseServiceTest {
         void populateCurrentCaseDetailsWithEventFields() throws Exception {
 
 
-            Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
+            Map<String, JsonNode> eventData = JacksonUtils.convertValue(MAPPER.readTree(
                 "{\n"
                     + "  \"PersonFirstName\": \"First Name\",\n"
                     + "  \"PersonLastName\": \"Last Name\"\n"
-                    + "}"), new TypeReference<HashMap<String, JsonNode>>() {
-            });
+                    + "}"));
 
-            Map<String, JsonNode> resultData = MAPPER.convertValue(MAPPER.readTree(
+            Map<String, JsonNode> resultData = JacksonUtils.convertValue(MAPPER.readTree(
                 "{\n"
                     + "  \"PersonFirstName\": \"First Name\",\n"
                     + "  \"PersonLastName\": \"Last Name\",\n"
                     + "  \"Person\":{\"Names\":{\"FirstName\":\"Jack\"}}\n"
-                    + "}"), new TypeReference<HashMap<String, JsonNode>>() {
-            });
+                    + "}"));
 
             CaseDataContent caseDataContent = newCaseDataContent()
                 .withData(data)

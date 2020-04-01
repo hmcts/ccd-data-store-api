@@ -1589,12 +1589,12 @@ class CompoundAccessControlServiceTest {
         people = people + peopleEnd;
         final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(people));
 
-        return MAPPER.convertValue(data, JsonNode.class);
+        return JacksonUtils.convertValueJsonNode(data);
     }
 
     static JsonNode generateJsonNodeWithData(String stringData) throws IOException {
         final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(stringData));
 
-        return MAPPER.convertValue(data, JsonNode.class);
+        return JacksonUtils.convertValueJsonNode(data);
     }
 }

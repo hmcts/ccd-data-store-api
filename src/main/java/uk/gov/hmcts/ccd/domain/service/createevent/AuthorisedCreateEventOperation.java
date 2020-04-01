@@ -127,7 +127,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
         if (!accessControlService.canAccessCaseFieldsForUpsert(
             JacksonUtils.convertValueJsonNode(newData),
-            MAPPER.convertValue(existingCaseDetails.getData(), JsonNode.class),
+            JacksonUtils.convertValueJsonNode(existingCaseDetails.getData()),
             caseType.getCaseFields(),
             userRoles)) {
             throw new ResourceNotFoundException(NO_FIELD_FOUND);

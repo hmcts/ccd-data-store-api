@@ -355,7 +355,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Note1"), is(false)),
                 () -> assertThat(resultNode.has("Note2"), is(false))
@@ -380,7 +380,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Note1"), is(false)),
                 () -> assertThat(resultNode.has("Note2"), is(false))
@@ -405,7 +405,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Note1"), is(false)),
                 () -> assertThat(resultNode.get("Note2"), is(equalTo(getTextNode("note2"))))
@@ -431,7 +431,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
 
@@ -463,7 +463,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.get("OrderType1"), hasItems(
                     getTextNode("ChildOrder"), getTextNode("SpecialIssueOrder"))),
@@ -496,7 +496,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())))
             );
@@ -533,7 +533,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
 
@@ -586,7 +586,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.get("Field").get("NestedField").get("Field1"),
                     is(equalTo(getTextNode("field1")))),
@@ -640,7 +640,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
 
@@ -686,7 +686,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Field"), is(true)),
                 () -> assertThat(resultNode.get("Field").isObject(), is(true)),
@@ -731,7 +731,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.get("Addresses").get(0).get(ID), is(equalTo(getTextNode(FIRST_CHILD_ID)))),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Address"),
@@ -841,7 +841,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Addresses"), is(true)),
                 () -> assertThat(resultNode.get("Addresses").isArray(), is(true)),
@@ -894,7 +894,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Aliases"), is(true)),
                 () -> assertThat(resultNode.get("Aliases").isArray(), is(true)),
@@ -918,7 +918,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
 
             assertThat(resultNode.has("collection"), is(true));
 
@@ -1071,7 +1071,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertThat("should remove classified collection node",
                 resultNode.has("Aliases"), is(false));
         }
@@ -1145,7 +1145,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.get("Addresses").get(0).get(ID), is(equalTo(getTextNode(FIRST_CHILD_ID)))),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(false)),
@@ -1218,7 +1218,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.get("Addresses").size(), is(equalTo(1))),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(ID), is(equalTo(getTextNode(FIRST_CHILD_ID)))),
@@ -1266,7 +1266,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
 
             final JsonNode addresses = resultNode.get("Addresses");
             assertThat(addresses, is(notNullValue()));
@@ -1348,7 +1348,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Addresses"), is(false))
             );
@@ -1443,7 +1443,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.get("Det3"), is(equalTo(getTextNode("Yes")))),
                 () -> assertThat(resultNode.get("SpecialIssueDescription"),
@@ -1490,7 +1490,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.nullNode())));
         }
 
@@ -1509,7 +1509,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
 
@@ -1528,7 +1528,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
 
@@ -1547,7 +1547,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
 
@@ -1570,7 +1570,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Note1"), is(false)),
                 () -> assertThat(resultNode.get("Note2"), is(equalTo(JSON_NODE_FACTORY.numberNode(56))))
@@ -1596,7 +1596,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Note1"), is(false)),
                 () -> assertThat(resultNode.get("Note2"), is(equalTo(JSON_NODE_FACTORY.booleanNode(false))))
@@ -1630,7 +1630,7 @@ public class SecurityClassificationServiceTest {
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Document1"), is(false)),
                 () -> assertThat(resultNode.get("Document2").get("document_url"),

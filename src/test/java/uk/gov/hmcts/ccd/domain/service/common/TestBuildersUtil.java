@@ -1,20 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -63,13 +55,21 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 public class TestBuildersUtil {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private TestBuildersUtil() {
     }
@@ -415,7 +415,7 @@ public class TestBuildersUtil {
         }
 
         public DataClassificationBuilder withData(String key, List value) {
-            dataClassification.put(key, MAPPER.convertValue(value, JsonNode.class));
+            dataClassification.put(key, JacksonUtils.convertValueJsonNode(value));
             return this;
         }
 
@@ -424,7 +424,7 @@ public class TestBuildersUtil {
         }
 
         public JsonNode buildAsNode() {
-            return MAPPER.convertValue(dataClassification, JsonNode.class);
+            return JacksonUtils.convertValueJsonNode(dataClassification);
         }
     }
 
@@ -553,7 +553,7 @@ public class TestBuildersUtil {
             this.jurisdictionUiConfig.setShuttered(shuttered);
             return this;
         }
-        
+
         public JurisdictionUiConfigBuilder withId(String id) {
             this.jurisdictionUiConfig.setId(id);
             return this;
