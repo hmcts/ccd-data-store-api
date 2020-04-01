@@ -12,7 +12,7 @@
     "has the 200 return code"
   ],
   "user": {
-    "username": "befta.caseworker.1.noprofile@gmail.com",
+    "username": "befta.caseworker.1.noprofile+1@gmail.com",
     "password": "[[$CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD]]"
   },
   "request": {
@@ -33,7 +33,7 @@
           "email": "${[scenarioContext][theInvokingUser][username]}",
           "forename": "testfirstname",
           "surname": "testsurname",
-          "roles": [ "caseworker", "caseworker-befta_jurisdiction_1" ],
+          "roles": [ "caseworker-befta_jurisdiction_1" , "caseworker" ],
           "defaultService": null
         }
       },
