@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -36,6 +37,8 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Service
 class SubmitCaseTransaction {
 
+    @Inject
+    private HttpServletRequest request;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final CaseTypeService caseTypeService;
@@ -92,6 +95,8 @@ class SubmitCaseTransaction {
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
             callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseType, ignoreWarning);
 
+        //saveAuditEventForCaseDetails is making a call to caseDetailsRepository.set(newCaseDetails);
+        //This is actually creating a record of the case in DB.
         final CaseDetails savedCaseDetails =
             saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseType, idamUser, eventTrigger, newCaseDetails);
 
@@ -100,6 +105,11 @@ class SubmitCaseTransaction {
                                            idamUser.getId(),
                                            CREATOR.getRole());
         }
+        //Make a call to update the metadata into document store here.
+        //the whole method is transactional, so it should be safe to update the metadata.
+        //We should be catching any exception from document store, like timeout , duplicatekey etc and throw the exception again.
+        //It is to be noted that the @Retryable will work only for ReferenceKeyUniqueConstraintException,
+        // which is an exception while persisting case data
 
         return savedCaseDetails;
     }
