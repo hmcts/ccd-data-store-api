@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
@@ -66,6 +67,9 @@ public class SearchResultProcessor {
     }
 
     private JsonNode createTextNodeFrom(final TextNode originalNode, final String dateFormat, final FieldType fieldType) {
+        if (Strings.isNullOrEmpty(originalNode.asText())) {
+            return new TextNode(originalNode.asText());
+        }
         if (fieldType.getType().equals(FieldType.DATE)) {
             return new TextNode(dateTimeFormatParser.convertIso8601ToDate(dateFormat, originalNode.asText()));
         } else {
