@@ -27,7 +27,6 @@ import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Comparator.comparingInt;
-import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.caseHasClassificationEqualOrLowerThan;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getSecurityClassification;
@@ -67,8 +66,8 @@ public class SecurityClassificationService {
                         cd.setDataClassification(Maps.newHashMap());
                     }
 
-                    JsonNode data = filterNestedObject(MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                        MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+                    JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                        JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                         securityClassification);
                     caseDetails.setData(JacksonUtils.convertValue(data));
                     return cd;
@@ -105,7 +104,8 @@ public class SecurityClassificationService {
 
     public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId, CaseType caseType, String fieldId) {
         final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
-        return userClassification.map(securityClassification -> securityClassification.higherOrEqualTo(caseType.getClassificationForField(fieldId))).orElse(false);
+        return userClassification.map(securityClassification -> securityClassification.higherOrEqualTo(
+            caseType.getClassificationForField(fieldId))).orElse(false);
     }
 
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification, SecurityClassification userClassification) {
@@ -139,7 +139,9 @@ public class SecurityClassificationService {
         return data;
     }
 
-    private void filterCollection(SecurityClassification userClassification, Iterator<Map.Entry<String, JsonNode>> dataIterator, JsonNode dataClassificationElement, JsonNode dataElementValue) {
+    private void filterCollection(SecurityClassification userClassification,
+                                  Iterator<Map.Entry<String, JsonNode>> dataIterator,
+                                  JsonNode dataClassificationElement, JsonNode dataElementValue) {
         // Apply collection-level classification
         filterSimpleField(userClassification,
             dataIterator,
@@ -183,7 +185,9 @@ public class SecurityClassificationService {
         }
     }
 
-    private void filterObject(SecurityClassification userClassification, Iterator<Map.Entry<String, JsonNode>> dataIterator, JsonNode dataClassificationParent, JsonNode dataElementValue) {
+    private void filterObject(SecurityClassification userClassification,
+                              Iterator<Map.Entry<String, JsonNode>> dataIterator,
+                              JsonNode dataClassificationParent, JsonNode dataElementValue) {
         filterNestedObject(dataElementValue,
             dataClassificationParent.get(VALUE),
             userClassification);

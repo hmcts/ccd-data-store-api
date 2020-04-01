@@ -30,6 +30,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCl
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
+
 class CaseDataServiceTest {
 
     private static final CaseDataService caseDataService = new CaseDataService();
@@ -297,7 +298,7 @@ class CaseDataServiceTest {
             "   \"PersonFirstName\":\"\"\n" +
             "}";
 
-        JsonNode result = MAPPER.convertValue(classifications, JsonNode.class);
+        JsonNode result = JacksonUtils.convertValueJsonNode(classifications);
         System.out.println(result);
         assertEquals(expectedResult, result.toString(), false);
     }
@@ -371,7 +372,7 @@ class CaseDataServiceTest {
             "      ]\n" +
             "   }\n" +
             "}";
-        JsonNode defaultResult = MAPPER.convertValue(defaultClassifications, JsonNode.class);
+        JsonNode defaultResult = JacksonUtils.convertValueJsonNode(defaultClassifications);
         assertEquals(expectedDefaultResult, defaultResult.toString(), false);
 
         // then to test already set classification is not overwritten
@@ -427,7 +428,7 @@ class CaseDataServiceTest {
         final Map<String, JsonNode> newClassifications = caseDataService.getDefaultSecurityClassifications(caseType, NEW_DATA, defaultClassifications);
 
         // ASSERT
-        JsonNode newClassificationsResult = MAPPER.convertValue(newClassifications, JsonNode.class);
+        JsonNode newClassificationsResult = JacksonUtils.convertValueJsonNode(newClassifications);
         final String expectedNewResult = "{  \n" +
             "   \"Company\":{  \n" +
             "      \"classification\":\"PUBLIC\",\n" +

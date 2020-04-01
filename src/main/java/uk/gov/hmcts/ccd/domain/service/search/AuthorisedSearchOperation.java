@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,7 +28,6 @@ import static uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation.Q
 @Qualifier(QUALIFIER)
 public class AuthorisedSearchOperation implements SearchOperation {
     public static final String QUALIFIER = "authorised";
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
 
     private final SearchOperation searchOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -96,14 +93,14 @@ public class AuthorisedSearchOperation implements SearchOperation {
 
         caseDetails.setData(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
-                MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
+                JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                 caseType.getCaseFields(),
                 userRoles,
                 CAN_READ,
                 false)));
         caseDetails.setDataClassification(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
-                MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+                JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                 caseType.getCaseFields(),
                 userRoles,
                 CAN_READ,

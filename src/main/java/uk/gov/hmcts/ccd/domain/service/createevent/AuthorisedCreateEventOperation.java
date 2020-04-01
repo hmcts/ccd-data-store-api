@@ -92,7 +92,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
             caseDetails.setData(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,
@@ -100,7 +100,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
             caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,
@@ -126,7 +126,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         }
 
         if (!accessControlService.canAccessCaseFieldsForUpsert(
-            MAPPER.convertValue(newData, JsonNode.class),
+            JacksonUtils.convertValueJsonNode(newData),
             MAPPER.convertValue(existingCaseDetails.getData(), JsonNode.class),
             caseType.getCaseFields(),
             userRoles)) {

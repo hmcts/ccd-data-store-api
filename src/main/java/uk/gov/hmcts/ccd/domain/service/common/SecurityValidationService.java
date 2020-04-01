@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,19 +22,19 @@ import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils
 public class SecurityValidationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityValidationService.class);
-
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data validation error (c)";
 
-    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails, Map<String, JsonNode> defaultDataClassification) {
+    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse,
+                                                     CaseDetails caseDetails,
+                                                     Map<String, JsonNode> defaultDataClassification) {
 
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
 
-            validateObject(MAPPER.convertValue(callbackResponse.getDataClassification(), JsonNode.class),
-                MAPPER.convertValue(defaultDataClassification, JsonNode.class));
+            validateObject(JacksonUtils.convertValueJsonNode(callbackResponse.getDataClassification()),
+                JacksonUtils.convertValueJsonNode(defaultDataClassification));
 
             caseDetails.setDataClassification(JacksonUtils.convertValue(callbackResponse.getDataClassification()));
         } else {
@@ -87,7 +86,7 @@ public class SecurityValidationService {
             } else {
                 if (!isValidClassification(callbackClassificationValue, defaultClassificationItem)) {
                     LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
-                        MAPPER.convertValue(callbackClassificationMap, JsonNode.class),
+                        JacksonUtils.convertValueJsonNode(callbackClassificationMap),
                         defaultDataClassification);
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }

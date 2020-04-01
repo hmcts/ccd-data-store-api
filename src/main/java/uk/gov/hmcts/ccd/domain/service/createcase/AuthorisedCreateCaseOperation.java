@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -29,7 +28,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIE
 @Qualifier("authorised")
 public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final CreateCaseOperation createCaseOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
@@ -85,13 +83,13 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
             caseDetails.setData(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ, false)));
             caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,
@@ -118,7 +116,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         }
 
         if (!accessControlService.canAccessCaseFieldsWithCriteria(
-            MAPPER.convertValue(data, JsonNode.class),
+            JacksonUtils.convertValueJsonNode(data),
             caseType.getCaseFields(),
             userRoles,
             CAN_CREATE)) {

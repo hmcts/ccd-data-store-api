@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,7 +30,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 @Qualifier("authorised")
 public class AuthorisedStartEventOperation implements StartEventOperation {
 
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final StartEventOperation startEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -124,14 +121,14 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         if (caseDetails != null) {
             caseDetails.setData(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,
                     false)));
             caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                     caseType.getCaseFields(),
                     userRoles,
                     CAN_READ,

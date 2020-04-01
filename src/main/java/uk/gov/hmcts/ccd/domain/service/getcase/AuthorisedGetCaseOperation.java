@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,7 +24,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 @Service
 @Qualifier("authorised")
 public class AuthorisedGetCaseOperation implements GetCaseOperation {
-    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final GetCaseOperation getCaseOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
@@ -87,14 +84,14 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
 
         caseDetails.setData(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
-                MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
+                JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                 caseType.getCaseFields(),
                 userRoles,
                 CAN_READ,
                 false)));
         caseDetails.setDataClassification(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
-                MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+                JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                 caseType.getCaseFields(),
                 userRoles,
                 CAN_READ,

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
@@ -56,8 +55,8 @@ public class CaseDetailsMapper {
         if (caseDetails.getData() == null) {
             newCaseDetailsEntity.setData(MAPPER.createObjectNode());
         } else {
-            newCaseDetailsEntity.setData(MAPPER.convertValue(caseDetails.getData(), JsonNode.class));
-            newCaseDetailsEntity.setDataClassification(MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class));
+            newCaseDetailsEntity.setData(JacksonUtils.convertValueJsonNode(caseDetails.getData()));
+            newCaseDetailsEntity.setDataClassification(JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()));
         }
         return newCaseDetailsEntity;
     }

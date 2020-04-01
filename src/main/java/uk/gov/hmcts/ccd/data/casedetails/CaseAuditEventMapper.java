@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
@@ -12,6 +10,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @Named
 @Singleton
@@ -67,9 +67,8 @@ public class CaseAuditEventMapper {
             newCaseAuditEventEntity.setData(MAPPER.createObjectNode());
             newCaseAuditEventEntity.setDataClassification(MAPPER.createObjectNode());
         } else {
-            newCaseAuditEventEntity.setData(MAPPER.convertValue(auditEvent.getData(), JsonNode.class));
-            newCaseAuditEventEntity.setDataClassification(MAPPER.convertValue(auditEvent.getDataClassification(),
-                JsonNode.class));
+            newCaseAuditEventEntity.setData(JacksonUtils.convertValueJsonNode(auditEvent.getData()));
+            newCaseAuditEventEntity.setDataClassification(JacksonUtils.convertValueJsonNode(auditEvent.getDataClassification()));
         }
         newCaseAuditEventEntity.setEventId(auditEvent.getEventId());
         newCaseAuditEventEntity.setEventName(auditEvent.getEventName());

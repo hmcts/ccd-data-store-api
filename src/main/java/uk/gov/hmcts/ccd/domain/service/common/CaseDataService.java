@@ -34,7 +34,7 @@ public class CaseDataService {
                                                                    final Map<String, JsonNode> caseData,
                                                                    final Map<String, JsonNode> currentDataClassification) {
         final JsonNode clonedDataClassification = cloneAndConvertDataMap(caseData);
-        deduceDefaultClassifications(clonedDataClassification, MAPPER.convertValue(currentDataClassification, JsonNode.class), caseType.getCaseFields(), EMPTY_STRING);
+        deduceDefaultClassifications(clonedDataClassification, JacksonUtils.convertValueJsonNode(currentDataClassification), caseType.getCaseFields(), EMPTY_STRING);
         return JacksonUtils.convertValue(clonedDataClassification);
     }
 
@@ -172,6 +172,6 @@ public class CaseDataService {
             return MAPPER.createObjectNode();
         }
         final Map<String, JsonNode> result = cloneDataMap(source);
-        return MAPPER.convertValue(result, JsonNode.class);
+        return JacksonUtils.convertValueJsonNode(result);
     }
 }
