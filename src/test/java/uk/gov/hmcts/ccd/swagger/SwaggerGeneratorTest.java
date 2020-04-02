@@ -4,32 +4,27 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-@SpringJUnitWebConfig
-@SpringBootTest
-@AutoConfigureMockMvc
-public class SwaggerGeneratorTest {
+public class SwaggerGeneratorTest extends WireMockBaseTest {
 
     private MockMvc mvc;
 
     @Autowired
     private WebApplicationContext webAppContext;
 
-    @BeforeEach
+    @Before
     public void setup() {
         this.mvc = webAppContextSetup(webAppContext).build();
     }
@@ -37,7 +32,7 @@ public class SwaggerGeneratorTest {
     @DisplayName("Generate swagger documentation")
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-    void generateDocs() throws Exception {
+    public void generateDocs() throws Exception {
         ResultActions perform = mvc.perform(get("/v2/api-docs"));
         byte[] specs = perform
             .andExpect(status().isOk())
