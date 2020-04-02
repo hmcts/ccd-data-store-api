@@ -1297,9 +1297,11 @@ public class TestBuildersUtil {
 
     public static class WorkbasketInputBuilder {
         private final WorkbasketInput workbasketInput;
+        private final Field field;
 
         private WorkbasketInputBuilder() {
             this.workbasketInput = new WorkbasketInput();
+            this.field = new Field();
         }
 
         public static WorkbasketInputBuilder aWorkbasketInput() {
@@ -1307,17 +1309,21 @@ public class TestBuildersUtil {
         }
 
         public WorkbasketInputBuilder withFieldId(String fieldId) {
-            Field f = new Field();
-            f.setId(fieldId);
-            this.workbasketInput.setField(f);
+            field.setId(fieldId);
+            this.workbasketInput.setField(field);
+            return this;
+        }
+
+        public WorkbasketInputBuilder withShowCondition(String showCondition) {
+            field.setShowCondition(showCondition);
+            this.workbasketInput.setField(field);
             return this;
         }
 
         public WorkbasketInputBuilder withFieldId(String fieldId, String elementPath) {
-            Field f = new Field();
-            f.setId(fieldId);
-            f.setElementPath(elementPath);
-            this.workbasketInput.setField(f);
+            field.setId(fieldId);
+            field.setElementPath(elementPath);
+            this.workbasketInput.setField(field);
             return this;
         }
 
@@ -1333,9 +1339,11 @@ public class TestBuildersUtil {
 
     public static class SearchInputBuilder {
         private final SearchInput searchInput;
+        private final Field field;
 
         private SearchInputBuilder() {
             this.searchInput = new SearchInput();
+            this.field = new Field();
         }
 
         public static SearchInputBuilder aSearchInput() {
@@ -1348,17 +1356,21 @@ public class TestBuildersUtil {
         }
 
         public SearchInputBuilder withFieldId(String fieldId) {
-            Field f = new Field();
-            f.setId(fieldId);
-            this.searchInput.setField(f);
+            field.setId(fieldId);
+            this.searchInput.setField(field);
+            return this;
+        }
+
+        public SearchInputBuilder withShowCondition(String showCondition) {
+            field.setShowCondition(showCondition);
+            this.searchInput.setField(field);
             return this;
         }
 
         public SearchInputBuilder withFieldId(String fieldId, String elementPath) {
-            Field f = new Field();
-            f.setId(fieldId);
-            f.setElementPath(elementPath);
-            this.searchInput.setField(f);
+            field.setId(fieldId);
+            field.setElementPath(elementPath);
+            this.searchInput.setField(field);
             return this;
         }
 
