@@ -85,6 +85,8 @@ class SubmitCaseTransaction {
         newCaseDetails.setCreatedDate(now);
         newCaseDetails.setLastStateModifiedDate(now);
         newCaseDetails.setReference(Long.valueOf(uidService.generateUID()));
+        //extract the documents and remove the hashcode in Json object
+
 
         /*
             About to submit
