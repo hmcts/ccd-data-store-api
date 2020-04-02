@@ -96,7 +96,7 @@ The functional tests are located in `aat` folder. Most of the tests are written 
 befta-fw library, while there are also quite a number of them written using RestAssured. 
 The latter group of tests will be decommissioned after the appropriate ones are replaced 
 with their new equivalents using befta fw so that the new ones will be 
-doing a lot more detailed verifications.  \
+doing a lot more detailed verifications.  
 
 To find out more about BEFTA Framework, see the repository and its README [here](https://github.com/hmcts/befta-fw).
 
