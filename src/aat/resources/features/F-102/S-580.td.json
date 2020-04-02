@@ -9,7 +9,7 @@
     "contains the list of jurisdictions a user has access to"
   ],
   "user": {
-    "username": "befta.caseworker.1.noprofile+1@gmail.com",
+    "username": "befta.caseworker.1.noprofile@gmail.com",
     "password": "[[$CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD]]"
   },
   "request": {
