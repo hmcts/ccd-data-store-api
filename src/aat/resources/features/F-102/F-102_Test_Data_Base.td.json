@@ -8,7 +8,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "uid": "[[DYNAMIC]]"
+      "uid": "[[DEFAULT_AUTO_VALUE]]"
     }
   },
   "user": {
