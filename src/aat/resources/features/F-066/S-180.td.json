@@ -10,7 +10,7 @@
 	],
   "request": {
     "pathVariables": {
-      "cid": "[[DYNAMIC]]",
+      "cid": "[[DEFAULT_AUTO_VALUE]]",
       "etid": "eyJhbGciOiJIUzI1NiJ9"
     }
   },

@@ -15,7 +15,7 @@
 	],
 	"request": {
 		"pathVariables": {
-			"uid": "[[DYNAMIC]]",
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
 			"jid": "AUTOTEST1",
 			"ctid": "AAT"
 		}
