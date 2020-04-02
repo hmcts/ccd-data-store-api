@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import static java.util.Arrays.asList;
@@ -289,3 +290,4 @@ public class GetCaseDocumentsOperationTest {
         }
     }
 }
+*/
