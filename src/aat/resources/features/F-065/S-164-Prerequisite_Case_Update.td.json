@@ -21,7 +21,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "AUTOTEST1",
       "ctid": "AAT_AUTH_15",
       "cid": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
