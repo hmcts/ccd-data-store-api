@@ -1,5 +1,5 @@
 @F-1003
-Feature: F-1003: Submit Case Creation (V2)
+Feature: F-1003: Submit Case Creation (V2.1)
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
@@ -10,7 +10,7 @@ Feature: F-1003: Submit Case Creation (V2)
     And   a successful call [by same user to upload a document with mandatory metadata] as in [Default_Document_Upload],
     When  a request is prepared with appropriate values,
     And   the request [is to attach the document uploaded above to a new case],
-    And   it is submitted to call the [Submit Case Creation (V2)] operation of [CCD Data Store],
+    And   it is submitted to call the [Submit Case Creation (V2.1)] operation of [CCD Data Store],
     Then  a positive response is received,
     And   the response [contains necessary details about the document attached to the case],
     And   the response has all other details as expected,
@@ -28,7 +28,7 @@ Feature: F-1003: Submit Case Creation (V2)
     And   a successful call [by same user to upload a document with mandatory metadata] as in [Default_Document_Upload_7],
     When  a request is prepared with appropriate values,
     And   the request [is to attach the documents uploaded above to a new case],
-    And   it is submitted to call the [Submit Case Creation (V2)] operation of [CCD Data Store],
+    And   it is submitted to call the [Submit Case Creation (V2.1)] operation of [CCD Data Store],
     Then  a positive response is received,
     And   the response [contains necessary details about the document attached to the case],
     And   the response has all other details as expected,
@@ -41,7 +41,7 @@ Feature: F-1003: Submit Case Creation (V2)
     When  a request is prepared with appropriate values
     And   the request [is to attach the document uploaded above to a new case],
     And   the request [contains a malformed case type ID]
-    And   it is submitted to call the [Submit Case Creation (V2)] operation of [CCD Data Store]
+    And   it is submitted to call the [Submit Case Creation (V2.1)] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response has all the details as expected
 
@@ -52,7 +52,7 @@ Feature: F-1003: Submit Case Creation (V2)
     When  a request is prepared with appropriate values
     And   the request [is to attach the document uploaded above to a new case],
     And   the request [contains a non-existing case type ID]
-    And   it is submitted to call the [Submit Case Creation (V2)] operation of [CCD Data Store]
+    And   it is submitted to call the [Submit Case Creation (V2.1)] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response has all the details as expected
 
@@ -63,7 +63,7 @@ Feature: F-1003: Submit Case Creation (V2)
     When  a request is prepared with appropriate values
     And   the request [is to attach the document uploaded above to a new case],
     And   the request [contains a non-existing Hashtoken]
-    And   it is submitted to call the [Submit Case Creation (V2)] operation of [CCD Data Store]
+    And   it is submitted to call the [Submit Case Creation (V2.1)] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response has all the details as expected
 
@@ -74,7 +74,7 @@ Feature: F-1003: Submit Case Creation (V2)
     When  a request is prepared with appropriate values
     And   the request [is to attach the document uploaded above to a new case],
     And   the request [contains a malformed Hashtoken]
-    And   it is submitted to call the [Submit Case Creation (V2)] operation of [CCD Data Store]
+    And   it is submitted to call the [Submit Case Creation (V2.1)] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response has all the details as expected
 
@@ -84,7 +84,7 @@ Feature: F-1003: Submit Case Creation (V2)
     When  a request is prepared with appropriate values
     And   the request [is to attach the document uploaded above to a new case],
     And   the request [contains a non-existing document ID]
-    And   it is submitted to call the [Submit Case Creation (V2)] operation of [CCD Data Store]
+    And   it is submitted to call the [Submit Case Creation (V2.1)] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response has all the details as expected
 
@@ -94,7 +94,7 @@ Feature: F-1003: Submit Case Creation (V2)
     When  a request is prepared with appropriate values
     And   the request [is to attach the document uploaded above to a new case],
     And   the request [contains a malformed document ID]
-    And   it is submitted to call the [Submit Case Creation (V2)] operation of [CCD Data Store]
+    And   it is submitted to call the [Submit Case Creation (V2.1)] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response has all the details as expected
 
