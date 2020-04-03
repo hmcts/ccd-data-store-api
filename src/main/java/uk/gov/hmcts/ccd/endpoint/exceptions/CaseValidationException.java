@@ -13,24 +13,28 @@ import java.util.stream.Collectors;
 @ResponseStatus(code = HttpStatus.UNPROCESSABLE_ENTITY)
 public class CaseValidationException extends ValidationException {
 
-    private final Collection<String> fields;
+    private final String[] fields;
 
     public CaseValidationException(List<CaseFieldValidationError> fieldErrors) {
         super("Case data validation failed");
-        this.fields = new ArrayList<>();
+        
+        String[] fieldIds = new String[0];
 
         if (fieldErrors != null && !fieldErrors.isEmpty()) {
             // prepare APiException.Details for use in HttpError response
             super.withDetails(new CaseValidationError(fieldErrors));
 
             // record field IDs for use with AppInsights
-            this.fields.addAll(fieldErrors.stream()
+            fieldIds = fieldErrors.stream()
                 .map(CaseFieldValidationError::getId)
-                .collect(Collectors.toList()));
+                .toArray(String[]::new);
         }
+
+        this.fields = fieldIds;
+        
     }
 
     public String[] getFields() {
-        return this.fields != null ? fields.toArray(new String[0]) : null;
+        return fields;
     }
 }
