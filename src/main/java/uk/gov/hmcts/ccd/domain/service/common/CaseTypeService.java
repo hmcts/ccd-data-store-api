@@ -17,7 +17,6 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
-import uk.gov.hmcts.ccd.domain.model.std.CaseValidationError;
 import uk.gov.hmcts.ccd.domain.types.CaseDataValidator;
 import uk.gov.hmcts.ccd.domain.types.ValidationResult;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
