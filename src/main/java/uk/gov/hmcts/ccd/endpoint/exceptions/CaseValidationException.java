@@ -5,10 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseValidationError;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ResponseStatus(code = HttpStatus.UNPROCESSABLE_ENTITY)
 public class CaseValidationException extends ValidationException {
@@ -17,7 +14,7 @@ public class CaseValidationException extends ValidationException {
 
     public CaseValidationException(List<CaseFieldValidationError> fieldErrors) {
         super("Case data validation failed");
-        
+
         String[] fieldIds = new String[0];
 
         if (fieldErrors != null && !fieldErrors.isEmpty()) {
@@ -31,7 +28,7 @@ public class CaseValidationException extends ValidationException {
         }
 
         this.fields = fieldIds;
-        
+
     }
 
     public String[] getFields() {
