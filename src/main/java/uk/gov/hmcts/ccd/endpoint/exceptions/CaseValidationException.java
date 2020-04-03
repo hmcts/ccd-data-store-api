@@ -6,32 +6,26 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseValidationError;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ResponseStatus(code = HttpStatus.UNPROCESSABLE_ENTITY)
 public class CaseValidationException extends ValidationException {
 
-    private final String[] fields;
+    private final List<String> fields;
 
     public CaseValidationException(List<CaseFieldValidationError> fieldErrors) {
         super("Case data validation failed");
 
-        String[] fieldIds = new String[0];
+        // prepare APiException.Details for use in HttpError response
+        super.withDetails(new CaseValidationError(fieldErrors));
 
-        if (fieldErrors != null && !fieldErrors.isEmpty()) {
-            // prepare APiException.Details for use in HttpError response
-            super.withDetails(new CaseValidationError(fieldErrors));
-
-            // record field IDs for use with AppInsights
-            fieldIds = fieldErrors.stream()
-                .map(CaseFieldValidationError::getId)
-                .toArray(String[]::new);
-        }
-
-        this.fields = fieldIds;
-
+        // record field IDs for use with AppInsights
+        this.fields = fieldErrors.stream()
+            .map(CaseFieldValidationError::getId)
+            .collect(Collectors.toList());
     }
 
-    public String[] getFields() {
+    public List<String> getFields() {
         return fields;
     }
 }

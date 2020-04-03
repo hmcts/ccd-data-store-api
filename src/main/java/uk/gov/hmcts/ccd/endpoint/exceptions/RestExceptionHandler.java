@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.exceptions;
 
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +60,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         // NB: only recording field IDs as some validation messages contain user data
         Map<String, String> customProperties = new HashMap<>();
-        customProperties.put("CaseValidationError field IDs", Arrays.toString(exception.getFields()));
+        customProperties.put("CaseValidationError field IDs", StringUtils.join(exception.getFields(), ", "));
 
         LOG.warn("{}: The following list of fields are in an invalid state: {}", exception.getMessage(), exception.getFields(), exception);
         appInsights.trackException(exception, customProperties, SeverityLevel.Warning);

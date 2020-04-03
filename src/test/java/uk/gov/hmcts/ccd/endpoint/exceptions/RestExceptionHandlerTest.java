@@ -311,40 +311,6 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleCaseValidationException_shouldReturnHttpErrorResponse_withoutFieldErrors_returnsWithoutDetails() throws Exception {
-
-        // ARRANGE
-        CaseValidationException expectedException = new CaseValidationException(null);
-
-        setupMockServiceToThrowException(expectedException);
-
-        // ACT
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
-
-        // ASSERT
-        assertHttpErrorResponse(result, expectedException);
-        assertExtraApiExceptionResponseProperties(result, expectedException);
-        result.andExpect(jsonPath("$.details").doesNotExist());
-    }
-
-    @Test
-    public void handleCaseValidationException_shouldReturnHttpErrorResponse_withEmptyFieldErrors_returnsWithoutDetails() throws Exception {
-
-        // ARRANGE
-        CaseValidationException expectedException = new CaseValidationException(new ArrayList<>());
-
-        setupMockServiceToThrowException(expectedException);
-
-        // ACT
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
-
-        // ASSERT
-        assertHttpErrorResponse(result, expectedException);
-        assertExtraApiExceptionResponseProperties(result, expectedException);
-        result.andExpect(jsonPath("$.details").doesNotExist());
-    }
-
-    @Test
     public void handleCaseValidationException_shouldReturnHttpErrorResponse_withFieldErrors_returnsWithDetails_includeFieldNamesAndMessages() throws Exception {
 
         // ARRANGE
@@ -479,5 +445,5 @@ public class RestExceptionHandlerTest {
         // configure chosen mock service to throw exception when controller is run
         when(mockService.execute(AccessControlService.CAN_READ)).thenThrow(expectedException);
     }
-    
+
 }
