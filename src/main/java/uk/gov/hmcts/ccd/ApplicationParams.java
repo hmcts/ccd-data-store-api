@@ -41,6 +41,9 @@ public class ApplicationParams {
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
 
+    @Value("${ccd.case-document-am-api.host}")
+    private String caseDocumentAmAPiHost;
+
     @Value("${ccd.draft.host}")
     private String draftHost;
 
@@ -204,7 +207,7 @@ public class ApplicationParams {
     public String bannersURL() {
         return uiDefinitionHost + "/api/display/banners";
     }
-    
+
     public String jurisdictionUiConfigsURL() {
     	return uiDefinitionHost + "/api/display/jurisdiction-ui-configs";
     }
@@ -344,4 +347,9 @@ public class ApplicationParams {
     public Integer getElasticSearchRequestTimeout() {
         return elasticSearchRequestTimeout;
     }
+
+    public String getCaseDocumentAmAPiHost() {
+        return caseDocumentAmAPiHost;
+    }
+
 }
