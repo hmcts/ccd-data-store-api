@@ -13,7 +13,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_JURISDICTION_1",
       "ctid": "BEFTA_CASETYPE_1_1",
       "etid": "START_PROGRESS",

@@ -14,7 +14,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_JURISDICTION_3",
       "ctid": "BEFTA_CASETYPE_3_2",
       "cid": "${[scenarioContext][childContexts][Citizen_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
