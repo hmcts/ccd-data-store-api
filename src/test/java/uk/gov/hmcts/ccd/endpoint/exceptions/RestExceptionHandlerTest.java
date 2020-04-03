@@ -4,13 +4,9 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.collect.Lists;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,10 +23,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
-import uk.gov.hmcts.ccd.domain.model.std.CaseValidationError;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.endpoint.ui.UserProfileEndpoint;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,13 +63,8 @@ public class RestExceptionHandlerTest {
     @Mock
     private AppInsights appInsights;
 
-    @Mock
-    private ObjectMapperService objectMapperService;
-
     private Logger logger;
     private ListAppender<ILoggingEvent> listAppender;
-
-    private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     @Captor
     private ArgumentCaptor<Map<String, String>> customPropertiesCaptor;
@@ -94,7 +83,7 @@ public class RestExceptionHandlerTest {
         logger.addAppender(listAppender);
 
         // only create classUnderTest after logger configuration
-        RestExceptionHandler classUnderTest = new RestExceptionHandler(appInsights, objectMapperService);
+        RestExceptionHandler classUnderTest = new RestExceptionHandler(appInsights);
 
         // any controller will do as these tests will force it to error
         final UserProfileEndpoint controller = new UserProfileEndpoint(mockService);
@@ -322,10 +311,10 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleCaseValidationException_shouldReturnHttpErrorResponse_noDetailsDoesNotCauseError() throws Exception {
+    public void handleCaseValidationException_shouldReturnHttpErrorResponse_withoutFieldErrors_returnsWithoutDetails() throws Exception {
 
         // ARRANGE
-        CaseValidationException expectedException = new CaseValidationException();
+        CaseValidationException expectedException = new CaseValidationException(null);
 
         setupMockServiceToThrowException(expectedException);
 
@@ -339,12 +328,10 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleCaseValidationException_shouldReturnHttpErrorResponse_badDetailsDoesNotCauseError() throws Exception {
+    public void handleCaseValidationException_shouldReturnHttpErrorResponse_withEmptyFieldErrors_returnsWithoutDetails() throws Exception {
 
         // ARRANGE
-        CaseValidationException expectedException = new CaseValidationException();
-        expectedException.withDetails("test details exist but in unrecognised format");
-        setupObjectMapperWithDetails(expectedException.getDetails());
+        CaseValidationException expectedException = new CaseValidationException(new ArrayList<>());
 
         setupMockServiceToThrowException(expectedException);
 
@@ -354,16 +341,15 @@ public class RestExceptionHandlerTest {
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
         assertExtraApiExceptionResponseProperties(result, expectedException);
-        result.andExpect(jsonPath("$.details").exists());
+        result.andExpect(jsonPath("$.details").doesNotExist());
     }
 
     @Test
-    public void handleCaseValidationException_shouldReturnHttpErrorResponse_withValidationDetails() throws Exception {
+    public void handleCaseValidationException_shouldReturnHttpErrorResponse_withFieldErrors_returnsWithDetails_includeFieldNamesAndMessages() throws Exception {
 
         // ARRANGE
-        CaseValidationException expectedException = new CaseValidationException();
-        expectedException.withDetails("test details");
-        setupObjectMapperWithDetails(expectedException.getDetails());
+        List<CaseFieldValidationError> fieldErrors = createFieldErrors();
+        CaseValidationException expectedException = new CaseValidationException(fieldErrors);
 
         setupMockServiceToThrowException(expectedException);
 
@@ -373,19 +359,19 @@ public class RestExceptionHandlerTest {
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
         assertExtraApiExceptionResponseProperties(result, expectedException);
-        result.andExpect(jsonPath("$.details").exists());
+        result.andExpect(jsonPath("$.details.field_errors[*]", hasSize(2)));
+        result.andExpect(jsonPath("$.details.field_errors[0].id").value(fieldErrors.get(0).getId()));
+        result.andExpect(jsonPath("$.details.field_errors[0].message").value(fieldErrors.get(0).getMessage()));
+        result.andExpect(jsonPath("$.details.field_errors[1].id").value(fieldErrors.get(1).getId()));
+        result.andExpect(jsonPath("$.details.field_errors[1].message").value(fieldErrors.get(1).getMessage()));
     }
 
     @Test
-    public void handleCaseValidationException_shouldLogExceptionAsWarning_withValidationDetails_includeFieldNamesButNotMessages() throws Exception {
+    public void handleCaseValidationException_shouldLogExceptionAsWarning_withFieldErrors_includeFieldNamesButNotMessages() throws Exception {
 
         // ARRANGE
-        CaseValidationException expectedException = new CaseValidationException();
-        List<CaseFieldValidationError> fieldErrors = new ArrayList<>();
-        fieldErrors.add(new CaseFieldValidationError("field1", "response message 1"));
-        fieldErrors.add(new CaseFieldValidationError("field2", "response message 2"));
-        expectedException.withDetails(new CaseValidationError(fieldErrors));
-        setupObjectMapperWithDetails(expectedException.getDetails());
+        List<CaseFieldValidationError> fieldErrors = createFieldErrors();
+        CaseValidationException expectedException = new CaseValidationException(fieldErrors);
 
         setupMockServiceToThrowException(expectedException);
 
@@ -406,16 +392,12 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleCaseValidationException_shouldTrackExceptionToAppInsightsAsWarning_withValidationDetails_includeFieldNamesButNotMessages()
+    public void handleCaseValidationException_shouldTrackExceptionToAppInsightsAsWarning_withFieldErrors_includeFieldNamesButNotMessages()
         throws Exception {
 
         // ARRANGE
-        CaseValidationException expectedException = new CaseValidationException();
-        List<CaseFieldValidationError> fieldErrors = new ArrayList<>();
-        fieldErrors.add(new CaseFieldValidationError("field1", "response message 1"));
-        fieldErrors.add(new CaseFieldValidationError("field2", "response message 2"));
-        expectedException.withDetails(new CaseValidationError(fieldErrors));
-        setupObjectMapperWithDetails(expectedException.getDetails());
+        List<CaseFieldValidationError> fieldErrors = createFieldErrors();
+        CaseValidationException expectedException = new CaseValidationException(fieldErrors);
 
         setupMockServiceToThrowException(expectedException);
 
@@ -426,9 +408,13 @@ public class RestExceptionHandlerTest {
         verify(appInsights, times(1)).trackException(eq(expectedException), customPropertiesCaptor.capture(), eq(SeverityLevel.Warning));
         // check logging field names
         Map<String, String> trackedCustomProperties = customPropertiesCaptor.getValue();
-        String trackedFieldNames = trackedCustomProperties.get("CaseValidationError field IDs");
-        assertThat(trackedFieldNames, containsString(fieldErrors.get(0).getId()));
-        assertThat(trackedFieldNames, containsString(fieldErrors.get(1).getId()));
+        String trackedFieldInfo = trackedCustomProperties.get("CaseValidationError field IDs");
+        // check logging field names
+        assertThat(trackedFieldInfo, containsString(fieldErrors.get(0).getId()));
+        assertThat(trackedFieldInfo, containsString(fieldErrors.get(1).getId()));
+        // check not logging validation messages
+        assertThat(trackedFieldInfo, not(containsString(fieldErrors.get(0).getMessage())));
+        assertThat(trackedFieldInfo, not(containsString(fieldErrors.get(1).getMessage())));
     }
 
     private void assertHttpErrorResponse(ResultActions result, Exception expectedException) throws Exception {
@@ -447,15 +433,19 @@ public class RestExceptionHandlerTest {
     private void assertExtraApiExceptionResponseProperties(ResultActions result, ApiException expectedException) throws Exception {
 
         // load extra properties
-        Serializable exceptionDetails = expectedException.getDetails(); // NB: expecting test to be a simple string
+        Serializable exceptionDetails = expectedException.getDetails();
         List<String> exceptionCallbackErrors = expectedException.getCallbackErrors();
         List<String> exceptionCallbackWarnings = expectedException.getCallbackWarnings();
 
         // check details
         if (exceptionDetails == null) {
             result.andExpect(jsonPath("$.details").doesNotExist());
-        } else {
+        } else if (exceptionDetails instanceof String) {
+            // simple object so can check value
             result.andExpect(jsonPath("$.details").value(exceptionDetails));
+        } else {
+            // complex object so just check if exists and leave finer detail to calling test method
+            result.andExpect(jsonPath("$.details").exists());
         }
 
         // check callback errors
@@ -477,16 +467,17 @@ public class RestExceptionHandlerTest {
         }
     }
 
+    private List<CaseFieldValidationError> createFieldErrors() {
+        List<CaseFieldValidationError> fieldErrors = new ArrayList<>();
+        fieldErrors.add(new CaseFieldValidationError("field1", "validation message 1"));
+        fieldErrors.add(new CaseFieldValidationError("field2", "validation message 2"));
+
+        return fieldErrors;
+    }
+
     private void setupMockServiceToThrowException(Exception expectedException) {
         // configure chosen mock service to throw exception when controller is run
         when(mockService.execute(AccessControlService.CAN_READ)).thenThrow(expectedException);
     }
-
-    private void setupObjectMapperWithDetails(Serializable details) {
-        try {
-            when(objectMapperService.convertObjectToString(details)).thenReturn(objectWriter.writeValueAsString(details));
-        } catch (JsonProcessingException e) {
-            Assert.fail("Unable to serialize details");
-        }
-    }
+    
 }

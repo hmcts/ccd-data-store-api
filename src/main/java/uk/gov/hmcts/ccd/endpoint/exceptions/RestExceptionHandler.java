@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.exceptions;
 
-import com.jayway.jsonpath.JsonPath;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,14 +11,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
-import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
@@ -27,12 +23,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
 
     private final AppInsights appInsights;
-    private final ObjectMapperService objectMapperService;
 
     @Autowired
-    public RestExceptionHandler(AppInsights appInsights, ObjectMapperService objectMapperService) {
+    public RestExceptionHandler(AppInsights appInsights) {
         this.appInsights = appInsights;
-        this.objectMapperService = objectMapperService;
     }
 
     @ExceptionHandler(ApiException.class)
@@ -64,17 +58,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ResponseEntity<HttpError> handleCaseValidationException(HttpServletRequest request, CaseValidationException exception) {
 
-        // read field IDs from CaseValidationException.details (i.e. avoid using full error details as this may contain user data)
-        List<String> fieldIds = new ArrayList<>();
-        if (exception.getDetails() != null) {
-            String detailsJson = this.objectMapperService.convertObjectToString(exception.getDetails());
-            fieldIds = JsonPath.read(detailsJson, "$..field_errors[*].id");
-        }
-
+        // NB: only recording field IDs as some validation messages contain user data
         Map<String, String> customProperties = new HashMap<>();
-        customProperties.put("CaseValidationError field IDs", Arrays.toString(fieldIds.toArray()));
+        customProperties.put("CaseValidationError field IDs", Arrays.toString(exception.getFields()));
 
-        LOG.warn("{}: The following list of fields are in an error state: {}", exception.getMessage(), fieldIds, exception);
+        LOG.warn("{}: The following list of fields are in an invalid state: {}", exception.getMessage(), exception.getFields(), exception);
         appInsights.trackException(exception, customProperties, SeverityLevel.Warning);
         final HttpError<Serializable> error = new HttpError<>(exception, request)
             .withDetails(exception.getDetails());

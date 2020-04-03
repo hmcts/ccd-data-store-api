@@ -37,8 +37,14 @@ public class AppInsights {
         telemetry.trackException(e);
     }
 
-    public void trackException(Exception e, Map<String, String> customProperties, SeverityLevel severityLevel) {
-        ExceptionTelemetry exceptionTelemetry = new ExceptionTelemetry(e);
+    /**
+     * Sends an exception record to Application Insights. Appears in "exceptions" in Analytics and Search.
+     * @param exception The exception to log information about.
+     * @param customProperties Named string values you can use to search and classify trace messages.
+     * @param severityLevel Sets the SeverityLevel property
+     */
+    public void trackException(Exception exception, Map<String, String> customProperties, SeverityLevel severityLevel) {
+        ExceptionTelemetry exceptionTelemetry = new ExceptionTelemetry(exception);
 
         if (severityLevel != null) {
             exceptionTelemetry.setSeverityLevel(severityLevel);

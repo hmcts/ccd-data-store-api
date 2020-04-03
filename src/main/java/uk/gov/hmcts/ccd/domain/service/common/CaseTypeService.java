@@ -61,8 +61,7 @@ public class CaseTypeService {
             final List<CaseFieldValidationError> fieldErrors = dataValidationResults.stream()
                 .map(validationResult -> new CaseFieldValidationError(validationResult.getFieldId(), validationResult.getErrorMessage()))
                 .collect(Collectors.toList());
-            throw new CaseValidationException()
-                .withDetails(new CaseValidationError(fieldErrors));
+            throw new CaseValidationException(fieldErrors);
         }
     }
 
