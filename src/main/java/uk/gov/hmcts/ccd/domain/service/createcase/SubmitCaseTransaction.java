@@ -17,8 +17,12 @@ import javax.transaction.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -45,6 +49,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
+import uk.gov.hmcts.ccd.endpoint.std.CaseAccessEndpoint;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -52,6 +57,8 @@ import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
 
 @Service
 class SubmitCaseTransaction {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SubmitCaseTransaction.class);
 
     @Inject
     private HttpServletRequest request;
@@ -128,6 +135,7 @@ class SubmitCaseTransaction {
             && request.getHeader(CONTENT_TYPE).equals(V2.MediaType.CREATE_CASE_2_1);
 
         if (isApiVersion21) {
+            LOG.debug("Creating case using Version 2.1 of case create API");
             documentSet = new HashSet<>();
             documentMetadata = DocumentMetadata.builder()
                                                .caseId(newCaseDetails.getReferenceAsString())
@@ -173,12 +181,10 @@ class SubmitCaseTransaction {
             extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentSet);
             filterDocumentFields(documentMetadata, documentSet);
 
-            HttpEntity<DocumentMetadata> request = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
+            HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
             restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-      /*  restTemplate.exchange(documentUrl, HttpMethod.PATCH, requestEntity, Void.class);
-        ResponseEntity<String> result = restTemplate.exchange(
-            (applicationParams.getCaseDocumentAmAPiHost().concat("/cases/documents/attachToCase"), request, String.class);
-*/
+            ResponseEntity<Void> result = restTemplate.exchange(applicationParams.getCaseDocumentAmAPiHost().concat("/cases/documents/attachToCase"),
+                                                                HttpMethod.PATCH, requestEntity, Void.class);
         }
         return savedCaseDetails;
     }
@@ -189,18 +195,19 @@ class SubmitCaseTransaction {
             //This quick check will reduce the processing time as most of filtering will be done at top level.
             if (jsonNodeValue != null && jsonNodeValue.get(HASH_CODE_STRING) != null) {
                 //Check if current node is of type document and hashcode is available.
-                if (jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null && jsonNodeValue.get(HASH_CODE_STRING) != null
-                    && !documentSet.contains(jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText())) {
+                JsonNode documentField = jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
+                if (documentField != null && jsonNodeValue.get(HASH_CODE_STRING) != null
+                    && !documentSet.contains(documentField.asText())) {
 
                     documentMetadata.getDocuments().add(CaseDocument
                                                             .builder()
-                                                            .url(jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText())
-                                                            .hashedToken(jsonNodeValue.get(HASH_CODE_STRING).asText())
+                                                            .id(documentField.asText().substring(documentField.asText().length() - 36))
+                                                            .hashToken(jsonNodeValue.get(HASH_CODE_STRING).asText())
                                                             .build());
                     if (jsonNodeValue instanceof ObjectNode) {
                         ((ObjectNode) jsonNodeValue).remove(HASH_CODE_STRING);
                     }
-                    documentSet.add(jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText());
+                    documentSet.add(documentField.asText().substring(documentField.asText().length() - 36));
                 } else {
                     jsonNodeValue.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata, (Map<String, JsonNode>) node, documentSet));
                 }
@@ -210,7 +217,7 @@ class SubmitCaseTransaction {
 
     private void filterDocumentFields(DocumentMetadata documentMetadata , Set<String> documentSet) {
         List<CaseDocument> caseDocumentList = documentMetadata.getDocuments().stream()
-                                                              .filter(document -> documentSet.contains(document.getUrl()))
+                                                              .filter(document -> documentSet.contains(document.getId()))
                                                               .collect(Collectors.toList());
         documentMetadata.setDocuments(caseDocumentList);
 

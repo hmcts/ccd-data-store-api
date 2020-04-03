@@ -1,23 +1,33 @@
 package uk.gov.hmcts.ccd.v2.external.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-
-import java.util.List;
 
 @Data
 @EqualsAndHashCode
 @Builder
-public class CaseDocument {
-    private String url;
-    private String name;
-    private String type;
-    private String description;
+public class CaseDocument implements Serializable {
+
+    @JsonProperty("id")
     private String id;
-    private List<AccessControlList> accessControlLists;
-    @JsonIgnore
-    private String hashedToken;
+
+    @JsonProperty("url")
+    private String url;
+
+    @JsonProperty("name")
+    private String name;
+
+    @JsonProperty("type")
+    private String type;
+
+    @JsonProperty("description")
+    private String description;
+
+    @JsonProperty("hashToken")
+    private String hashToken;
+
 }
