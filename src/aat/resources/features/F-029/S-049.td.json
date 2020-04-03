@@ -20,6 +20,10 @@
       "case_id": null,
       "case_fields": [
         {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
+        {
           "id": "TextField",
           "label": "A `Text` field",
           "hidden": false,
