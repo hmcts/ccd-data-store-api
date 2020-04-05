@@ -24,7 +24,7 @@ Feature: F-057: Get the pagination metadata for a case data search for Citizen
     And the response [has the 400 return code]
     And the response has all other details as expected
 
-  @S-138
+  @S-138 @Ignore # re-write as part of RDM-6847
   Scenario: must return appropriate negative response when request does not provide a valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -34,7 +34,7 @@ Feature: F-057: Get the pagination metadata for a case data search for Citizen
     And the response [has the 403 return code]
     And the response has all other details as expected
 
-  @S-139
+  @S-139 @Ignore # re-write as part of RDM-6847
   Scenario: must return appropriate negative response when request does not provide an authorized access
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
