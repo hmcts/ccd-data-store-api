@@ -9,7 +9,7 @@
   ],
   "request": {
     "pathVariables": {
-      "cid": "[[DYNAMIC]]"
+      "cid": "[[DEFAULT_AUTO_VALUE]]"
     }
   },
   "expectedResponse": {
@@ -25,6 +25,10 @@
       "description": null,
       "case_id": "[[ANYTHING_PRESENT]]",
       "case_fields": [
+        {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
         {
           "id": "TextField",
           "label": "A `Text` field",
