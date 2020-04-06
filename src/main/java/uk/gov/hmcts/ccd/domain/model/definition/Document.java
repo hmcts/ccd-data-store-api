@@ -5,7 +5,6 @@ public class Document {
     private String name;
     private String type;
     private String description;
-    private String hashCode;
 
     public String getUrl() {
         return url;
@@ -39,11 +38,4 @@ public class Document {
         this.type = type;
     }
 
-    public String getHashCode() {
-        return hashCode;
-    }
-
-    public void setHashCode(String hashCode) {
-        this.hashCode = hashCode;
-    }
 }
