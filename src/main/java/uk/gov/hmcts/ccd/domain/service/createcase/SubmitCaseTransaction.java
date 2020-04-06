@@ -53,7 +53,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataParsingException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -88,7 +87,8 @@ class SubmitCaseTransaction {
     public static final String HASH_CODE_STRING = "hashcode";
     public static final String CONTENT_TYPE = "content-type";
     public static final String BINARY = "/binary";
-    public static final String EXCEPTION_STRING = "Exception while extracting the document fields from Case payload";
+    public static final String CASE_DATA_PARSING_EXCEPTION = "Exception while extracting the document fields from Case payload";
+    public static final String DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION = "The documents have been altered outside the create case transaction";
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
@@ -154,8 +154,8 @@ class SubmitCaseTransaction {
                 extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback);
             }
             catch (Exception e) {
-                LOG.error(EXCEPTION_STRING);
-                throw new DataParsingException(EXCEPTION_STRING);
+                LOG.error(CASE_DATA_PARSING_EXCEPTION);
+                throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
             }
         }
 
@@ -180,27 +180,27 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion21) {
+            documentAfterCallback = new HashSet<>();
+            extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
+            filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
+
+            HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
+            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+
             try {
-                documentAfterCallback = new HashSet<>();
-                extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
-                filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
-
-                HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
-                restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-
                 if (!documentMetadata.getDocuments().isEmpty()) {
                     ResponseEntity<Boolean> result = restTemplate
-                        .exchange(applicationParams.getCaseDocumentAmAPiHost().concat("/cases/documents/attachToCase"),
+                        .exchange(applicationParams.getCaseDocumentAmAPiHost().concat(applicationParams.getAttachDocumentPath()),
                                   HttpMethod.PATCH, requestEntity, Boolean.class);
+
                     if (!result.getStatusCode().equals(HttpStatus.OK) || result.getBody() == null || result.getBody().equals(false)) {
-                        LOG.error("An issue occured while patching the metadata for uploaded documents.");
-                        throw new ServiceException("An issue occurred while patching the metadata for uploaded documents.");
+                        LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
+                        throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
                     }
                 }
-            }
-            catch (Exception e) {
-                LOG.error(EXCEPTION_STRING);
-                throw new CaseConcurrencyException(EXCEPTION_STRING);
+            } catch (Exception e) {
+                LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
+                throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
             }
         }
         return savedCaseDetails;
@@ -244,8 +244,8 @@ class SubmitCaseTransaction {
                 }
             });
         } catch (Exception e) {
-            LOG.error(EXCEPTION_STRING);
-            throw new DataParsingException(EXCEPTION_STRING);
+            LOG.error(CASE_DATA_PARSING_EXCEPTION);
+            throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
         }
     }
 

@@ -44,6 +44,9 @@ public class ApplicationParams {
     @Value("${ccd.case-document-am-api.host}")
     private String caseDocumentAmAPiHost;
 
+    @Value("${ccd.case-document-am-api.attachDocumentPath}")
+    private String attachDocumentPath;
+
     @Value("${ccd.draft.host}")
     private String draftHost;
 
@@ -351,5 +354,14 @@ public class ApplicationParams {
     public String getCaseDocumentAmAPiHost() {
         return caseDocumentAmAPiHost;
     }
+
+    public String getAttachDocumentPath() {
+        return attachDocumentPath;
+    }
+
+    public void setAttachDocumentPath(String attachDocumentPath) {
+        this.attachDocumentPath = attachDocumentPath;
+    }
+
 
 }
