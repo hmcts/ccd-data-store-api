@@ -10,7 +10,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
@@ -75,13 +74,14 @@ public class MergeDataToSearchResultOperation {
     }
 
     private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseField caseField) {
+        CommonField commonField = commonField(searchResultField, caseField);
         return new SearchResultViewColumn(
             searchResultField.buildCaseFieldId(),
-            buildCaseFieldType(searchResultField, caseField),
+            commonField.getFieldType(),
             searchResultField.getLabel(),
             searchResultField.getDisplayOrder(),
             searchResultField.isMetadata(),
-            searchResultField.getDisplayContextParameter());
+            displayContextParameter(searchResultField, commonField));
     }
 
     private boolean filterDistinctFieldsByRole(final HashSet<String> addedFields, final SearchResultField resultField) {
@@ -98,10 +98,15 @@ public class MergeDataToSearchResultOperation {
         }
     }
 
-    private FieldType buildCaseFieldType(SearchResultField searchResultField, CaseField caseField) {
-        CommonField resultField = caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
+    private CommonField commonField(SearchResultField searchResultField, CaseField caseField) {
+        return caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
             .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseField.getId(), searchResultField.getCaseFieldPath())));
-        return resultField.getFieldType();
+    }
+
+    private String displayContextParameter(SearchResultField searchResultField, CommonField commonField) {
+        return searchResultField.getDisplayContextParameter() == null ?
+            commonField.getDisplayContextParameter() :
+            searchResultField.getDisplayContextParameter();
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,

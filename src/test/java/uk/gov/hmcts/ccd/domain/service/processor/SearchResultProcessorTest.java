@@ -1,16 +1,23 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
+import uk.gov.hmcts.ccd.domain.types.BaseType;
+import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
 import java.util.*;
 
@@ -21,9 +28,17 @@ import static org.mockito.Mockito.when;
 
 class SearchResultProcessorTest {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String DATE_FIELD = "DateField";
     private static final String DATETIME_FIELD = "DateTimeField";
     private static final String TEXT_FIELD = "TextField";
+    private static final String COMPLEX_FIELD = "ComplexField";
+    private static final String COLLECTION_FIELD = "CollectionField";
+
+    private static final String DATETIME_FIELD_TYPE = "DateTime";
+    private static final String DATE_FIELD_TYPE = "Date";
+    private static final String COLLECTION_FIELD_TYPE = "Collection";
+    private static final String COMPLEX_FIELD_TYPE = "Complex";
 
     private List<SearchResultViewColumn> viewColumns = new ArrayList<>();
     private List<SearchResultViewItem> viewItems = new ArrayList<>();
@@ -35,14 +50,22 @@ class SearchResultProcessorTest {
     @Mock
     private DateTimeFormatParser dateTimeFormatParser;
 
+    @Mock
+    private CaseDefinitionRepository definitionRepository;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.EMPTY_LIST);
+        BaseType.setCaseDefinitionRepository(definitionRepository);
+        BaseType.initialise();
+        setUpBaseTypes();
+
         SearchResultViewColumn column1 = new SearchResultViewColumn(DATE_FIELD,
-            fieldType("Date"), null, 1, false, "#DATETIMEDISPLAY(dd/MM/yyyy)");
+            fieldType(DATE_FIELD_TYPE), null, 1, false, "#DATETIMEDISPLAY(dd/MM/yyyy)");
         SearchResultViewColumn column2 = new SearchResultViewColumn(DATETIME_FIELD,
-            fieldType("DateTime"), null, 1, false, "#DATETIMEDISPLAY(ddMMyyyy)");
+            fieldType(DATETIME_FIELD_TYPE), null, 1, false, "#DATETIMEDISPLAY(ddMMyyyy)");
         viewColumns.addAll(Arrays.asList(column1, column2));
 
         caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
@@ -75,11 +98,90 @@ class SearchResultProcessorTest {
     }
 
     @Test
+    void shouldProcessComplexTypesWithDCP() throws JsonProcessingException {
+        caseFields.put(COMPLEX_FIELD, MAPPER.readTree("{\"ComplexDateField\": \"2020-10-05\"}"));
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
+        CaseField complexField = caseField("ComplexDateField", fieldType("Date"), "#DATETIMEDISPLAY(MM-yyyy)");
+        SearchResultViewColumn complexColumn = new SearchResultViewColumn(COMPLEX_FIELD,
+            fieldType(COMPLEX_FIELD_TYPE, COMPLEX_FIELD_TYPE, Collections.singletonList(complexField), null), null, 1, false, null);
+        viewColumns.add(complexColumn);
+
+        when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "2020-10-05")).thenReturn("10-2020");
+
+        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+
+        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        assertAll(
+            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
+            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
+            () -> assertThat(((ObjectNode)itemResult.getCaseFieldsFormatted().get(COMPLEX_FIELD)).get("ComplexDateField").asText(), is("10-2020")),
+            () -> assertThat(((ObjectNode)itemResult.getCaseFields().get(COMPLEX_FIELD)).get("ComplexDateField").asText(), is("2020-10-05"))
+        );
+    }
+
+    @Test
+    void shouldProcessCollectionsWithDCP() throws JsonProcessingException {
+        caseFields.put(COLLECTION_FIELD,
+            MAPPER.readTree("[{\"id\": \"1\", \"value\": \"2020-10-05\"},{\"id\": \"2\", \"value\": \"1999-12-01\"}]"));
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
+        SearchResultViewColumn collectionColumn = new SearchResultViewColumn(COLLECTION_FIELD,
+            fieldType(COLLECTION_FIELD_TYPE, COLLECTION_FIELD_TYPE, null, fieldType(DATE_FIELD_TYPE)), null, 1, false, "#DATETIMEDISPLAY(MM-yyyy)");
+        viewColumns.add(collectionColumn);
+
+        when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "2020-10-05"))
+            .thenReturn("10-2020");
+        when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "1999-12-01"))
+            .thenReturn("12-1999");
+
+        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+
+        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        assertAll(
+            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
+            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
+            () -> assertThat(((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(), is("10-2020")),
+            () -> assertThat(((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(), is("12-1999")),
+            () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(), is("2020-10-05")),
+            () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(), is("1999-12-01"))
+        );
+    }
+
+    @Test
+    void shouldProcessCollectionOfComplexTypesWithDCP() throws JsonProcessingException {
+        caseFields.put(COLLECTION_FIELD,
+            MAPPER.readTree("[{\"id\": \"1\", \"value\": {\"NestedDate\": \"2020-10-05\"}},"
+                            + "{\"id\": \"2\", \"value\": {\"NestedDate\": \"1992-07-30\"}}]"));
+        CaseField nestedDateField = caseField("NestedDate", fieldType("Date"), "#DATETIMEDISPLAY(MM-yyyy)");
+        FieldType complexFieldType = fieldType(COMPLEX_FIELD_TYPE, COMPLEX_FIELD_TYPE, Collections.singletonList(nestedDateField), null);
+        SearchResultViewColumn collectionColumn = new SearchResultViewColumn(COLLECTION_FIELD,
+            fieldType(COLLECTION_FIELD_TYPE, COLLECTION_FIELD_TYPE, null, complexFieldType), null, 1, false, null);
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
+        viewColumns.add(collectionColumn);
+
+        when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "2020-10-05"))
+            .thenReturn("10-2020");
+        when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "1992-07-30"))
+            .thenReturn("07-1992");
+
+        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+
+        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        assertAll(
+            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
+            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
+            () -> assertThat(((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(), is("10-2020")),
+            () -> assertThat(((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(), is("07-1992")),
+            () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(), is("2020-10-05")),
+            () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(), is("1992-07-30"))
+        );
+    }
+
+    @Test
     void shouldUseOriginalValueForDatesWithoutDCP() {
         SearchResultViewColumn column1 = new SearchResultViewColumn(DATE_FIELD,
-            fieldType("Date"), null, 1, false, null);
+            fieldType(DATE_FIELD_TYPE), null, 1, false, null);
         SearchResultViewColumn column2 = new SearchResultViewColumn(DATETIME_FIELD,
-            fieldType("DateTime"), null, 1, false, null);
+            fieldType(DATETIME_FIELD_TYPE), null, 1, false, null);
         List<SearchResultViewColumn> columns = new ArrayList<>();
         columns.addAll(Arrays.asList(column1, column2));
 
@@ -94,6 +196,13 @@ class SearchResultProcessorTest {
         );
     }
 
+    private CaseField caseField(String id, FieldType fieldType, String displayContextParameter) {
+        CaseField caseField = new CaseField();
+        caseField.setId(id);
+        caseField.setFieldType(fieldType);
+        caseField.setDisplayContextParameter(displayContextParameter);
+        return caseField;
+    }
 
     private FieldType fieldType(String id, String type, List<CaseField> complexFields, FieldType collectionFieldType) {
         FieldType fieldType = new FieldType();
@@ -106,5 +215,12 @@ class SearchResultProcessorTest {
 
     private FieldType fieldType(String fieldType) {
         return fieldType(fieldType, fieldType, Collections.emptyList(), null);
+    }
+
+    private void setUpBaseTypes() {
+        BaseType.register(new BaseType(fieldType(DATE_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(DATETIME_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(COLLECTION_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(COMPLEX_FIELD_TYPE)));
     }
 }
