@@ -166,8 +166,7 @@ class UIDefinitionControllerTest {
         void shouldPropagateExceptionWhenThrown() {
             when(getCriteriaOperation.execute(CASE_TYPE_ID, CAN_READ, SEARCH)).thenThrow(RuntimeException.class);
 
-            assertThrows(RuntimeException.class,
-                         () -> uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID));
+            assertThrows(RuntimeException.class, () -> uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID));
         }
     }
 
@@ -273,10 +272,7 @@ class UIDefinitionControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> {
-                    UIJurisdictionResource jurisdictionResource = response.getBody();
-                    assertEquals(2, jurisdictionResource.getJurisdictions().length);
-                }
+                () -> assertEquals(2, response.getBody().getJurisdictions().length)
             );
         }
     }
