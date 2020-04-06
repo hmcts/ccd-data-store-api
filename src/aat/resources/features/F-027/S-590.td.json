@@ -13,7 +13,7 @@
   },
   "request": {
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_JURISDICTION_3",
       "ctid": "BEFTA_CASETYPE_3_4",
       "cid": "${[scenarioContext][childContexts][S-027.01_Case][testData][actualResponse][body][id]}"
@@ -31,6 +31,10 @@
     "body" : {
       "tabs" : "[[ANYTHING_PRESENT]]",
       "metadataFields": [
+        {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
         {
           "id": "[STATE]",
           "label": "State",

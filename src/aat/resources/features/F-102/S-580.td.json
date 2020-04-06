@@ -1,0 +1,551 @@
+{
+  "_guid_": "S-580",
+  "_extends_": "F-102_Test_Data_Base",
+  "title": "Get jurisdictions available to the user",
+  "specs": [
+    "appropriate idam roles but no CCD user profile",
+    "has CREATE as case access parameter",
+    "contains HTTP 200 Ok status code",
+    "contains the list of jurisdictions a user has access to"
+  ],
+  "user": {
+    "username": "befta.caseworker.1.noprofile@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD]]"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "access": "create"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "arrayInMap": [
+        {
+          "id": "BEFTA_JURISDICTION_1",
+          "name": "BEFTA_JURISDICTION_1",
+          "description": "Content for the Test Jurisdiction.",
+          "caseTypes": [
+            {
+              "id": "BEFTA_CASETYPE_1_1",
+              "description": "Create a case of type BEFTA_CASETYPE_1_1",
+              "version": null,
+              "name": "BEFTA Case Type 1 1",
+              "jurisdiction": null,
+              "events": [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered"
+                },
+                {
+                  "id": "REVIEW",
+                  "name": "Review",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "*"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "UPDATE",
+                  "name": "Update",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "*"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "COMPLETE",
+                  "name": "Mark as done",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "IN_PROGRESS"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "STOP_PROGRESS",
+                  "name": "Stop",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "IN_PROGRESS"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "START_PROGRESS",
+                  "name": "Start",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "TODO"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "CREATE",
+                  "name": "Create a new case",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                }
+              ],
+              "states": [
+                {
+                  "id": "TODO",
+                  "name": "To do",
+                  "description": null,
+                  "order": 1,
+                  "title_display": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "IN_PROGRESS",
+                  "name": "In progress",
+                  "description": null,
+                  "order": 2,
+                  "title_display": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "DONE",
+                  "name": "Done",
+                  "description": null,
+                  "order": 3,
+                  "title_display": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                }
+              ],
+              "searchAliasFields": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": [
+                {
+                  "role": "caseworker-befta_jurisdiction_1",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
+            },
+            {
+              "id": "CASE_TYPE_WITH_NO_CASES",
+              "description": "Create a case of type CASE_TYPE_WITH_NO_CASES",
+              "version": null,
+              "name": "CT With No Cases -Don't Create",
+              "jurisdiction": null,
+              "events": [
+                {
+                  "id": "REVIEW",
+                  "name": "Review",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "*"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "UPDATE",
+                  "name": "Update",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "*"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "COMPLETE",
+                  "name": "Mark as done",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "IN_PROGRESS"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "STOP_PROGRESS",
+                  "name": "Stop",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "IN_PROGRESS"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "START_PROGRESS",
+                  "name": "Start",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "TODO"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "CREATE",
+                  "name": "Create a new case",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                }
+              ],
+              "states": [
+                {
+                  "id": "TODO",
+                  "name": "To do",
+                  "description": null,
+                  "order": 1,
+                  "title_display": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "IN_PROGRESS",
+                  "name": "In progress",
+                  "description": null,
+                  "order": 2,
+                  "title_display": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "DONE",
+                  "name": "Done",
+                  "description": null,
+                  "order": 3,
+                  "title_display": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                }
+              ],
+              "searchAliasFields": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": [
+                {
+                  "role": "caseworker-befta_jurisdiction_1",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
