@@ -10,7 +10,7 @@
   ],
   "request": {
     "pathVariables": {
-      "cid": "[[DYNAMIC]]"
+      "cid": "[[DEFAULT_AUTO_VALUE]]"
     }
   },
   "expectedResponse": {
@@ -39,6 +39,10 @@
       },
       "tabs": "[[ANYTHING_PRESENT]]",
       "metadataFields": [
+        {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
         {
           "id": "[STATE]",
           "label": "State",
