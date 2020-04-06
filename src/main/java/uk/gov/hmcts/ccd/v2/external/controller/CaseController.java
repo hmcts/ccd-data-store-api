@@ -290,7 +290,7 @@ public class CaseController {
               message = V2.Error.CALLBACK_EXCEPTION
           )
     })
-    public ResponseEntity<CaseResource> createCaseV2(@PathVariable("caseTypeId") String caseTypeId,
+    public ResponseEntity<CaseResource> createCaseV21(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
