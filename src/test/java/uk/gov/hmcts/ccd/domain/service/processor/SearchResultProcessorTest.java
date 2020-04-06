@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -94,6 +95,28 @@ class SearchResultProcessorTest {
             () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATE_FIELD)).asText(), is("2020-10-01")),
             () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATETIME_FIELD)).asText(), is("1985-12-30")),
             () -> assertThat(((TextNode)itemResult.getCaseFields().get(TEXT_FIELD)).asText(), is("Text Value"))
+        );
+    }
+
+    @Test
+    void shouldProcessMetadataDatesWithDCP() {
+        final String metadataField = "[METADATA_DATE]";
+        final LocalDateTime localDateTime = LocalDateTime.of(2020, 10, 1, 12, 30, 0, 0);
+        caseFields.put(metadataField, localDateTime);
+        viewColumns.add(new SearchResultViewColumn(metadataField,
+            fieldType(DATE_FIELD_TYPE), null, 1, true, "#DATETIMEDISPLAY(dd/MM/yyyy)"));
+        when(dateTimeFormatParser.convertIso8601ToDateTime("dd/MM/yyyy", "2020-10-01T12:30:00.000"))
+            .thenReturn("01/10/2020");
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
+
+        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+
+        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        assertAll(
+            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
+            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
+            () -> assertThat(((TextNode)itemResult.getCaseFieldsFormatted().get(metadataField)).asText(), is("01/10/2020")),
+            () -> assertThat(itemResult.getCaseFields().get(metadataField), is(localDateTime))
         );
     }
 

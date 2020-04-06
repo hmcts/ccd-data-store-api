@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -51,18 +52,20 @@ public class SearchResultProcessor {
 
     private SearchResultViewItem processSearchResultViewItem(SearchResultViewItem viewItem, SearchResultViewColumn viewColumn) {
         viewItem.getCaseFieldsFormatted().replace(viewColumn.getCaseFieldId(),
-            processNode(viewItem.getCaseFields().get(viewColumn.getCaseFieldId()), viewColumn));
+            processObject(viewItem.getCaseFields().get(viewColumn.getCaseFieldId()), viewColumn));
         return viewItem;
     }
 
-    private Object processNode(final Object object,
-                               final SearchResultViewColumn viewColumn) {
+    private Object processObject(final Object object,
+                                 final SearchResultViewColumn viewColumn) {
         if (object instanceof TextNode && !FieldProcessor.isNullOrEmpty((TextNode) object)) {
             return createTextNodeFrom((TextNode) object, viewColumn, viewColumn.getCaseFieldId());
         } else if (object instanceof ArrayNode && !FieldProcessor.isNullOrEmpty((ArrayNode) object)) {
             return createArrayNodeFrom((ArrayNode) object, viewColumn, viewColumn.getCaseFieldId());
         } else if (object instanceof ObjectNode && !FieldProcessor.isNullOrEmpty((ObjectNode) object)) {
             return createObjectNodeFrom((ObjectNode) object, viewColumn, viewColumn.getCaseFieldType().getComplexFields(), viewColumn.getCaseFieldId());
+        } else if (object instanceof LocalDateTime) {
+            return createTextNodeFrom(new TextNode(((LocalDateTime) object).format(DateTimeFormatParser.DATE_TIME_FORMAT)), viewColumn, viewColumn.getCaseFieldId());
         }
 
         return object;
@@ -122,10 +125,10 @@ public class SearchResultProcessor {
                         FieldType collectionFieldType = viewColumn.getCaseFieldType().getCollectionFieldType();
                         return collectionFieldType == null ? viewColumn.getCaseFieldType().getType() : collectionFieldType.getType();
                     });
-                if (fieldType.equals(FieldType.DATE)) {
-                    return new TextNode(dateTimeFormatParser.convertIso8601ToDate(dcp.getValue(), originalNode.asText()));
-                } else {
+                if (fieldType.equals(FieldType.DATETIME) || viewColumn.isMetadata()) {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDateTime(dcp.getValue(), originalNode.asText()));
+                } else {
+                    return new TextNode(dateTimeFormatParser.convertIso8601ToDate(dcp.getValue(), originalNode.asText()));
                 }
             }).orElse(new TextNode(originalNode.asText()));
     }
