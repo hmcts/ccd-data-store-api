@@ -84,8 +84,7 @@ class SubmitCaseTransaction {
     public static final String BAD_REQUEST_EXCEPTION_DOCUMENT_INVALID = "DocumentId is not valid";
     public static final String HASH_CODE_STRING = "hashcode";
     public static final String CONTENT_TYPE = "content-type";
-
-
+    public static final String BINARY = "/binary";
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
@@ -158,11 +157,6 @@ class SubmitCaseTransaction {
          */
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
             callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseType, ignoreWarning);
-        // aboutToSubmitCallbackResponse -> filtering again, update the list as per response.
-        // Match the documentId again, and produce URL list.
-        // consider only removal scenario-> drop elements which are not found in original list.
-        // Replacement scenario also -> drop elements which are not found in original list.
-        // If document comes with hashcode, add it to POJO, else leave it
 
         //saveAuditEventForCaseDetails is making a call to caseDetailsRepository.set(newCaseDetails);
         //This is actually creating a record of the case in DB.
@@ -174,11 +168,6 @@ class SubmitCaseTransaction {
                                            idamUser.getId(),
                                            CREATOR.getRole());
         }
-        //Make a call to update the metadata into document store here.
-        //the whole method is transactional, so it should be safe to update the metadata.
-        //We should be catching any exception from document store, like timeout , duplicatekey etc and throw the exception again.
-        //It is to be noted that the @Retryable will work only for ReferenceKeyUniqueConstraintException,
-        // which is an exception while persisting case data
 
         if (isApiVersion21) {
             documentAfterCallback = new HashSet<>();
@@ -204,21 +193,32 @@ class SubmitCaseTransaction {
             //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
             //This quick check will reduce the processing time as most of filtering will be done at top level.
             if (jsonNodeValue != null && jsonNodeValue.get(HASH_CODE_STRING) != null) {
+
+                //Document Binary URL is preferred.
+                JsonNode documentField = jsonNodeValue.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null ?
+                                         jsonNodeValue.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) :
+                                         jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
                 //Check if current node is of type document and hashcode is available.
-                JsonNode documentField = jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
-                if (documentField != null && jsonNodeValue.get(HASH_CODE_STRING) != null
-                    && !documentSet.contains(documentField.asText())) {
+
+                if (documentField != null && jsonNodeValue.get(HASH_CODE_STRING) != null && !documentSet.contains(documentField.asText())) {
+                    String documentId = null;
+
+                    if (documentField.asText().contains(BINARY)) {
+                        documentId = documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
+                    } else {
+                        documentId = documentField.asText().substring(documentField.asText().length() - 36);
+                    }
 
                     documentMetadata.getDocuments().add(CaseDocument
                                                             .builder()
-                                                            .id(documentField.asText().substring(documentField.asText().length() - 36))
+                                                            .id(documentId)
                                                             .hashToken(jsonNodeValue.get(HASH_CODE_STRING).asText())
                                                             .permissions(Collections.singletonList(Permission.CREATE))
                                                             .build());
                     if (jsonNodeValue instanceof ObjectNode) {
                         ((ObjectNode) jsonNodeValue).remove(HASH_CODE_STRING);
                     }
-                    documentSet.add(documentField.asText().substring(documentField.asText().length() - 36));
+                    documentSet.add(documentId);
                 } else {
                     jsonNodeValue.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata, (Map<String, JsonNode>) node, documentSet));
                 }
