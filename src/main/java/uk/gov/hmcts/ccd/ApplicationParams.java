@@ -42,7 +42,7 @@ public class ApplicationParams {
     private String caseDefinitionHost;
 
     @Value("${ccd.case-document-am-api.host}")
-    private String caseDocumentAmAPiHost;
+    private String caseDocumentAmApiHost;
 
     @Value("${ccd.case-document-am-api.attachDocumentPath}")
     private String attachDocumentPath;
@@ -351,17 +351,12 @@ public class ApplicationParams {
         return elasticSearchRequestTimeout;
     }
 
-    public String getCaseDocumentAmAPiHost() {
-        return caseDocumentAmAPiHost;
+    public String getCaseDocumentAmApiHost() {
+        return caseDocumentAmApiHost;
     }
 
     public String getAttachDocumentPath() {
         return attachDocumentPath;
     }
-
-    public void setAttachDocumentPath(String attachDocumentPath) {
-        this.attachDocumentPath = attachDocumentPath;
-    }
-
 
 }

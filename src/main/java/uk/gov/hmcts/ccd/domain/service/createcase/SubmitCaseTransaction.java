@@ -191,7 +191,7 @@ class SubmitCaseTransaction {
             try {
                 if (!documentMetadata.getDocuments().isEmpty()) {
                     ResponseEntity<Boolean> result = restTemplate
-                        .exchange(applicationParams.getCaseDocumentAmAPiHost().concat(applicationParams.getAttachDocumentPath()),
+                        .exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
                                   HttpMethod.PATCH, requestEntity, Boolean.class);
 
                     if (!result.getStatusCode().equals(HttpStatus.OK) || result.getBody() == null || result.getBody().equals(false)) {
