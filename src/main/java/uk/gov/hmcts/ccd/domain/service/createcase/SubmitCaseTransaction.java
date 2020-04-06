@@ -64,7 +64,6 @@ class SubmitCaseTransaction {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmitCaseTransaction.class);
 
-    @Inject
     private HttpServletRequest request;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
@@ -97,12 +96,14 @@ class SubmitCaseTransaction {
                                  final CallbackInvoker callbackInvoker,
                                  final UIDService uidService,
                                  final SecurityClassificationService securityClassificationService,
-                                 final @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository,
+                                 final @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation,
                                  @Qualifier("restTemplate") final RestTemplate restTemplate,
                                  ApplicationParams applicationParams,
-                                 SecurityUtils securityUtils
-                                 ) {
+                                 SecurityUtils securityUtils,
+                                 HttpServletRequest request
+                                ) {
+        this.request = request;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
         this.caseTypeService = caseTypeService;

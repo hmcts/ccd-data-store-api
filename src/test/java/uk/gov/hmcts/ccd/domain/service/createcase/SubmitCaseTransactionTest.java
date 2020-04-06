@@ -1,7 +1,23 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +26,9 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -30,19 +49,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
 
@@ -90,6 +96,18 @@ class SubmitCaseTransactionTest {
     @Mock
     private UserAuthorisation userAuthorisation;
 
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
+    private SecurityUtils securityUtils;
+
+    @Mock
+    private HttpServletRequest request;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -109,7 +127,11 @@ class SubmitCaseTransactionTest {
                                                           uidService,
                                                           securityClassificationService,
                                                           caseUserRepository,
-                                                          userAuthorisation);
+                                                          userAuthorisation,
+                                                          restTemplate,
+                                                          applicationParams,
+                                                          securityUtils,
+                                                          request);
 
         event = buildEvent();
         caseType = buildCaseType();
