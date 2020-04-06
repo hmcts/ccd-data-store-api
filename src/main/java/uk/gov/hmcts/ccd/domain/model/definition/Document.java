@@ -37,5 +37,4 @@ public class Document {
     public void setType(String type) {
         this.type = type;
     }
-
 }
