@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.retry.annotation.Backoff;
@@ -49,6 +50,8 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.DataParsingException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -85,6 +88,7 @@ class SubmitCaseTransaction {
     public static final String HASH_CODE_STRING = "hashcode";
     public static final String CONTENT_TYPE = "content-type";
     public static final String BINARY = "/binary";
+    public static final String EXCEPTION_STRING = "Exception while extracting the document fields from Case payload";
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
@@ -137,16 +141,22 @@ class SubmitCaseTransaction {
             && request.getHeader(CONTENT_TYPE).equals(V2.MediaType.CREATE_CASE_2_1);
 
         if (isApiVersion21) {
-            LOG.debug("Creating case using Version 2.1 of case create API");
-            documentSetBeforeCallback = new HashSet<>();
-            documentMetadata = DocumentMetadata.builder()
-                                               .caseId(newCaseDetails.getReferenceAsString())
-                                               .jurisdictionId(newCaseDetails.getJurisdiction())
-                                               .caseTypeId(newCaseDetails.getCaseTypeId())
-                                               .documents(new ArrayList<>())
-                                               .build();
+            try {
+                LOG.debug("Creating case using Version 2.1 of case create API");
+                documentSetBeforeCallback = new HashSet<>();
+                documentMetadata = DocumentMetadata.builder()
+                                                   .caseId(newCaseDetails.getReferenceAsString())
+                                                   .jurisdictionId(newCaseDetails.getJurisdiction())
+                                                   .caseTypeId(newCaseDetails.getCaseTypeId())
+                                                   .documents(new ArrayList<>())
+                                                   .build();
 
-            extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback);
+                extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback);
+            }
+            catch (Exception e) {
+                LOG.error(EXCEPTION_STRING);
+                throw new DataParsingException(EXCEPTION_STRING);
+            }
         }
 
         /*
@@ -170,86 +180,104 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion21) {
-            documentAfterCallback = new HashSet<>();
-            extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
-            filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
+            try {
+                documentAfterCallback = new HashSet<>();
+                extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
+                filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
 
-            HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
-            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-            if (!documentMetadata.getDocuments().isEmpty()) {
-                ResponseEntity<Boolean> result = restTemplate.exchange(applicationParams.getCaseDocumentAmAPiHost().concat("/cases/documents/attachToCase"),
-                                                                    HttpMethod.PATCH, requestEntity, Boolean.class);
-                if (result.getBody() == null || result.getBody().equals(false)) {
-                    LOG.error("An issue occured while patching the metadata for uploaded documents.");
-                    throw new ServiceException("An issue occured while patching the metadata for uploaded documents.");
+                HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
+                restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+
+                if (!documentMetadata.getDocuments().isEmpty()) {
+                    ResponseEntity<Boolean> result = restTemplate
+                        .exchange(applicationParams.getCaseDocumentAmAPiHost().concat("/cases/documents/attachToCase"),
+                                  HttpMethod.PATCH, requestEntity, Boolean.class);
+                    if (!result.getStatusCode().equals(HttpStatus.OK) || result.getBody() == null || result.getBody().equals(false)) {
+                        LOG.error("An issue occured while patching the metadata for uploaded documents.");
+                        throw new ServiceException("An issue occurred while patching the metadata for uploaded documents.");
+                    }
                 }
+            }
+            catch (Exception e) {
+                LOG.error(EXCEPTION_STRING);
+                throw new CaseConcurrencyException(EXCEPTION_STRING);
             }
         }
         return savedCaseDetails;
     }
 
     private void extractDocumentFields(DocumentMetadata documentMetadata, Map<String, JsonNode> data, Set<String> documentSet) {
-        data.forEach((field, jsonNodeValue) -> {
-            //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
-            //This quick check will reduce the processing time as most of filtering will be done at top level.
-            if (jsonNodeValue != null && jsonNodeValue.get(HASH_CODE_STRING) != null) {
+        try {
+            data.forEach((field, jsonNodeValue) -> {
+                //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
+                //This quick check will reduce the processing time as most of filtering will be done at top level.
+                if (jsonNodeValue != null && jsonNodeValue.get(HASH_CODE_STRING) != null) {
 
-                //Document Binary URL is preferred.
-                JsonNode documentField = jsonNodeValue.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null ?
-                                         jsonNodeValue.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) :
-                                         jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
-                //Check if current node is of type document and hashcode is available.
+                    //Document Binary URL is preferred.
+                    JsonNode documentField = jsonNodeValue.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null ?
+                                             jsonNodeValue.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) :
+                                             jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
+                    //Check if current node is of type document and hashcode is available.
 
-                if (documentField != null && jsonNodeValue.get(HASH_CODE_STRING) != null && !documentSet.contains(documentField.asText())) {
-                    String documentId = null;
+                    if (documentField != null && jsonNodeValue.get(HASH_CODE_STRING) != null && !documentSet.contains(documentField.asText())) {
+                        String documentId = null;
 
-                    if (documentField.asText().contains(BINARY)) {
-                        documentId = documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
+                        if (documentField.asText().contains(BINARY)) {
+                            documentId = documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
+                        } else {
+                            documentId = documentField.asText().substring(documentField.asText().length() - 36);
+                        }
+
+                        documentMetadata.getDocuments().add(CaseDocument
+                                                                .builder()
+                                                                .id(documentId)
+                                                                .hashToken(jsonNodeValue.get(HASH_CODE_STRING).asText())
+                                                                .permissions(Collections.singletonList(Permission.CREATE))
+                                                                .build());
+                        if (jsonNodeValue instanceof ObjectNode) {
+                            ((ObjectNode) jsonNodeValue).remove(HASH_CODE_STRING);
+                        }
+                        documentSet.add(documentId);
                     } else {
-                        documentId = documentField.asText().substring(documentField.asText().length() - 36);
+                        jsonNodeValue.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata, (Map<String, JsonNode>) node, documentSet));
                     }
-
-                    documentMetadata.getDocuments().add(CaseDocument
-                                                            .builder()
-                                                            .id(documentId)
-                                                            .hashToken(jsonNodeValue.get(HASH_CODE_STRING).asText())
-                                                            .permissions(Collections.singletonList(Permission.CREATE))
-                                                            .build());
-                    if (jsonNodeValue instanceof ObjectNode) {
-                        ((ObjectNode) jsonNodeValue).remove(HASH_CODE_STRING);
-                    }
-                    documentSet.add(documentId);
-                } else {
-                    jsonNodeValue.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata, (Map<String, JsonNode>) node, documentSet));
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            LOG.error(EXCEPTION_STRING);
+            throw new DataParsingException(EXCEPTION_STRING);
+        }
     }
 
     private void filterDocumentFields(DocumentMetadata documentMetadata, Set<String> documentSetBeforeCallback, Set<String> documentSetAfterCallback) {
-        //The below change is STRICTLY for testing purpose. It needs to be removed in the PR environment
-        documentSetAfterCallback.addAll(documentSetBeforeCallback);
-        //PLEASE REMOVE ABOVE line in PR environment
+        try {
+            //The below change is STRICTLY for LOCAL testing purpose. It needs to be removed in the PR environment
+            documentSetAfterCallback.addAll(documentSetBeforeCallback);
+            //PLEASE REMOVE ABOVE line in PR environment
 
 
-        //find documents which are intersection of Before and after callback
-        Set<String> filteredDocumentSet = documentSetAfterCallback.stream()
-                                                          .filter(documentSetBeforeCallback::contains)
-                                                          .collect(Collectors.toSet());
+            //find documents which are intersection of Before and after callback
+            Set<String> filteredDocumentSet = documentSetAfterCallback.stream()
+                                                                      .filter(documentSetBeforeCallback::contains)
+                                                                      .collect(Collectors.toSet());
 
-        //Add the intersection to aftercallback list. Now, afterCallbackList will have the documents from
-        //Callback response
-        // + original documents which have not been removed by the callback
-        // + Any new documents which are added by callback response
-        //This code should drop any documents which were removed by the callback
-        documentSetAfterCallback.addAll(filteredDocumentSet);
+            //Add the intersection to aftercallback list. Now, afterCallbackList will have the documents from
+            //Callback response
+            // + original documents which have not been removed by the callback
+            // + Any new documents which are added by callback response
+            //This code should drop any documents which were removed by the callback
+            documentSetAfterCallback.addAll(filteredDocumentSet);
 
-        //The following code will filter the documents based on above prepared Set.
-        List<CaseDocument> caseDocumentList = documentMetadata.getDocuments()
-                                                              .stream()
-                                                              .filter(document -> documentSetAfterCallback.contains(document.getId()))
-                                                              .collect(Collectors.toList());
-        documentMetadata.setDocuments(caseDocumentList);
+            //The following code will filter the documents based on above prepared Set.
+            List<CaseDocument> caseDocumentList = documentMetadata.getDocuments()
+                                                                  .stream()
+                                                                  .filter(document -> documentSetAfterCallback.contains(document.getId()))
+                                                                  .collect(Collectors.toList());
+            documentMetadata.setDocuments(caseDocumentList);
+        } catch (Exception e) {
+            LOG.error("Exception while filtering the document fields.");
+            throw new DataParsingException("Exception while filtering the document fields.");
+        }
 
     }
 
