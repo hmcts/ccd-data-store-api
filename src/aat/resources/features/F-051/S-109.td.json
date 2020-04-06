@@ -33,7 +33,14 @@
           "email": "${[scenarioContext][theInvokingUser][username]}",
           "forename": "testfirstname",
           "surname": "testsurname",
-          "roles": [ "caseworker-befta_jurisdiction_1" , "caseworker" ],
+          "roles": [
+             {
+                "__operator__": "equivalent",
+                "__ordering__": "unordered"
+             },
+             "caseworker-befta_jurisdiction_1",
+             "caseworker"
+          ],
           "defaultService": null
         }
       },
