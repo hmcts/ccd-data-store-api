@@ -13,7 +13,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "AUTOTEST1",
       "ctid": "AAT",
       "cid": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
