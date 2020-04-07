@@ -232,7 +232,7 @@ public class CaseController {
         }
     )
     @ApiOperation(
-        value = "Submit case creation",
+        value = "Submit case creation V2.1",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
