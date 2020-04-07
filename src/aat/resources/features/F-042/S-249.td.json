@@ -10,7 +10,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "cid": "${[scenarioContext][childContexts][Case_Creation_Using_Caseworker1_Role][testData][actualResponse][body][id]}",
       "jid": "BEFTA_JURISDICTION_1",
       "ctid": "BEFTA_CASETYPE_1_1",
