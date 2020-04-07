@@ -138,8 +138,8 @@ class SubmitCaseTransaction {
         newCaseDetails.setLastStateModifiedDate(now);
         newCaseDetails.setReference(Long.valueOf(uidService.generateUID()));
 
-        boolean isApiVersion21 = request.getHeader(CONTENT_TYPE) != null
-            && request.getHeader(CONTENT_TYPE).equals(V2.MediaType.CREATE_CASE_2_1);
+        boolean isApiVersion21 = request.getContentType() != null
+            && request.getContentType().equals(V2.MediaType.CREATE_CASE_2_1);
 
         if (isApiVersion21) {
             try {
@@ -279,7 +279,6 @@ class SubmitCaseTransaction {
             LOG.error("Exception while filtering the document fields.");
             throw new DataParsingException("Exception while filtering the document fields.");
         }
-
     }
 
     private CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,

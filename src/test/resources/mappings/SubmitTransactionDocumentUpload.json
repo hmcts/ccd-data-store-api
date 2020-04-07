@@ -1,0 +1,34 @@
+{
+  "DateField": null,
+  "TextField": "A text fields",
+  "EmailField": "a@b.com",
+  "NumberField": "11111",
+  "ComplexField": {
+    "ComplexTextField": "aefaefa",
+    "ComplexNestedField": {
+      "NestedNumberField": null,
+      "NestedCollectionTextField": []
+    },
+    "ComplexFixedListField": "VALUE2"
+  },
+  "PhoneUKField": "08888899999",
+  "TextAreaField": "fqeadadfTSFGsfs`f`sfs`f",
+  "AddressUKField": {
+    "County": null,
+    "Country": null
+  },
+  "DocumentField4": {
+    "document_url": "http://dm-store:8080/documents/388a1ce0-f132-4680-90e9-5e782721cabb",
+    "document_filename": "Screenshot 2020-03-17 at 1.24.43 pm.png",
+    "document_binary_url": "http://dm-store:8080/documents/388a1ce0-f132-4680-90e9-5e782721cabb/binary",
+    "hashcode": "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a"
+  },
+  "DocumentField7": {
+    "document_url": "http://dm-store:8080/documents/12591565-c8c0-4bc3-9dab-97bcf61ea728",
+    "document_filename": "Screenshot 2020-03-21 at 8.59.53 pm.png",
+    "document_binary_url": "http://dm-store:8080/documents/12591565-c8c0-4bc3-9dab-97bcf61ea728/binary",
+    "hashcode": "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc"
+  },
+  "FixedListField": "VALUE2",
+  "CollectionField": []
+}
