@@ -1,0 +1,29 @@
+{
+	"title": "must return 400 when case reference is invalid",
+	"_guid_": "S-162",
+	"_extends_": "F-065_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD",
+		"uses an invalid case-reference",
+		"has an HTTP-400 code"
+	],
+	"request": {
+		"pathVariables": {
+			"cid": "dummyid"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_400_Response",
+		"headers": {
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+		},
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+			"message": "Case ID is not valid",
+			"path": "/internal/cases/dummyid",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
+}

@@ -127,4 +127,48 @@
         <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
         <cve>CVE-2020-5398</cve>
     </suppress>
+
+    <!-- FIXME : RDM-78578 -->
+    <suppress>
+        <notes>Temporary suppression for on-going developments</notes>
+        <cpe>cpe:2.3:a:checkstyle:checkstyle:*:*:*:*:*:*:*:*</cpe>
+        <cve>CVE-2019-10782</cve>
+    </suppress>
+
+    <!-- FIXME : RDM-???? -->
+    <suppress>
+        <notes>Temporary suppression for on-going developments</notes>
+        <cve>CVE-2020-1938</cve>
+        <cve>CVE-2020-8840</cve>
+        <cve>CVE-2020-9547</cve>
+        <cve>CVE-2020-9548</cve>
+        <cve>CVE-2020-9546</cve>
+        <cve>CVE-2020-10673</cve>
+        <cve>CVE-2020-10672</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-10968</cve>
+     </suppress>
+     <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-10969</cve>
+     </suppress>
+     <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-11111</cve>
+     </suppress>
+     <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-11112</cve>
+     </suppress>
+     <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-11113</cve>
+     </suppress>
 </suppressions>

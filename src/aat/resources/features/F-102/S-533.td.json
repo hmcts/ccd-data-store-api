@@ -1,0 +1,75 @@
+{
+  "_guid_": "S-533",
+  "_extends_": "F-102_Test_Data_Base",
+  "title": "Get jurisdictions available to the user",
+  "specs": [
+    "an active profile in CCD having create case access for a jurisdiction",
+    "has CREATE as case access parameter",
+    "contains HTTP 200 Ok status code",
+    "contains the list of jurisdictions a user has access to"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "access": "create"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "arrayInMap": [
+        {
+          "id": "BEFTA_JURISDICTION_1",
+          "name": "BEFTA_JURISDICTION_1",
+          "description": "Content for the Test Jurisdiction.",
+          "caseTypes": [
+            {
+              "id": "BEFTA_CASETYPE_1_1",
+              "description": "Create a case of type BEFTA_CASETYPE_1_1",
+              "version": null,
+              "name": "BEFTA Case Type 1 1",
+              "jurisdiction": null,
+              "events": "[[ANYTHING_PRESENT]]",
+              "states": "[[ANYTHING_PRESENT]]",
+              "searchAliasFields": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": [
+                {
+                  "role": "caseworker-befta_jurisdiction_1",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
+            },
+            {
+              "id": "CASE_TYPE_WITH_NO_CASES",
+              "description": "Create a case of type CASE_TYPE_WITH_NO_CASES",
+              "version": null,
+              "name": "CT With No Cases -Don't Create",
+              "jurisdiction": null,
+              "events": "[[ANYTHING_PRESENT]]",
+              "states": "[[ANYTHING_PRESENT]]",
+              "searchAliasFields": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": [
+                {
+                  "role": "caseworker-befta_jurisdiction_1",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

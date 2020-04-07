@@ -46,6 +46,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
@@ -533,6 +534,38 @@ public class TestBuildersUtil {
 
         public Banner build() {
             return banner;
+        }
+    }
+
+    public static class JurisdictionUiConfigBuilder {
+
+        private final JurisdictionUiConfig jurisdictionUiConfig;
+
+        private JurisdictionUiConfigBuilder() {
+            this.jurisdictionUiConfig = new JurisdictionUiConfig();
+        }
+
+        public static JurisdictionUiConfigBuilder newJurisdictionUiConfig() {
+            return new JurisdictionUiConfigBuilder();
+        }
+
+        public JurisdictionUiConfigBuilder withShutteredEnabled(Boolean shuttered) {
+            this.jurisdictionUiConfig.setShuttered(shuttered);
+            return this;
+        }
+        
+        public JurisdictionUiConfigBuilder withId(String id) {
+            this.jurisdictionUiConfig.setId(id);
+            return this;
+        }
+
+        public JurisdictionUiConfigBuilder withName(String name) {
+            this.jurisdictionUiConfig.setName(name);
+            return this;
+        }
+
+        public JurisdictionUiConfig build() {
+            return jurisdictionUiConfig;
         }
     }
 

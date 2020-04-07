@@ -5,13 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIBannerResource extends ResourceSupport {
+public class UIBannerResource extends RepresentationModel {
 
     private List<Banner> banners;
 

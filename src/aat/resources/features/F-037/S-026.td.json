@@ -1,0 +1,20 @@
+{
+  "title": "must return negative response when request contains a non-existing case-reference",
+  "_guid_": "S-026",
+  "_extends_": "F-037_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a non-existing case-reference",
+    "contains a HTTP 404 'Not Found'"
+  ],
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "[[ANYTHING_PRESENT]]",
+      "message": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

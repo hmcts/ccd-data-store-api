@@ -24,7 +24,7 @@ public class CriterionFactory {
                 .stream()
                 .map(this::buildFromEntry)
                 .collect(Collectors.toList());
-        result.addAll(buildFomMetaData(metadata));
+        result.addAll(buildFromMetaData(metadata));
         return result;
     }
 
@@ -32,7 +32,7 @@ public class CriterionFactory {
         return new FieldDataCriterion(entry.getKey(), entry.getValue());
     }
 
-    private List<Criterion> buildFomMetaData(MetaData metadata) {
+    private List<Criterion> buildFromMetaData(MetaData metadata) {
         List<Criterion> result = new ArrayList<>();
 
         ifPresentAndNotBlank(Optional.ofNullable(metadata.getCaseTypeId()), ct ->
@@ -52,6 +52,9 @@ public class CriterionFactory {
 
         ifPresentAndNotBlank(metadata.getLastModified(), lm ->
                 result.add(new MetaDataCriterion("date(" + CaseDetailsEntity.LAST_MODIFIED_FIELD_COL + ")", lm)));
+
+        ifPresentAndNotBlank(metadata.getLastStateModifiedDate(), lsm ->
+            result.add(new MetaDataCriterion("date(" + CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL + ")", lsm)));
 
         ifPresentAndNotBlank(metadata.getSecurityClassification(), sc ->
                 result.add(new MetaDataCriterion(CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL, sc.toUpperCase())));

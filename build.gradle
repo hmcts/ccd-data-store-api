@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.1.4.RELEASE'
+        springBootVersion = '2.2.4.RELEASE'
     }
     dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
@@ -19,6 +19,7 @@ buildscript {
 plugins {
     id 'application'
     id 'com.github.ben-manes.versions' version '0.20.0'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
     id 'checkstyle'
@@ -27,6 +28,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '5.1.0'
     id 'com.github.spotbugs' version '1.6.9'
     id 'net.ltgt.apt' version '0.21'
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.14'
 }
 
 apply plugin: 'java'
@@ -64,19 +66,6 @@ dependencyUpdates.resolutionStrategy = {
         }
     }
 }
-
-configurations.all {
-    resolutionStrategy {
-        eachDependency { DependencyResolveDetails details ->
-            // Wiremock requires old jetty because it still support java 7
-            // spring bom is currenty upgrading it
-            if (details.requested.group == 'org.eclipse.jetty') {
-                details.useVersion '9.2.24.v20180105'
-            }
-        }
-    }
-}
-
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
@@ -101,17 +90,18 @@ repositories {
     maven {
         url 'https://dl.bintray.com/hmcts/hmcts-maven'
     }
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 }
 // end::repositories[]
 
 ext {
-    junitJupiterVersion = '5.2.0'
-    junitVintageVersion = '5.2.0'
+    junitJupiterVersion = '5.5.2'
+    junitVintageVersion = '5.5.2'
     hibernateVersion = '5.2.18.Final'
     powermockVersion = '2.0.0-beta.5'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
-    swagger2Version = '2.9.2'
+    swagger2Version = '3.0.0-SNAPSHOT'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -121,7 +111,7 @@ ext {
             'class'      : 98
     ]
     appInsights = '2.0.1'
-    springCloudVersion = 'Greenwich.RELEASE'
+    springCloudVersion = 'Hoxton.RELEASE'
 }
 
 group 'uk.gov.hmcts.ccd'
@@ -147,6 +137,7 @@ configurations {
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
+    cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
 checkstyle {
@@ -236,8 +227,8 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
-    testCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
-    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.0.RELEASE')
+    testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
+    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.1.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
@@ -264,6 +255,8 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '1.2.3'
+
 }
 // end::dependencies[]
 
@@ -487,11 +480,9 @@ jacoco {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**,**/DefaultCaseDetailsRepository.java"
-        property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
-        property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     }
 }
 
@@ -575,6 +566,7 @@ jacocoTestReport {
 
 test {
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
+    generateCucumberReports.enabled = false
 
     useJUnitPlatform()
 
@@ -630,6 +622,14 @@ task smoke(type: Test) {
         includeTags 'smoke'
     }
 
+    doFirst {
+        javaexec {
+            main = "uk.gov.hmcts.ccd.datastore.befta.TestDataLoaderMain"
+            classpath += sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['']
+        }
+    }
+
 }
 
 task functional(type: Test) {
@@ -647,6 +647,16 @@ task functional(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
+
+    doFirst {
+        generateCucumberReports.enabled = true
+        javaexec {
+            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
+                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
+        }
+    }
 }
 
 
@@ -686,6 +696,11 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
             "-r",
             "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     ]
+}
+
+cucumberReports {
+    outputDir = file("${projectDir}/target/cucumber")
+    reports = files("${projectDir}/target/cucumber.json")
 }
 
 task installDist(overwrite: true) {

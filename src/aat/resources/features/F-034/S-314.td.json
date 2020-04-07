@@ -1,0 +1,37 @@
+{
+  "title": "must return 200 when the case type and event exists",
+  "_guid_": "S-314",
+  "_extends_": "F-034_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains the case type and event, along with a HTTP 200 OK",
+    "contains the case type and event"
+  ],
+  "request": {
+    "body": {
+      "event": {
+        "id": "UPDATE",
+        "summary": "",
+        "description": ""
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-data-validate.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "data": {
+        "_extends_" : "Standard_Full_Case_Data"
+      },
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]",
+          "templated": true
+        }
+      }
+    }
+  }
+}
+

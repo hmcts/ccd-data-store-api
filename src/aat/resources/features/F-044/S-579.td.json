@@ -1,0 +1,50 @@
+{
+  "title": "must submit the event creation successfully for correct inputs",
+  "_guid_": "S-579",
+  "_extends_": "S-579-Update_Case_For_Solicitor_Data_Base",
+  "specs": [
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "an active solicitor profile with another specific variation of ACLs on the same case type",
+    "an active Solicitor profile having full permissions on the same case type",
+    "is prepared on behalf of the user creating the case above",
+    "contains values for all fields under the case type",
+    "contains updated values for DocumentField2"
+  ],
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "vary": "accept-encoding",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_JURISDICTION_2",
+      "state": "TODO",
+      "version": 1,
+      "case_type_id": "BEFTA_CASETYPE_2_1",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data",
+        "DocumentField2": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_filename": "Elastic Search test Case.png"
+        }
+      },
+      "data_classification" : {
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null,
+      "security_classifications" : {
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
+      }
+    }
+  }
+}
