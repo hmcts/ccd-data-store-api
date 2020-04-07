@@ -64,6 +64,7 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
+    // TODO: @AuditLog( operation = "Create case")
     public ResponseEntity<UIStartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
                                                                       @PathVariable("triggerId") String triggerId,
                                                                       @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
