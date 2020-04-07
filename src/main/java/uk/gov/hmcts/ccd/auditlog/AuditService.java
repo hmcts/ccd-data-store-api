@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.auditlog;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
@@ -8,11 +9,23 @@ import org.springframework.web.util.WebUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
+import java.time.Clock;
+import java.time.LocalDateTime;
+
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 public class AuditService {
 
-    public String prepareAuditMessage(HttpServletRequest requestToCache, HttpServletResponse responseToCache, HandlerExecutionChain handler, String formattedDate) {
+    private final Clock clock;
+
+    public AuditService(@Qualifier("utcClock") final Clock clock) {
+        this.clock = clock;
+    }
+
+    public String prepareAuditMessage(HttpServletRequest requestToCache, HttpServletResponse responseToCache, HandlerExecutionChain handler) {
         LogMessage log = new LogMessage();
+        String formattedDate = LocalDateTime.now(clock).format(ISO_LOCAL_DATE_TIME);
+
         log.setDateTime(formattedDate);
         log.setHttpStatus(responseToCache.getStatus());
         log.setHttpMethod(requestToCache.getMethod());

@@ -11,9 +11,6 @@ import org.springframework.web.util.WebUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDateTime;
-
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 public class LoggableDispatcherServlet extends DispatcherServlet {
     private final Log logger = LogFactory.getLog(getClass());
@@ -37,8 +34,7 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
         try {
             super.doDispatch(request, response);
         } finally {
-            String formattedDate = LocalDateTime.now().format(ISO_LOCAL_DATE_TIME);
-            logger.info(auditService.prepareAuditMessage(request, response, handler, formattedDate));
+            logger.info(auditService.prepareAuditMessage(request, response, handler));
             updateResponse(response);
         }
     }

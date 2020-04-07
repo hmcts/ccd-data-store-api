@@ -58,6 +58,6 @@ public class CoreCaseDataApplication {
 
     @Bean
     public AuditService auditService() {
-        return new AuditService();
+        return new AuditService(utcClock());
     }
 }
