@@ -111,4 +111,24 @@ class DateTimeFormatParserTest {
             () -> assertThat(result, is("2000-01-01T00:00:00.000"))
         );
     }
+
+    @Test
+    void shouldDefaultYearWhenNotProvidedInDateFormat() {
+        final String dateTimeFormat = "MM";
+        final String value = "12";
+        final String result = dateTimeFormatParser.convertDateToIso8601(dateTimeFormat, value);
+        assertAll(
+            () -> assertThat(result, is("1970-12-01"))
+        );
+    }
+
+    @Test
+    void shouldDefaultYearWhenNotProvidedInDateTimeFormat() {
+        final String dateTimeFormat = "MM";
+        final String value = "12";
+        final String result = dateTimeFormatParser.convertDateTimeToIso8601(dateTimeFormat, value);
+        assertAll(
+            () -> assertThat(result, is("1970-12-01T00:00:00.000"))
+        );
+    }
 }

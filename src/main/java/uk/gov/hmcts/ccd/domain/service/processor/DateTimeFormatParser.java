@@ -15,6 +15,7 @@ public class DateTimeFormatParser {
 
     static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
     static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final int DEFAULT_YEAR = 1970;
 
     public String convertDateTimeToIso8601(String dateTimeFormat, String value) {
         LocalDateTime dateTime;
@@ -53,7 +54,7 @@ public class DateTimeFormatParser {
     private DateTimeFormatter getDateTimeFormatter(String dateTimeFormat) {
         return new DateTimeFormatterBuilder()
             .appendPattern(dateTimeFormat)
-            .parseDefaulting(ChronoField.YEAR_OF_ERA, LocalDate.now().getYear())
+            .parseDefaulting(ChronoField.YEAR_OF_ERA, DEFAULT_YEAR)
             .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
             .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
@@ -66,7 +67,7 @@ public class DateTimeFormatParser {
     private DateTimeFormatter getDateFormatter(String dateFormat) {
         return new DateTimeFormatterBuilder()
             .appendPattern(dateFormat)
-            .parseDefaulting(ChronoField.YEAR_OF_ERA, LocalDate.now().getYear())
+            .parseDefaulting(ChronoField.YEAR_OF_ERA, DEFAULT_YEAR)
             .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
             .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
             .toFormatter();
