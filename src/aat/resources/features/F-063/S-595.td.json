@@ -33,6 +33,7 @@
           "id" : "TextField",
           "elementPath" : null,
           "metadata" : false,
+          "show_condition": null,
           "field_type" : {
             "id" : "Text",
             "type" : "Text",
@@ -51,6 +52,7 @@
           "id" : "[LAST_STATE_MODIFIED_DATE]",
           "elementPath" : null,
           "metadata" : true,
+          "show_condition": null,
           "field_type" : {
             "id" : "Date",
             "type" : "Date",

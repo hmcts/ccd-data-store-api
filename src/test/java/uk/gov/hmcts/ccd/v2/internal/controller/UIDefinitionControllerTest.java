@@ -52,11 +52,12 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.Workbasket
 @DisplayName("UIDefinitionController")
 class UIDefinitionControllerTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
+    private static final String SHOW_CONDITION = "aShowCondition";
 
-    private WorkbasketInput workbasketInput1 = aWorkbasketInput().withFieldId("field1").build();
+    private WorkbasketInput workbasketInput1 = aWorkbasketInput().withFieldId("field1").withShowCondition(SHOW_CONDITION).build();
     private WorkbasketInput workbasketInput2 = aWorkbasketInput().withFieldId("field2").build();
     private SearchInput searchInput1 = aSearchInput().withFieldId("field1").build();
-    private SearchInput searchInput2 = aSearchInput().withFieldId("field2").build();
+    private SearchInput searchInput2 = aSearchInput().withFieldId("field2").withShowCondition(SHOW_CONDITION).build();
 
     private Banner banner1 = newBanner().withBannerEnabled(true)
                                         .withBannerDescription("Test Description1")
@@ -124,7 +125,8 @@ class UIDefinitionControllerTest {
                 () -> {
                     UIWorkbasketInputsResource.UIWorkbasketInput[] workbasketInputs = response.getBody().getWorkbasketInputs();
                     assertThat(Lists.newArrayList(workbasketInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
-                        hasProperty("field", hasProperty("id", is("field2")))));
+                        hasProperty("field", hasProperty("id", is("field2"))),
+                            hasProperty("field", hasProperty("showCondition", is(SHOW_CONDITION)))));
                 }
             );
         }
@@ -153,7 +155,8 @@ class UIDefinitionControllerTest {
                 () -> {
                     UISearchInputsResource.UISearchInput[] searchInputs = response.getBody().getSearchInputs();
                     assertThat(Lists.newArrayList(searchInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
-                                                                          hasProperty("field", hasProperty("id", is("field2")))));
+                                                                          hasProperty("field", hasProperty("id", is("field2"))),
+                                                                          hasProperty("field", hasProperty("showCondition", is(SHOW_CONDITION)))));
                 }
             );
         }
@@ -163,8 +166,7 @@ class UIDefinitionControllerTest {
         void shouldPropagateExceptionWhenThrown() {
             when(getCriteriaOperation.execute(CASE_TYPE_ID, CAN_READ, SEARCH)).thenThrow(RuntimeException.class);
 
-            assertThrows(RuntimeException.class,
-                         () -> uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID));
+            assertThrows(RuntimeException.class, () -> uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID));
         }
     }
 
@@ -270,10 +272,7 @@ class UIDefinitionControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> {
-                    UIJurisdictionResource jurisdictionResource = response.getBody();
-                    assertEquals(2, jurisdictionResource.getJurisdictions().length);
-                }
+                () -> assertEquals(2, response.getBody().getJurisdictions().length)
             );
         }
     }
