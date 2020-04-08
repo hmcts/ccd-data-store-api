@@ -3,25 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.elasticsearch.common.TriFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,6 +16,24 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
@@ -156,7 +156,19 @@ class SubmitCaseTransaction {
                                                    .documents(new ArrayList<>())
                                                    .build();
 
-                extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback);
+                extractDocumentFieldsNew(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback,
+                        (dmd, df, jn) -> {
+                            String documentId = extractDocumentId(df);
+
+                            dmd.getDocuments()
+                                    .add(CaseDocument.builder().id(documentId)
+                                            .hashToken(jn.get(HASH_CODE_STRING).asText())
+                                            .permissions(Collections.singletonList(Permission.CREATE)).build());
+                            if (jn instanceof ObjectNode) {
+                                ((ObjectNode) jn).remove(HASH_CODE_STRING);
+                            }
+                            return documentId;
+                        });
             }
             catch (Exception e) {
                 LOG.error(CASE_DATA_PARSING_EXCEPTION);
@@ -216,6 +228,37 @@ class SubmitCaseTransaction {
         }
     }
 
+    void extractDocumentFieldsNew(DocumentMetadata documentMetadata, Map<String, JsonNode> data,
+            Set<String> documentSet, TriFunction<DocumentMetadata, JsonNode, JsonNode, String> processor) {
+        try {
+            data.forEach((field, jsonNode) -> {
+                // Check if the field consists of Document at any level, e.g. Complex fields can
+                // also have documents.
+                // This quick check will reduce the processing time as most of filtering will be
+                // done at top level.
+                if (jsonNode != null && jsonNode.findValue(HASH_CODE_STRING) != null) {
+
+                    // Document Binary URL is preferred.
+                    JsonNode documentField = jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null
+                            ? jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE)
+                            : jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
+                    // Check if current node is of type document and hashcode is available.
+
+                    if (documentField != null && jsonNode.get(HASH_CODE_STRING) != null
+                            && !documentSet.contains(documentField.asText())) {
+                        String documentId = processor.apply(documentMetadata, documentField, jsonNode);
+                        documentSet.add(documentId);
+                    } else {
+                        jsonNode.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata,
+                                Collections.singletonMap(node.getKey(), node.getValue()), documentSet));
+                    }
+                }
+            });
+        } catch (Exception e) {
+            LOG.error(CASE_DATA_PARSING_EXCEPTION);
+            throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
+        }
+    }
      void extractDocumentFields(DocumentMetadata documentMetadata, Map<String, JsonNode> data, Set<String> documentSet) {
         try {
             data.forEach((field, jsonNode) -> {
