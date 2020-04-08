@@ -5,8 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
+
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doReturn;
@@ -284,7 +283,7 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("should extract all documents from Case Data")
+    @DisplayName("should extract only documents with hashcode from Case Data")
     void shouldExtractDocumentFromCaseData() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
@@ -293,8 +292,8 @@ class SubmitCaseTransactionTest {
 
         submitCaseTransaction.extractDocumentFields(documentMetadata, dataMap, documentSet);
         Set<String> expectedSet = Sets.newHashSet("388a1ce0-f132-4680-90e9-5e782721cabb",
-                                                  "12591565-c8c0-4bc3-9dab-97bcf61ea728",
-                                                  "f0550adc-eaea-4232-b52f-1c4ac0534d60");
+                                                  "f0550adc-eaea-4232-b52f-1c4ac0534d60",
+                                                  "5c4b5564-a29f-47d3-8c51-50e2d4629435");
         assertAll(
             () -> assertEquals(documentSet, expectedSet));
     }
