@@ -35,7 +35,7 @@ import org.mockito.MockitoAnnotations;
 class AuthorisedGetCriteriaOperationTest {
     private static final String CASE_TYPE_ONE = "CaseTypeOne";
     private static final String ROLE1 = "Role1";
-    private static final String ROLE2 = "Role1";
+    private static final String ROLE2 = "Role2";
     private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
@@ -216,6 +216,90 @@ class AuthorisedGetCriteriaOperationTest {
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(0))
+        );
+    }
+
+    @Test
+    @DisplayName("should return workbasket input fields for complex fields")
+    void shouldReturnWorkbasketInputForComplexFields() {
+        testWorkbasketInputs = Arrays.asList(
+            aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_1).build(),
+            aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_2, "firstName").build(),
+            aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_2, "lastName").build()
+        );
+
+        doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+
+        final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+
+        assertAll(
+            () -> assertThat(workbasketInputs.size(), is(3)),
+            () -> assertThat(workbasketInputs.get(0), is(testWorkbasketInputs.get(0))),
+            () -> assertThat(workbasketInputs.get(1), is(testWorkbasketInputs.get(1))),
+            () -> assertThat(workbasketInputs.get(2), is(testWorkbasketInputs.get(2)))
+        );
+    }
+
+    @Test
+    @DisplayName("should return only authorised workbasket input fields for complex fields")
+    void shouldReturnAuthorisedWorkbasketInputForComplexFields() {
+        testWorkbasketInputs = Arrays.asList(
+            aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_1).build(),
+            aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_2, "firstName").withUserRole(ROLE1).build(),
+            aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_2, "lastName").withUserRole(ROLE2).build()
+        );
+
+        doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        doReturn(Sets.newHashSet(ROLE1)).when(userRepository).getUserRoles();
+
+        final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+
+        assertAll(
+            () -> assertThat(workbasketInputs.size(), is(2)),
+            () -> assertThat(workbasketInputs.get(0), is(testWorkbasketInputs.get(0))),
+            () -> assertThat(workbasketInputs.get(1), is(testWorkbasketInputs.get(1)))
+        );
+    }
+
+    @Test
+    @DisplayName("should return search input fields for complex fields")
+    void shouldReturnSearchInputForComplexFields() {
+        testSearchInputs = Arrays.asList(
+            aSearchInput().withFieldId(CASE_FIELD_ID_1_1).build(),
+            aSearchInput().withFieldId(CASE_FIELD_ID_1_2, "firstName").build(),
+            aSearchInput().withFieldId(CASE_FIELD_ID_1_2, "lastName").build()
+        );
+
+        doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+
+        final List<WorkbasketInput> searchInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+
+        assertAll(
+            () -> assertThat(searchInputs.size(), is(3)),
+            () -> assertThat(searchInputs.get(0), is(testSearchInputs.get(0))),
+            () -> assertThat(searchInputs.get(1), is(testSearchInputs.get(1))),
+            () -> assertThat(searchInputs.get(2), is(testSearchInputs.get(2)))
+        );
+    }
+
+    @Test
+    @DisplayName("should return authorised search input fields for complex fields")
+    void shouldReturnAuthorisedSearchInputForComplexFields() {
+        testSearchInputs = Arrays.asList(
+            aSearchInput().withFieldId(CASE_FIELD_ID_1_1).build(),
+            aSearchInput().withFieldId(CASE_FIELD_ID_1_2, "firstName").withUserRole(ROLE1).build(),
+            aSearchInput().withFieldId(CASE_FIELD_ID_1_2, "lastName").withUserRole(ROLE2).build()
+        );
+
+        doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        doReturn(Sets.newHashSet(ROLE1)).when(userRepository).getUserRoles();
+
+        final List<WorkbasketInput> searchInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+
+        assertAll(
+            () -> assertThat(searchInputs.size(), is(2)),
+            () -> assertThat(searchInputs.get(0), is(testSearchInputs.get(0))),
+            () -> assertThat(searchInputs.get(1), is(testSearchInputs.get(1)))
         );
     }
 }
