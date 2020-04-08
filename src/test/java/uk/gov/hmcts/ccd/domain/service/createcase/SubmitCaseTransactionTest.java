@@ -1,10 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
@@ -17,17 +20,19 @@ import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Maps;
-import org.hamcrest.Matchers;
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +41,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -55,6 +59,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
+import uk.gov.hmcts.ccd.domain.model.search.DocumentMetadata;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -246,11 +251,14 @@ class SubmitCaseTransactionTest {
 
     @Test
     @DisplayName("should persist V2.1 Case creation event")
-    void shouldPersistV2Event() throws IOException{
+    void shouldPersistV2Event() throws IOException {
         doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
         final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        CaseDetails inputCaseDetails = new CaseDetails();
+
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        inputCaseDetails.setData(dataMap);
         doReturn(dataMap).when(this.caseDetails).getData();
         ResponseEntity<Boolean> responseEntity = new ResponseEntity<Boolean>(true, HttpStatus.OK);
         doReturn(responseEntity).when(restTemplate).exchange(
@@ -259,17 +267,36 @@ class SubmitCaseTransactionTest {
             ArgumentMatchers.any(),
             ArgumentMatchers.<Class<String>>any());
 
-        submitCaseTransaction.submitCase(event,
-                                         caseType,
-                                         idamUser,
-                                         eventTrigger,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+        CaseDetails caseDetails = submitCaseTransaction.submitCase(event,
+                                                                   caseType,
+                                                                   idamUser,
+                                                                   eventTrigger,
+                                                                   inputCaseDetails,
+                                                                   IGNORE_WARNING);
 
         assertAll(
+            () -> assertThat(caseDetails, isNotNull()),
+            () -> assertThat(caseDetails.getData(), isNotNull()),
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
-            () -> assertAuditEvent(auditEventCaptor.getValue())
-                 );
+            () -> assertAuditEvent(auditEventCaptor.getValue()));
+
+        //assertCaseData(caseDetails);
+    }
+
+    @Test
+    @DisplayName("should extract all documents from Case Data")
+    void shouldExtractDocumentFromCaseData() throws IOException {
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        DocumentMetadata documentMetadata = DocumentMetadata.builder().documents(new ArrayList<>()).build();
+        Set<String> documentSet = new HashSet<>();
+
+        submitCaseTransaction.extractDocumentFields(documentMetadata, dataMap, documentSet);
+        Set<String> expectedSet = Sets.newHashSet("388a1ce0-f132-4680-90e9-5e782721cabb",
+                                                  "12591565-c8c0-4bc3-9dab-97bcf61ea728",
+                                                  "f0550adc-eaea-4232-b52f-1c4ac0534d60");
+        assertAll(
+            () -> assertEquals(documentSet, expectedSet));
     }
 
     @Test
@@ -347,6 +374,15 @@ class SubmitCaseTransactionTest {
             () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
             () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
             () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
+    }
+
+    private void assertCaseData(final CaseDetails caseDetails) {
+        assertAll("Assert Casedetails",
+                  () -> assertThat(caseDetails.getData().get("DocumentField4"), isNotNull()),
+                  () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_url"), isNotNull()),
+                  () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_binary_url"), isNotNull())
+
+                 );
     }
 
     private void assertAuditEventWithSignificantDocument(final AuditEvent auditEvent) {

@@ -7,7 +7,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +18,9 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,72 +185,81 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion21) {
-            documentAfterCallback = new HashSet<>();
-            extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
-            filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
-
-            HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
-            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-
-            try {
-                if (!documentMetadata.getDocuments().isEmpty()) {
-                    ResponseEntity<Boolean> result = restTemplate
-                        .exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
-                                  HttpMethod.PATCH, requestEntity, Boolean.class);
-
-                    if (!result.getStatusCode().equals(HttpStatus.OK) || result.getBody() == null || result.getBody().equals(false)) {
-                        LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-                        throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-                    }
-                }
-            } catch (Exception e) {
-                LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-                throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-            }
+            attachDocumentToCase(newCaseDetails, documentSetBeforeCallback, documentMetadata);
         }
         return savedCaseDetails;
     }
 
-    private void extractDocumentFields(DocumentMetadata documentMetadata, Map<String, JsonNode> data, Set<String> documentSet) {
+    private void attachDocumentToCase(CaseDetails newCaseDetails, Set<String> documentSetBeforeCallback, DocumentMetadata documentMetadata) {
+        Set<String> documentAfterCallback;
+        documentAfterCallback = new HashSet<>();
+        extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
+        filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
+
         try {
-            data.forEach((field, jsonNodeValue) -> {
+            if (!documentMetadata.getDocuments().isEmpty()) {
+                HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
+                restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+
+                ResponseEntity<Boolean> result = restTemplate
+                    .exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
+                              HttpMethod.PATCH, requestEntity, Boolean.class);
+
+                if (!result.getStatusCode().equals(HttpStatus.OK) || result.getBody() == null || result.getBody().equals(false)) {
+                    LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
+                    throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
+            throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
+        }
+    }
+
+     void extractDocumentFields(DocumentMetadata documentMetadata, Map<String, JsonNode> data, Set<String> documentSet) {
+        try {
+            data.forEach((field, jsonNode) -> {
                 //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
                 //This quick check will reduce the processing time as most of filtering will be done at top level.
-                if (jsonNodeValue != null && jsonNodeValue.get(HASH_CODE_STRING) != null) {
+                if (jsonNode != null && jsonNode.findValue(HASH_CODE_STRING) != null) {
 
                     //Document Binary URL is preferred.
-                    JsonNode documentField = jsonNodeValue.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null ?
-                                             jsonNodeValue.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) :
-                                             jsonNodeValue.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
+                    JsonNode documentField = jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null ?
+                                             jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) :
+                                             jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
                     //Check if current node is of type document and hashcode is available.
 
-                    if (documentField != null && jsonNodeValue.get(HASH_CODE_STRING) != null && !documentSet.contains(documentField.asText())) {
-                        String documentId = null;
-
-                        if (documentField.asText().contains(BINARY)) {
-                            documentId = documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
-                        } else {
-                            documentId = documentField.asText().substring(documentField.asText().length() - 36);
-                        }
+                    if (documentField != null && jsonNode.get(HASH_CODE_STRING) != null && !documentSet.contains(documentField.asText())) {
+                        String documentId = extractDocumentId(documentField);
 
                         documentMetadata.getDocuments().add(CaseDocument
                                                                 .builder()
                                                                 .id(documentId)
-                                                                .hashToken(jsonNodeValue.get(HASH_CODE_STRING).asText())
+                                                                .hashToken(jsonNode.get(HASH_CODE_STRING).asText())
                                                                 .permissions(Collections.singletonList(Permission.CREATE))
                                                                 .build());
-                        if (jsonNodeValue instanceof ObjectNode) {
-                            ((ObjectNode) jsonNodeValue).remove(HASH_CODE_STRING);
+                        if (jsonNode instanceof ObjectNode) {
+                            ((ObjectNode) jsonNode).remove(HASH_CODE_STRING);
                         }
                         documentSet.add(documentId);
-                    } else {
-                        jsonNodeValue.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata, (Map<String, JsonNode>) node, documentSet));
+                    }
+                    else {
+                        jsonNode.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata,
+                                                                                         Collections.singletonMap(node.getKey(), node.getValue()), documentSet));
                     }
                 }
             });
         } catch (Exception e) {
             LOG.error(CASE_DATA_PARSING_EXCEPTION);
             throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
+        }
+    }
+
+    private String extractDocumentId(JsonNode documentField) {
+        if (documentField.asText().contains(BINARY)) {
+            return documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
+        } else {
+            return documentField.asText().substring(documentField.asText().length() - 36);
         }
     }
 

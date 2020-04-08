@@ -9,10 +9,16 @@
       "NestedNumberField": null,
       "NestedCollectionTextField": []
     },
+    "DocumentField8": {
+      "document_url": "http://dm-store:8080/documents/f0550adc-eaea-4232-b52f-1c4ac0534d60",
+      "document_filename": "Test.png",
+      "document_binary_url": "http://dm-store:8080/documents/f0550adc-eaea-4232-b52f-1c4ac0534d60/binary",
+      "hashcode": "UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q"
+    },
     "ComplexFixedListField": "VALUE2"
   },
   "PhoneUKField": "08888899999",
-  "TextAreaField": "fqeadadfTSFGsfs`f`sfs`f",
+  "TextAreaField": "fqeadadfTSFGsfs",
   "AddressUKField": {
     "County": null,
     "Country": null
