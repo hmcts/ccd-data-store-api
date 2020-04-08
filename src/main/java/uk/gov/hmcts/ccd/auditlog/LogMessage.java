@@ -1,13 +1,14 @@
 package uk.gov.hmcts.ccd.auditlog;
 
 public class LogMessage {
-
+    private static final String TAG = "CLA-CCD";
     private String dateTime;
+
     private int httpStatus;
     private String httpMethod;
     private String path;
     private String clientIp;
-    private String javaMethod;
+    private String operationType;
     private String response;
 
     public void setDateTime(String time) {
@@ -50,12 +51,12 @@ public class LogMessage {
         this.clientIp = clientIp;
     }
 
-    public String getJavaMethod() {
-        return javaMethod;
+    public String getOperationType() {
+        return operationType;
     }
 
-    public void setJavaMethod(String javaMethod) {
-        this.javaMethod = javaMethod;
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
     }
 
     public String getResponse() {
@@ -68,12 +69,11 @@ public class LogMessage {
 
     @Override
     public String toString() {
-        return "CLA-CCD " + dateTime +
+        return TAG + " " + dateTime + " Operation:" + operationType +
             " { httpStatus=" + httpStatus +
             ", httpMethod='" + httpMethod + '\'' +
             ", path='" + path + '\'' +
             ", clientIp='" + clientIp + '\'' +
-            ", javaMethod='" + javaMethod + '\'' +
             ", response='" + response + '\'' +
             '}';
     }

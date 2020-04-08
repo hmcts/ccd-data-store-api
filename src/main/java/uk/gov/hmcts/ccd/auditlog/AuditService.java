@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.auditlog;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
@@ -22,21 +21,22 @@ public class AuditService {
         this.clock = clock;
     }
 
-    public String prepareAuditMessage(HttpServletRequest requestToCache, HttpServletResponse responseToCache, HandlerExecutionChain handler) {
+    public String prepareAuditMessage(HttpServletRequest request, HttpServletResponse response, String operationType) {
         LogMessage log = new LogMessage();
+
         String formattedDate = LocalDateTime.now(clock).format(ISO_LOCAL_DATE_TIME);
 
         log.setDateTime(formattedDate);
-        log.setHttpStatus(responseToCache.getStatus());
-        log.setHttpMethod(requestToCache.getMethod());
-        log.setPath(requestToCache.getRequestURI());
-        log.setClientIp(requestToCache.getRemoteAddr());
-        log.setJavaMethod(handler.toString());
-        log.setResponse(getResponsePayload(responseToCache));
+        log.setHttpStatus(response.getStatus());
+        log.setHttpMethod(request.getMethod());
+        log.setPath(request.getRequestURI());
+        log.setClientIp(request.getRemoteAddr());
+        log.setOperationType(operationType);
+        log.setResponse(getResponsePayload(response));
         return log.toString();
-//        if ("POST".equalsIgnoreCase(requestToCache.getMethod())) {
+//        if ("POST".equalsIgnoreCase(request.getMethod())) {
 //            logger.info("***** POST *****");
-//            logger.info(getRequestPayload(requestToCache));
+//            logger.info(getRequestPayload(request));
 //        } else {
 //            logger.info("***** REQUEST *****");
 //            logger.info(log);

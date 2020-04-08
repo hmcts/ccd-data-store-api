@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
@@ -64,7 +66,8 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    // TODO: @AuditLog( operation = "Create case")
+
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public ResponseEntity<UIStartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
                                                                       @PathVariable("triggerId") String triggerId,
                                                                       @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {

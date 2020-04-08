@@ -2,17 +2,12 @@ package uk.gov.hmcts.ccd;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.DispatcherServlet;
-import uk.gov.hmcts.ccd.auditlog.AuditService;
-import uk.gov.hmcts.ccd.auditlog.LoggableDispatcherServlet;
 
 import java.time.Clock;
 
@@ -46,18 +41,4 @@ public class CoreCaseDataApplication {
         return Clock.systemUTC();
     }
 
-    @Bean
-    public ServletRegistrationBean dispatcherRegistration() {
-        return new ServletRegistrationBean(dispatcherServlet());
-    }
-
-    @Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
-    public DispatcherServlet dispatcherServlet() {
-        return new LoggableDispatcherServlet(auditService());
-    }
-
-    @Bean
-    public AuditService auditService() {
-        return new AuditService(utcClock());
-    }
 }
