@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doReturn;
@@ -20,11 +19,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -69,6 +71,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
 
 class SubmitCaseTransactionTest {
 
@@ -252,13 +255,13 @@ class SubmitCaseTransactionTest {
     @DisplayName("should persist V2.1 Case creation event")
     void shouldPersistV2Event() throws IOException {
         doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
-        final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
         CaseDetails inputCaseDetails = new CaseDetails();
 
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
         doReturn(dataMap).when(this.caseDetails).getData();
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         ResponseEntity<Boolean> responseEntity = new ResponseEntity<Boolean>(true, HttpStatus.OK);
         doReturn(responseEntity).when(restTemplate).exchange(
             ArgumentMatchers.anyString(),
@@ -275,9 +278,8 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> assertThat(caseDetails, isNotNull()),
-            () -> assertThat(caseDetails.getData(), isNotNull()),
-            () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
-            () -> assertAuditEvent(auditEventCaptor.getValue()));
+            () -> assertThat(caseDetails.getData(), isNotNull())
+           );
 
         //assertCaseData(caseDetails);
     }
@@ -296,6 +298,39 @@ class SubmitCaseTransactionTest {
                                                   "5c4b5564-a29f-47d3-8c51-50e2d4629435");
         assertAll(
             () -> assertEquals(documentSet, expectedSet));
+    }
+
+    @Test
+    @DisplayName("should filter documents after callback to service")
+    void shouldFilterDocumentFieldsAfterCallback() throws IOException {
+
+        //Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+
+        DocumentMetadata documentMetadata = DocumentMetadata
+            .builder()
+            .documents(Arrays.asList(CaseDocument.builder().id("DocumentId1").build(),
+                                     CaseDocument.builder().id("DocumentId2").build(),
+                                     CaseDocument.builder().id("DocumentId3").build(),
+                                     CaseDocument.builder().id("DocumentId4").build(),
+                                     CaseDocument.builder().id("DocumentId5").build()))
+            .build();
+
+        Set<String> documentSetBeforeCallback = Stream.of("DocumentId1", "DocumentId2", "DocumentId3")
+                                                      .collect(Collectors.toSet());
+        Set<String> documentSetAfterCallback = Stream.of("DocumentId1", "DocumentId2", "DocumentId4", "DocumentId5")
+                                                     .collect(Collectors.toSet());
+
+        submitCaseTransaction.filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentSetAfterCallback);
+        Set<String> expectedSet = Sets.newHashSet("DocumentId1",
+                                                  "DocumentId2",
+                                                  "DocumentId4", "DocumentId5");
+
+        Set<String> filteredDocumentIds = documentMetadata.getDocuments()
+                                                  .stream().map(CaseDocument::getId)
+                                                  .collect(Collectors.toSet());
+        assertAll(
+            () -> assertEquals(documentSetAfterCallback, expectedSet),
+            ()-> assertEquals(filteredDocumentIds, expectedSet));
     }
 
     @Test
@@ -469,8 +504,7 @@ class SubmitCaseTransactionTest {
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
         InputStream inputStream =
-            SubmitCaseTransactionTest.class.getClassLoader()
-                                           .getResourceAsStream("mappings/".concat(fileName));
+            SubmitCaseTransactionTest.class.getClassLoader().getResourceAsStream("mappings/".concat(fileName));
 
         HashMap<String, JsonNode> result =
             new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {});

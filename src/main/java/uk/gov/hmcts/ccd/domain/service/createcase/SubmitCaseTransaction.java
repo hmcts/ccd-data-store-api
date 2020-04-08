@@ -7,9 +7,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,9 +16,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +131,6 @@ class SubmitCaseTransaction {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         Set<String> documentSetBeforeCallback = null;
-        Set<String> documentAfterCallback = null;
         DocumentMetadata documentMetadata = null;
 
         newCaseDetails.setCreatedDate(now);
@@ -146,22 +141,16 @@ class SubmitCaseTransaction {
             && request.getContentType().equals(V2.MediaType.CREATE_CASE_2_1);
 
         if (isApiVersion21) {
-            try {
-                LOG.debug("Creating case using Version 2.1 of case create API");
-                documentSetBeforeCallback = new HashSet<>();
-                documentMetadata = DocumentMetadata.builder()
-                                                   .caseId(newCaseDetails.getReferenceAsString())
-                                                   .jurisdictionId(newCaseDetails.getJurisdiction())
-                                                   .caseTypeId(newCaseDetails.getCaseTypeId())
-                                                   .documents(new ArrayList<>())
-                                                   .build();
+            LOG.debug("Creating case using Version 2.1 of case create API");
+            documentSetBeforeCallback = new HashSet<>();
+            documentMetadata = DocumentMetadata.builder()
+                                               .caseId(newCaseDetails.getReferenceAsString())
+                                               .jurisdictionId(newCaseDetails.getJurisdiction())
+                                               .caseTypeId(newCaseDetails.getCaseTypeId())
+                                               .documents(new ArrayList<>())
+                                               .build();
 
-                extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback);
-            }
-            catch (Exception e) {
-                LOG.error(CASE_DATA_PARSING_EXCEPTION);
-                throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
-            }
+            extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback);
         }
 
         /*
@@ -190,9 +179,8 @@ class SubmitCaseTransaction {
         return savedCaseDetails;
     }
 
-    private void attachDocumentToCase(CaseDetails newCaseDetails, Set<String> documentSetBeforeCallback, DocumentMetadata documentMetadata) {
-        Set<String> documentAfterCallback;
-        documentAfterCallback = new HashSet<>();
+    void attachDocumentToCase(CaseDetails newCaseDetails, Set<String> documentSetBeforeCallback, DocumentMetadata documentMetadata) {
+        Set<String> documentAfterCallback = new HashSet<>();
         extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
         filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
 
@@ -222,16 +210,14 @@ class SubmitCaseTransaction {
                 //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
                 //This quick check will reduce the processing time as most of filtering will be done at top level.
                 if (jsonNode != null && jsonNode.findValue(HASH_CODE_STRING) != null) {
-
                     //Document Binary URL is preferred.
                     JsonNode documentField = jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null ?
                                              jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) :
                                              jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
                     //Check if current node is of type document and hashcode is available.
 
-                    if (documentField != null && jsonNode.get(HASH_CODE_STRING) != null && !documentSet.contains(documentField.asText())) {
+                    if (documentField != null && jsonNode.get(HASH_CODE_STRING) != null) {
                         String documentId = extractDocumentId(documentField);
-
                         documentMetadata.getDocuments().add(CaseDocument
                                                                 .builder()
                                                                 .id(documentId)
@@ -263,20 +249,20 @@ class SubmitCaseTransaction {
         }
     }
 
-    private void filterDocumentFields(DocumentMetadata documentMetadata, Set<String> documentSetBeforeCallback, Set<String> documentSetAfterCallback) {
+     void filterDocumentFields(DocumentMetadata documentMetadata, Set<String> documentSetBeforeCallback, Set<String> documentSetAfterCallback) {
         try {
-            //The below change is STRICTLY for LOCAL testing purpose. It needs to be removed in the PR environment
-            documentSetAfterCallback.addAll(documentSetBeforeCallback);
+            //The below line is STRICTLY for LOCAL testing purpose. It needs to be removed in the PR environment
+            //documentSetAfterCallback.addAll(documentSetBeforeCallback);
             //PLEASE REMOVE ABOVE line in PR environment
-
 
             //find documents which are intersection of Before and after callback
             Set<String> filteredDocumentSet = documentSetAfterCallback.stream()
                                                                       .filter(documentSetBeforeCallback::contains)
                                                                       .collect(Collectors.toSet());
 
-            //Add the intersection to aftercallback list. Now, afterCallbackList will have the documents from
-            //Callback response
+
+            //Add the intersection to aftercallback list. The below scenario supports the replaced documents
+            // Now, afterCallbackList will have the documents from Callback response
             // + original documents which have not been removed by the callback
             // + Any new documents which are added by callback response
             //This code should drop any documents which were removed by the callback
