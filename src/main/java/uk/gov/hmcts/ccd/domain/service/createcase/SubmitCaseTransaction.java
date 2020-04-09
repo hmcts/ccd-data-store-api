@@ -130,8 +130,6 @@ class SubmitCaseTransaction {
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
             callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseType, ignoreWarning);
 
-        //saveAuditEventForCaseDetails is making a call to caseDetailsRepository.set(newCaseDetails);
-        //This is actually creating a record of the case in DB.
         final CaseDetails savedCaseDetails =
             saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseType, idamUser, eventTrigger, newCaseDetails);
 
@@ -149,39 +147,6 @@ class SubmitCaseTransaction {
 
         return savedCaseDetails;
     }
-
-    void extractDocumentFieldsNew(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, JsonNode> data,
-                                  Set<String> documentSet, TriFunction<CaseDocumentsMetadata, JsonNode, JsonNode, String> processor) {
-        try {
-            data.forEach((field, jsonNode) -> {
-                // Check if the field consists of Document at any level, e.g. Complex fields can
-                // also have documents.
-                // This quick check will reduce the processing time as most of filtering will be
-                // done at top level.
-                if (jsonNode != null && jsonNode.findValue(HASH_CODE_STRING) != null) {
-
-                    // Document Binary URL is preferred.
-                    JsonNode documentField = jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null
-                            ? jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE)
-                            : jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
-                    // Check if current node is of type document and hashcode is available.
-
-                    if (documentField != null && jsonNode.get(HASH_CODE_STRING) != null
-                            && !documentSet.contains(documentField.asText())) {
-                        String documentId = processor.apply(caseDocumentsMetadata, documentField, jsonNode);
-                        documentSet.add(documentId);
-                    } else {
-                        /*jsonNode.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata,
-                                Collections.singletonMap(node.getKey(), node.getValue()), documentSet));*/
-                    }
-                }
-            });
-        } catch (Exception e) {
-            LOG.error(CASE_DATA_PARSING_EXCEPTION);
-            throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
-        }
-    }
-
 
     private CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,
                                                      Event event,
