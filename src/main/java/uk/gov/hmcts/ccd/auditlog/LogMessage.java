@@ -8,6 +8,8 @@ public class LogMessage {
     private String httpMethod;
     private String path;
     private String clientIp;
+    private String idamId;
+    private String invokingService;
     private String operationType;
     private String response;
 
@@ -67,6 +69,22 @@ public class LogMessage {
         this.response = response;
     }
 
+    public String getIdamId() {
+        return idamId;
+    }
+
+    public void setIdamId(String idamId) {
+        this.idamId = idamId;
+    }
+
+    public String getInvokingService() {
+        return invokingService;
+    }
+
+    public void setInvokingService(String invokingService) {
+        this.invokingService = invokingService;
+    }
+
     @Override
     public String toString() {
         return TAG + " " + dateTime + " Operation:" + operationType +
@@ -74,6 +92,8 @@ public class LogMessage {
             ", httpMethod='" + httpMethod + '\'' +
             ", path='" + path + '\'' +
             ", clientIp='" + clientIp + '\'' +
+            ", idamId='" + idamId + '\'' +
+            ", invokingService='" + invokingService + '\'' +
             ", response='" + response + '\'' +
             '}';
     }

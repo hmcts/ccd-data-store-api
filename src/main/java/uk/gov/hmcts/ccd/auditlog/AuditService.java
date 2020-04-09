@@ -1,9 +1,14 @@
 package uk.gov.hmcts.ccd.auditlog;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,12 +18,19 @@ import java.time.LocalDateTime;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
+@Service
 public class AuditService {
 
     private final Clock clock;
+    private final SecurityUtils securityUtils;
+    private final UserRepository userRepository;
 
-    public AuditService(@Qualifier("utcClock") final Clock clock) {
+    public AuditService(@Qualifier("utcClock") final Clock clock,
+                        @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                        @Lazy final SecurityUtils securityUtils) {
         this.clock = clock;
+        this.userRepository = userRepository;
+        this.securityUtils = securityUtils;
     }
 
     public String prepareAuditMessage(HttpServletRequest request, HttpServletResponse response, String operationType) {
@@ -33,6 +45,8 @@ public class AuditService {
         log.setClientIp(request.getRemoteAddr());
         log.setOperationType(operationType);
         log.setResponse(getResponsePayload(response));
+        log.setIdamId(userRepository.getUser().getEmail());
+        log.setInvokingService(securityUtils.getServiceName());
         return log.toString();
 //        if ("POST".equalsIgnoreCase(request.getMethod())) {
 //            logger.info("***** POST *****");

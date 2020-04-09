@@ -4,18 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.auditlog.LogAuditInterceptor;
 
-import java.time.Clock;
-
 @Configuration
-public class AuditConfig extends WebMvcConfigurerAdapter {
+public class AuditConfig implements WebMvcConfigurer {
 
     @Autowired
-    private Clock clock;
+    private AuditService auditService;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -24,11 +21,7 @@ public class AuditConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public LogAuditInterceptor logAuditInterceptor() {
-        return new LogAuditInterceptor(auditService());
+        return new LogAuditInterceptor(auditService);
     }
 
-    @Bean
-    public AuditService auditService() {
-        return new AuditService(clock);
-    }
 }
