@@ -195,25 +195,6 @@ class SubmitCaseTransaction {
         caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
         caseDocumentAttachOperation.filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
         caseDocumentAttachOperation.restCallToAttachCaseDocuments();
-
-       /* try {
-            if (!documentMetadata.getDocuments().isEmpty()) {
-                HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
-                restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-
-                ResponseEntity<Boolean> result = restTemplate
-                    .exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
-                              HttpMethod.PATCH, requestEntity, Boolean.class);
-
-                if (!result.getStatusCode().equals(HttpStatus.OK) || result.getBody() == null || result.getBody().equals(false)) {
-                    LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-                    throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-                }
-            }
-        } catch (Exception e) {
-            LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-            throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-        }*/
     }
 
     void extractDocumentFieldsNew(DocumentMetadata documentMetadata, Map<String, JsonNode> data,
