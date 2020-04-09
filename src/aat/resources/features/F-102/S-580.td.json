@@ -35,6 +35,10 @@
               "jurisdiction": null,
               "events": [
                 {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered"
+                },
+                {
                   "id": "REVIEW",
                   "name": "Review",
                   "description": null,
