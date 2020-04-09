@@ -3,39 +3,24 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
-import org.elasticsearch.common.TriFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.elasticsearch.common.TriFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -55,14 +40,11 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttachOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataParsingException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
-import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 
 @Service
 class SubmitCaseTransaction {
@@ -129,8 +111,6 @@ class SubmitCaseTransaction {
                                   CaseDetails newCaseDetails, Boolean ignoreWarning) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-        Set<String> documentSetBeforeCallback = null;
-        DocumentMetadata documentMetadata = null;
 
         newCaseDetails.setCreatedDate(now);
         newCaseDetails.setLastStateModifiedDate(now);
@@ -140,29 +120,8 @@ class SubmitCaseTransaction {
             && request.getContentType().equals(V2.MediaType.CREATE_CASE_2_1);
 
         if (isApiVersion21) {
-            LOG.debug("Creating case using Version 2.1 of case create API");
-            documentSetBeforeCallback = new HashSet<>();
-            documentMetadata = DocumentMetadata.builder()
-                                               .caseId(newCaseDetails.getReferenceAsString())
-                                               .jurisdictionId(newCaseDetails.getJurisdiction())
-                                               .caseTypeId(newCaseDetails.getCaseTypeId())
-                                               .documents(new ArrayList<>())
-                                               .build();
-            caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback);
-                extractDocumentFieldsNew(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback,
-                        (dmd, df, jn) -> {
-                            String documentId = caseDocumentAttachOperation.extractDocumentId(df);
-
-                            dmd.getDocuments()
-                                    .add(CaseDocument.builder().id(documentId)
-                                            .hashToken(jn.get(HASH_CODE_STRING).asText())
-                                            .permissions(Collections.singletonList(Permission.CREATE)).build());
-                            if (jn instanceof ObjectNode) {
-                                ((ObjectNode) jn).remove(HASH_CODE_STRING);
-                            }
-                            return documentId;
-                });
-            }
+            caseDocumentAttachOperation.caseDocumentAttachOperation(newCaseDetails);
+        }
 
         /*
             About to submit
@@ -185,16 +144,12 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion21) {
-            attachDocumentToCase(newCaseDetails, documentSetBeforeCallback, documentMetadata);
+            caseDocumentAttachOperation.afterCallbackPrepareDocumentMetaData(newCaseDetails);
+            caseDocumentAttachOperation.filterDocumentFields();
+            caseDocumentAttachOperation.restCallToAttachCaseDocuments();
         }
-        return savedCaseDetails;
-    }
 
-    void attachDocumentToCase(CaseDetails newCaseDetails, Set<String> documentSetBeforeCallback, DocumentMetadata documentMetadata) {
-        Set<String> documentAfterCallback = new HashSet<>();
-        caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
-        caseDocumentAttachOperation.filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
-        caseDocumentAttachOperation.restCallToAttachCaseDocuments();
+        return savedCaseDetails;
     }
 
     void extractDocumentFieldsNew(DocumentMetadata documentMetadata, Map<String, JsonNode> data,
