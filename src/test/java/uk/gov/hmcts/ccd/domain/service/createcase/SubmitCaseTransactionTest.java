@@ -280,8 +280,6 @@ class SubmitCaseTransactionTest {
             () -> assertThat(caseDetails, isNotNull()),
             () -> assertThat(caseDetails.getData(), isNotNull())
            );
-
-        //assertCaseData(caseDetails);
     }
 
     @Test
@@ -303,9 +301,6 @@ class SubmitCaseTransactionTest {
     @Test
     @DisplayName("should filter documents after callback to service")
     void shouldFilterDocumentFieldsAfterCallback() throws IOException {
-
-        //Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-
         DocumentMetadata documentMetadata = DocumentMetadata
             .builder()
             .documents(Arrays.asList(CaseDocument.builder().id("DocumentId1").build(),

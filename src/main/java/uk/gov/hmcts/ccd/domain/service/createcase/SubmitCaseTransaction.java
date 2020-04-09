@@ -209,6 +209,7 @@ class SubmitCaseTransaction {
             data.forEach((field, jsonNode) -> {
                 //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
                 //This quick check will reduce the processing time as most of filtering will be done at top level.
+                //****** Every document should have hashcode, else throw error
                 if (jsonNode != null && jsonNode.findValue(HASH_CODE_STRING) != null) {
                     //Document Binary URL is preferred.
                     JsonNode documentField = jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null ?

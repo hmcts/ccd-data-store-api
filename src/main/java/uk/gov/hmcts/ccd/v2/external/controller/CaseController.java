@@ -212,9 +212,7 @@ public class CaseController {
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
-        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
-
-        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
+        return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
     }
 
     @Transactional
@@ -292,11 +290,8 @@ public class CaseController {
     public ResponseEntity<CaseResource> createCaseV21(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
-        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
-
-        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
+        return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
     }
-
 
     @GetMapping(
         path = "/cases/{caseId}/events",
@@ -342,5 +337,15 @@ public class CaseController {
         final List<AuditEvent> auditEvents = getEventsOperation.getEvents(caseId);
 
         return ResponseEntity.ok(new CaseEventsResource(caseId, auditEvents));
+    }
+
+
+    private ResponseEntity<CaseResource> getCaseResourceResponseEntity(@PathVariable("caseTypeId") String caseTypeId,
+                                                                       @RequestBody CaseDataContent content,
+                                                                       @RequestParam(value = "ignore-warning",
+                                                                                     required = false) Boolean ignoreWarning) {
+        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
+
+        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
     }
 }
