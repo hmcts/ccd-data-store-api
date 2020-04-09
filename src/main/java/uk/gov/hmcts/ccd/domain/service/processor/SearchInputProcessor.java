@@ -71,7 +71,7 @@ public class SearchInputProcessor {
     }
 
     private void handleNested(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
-        final Optional<CommonField> field = criteriaInput.getField().getNestedField(fieldPath);
+        final Optional<CommonField> field = criteriaInput.getField().getType().getNestedField(fieldPath, true);
 
         if (field.isPresent() && DisplayContextParameter
             .hasDisplayContextParameterType(field.get().getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)) {

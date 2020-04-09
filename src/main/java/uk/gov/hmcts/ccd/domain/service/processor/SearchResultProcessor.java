@@ -111,7 +111,7 @@ public class SearchResultProcessor {
             return new TextNode(originalNode.asText());
         }
 
-        final Optional<CommonField> nestedField = viewColumn.getNestedField(fieldPath);
+        final Optional<CommonField> nestedField = viewColumn.getCaseFieldType().getNestedField(fieldPath, true);
         final String displayContextParameter = nestedField
             .map(CommonField::getDisplayContextParameter)
             .orElse(viewColumn.getDisplayContextParameter());

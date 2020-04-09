@@ -134,13 +134,13 @@ public class FieldType implements Serializable {
         this.collectionFieldType = collectionFieldType;
     }
 
-    public Optional<CommonField> getNestedField(String path) {
-        if (StringUtils.isBlank(path) || this.getChildren().isEmpty()) {
+    public Optional<CommonField> getNestedField(String path, boolean pathIncludesParent) {
+        if (StringUtils.isBlank(path) || this.getChildren().isEmpty() || (pathIncludesParent && path.trim().split("\\.").length == 1)) {
             return Optional.empty();
         }
         List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(toList());
 
-        return reduce(this.getChildren(), pathElements);
+        return reduce(this.getChildren(), pathIncludesParent ? pathElements.stream().skip(1).collect(toList()) : pathElements);
     }
 
     private Optional<CommonField> reduce(List<CaseField> caseFields, List<String> pathElements) {

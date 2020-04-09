@@ -3,10 +3,14 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.*;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -85,19 +89,20 @@ public class FieldTypeTest {
     @DisplayName("getNestedField test")
     class FieldTypeGetNestedFieldTest {
 
+        private final String TEXT_FIELD_TYPE = "Text";
         private final String COMPLEX_FIELD_TYPE = "Complex";
         private final String COLLECTION_FIELD_TYPE = "Collection";
 
-        @Test
-        void shouldFindBasicNestedField() {
-            String testPath = "NestedField";
+        @ParameterizedTest
+        @ArgumentsSource(BasicNestedFieldTestData.class)
+        void shouldFindBasicNestedField(String testPath, boolean pathIncludesParent) {
             CaseField nestedField = newCaseField()
                 .withId("NestedField")
                 .withFieldType(aFieldType().withType("Text").build())
                 .build();
             FieldType fieldType = aFieldType().withType(COMPLEX_FIELD_TYPE).withComplexField(nestedField).build();
 
-            final Optional<CommonField> result = fieldType.getNestedField(testPath);
+            final Optional<CommonField> result = fieldType.getNestedField(testPath, pathIncludesParent);
 
             assertAll(
                 () -> assertThat(result.isPresent(), is(true)),
@@ -105,9 +110,9 @@ public class FieldTypeTest {
             );
         }
 
-        @Test
-        void shouldFindDeepNestedField() {
-            String testPath = "NestedField.DeepNestedField";
+        @ParameterizedTest
+        @ArgumentsSource(DeepNestedFieldTestData.class)
+        void shouldFindDeepNestedField(String testPath, boolean pathIncludesParent) {
             CaseField deepNestedField = newCaseField().withId("DeepNestedField").build();
             CaseField nestedField = newCaseField()
                 .withId("NestedField")
@@ -118,7 +123,7 @@ public class FieldTypeTest {
                 ).build();
             FieldType fieldType = aFieldType().withType(COMPLEX_FIELD_TYPE).withComplexField(nestedField).build();
 
-            final Optional<CommonField> result = fieldType.getNestedField(testPath);
+            final Optional<CommonField> result = fieldType.getNestedField(testPath, pathIncludesParent);
 
             assertAll(
                 () -> assertThat(result.isPresent(), is(true)),
@@ -126,9 +131,9 @@ public class FieldTypeTest {
             );
         }
 
-        @Test
-        void shouldFindNestedCollectionField() {
-            String testPath = "NestedCollectionField";
+        @ParameterizedTest
+        @ArgumentsSource(NestedCollectionFieldTestData.class)
+        void shouldFindNestedCollectionField(String testPath, boolean pathIncludesParent) {
             CaseField collectionField = newCaseField()
                 .withId("NestedCollectionField")
                 .withFieldType(aFieldType().withType(COLLECTION_FIELD_TYPE)
@@ -137,7 +142,7 @@ public class FieldTypeTest {
                 ).build();
             FieldType fieldType = aFieldType().withType(COLLECTION_FIELD_TYPE).withCollectionField(collectionField).build();
 
-            final Optional<CommonField> result = fieldType.getNestedField(testPath);
+            final Optional<CommonField> result = fieldType.getNestedField(testPath, pathIncludesParent);
 
             assertAll(
                 () -> assertThat(result.isPresent(), is(true)),
@@ -145,9 +150,9 @@ public class FieldTypeTest {
             );
         }
 
-        @Test
-        void shouldNotReturnResultForNonExistentNestedField() {
-            String testPath = "NestedField.NonExistentDeepNestedField";
+        @ParameterizedTest
+        @ArgumentsSource(NonExistentNestedFieldTestData.class)
+        void shouldNotReturnResultForNonExistentNestedField(String testPath, boolean pathIncludesParent) {
             CaseField deepNestedField = newCaseField().withId("DeepNestedField").build();
             CaseField nestedField = newCaseField()
                 .withId("NestedField")
@@ -158,15 +163,16 @@ public class FieldTypeTest {
                 ).build();
             FieldType fieldType = aFieldType().withType(COMPLEX_FIELD_TYPE).withComplexField(nestedField).build();
 
-            final Optional<CommonField> result = fieldType.getNestedField(testPath);
+            final Optional<CommonField> result = fieldType.getNestedField(testPath, pathIncludesParent);
 
             assertAll(
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
 
-        @Test
-        void shouldNotReturnResultForBlankPath() {
+        @ParameterizedTest
+        @ValueSource(booleans = { true, false })
+        void shouldNotReturnResultForBlankPath(boolean pathIncludesParent) {
             String testPath = "";
             CaseField nestedField = newCaseField()
                 .withId("NestedField")
@@ -174,7 +180,7 @@ public class FieldTypeTest {
                 .build();
             FieldType fieldType = aFieldType().withType(COMPLEX_FIELD_TYPE).withComplexField(nestedField).build();
 
-            final Optional<CommonField> result = fieldType.getNestedField(testPath);
+            final Optional<CommonField> result = fieldType.getNestedField(testPath, pathIncludesParent);
 
             assertAll(() -> {
                 assertThat(result.isPresent(), is(false));
@@ -182,35 +188,72 @@ public class FieldTypeTest {
         }
 
         @Test
-        void shouldNotReturnResultForPathWithNoNesting() {
-            String testPath = "NonNestedPath";
+        void shouldNotReturnResultForPathWithOnlyParent() {
+            String testPath = "ParentField";
             CaseField nestedField = newCaseField()
                 .withId("NestedField")
                 .withFieldType(aFieldType().withType("Text").build())
                 .build();
             FieldType fieldType = aFieldType().withType(COMPLEX_FIELD_TYPE).withComplexField(nestedField).build();
 
-            final Optional<CommonField> result = fieldType.getNestedField(testPath);
+            final Optional<CommonField> result = fieldType.getNestedField(testPath, true);
 
             assertAll(() -> {
                 assertThat(result.isPresent(), is(false));
             });
         }
 
-        @Test
-        void shouldNotReturnResultForFieldTypeWithNoChildren() {
+        @ParameterizedTest
+        @ValueSource(booleans = { true, false })
+        void shouldNotReturnResultForFieldTypeWithNoChildren(boolean pathIncludesParent) {
             String testPath = "Field.ID";
-            CaseField nestedField = newCaseField()
-                .withId("NestedField")
-                .withFieldType(aFieldType().withType("Text").build())
-                .build();
-            FieldType fieldType = aFieldType().withType(COMPLEX_FIELD_TYPE).withComplexField(nestedField).build();
+            FieldType fieldType = aFieldType().withType(TEXT_FIELD_TYPE).build();
 
-            final Optional<CommonField> result = fieldType.getNestedField(testPath);
+            final Optional<CommonField> result = fieldType.getNestedField(testPath, pathIncludesParent);
 
             assertAll(() -> {
                 assertThat(result.isPresent(), is(false));
             });
+        }
+    }
+
+    private static class BasicNestedFieldTestData implements ArgumentsProvider {
+        @Override
+        public Stream<Arguments> provideArguments(ExtensionContext context) {
+            return Stream.of(
+                Arguments.of("NestedField", false),
+                Arguments.of("Field.NestedField", true)
+            );
+        }
+    }
+
+    private static class DeepNestedFieldTestData implements ArgumentsProvider {
+        @Override
+        public Stream<Arguments> provideArguments(ExtensionContext context) {
+            return Stream.of(
+                Arguments.of("NestedField.DeepNestedField", false),
+                Arguments.of("Field.NestedField.DeepNestedField", true)
+            );
+        }
+    }
+
+    private static class NestedCollectionFieldTestData implements ArgumentsProvider {
+        @Override
+        public Stream<Arguments> provideArguments(ExtensionContext context) {
+            return Stream.of(
+                Arguments.of("NestedCollectionField", false),
+                Arguments.of("Field.NestedCollectionField", true)
+            );
+        }
+    }
+
+    private static class NonExistentNestedFieldTestData implements ArgumentsProvider {
+        @Override
+        public Stream<Arguments> provideArguments(ExtensionContext context) {
+            return Stream.of(
+                Arguments.of("NestedField.NonExistentDeepNestedField", false),
+                Arguments.of("Field.NestedField.NonExistentDeepNestedField", true)
+            );
         }
     }
 }
