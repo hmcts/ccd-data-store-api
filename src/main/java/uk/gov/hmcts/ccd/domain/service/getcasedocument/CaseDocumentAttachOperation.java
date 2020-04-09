@@ -94,22 +94,12 @@ public class CaseDocumentAttachOperation {
     public void restCallToAttachCaseDocuments(){
         HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-
-        try {
             if (!documentMetadata.getDocumentHashToken().isEmpty()) {
-                ResponseEntity<Boolean> result = restTemplate
+                restTemplate
                     .exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
-                              HttpMethod.PATCH, requestEntity, Boolean.class);
+                              HttpMethod.PATCH, requestEntity, Void.class);
 
-                if (!result.getStatusCode().equals(HttpStatus.OK) || result.getBody() == null || result.getBody().equals(false)) {
-                    LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-                    throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-                }
             }
-        } catch (Exception e) {
-            LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-            throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-        }
     }
 
     public void extractDocumentFieldsBeforeCallback(Map<String, JsonNode> data, Map<String,String> documentMap) {
