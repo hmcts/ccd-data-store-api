@@ -52,6 +52,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttachOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
@@ -77,9 +78,7 @@ class SubmitCaseTransaction {
     private final SecurityClassificationService securityClassificationService;
     private final CaseUserRepository caseUserRepository;
     private final UserAuthorisation userAuthorisation;
-    private final RestTemplate restTemplate;
-    private final ApplicationParams applicationParams;
-    private final SecurityUtils securityUtils;
+    private final CaseDocumentAttachOperation caseDocumentAttachOperation;
 
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
@@ -102,10 +101,8 @@ class SubmitCaseTransaction {
                                  final SecurityClassificationService securityClassificationService,
                                  final @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation,
-                                 @Qualifier("restTemplate") final RestTemplate restTemplate,
-                                 ApplicationParams applicationParams,
-                                 SecurityUtils securityUtils,
-                                 HttpServletRequest request
+                                 HttpServletRequest request,
+                                 CaseDocumentAttachOperation caseDocumentAttachOperation
                                 ) {
         this.request = request;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -116,9 +113,7 @@ class SubmitCaseTransaction {
         this.securityClassificationService = securityClassificationService;
         this.caseUserRepository = caseUserRepository;
         this.userAuthorisation = userAuthorisation;
-        this.restTemplate = restTemplate;
-        this.applicationParams = applicationParams;
-        this.securityUtils = securityUtils;
+        this.caseDocumentAttachOperation = caseDocumentAttachOperation;
     }
 
     @Transactional(REQUIRES_NEW)
@@ -135,7 +130,6 @@ class SubmitCaseTransaction {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         Set<String> documentSetBeforeCallback = null;
-        Set<String> documentAfterCallback = null;
         DocumentMetadata documentMetadata = null;
 
         newCaseDetails.setCreatedDate(now);
@@ -154,10 +148,10 @@ class SubmitCaseTransaction {
                                                .caseTypeId(newCaseDetails.getCaseTypeId())
                                                .documents(new ArrayList<>())
                                                .build();
-
+            caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback);
                 extractDocumentFieldsNew(documentMetadata, newCaseDetails.getData(), documentSetBeforeCallback,
                         (dmd, df, jn) -> {
-                            String documentId = extractDocumentId(df);
+                            String documentId = caseDocumentAttachOperation.extractDocumentId(df);
 
                             dmd.getDocuments()
                                     .add(CaseDocument.builder().id(documentId)
@@ -167,13 +161,8 @@ class SubmitCaseTransaction {
                                 ((ObjectNode) jn).remove(HASH_CODE_STRING);
                             }
                             return documentId;
-                        });
+                });
             }
-            catch (Exception e) {
-                LOG.error(CASE_DATA_PARSING_EXCEPTION);
-                throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
-            }
-        }
 
         /*
             About to submit
@@ -203,10 +192,11 @@ class SubmitCaseTransaction {
 
     void attachDocumentToCase(CaseDetails newCaseDetails, Set<String> documentSetBeforeCallback, DocumentMetadata documentMetadata) {
         Set<String> documentAfterCallback = new HashSet<>();
-        extractDocumentFields(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
-        filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
+        caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(documentMetadata, newCaseDetails.getData(), documentAfterCallback);
+        caseDocumentAttachOperation.filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
+        caseDocumentAttachOperation.restCallToAttachCaseDocuments();
 
-        try {
+       /* try {
             if (!documentMetadata.getDocuments().isEmpty()) {
                 HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
                 restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
@@ -223,7 +213,7 @@ class SubmitCaseTransaction {
         } catch (Exception e) {
             LOG.error(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
             throw new CaseConcurrencyException(DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION);
-        }
+        }*/
     }
 
     void extractDocumentFieldsNew(DocumentMetadata documentMetadata, Map<String, JsonNode> data,
@@ -247,45 +237,8 @@ class SubmitCaseTransaction {
                         String documentId = processor.apply(documentMetadata, documentField, jsonNode);
                         documentSet.add(documentId);
                     } else {
-                        jsonNode.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata,
-                                Collections.singletonMap(node.getKey(), node.getValue()), documentSet));
-                    }
-                }
-            });
-        } catch (Exception e) {
-            LOG.error(CASE_DATA_PARSING_EXCEPTION);
-            throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
-        }
-    }
-     void extractDocumentFields(DocumentMetadata documentMetadata, Map<String, JsonNode> data, Set<String> documentSet) {
-        try {
-            data.forEach((field, jsonNode) -> {
-                //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
-                //This quick check will reduce the processing time as most of filtering will be done at top level.
-                //****** Every document should have hashcode, else throw error
-                if (jsonNode != null && jsonNode.findValue(HASH_CODE_STRING) != null) {
-                    //Document Binary URL is preferred.
-                    JsonNode documentField = jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null ?
-                                             jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) :
-                                             jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE);
-                    //Check if current node is of type document and hashcode is available.
-
-                    if (documentField != null && jsonNode.get(HASH_CODE_STRING) != null) {
-                        String documentId = extractDocumentId(documentField);
-                        documentMetadata.getDocuments().add(CaseDocument
-                                                                .builder()
-                                                                .id(documentId)
-                                                                .hashToken(jsonNode.get(HASH_CODE_STRING).asText())
-                                                                .permissions(Collections.singletonList(Permission.CREATE))
-                                                                .build());
-                        if (jsonNode instanceof ObjectNode) {
-                            ((ObjectNode) jsonNode).remove(HASH_CODE_STRING);
-                        }
-                        documentSet.add(documentId);
-                    }
-                    else {
-                        jsonNode.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata,
-                                                                                         Collections.singletonMap(node.getKey(), node.getValue()), documentSet));
+                        /*jsonNode.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata,
+                                Collections.singletonMap(node.getKey(), node.getValue()), documentSet));*/
                     }
                 }
             });
@@ -295,44 +248,6 @@ class SubmitCaseTransaction {
         }
     }
 
-    private String extractDocumentId(JsonNode documentField) {
-        if (documentField.asText().contains(BINARY)) {
-            return documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
-        } else {
-            return documentField.asText().substring(documentField.asText().length() - 36);
-        }
-    }
-
-     void filterDocumentFields(DocumentMetadata documentMetadata, Set<String> documentSetBeforeCallback, Set<String> documentSetAfterCallback) {
-        try {
-            //The below line is STRICTLY for LOCAL testing purpose. It needs to be removed in the PR environment
-            //documentSetAfterCallback.addAll(documentSetBeforeCallback);
-            //PLEASE REMOVE ABOVE line in PR environment
-
-            //find documents which are intersection of Before and after callback
-            Set<String> filteredDocumentSet = documentSetAfterCallback.stream()
-                                                                      .filter(documentSetBeforeCallback::contains)
-                                                                      .collect(Collectors.toSet());
-
-
-            //Add the intersection to aftercallback list. The below scenario supports the replaced documents
-            // Now, afterCallbackList will have the documents from Callback response
-            // + original documents which have not been removed by the callback
-            // + Any new documents which are added by callback response
-            //This code should drop any documents which were removed by the callback
-            documentSetAfterCallback.addAll(filteredDocumentSet);
-
-            //The following code will filter the documents based on above prepared Set.
-            List<CaseDocument> caseDocumentList = documentMetadata.getDocuments()
-                                                                  .stream()
-                                                                  .filter(document -> documentSetAfterCallback.contains(document.getId()))
-                                                                  .collect(Collectors.toList());
-            documentMetadata.setDocuments(caseDocumentList);
-        } catch (Exception e) {
-            LOG.error("Exception while filtering the document fields.");
-            throw new DataParsingException("Exception while filtering the document fields.");
-        }
-    }
 
     private CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,
                                                      Event event,
