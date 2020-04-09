@@ -60,7 +60,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
-import uk.gov.hmcts.ccd.domain.model.search.DocumentMetadata;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -71,7 +71,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
 
 class SubmitCaseTransactionTest {
 
@@ -287,10 +286,10 @@ class SubmitCaseTransactionTest {
     void shouldExtractDocumentFromCaseData() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        DocumentMetadata documentMetadata = DocumentMetadata.builder().documents(new ArrayList<>()).build();
+        CaseDocumentsMetadata caseDocumentsMetadata = CaseDocumentsMetadata.builder().documents(new ArrayList<>()).build();
         Set<String> documentSet = new HashSet<>();
 
-        submitCaseTransaction.extractDocumentFields(documentMetadata, dataMap, documentSet);
+        submitCaseTransaction.extractDocumentFields(caseDocumentsMetadata, dataMap, documentSet);
         Set<String> expectedSet = Sets.newHashSet("388a1ce0-f132-4680-90e9-5e782721cabb",
                                                   "f0550adc-eaea-4232-b52f-1c4ac0534d60",
                                                   "5c4b5564-a29f-47d3-8c51-50e2d4629435");
@@ -301,7 +300,7 @@ class SubmitCaseTransactionTest {
     @Test
     @DisplayName("should filter documents after callback to service")
     void shouldFilterDocumentFieldsAfterCallback() throws IOException {
-        DocumentMetadata documentMetadata = DocumentMetadata
+        CaseDocumentsMetadata caseDocumentsMetadata = CaseDocumentsMetadata
             .builder()
             .documents(Arrays.asList(CaseDocument.builder().id("DocumentId1").build(),
                                      CaseDocument.builder().id("DocumentId2").build(),
@@ -315,14 +314,14 @@ class SubmitCaseTransactionTest {
         Set<String> documentSetAfterCallback = Stream.of("DocumentId1", "DocumentId2", "DocumentId4", "DocumentId5")
                                                      .collect(Collectors.toSet());
 
-        submitCaseTransaction.filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentSetAfterCallback);
+        submitCaseTransaction.filterDocumentFields(caseDocumentsMetadata, documentSetBeforeCallback, documentSetAfterCallback);
         Set<String> expectedSet = Sets.newHashSet("DocumentId1",
                                                   "DocumentId2",
                                                   "DocumentId4", "DocumentId5");
 
-        Set<String> filteredDocumentIds = documentMetadata.getDocuments()
-                                                  .stream().map(CaseDocument::getId)
-                                                  .collect(Collectors.toSet());
+        Set<String> filteredDocumentIds = caseDocumentsMetadata.getDocuments()
+                                                               .stream().map(CaseDocument::getId)
+                                                               .collect(Collectors.toSet());
         assertAll(
             () -> assertEquals(documentSetAfterCallback, expectedSet),
             ()-> assertEquals(filteredDocumentIds, expectedSet));

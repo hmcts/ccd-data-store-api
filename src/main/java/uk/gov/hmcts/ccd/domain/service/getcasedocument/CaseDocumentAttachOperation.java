@@ -16,17 +16,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.DocumentMetadata;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataParsingException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
@@ -37,14 +34,14 @@ public class CaseDocumentAttachOperation {
 
     Map<String,String> documentSetBeforeCallback = null;
     Map<String,String> documentAfterCallback = null;
-    DocumentMetadata documentMetadata = null;
+    CaseDocumentsMetadata caseDocumentsMetadata = null;
     public static final String CASE_DATA_PARSING_EXCEPTION = "Exception while extracting the document fields from Case payload";
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
     public static final String DOCUMENT = "Document";
     public static final String DOCUMENT_CASE_FIELD_URL_ATTRIBUTE = "document_url";
     public static final String DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE = "document_binary_url";
-    public static final String HASH_CODE_STRING = "hashcode";
+    public static final String HASH_TOKEN_STRING = "hashtoken";
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
@@ -74,13 +71,13 @@ public class CaseDocumentAttachOperation {
     public void afterCallbackPrepareDocumentMetaData(CaseDetails caseDetails) {
         try {
             documentAfterCallback = new HashMap<>();
-            documentMetadata = DocumentMetadata.builder()
-                                               .caseId(caseDetails.getReference().toString())
-                                               .caseTypeId(caseDetails.getCaseTypeId())
-                                               .documentHashToken(new ArrayList<>())
-                                               .build();
+            caseDocumentsMetadata = CaseDocumentsMetadata.builder()
+                                                         .caseId(caseDetails.getReference().toString())
+                                                         .caseTypeId(caseDetails.getCaseTypeId())
+                                                         .documentHashToken(new ArrayList<>())
+                                                         .build();
             // to remove hashcode before compute delta
-            extractDocumentFieldsAfterCallback(documentMetadata, caseDetails.getData(), documentAfterCallback);
+            extractDocumentFieldsAfterCallback(caseDocumentsMetadata, caseDetails.getData(), documentAfterCallback);
         } catch (Exception e) {
             LOG.error(CASE_DATA_PARSING_EXCEPTION);
             throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
@@ -88,13 +85,13 @@ public class CaseDocumentAttachOperation {
     }
 
     public void filterDocumentFields(){
-        filterDocumentFields(documentMetadata, documentSetBeforeCallback, documentAfterCallback);
+        filterDocumentFields(caseDocumentsMetadata, documentSetBeforeCallback, documentAfterCallback);
     }
 
     public void restCallToAttachCaseDocuments(){
-        HttpEntity<DocumentMetadata> requestEntity = new HttpEntity<>(documentMetadata, securityUtils.authorizationHeaders());
+        HttpEntity<CaseDocumentsMetadata> requestEntity = new HttpEntity<>(caseDocumentsMetadata, securityUtils.authorizationHeaders());
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-            if (!documentMetadata.getDocumentHashToken().isEmpty()) {
+            if (!caseDocumentsMetadata.getDocumentHashToken().isEmpty()) {
                 restTemplate
                     .exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
                               HttpMethod.PATCH, requestEntity, Void.class);
@@ -108,12 +105,12 @@ public class CaseDocumentAttachOperation {
             //This quick check will reduce the processing time as most of filtering will be done at top level.
             //****** Every document should have hashcode, else throw error
             if (jsonNode != null && isDocumentField(jsonNode)) {
-                if (jsonNode.get(HASH_CODE_STRING) == null) {
+                if (jsonNode.get(HASH_TOKEN_STRING) == null) {
                     throw new BadRequestException("The document does not has the hashcode");
                 }
 
                 String documentId = extractDocumentId(jsonNode);
-                documentMap.put(documentId,jsonNode.get(HASH_CODE_STRING).asText());
+                documentMap.put(documentId,jsonNode.get(HASH_TOKEN_STRING).asText());
                 if (jsonNode instanceof ObjectNode) {
                     //((ObjectNode) jsonNode).remove(HASH_CODE_STRING);
                 }
@@ -126,24 +123,24 @@ public class CaseDocumentAttachOperation {
         });
     }
 
-    public void extractDocumentFieldsAfterCallback(DocumentMetadata documentMetadata, Map<String, JsonNode> data, Map<String,String> documentMap) {
+    public void extractDocumentFieldsAfterCallback(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, JsonNode> data, Map<String,String> documentMap) {
         data.forEach((field, jsonNode) -> {
             //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
             //This quick check will reduce the processing time as most of filtering will be done at top level.
             //****** Every document should have hashcode, else throw error
             if (jsonNode != null && isDocumentField(jsonNode)) {
-                if (jsonNode.get(HASH_CODE_STRING) == null) {
+                if (jsonNode.get(HASH_TOKEN_STRING) == null) {
                     throw new BadRequestException("The document does not has the hashcode");
                 }
                 String documentId = extractDocumentId(jsonNode);
-                documentMap.put(documentId,jsonNode.get(HASH_CODE_STRING).asText());
-                documentMetadata.getDocumentHashToken().add(DocumentHashToken.builder()
-                                                                             .id(documentId)
-                                                                             .hashToken(jsonNode.get(HASH_CODE_STRING).asText())
-                                                                             .build());
+                documentMap.put(documentId,jsonNode.get(HASH_TOKEN_STRING).asText());
+                caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken.builder()
+                                                                                  .id(documentId)
+                                                                                  .hashToken(jsonNode.get(HASH_TOKEN_STRING).asText())
+                                                                                  .build());
 
                 if (jsonNode instanceof ObjectNode) {
-                    ((ObjectNode) jsonNode).remove(HASH_CODE_STRING);
+                    ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
                 }
 
             } else {
@@ -172,7 +169,7 @@ public class CaseDocumentAttachOperation {
     }
 
 
-    private void filterDocumentFields(DocumentMetadata documentMetadata, Map<String,String> documentSetBeforeCallback, Map<String,String> documentSetAfterCallback) {
+    private void filterDocumentFields(CaseDocumentsMetadata caseDocumentsMetadata, Map<String,String> documentSetBeforeCallback, Map<String,String> documentSetAfterCallback) {
         try {
             //Below line should be remove before promoting to PR env.
             documentSetAfterCallback.putAll(documentSetBeforeCallback);
@@ -189,14 +186,14 @@ public class CaseDocumentAttachOperation {
             // + Any new documents which are added by callback response
             //This code should drop any documents which were removed by the callback
             documentSetAfterCallback.putAll(filteredDocumentSet);
-            List<DocumentHashToken> filterCaseDocument = documentMetadata.getDocumentHashToken()
-                                                                    .stream()
-                                                                    .filter(caseDocument -> documentSetAfterCallback
+            List<DocumentHashToken> filterCaseDocument = caseDocumentsMetadata.getDocumentHashToken()
+                                                                              .stream()
+                                                                              .filter(caseDocument -> documentSetAfterCallback
                                                                                                 .containsKey(caseDocument.getId()) && documentSetAfterCallback
                                                                                                 .get(caseDocument.getId())
                                                                                                 .equals(caseDocument.getHashToken()))
-                                                                    .collect(Collectors.toList());
-            documentMetadata.setDocumentHashToken(filterCaseDocument);
+                                                                              .collect(Collectors.toList());
+            caseDocumentsMetadata.setDocumentHashToken(filterCaseDocument);
         } catch (Exception e) {
             LOG.error("Exception while filtering the document fields.");
             throw new DataParsingException("Exception while filtering the document fields.");
@@ -247,10 +244,10 @@ public class CaseDocumentAttachOperation {
 
     public void filterDocumentMetaData(Set<String> filterDocumentSet){
 
-        List<DocumentHashToken> caseDocumentList = documentMetadata.getDocumentHashToken().stream()
-                                                              .filter(document -> filterDocumentSet.contains(document.getId()))
-                                                              .collect(Collectors.toList());
-        documentMetadata.setDocumentHashToken(caseDocumentList);
+        List<DocumentHashToken> caseDocumentList = caseDocumentsMetadata.getDocumentHashToken().stream()
+                                                                        .filter(document -> filterDocumentSet.contains(document.getId()))
+                                                                        .collect(Collectors.toList());
+        caseDocumentsMetadata.setDocumentHashToken(caseDocumentList);
 
     }
 

@@ -5,8 +5,6 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
@@ -31,7 +29,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.search.DocumentMetadata;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -152,8 +150,8 @@ class SubmitCaseTransaction {
         return savedCaseDetails;
     }
 
-    void extractDocumentFieldsNew(DocumentMetadata documentMetadata, Map<String, JsonNode> data,
-            Set<String> documentSet, TriFunction<DocumentMetadata, JsonNode, JsonNode, String> processor) {
+    void extractDocumentFieldsNew(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, JsonNode> data,
+                                  Set<String> documentSet, TriFunction<CaseDocumentsMetadata, JsonNode, JsonNode, String> processor) {
         try {
             data.forEach((field, jsonNode) -> {
                 // Check if the field consists of Document at any level, e.g. Complex fields can
@@ -170,7 +168,7 @@ class SubmitCaseTransaction {
 
                     if (documentField != null && jsonNode.get(HASH_CODE_STRING) != null
                             && !documentSet.contains(documentField.asText())) {
-                        String documentId = processor.apply(documentMetadata, documentField, jsonNode);
+                        String documentId = processor.apply(caseDocumentsMetadata, documentField, jsonNode);
                         documentSet.add(documentId);
                     } else {
                         /*jsonNode.fields().forEachRemaining(node -> extractDocumentFields(documentMetadata,
