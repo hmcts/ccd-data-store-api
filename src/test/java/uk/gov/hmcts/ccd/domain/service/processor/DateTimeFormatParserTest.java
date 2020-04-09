@@ -92,6 +92,30 @@ class DateTimeFormatParserTest {
         );
     }
 
+    @Test
+    void shouldConvertIso8601ToDateTimeFormat5() {
+        final String dateTimeFormat = "dd/MM/yyyy HH-mm-ss-SSS";
+        final String value = "2012-04-21T00:00:00.5";
+
+        final String result = dateTimeFormatParser.convertIso8601ToDateTime(dateTimeFormat, value);
+
+        assertAll(
+            () -> assertThat(result, is("21/04/2012 00-00-00-500"))
+        );
+    }
+
+    @Test
+    void shouldConvertIso8601ToDateTimeFormat6() {
+        final String dateTimeFormat = "dd/MM/yyyy HH-mm-ss-SSS";
+        final String value = "2012-04-21T00:00:30.01";
+
+        final String result = dateTimeFormatParser.convertIso8601ToDateTime(dateTimeFormat, value);
+
+        assertAll(
+            () -> assertThat(result, is("21/04/2012 00-00-30-010"))
+        );
+    }
+
 
     @Test
     void shouldConvertIso8601ToDateFormat1() {
