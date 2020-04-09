@@ -21,7 +21,7 @@ public class UIWorkbasketInputsResource extends RepresentationModel {
 
     @Data
     @NoArgsConstructor
-    public class UIWorkbasketInput {
+    public static class UIWorkbasketInput {
         private String label;
         private int order;
         private Field field;

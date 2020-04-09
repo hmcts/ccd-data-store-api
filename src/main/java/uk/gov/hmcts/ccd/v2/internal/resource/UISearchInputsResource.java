@@ -24,7 +24,7 @@ public class UISearchInputsResource extends RepresentationModel {
 
     @Data
     @NoArgsConstructor
-    public class UISearchInput {
+    public static class UISearchInput {
         private String label;
         private int order;
         private Field field;
