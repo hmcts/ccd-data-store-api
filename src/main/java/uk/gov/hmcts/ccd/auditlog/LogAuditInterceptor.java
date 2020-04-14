@@ -8,6 +8,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
+import uk.gov.hmcts.ccd.auditlog.aop.AuditContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,10 +40,21 @@ public class LogAuditInterceptor extends HandlerInterceptorAdapter {
 
                 LogAudit logAudit = handlerMethod.getMethodAnnotation(LogAudit.class);
 
+                readValuesSetByAudiAspect();
+
                 String operationType = logAudit.operationType().getLabel();
                 logger.info(auditService.prepareAuditMessage(request, response, operationType));
 
             }
+        }
+    }
+
+    private void readValuesSetByAudiAspect() {
+        // read values from thread local context and call clear in the finally block.
+        LogMessage context = AuditContextHolder.getAuditContext();
+        if (context != null) {
+            logger.info("CaseId from context:" + context.getCaseId());
+            logger.info("Jurisdiction from context:" + context.getJurisdiction());
         }
     }
 }

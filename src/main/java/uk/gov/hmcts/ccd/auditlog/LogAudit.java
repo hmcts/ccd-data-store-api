@@ -14,4 +14,8 @@ public @interface LogAudit {
 
     OperationType operationType();
 
+    String caseId() default "";
+
+    String jurisdiction() default "";
+
 }

@@ -9,6 +9,8 @@ public class LogMessage {
     private String path;
     private String clientIp;
     private String idamId;
+    private String caseId;
+    private String jurisdiction;
     private String invokingService;
     private String operationType;
     private String response;
@@ -83,6 +85,26 @@ public class LogMessage {
 
     public void setInvokingService(String invokingService) {
         this.invokingService = invokingService;
+    }
+
+    public static String getTAG() {
+        return TAG;
+    }
+
+    public String getCaseId() {
+        return caseId;
+    }
+
+    public void setCaseId(String caseId) {
+        this.caseId = caseId;
+    }
+
+    public String getJurisdiction() {
+        return jurisdiction;
+    }
+
+    public void setJurisdiction(String jurisdiction) {
+        this.jurisdiction = jurisdiction;
     }
 
     @Override
