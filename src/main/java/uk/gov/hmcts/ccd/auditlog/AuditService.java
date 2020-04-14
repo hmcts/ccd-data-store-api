@@ -20,33 +20,36 @@ public class AuditService {
     private final Clock clock;
     private final SecurityUtils securityUtils;
     private final UserRepository userRepository;
+    private final AuditRepository auditRepository;
 
     public AuditService(@Qualifier("utcClock") final Clock clock,
                         @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                        @Lazy final SecurityUtils securityUtils) {
+                        @Lazy final SecurityUtils securityUtils, final AuditRepository auditRepository) {
         this.clock = clock;
         this.userRepository = userRepository;
         this.securityUtils = securityUtils;
+        this.auditRepository = auditRepository;
     }
 
-    public String prepareAuditMessage(HttpServletRequest request, int httpResponseStatus, AuditContext auditContext) {
-        LogMessage log = new LogMessage();
+    public void audit(HttpServletRequest request, int httpResponseStatus, AuditContext auditContext) {
+        AuditEntry entry = new AuditEntry();
 
         String formattedDate = LocalDateTime.now(clock).format(ISO_LOCAL_DATE_TIME);
 
-        log.setDateTime(formattedDate);
-        log.setHttpStatus(httpResponseStatus);
-        log.setHttpMethod(request.getMethod());
-        log.setPath(request.getRequestURI());
-        log.setClientIp(request.getRemoteAddr());
-        log.setIdamId(userRepository.getUser().getEmail());
-        log.setInvokingService(securityUtils.getServiceName());
+        entry.setDateTime(formattedDate);
+        entry.setHttpStatus(httpResponseStatus);
+        entry.setHttpMethod(request.getMethod());
+        entry.setPath(request.getRequestURI());
+        entry.setClientIp(request.getRemoteAddr());
+        entry.setIdamId(userRepository.getUser().getEmail());
+        entry.setInvokingService(securityUtils.getServiceName());
 
-        log.setOperationType(auditContext.getOperationType().getLabel());
-        log.setJurisdiction(auditContext.getJurisdiction());
-        log.setCaseId(auditContext.getCaseId());
-        log.setCaseType(auditContext.getCaseType());
-        return log.toString();
+        entry.setOperationType(auditContext.getOperationType().getLabel());
+        entry.setJurisdiction(auditContext.getJurisdiction());
+        entry.setCaseId(auditContext.getCaseId());
+        entry.setCaseType(auditContext.getCaseType());
+
+        auditRepository.save(entry);
     }
 
 }

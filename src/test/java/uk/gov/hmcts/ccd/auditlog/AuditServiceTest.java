@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -18,8 +20,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("audit log specific calls")
 class AuditServiceTest {
@@ -38,6 +40,12 @@ class AuditServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private AuditRepository auditRepository;
+
+    @Captor
+    ArgumentCaptor<AuditEntry> captor;
+
     private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.01Z"), ZoneOffset.UTC);
 
     private AuditService auditService;
@@ -45,7 +53,7 @@ class AuditServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        auditService = new AuditService(fixedClock, userRepository, securityUtils);
+        auditService = new AuditService(fixedClock, userRepository, securityUtils, auditRepository);
         IdamUser user = new IdamUser();
         user.setEmail(EMAIL);
 
@@ -66,12 +74,12 @@ class AuditServiceTest {
                 .jurisdiction("AUTOTEST1")
                 .build();
 
-            String message = auditService.prepareAuditMessage(request, 200, auditContext);
+            auditService.audit(request, 200, auditContext);
 
-            assertAll(
-                () -> assertThat(message).contains("idamId=" + "'" + EMAIL + "'"),
-                () -> assertThat(message).contains("invokingService=" + "'" + SERVICE_NAME + "'")
-            );
+            verify(auditRepository).save(captor.capture());
+
+            assertThat(captor.getValue().getIdamId()).isEqualTo((EMAIL));
+
         }
 
     }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -15,6 +16,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
@@ -25,7 +28,6 @@ import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -59,7 +61,7 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
     private SecurityContext securityContext;
 
     @SpyBean
-    private AuditService auditService;
+    private AuditRepository auditRepository;
 
     private MockMvc mockMvc;
 
@@ -114,7 +116,11 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertThat(field1.getAccessControlLists().get(1).isUpdate(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isDelete(), is(false));
 
-        verify(auditService).prepareAuditMessage(any(HttpServletRequest.class), eq(200), any(AuditContext.class));
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(OperationType.CREATE_CASE.getLabel()));
+        // TODO : add other assertions
     }
 
     @Test

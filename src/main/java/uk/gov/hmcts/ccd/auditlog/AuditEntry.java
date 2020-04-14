@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ccd.auditlog;
 
-public class LogMessage {
-    private static final String TAG = "CLA-CCD";
-    private String dateTime;
+public class AuditEntry {
 
+    private static final String TAG = "CLA-CCD";
+
+    private String dateTime;
     private int httpStatus;
     private String httpMethod;
     private String path;

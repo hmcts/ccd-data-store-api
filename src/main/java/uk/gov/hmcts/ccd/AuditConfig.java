@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
-import uk.gov.hmcts.ccd.auditlog.LogAuditInterceptor;
+import uk.gov.hmcts.ccd.auditlog.AuditInterceptor;
 
 @Configuration
 public class AuditConfig implements WebMvcConfigurer {
@@ -16,12 +16,12 @@ public class AuditConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(logAuditInterceptor());
+        registry.addInterceptor(auditInterceptor());
     }
 
     @Bean
-    public LogAuditInterceptor logAuditInterceptor() {
-        return new LogAuditInterceptor(auditService);
+    public AuditInterceptor auditInterceptor() {
+        return new AuditInterceptor(auditService);
     }
 
 }
