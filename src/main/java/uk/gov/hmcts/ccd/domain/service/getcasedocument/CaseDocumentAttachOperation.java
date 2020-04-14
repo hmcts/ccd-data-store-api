@@ -124,7 +124,7 @@ public class CaseDocumentAttachOperation {
         });
     }
 
-    public void extractDocumentFieldsAfterCallback(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, JsonNode> data, Map<String,String> documentMap) {
+    public void extractDocumentFieldsAfterCallback(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
             //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
             //This quick check will reduce the processing time as most of filtering will be done at top level.
@@ -134,7 +134,7 @@ public class CaseDocumentAttachOperation {
                     throw new BadRequestException("The document does not has the hashcode");
                 }
                 String documentId = extractDocumentId(jsonNode);
-                documentMap.put(documentId,jsonNode.get(HASH_TOKEN_STRING).asText());
+                documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                 caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken.builder()
                                                                                   .id(documentId)
                                                                                   .hashToken(jsonNode.get(HASH_TOKEN_STRING).asText())
@@ -146,8 +146,8 @@ public class CaseDocumentAttachOperation {
 
             } else {
                 jsonNode.fields().forEachRemaining
-                    (node -> extractDocumentFieldsBeforeCallback(
-                        Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+                    (node -> extractDocumentFieldsAfterCallback(caseDocumentsMetadata,
+                                                                Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
             }
         });
     }
@@ -233,6 +233,7 @@ public class CaseDocumentAttachOperation {
         findDocumenstId(documentsDifference,filterDocumentSet);
         return filterDocumentSet;
     }
+
     private void findDocumenstId(Map<String, JsonNode> sanitisedDataToAttachDoc, Set<String> filterDocumentSet) {
 
         sanitisedDataToAttachDoc.forEach((field, jsonNode) -> {

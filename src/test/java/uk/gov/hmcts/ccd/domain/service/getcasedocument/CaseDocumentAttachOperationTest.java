@@ -2,14 +2,17 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,7 +20,6 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,9 +35,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 class CaseDocumentAttachOperationTest {
 
@@ -110,7 +114,7 @@ class CaseDocumentAttachOperationTest {
 
     @Test
     @DisplayName("should extract only documents with hashcode from Case Data")
-    void shouldExtractDocumentsFromCaseData() throws IOException {
+    void shouldExtractDocumentsFromCaseDataBeforeCallBack() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         Map<String, String> documentMap = new HashMap<>();
@@ -136,19 +140,11 @@ class CaseDocumentAttachOperationTest {
         Map<String, String> documentMap = new HashMap<>();
 
         caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(dataMap, documentMap);
-        JsonNode documentField9 =  dataMap.get("DocumentField4");
-
-        Map<String, String> expectedMap = Stream.of(new String[][] {
-            {"388a1ce0-f132-4680-90e9-5e782721cabb", "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a"},
-            {"f0550adc-eaea-4232-b52f-1c4ac0534d60", "UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q"},
-            {"5c4b5564-a29f-47d3-8c51-50e2d4629435", "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc"},
-            {"7b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec", "7b8930ef-2bcd-44cd-8a78-17b8930ef-27b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec"},
-            }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+        JsonNode documentField9 = dataMap.get("DocumentField4");
 
         assertAll(
-            () -> assertEquals(documentMap, expectedMap),
-            ()-> assertNotNull(documentField9.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE)),
-            ()-> assertNull(documentField9.get(HASH_TOKEN_STRING)));
+            () -> assertNotNull(documentField9.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE)),
+            () -> assertNull(documentField9.get(HASH_TOKEN_STRING)));
     }
 
     @Test
@@ -158,9 +154,36 @@ class CaseDocumentAttachOperationTest {
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadDocumentUpload.json");
         Map<String, String> documentMap = new HashMap<>();
 
-
         Assertions.assertThrows(BadRequestException.class,
                                 () -> caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(dataMap, documentMap));
+    }
+
+    @Test
+    @DisplayName("should build Case Document Metadata after callback response")
+    void shouldExtractDocumentsFromCaseDataAfterCallBack() throws IOException {
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        Map<String, String> documentMap = new HashMap<>();
+
+        CaseDocumentsMetadata caseDocumentsMetadata = CaseDocumentsMetadata.builder()
+                                                                           .caseId("11111122222333334")
+                                                                           .caseTypeId("BEFTA_CASETYPE_2")
+                                                                           .documentHashToken(new ArrayList<>())
+                                                                           .build();
+
+        caseDocumentAttachOperation.extractDocumentFieldsAfterCallback(caseDocumentsMetadata, dataMap, documentMap);
+        List<DocumentHashToken> listDocumentHashToken = Arrays.asList(
+            DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                             .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build(),
+            DocumentHashToken.builder().id("f0550adc-eaea-4232-b52f-1c4ac0534d60")
+                             .hashToken("UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q").build(),
+            DocumentHashToken.builder().id("5c4b5564-a29f-47d3-8c51-50e2d4629435").hashToken("6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc")
+                             .build(),
+            DocumentHashToken.builder().id("7b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec")
+                             .hashToken("7b8930ef-2bcd-44cd-8a78-17b8930ef-27b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec").build());
+
+        assertAll(
+            () -> assertTrue(caseDocumentsMetadata.getDocumentHashToken().containsAll(listDocumentHashToken)));
     }
 
     /*@Test
