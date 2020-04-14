@@ -15,7 +15,7 @@
     "_extends_": "Common_400_Response",
     "headers" : {
       "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip",
+      "Content-Encoding" : "gzip"
     },
     "body" : {
       "exception" : "[[ANYTHING_PRESENT]]",
