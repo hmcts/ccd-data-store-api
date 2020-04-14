@@ -161,4 +161,5 @@ class SubmitCaseTransaction {
         caseAuditEventRepository.set(auditEvent);
         return savedCaseDetails;
     }
+
 }
