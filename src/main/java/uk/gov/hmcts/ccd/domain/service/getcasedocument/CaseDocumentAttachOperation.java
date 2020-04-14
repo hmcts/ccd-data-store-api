@@ -41,7 +41,7 @@ public class CaseDocumentAttachOperation {
     public static final String DOCUMENT = "Document";
     public static final String DOCUMENT_CASE_FIELD_URL_ATTRIBUTE = "document_url";
     public static final String DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE = "document_binary_url";
-    public static final String HASH_TOKEN_STRING = "hashtoken";
+    public static final String HASH_TOKEN_STRING = "hashToken";
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;

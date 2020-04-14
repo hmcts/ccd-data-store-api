@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doReturn;
@@ -18,22 +17,15 @@ import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,12 +52,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttachOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -138,7 +130,7 @@ class SubmitCaseTransactionTest {
     private ApplicationParams applicationParams;
 
     @Mock
-    private SecurityUtils securityUtils;
+    private CaseDocumentAttachOperation caseDocumentAttachOperation;
 
     @Mock
     private HttpServletRequest request;
@@ -163,10 +155,9 @@ class SubmitCaseTransactionTest {
                                                           securityClassificationService,
                                                           caseUserRepository,
                                                           userAuthorisation,
-                                                          restTemplate,
-                                                          applicationParams,
-                                                          securityUtils,
-                                                          request);
+                                                          request,
+                                                          caseDocumentAttachOperation
+                                                         );
 
         event = buildEvent();
         caseType = buildCaseType();
@@ -279,52 +270,6 @@ class SubmitCaseTransactionTest {
             () -> assertThat(caseDetails, isNotNull()),
             () -> assertThat(caseDetails.getData(), isNotNull())
            );
-    }
-
-    @Test
-    @DisplayName("should extract only documents with hashcode from Case Data")
-    void shouldExtractDocumentFromCaseData() throws IOException {
-
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        CaseDocumentsMetadata caseDocumentsMetadata = CaseDocumentsMetadata.builder().documents(new ArrayList<>()).build();
-        Set<String> documentSet = new HashSet<>();
-
-        submitCaseTransaction.extractDocumentFields(caseDocumentsMetadata, dataMap, documentSet);
-        Set<String> expectedSet = Sets.newHashSet("388a1ce0-f132-4680-90e9-5e782721cabb",
-                                                  "f0550adc-eaea-4232-b52f-1c4ac0534d60",
-                                                  "5c4b5564-a29f-47d3-8c51-50e2d4629435");
-        assertAll(
-            () -> assertEquals(documentSet, expectedSet));
-    }
-
-    @Test
-    @DisplayName("should filter documents after callback to service")
-    void shouldFilterDocumentFieldsAfterCallback() throws IOException {
-        CaseDocumentsMetadata caseDocumentsMetadata = CaseDocumentsMetadata
-            .builder()
-            .documents(Arrays.asList(CaseDocument.builder().id("DocumentId1").build(),
-                                     CaseDocument.builder().id("DocumentId2").build(),
-                                     CaseDocument.builder().id("DocumentId3").build(),
-                                     CaseDocument.builder().id("DocumentId4").build(),
-                                     CaseDocument.builder().id("DocumentId5").build()))
-            .build();
-
-        Set<String> documentSetBeforeCallback = Stream.of("DocumentId1", "DocumentId2", "DocumentId3")
-                                                      .collect(Collectors.toSet());
-        Set<String> documentSetAfterCallback = Stream.of("DocumentId1", "DocumentId2", "DocumentId4", "DocumentId5")
-                                                     .collect(Collectors.toSet());
-
-        submitCaseTransaction.filterDocumentFields(caseDocumentsMetadata, documentSetBeforeCallback, documentSetAfterCallback);
-        Set<String> expectedSet = Sets.newHashSet("DocumentId1",
-                                                  "DocumentId2",
-                                                  "DocumentId4", "DocumentId5");
-
-        Set<String> filteredDocumentIds = caseDocumentsMetadata.getDocuments()
-                                                               .stream().map(CaseDocument::getId)
-                                                               .collect(Collectors.toSet());
-        assertAll(
-            () -> assertEquals(documentSetAfterCallback, expectedSet),
-            ()-> assertEquals(filteredDocumentIds, expectedSet));
     }
 
     @Test
