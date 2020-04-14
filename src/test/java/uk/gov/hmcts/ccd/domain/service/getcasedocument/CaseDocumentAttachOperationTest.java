@@ -38,7 +38,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
@@ -68,10 +67,6 @@ class CaseDocumentAttachOperationTest {
     public static final String CASE_DATA_PARSING_EXCEPTION = "Exception while extracting the document fields from Case payload";
     public static final String DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION = "The documents have been altered outside the create case transaction";
 
-    @Mock
-    private CaseDetailsRepository caseDetailsRepository;
-
-    @Mock
     private CaseDetails caseDetails;
 
     @Mock
@@ -133,9 +128,9 @@ class CaseDocumentAttachOperationTest {
     void shouldExtractDocumentsFromCaseDataBeforeCallBack() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        Map<String, String> documentMap = new HashMap<>();
+        caseDocumentAttachOperation.documentSetBeforeCallback = new HashMap<>();
 
-        caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(dataMap, documentMap);
+        caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(dataMap);
 
         Map<String, String> expectedMap = Stream.of(new String[][] {
             {"388a1ce0-f132-4680-90e9-5e782721cabb", "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a"},
@@ -145,7 +140,7 @@ class CaseDocumentAttachOperationTest {
             }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
         assertAll(
-            () -> assertEquals(documentMap, expectedMap));
+            () -> assertEquals(caseDocumentAttachOperation.documentSetBeforeCallback, expectedMap));
     }
 
     @Test
@@ -153,9 +148,10 @@ class CaseDocumentAttachOperationTest {
     void shouldRemoveHashTokenFromDocuments() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        Map<String, String> documentMap = new HashMap<>();
+        caseDocumentAttachOperation.documentSetBeforeCallback = new HashMap<>();
 
-        caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(dataMap, documentMap);
+        caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(dataMap);
+
         JsonNode documentField9 = dataMap.get("DocumentField4");
 
         assertAll(
@@ -179,15 +175,19 @@ class CaseDocumentAttachOperationTest {
     void shouldExtractDocumentsFromCaseDataAfterCallBack() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        Map<String, String> documentMap = new HashMap<>();
+        caseDetails = new CaseDetails();
+        caseDetails.setData(dataMap);
+        caseDetails.setReference(1111122222333334L);
+        caseDetails.setCaseTypeId("BEFTA_CASETYPE_2");
 
-        CaseDocumentsMetadata caseDocumentsMetadata = CaseDocumentsMetadata.builder()
+
+        caseDocumentAttachOperation.caseDocumentsMetadata = CaseDocumentsMetadata.builder()
                                                                            .caseId("11111122222333334")
                                                                            .caseTypeId("BEFTA_CASETYPE_2")
                                                                            .documentHashToken(new ArrayList<>())
                                                                            .build();
 
-        caseDocumentAttachOperation.extractDocumentFieldsAfterCallback(caseDocumentsMetadata, dataMap, documentMap);
+        caseDocumentAttachOperation.afterCallbackPrepareDocumentMetaData(caseDetails);
         List<DocumentHashToken> listDocumentHashToken = Arrays.asList(
             DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build(),
@@ -199,7 +199,7 @@ class CaseDocumentAttachOperationTest {
                              .hashToken("7b8930ef-2bcd-44cd-8a78-17b8930ef-27b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec").build());
 
         assertAll(
-            () -> assertTrue(caseDocumentsMetadata.getDocumentHashToken().containsAll(listDocumentHashToken)));
+            () -> assertTrue(caseDocumentAttachOperation.caseDocumentsMetadata.getDocumentHashToken().containsAll(listDocumentHashToken)));
     }
 
     @Test
@@ -222,9 +222,10 @@ class CaseDocumentAttachOperationTest {
                                      DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
                                                       .hashToken(
                                                           "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build()
-                                     )).build();
+                                                                 )).build();
 
         caseDocumentAttachOperation.restCallToAttachCaseDocuments();
+
         verify(restTemplate, times(1)).exchange(ArgumentMatchers.anyString(),
                                                 ArgumentMatchers.any(HttpMethod.class),
                                                 ArgumentMatchers.any(),
@@ -233,7 +234,7 @@ class CaseDocumentAttachOperationTest {
 
     @Test
     @DisplayName("Should call the Case Document AM API to attach document to a case")
-    void shouldNotCallRestclientToAttachDocumentToCaseForNoEligibleDocuments() {
+    void shouldNotCallRestClientToAttachDocumentToCaseForNoEligibleDocuments() {
         caseDocumentAttachOperation.caseDocumentsMetadata =
             CaseDocumentsMetadata.builder()
                                  .documentHashToken(Collections.emptyList()).build();
