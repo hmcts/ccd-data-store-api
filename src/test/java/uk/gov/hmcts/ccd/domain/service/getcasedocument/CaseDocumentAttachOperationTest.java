@@ -221,14 +221,8 @@ class CaseDocumentAttachOperationTest {
                                  .documentHashToken(Arrays.asList(
                                      DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
                                                       .hashToken(
-                                                          "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build(),
-                                     DocumentHashToken.builder().id("f0550adc-eaea-4232-b52f-1c4ac0534d60")
-                                                      .hashToken(
-                                                          "UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q").build(),
-                                     DocumentHashToken.builder().id("5c4b5564-a29f-47d3-8c51-50e2d4629435")
-                                                      .hashToken(
-                                                          "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc").build()
-                                                                 )).build();
+                                                          "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build()
+                                     )).build();
 
         caseDocumentAttachOperation.restCallToAttachCaseDocuments();
         verify(restTemplate, times(1)).exchange(ArgumentMatchers.anyString(),
