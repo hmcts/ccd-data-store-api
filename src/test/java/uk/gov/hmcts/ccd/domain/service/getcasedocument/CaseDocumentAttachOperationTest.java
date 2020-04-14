@@ -186,6 +186,17 @@ class CaseDocumentAttachOperationTest {
             () -> assertTrue(caseDocumentsMetadata.getDocumentHashToken().containsAll(listDocumentHashToken)));
     }
 
+    @Test
+    @DisplayName("should throw exception while getting documents without hashcode from Case Data after callback response")
+    void shouldThrowExceptionWhileExtractingDocumentsFromCaseDataAfterCallback() throws IOException {
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadDocumentUpload.json");
+        Map<String, String> documentMap = new HashMap<>();
+
+        Assertions.assertThrows(BadRequestException.class,
+                                () -> caseDocumentAttachOperation.extractDocumentFieldsAfterCallback(null, dataMap, documentMap));
+    }
+
     /*@Test
     @DisplayName("should filter documents after callback to service")
     void shouldFilterDocumentFieldsAfterCallback() throws IOException {
