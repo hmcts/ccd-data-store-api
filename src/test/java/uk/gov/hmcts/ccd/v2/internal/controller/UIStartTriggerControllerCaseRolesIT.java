@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.auditlog.OperationType;
+import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -113,8 +114,7 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertThat(field1.getAccessControlLists().get(1).isUpdate(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isDelete(), is(false));
 
-        verify(auditService).prepareAuditMessage(any(HttpServletRequest.class), any(HttpServletResponse.class),
-            eq(OperationType.CREATE_CASE.getLabel()));
+        verify(auditService).prepareAuditMessage(any(HttpServletRequest.class), eq(200), any(AuditContext.class));
     }
 
     @Test

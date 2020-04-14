@@ -1,19 +1,17 @@
 package uk.gov.hmcts.ccd.auditlog.aop;
 
-import uk.gov.hmcts.ccd.auditlog.LogMessage;
-
 public class AuditContextHolder {
 
     private AuditContextHolder() {}
 
-    private static final InheritableThreadLocal<LogMessage> threadLocal = new InheritableThreadLocal<>();
+    private static final InheritableThreadLocal<AuditContext> threadLocal = new InheritableThreadLocal<>();
 
 
-    public static void setAuditContext(LogMessage logMessage) {
-        threadLocal.set(logMessage);
+    public static void setAuditContext(AuditContext auditContext) {
+        threadLocal.set(auditContext);
     }
 
-    public static LogMessage getAuditContext() {
+    public static AuditContext getAuditContext() {
         return threadLocal.get();
     }
 

@@ -116,6 +116,8 @@ public class LogMessage {
             ", clientIp='" + clientIp + '\'' +
             ", idamId='" + idamId + '\'' +
             ", invokingService='" + invokingService + '\'' +
+            ", caseId='" + caseId + '\'' +
+            ", jurisdiction='" + jurisdiction + '\'' +
             ", response='" + response + '\'' +
             '}';
     }

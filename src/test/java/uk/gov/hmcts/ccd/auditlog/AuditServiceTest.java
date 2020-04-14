@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
+import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -62,9 +63,13 @@ class AuditServiceTest {
         @Test
         @DisplayName("should return 200 when case found")
         void caseFound() {
-            given(response.getContentAsByteArray()).willReturn("".getBytes());
+            AuditContext auditContext = AuditContext.auditContextWith()
+                .caseId("123456")
+                .operationType(OperationType.CREATE_CASE)
+                .jurisdiction("AUTOTEST1")
+                .build();
 
-            String message = auditService.prepareAuditMessage(request, response, OperationType.CREATE_CASE.getLabel());
+            String message = auditService.prepareAuditMessage(request, 200, auditContext);
 
             assertAll(
                 () -> assertThat(message).contains("idamId=" + "'" + EMAIL + "'"),

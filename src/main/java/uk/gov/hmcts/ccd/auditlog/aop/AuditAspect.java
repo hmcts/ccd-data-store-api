@@ -9,7 +9,6 @@ import org.springframework.context.expression.AnnotatedElementKey;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.LogMessage;
 
 import java.lang.reflect.Method;
 
@@ -24,13 +23,30 @@ public class AuditAspect {
 
     @Around("@annotation(logAudit)")
     public Object audit(ProceedingJoinPoint joinPoint, LogAudit logAudit) throws Throwable {
-        Object result = joinPoint.proceed();
-        // TODO : try lookup in the result Object based on expression string (contains "result") otherwise from args.
-        // introduce try/catch/finally for better handling of error scenarios.
-        String caseId = (String) getValueFromArgs(joinPoint, logAudit.caseId());
-        String jurisdiction = (String) getValueFromResult(joinPoint, result, logAudit.jurisdiction());
-        storeInAuditContext(caseId, jurisdiction);
+        Object result;
+        String caseId = null;
+        String jurisdiction = null;
+        try {
+            result = joinPoint.proceed();
+            caseId = (String) getValue(joinPoint, joinPoint.getArgs(), result, logAudit.caseId());
+            jurisdiction = (String) getValue(joinPoint, joinPoint.getArgs(), result, logAudit.jurisdiction());
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            AuditContextHolder.setAuditContext(AuditContext.auditContextWith()
+                .operationType(logAudit.operationType())
+                .caseId(caseId)
+                .jurisdiction(jurisdiction)
+                .build());
+        }
         return result;
+    }
+
+    private Object getValue(JoinPoint joinPoint, Object[] args, Object result, String condition) {
+        if (condition.contains(RESULT_VARIABLE)) {
+            return getValueFromResult(joinPoint, result, condition);
+        }
+        return getValueFromArgs(joinPoint, args, condition);
     }
 
     private Object getValueFromResult(JoinPoint joinPoint, Object result, String condition) {
@@ -41,8 +57,7 @@ public class AuditAspect {
         return getValue(evaluationContext, joinPoint.getThis().getClass(), method, condition);
     }
 
-    private Object getValueFromArgs(JoinPoint joinPoint, String condition) {
-        Object[] args = joinPoint.getArgs();
+    private Object getValueFromArgs(JoinPoint joinPoint, Object[] args, String condition) {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         EvaluationContext evaluationContext = evaluator.createEvaluationContext(joinPoint.getTarget(),
             joinPoint.getTarget().getClass(), method, args);
@@ -53,12 +68,4 @@ public class AuditAspect {
         AnnotatedElementKey methodKey = new AnnotatedElementKey(method, clazz);
         return evaluator.condition(condition, methodKey, evaluationContext, Object.class);
     }
-
-    private void storeInAuditContext(String caseId, String jurisdiction) {
-        LogMessage logMessage = new LogMessage();
-        logMessage.setCaseId(caseId);
-        logMessage.setJurisdiction(jurisdiction);
-        AuditContextHolder.setAuditContext(logMessage);
-    }
-
 }
