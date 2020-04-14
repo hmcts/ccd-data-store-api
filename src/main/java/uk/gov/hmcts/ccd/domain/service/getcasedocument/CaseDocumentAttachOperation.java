@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataParsingException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
@@ -56,13 +57,17 @@ public class CaseDocumentAttachOperation {
         this.securityUtils = securityUtils;
     }
 
-    public void caseDocumentAttachOperation(CaseDetails caseDetails){
+    public void beforeCallbackPrepareDocumentMetaData(Map<String, JsonNode> caseData) {
+            documentSetBeforeCallback = new HashMap<>();
+            extractDocumentFieldsBeforeCallback(caseData, documentSetBeforeCallback);
+    }
+
+    public void beforeCallbackPrepareDocumentMetaData(CaseDataContent contentData) {
         try {
             LOG.debug("Updating  case using Version 2.1 of case create API");
             documentSetBeforeCallback = new HashMap<>();
-            extractDocumentFieldsBeforeCallback(caseDetails.getData(), documentSetBeforeCallback);
-        }
-        catch (Exception e) {
+            extractDocumentFieldsBeforeCallback(contentData.getData(), documentSetBeforeCallback);
+        } catch (Exception e) {
             LOG.error(CASE_DATA_PARSING_EXCEPTION);
             throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
         }
@@ -99,22 +104,18 @@ public class CaseDocumentAttachOperation {
             }
     }
 
-    public void extractDocumentFieldsBeforeCallback(Map<String, JsonNode> data, Map<String,String> documentMap) {
+    public void extractDocumentFieldsBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
-            //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
-            //This quick check will reduce the processing time as most of filtering will be done at top level.
-            //****** Every document should have hashcode, else throw error
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 if (jsonNode.get(HASH_TOKEN_STRING) == null) {
                     throw new BadRequestException("The document does not has the hashcode");
                 }
 
                 String documentId = extractDocumentId(jsonNode);
-                documentMap.put(documentId,jsonNode.get(HASH_TOKEN_STRING).asText());
+                documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                 if (jsonNode instanceof ObjectNode) {
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
                 }
-
             } else {
                 jsonNode.fields().forEachRemaining
                     (node -> extractDocumentFieldsBeforeCallback(

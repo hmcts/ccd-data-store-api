@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 class CaseDocumentAttachOperationTest {
 
@@ -48,7 +50,6 @@ class CaseDocumentAttachOperationTest {
     public static final String BINARY = "/binary";
     public static final String CASE_DATA_PARSING_EXCEPTION = "Exception while extracting the document fields from Case payload";
     public static final String DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION = "The documents have been altered outside the create case transaction";
-
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -105,7 +106,7 @@ class CaseDocumentAttachOperationTest {
 
     @Test
     @DisplayName("should extract only documents with hashcode from Case Data")
-    void shouldExtractDocumentFromCaseData() throws IOException {
+    void shouldExtractDocumentsFromCaseData() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         Map<String, String> documentMap = new HashMap<>();
@@ -121,6 +122,18 @@ class CaseDocumentAttachOperationTest {
 
         assertAll(
             () -> assertEquals(documentMap, expectedMap));
+    }
+
+    @Test
+    @DisplayName("should throw exception while getting documents without hashcode from Case Data")
+    void shouldThrowExceptionWhileExtractingDocumentsFromCaseData() throws IOException {
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadDocumentUpload.json");
+        Map<String, String> documentMap = new HashMap<>();
+
+
+        Assertions.assertThrows(BadRequestException.class,
+                                () -> caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(dataMap, documentMap));
     }
 
     /*@Test

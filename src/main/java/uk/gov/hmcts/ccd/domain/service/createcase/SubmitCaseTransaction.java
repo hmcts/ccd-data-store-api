@@ -100,7 +100,7 @@ class SubmitCaseTransaction {
             && request.getContentType().equals(V2.MediaType.CREATE_CASE_2_1);
 
         if (isApiVersion21) {
-            caseDocumentAttachOperation.caseDocumentAttachOperation(newCaseDetails);
+            caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(newCaseDetails.getData());
         }
 
         /*
