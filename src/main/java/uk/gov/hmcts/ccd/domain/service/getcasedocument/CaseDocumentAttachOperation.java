@@ -75,19 +75,14 @@ public class CaseDocumentAttachOperation {
     }
 
     public void afterCallbackPrepareDocumentMetaData(CaseDetails caseDetails) {
-        try {
-            documentAfterCallback = new HashMap<>();
-            caseDocumentsMetadata = CaseDocumentsMetadata.builder()
-                                                         .caseId(caseDetails.getReference().toString())
-                                                         .caseTypeId(caseDetails.getCaseTypeId())
-                                                         .documentHashToken(new ArrayList<>())
-                                                         .build();
-            // to remove hashcode before compute delta
-            extractDocumentFieldsAfterCallback(caseDocumentsMetadata, caseDetails.getData(), documentAfterCallback);
-        } catch (Exception e) {
-            LOG.error(CASE_DATA_PARSING_EXCEPTION);
-            throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
-        }
+        documentAfterCallback = new HashMap<>();
+        caseDocumentsMetadata = CaseDocumentsMetadata.builder()
+                                                     .caseId(caseDetails.getReference().toString())
+                                                     .caseTypeId(caseDetails.getCaseTypeId())
+                                                     .documentHashToken(new ArrayList<>())
+                                                     .build();
+        // to remove hashcode before compute delta
+        extractDocumentFieldsAfterCallback(caseDocumentsMetadata, caseDetails.getData(), documentAfterCallback);
     }
 
     public void filterDocumentFields(){

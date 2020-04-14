@@ -180,7 +180,6 @@ class CaseDocumentAttachOperationTest {
         caseDetails.setReference(1111122222333334L);
         caseDetails.setCaseTypeId("BEFTA_CASETYPE_2");
 
-
         caseDocumentAttachOperation.caseDocumentsMetadata = CaseDocumentsMetadata.builder()
                                                                            .caseId("11111122222333334")
                                                                            .caseTypeId("BEFTA_CASETYPE_2")
