@@ -43,6 +43,7 @@ public class CaseDocumentAttachOperation {
     public static final String DOCUMENT_CASE_FIELD_URL_ATTRIBUTE = "document_url";
     public static final String DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE = "document_binary_url";
     public static final String HASH_TOKEN_STRING = "hashToken";
+
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
@@ -93,15 +94,15 @@ public class CaseDocumentAttachOperation {
         filterDocumentFields(caseDocumentsMetadata, documentSetBeforeCallback, documentAfterCallback);
     }
 
-    public void restCallToAttachCaseDocuments(){
+    public void restCallToAttachCaseDocuments() {
         HttpEntity<CaseDocumentsMetadata> requestEntity = new HttpEntity<>(caseDocumentsMetadata, securityUtils.authorizationHeaders());
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-            if (!caseDocumentsMetadata.getDocumentHashToken().isEmpty()) {
-                restTemplate
-                    .exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
-                              HttpMethod.PATCH, requestEntity, Void.class);
+        if (!caseDocumentsMetadata.getDocumentHashToken().isEmpty()) {
+            restTemplate
+                .exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
+                          HttpMethod.PATCH, requestEntity, Void.class);
 
-            }
+        }
     }
 
     public void extractDocumentFieldsBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {

@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +26,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -37,7 +46,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
@@ -66,13 +74,13 @@ class CaseDocumentAttachOperationTest {
     private CaseDetails caseDetails;
 
     @Mock
-    private CaseDetails savedCaseDetails;
-
-    @Mock
-    private UIDService uidService;
-
-    @Mock
     private ApplicationParams applicationParams;
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private SecurityUtils securityUtils;
 
     @InjectMocks
     private CaseDocumentAttachOperation caseDocumentAttachOperation;
@@ -89,7 +97,14 @@ class CaseDocumentAttachOperationTest {
         caseType = buildCaseType();
         doReturn("http://localhost:4455").when(applicationParams).getCaseDocumentAmApiHost();
         doReturn("/cases/documents/attachToCase").when(applicationParams).getAttachDocumentPath();
+        ResponseEntity<String> responseEntity = new ResponseEntity<String>("Success", HttpStatus.OK);
+        doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
 
+        doReturn(responseEntity).when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
     }
 
 /*    @Test
@@ -195,6 +210,30 @@ class CaseDocumentAttachOperationTest {
 
         Assertions.assertThrows(BadRequestException.class,
                                 () -> caseDocumentAttachOperation.extractDocumentFieldsAfterCallback(null, dataMap, documentMap));
+    }
+
+    @Test
+    @DisplayName("Should call the Case Document AM API to attach document to a case")
+    void shouldCallRestclientToAttachDocumentToCase() {
+        caseDocumentAttachOperation.caseDocumentsMetadata =
+            CaseDocumentsMetadata.builder()
+                                 .documentHashToken(Arrays.asList(
+                                     DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                                                      .hashToken(
+                                                          "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build(),
+                                     DocumentHashToken.builder().id("f0550adc-eaea-4232-b52f-1c4ac0534d60")
+                                                      .hashToken(
+                                                          "UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q").build(),
+                                     DocumentHashToken.builder().id("5c4b5564-a29f-47d3-8c51-50e2d4629435")
+                                                      .hashToken(
+                                                          "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc").build()
+                                                                 )).build();
+
+        caseDocumentAttachOperation.restCallToAttachCaseDocuments();
+        verify(restTemplate, times(1)).exchange(ArgumentMatchers.anyString(),
+                                                ArgumentMatchers.any(HttpMethod.class),
+                                                ArgumentMatchers.any(),
+                                                ArgumentMatchers.<Class<String>>any());
     }
 
     /*@Test
