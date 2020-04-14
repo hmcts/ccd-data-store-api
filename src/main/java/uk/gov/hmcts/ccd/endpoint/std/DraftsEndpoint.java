@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -68,6 +70,7 @@ public class DraftsEndpoint {
         @ApiResponse(code = 201, message = "Draft created"),
         @ApiResponse(code = 400, message = "Bad request")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public DraftResponse saveDraftForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -91,6 +94,7 @@ public class DraftsEndpoint {
         @ApiResponse(code = 200, message = "Draft updated"),
         @ApiResponse(code = 400, message = "Bad request")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public DraftResponse updateDraftForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -113,6 +117,7 @@ public class DraftsEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A displayable draft")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public CaseView findDraft(@PathVariable("uid") final String uid,
                               @PathVariable("jid") final String jurisdictionId,
                               @PathVariable("ctid") final String caseTypeId,
@@ -130,6 +135,7 @@ public class DraftsEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A draft deleted successfully")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public void deleteDraft(@PathVariable("uid") final String uid,
                             @PathVariable("jid") final String jurisdictionId,
                             @PathVariable("ctid") final String caseTypeId,

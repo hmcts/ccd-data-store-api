@@ -1,31 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
-import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
-import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
-
 import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -34,12 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
@@ -51,21 +22,24 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseTypesOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCriteriaOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetUserProfileOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypesOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Predicate;
+
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.*;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 @RestController
 @RequestMapping(path = "/aggregated",
@@ -152,6 +126,7 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria"),
         @ApiResponse(code = 412, message = "Mismatch between case type and workbasket definitions")})
+    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public SearchResultView searchNew(@PathVariable("jid") final String jurisdictionId,
                                       @PathVariable("ctid") final String caseTypeId,
                                       @RequestParam java.util.Map<String, String> params) {
@@ -218,6 +193,7 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A displayable case")
     })
+    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public CaseView findCase(@PathVariable("jid") final String jurisdictionId,
                              @PathVariable("ctid") final String caseTypeId,
                              @PathVariable("cid") final String cid) {
@@ -236,13 +212,14 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Empty pre-state conditions"),
         @ApiResponse(code = 422, message = "The case status did not qualify for the event")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public CaseEventTrigger getEventTriggerForCaseType(@PathVariable("uid") String userId,
                                                        @PathVariable("jid") String jurisdictionId,
-                                                       @PathVariable("ctid") String casetTypeId,
+                                                       @PathVariable("ctid") String caseTypeId,
                                                        @PathVariable("etid") String eventTriggerId,
                                                        @RequestParam(value = "ignore-warning",
                                                            required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForCaseType(casetTypeId, eventTriggerId, ignoreWarning);
+        return getEventTriggerOperation.executeForCaseType(caseTypeId, eventTriggerId, ignoreWarning);
     }
 
     @Transactional
@@ -253,6 +230,7 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Valid pre-state conditions")
     })
+    @LogAudit(operationType = OperationType.UPDATE_CASE)
     public CaseEventTrigger getEventTriggerForCase(@PathVariable("uid") String userId,
                                                    @PathVariable("jid") String jurisdictionId,
                                                    @PathVariable("ctid") String caseTypeId,
@@ -271,6 +249,7 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Valid pre-state conditions")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public CaseEventTrigger getEventTriggerForDraft(@PathVariable("uid") String userId,
                                                     @PathVariable("jid") String jurisdictionId,
                                                     @PathVariable("ctid") String caseTypeId,
@@ -290,6 +269,7 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Displayable case data"),
         @ApiResponse(code = 404, message = "Invalid jurisdiction/case type/case reference or event id")
     })
+    @LogAudit(operationType = OperationType.VIEW_CASE)
     public CaseHistoryView getCaseHistoryForEvent(@PathVariable("jid") final String jurisdictionId,
                                                   @PathVariable("ctid") final String caseTypeId,
                                                   @PathVariable("cid") final String caseReference,

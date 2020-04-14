@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -112,6 +114,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID"),
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
+    @LogAudit(operationType = OperationType.VIEW_CASE)
     public CaseDetails findCaseDetailsForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -138,6 +141,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID"),
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
+    @LogAudit(operationType = OperationType.VIEW_CASE)
     public CaseDetails findCaseDetailsForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -160,6 +164,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 404, message = "No case found for the given ID"),
         @ApiResponse(code = 422, message = "Process could not be started")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public StartEventTrigger startEventForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -185,6 +190,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 404, message = "No case found for the given ID"),
         @ApiResponse(code = 422, message = "Process could not be started")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public StartEventTrigger startEventForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -209,6 +215,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "Case creation process started"),
         @ApiResponse(code = 422, message = "Process could not be started")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public StartEventTrigger startCaseForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -231,6 +238,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "Case creation process started"),
         @ApiResponse(code = 422, message = "Process could not be started")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public StartEventTrigger startCaseForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -257,6 +265,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 422, message = "Case submission failed"),
         @ApiResponse(code = 409, message = "Case reference not unique")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public CaseDetails saveCaseDetailsForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -282,6 +291,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 422, message = "Case submission failed"),
         @ApiResponse(code = 409, message = "Case reference not unique")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public CaseDetails saveCaseDetailsForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -308,6 +318,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 422, message = "Field validation failed"),
         @ApiResponse(code = 409, message = "Case reference not unique")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public JsonNode validateCaseDetails(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -339,6 +350,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 409, message = "Case altered outside of transaction"),
         @ApiResponse(code = 422, message = "Event submission failed")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public CaseDetails createCaseEventForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -365,6 +377,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 409, message = "Case altered outside of transaction"),
         @ApiResponse(code = 422, message = "Event submission failed")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public CaseDetails createCaseEventForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -385,6 +398,7 @@ public class CaseDetailsEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Documents list for the given case id")
     })
+    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public List<Document> getDocumentsForCase(
         @PathVariable("uid") final String uid,
         @PathVariable("jid") String jid,
@@ -402,6 +416,7 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
+    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
                                                        @PathVariable("jid") final String jurisdictionId,
                                                        @PathVariable("ctid") final String caseTypeId,
@@ -414,6 +429,7 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
+    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public List<CaseDetails> searchCasesForCitizens(@PathVariable("uid") final String uid,
                                                     @PathVariable("jid") final String jurisdictionId,
                                                     @PathVariable("ctid") final String caseTypeId,
@@ -437,6 +453,7 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
+    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public PaginatedSearchMetadata searchCasesMetadataForCaseworkers(@PathVariable("uid") final String uid,
                                                                      @PathVariable("jid") final String jurisdictionId,
                                                                      @PathVariable("ctid") final String caseTypeId,
@@ -449,6 +466,7 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
+    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public PaginatedSearchMetadata searchCasesMetadataForCitizens(@PathVariable("uid") final String uid,
                                                                   @PathVariable("jid") final String jurisdictionId,
                                                                   @PathVariable("ctid") final String caseTypeId,

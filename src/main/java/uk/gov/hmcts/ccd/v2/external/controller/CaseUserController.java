@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -71,6 +73,7 @@ public class CaseUserController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
+    @LogAudit(operationType = OperationType.GRANT_CASE_ROLE)
     public ResponseEntity<Void> putUser(
         @PathVariable("caseReference") String caseReference,
         @PathVariable("userId") String userId,

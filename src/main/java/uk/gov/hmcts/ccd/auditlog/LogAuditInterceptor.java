@@ -26,7 +26,7 @@ public class LogAuditInterceptor extends HandlerInterceptorAdapter {
                            @Nullable ModelAndView modelAndView) {
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
-            logger.info("handlerMethod" + handlerMethod.getMethod().toString());
+            logger.info("handlerMethod: " + handlerMethod.getMethod().toString());
             if (handlerMethod.hasMethodAnnotation(LogAudit.class)) {
                 AuditContext auditContext = AuditContextHolder.getAuditContext();
                 logger.info(auditService.prepareAuditMessage(request, response.getStatus(), auditContext));

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
@@ -52,7 +54,7 @@ public class UIDefinitionController {
     private final GetCriteriaOperation getCriteriaOperation;
 
     private final GetBannerOperation getBannerOperation;
-    
+
     private final GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation;
 
     private final GetUserProfileOperation getUserProfileOperation;
@@ -97,6 +99,7 @@ public class UIDefinitionController {
             message = "Case type not found"
         )
     })
+    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public ResponseEntity<UIWorkbasketInputsResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
 
         WorkbasketInput[] workbasketInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, WORKBASKET).toArray(new WorkbasketInput[0]);
@@ -128,6 +131,7 @@ public class UIDefinitionController {
             message = "Case type not found"
         )
     })
+    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public ResponseEntity<UISearchInputsResource> getSearchInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
 
         SearchInput[] searchInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, SEARCH).toArray(new SearchInput[0]);
@@ -162,8 +166,7 @@ public class UIDefinitionController {
         return ResponseEntity.ok(new UIBannerResource(listOfBanners));
     }
 
-  
-   @GetMapping(
+    @GetMapping(
         path = "/jurisdiction-ui-configs",
         headers = {
             V2.EXPERIMENTAL_HEADER
@@ -189,8 +192,8 @@ public class UIDefinitionController {
                                         : Lists.newArrayList();
         return ResponseEntity.ok(new UIJurisdictionConfigResource(listOfConfigs));
     }
-  
-  @GetMapping(
+
+    @GetMapping(
         path = "/jurisdictions",
         headers = {
             V2.EXPERIMENTAL_HEADER

@@ -66,7 +66,6 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-
     @LogAudit(operationType = OperationType.CREATE_CASE)
     public ResponseEntity<UIStartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
                                                                       @PathVariable("triggerId") String triggerId,
@@ -111,6 +110,7 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
+    @LogAudit(operationType = OperationType.UPDATE_CASE)
     public ResponseEntity<UIStartTriggerResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
                                                                        @PathVariable("triggerId") String triggerId,
                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
@@ -153,6 +153,7 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public ResponseEntity<UIStartTriggerResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,
                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 

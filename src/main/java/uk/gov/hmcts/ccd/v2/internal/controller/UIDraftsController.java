@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -66,6 +68,7 @@ public class UIDraftsController {
         @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public ResponseEntity<UIDraftResource> saveDraft(
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
@@ -93,6 +96,7 @@ public class UIDraftsController {
         @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public ResponseEntity<UIDraftResource> updateDraft(
         @PathVariable("ctid") final String caseTypeId,
         @PathVariable("did") final String draftId,
@@ -116,6 +120,7 @@ public class UIDraftsController {
         @ApiResponse(code = 200, message = "A displayable draft"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public ResponseEntity<UICaseViewResource> findDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
         CaseView caseView = getDraftViewOperation.execute(did);
@@ -138,6 +143,7 @@ public class UIDraftsController {
         @ApiResponse(code = 200, message = "A draft deleted successfully"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
+    @LogAudit(operationType = OperationType.CREATE_CASE)
     public ResponseEntity<Void> deleteDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
         draftGateway.delete(did);

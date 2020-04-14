@@ -15,13 +15,10 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 
 @DisplayName("audit log specific calls")
