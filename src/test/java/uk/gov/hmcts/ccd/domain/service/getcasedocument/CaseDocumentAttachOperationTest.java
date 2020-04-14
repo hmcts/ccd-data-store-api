@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -231,6 +232,20 @@ class CaseDocumentAttachOperationTest {
 
         caseDocumentAttachOperation.restCallToAttachCaseDocuments();
         verify(restTemplate, times(1)).exchange(ArgumentMatchers.anyString(),
+                                                ArgumentMatchers.any(HttpMethod.class),
+                                                ArgumentMatchers.any(),
+                                                ArgumentMatchers.<Class<String>>any());
+    }
+
+    @Test
+    @DisplayName("Should call the Case Document AM API to attach document to a case")
+    void shouldNotCallRestclientToAttachDocumentToCaseForNoEligibleDocuments() {
+        caseDocumentAttachOperation.caseDocumentsMetadata =
+            CaseDocumentsMetadata.builder()
+                                 .documentHashToken(Collections.emptyList()).build();
+
+        caseDocumentAttachOperation.restCallToAttachCaseDocuments();
+        verify(restTemplate, times(0)).exchange(ArgumentMatchers.anyString(),
                                                 ArgumentMatchers.any(HttpMethod.class),
                                                 ArgumentMatchers.any(),
                                                 ArgumentMatchers.<Class<String>>any());
