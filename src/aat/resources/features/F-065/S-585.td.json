@@ -20,7 +20,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8",
       "Content-Encoding" : "[[ANYTHING_PRESENT]]",
       "VaRy" : "[[ANYTHING_PRESENT]]",
       "Transfer-Encoding" : "[[ANYTHING_PRESENT]]"

@@ -13,11 +13,10 @@
 		}
 	},
 	"expectedResponse": {
-		"responseCode": 201,
-		"responseMessage": "Created",
+    "_extends_": "Common_201_Response",
 		"headers": {
-			"_extends_": "Common_Response_Headers",
 			"Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANY_STRING_NULLABLE]]",
 			"Vary": "Accept-Encoding"
 		}
 	}

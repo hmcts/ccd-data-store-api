@@ -8,6 +8,9 @@
 	],
 	"expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers" : {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-workbasket-input-details.v2+json;charset=UTF-8"
+    },
     "body" : {
       "workbasketInputs" : [ {
         "label" : "Search `Text` field",
