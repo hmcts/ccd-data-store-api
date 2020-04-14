@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ExpressionEvaluator<T> extends CachedExpressionEvaluator {
+public class ExpressionEvaluator extends CachedExpressionEvaluator {
 
     // shared param discoverer since it caches data internally
     private final ParameterNameDiscoverer paramNameDiscoverer = new DefaultParameterNameDiscoverer();
@@ -28,7 +28,7 @@ public class ExpressionEvaluator<T> extends CachedExpressionEvaluator {
         return new MethodBasedEvaluationContext(root, targetMethod, args, this.paramNameDiscoverer);
     }
 
-    public T condition(String conditionExpression, AnnotatedElementKey elementKey, EvaluationContext evalContext, Class<T> clazz) {
+    public <T> T condition(String conditionExpression, AnnotatedElementKey elementKey, EvaluationContext evalContext, Class<T> clazz) {
         return getExpression(this.conditionCache, elementKey, conditionExpression).getValue(evalContext, clazz);
     }
 

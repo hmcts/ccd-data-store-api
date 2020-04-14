@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.auditlog.OperationType;
 public class AuditContext {
 
     private String caseId;
+    private String caseType;
     private String jurisdiction;
     private OperationType operationType;
 }

@@ -45,6 +45,7 @@ public class AuditService {
         log.setOperationType(auditContext.getOperationType().getLabel());
         log.setJurisdiction(auditContext.getJurisdiction());
         log.setCaseId(auditContext.getCaseId());
+        log.setCaseType(auditContext.getCaseType());
         return log.toString();
     }
 

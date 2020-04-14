@@ -18,4 +18,6 @@ public @interface LogAudit {
 
     String jurisdiction() default "";
 
+    String caseType() default "";
+
 }

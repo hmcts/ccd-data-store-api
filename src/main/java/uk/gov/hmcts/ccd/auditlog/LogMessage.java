@@ -10,6 +10,7 @@ public class LogMessage {
     private String clientIp;
     private String idamId;
     private String caseId;
+    private String caseType;;
     private String jurisdiction;
     private String invokingService;
     private String operationType;
@@ -107,6 +108,14 @@ public class LogMessage {
         this.jurisdiction = jurisdiction;
     }
 
+    public String getCaseType() {
+        return caseType;
+    }
+
+    public void setCaseType(String caseType) {
+        this.caseType = caseType;
+    }
+
     @Override
     public String toString() {
         return TAG + " " + dateTime + " Operation:" + operationType +
@@ -117,6 +126,7 @@ public class LogMessage {
             ", idamId='" + idamId + '\'' +
             ", invokingService='" + invokingService + '\'' +
             ", caseId='" + caseId + '\'' +
+            ", caseType='" + caseType + '\'' +
             ", jurisdiction='" + jurisdiction + '\'' +
             ", response='" + response + '\'' +
             '}';
