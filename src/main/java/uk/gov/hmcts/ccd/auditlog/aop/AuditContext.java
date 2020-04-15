@@ -13,5 +13,6 @@ public class AuditContext {
     private String caseId;
     private String caseType;
     private String jurisdiction;
+    private String eventName;
     private OperationType operationType;
 }

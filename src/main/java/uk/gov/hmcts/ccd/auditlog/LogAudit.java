@@ -20,4 +20,6 @@ public @interface LogAudit {
 
     String caseType() default "";
 
+    String eventName() default "";
+
 }

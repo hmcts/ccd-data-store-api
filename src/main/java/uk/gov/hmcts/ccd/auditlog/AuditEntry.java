@@ -13,6 +13,7 @@ public class AuditEntry {
     private String caseId;
     private String caseType;;
     private String jurisdiction;
+    private String eventSelected;
     private String invokingService;
     private String operationType;
     private String response;
@@ -117,6 +118,14 @@ public class AuditEntry {
         this.caseType = caseType;
     }
 
+    public String getEventSelected() {
+        return eventSelected;
+    }
+
+    public void setEventSelected(String eventSelected) {
+        this.eventSelected = eventSelected;
+    }
+
     @Override
     public String toString() {
         return TAG + " " + dateTime + " Operation:" + operationType +
@@ -129,6 +138,7 @@ public class AuditEntry {
             ", caseId='" + caseId + '\'' +
             ", caseType='" + caseType + '\'' +
             ", jurisdiction='" + jurisdiction + '\'' +
+            ", eventSelected='" + eventSelected + '\'' +
             ", response='" + response + '\'' +
             '}';
     }
