@@ -63,8 +63,8 @@ class SubmitCaseTransaction {
                                  final SecurityClassificationService securityClassificationService,
                                  final @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation,
-                                 HttpServletRequest request,
-                                 CaseDocumentAttachOperation caseDocumentAttachOperation
+                                 final HttpServletRequest request,
+                                 final CaseDocumentAttachOperation caseDocumentAttachOperation
                                 ) {
         this.request = request;
         this.caseDetailsRepository = caseDetailsRepository;

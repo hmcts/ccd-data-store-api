@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -40,7 +41,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -246,13 +246,19 @@ class SubmitCaseTransactionTest {
     void shouldPersistV2Event() throws IOException {
         doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
         CaseDetails inputCaseDetails = new CaseDetails();
-
+        inputCaseDetails.setState("SomeState");
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+                                                                             null,
+                                                                             inputCaseDetails, caseType, IGNORE_WARNING
+                                                                            );
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
         doReturn(dataMap).when(this.caseDetails).getData();
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        ResponseEntity<Boolean> responseEntity = new ResponseEntity<Boolean>(true, HttpStatus.OK);
+        ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
+        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
         doReturn(responseEntity).when(restTemplate).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
@@ -266,10 +272,40 @@ class SubmitCaseTransactionTest {
                                                                    inputCaseDetails,
                                                                    IGNORE_WARNING);
 
-        assertAll(
-            () -> assertThat(caseDetails, isNotNull()),
-            () -> assertThat(caseDetails.getData(), isNotNull())
-           );
+        verify(caseDocumentAttachOperation , times(1)).restCallToAttachCaseDocuments();
+
+    }
+
+    @Test
+    @DisplayName("should persist V2.1 Case creation event")
+    void shouldNotInvokeAttachDocumentToCase() throws IOException {
+        //doReturn("application/").when(request).getContentType();
+        CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setState("SomeState");
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+                                                                             null,
+                                                                             inputCaseDetails, caseType, IGNORE_WARNING
+                                                                            );
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        inputCaseDetails.setData(dataMap);
+        doReturn(dataMap).when(this.caseDetails).getData();
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
+        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         inputCaseDetails,
+                                         IGNORE_WARNING);
+
+        verify(caseDocumentAttachOperation , times(0)).beforeCallbackPrepareDocumentMetaData(dataMap);
+        verify(caseDocumentAttachOperation , times(0)).filterDocumentFields();
+        verify(caseDocumentAttachOperation , times(0)).restCallToAttachCaseDocuments();
+
     }
 
     @Test
