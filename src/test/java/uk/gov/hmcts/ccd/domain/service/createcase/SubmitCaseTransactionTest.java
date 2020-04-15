@@ -255,7 +255,7 @@ class SubmitCaseTransactionTest {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
-        doReturn(dataMap).when(this.caseDetails).getData();
+        //doReturn(dataMap).when(this.caseDetails).getData();
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
         doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
@@ -265,13 +265,15 @@ class SubmitCaseTransactionTest {
             ArgumentMatchers.any(),
             ArgumentMatchers.<Class<String>>any());
 
-        CaseDetails caseDetails = submitCaseTransaction.submitCase(event,
-                                                                   caseType,
-                                                                   idamUser,
-                                                                   eventTrigger,
-                                                                   inputCaseDetails,
-                                                                   IGNORE_WARNING);
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         inputCaseDetails,
+                                         IGNORE_WARNING);
 
+        verify(caseDocumentAttachOperation , times(1)).beforeCallbackPrepareDocumentMetaData(dataMap);
+        verify(caseDocumentAttachOperation , times(1)).filterDocumentFields();
         verify(caseDocumentAttachOperation , times(1)).restCallToAttachCaseDocuments();
 
     }
