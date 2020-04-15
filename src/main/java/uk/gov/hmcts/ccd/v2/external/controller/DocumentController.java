@@ -68,7 +68,7 @@ public class DocumentController {
             message = V2.Error.PRINTABLE_DOCUMENTS_ENDPOINT_DOWN
         )
     })
-    @LogAudit(operationType = OperationType.VIEW_CASE)
+    @LogAudit(operationType = OperationType.VIEW_CASE, caseId = "#caseId")
     public ResponseEntity<DocumentsResource> getDocuments(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
