@@ -34,6 +34,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 import static org.springframework.http.ResponseEntity.status;
+import static uk.gov.hmcts.ccd.auditlog.OperationType.VIEW_CASE;
 
 @RestController
 @RequestMapping(path = "/")
@@ -87,7 +88,8 @@ public class CaseController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
-    @LogAudit(operationType = OperationType.VIEW_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction")
+    @LogAudit(operationType = VIEW_CASE, caseId = "#caseId",
+        jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
