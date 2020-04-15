@@ -48,6 +48,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
     private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
     private static final String REQUEST_ID = "request-id";
+    private static final String REQUEST_ID_VALUE = "1234567898765432";
 
     @Inject
     private WebApplicationContext wac;
@@ -83,6 +84,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
             .contentType(JSON_CONTENT_TYPE)
         ).andReturn();
 
@@ -98,9 +100,55 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         verify(auditRepository).save(captor.capture());
 
         assertThat(captor.getValue().getOperationType(), is(OperationType.VIEW_CASE.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
-        assertThat(captor.getValue().getCaseType(), is("TestAddressBookCase"));
-        assertThat(captor.getValue().getJurisdiction(), is("PROBATE"));
+        assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
+        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getHttpStatus(), is(200));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldLogAuditInfoForCreateEventByCaseId() throws Exception {
+        String caseId = "1504259907353529";
+        final String URL =  "/cases/" + caseId + "/events";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withCaseReference(caseId)
+            .withEvent(anEvent()
+                .withEventId("HAS_PRE_STATES_EVENT")
+                .withSummary("Short comment")
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "HAS_PRE_STATES_EVENT"))
+            .build();
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(caseDetailsToSave))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(OperationType.UPDATE_CASE.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
+        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getHttpStatus(), is(201));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getEventSelected(), is("HAS_PRE_STATES_EVENT"));
+        assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
     }
 
     @Test
@@ -120,7 +168,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
-            .header(REQUEST_ID, "1234-5678-1234-1234")
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
@@ -137,10 +185,13 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(OperationType.CREATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
+        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
         assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
-        assertThat(captor.getValue().getRequestId(), is("1234-5678-1234-1234"));
+        assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
     }
 
     @Test
@@ -186,43 +237,6 @@ public class CaseControllerTestIT extends WireMockBaseTest {
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andExpect(status().is(404))
             .andReturn();
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldLogAuditInfoForUpdateCaseById() throws Exception {
-        String caseId = "1504259907353529";
-        final String URL =  "/cases/" + caseId + "/events";
-
-        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        String eventId = "Goodness";
-        final Event triggeringEvent = anEvent().build();
-        triggeringEvent.setEventId(eventId);
-        triggeringEvent.setSummary("Short comment");
-        caseDetailsToSave.setEvent(triggeringEvent);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, eventId);
-        caseDetailsToSave.setToken(token);
-
-        final MvcResult mvcResult = mockMvc.perform(post(URL)
-            .header(EXPERIMENTAL_HEADER, "experimental")
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsString(caseDetailsToSave))
-        ).andReturn();
-
-        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        String content = mvcResult.getResponse().getContentAsString();
-        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
-        assertNotNull("Saved Case Details should not be null", savedCaseResource);
-
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        assertThat(captor.getValue().getOperationType(), is(OperationType.CREATE_CASE.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
-        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
-        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
-        assertThat(captor.getValue().getEventSelected(), is(eventId));
     }
 
 }
