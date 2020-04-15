@@ -79,6 +79,7 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         result.setLabel(in.getLabel());
         result.setOrder(in.getDisplayOrder());
         result.setRole(in.getRole());
+        result.setDisplayContextParameter(in.getDisplayContextParameter());
 
         CaseField caseField = caseType.getCaseField(in.getCaseFieldId())
             .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(), in.getCaseFieldPath())));

@@ -553,7 +553,7 @@ public class TestBuildersUtil {
             this.jurisdictionUiConfig.setShuttered(shuttered);
             return this;
         }
-        
+
         public JurisdictionUiConfigBuilder withId(String id) {
             this.jurisdictionUiConfig.setId(id);
             return this;
@@ -1111,6 +1111,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseFieldBuilder withFormattedValue(final String formattedValue) {
+            caseField.setFormattedValue(formattedValue);
+            return this;
+        }
+
         public CaseField build() {
             caseField.setAccessControlLists(accessControlLists);
             caseField.setComplexACLs(complexACLs);
@@ -1326,6 +1331,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public WorkbasketInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.workbasketInput.setDisplayContextParameter(displayContextParameter);
+            return this;
+        }
+
         public WorkbasketInput build() {
             return this.workbasketInput;
         }
@@ -1351,6 +1361,11 @@ public class TestBuildersUtil {
             Field f = new Field();
             f.setId(fieldId);
             this.searchInput.setField(f);
+            return this;
+        }
+
+        public SearchInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.searchInput.setDisplayContextParameter(displayContextParameter);
             return this;
         }
 
