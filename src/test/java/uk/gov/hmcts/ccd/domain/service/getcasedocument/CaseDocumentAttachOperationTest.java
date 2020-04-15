@@ -103,26 +103,6 @@ class CaseDocumentAttachOperationTest {
             ArgumentMatchers.<Class<String>>any());
     }
 
-/*    @Test
-    @DisplayName("should persist V2.1 Case creation event")
-    void shouldPersistV2Event() throws IOException {
-        doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
-        CaseDetails inputCaseDetails = new CaseDetails();
-
-
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        inputCaseDetails.setData(dataMap);
-        doReturn(dataMap).when(this.caseDetails).getData();
-        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        ResponseEntity<Boolean> responseEntity = new ResponseEntity<Boolean>(true, HttpStatus.OK);
-        doReturn(responseEntity).when(restTemplate).exchange(
-            ArgumentMatchers.anyString(),
-            ArgumentMatchers.any(HttpMethod.class),
-            ArgumentMatchers.any(),
-            ArgumentMatchers.<Class<String>>any());
-
-    }*/
-
     @Test
     @DisplayName("should extract only documents with hashcode from Case Data")
     void shouldExtractDocumentsFromCaseDataBeforeCallBack() throws IOException {
@@ -244,36 +224,6 @@ class CaseDocumentAttachOperationTest {
                                                 ArgumentMatchers.any(),
                                                 ArgumentMatchers.<Class<String>>any());
     }
-
-    /*@Test
-    @DisplayName("should filter documents after callback to service")
-    void shouldFilterDocumentFieldsAfterCallback() throws IOException {
-        CaseDocumentsMetadata caseDocumentsMetadata = CaseDocumentsMetadata
-            .builder()
-            .documents(Arrays.asList(CaseDocument.builder().id("DocumentId1").build(),
-                                     CaseDocument.builder().id("DocumentId2").build(),
-                                     CaseDocument.builder().id("DocumentId3").build(),
-                                     CaseDocument.builder().id("DocumentId4").build(),
-                                     CaseDocument.builder().id("DocumentId5").build()))
-            .build();
-
-        Set<String> documentSetBeforeCallback = Stream.of("DocumentId1", "DocumentId2", "DocumentId3")
-                                                      .collect(Collectors.toSet());
-        Set<String> documentSetAfterCallback = Stream.of("DocumentId1", "DocumentId2", "DocumentId4", "DocumentId5")
-                                                     .collect(Collectors.toSet());
-
-        submitCaseTransaction.filterDocumentFields(caseDocumentsMetadata, documentSetBeforeCallback, documentSetAfterCallback);
-        Set<String> expectedSet = Sets.newHashSet("DocumentId1",
-                                                  "DocumentId2",
-                                                  "DocumentId4", "DocumentId5");
-
-        Set<String> filteredDocumentIds = caseDocumentsMetadata.getDocuments()
-                                                               .stream().map(CaseDocument::getId)
-                                                               .collect(Collectors.toSet());
-        assertAll(
-            () -> assertEquals(documentSetAfterCallback, expectedSet),
-            () -> assertEquals(filteredDocumentIds, expectedSet));
-    }*/
 
     private CaseType buildCaseType() {
         final Version version = new Version();
