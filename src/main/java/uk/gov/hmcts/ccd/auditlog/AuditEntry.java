@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.auditlog;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class AuditEntry {
 
     private static final String TAG = "CLA-CCD";
@@ -8,15 +10,14 @@ public class AuditEntry {
     private int httpStatus;
     private String httpMethod;
     private String path;
-    private String clientIp;
     private String idamId;
     private String caseId;
-    private String caseType;;
+    private String caseType;
     private String jurisdiction;
     private String eventSelected;
     private String invokingService;
     private String operationType;
-    private String response;
+    private String requestId;
 
     public void setDateTime(String time) {
         this.dateTime = time;
@@ -50,28 +51,12 @@ public class AuditEntry {
         this.path = path;
     }
 
-    public String getClientIp() {
-        return clientIp;
-    }
-
-    public void setClientIp(String clientIp) {
-        this.clientIp = clientIp;
-    }
-
     public String getOperationType() {
         return operationType;
     }
 
     public void setOperationType(String operationType) {
         this.operationType = operationType;
-    }
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
     }
 
     public String getIdamId() {
@@ -126,21 +111,29 @@ public class AuditEntry {
         this.eventSelected = eventSelected;
     }
 
-    @Override
-    public String toString() {
-        return TAG + " " + dateTime + " Operation:" + operationType +
-            " { httpStatus=" + httpStatus +
-            ", httpMethod='" + httpMethod + '\'' +
-            ", path='" + path + '\'' +
-            ", clientIp='" + clientIp + '\'' +
-            ", idamId='" + idamId + '\'' +
-            ", invokingService='" + invokingService + '\'' +
-            ", caseId='" + caseId + '\'' +
-            ", caseType='" + caseType + '\'' +
-            ", jurisdiction='" + jurisdiction + '\'' +
-            ", eventSelected='" + eventSelected + '\'' +
-            ", response='" + response + '\'' +
-            '}';
+    public String getRequestId() {
+        return requestId;
     }
 
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    @Override
+    public String toString() {
+        return TAG + " " + dateTime + " operationType:" + operationType +
+            (isNotBlank(caseId) ? ", caseId:" + caseId : "") +
+            (isNotBlank(idamId) ? ", idamId:" + idamId : "") +
+            (isNotBlank(invokingService) ? ", invokingService:" + invokingService : "") +
+            (isNotBlank(path) ? ", endpointCalled:" + httpMethod + " " + path : "") +
+            ", operationOutcome:" + httpStatus +
+            (isNotBlank(caseType) ? ", caseType:" + caseType : "") +
+            (isNotBlank(jurisdiction) ? ", jurisdiction:" + jurisdiction : "") +
+            (isNotBlank(eventSelected) ? ", eventSelected:" + eventSelected : "") +
+//            (isNotBlank(idamIdOfTarget) ? ", idamIdOfTarget:" + idamIdOfTarget : "") +
+//            (isNotBlank(listOfCaseTypes) ? ", listOfCaseTypes:" + listOfCaseTypes : "") +
+//            (isNotBlank(targetCaseRoles) ? ", targetCaseRoles:" + targetCaseRoles : "") +
+            (isNotBlank(requestId) ? ", X-Request-ID:" + requestId : "") +
+            '}';
+    }
 }

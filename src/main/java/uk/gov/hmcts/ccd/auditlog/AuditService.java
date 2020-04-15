@@ -40,7 +40,6 @@ public class AuditService {
         entry.setHttpStatus(httpResponseStatus);
         entry.setHttpMethod(request.getMethod());
         entry.setPath(request.getRequestURI());
-        entry.setClientIp(request.getRemoteAddr());
         entry.setIdamId(userRepository.getUser().getEmail());
         entry.setInvokingService(securityUtils.getServiceName());
 
@@ -49,6 +48,7 @@ public class AuditService {
         entry.setCaseId(auditContext.getCaseId());
         entry.setCaseType(auditContext.getCaseType());
         entry.setEventSelected(auditContext.getEventName());
+        entry.setRequestId(request.getHeader("request-id"));
 
         auditRepository.save(entry);
     }

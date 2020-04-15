@@ -47,6 +47,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     private static final String UID = "123";
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
     private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
+    private static final String REQUEST_ID = "request-id";
 
     @Inject
     private WebApplicationContext wac;
@@ -119,6 +120,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, "1234-5678-1234-1234")
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
@@ -138,6 +140,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
         assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
+        assertThat(captor.getValue().getRequestId(), is("1234-5678-1234-1234"));
     }
 
     @Test
