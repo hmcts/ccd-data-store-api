@@ -17,6 +17,11 @@
 		"pathVariables": {
 			"cid": "${[scenarioContext][childContexts][F101_Case_Data_Solicitor][testData][actualResponse][body][id]}",
 			"uid": "${[scenarioContext][testData][users][solicitor3][id]}"
-		}
+		},
+    "expectedResponse": {
+      "headers": {
+        "Content-Type": "[[ANY_STRING_NULLABLE]]"
+      }
+    }
 	}
 }
