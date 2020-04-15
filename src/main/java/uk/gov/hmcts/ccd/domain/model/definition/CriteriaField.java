@@ -12,6 +12,7 @@ public class CriteriaField implements Serializable {
     private Integer displayOrder;
     private String role;
     private String displayContextParameter = null;
+    private String showCondition;
 
     /**
      **/
@@ -79,5 +80,14 @@ public class CriteriaField implements Serializable {
 
     public void setDisplayContextParameter(String displayContextParameter) {
         this.displayContextParameter = displayContextParameter;
+    }
+    
+    @JsonProperty("show_condition")
+    public String getShowCondition() {
+        return showCondition;
+    }
+
+    public void setShowCondition(String showCondition) {
+        this.showCondition = showCondition;
     }
 }

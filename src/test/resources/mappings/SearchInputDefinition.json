@@ -14,12 +14,14 @@
     {
       "case_field_id": "PersonFirstName",
       "label": "First Name",
-      "order": 1
+      "order": 1,
+      "show_condition": null
     },
     {
       "case_field_id": "PersonLastName",
       "label": "Last Name",
-      "order": 2
+      "order": 2,
+      "show_condition": "PersonFirstName=\"fred\""
     },
     {
       "case_field_id": "PersonAddress",

@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,7 +66,8 @@ public class SearchResultProcessor {
         } else if (object instanceof ObjectNode && !FieldProcessor.isNullOrEmpty((ObjectNode) object)) {
             return createObjectNodeFrom((ObjectNode) object, viewColumn, viewColumn.getCaseFieldType().getComplexFields(), viewColumn.getCaseFieldId());
         } else if (object instanceof LocalDateTime) {
-            return createTextNodeFrom(new TextNode(((LocalDateTime) object).format(DateTimeFormatParser.DATE_TIME_FORMAT)), viewColumn, viewColumn.getCaseFieldId());
+            return createTextNodeFrom(new TextNode(((LocalDateTime) object)
+                .format(DateTimeFormatter.ofPattern(DateTimeFormatParser.DATE_TIME_FORMAT))), viewColumn, viewColumn.getCaseFieldId());
         }
 
         return object;

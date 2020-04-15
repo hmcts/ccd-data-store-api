@@ -24,6 +24,7 @@
             "id": "TextField",
             "elementPath": null,
             "metadata": false,
+            "show_condition": null,
             "field_type": {
               "id": "Text",
               "type": "Text",
