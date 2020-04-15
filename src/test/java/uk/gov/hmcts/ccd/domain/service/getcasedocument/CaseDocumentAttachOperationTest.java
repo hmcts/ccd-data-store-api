@@ -127,7 +127,7 @@ class CaseDocumentAttachOperationTest {
     @DisplayName("should extract only documents with hashcode from Case Data")
     void shouldExtractDocumentsFromCaseDataBeforeCallBack() throws IOException {
 
-        Map<String, JsonNode> dataMap = buildCaseData("casedata/SubmitTransactionDocumentUpload.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         caseDocumentAttachOperation.documentSetBeforeCallback = new HashMap<>();
 
         caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(dataMap);
@@ -147,7 +147,7 @@ class CaseDocumentAttachOperationTest {
     @DisplayName("should extract only documents with hashcode from Case Data")
     void shouldRemoveHashTokenFromDocuments() throws IOException {
 
-        Map<String, JsonNode> dataMap = buildCaseData("casedata/SubmitTransactionDocumentUpload.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         caseDocumentAttachOperation.documentSetBeforeCallback = new HashMap<>();
 
         caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(dataMap);
@@ -163,7 +163,7 @@ class CaseDocumentAttachOperationTest {
     @DisplayName("should throw exception while getting documents without hashcode from Case Data")
     void shouldThrowExceptionWhileExtractingDocumentsFromCaseData() throws IOException {
 
-        Map<String, JsonNode> dataMap = buildCaseData("casedata/SubmitTransactionBadDocumentUpload.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadDocumentUpload.json");
         Map<String, String> documentMap = new HashMap<>();
 
         Assertions.assertThrows(BadRequestException.class,
@@ -174,7 +174,7 @@ class CaseDocumentAttachOperationTest {
     @DisplayName("should build Case Document Metadata after callback response")
     void shouldExtractDocumentsFromCaseDataAfterCallBack() throws IOException {
 
-        Map<String, JsonNode> dataMap = buildCaseData("casedata/SubmitTransactionDocumentUpload.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         caseDetails = new CaseDetails();
         caseDetails.setData(dataMap);
         caseDetails.setReference(1111122222333334L);
@@ -205,7 +205,7 @@ class CaseDocumentAttachOperationTest {
     @DisplayName("should throw exception while getting documents without hashcode from Case Data after callback response")
     void shouldThrowExceptionWhileExtractingDocumentsFromCaseDataAfterCallback() throws IOException {
 
-        Map<String, JsonNode> dataMap = buildCaseData("casedata/SubmitTransactionBadDocumentUpload.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadDocumentUpload.json");
         Map<String, String> documentMap = new HashMap<>();
 
         Assertions.assertThrows(BadRequestException.class,
