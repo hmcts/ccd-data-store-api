@@ -167,8 +167,6 @@ public class CaseDocumentAttachOperation {
     private void filterDocumentFields(CaseDocumentsMetadata documentMetadata, Map<String, String> documentSetBeforeCallback,
                                       Map<String, String> documentSetAfterCallback) {
         try {
-            //Below line should be remove before promoting to PR env.
-//            documentSetAfterCallback.putAll(documentSetBeforeCallback);
             if (documentSetAfterCallback.size() > 0) {
                 //find documents which are intersection of Before and after callback
                 Map<String, String> filteredDocumentSet = documentSetAfterCallback.entrySet().stream()
