@@ -13,10 +13,10 @@
 		}
 	},
 	"expectedResponse": {
-    "_extends_": "Common_201_Response",
+		"_extends_": "Common_201_Response",
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Type": "[[ANY_STRING_NULLABLE]]",
+			"Content-Type": "[[ANY_STRING_NULLABLE]]",
 			"Vary": "Accept-Encoding"
 		}
 	}
