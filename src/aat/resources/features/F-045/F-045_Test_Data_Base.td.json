@@ -17,10 +17,5 @@
 		"body": {
 			"id": "Test User"
 		}
-	},
-	"expectedResponse": {
-		"headers": {
-			"Content-Type": "[[ANY_STRING_NULLABLE]]"
-		}
 	}
 }
