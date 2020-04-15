@@ -253,7 +253,7 @@ class SubmitCaseTransactionTest {
                                                                              inputCaseDetails, caseType, IGNORE_WARNING
                                                                             );
 
-        Map<String, JsonNode> dataMap = buildCaseData("tests/SubmitTransactionDocumentUpload.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
@@ -288,7 +288,7 @@ class SubmitCaseTransactionTest {
                                                                              inputCaseDetails, caseType, IGNORE_WARNING
                                                                             );
 
-        Map<String, JsonNode> dataMap = buildCaseData("tests/SubmitTransactionDocumentUpload.json");
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
         doReturn(dataMap).when(this.caseDetails).getData();
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
@@ -446,39 +446,9 @@ class SubmitCaseTransactionTest {
         return idamUser;
     }
 
-/*    private Map<String, JsonNode> buildJsonNodeData(String fieldName) throws IOException {
-        final JsonNode node = new ObjectMapper()
-            .readTree("{\n" + "  \"document_url\": \"http://dm-store:8080/documents/388a1ce0-f132-4680-90e9-5e782721cabb\",\n"
-                      + "  \"PersonLastName\": \"Last Name\",\n"
-                      + "  " + "\"PersonAddress\": {\n"
-                      + "    \"InnerDocumentField\": \"Address Line 1\",\n" + "    \"AddressLine2\": " + "\"Address Line 2\"\n" + "  }\n" + "}\n");
-        final Map<String, JsonNode> map = new HashMap<>();
-        map.put(fieldName, node);
-        return map;
-    }*/
-/*
-    static Map<String, JsonNode> buildData(String key, String...value) {
-        Map<String, JsonNode> dataMap = Maps.newHashMap();
-        asList(value).forEach(dataFieldId -> {
-            dataMap.put(key, JSON_NODE_FACTORY.textNode(dataFieldId));
-        });
-        return dataMap;
-    }*/
-/*
-
-    public Map<String, JsonNode> buildDocument () {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, JsonNode> documentMap = new HashMap<>();
-        JsonNode node = mapper.valueToTree(buildData(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE, "http://dm-store:8080/documents/388a1ce0-f132-4680-90e9-5e782721cabb"));
-        documentMap.put("DocumentField1", mapper.valueToTree(buildData(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE, "http://dm-store:8080/documents/388a1ce0-f132-4680-90e9-5e782721cabb")));
-        documentMap.put("DocumentField1", mapper.valueToTree(buildData(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE, "http://dm-store:8080/documents/388a1ce0-f132-4680-90e9-5e782721cabb/binary")));
-       return documentMap;
-    }
-*/
-
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
         InputStream inputStream =
-            SubmitCaseTransactionTest.class.getClassLoader().getResourceAsStream("mappings/".concat(fileName));
+            SubmitCaseTransactionTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
 
         HashMap<String, JsonNode> result =
             new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {});
