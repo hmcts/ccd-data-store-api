@@ -23,7 +23,7 @@
   "expectedResponse": {
     "headers": {
       "Content-Encoding" : "gzip",
-      "Content-Length" : "857",
+      "Content-Length" : "[[ANY_INTEGER_NOT_NULLABLE]]",
       "Content-Type" : "application/json"
     },
     "body": {
