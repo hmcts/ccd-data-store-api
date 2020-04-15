@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,6 +43,7 @@ public class DefaultGetCriteriaOperationTest {
     private static final String DEBTOR_DETAILS = "Debtor details";
     private static final String NAME = "Name";
     private static final String SURNAME = "Surname";
+    private static final String SHOW_CONDITION = "some show condition";
 
     private final CaseType caseType = new CaseType();
     private final CaseField caseField1 = new CaseField();
@@ -106,6 +109,21 @@ public class DefaultGetCriteriaOperationTest {
             () -> assertThat(searchInputs.get(3).getField().isMetadata(), is(true))
         );
     }
+
+    @Test
+    void shouldReturnSearchInputsWithShowCondition() {
+        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH);
+
+        assertThat(searchInputs, hasItems(hasProperty("field", hasProperty("showCondition", equalTo(SHOW_CONDITION)))));
+    }
+
+    @Test
+    void shouldReturnWorkbasketInputsWithNullShowCondition() {
+        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET);
+
+        assertThat(workbasketInputs, hasItems(hasProperty("field", hasProperty("showCondition", nullValue()))));
+    }
+
 
     @Test
     void shouldReturnWorkbasketInputsWhenCaseFieldElementPathDefined() {
@@ -233,6 +251,7 @@ public class DefaultGetCriteriaOperationTest {
         searchInputField.setDisplayOrder(order);
         searchInputField.setCaseFieldPath(path);
         searchInputField.setDisplayContextParameter("#DATETIME(“YYYY-MM-DD hh:mm:ss”)");
+        searchInputField.setShowCondition(SHOW_CONDITION);
         return searchInputField;
     }
 }
