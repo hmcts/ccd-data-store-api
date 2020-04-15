@@ -54,8 +54,8 @@
           "metadata" : true,
           "show_condition": null,
           "field_type" : {
-            "id" : "Date",
-            "type" : "Date",
+            "id" : "DateTime",
+            "type" : "DateTime",
             "min" : null,
             "max" : null,
             "regular_expression" : null,

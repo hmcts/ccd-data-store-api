@@ -71,8 +71,8 @@
           "metadata": true,
           "hint_text": null,
           "field_type": {
-            "id": "Date",
-            "type": "Date",
+            "id": "DateTime",
+            "type": "DateTime",
             "min": null,
             "max": null,
             "regular_expression": null,
@@ -236,8 +236,8 @@
           "metadata": true,
           "hint_text": null,
           "field_type": {
-            "id": "Date",
-            "type": "Date",
+            "id": "DateTime",
+            "type": "DateTime",
             "min": null,
             "max": null,
             "regular_expression": null,
@@ -269,8 +269,8 @@
           "metadata": true,
           "hint_text": null,
           "field_type": {
-            "id": "Date",
-            "type": "Date",
+            "id": "DateTime",
+            "type": "DateTime",
             "min": null,
             "max": null,
             "regular_expression": null,
