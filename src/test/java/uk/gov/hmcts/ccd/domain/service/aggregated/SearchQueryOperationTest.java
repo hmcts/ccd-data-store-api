@@ -25,16 +25,14 @@ import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 
 public class SearchQueryOperationTest {
@@ -70,8 +68,12 @@ public class SearchQueryOperationTest {
 
     @Mock
     private UIDefinitionRepository uiDefinitionRepository;
+
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private SearchInputProcessor searchInputProcessor;
 
     private SearchQueryOperation searchQueryOperation;
     private MetaData metadata;
@@ -100,12 +102,14 @@ public class SearchQueryOperationTest {
         searchQueryOperation = new SearchQueryOperation(searchOperation,
                                                         mergeDataToSearchResultOperation,
                                                         getCaseTypeOperation,
-                                                        getDraftsOperation, uiDefinitionRepository, userRepository);
+                                                        getDraftsOperation, uiDefinitionRepository, userRepository,
+                                                        searchInputProcessor);
         SearchResult searchResult = aSearchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, ""))
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
         doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
+        doAnswer(i -> i.getArgument(2)).when(searchInputProcessor).execute(Mockito.any(), Mockito.any(), Mockito.any());
 
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();

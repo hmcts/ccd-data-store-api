@@ -4,9 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
+import java.time.temporal.*;
 
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.format.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class DateTimeFormatParser {
 
     static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    static final DateTimeFormatter DATE_TIME_FORMAT_MILLISECOND = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SS");
     static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final int DEFAULT_YEAR = 1970;
 
@@ -42,7 +44,7 @@ public class DateTimeFormatParser {
     }
 
     public String convertIso8601ToDateTime(String dateTimeFormat, String value) {
-        LocalDateTime dateTime = LocalDateTime.parse(value, DATE_TIME_FORMAT);
+        LocalDateTime dateTime = LocalDateTime.parse(value);
         return dateTime.format(DateTimeFormatter.ofPattern(dateTimeFormat));
     }
 

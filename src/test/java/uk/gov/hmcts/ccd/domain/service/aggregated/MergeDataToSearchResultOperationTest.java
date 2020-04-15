@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
+import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.io.IOException;
@@ -29,10 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
@@ -89,6 +92,10 @@ class MergeDataToSearchResultOperationTest {
 
     @Mock
     private UserRepository userRepository;
+    
+    @Mock
+    private SearchResultProcessor searchResultProcessor;
+    
     private MergeDataToSearchResultOperation classUnderTest;
 
     private List<CaseDetails> caseDetailsList;
@@ -150,8 +157,10 @@ class MergeDataToSearchResultOperationTest {
             .withField(labelField)
             .build();
         doReturn(Collections.emptySet()).when(userRepository).getUserRoles();
+        doAnswer(i -> new SearchResultView(i.getArgument(0), i.getArgument(1), i.getArgument(2)))
+            .when(searchResultProcessor).execute(Mockito.any(), Mockito.any(), Mockito.any());
 
-        classUnderTest = new MergeDataToSearchResultOperation(userRepository);
+        classUnderTest = new MergeDataToSearchResultOperation(userRepository, searchResultProcessor);
     }
 
     @Test
@@ -167,8 +176,16 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields(),
+                is(not(sameInstance(searchResultView.getSearchResultViewItems().get(0).getCaseFieldsFormatted())))),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields(),
+                is(not(sameInstance(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted())))),
             () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
             () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFieldsFormatted().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()),
+                is(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted().get(STATE.getReference()))),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
                  );
     }
