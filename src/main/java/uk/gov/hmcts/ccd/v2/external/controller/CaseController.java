@@ -34,6 +34,8 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 import static org.springframework.http.ResponseEntity.status;
+import static uk.gov.hmcts.ccd.auditlog.OperationType.CREATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.OperationType.UPDATE_CASE;
 import static uk.gov.hmcts.ccd.auditlog.OperationType.VIEW_CASE;
 
 @RestController
@@ -134,7 +136,8 @@ public class CaseController {
             message = V2.Error.CASE_ALTERED
         )
     })
-    @LogAudit(operationType = OperationType.UPDATE_CASE)
+    @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction",
+        caseType = "#result.body.caseType", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createEvent(@PathVariable("caseId") String caseId,
                                                     @RequestBody final CaseDataContent content) {
         if (!caseReferenceService.validateUID(caseId)) {
@@ -216,7 +219,8 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
-    @LogAudit(operationType = OperationType.CREATE_CASE)
+    @LogAudit(operationType = CREATE_CASE, caseId = "#result.body.reference",
+        jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {

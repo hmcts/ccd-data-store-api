@@ -129,6 +129,15 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertNotNull("Content Should not be null", content);
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(OperationType.CREATE_CASE.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
     }
 
     @Test
@@ -175,4 +184,42 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         ).andExpect(status().is(404))
             .andReturn();
     }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldLogAuditInfoForUpdateCaseById() throws Exception {
+        String caseId = "1504259907353529";
+        final String URL =  "/cases/" + caseId + "/events";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        String eventId = "Goodness";
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(eventId);
+        triggeringEvent.setSummary("Short comment");
+        caseDetailsToSave.setEvent(triggeringEvent);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, eventId);
+        caseDetailsToSave.setToken(token);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(caseDetailsToSave))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(OperationType.CREATE_CASE.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getEventSelected(), is(eventId));
+    }
+
 }
