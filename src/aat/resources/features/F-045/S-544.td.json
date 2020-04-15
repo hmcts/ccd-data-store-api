@@ -16,11 +16,10 @@
 		}
 	},
 	"expectedResponse": {
-    "_extends_": "Common_400_Response",
+		"_extends_": "Common_400_Response",
 		"headers": {
-			"_extends_": "Common_Response_Headers",
 			"Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Type": "[[ANY_STRING_NULLABLE]]",
+			"Content-Type": "[[ANY_STRING_NULLABLE]]",
 			"Vary": "Accept-Encoding"
 		}
 	}
