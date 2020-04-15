@@ -11,6 +11,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class DateTimeFormatParser {
 
     static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
     static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final int DEFAULT_YEAR = 1970;
 
     public String convertDateTimeToIso8601(String dateTimeFormat, String value) {
         return convert(Arrays.asList(dateTimeFormat, DATE_TIME_FORMAT), DATE_TIME_FORMAT, value);
@@ -32,7 +34,7 @@ public class DateTimeFormatParser {
     }
 
     public String convertIso8601ToDateTime(String dateTimeFormat, String value) {
-        LocalDateTime dateTime = LocalDateTime.parse(value, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+        LocalDateTime dateTime = LocalDateTime.parse(value);
         return dateTime.format(DateTimeFormatter.ofPattern(dateTimeFormat));
     }
 
@@ -43,6 +45,7 @@ public class DateTimeFormatParser {
 
     private String convert(List<String> permittedInputFormats, String outputFormat, String value) {
         List<DateTimeFormatter> inputFormatters = permittedInputFormats.stream()
+            .filter(Objects::nonNull)
             .map(this::getFormatter)
             .collect(Collectors.toList());
         DateTimeFormatter outputFormatter = getFormatter(outputFormat);
@@ -70,7 +73,7 @@ public class DateTimeFormatParser {
     private DateTimeFormatter getFormatter(String dateTimeFormat) {
         return new DateTimeFormatterBuilder()
             .appendPattern(dateTimeFormat)
-            .parseDefaulting(ChronoField.YEAR_OF_ERA, LocalDate.now().getYear())
+            .parseDefaulting(ChronoField.YEAR_OF_ERA, DEFAULT_YEAR)
             .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
             .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)

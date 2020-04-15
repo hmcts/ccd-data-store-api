@@ -137,14 +137,14 @@ class DateTimeValueFormatterTest {
 
             CaseViewField result = dateTimeValueFormatter.execute(caseViewField);
 
-            String expectedResultJson = "{" +
-                "\"ComplexDateField\":\"1990-01-01\"," +
-                "\"ComplexNestedField\":{" +
-                    "\"NestedDateField\":\"03 2020\"," +
-                    "\"NestedCollectionDateField\":[" +
-                        "{\"id\":\"id1\",\"value\":\"10/10/2020\"}," +
-                        "{\"id\":\"id2\",\"value\":\"30/01/2010\"}" +
-                "]}}";
+            String expectedResultJson = "{"
+                    + "\"ComplexDateField\":\"1990-01-01\","
+                    + "\"ComplexNestedField\":{"
+                    + "\"NestedDateField\":\"03 2020\","
+                    + "\"NestedCollectionDateField\":["
+                    + "{\"id\":\"id1\",\"value\":\"10/10/2020\"},"
+                    + "{\"id\":\"id2\",\"value\":\"30/01/2010\"}"
+                + "]}}";
             ObjectNode expectedValue = (ObjectNode) MAPPER.readTree(expectedResultJson);
 
             assertAll(
