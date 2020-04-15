@@ -14,14 +14,17 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
+import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 class DateTimeEntryProcessorTest {
@@ -128,6 +131,50 @@ class DateTimeEntryProcessorTest {
             () -> assertThat(result.get(1).get(CollectionValidator.VALUE).asText(), is("1995-12-25T00:00:00.000")),
             () -> assertThat(result.get(1).get("id").asText(), is("id2"))
         );
+    }
+
+    @Test
+    void shouldThrowErrorDetailingExpectedDateTimeFormat() throws IOException {
+        setUpBaseType("DateTime");
+        String json = "{\"DateTimeField\":\"abc\"}";
+        JsonNode node = MAPPER.readTree(json).get("DateTimeField");
+        CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
+        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
+        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "abc")).thenThrow(DateTimeParseException.class);
+
+        DataProcessingException exception = assertThrows(DataProcessingException.class, () -> {
+            dateTimeEntryProcessor.execute(node, caseField("FieldId"), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+        });
+
+        assertAll(
+            () -> assertThat(exception.getDetails(),
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd'T'HH:mm:ss.SSS"))
+        );
+    }
+
+    @Test
+    void shouldThrowErrorDetailingExpectedDateFormat() throws IOException {
+        setUpBaseType("Date");
+        String json = "{\"DateField\":\"abc\"}";
+        JsonNode node = MAPPER.readTree(json).get("DateField");
+        CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType("Date", "Date", Collections.emptyList(), null));
+        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
+        Mockito.when(dateTimeFormatParser.convertDateToIso8601("dd/MM/yyyy", "abc")).thenThrow(DateTimeParseException.class);
+
+        DataProcessingException exception = assertThrows(DataProcessingException.class, () -> {
+            dateTimeEntryProcessor.execute(node, caseField("FieldId"), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+        });
+
+        assertAll(
+            () -> assertThat(exception.getDetails(),
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd"))
+        );
+    }
+
+    private CaseField caseField(String id) {
+        CaseField caseField = new CaseField();
+        caseField.setId(id);
+        return caseField;
     }
 
     private WizardPageField wizardPageField(String id, List<WizardPageComplexFieldOverride> overrides) {
