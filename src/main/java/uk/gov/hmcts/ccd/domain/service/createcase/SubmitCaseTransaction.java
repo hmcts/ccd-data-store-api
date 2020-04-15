@@ -9,8 +9,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -40,8 +38,6 @@ import uk.gov.hmcts.ccd.v2.V2;
 
 @Service
 class SubmitCaseTransaction {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SubmitCaseTransaction.class);
 
     private HttpServletRequest request;
     private final CaseDetailsRepository caseDetailsRepository;

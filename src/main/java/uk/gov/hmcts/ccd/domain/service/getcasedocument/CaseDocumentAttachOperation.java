@@ -244,22 +244,14 @@ public class CaseDocumentAttachOperation {
                         Collections.singletonMap(node.getKey(), node.getValue()), filterDocumentSet));
             }
         });
+    }
 
+    public void filterDocumentMetaData(Set<String> filterDocumentSet) {
 
+        List<DocumentHashToken> caseDocumentList = caseDocumentsMetadata.getDocumentHashToken().stream()
+                                                                        .filter(document -> filterDocumentSet.contains(document.getId()))
+                                                                        .collect(Collectors.toList());
+        caseDocumentsMetadata.setDocumentHashToken(caseDocumentList);
 
     }
-/*
-
-    public void filterDocumentMetaData(Set<String> filterDocumentSet){
-
-        List<CaseDocument> caseDocumentList = documentMetadata.getDocuments().stream()
-                                                              .filter(document -> filterDocumentSet.contains(document.getId()))
-                                                              .collect(Collectors.toList());
-        documentMetadata.setDocuments(caseDocumentList);
-
-    }
-*/
-
-
-
 }
