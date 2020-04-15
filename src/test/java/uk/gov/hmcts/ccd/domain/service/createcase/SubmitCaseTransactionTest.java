@@ -253,7 +253,7 @@ class SubmitCaseTransactionTest {
                                                                              inputCaseDetails, caseType, IGNORE_WARNING
                                                                             );
 
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        Map<String, JsonNode> dataMap = buildCaseData("tests/SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
@@ -288,7 +288,7 @@ class SubmitCaseTransactionTest {
                                                                              inputCaseDetails, caseType, IGNORE_WARNING
                                                                             );
 
-        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        Map<String, JsonNode> dataMap = buildCaseData("tests/SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
         doReturn(dataMap).when(this.caseDetails).getData();
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);

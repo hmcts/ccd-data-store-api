@@ -63,7 +63,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Ignore("Enabled this once createCase endpoint is merged from  develop branch")
+   // @Ignore("Enabled this once createCase endpoint is merged from  develop branch")
     public void shouldReturn201WhenPostCreateCase() throws Exception {
         final String URL =  "/case-types/" + CASE_TYPE + "/cases";
         final String DESCRIPTION = "A very long comment.......";
@@ -93,7 +93,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Ignore("Enabled this once createCase endpoint is merged from  develop branch")
+    //@Ignore("Enabled this once createCase endpoint is merged from  develop branch")
     public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
@@ -125,7 +125,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Ignore("Enabled this once createCase endpoint is merged from  develop branch")
+   // @Ignore("Enabled this once createCase endpoint is merged from  develop branch")
     public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRole() throws Exception {
         final String URL =  "/case-types/" + CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS + "/cases";
 

@@ -85,7 +85,7 @@ public class CaseDocumentAttachOperation {
         extractDocumentFieldsAfterCallback(caseDocumentsMetadata, caseDetails.getData(), documentAfterCallback);
     }
 
-    public void filterDocumentFields(){
+    public void filterDocumentFields() {
         filterDocumentFields(caseDocumentsMetadata, documentSetBeforeCallback, documentAfterCallback);
     }
 
@@ -113,8 +113,7 @@ public class CaseDocumentAttachOperation {
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
                 }
             } else {
-                jsonNode.fields().forEachRemaining
-                    (node -> extractDocumentFieldsBeforeCallback(
+                jsonNode.fields().forEachRemaining(node -> extractDocumentFieldsBeforeCallback(
                         Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
             }
         });
@@ -141,8 +140,7 @@ public class CaseDocumentAttachOperation {
                 }
 
             } else {
-                jsonNode.fields().forEachRemaining
-                    (node -> extractDocumentFieldsAfterCallback(caseDocumentsMetadata,
+                jsonNode.fields().forEachRemaining(node -> extractDocumentFieldsAfterCallback(caseDocumentsMetadata,
                                                                 Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
             }
         });
@@ -205,6 +203,7 @@ public class CaseDocumentAttachOperation {
         }
 
     }
+
     public Set<String> differenceBeforeAndAfterInCaseDetails(final CaseDetails caseDetails, final Map<String, JsonNode> caseData) {
 
         final Map<String, JsonNode> documentsDifference = new HashMap<>();
@@ -216,17 +215,17 @@ public class CaseDocumentAttachOperation {
 
         caseData.forEach((key, value) -> {
 
-            if (caseDetails.getData().containsKey(key) && (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null)) {
-                if(!value.equals(caseDetails.getData().get(key)))
-                {
-                    documentsDifference.put(key,value);
+            if (caseDetails.getData().containsKey(key) && (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(
+                DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null)) {
+                if (!value.equals(caseDetails.getData().get(key))) {
+                    documentsDifference.put(key, value);
                 }
-            } else if (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null){
-                documentsDifference.put(key,value);
+            } else if (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null) {
+                documentsDifference.put(key, value);
             }
         });
         //Find documentId based on filter Map. So that I can filter the DocumentMetaData Object before calling the case document am Api.
-        findDocumenstId(documentsDifference,filterDocumentSet);
+        findDocumenstId(documentsDifference, filterDocumentSet);
         return filterDocumentSet;
     }
 
@@ -241,8 +240,7 @@ public class CaseDocumentAttachOperation {
                 filterDocumentSet.add(documentId);
 
             } else {
-                jsonNode.fields().forEachRemaining
-                    (node -> findDocumenstId(
+                jsonNode.fields().forEachRemaining(node -> findDocumenstId(
                         Collections.singletonMap(node.getKey(), node.getValue()), filterDocumentSet));
             }
         });
