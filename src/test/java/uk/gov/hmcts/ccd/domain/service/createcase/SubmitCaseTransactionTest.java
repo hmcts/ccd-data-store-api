@@ -255,7 +255,6 @@ class SubmitCaseTransactionTest {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
-        //doReturn(dataMap).when(this.caseDetails).getData();
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
         doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
@@ -281,7 +280,6 @@ class SubmitCaseTransactionTest {
     @Test
     @DisplayName("should persist V2.1 Case creation event")
     void shouldNotInvokeAttachDocumentToCase() throws IOException {
-        //doReturn("application/").when(request).getContentType();
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
         AboutToSubmitCallbackResponse response = buildResponse();
@@ -294,7 +292,6 @@ class SubmitCaseTransactionTest {
         inputCaseDetails.setData(dataMap);
         doReturn(dataMap).when(this.caseDetails).getData();
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
         doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
 
         submitCaseTransaction.submitCase(event,
