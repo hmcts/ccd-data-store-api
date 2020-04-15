@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ApiModel(description = "")
 public class WizardPageField implements Serializable {
@@ -49,5 +50,11 @@ public class WizardPageField implements Serializable {
 
     public void setComplexFieldOverrides(List<WizardPageComplexFieldOverride> complexFieldOverrides) {
         this.complexFieldOverrides = complexFieldOverrides;
+    }
+
+    public Optional<WizardPageComplexFieldOverride> getComplexFieldOverride(String fieldPath) {
+        return getComplexFieldOverrides().stream()
+            .filter(override -> fieldPath.equals(override.getComplexFieldElementId()))
+            .findAny();
     }
 }

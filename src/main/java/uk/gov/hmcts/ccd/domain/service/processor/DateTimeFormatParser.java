@@ -4,9 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
+import java.time.temporal.*;
 
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.format.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Component;
 public class DateTimeFormatParser {
 
     static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    static final DateTimeFormatter DATE_TIME_FORMAT_MILLISECOND = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SS");
     static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final int DEFAULT_YEAR = 1970;
 
     public String convertDateTimeToIso8601(String dateTimeFormat, String value) {
         LocalDateTime dateTime;
@@ -26,19 +29,6 @@ public class DateTimeFormatParser {
             dateTime = LocalDateTime.parse(value, DATE_TIME_FORMAT);
         }
         return dateTime.format(DATE_TIME_FORMAT);
-    }
-
-    private DateTimeFormatter getDateTimeFormatter(String dateTimeFormat) {
-        return new DateTimeFormatterBuilder()
-            .appendPattern(dateTimeFormat)
-            .parseDefaulting(ChronoField.YEAR_OF_ERA, LocalDate.now().getYear())
-            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-            .parseDefaulting(ChronoField.MILLI_OF_SECOND, 0)
-            .toFormatter();
     }
 
     public String convertDateToIso8601(String dateFormat, String value) {
@@ -53,12 +43,35 @@ public class DateTimeFormatParser {
         return date.format(DATE_FORMAT);
     }
 
+    public String convertIso8601ToDateTime(String dateTimeFormat, String value) {
+        LocalDateTime dateTime = LocalDateTime.parse(value);
+        return dateTime.format(DateTimeFormatter.ofPattern(dateTimeFormat));
+    }
+
+    public String convertIso8601ToDate(String dateFormat, String value) {
+        LocalDate date = LocalDate.parse(value, DATE_FORMAT);
+        return date.format(DateTimeFormatter.ofPattern(dateFormat));
+    }
+
+    private DateTimeFormatter getDateTimeFormatter(String dateTimeFormat) {
+        return new DateTimeFormatterBuilder()
+            .appendPattern(dateTimeFormat)
+            .parseDefaulting(ChronoField.YEAR_OF_ERA, DEFAULT_YEAR)
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+            .parseDefaulting(ChronoField.MILLI_OF_SECOND, 0)
+            .toFormatter();
+    }
+
     private DateTimeFormatter getDateFormatter(String dateFormat) {
         return new DateTimeFormatterBuilder()
-                .appendPattern(dateFormat)
-                .parseDefaulting(ChronoField.YEAR_OF_ERA, LocalDate.now().getYear())
-                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-                .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-                .toFormatter();
+            .appendPattern(dateFormat)
+            .parseDefaulting(ChronoField.YEAR_OF_ERA, DEFAULT_YEAR)
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+            .toFormatter();
     }
 }
