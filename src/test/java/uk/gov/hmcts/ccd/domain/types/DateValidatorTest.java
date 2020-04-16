@@ -104,7 +104,7 @@ class DateValidatorTest {
                                                                      NODE_FACTORY.textNode("3321M1 1AA"), caseField);
             assertAll(
                 () -> assertEquals(1, result.size()),
-                () -> assertEquals("\"3321M1 1AA\" is not a valid ISO 8601 date", result.get(0).getErrorMessage())
+                () -> assertEquals("Date or Time entered is not valid", result.get(0).getErrorMessage())
             );
         }
 
@@ -115,7 +115,7 @@ class DateValidatorTest {
                                                                      NODE_FACTORY.textNode("1800-14-14"), caseField);
             assertAll(
                 () -> assertEquals(1, result.size()),
-                () -> assertEquals("\"1800-14-14\" is not a valid ISO 8601 date", result.get(0).getErrorMessage())
+                () -> assertEquals("Date or Time entered is not valid", result.get(0).getErrorMessage())
             );
         }
 
@@ -126,7 +126,7 @@ class DateValidatorTest {
                                                                      NODE_FACTORY.textNode("2001-11-31"), caseField);
             assertAll(
                 () -> assertEquals(1, result.size()),
-                () -> assertEquals("\"2001-11-31\" is not a valid ISO 8601 date", result.get(0).getErrorMessage())
+                () -> assertEquals("Date or Time entered is not valid", result.get(0).getErrorMessage())
             );
         }
 
@@ -138,7 +138,7 @@ class DateValidatorTest {
                                                                      caseField);
             assertAll(
                 () -> assertEquals(1, result.size()),
-                () -> assertEquals("\"2001-01-01T00:00:00.000Z\" is not a valid ISO 8601 date",
+                () -> assertEquals("Date or Time entered is not valid",
                                    result.get(0).getErrorMessage())
             );
         }
@@ -150,7 +150,7 @@ class DateValidatorTest {
                                                                      NODE_FACTORY.textNode("2001-02-29Z"), caseField);
             assertAll(
                 () -> assertEquals(1, result.size()),
-                () -> assertEquals("\"2001-02-29Z\" is not a valid ISO 8601 date", result.get(0).getErrorMessage())
+                () -> assertEquals("Date or Time entered is not valid", result.get(0).getErrorMessage())
             );
         }
     }
