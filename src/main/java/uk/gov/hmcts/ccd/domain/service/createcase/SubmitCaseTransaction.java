@@ -118,7 +118,11 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion21) {
-            caseDocumentAttachOperation.afterCallbackPrepareDocumentMetaData(newCaseDetails);
+            boolean callBackResult = false;
+            if (eventTrigger.getCallBackURLAboutToSubmitEvent() != null) {
+                callBackResult = true;
+            }
+            caseDocumentAttachOperation.afterCallbackPrepareDocumentMetaData(newCaseDetails, callBackResult);
             caseDocumentAttachOperation.filterDocumentFields();
             caseDocumentAttachOperation.restCallToAttachCaseDocuments();
         }
