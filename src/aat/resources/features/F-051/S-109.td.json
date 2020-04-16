@@ -24,7 +24,6 @@
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
-			"Content-Type": "application/json"
 		},
 		"body": {
 			"user": {
