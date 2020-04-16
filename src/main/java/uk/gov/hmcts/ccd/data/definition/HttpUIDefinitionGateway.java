@@ -18,7 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
@@ -125,15 +125,15 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public CaseTabCollection getCaseTabCollection(int version, String caseTypeId) {
+    public CaseTypeTabsDefinition getCaseTabCollection(int version, String caseTypeId) {
         final Instant start = Instant.now();
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-        final CaseTabCollection
+        final CaseTypeTabsDefinition
                 collection =
                 restTemplate.exchange(withVersionQueryParam(applicationParams.displayCaseTabCollection(caseTypeId), version),
                         HttpMethod.GET,
                         requestEntity,
-                        CaseTabCollection.class).getBody();
+                        CaseTypeTabsDefinition.class).getBody();
         final Duration duration = Duration.between(start, Instant.now());
         LOG.debug("Rest API getCaseTabCollectionGetHttp called for {}, finished in {}",
                 caseTypeId,
@@ -214,7 +214,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                 e.getMessage()));
         }
     }
-    
+
     public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionIds) {
         try {
             final Instant start = Instant.now();

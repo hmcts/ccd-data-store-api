@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -69,11 +69,11 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
         final CaseViewTrigger resumeTrigger = buildResumeTriggerFromDraft(draftResponse);
 
-        final CaseTabCollection caseTabCollection = getCaseTabCollection(draftResponse.getCaseTypeId());
+        final CaseTypeTabsDefinition caseTypeTabsDefinition = getCaseTabCollection(draftResponse.getCaseTypeId());
 
         CaseViewEvent[] events = buildEventsFromDraft(draftResponse);
 
-        return merge(caseDetails, resumeTrigger, events, caseTypeDefinition, caseTabCollection);
+        return merge(caseDetails, resumeTrigger, events, caseTypeDefinition, caseTypeTabsDefinition);
     }
 
     private CaseViewEvent[] buildEventsFromDraft(DraftResponse draftResponse) {
@@ -111,16 +111,16 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
     }
 
     private CaseView merge(CaseDetails caseDetails, CaseViewTrigger resumeTrigger, CaseViewEvent[] events, CaseTypeDefinition caseTypeDefinition,
-                           CaseTabCollection caseTabCollection) {
+                           CaseTypeTabsDefinition caseTypeTabsDefinition) {
         CaseView caseView = new CaseView();
         caseView.setCaseId(caseDetails.getId().toString());
-        caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
+        caseView.setChannels(caseTypeTabsDefinition.getChannels().toArray(new String[0]));
 
         caseView.setCaseType(CaseViewType.createFrom(caseTypeDefinition));
-        if (caseTabCollection.hasTabFieldType(CASE_HISTORY_VIEWER)) {
+        if (caseTypeTabsDefinition.hasTabFieldType(CASE_HISTORY_VIEWER)) {
             hydrateHistoryField(caseDetails, caseTypeDefinition, Lists.newArrayList(events));
         }
-        caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTabCollection));
+        caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTypeTabsDefinition));
         caseView.setMetadataFields(getMetadataFields(caseTypeDefinition, caseDetails));
 
         caseView.setTriggers(new CaseViewTrigger[]{resumeTrigger, DELETE_TRIGGER});

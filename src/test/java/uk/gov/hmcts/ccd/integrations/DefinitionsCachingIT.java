@@ -70,7 +70,7 @@ public class DefinitionsCachingIT {
     SearchResult searchResult;
 
     @Mock
-    CaseTabCollection caseTabCollection;
+    CaseTypeTabsDefinition caseTypeTabsDefinition;
 
     @Mock
     SearchInputDefinition searchInputDefinition;
@@ -239,7 +239,7 @@ public class DefinitionsCachingIT {
     @Test
     public void testCaseTabsAreCached() {
 
-        doReturn(caseTabCollection).when(this.httpUIDefinitionGateway).getCaseTabCollection(VERSION_1, ID_1);
+        doReturn(caseTypeTabsDefinition).when(this.httpUIDefinitionGateway).getCaseTabCollection(VERSION_1, ID_1);
 
         uiDefinitionRepository.getCaseTabCollection(ID_1);
         uiDefinitionRepository.getCaseTabCollection(ID_1);

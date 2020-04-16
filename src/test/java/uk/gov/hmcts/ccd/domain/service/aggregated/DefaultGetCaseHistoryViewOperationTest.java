@@ -93,9 +93,9 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
 
-        CaseTabCollection caseTabCollection = newCaseTabCollection().withFieldIds("dataTestField1",
+        CaseTypeTabsDefinition caseTypeTabsDefinition = newCaseTabCollection().withFieldIds("dataTestField1",
                                                                                   "dataTestField2").build();
-        doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+        doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         Jurisdiction jurisdiction = new Jurisdiction();

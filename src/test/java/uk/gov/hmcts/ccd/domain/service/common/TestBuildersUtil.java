@@ -38,7 +38,7 @@ import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
@@ -1479,12 +1479,12 @@ public class TestBuildersUtil {
 
     public static class CaseTabCollectionBuilder {
         private final List<CaseTypeTab> tabs;
-        private final CaseTabCollection caseTabCollection;
+        private final CaseTypeTabsDefinition caseTypeTabsDefinition;
 
         private CaseTabCollectionBuilder() {
             this.tabs = newArrayList();
-            this.caseTabCollection = new CaseTabCollection();
-            this.caseTabCollection.setTabs(tabs);
+            this.caseTypeTabsDefinition = new CaseTypeTabsDefinition();
+            this.caseTypeTabsDefinition.setTabs(tabs);
         }
 
         public static CaseTabCollectionBuilder newCaseTabCollection() {
@@ -1510,7 +1510,7 @@ public class TestBuildersUtil {
             tab.setTabFields(tabFields);
             List<CaseTypeTab> tabs = new ArrayList<>();
             tabs.add(tab);
-            caseTabCollection.setTabs(tabs);
+            caseTypeTabsDefinition.setTabs(tabs);
 
             return this;
         }
@@ -1520,8 +1520,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseTabCollection build() {
-            return caseTabCollection;
+        public CaseTypeTabsDefinition build() {
+            return caseTypeTabsDefinition;
         }
     }
 

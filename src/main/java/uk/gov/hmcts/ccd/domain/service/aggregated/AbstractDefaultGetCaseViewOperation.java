@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -74,8 +74,8 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         return getTabs(caseDetails, data, getCaseTabCollection(caseDetails.getCaseTypeId()));
     }
 
-    CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data, CaseTabCollection caseTabCollection) {
-        return caseTabCollection.getTabs().stream().map(tab -> {
+    CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data, CaseTypeTabsDefinition caseTypeTabsDefinition) {
+        return caseTypeTabsDefinition.getTabs().stream().map(tab -> {
             CommonField[] caseViewFields = tab.getTabFields().stream()
                 .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
                 .map(caseTypeTabField -> CaseViewField.createFrom(caseTypeTabField, data))
@@ -86,7 +86,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         }).toArray(CaseViewTab[]::new);
     }
 
-    CaseTabCollection getCaseTabCollection(String caseTypeId) {
+    CaseTypeTabsDefinition getCaseTabCollection(String caseTypeId) {
         return uiDefinitionRepository.getCaseTabCollection(caseTypeId);
     }
 

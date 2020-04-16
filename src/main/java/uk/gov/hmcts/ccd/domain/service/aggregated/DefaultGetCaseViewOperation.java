@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -61,25 +61,25 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getJurisdiction(), caseDetails.getCaseTypeId());
         final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
-        final CaseTabCollection caseTabCollection = getCaseTabCollection(caseDetails.getCaseTypeId());
+        final CaseTypeTabsDefinition caseTypeTabsDefinition = getCaseTabCollection(caseDetails.getCaseTypeId());
 
-        return merge(caseDetails, events, caseTypeDefinition, caseTabCollection);
+        return merge(caseDetails, events, caseTypeDefinition, caseTypeTabsDefinition);
     }
 
-    private CaseView merge(CaseDetails caseDetails, List<AuditEvent> events, CaseTypeDefinition caseTypeDefinition, CaseTabCollection caseTabCollection) {
+    private CaseView merge(CaseDetails caseDetails, List<AuditEvent> events, CaseTypeDefinition caseTypeDefinition, CaseTypeTabsDefinition caseTypeTabsDefinition) {
         CaseView caseView = new CaseView();
         caseView.setCaseId(caseDetails.getReference().toString());
-        caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
+        caseView.setChannels(caseTypeTabsDefinition.getChannels().toArray(new String[0]));
 
         CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         caseView.setState(new ProfileCaseState(caseStateDefinition.getId(), caseStateDefinition.getName(), caseStateDefinition.getDescription(), caseStateDefinition.getTitleDisplay()));
 
         caseView.setCaseType(CaseViewType.createFrom(caseTypeDefinition));
         final CaseViewEvent[] caseViewEvents = convertToCaseViewEvent(events);
-        if (caseTabCollection.hasTabFieldType(CASE_HISTORY_VIEWER)) {
+        if (caseTypeTabsDefinition.hasTabFieldType(CASE_HISTORY_VIEWER)) {
             hydrateHistoryField(caseDetails, caseTypeDefinition, Lists.newArrayList(caseViewEvents));
         }
-        caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTabCollection));
+        caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTypeTabsDefinition));
         caseView.setMetadataFields(getMetadataFields(caseTypeDefinition, caseDetails));
 
         final CaseViewTrigger[] triggers = caseTypeDefinition.getEvents()

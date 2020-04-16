@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -89,7 +89,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
     private GetCaseViewOperation getDraftViewOperation;
 
     private CaseTypeDefinition caseTypeDefinition;
-    private CaseTabCollection caseTabCollection;
+    private CaseTypeTabsDefinition caseTypeTabsDefinition;
     private DraftResponse draftResponse;
     private CaseDetails caseDetails;
     private Map<String, JsonNode> data;
@@ -132,9 +132,9 @@ class DefaultGetCaseViewFromDraftOperationTest {
             .build();
         doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
 
-        caseTabCollection = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2")
+        caseTypeTabsDefinition = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2")
                                                   .build();
-        doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+        doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         caseTypeDefinition = new CaseTypeDefinition();
         Jurisdiction jurisdiction = new Jurisdiction();
@@ -201,7 +201,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
         @Test
         @DisplayName("should hydrate case history viewer if CaseHistoryViewer field type present in tabs")
         void shouldHydrateCaseHistoryViewerIfFieldPresentInTabs() {
-            caseTabCollection = newCaseTabCollection().withTab(newCaseTab()
+            caseTypeTabsDefinition = newCaseTabCollection().withTab(newCaseTab()
                                                                    .withTabField(newCaseTabField()
                                                                                      .withCaseField(newCaseField()
                                                                                                         .withId(CASE_HISTORY_VIEWER)
@@ -213,7 +213,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                                                      .build())
                                                                    .build())
                                                       .build();
-            doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+            doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
             caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField()
                                                      .withId(CASE_HISTORY_VIEWER)
                                                      .withFieldType(aFieldType()
@@ -245,7 +245,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
         @Test
         @DisplayName("should not hydrate case history viewer if CaseHistoryViewer field type is not present in tabs")
         void shouldNotHydrateCaseHistoryViewerIfFieldIsNotPresentInTabs() {
-            caseTabCollection = newCaseTabCollection().withTab(newCaseTab()
+            caseTypeTabsDefinition = newCaseTabCollection().withTab(newCaseTab()
                                                                    .withTabField(newCaseTabField()
                                                                                      .withCaseField(newCaseField()
                                                                                                         .withId("NotACaseHistoryViewer")
@@ -257,7 +257,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                                                      .build())
                                                                    .build())
                                                       .build();
-            doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+            doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
             caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
             doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
@@ -59,7 +59,7 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
 
     @Override
     @Cacheable("caseTabCollectionCache")
-    public CaseTabCollection getCaseTabCollection(final int version, final String caseTypeId) {
+    public CaseTypeTabsDefinition getCaseTabCollection(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of case tab collection for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getCaseTabCollection(version, caseTypeId);
     }
@@ -76,10 +76,10 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
     public BannersResult getBanners(final List<String> jurisdictionIds) {
         return httpUiDefinitionGateway.getBanners(jurisdictionIds);
     }
-    
+
     @Override
     @Cacheable("jurisdictionUiConfigsCache")
     public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionIds) {
         return httpUiDefinitionGateway.getJurisdictionUiConfigs(jurisdictionIds);
-    }    
+    }
 }

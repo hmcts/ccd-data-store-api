@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CaseTabCollection implements Serializable {
+public class CaseTypeTabsDefinition implements Serializable {
 
     @JsonProperty("case_type_id")
     private String caseTypeId = null;
