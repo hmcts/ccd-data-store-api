@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
@@ -29,7 +29,7 @@ public class CompoundFieldOrderService {
 
     public static final String ROOT = "";
 
-    public void sortNestedFieldsFromCaseEventComplexFields(final CaseFieldDefinition caseFieldDefinition, final List<CaseEventFieldComplex> caseEventComplexFields, final String listElementCode) {
+    public void sortNestedFieldsFromCaseEventComplexFields(final CaseFieldDefinition caseFieldDefinition, final List<CaseEventFieldComplexDefinition> caseEventComplexFields, final String listElementCode) {
         if (CollectionUtils.isNotEmpty(caseEventComplexFields) && caseFieldDefinition.isCompoundFieldType()) {
             List<CaseFieldDefinition> children = caseFieldDefinition.getFieldType().getChildren();
             children.forEach(childField -> {
@@ -41,14 +41,14 @@ public class CompoundFieldOrderService {
         }
     }
 
-    private List<CaseEventFieldComplex> getNestedComplexFields(final List<CaseEventFieldComplex> caseEventComplexFields, final String listElementCode) {
+    private List<CaseEventFieldComplexDefinition> getNestedComplexFields(final List<CaseEventFieldComplexDefinition> caseEventComplexFields, final String listElementCode) {
         return caseEventComplexFields
             .stream()
-            .filter(caseEventFieldComplex -> caseEventFieldComplex.getReference().startsWith(listElementCode))
+            .filter(caseEventFieldComplexDefinition -> caseEventFieldComplexDefinition.getReference().startsWith(listElementCode))
             .collect(Collectors.toList());
     }
 
-    private List<CaseFieldDefinition> getSortedCompoundTypeFields(final List<CaseEventFieldComplex> caseEventComplexFields, final List<CaseFieldDefinition> children, String listElementCode) {
+    private List<CaseFieldDefinition> getSortedCompoundTypeFields(final List<CaseEventFieldComplexDefinition> caseEventComplexFields, final List<CaseFieldDefinition> children, String listElementCode) {
         final List<String> sortedFieldsFromEventFieldOverride = getSortedFieldsFromEventFieldOverride(children, caseEventComplexFields, listElementCode);
         if (sortedFieldsFromEventFieldOverride.isEmpty()) {
             return children;
@@ -76,28 +76,28 @@ public class CompoundFieldOrderService {
         sortedCaseFieldDefinitions.addAll(childrenCaseIdToCaseField.values());
     }
 
-    private List<String> getSortedFieldsFromEventFieldOverride(final List<CaseFieldDefinition> children, final List<CaseEventFieldComplex> caseEventComplexFields, String listElementCode) {
+    private List<String> getSortedFieldsFromEventFieldOverride(final List<CaseFieldDefinition> children, final List<CaseEventFieldComplexDefinition> caseEventComplexFields, String listElementCode) {
         return caseEventComplexFields.stream()
             .filter(field -> hasOrderAndIsLeaf(children, listElementCode, field))
-            .sorted(comparingInt(CaseEventFieldComplex::getOrder))
-            .map(CaseEventFieldComplex::getReference)
+            .sorted(comparingInt(CaseEventFieldComplexDefinition::getOrder))
+            .map(CaseEventFieldComplexDefinition::getReference)
             .collect(Collectors.toList());
     }
 
-    private boolean hasOrderAndIsLeaf(final List<CaseFieldDefinition> children, final String listElementCode, final CaseEventFieldComplex field) {
+    private boolean hasOrderAndIsLeaf(final List<CaseFieldDefinition> children, final String listElementCode, final CaseEventFieldComplexDefinition field) {
         return field.getOrder() != null && isFieldReferenceALeaf(children, listElementCode, field);
     }
 
-    private boolean isFieldReferenceALeaf(final List<CaseFieldDefinition> children, final String listElementCode, final CaseEventFieldComplex field) {
+    private boolean isFieldReferenceALeaf(final List<CaseFieldDefinition> children, final String listElementCode, final CaseEventFieldComplexDefinition field) {
         return isBlank(listElementCode) ? isTopLevelLeaf(children, field) : isNestedLeaf(listElementCode, field);
     }
 
-    private boolean isNestedLeaf(final String listElementCode, final CaseEventFieldComplex field) {
+    private boolean isNestedLeaf(final String listElementCode, final CaseEventFieldComplexDefinition field) {
         String substringAfterLast = substringAfterLast(field.getReference(), listElementCode + ".");
         return !isBlank(substringAfterLast) && !substringAfterLast.contains(".");
     }
 
-    private boolean isTopLevelLeaf(final List<CaseFieldDefinition> children, final CaseEventFieldComplex field) {
+    private boolean isTopLevelLeaf(final List<CaseFieldDefinition> children, final CaseEventFieldComplexDefinition field) {
         return children.stream().anyMatch(caseField -> field.getReference().equals(caseField.getId()));
     }
 

@@ -5,17 +5,17 @@ import lombok.Builder;
 import java.io.Serializable;
 
 @Builder
-public class CaseEventFieldComplex implements Serializable {
+public class CaseEventFieldComplexDefinition implements Serializable {
 
     private String reference;
 
     private Integer order;
 
-    public CaseEventFieldComplex() {
+    public CaseEventFieldComplexDefinition() {
     }
 
-    public CaseEventFieldComplex(String reference,
-                                 Integer order) {
+    public CaseEventFieldComplexDefinition(String reference,
+                                           Integer order) {
         this.reference = reference;
         this.order = order;
     }

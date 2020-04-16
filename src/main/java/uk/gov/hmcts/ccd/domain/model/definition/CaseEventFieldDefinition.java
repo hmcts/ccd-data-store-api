@@ -21,7 +21,7 @@ public class CaseEventFieldDefinition implements Serializable {
     private Integer showSummaryContentOption = null;
     private String label = null;
     private String hintText = null;
-    private List<CaseEventFieldComplex> caseEventFieldComplex = new ArrayList<>();
+    private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
 
     @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
     @JsonProperty("case_field_id")
@@ -111,12 +111,12 @@ public class CaseEventFieldDefinition implements Serializable {
 
     @ApiModelProperty(value = "")
     @JsonProperty("case_fields_complex")
-    public List<CaseEventFieldComplex> getCaseEventFieldComplex() {
-        return caseEventFieldComplex;
+    public List<CaseEventFieldComplexDefinition> getCaseEventFieldComplexDefinitions() {
+        return caseEventFieldComplexDefinitions;
     }
 
-    public void setCaseEventFieldComplex(List<CaseEventFieldComplex> eventComplexTypeEntities) {
-        this.caseEventFieldComplex = eventComplexTypeEntities;
+    public void setCaseEventFieldComplexDefinitions(List<CaseEventFieldComplexDefinition> eventComplexTypeEntities) {
+        this.caseEventFieldComplexDefinitions = eventComplexTypeEntities;
     }
 
 }

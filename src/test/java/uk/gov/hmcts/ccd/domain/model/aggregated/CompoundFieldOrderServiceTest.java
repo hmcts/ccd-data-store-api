@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService.ROOT;
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex.builder;
+import static uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition.builder;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
@@ -31,7 +31,7 @@ class CompoundFieldOrderServiceTest {
         .withId("PersonFirstName")
         .build();
     private static final String TEXT_TYPE = "Text";
-    public static final ArrayList<CaseEventFieldComplex> EMPTY_CASE_EVENT_COMPLEX_FIELDS = Lists.newArrayList();
+    public static final ArrayList<CaseEventFieldComplexDefinition> EMPTY_CASE_EVENT_COMPLEX_FIELDS = Lists.newArrayList();
 
     private CompoundFieldOrderService compoundFieldOrderService = new CompoundFieldOrderService();
 
@@ -102,7 +102,7 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldType)
                                     .build());
 
-        List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(builder().reference("OneTwo").order(3).build());
+        List<CaseEventFieldComplexDefinition> caseEventComplexFields = Lists.newArrayList(builder().reference("OneTwo").order(3).build());
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
@@ -130,7 +130,7 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldType)
                                     .build());
 
-        List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(null).build());
+        List<CaseEventFieldComplexDefinition> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(null).build());
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
@@ -158,7 +158,7 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldType)
                                     .build());
 
-        List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(5).build(),
+        List<CaseEventFieldComplexDefinition> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(5).build(),
                                                                                 builder().reference("One").order(6).build(),
                                                                                 builder().reference("Two").order(3).build(),
                                                                                 builder().reference("Two").order(4).build(),
@@ -236,7 +236,7 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(multipleNestedCompoundFieldType)
                                     .build());
 
-        List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(
+        List<CaseEventFieldComplexDefinition> caseEventComplexFields = Lists.newArrayList(
             builder().reference("complex2.complex3.simple1").order(3).build(),
             builder().reference("complex2.complex3.simple2").order(2).build(),
             builder().reference("complex2.complex3.simple3").order(1).build(),
@@ -346,7 +346,7 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(multipleNestedCompoundFieldType)
                                     .build());
 
-        List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(
+        List<CaseEventFieldComplexDefinition> caseEventComplexFields = Lists.newArrayList(
             builder().reference("complex2.complex3.simple3").order(3).build(),
             builder().reference("complex1simple9").order(2).build());
 
