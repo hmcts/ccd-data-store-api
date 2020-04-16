@@ -21,7 +21,7 @@ public class CaseTypeDefinition implements Serializable {
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
     private List<CaseEvent> events = new ArrayList<>();
-    private List<CaseState> states = new ArrayList<>();
+    private List<CaseStateDefinition> states = new ArrayList<>();
     @JsonProperty("case_fields")
     private List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
     @JsonProperty("printable_document_url")
@@ -91,11 +91,11 @@ public class CaseTypeDefinition implements Serializable {
         this.events = events;
     }
 
-    public List<CaseState> getStates() {
+    public List<CaseStateDefinition> getStates() {
         return states;
     }
 
-    public void setStates(List<CaseState> states) {
+    public void setStates(List<CaseStateDefinition> states) {
         this.states = states;
     }
 

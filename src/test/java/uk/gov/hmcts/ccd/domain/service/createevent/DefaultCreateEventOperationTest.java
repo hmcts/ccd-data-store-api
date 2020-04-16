@@ -62,7 +62,7 @@ class DefaultCreateEventOperationTest {
     private CaseEvent eventTrigger;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
-    private CaseState postState;
+    private CaseStateDefinition postState;
     private CaseDataContent caseDataContent;
 
     private static Event buildEvent() {
@@ -97,7 +97,7 @@ class DefaultCreateEventOperationTest {
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
         caseDetailsBefore = mock(CaseDetails.class);
-        postState = new CaseState();
+        postState = new CaseStateDefinition();
         postState.setId(POST_STATE);
 
         CreateCaseEventResult caseEventResult =  CreateCaseEventResult.caseEventWith()

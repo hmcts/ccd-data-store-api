@@ -103,8 +103,8 @@ class DefaultGetCaseHistoryViewOperationTest {
         caseTypeDefinition.setJurisdiction(jurisdiction);
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
-        CaseState caseState = new CaseState();
-        doReturn(caseState).when(caseTypeService).findState(caseTypeDefinition, STATE);
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        doReturn(caseStateDefinition).when(caseTypeService).findState(caseTypeDefinition, STATE);
     }
 
     @Test

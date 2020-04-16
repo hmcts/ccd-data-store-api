@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -47,12 +47,12 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     @Override
     public List<String> getUserAuthorisedCaseStateIds(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
-        List<CaseState> caseStates = getUserAuthorisedCaseStates(jurisdiction, caseTypeId, access);
-        return collectCaseStateIds(caseStates);
+        List<CaseStateDefinition> caseStateDefinitions = getUserAuthorisedCaseStates(jurisdiction, caseTypeId, access);
+        return collectCaseStateIds(caseStateDefinitions);
     }
 
     @Override
-    public List<CaseState> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
+    public List<CaseStateDefinition> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction);
         return filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
     }
@@ -60,8 +60,8 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     @Override
     public List<String> getUserAuthorisedCaseStateIds(String caseTypeId, Predicate<AccessControlList> access) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
-        List<CaseState> caseStates = filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
-        return collectCaseStateIds(caseStates);
+        List<CaseStateDefinition> caseStateDefinitions = filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
+        return collectCaseStateIds(caseStateDefinitions);
     }
 
     private boolean verifyAclOnCaseType(CaseTypeDefinition caseTypeDefinition, Predicate<AccessControlList> access) {
@@ -72,12 +72,12 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
         return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdiction().getId()).higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
     }
 
-    private List<CaseState> filterCaseStatesForUser(List<CaseState> caseStates, Predicate<AccessControlList> access) {
-        return accessControlService.filterCaseStatesByAccess(caseStates, getUserRoles(), access);
+    private List<CaseStateDefinition> filterCaseStatesForUser(List<CaseStateDefinition> caseStateDefinitions, Predicate<AccessControlList> access) {
+        return accessControlService.filterCaseStatesByAccess(caseStateDefinitions, getUserRoles(), access);
     }
 
-    private List<String> collectCaseStateIds(List<CaseState> caseStates) {
-        return caseStates.stream().map(CaseState::getId).collect(toList());
+    private List<String> collectCaseStateIds(List<CaseStateDefinition> caseStateDefinitions) {
+        return caseStateDefinitions.stream().map(CaseStateDefinition::getId).collect(toList());
     }
 
     private Set<String> getUserRoles() {

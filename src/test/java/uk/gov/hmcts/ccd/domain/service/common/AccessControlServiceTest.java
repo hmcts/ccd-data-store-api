@@ -42,7 +42,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -305,58 +305,58 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should filter states according to acls")
         void shouldFilterStatesAccordingToACLs() {
-            CaseState caseState1 = newState()
+            CaseStateDefinition caseStateDefinition1 = newState()
                 .withId(STATE_ID1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
                     .build())
                 .build();
-            CaseState caseState2 = newState()
+            CaseStateDefinition caseStateDefinition2 = newState()
                 .withId(STATE_ID2)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseState> caseStates = new ArrayList<>(asList(caseState1, caseState2));
-            final List<CaseState> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
+            List<CaseStateDefinition> caseStateDefinitions = new ArrayList<>(asList(caseStateDefinition1, caseStateDefinition2));
+            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStateDefinitions, USER_ROLES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(1)),
-                () -> assertThat(states, hasItem(caseState1)),
-                () -> assertThat(states, not(hasItem(caseState2)))
+                () -> assertThat(states, hasItem(caseStateDefinition1)),
+                () -> assertThat(states, not(hasItem(caseStateDefinition2)))
             );
         }
 
         @Test
         @DisplayName("Should filter states out when no matching ACLs")
         void shouldFilterOutStatesWhenNoMatchingACLSs() {
-            CaseState caseState1 = newState()
+            CaseStateDefinition caseStateDefinition1 = newState()
                 .withId(STATE_ID1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            CaseState caseState2 = newState()
+            CaseStateDefinition caseStateDefinition2 = newState()
                 .withId(STATE_ID2)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            CaseState caseState3 = newState()
+            CaseStateDefinition caseStateDefinition3 = newState()
                 .withId("Some State")
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseState> caseStates = new ArrayList<>(asList(caseState1, caseState2, caseState3));
-            final List<CaseState> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
+            List<CaseStateDefinition> caseStateDefinitions = new ArrayList<>(asList(caseStateDefinition1, caseStateDefinition2, caseStateDefinition3));
+            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStateDefinitions, USER_ROLES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(0)),
-                () -> assertThat(states, not(hasItem(caseState1))),
-                () -> assertThat(states, not(hasItem(caseState2))),
-                () -> assertThat(states, not(hasItem(caseState3)))
+                () -> assertThat(states, not(hasItem(caseStateDefinition1))),
+                () -> assertThat(states, not(hasItem(caseStateDefinition2))),
+                () -> assertThat(states, not(hasItem(caseStateDefinition3)))
             );
         }
     }

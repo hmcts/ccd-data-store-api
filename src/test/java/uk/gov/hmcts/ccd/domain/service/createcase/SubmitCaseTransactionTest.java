@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -96,7 +96,7 @@ class SubmitCaseTransactionTest {
     private CaseTypeDefinition caseTypeDefinition;
     private IdamUser idamUser;
     private CaseEvent eventTrigger;
-    private CaseState state;
+    private CaseStateDefinition state;
 
     @BeforeEach
     void setup() {
@@ -145,10 +145,10 @@ class SubmitCaseTransactionTest {
         return aboutToSubmitCallbackResponse;
     }
 
-    private CaseState buildState() {
-        final CaseState caseState = new CaseState();
-        caseState.setName(STATE_NAME);
-        return caseState;
+    private CaseStateDefinition buildState() {
+        final CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setName(STATE_NAME);
+        return caseStateDefinition;
     }
 
     @Test

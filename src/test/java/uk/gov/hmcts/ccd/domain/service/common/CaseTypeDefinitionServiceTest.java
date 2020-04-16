@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -42,10 +42,10 @@ class CaseTypeDefinitionServiceTest {
         @DisplayName("happy path finding a state")
         void happyPathFindState() {
             final CaseTypeDefinition c = new CaseTypeDefinition();
-            final CaseState caseState = buildCaseState("ngitb");
-            c.setStates(Arrays.asList(buildCaseState("hemanth"), caseState));
-            final CaseState found = subject.findState(c, "ngitb");
-            assertThat(found, is(caseState));
+            final CaseStateDefinition caseStateDefinition = buildCaseState("ngitb");
+            c.setStates(Arrays.asList(buildCaseState("hemanth"), caseStateDefinition));
+            final CaseStateDefinition found = subject.findState(c, "ngitb");
+            assertThat(found, is(caseStateDefinition));
         }
 
         @Test
@@ -60,8 +60,8 @@ class CaseTypeDefinitionServiceTest {
                        is("No state found with id 'ngitb' for case type 'nOonEhaStimEtodomYcodEreview'"));
         }
 
-        private CaseState buildCaseState(final String name) {
-            final CaseState s = new CaseState();
+        private CaseStateDefinition buildCaseState(final String name) {
+            final CaseStateDefinition s = new CaseStateDefinition();
             s.setId(name);
             return s;
         }

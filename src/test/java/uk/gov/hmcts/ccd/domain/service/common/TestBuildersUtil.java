@@ -37,7 +37,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
@@ -472,7 +472,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseTypeBuilder withState(CaseState state) {
+        public CaseTypeBuilder withState(CaseStateDefinition state) {
             caseTypeDefinition.getStates().add(state);
             return this;
         }
@@ -652,11 +652,11 @@ public class TestBuildersUtil {
     }
 
     public static class CaseStateBuilder {
-        private final CaseState caseState;
+        private final CaseStateDefinition caseStateDefinition;
         private final List<AccessControlList> acls = newArrayList();
 
         private CaseStateBuilder() {
-            this.caseState = new CaseState();
+            this.caseStateDefinition = new CaseStateDefinition();
         }
 
         public static CaseStateBuilder newState() {
@@ -669,13 +669,13 @@ public class TestBuildersUtil {
         }
 
         public CaseStateBuilder withId(String id) {
-            caseState.setId(id);
+            caseStateDefinition.setId(id);
             return this;
         }
 
-        public CaseState build() {
-            caseState.setAccessControlLists(this.acls);
-            return caseState;
+        public CaseStateDefinition build() {
+            caseStateDefinition.setAccessControlLists(this.acls);
+            return caseStateDefinition;
         }
     }
 

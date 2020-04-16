@@ -32,7 +32,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
@@ -69,12 +69,12 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
     private static final String CASE_FIELD_ID_3_1 = "CASE_FIELD_3_1";
     private static final String CASE_FIELD_ID_3_2 = "CASE_FIELD_3_2";
     private static final String CASE_FIELD_ID_3_3 = "CASE_FIELD_3_3";
-    private static final CaseState CASE_STATE_1_1 = newState().withId(STATE_ID_1_1).build();
-    private static final CaseState CASE_STATE_1_2 = newState().withId(STATE_ID_1_2).build();
-    private static final CaseState CASE_STATE_2_1 = newState().withId(STATE_ID_2_1).build();
-    private static final CaseState CASE_STATE_2_2 = newState().withId(STATE_ID_2_2).build();
-    private static final CaseState CASE_STATE_3_1 = newState().withId(STATE_ID_3_1).build();
-    private static final CaseState CASE_STATE_3_2 = newState().withId(STATE_ID_3_2).build();
+    private static final CaseStateDefinition CASE_STATE_1_1 = newState().withId(STATE_ID_1_1).build();
+    private static final CaseStateDefinition CASE_STATE_1_2 = newState().withId(STATE_ID_1_2).build();
+    private static final CaseStateDefinition CASE_STATE_2_1 = newState().withId(STATE_ID_2_1).build();
+    private static final CaseStateDefinition CASE_STATE_2_2 = newState().withId(STATE_ID_2_2).build();
+    private static final CaseStateDefinition CASE_STATE_3_1 = newState().withId(STATE_ID_3_1).build();
+    private static final CaseStateDefinition CASE_STATE_3_2 = newState().withId(STATE_ID_3_2).build();
     private static final CaseEvent CASE_EVENT_1_1 = newCaseEvent().withId(EVENT_ID_1_1)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)

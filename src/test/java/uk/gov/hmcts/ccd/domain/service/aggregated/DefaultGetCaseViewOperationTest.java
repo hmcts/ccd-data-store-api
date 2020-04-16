@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
@@ -99,7 +99,7 @@ class DefaultGetCaseViewOperationTest {
     private AuditEvent event2;
     private CaseTabCollection caseTabCollection;
     private CaseTypeDefinition caseTypeDefinition;
-    private CaseState caseState;
+    private CaseStateDefinition caseStateDefinition;
     private JsonNode eventsNode;
 
     @BeforeEach
@@ -141,10 +141,10 @@ class DefaultGetCaseViewOperationTest {
 
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
-        caseState = new CaseState();
-        caseState.setId(STATE);
-        caseState.setTitleDisplay(TITLE_DISPLAY);
-        doReturn(caseState).when(caseTypeService).findState(caseTypeDefinition, STATE);
+        caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId(STATE);
+        caseStateDefinition.setTitleDisplay(TITLE_DISPLAY);
+        doReturn(caseStateDefinition).when(caseTypeService).findState(caseTypeDefinition, STATE);
     }
 
     @Nested

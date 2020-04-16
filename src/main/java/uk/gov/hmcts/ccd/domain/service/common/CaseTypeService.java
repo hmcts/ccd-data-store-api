@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseValidationError;
@@ -39,8 +39,8 @@ public class CaseTypeService {
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
-    public CaseState findState(CaseTypeDefinition caseTypeDefinition, String stateId) {
-        Optional<CaseState> optionalState = caseTypeDefinition.getStates()
+    public CaseStateDefinition findState(CaseTypeDefinition caseTypeDefinition, String stateId) {
+        Optional<CaseStateDefinition> optionalState = caseTypeDefinition.getStates()
             .stream()
             .filter(state -> state.getId().equals(stateId))
             .findFirst();

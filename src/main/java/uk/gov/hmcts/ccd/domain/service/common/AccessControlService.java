@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterUtil;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
@@ -94,7 +94,7 @@ public class AccessControlService {
         boolean hasAccess = hasAccessControlList(userRoles, criteria, caseTypeDefinition.getStates()
             .stream()
             .filter(cState -> cState.getId().equalsIgnoreCase(caseState))
-            .map(CaseState::getAccessControlLists)
+            .map(CaseStateDefinition::getAccessControlLists)
             .flatMap(Collection::stream)
             .collect(toList()));
 
@@ -472,9 +472,9 @@ public class AccessControlService {
         return filteredAuditEvents;
     }
 
-    public List<CaseState> filterCaseStatesByAccess(final List<CaseState> caseStateDefinitions,
-                                                    final Set<String> userRoles,
-                                                    final Predicate<AccessControlList> access) {
+    public List<CaseStateDefinition> filterCaseStatesByAccess(final List<CaseStateDefinition> caseStateDefinitions,
+                                                              final Set<String> userRoles,
+                                                              final Predicate<AccessControlList> access) {
         return caseStateDefinitions
             .stream()
             .filter(caseState -> hasAccessControlList(userRoles,

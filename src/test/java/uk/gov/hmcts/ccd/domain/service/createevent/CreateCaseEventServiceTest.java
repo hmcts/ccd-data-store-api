@@ -99,7 +99,7 @@ class CreateCaseEventServiceTest {
     private CaseEvent eventTrigger;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
-    private CaseState postState;
+    private CaseStateDefinition postState;
     private CaseDataContent caseDataContent;
 
     private static Event buildEvent() {
@@ -140,7 +140,7 @@ class CreateCaseEventServiceTest {
         caseDetails.setLastModified(LAST_MODIFIED);
         caseDetails.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore = caseDetails.shallowClone();
-        postState = new CaseState();
+        postState = new CaseStateDefinition();
         postState.setId(POST_STATE);
         IdamUser user = new IdamUser();
         user.setId("123");
@@ -194,7 +194,7 @@ class CreateCaseEventServiceTest {
         eventTrigger = new CaseEvent();
         eventTrigger.setPostState(PRE_STATE_ID);
 
-        CaseState state = new CaseState();
+        CaseStateDefinition state = new CaseStateDefinition();
         state.setId(PRE_STATE_ID);
 
         doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);

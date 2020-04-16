@@ -7,7 +7,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidDefinitionException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseState.ANY;
+import static uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition.ANY;
 
 @Named
 @Singleton

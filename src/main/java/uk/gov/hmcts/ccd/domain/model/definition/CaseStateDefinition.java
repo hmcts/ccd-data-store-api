@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @ApiModel(description = "")
-public class CaseState implements Serializable {
+public class CaseStateDefinition implements Serializable {
 
     @JsonIgnore
     public static final String ANY = "*";

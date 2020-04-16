@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
@@ -36,7 +36,7 @@ class AuthorisedGetUserProfileOperationTest {
     private final JurisdictionDisplayProperties test2JurisdictionDisplayProperties = new JurisdictionDisplayProperties();
 
     private Set<String> userRoles = Sets.newHashSet("role1", "role2", "role3");
-    private List<CaseState> caseStates = Arrays.asList(new CaseState(), new CaseState(), new CaseState());
+    private List<CaseStateDefinition> caseStateDefinitions = Arrays.asList(new CaseStateDefinition(), new CaseStateDefinition(), new CaseStateDefinition());
     private List<CaseEvent> caseEvents = Arrays.asList(new CaseEvent(), new CaseEvent(), new CaseEvent(), new CaseEvent());
 
     private CaseTypeDefinition notAllowedCaseTypeDefinition = new CaseTypeDefinition();
@@ -74,7 +74,7 @@ class AuthorisedGetUserProfileOperationTest {
     @DisplayName("should return only caseTypes the user is allowed to access")
     public void execute() {
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseTypeDefinition), eq(userRoles), eq(CAN_READ));
-        doReturn(caseStates).when(accessControlService).filterCaseStatesByAccess(any(), eq(userRoles), eq(CAN_READ));
+        doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(userRoles), eq(CAN_READ));
         doReturn(caseEvents).when(accessControlService).filterCaseEventsByAccess(any(), eq(userRoles), eq(CAN_READ));
 
         UserProfile userProfile = classUnderTest.execute(CAN_READ);

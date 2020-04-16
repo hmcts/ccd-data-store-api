@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -71,8 +71,8 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         caseView.setCaseId(caseDetails.getReference().toString());
         caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
 
-        CaseState caseState = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
-        caseView.setState(new ProfileCaseState(caseState.getId(), caseState.getName(), caseState.getDescription(), caseState.getTitleDisplay()));
+        CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
+        caseView.setState(new ProfileCaseState(caseStateDefinition.getId(), caseStateDefinition.getName(), caseStateDefinition.getDescription(), caseStateDefinition.getTitleDisplay()));
 
         caseView.setCaseType(CaseViewType.createFrom(caseTypeDefinition));
         final CaseViewEvent[] caseViewEvents = convertToCaseViewEvent(events);
@@ -84,7 +84,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
 
         final CaseViewTrigger[] triggers = caseTypeDefinition.getEvents()
             .stream()
-            .filter(event -> eventTriggerService.isPreStateValid(caseState.getId(), event))
+            .filter(event -> eventTriggerService.isPreStateValid(caseStateDefinition.getId(), event))
             .map(event -> {
                 final CaseViewTrigger trigger = new CaseViewTrigger();
                 trigger.setId(event.getId());

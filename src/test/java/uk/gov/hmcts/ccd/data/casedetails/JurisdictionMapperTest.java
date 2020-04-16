@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 
@@ -17,20 +17,20 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.Jurisdicti
 class JurisdictionMapperTest {
     JurisdictionMapper jurisdictionMapper = new JurisdictionMapper();
 
-    CaseState caseState1 = newState()
+    CaseStateDefinition caseStateDefinition1 = newState()
         .withId("ST1")
         .build();
-    CaseState caseState2 = newState()
+    CaseStateDefinition caseStateDefinition2 = newState()
         .withId("ST2")
         .build();
 
     CaseTypeDefinition caseTypeDefinition1 = newCaseType()
         .withId("CT1")
-        .withState(caseState1)
+        .withState(caseStateDefinition1)
         .build();
     CaseTypeDefinition caseTypeDefinition2 = newCaseType()
         .withId("CT2")
-        .withState(caseState2)
+        .withState(caseStateDefinition2)
         .build();
 
     Jurisdiction jurisdiction = newJurisdiction()
@@ -51,7 +51,7 @@ class JurisdictionMapperTest {
             () -> assertThat(response.getDescription(), is(equalTo(jurisdiction.getDescription()))),
             () -> assertThat(response.getCaseTypeDefinitions().size(), is(2)),
             () -> assertThat(response.getCaseTypeDefinitions().get(0).getStates().size(), is(1)),
-            () -> assertThat(response.getCaseTypeDefinitions().get(1).getStates().get(0).getId(), is(caseState2.getId()))
+            () -> assertThat(response.getCaseTypeDefinitions().get(1).getStates().get(0).getId(), is(caseStateDefinition2.getId()))
         );
     }
 }

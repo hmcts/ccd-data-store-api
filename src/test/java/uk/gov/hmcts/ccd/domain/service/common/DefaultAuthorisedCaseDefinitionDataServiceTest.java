@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.security.DefaultAuthorisedCaseDefinitionDataService;
 
@@ -69,10 +69,10 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         @Test
         @DisplayName("Should return list of user authorised case states for a jurisdiction and case type")
         void shouldReturnAuthorisedCaseStates() {
-            List<CaseState> result = authorisedCaseDataService.getUserAuthorisedCaseStates(JURISDICTION, CASE_TYPE, CAN_READ);
+            List<CaseStateDefinition> result = authorisedCaseDataService.getUserAuthorisedCaseStates(JURISDICTION, CASE_TYPE, CAN_READ);
 
             verify(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE, JURISDICTION);
-            verifyResult(result.stream().map(CaseState::getId).collect(Collectors.toList()));
+            verifyResult(result.stream().map(CaseStateDefinition::getId).collect(Collectors.toList()));
         }
 
         @Test
@@ -93,12 +93,12 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             verifyResult(result);
         }
 
-        private List<CaseState> getCaseStates() {
-            CaseState caseState1 = new CaseState();
-            caseState1.setId(STATE1);
-            CaseState caseState2 = new CaseState();
-            caseState2.setId(STATE2);
-            return Arrays.asList(caseState1, caseState2);
+        private List<CaseStateDefinition> getCaseStates() {
+            CaseStateDefinition caseStateDefinition1 = new CaseStateDefinition();
+            caseStateDefinition1.setId(STATE1);
+            CaseStateDefinition caseStateDefinition2 = new CaseStateDefinition();
+            caseStateDefinition2.setId(STATE2);
+            return Arrays.asList(caseStateDefinition1, caseStateDefinition2);
         }
 
         private void verifyResult(List<String> result) {

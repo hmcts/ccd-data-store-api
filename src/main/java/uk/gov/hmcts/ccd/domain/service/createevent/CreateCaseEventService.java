@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -175,7 +175,7 @@ public class CreateCaseEventService {
     private CaseDetails saveCaseDetails(CaseDetails caseDetailsBefore, final CaseDetails caseDetails,
                                         final CaseEvent eventTrigger,
                                         final Optional<String> state, LocalDateTime timeNow) {
-        if (!state.isPresent() && !equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
+        if (!state.isPresent() && !equalsIgnoreCase(CaseStateDefinition.ANY, eventTrigger.getPostState())) {
             caseDetails.setState(eventTrigger.getPostState());
         }
         if (!caseDetails.getState().equalsIgnoreCase(caseDetailsBefore.getState())) {
@@ -200,7 +200,7 @@ public class CreateCaseEventService {
             caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, caseDetails.getData(), caseDetails.getDataClassification()));
         }
         caseDetails.setLastModified(now());
-        if (!StringUtils.equalsAnyIgnoreCase(CaseState.ANY, caseEvent.getPostState())) {
+        if (!StringUtils.equalsAnyIgnoreCase(CaseStateDefinition.ANY, caseEvent.getPostState())) {
             caseDetails.setState(caseEvent.getPostState());
         }
     }
@@ -211,7 +211,7 @@ public class CreateCaseEventService {
                                               final CaseDetails caseDetails,
                                               final CaseTypeDefinition caseTypeDefinition, LocalDateTime timeNow) {
         final IdamUser user = userRepository.getUser();
-        final CaseState caseState = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
+        final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
 
         auditEvent.setEventId(event.getEventId());
@@ -221,7 +221,7 @@ public class CreateCaseEventService {
         auditEvent.setCaseDataId(caseDetails.getId());
         auditEvent.setData(caseDetails.getData());
         auditEvent.setStateId(caseDetails.getState());
-        auditEvent.setStateName(caseState.getName());
+        auditEvent.setStateName(caseStateDefinition.getName());
         auditEvent.setCaseTypeId(caseTypeDefinition.getId());
         auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
         auditEvent.setUserId(user.getId());
