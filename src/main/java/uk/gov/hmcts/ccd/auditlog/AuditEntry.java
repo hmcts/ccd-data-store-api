@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ccd.auditlog;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.builder.ToStringStyle.JSON_STYLE;
 
 public class AuditEntry {
 
@@ -135,5 +138,10 @@ public class AuditEntry {
 //            (isNotBlank(targetCaseRoles) ? ", targetCaseRoles:" + targetCaseRoles : "") +
             (isNotBlank(requestId) ? ", X-Request-ID:" + requestId : "") +
             '}';
+    }
+
+    public String formattedAuditData() {
+        return  ReflectionToStringBuilder.toString(this, JSON_STYLE, false, false,
+            true, null).toString();
     }
 }

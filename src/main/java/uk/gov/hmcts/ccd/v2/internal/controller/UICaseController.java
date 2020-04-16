@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
@@ -23,6 +22,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
+
+import static uk.gov.hmcts.ccd.auditlog.OperationType.VIEW_CASE;
 
 @RestController
 @RequestMapping(path = "/internal/cases")
@@ -72,7 +73,8 @@ public class UICaseController {
             message = "Case not found"
         )
     })
-    @LogAudit(operationType = OperationType.VIEW_CASE)
+    @LogAudit(operationType = VIEW_CASE, caseId = "#caseId", jurisdiction = "#result.body.caseType.jurisdiction.id",
+        caseType = "#result.body.caseType.id")
     public ResponseEntity<UICaseViewResource> getCase(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
@@ -111,7 +113,8 @@ public class UICaseController {
             message = "Case event not found"
         )
     })
-    @LogAudit(operationType = OperationType.VIEW_CASE)
+    @LogAudit(operationType = VIEW_CASE, caseId = "#caseId", eventName = "#result.body.event.eventId",
+        jurisdiction = "#result.body.caseType.jurisdiction.id", caseType = "#result.body.caseType.id")
     public ResponseEntity<UIEventViewResource> getCaseEvent(@PathVariable("caseId") String caseId, @PathVariable("eventId") String eventId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);

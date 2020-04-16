@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -18,16 +19,13 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.auditlog.OperationType;
-import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -35,8 +33,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -50,6 +46,9 @@ import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_UPDATE;
 public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase" +
         "/event-triggers/CREATE-CASE";
+
+    private static final String GET_EVENT_TRIGGER_FOR_CASE = "/internal/cases/1504259907353529/" +
+        "/event-triggers/HAS_PRE_STATES_EVENT";
 
     @Inject
     private WebApplicationContext wac;
@@ -120,7 +119,8 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         verify(auditRepository).save(captor.capture());
 
         assertThat(captor.getValue().getOperationType(), is(OperationType.CREATE_CASE.getLabel()));
-        // TODO : add other assertions
+        assertThat(captor.getValue().getCaseType(), is("CaseRolesCase"));
+        assertThat(captor.getValue().getEventSelected(), is("CREATE-CASE"));
     }
 
     @Test
@@ -244,5 +244,36 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         final CaseField hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
+    public void shouldStartEventTrigger() throws Exception {
+
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
+
+        final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE)
+            .contentType(JSON_CONTENT_TYPE)
+            .accept(V2.MediaType.UI_START_EVENT_TRIGGER)
+            .headers(headers))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final UIStartTriggerResource uiStartTriggerResource =
+            mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
+        assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
+
+        assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseId(), is("1504259907353529"));
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(OperationType.UPDATE_CASE.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
+        assertThat(captor.getValue().getEventSelected(), is("HAS_PRE_STATES_EVENT"));
     }
 }

@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import static uk.gov.hmcts.ccd.auditlog.OperationType.CREATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.OperationType.UPDATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.OperationType.VIEW_CASE;
 import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCase;
 import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCaseType;
 import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forDraft;
@@ -66,7 +69,7 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    @LogAudit(operationType = OperationType.CREATE_CASE)
+    @LogAudit(operationType = CREATE_CASE, eventName = "#triggerId", caseType = "#caseTypeId")
     public ResponseEntity<UIStartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
                                                                       @PathVariable("triggerId") String triggerId,
                                                                       @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
@@ -110,7 +113,7 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    @LogAudit(operationType = OperationType.UPDATE_CASE)
+    @LogAudit(operationType = UPDATE_CASE,  caseId = "#caseId", eventName = "#triggerId")
     public ResponseEntity<UIStartTriggerResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
                                                                        @PathVariable("triggerId") String triggerId,
                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
@@ -153,7 +156,7 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    @LogAudit(operationType = OperationType.CREATE_CASE)
+    @LogAudit(operationType = CREATE_CASE)
     public ResponseEntity<UIStartTriggerResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,
                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 

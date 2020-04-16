@@ -43,11 +43,14 @@ public class AuditService {
         entry.setIdamId(userRepository.getUser().getEmail());
         entry.setInvokingService(securityUtils.getServiceName());
 
-        entry.setOperationType(auditContext.getOperationType().getLabel());
-        entry.setJurisdiction(auditContext.getJurisdiction());
-        entry.setCaseId(auditContext.getCaseId());
-        entry.setCaseType(auditContext.getCaseType());
-        entry.setEventSelected(auditContext.getEventName());
+        if (auditContext != null) {
+            entry.setOperationType(auditContext.getOperationType().getLabel());
+            entry.setJurisdiction(auditContext.getJurisdiction());
+            entry.setCaseId(auditContext.getCaseId());
+            entry.setCaseType(auditContext.getCaseType());
+            entry.setEventSelected(auditContext.getEventName());
+        }
+
         entry.setRequestId(request.getHeader("request-id"));
 
         auditRepository.save(entry);
