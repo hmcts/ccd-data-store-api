@@ -38,14 +38,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
@@ -81,16 +75,9 @@ class CaseDocumentAttachOperationTest {
     @InjectMocks
     private CaseDocumentAttachOperation caseDocumentAttachOperation;
 
-    private Event event;
-    private CaseType caseType;
-    private IdamUser idamUser;
-    private CaseEvent eventTrigger;
-    private CaseState state;
-
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
-        caseType = buildCaseType();
         doReturn("http://localhost:4455").when(applicationParams).getCaseDocumentAmApiHost();
         doReturn("/cases/documents/attachToCase").when(applicationParams).getAttachDocumentPath();
         ResponseEntity<String> responseEntity = new ResponseEntity<String>("Success", HttpStatus.OK);
@@ -166,7 +153,7 @@ class CaseDocumentAttachOperationTest {
                                                                                  .documentHashToken(new ArrayList<>())
                                                                                  .build();
 
-        caseDocumentAttachOperation.afterCallbackPrepareDocumentMetaData(caseDetails);
+        caseDocumentAttachOperation.afterCallbackPrepareDocumentMetaData(caseDetails, true);
         List<DocumentHashToken> listDocumentHashToken = Arrays.asList(
             DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build(),
@@ -223,15 +210,6 @@ class CaseDocumentAttachOperationTest {
                                                 ArgumentMatchers.any(HttpMethod.class),
                                                 ArgumentMatchers.any(),
                                                 ArgumentMatchers.<Class<String>>any());
-    }
-
-    private CaseType buildCaseType() {
-        final Version version = new Version();
-        version.setNumber(VERSION);
-        final CaseType caseType = new CaseType();
-        caseType.setId(CASE_TYPE_ID);
-        caseType.setVersion(version);
-        return caseType;
     }
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {

@@ -33,8 +33,8 @@ public class CaseDocumentAttachOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseDocumentAttachOperation.class);
 
-    Map<String,String> documentSetBeforeCallback = null;
-    Map<String,String> documentAfterCallback = null;
+    Map<String, String> documentSetBeforeCallback = null;
+    Map<String, String> documentAfterCallback = null;
     CaseDocumentsMetadata caseDocumentsMetadata = null;
     public static final String CASE_DATA_PARSING_EXCEPTION = "Exception while extracting the document fields from Case payload";
     public static final String COMPLEX = "Complex";
@@ -74,21 +74,22 @@ public class CaseDocumentAttachOperation {
         }
     }
 
-    public void afterCallbackPrepareDocumentMetaData(CaseDetails caseDetails, boolean callBackResult){
+    public void afterCallbackPrepareDocumentMetaData(CaseDetails caseDetails, boolean callBackResult) {
         try {
             documentAfterCallback = new HashMap<>();
             caseDocumentsMetadata = CaseDocumentsMetadata.builder()
-                .caseId(caseDetails.getReference().toString())
-                .caseTypeId(caseDetails.getCaseTypeId())
-                .jurisdictionId(caseDetails.getJurisdiction())
-                .documentHashToken(new ArrayList<>())
-                .build();
+                                                         .caseId(caseDetails.getReference().toString())
+                                                         .caseTypeId(caseDetails.getCaseTypeId())
+                                                         .jurisdictionId(caseDetails.getJurisdiction())
+                                                         .documentHashToken(new ArrayList<>())
+                                                         .build();
 
-            if(callBackResult)
-                // to remove hashcode before compute delta
-             extractDocumentFieldsAfterCallback(caseDocumentsMetadata, caseDetails.getData(),documentAfterCallback);
-        }
-        catch (Exception e) {
+            if (callBackResult)
+            // to remove hashcode before compute delta
+            {
+                extractDocumentFieldsAfterCallback(caseDocumentsMetadata, caseDetails.getData(), documentAfterCallback);
+            }
+        } catch (Exception e) {
             LOG.error(CASE_DATA_PARSING_EXCEPTION);
             throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
         }
@@ -150,7 +151,8 @@ public class CaseDocumentAttachOperation {
 
             } else {
                 jsonNode.fields().forEachRemaining(node -> extractDocumentFieldsAfterCallback(caseDocumentsMetadata,
-                                                                                              Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+                                                                                              Collections.singletonMap(node.getKey(), node.getValue()),
+                                                                                              documentMap));
             }
         });
     }
@@ -197,19 +199,19 @@ public class CaseDocumentAttachOperation {
 
                 //Filter DocumentHashToken based on finalMap
                 finalMap.forEach((key, value) ->
-                    caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken
-                                                                         .builder()
-                                                                         .id(key)
-                                                                         .hashToken(value)
-                                                                         .build()));
+                                     caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken
+                                                                                          .builder()
+                                                                                          .id(key)
+                                                                                          .hashToken(value)
+                                                                                          .build()));
             } else {
                 documentSetBeforeCallback.forEach((key, value) ->
-                    caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken
-                                                                         .builder()
-                                                                         .id(key)
-                                                                         .hashToken(value)
-                                                                         .build())
-                );
+                                                      caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken
+                                                                                                           .builder()
+                                                                                                           .id(key)
+                                                                                                           .hashToken(value)
+                                                                                                           .build())
+                                                 );
 
             }
         } catch (Exception e) {
@@ -230,19 +232,20 @@ public class CaseDocumentAttachOperation {
 
         caseData.forEach((key, value) -> {
 
-            if (caseDetails.getData().containsKey(key) && (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null)) {
-                if(!value.equals(caseDetails.getData().get(key)))
-                {
-                    documentsDifference.put(key,value);
+            if (caseDetails.getData().containsKey(key) && (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(
+                DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null)) {
+                if (!value.equals(caseDetails.getData().get(key))) {
+                    documentsDifference.put(key, value);
                 }
-            } else if (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null){
-                documentsDifference.put(key,value);
+            } else if (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null) {
+                documentsDifference.put(key, value);
             }
         });
         //Find documentId based on filter Map. So that I can filter the DocumentMetaData Object before calling the case document am Api.
-        findDocumentsId(documentsDifference,filterDocumentSet);
+        findDocumentsId(documentsDifference, filterDocumentSet);
         return filterDocumentSet;
     }
+
     private void findDocumentsId(Map<String, JsonNode> sanitisedDataToAttachDoc, Set<String> filterDocumentSet) {
 
         sanitisedDataToAttachDoc.forEach((field, jsonNode) -> {
@@ -254,18 +257,17 @@ public class CaseDocumentAttachOperation {
                 filterDocumentSet.add(documentId);
 
             } else {
-                jsonNode.fields().forEachRemaining
-                    (node -> findDocumentsId(
-                        Collections.singletonMap(node.getKey(), node.getValue()), filterDocumentSet));
+                jsonNode.fields().forEachRemaining(node -> findDocumentsId(
+                    Collections.singletonMap(node.getKey(), node.getValue()), filterDocumentSet));
             }
         });
     }
 
-    public void filterDocumentMetaData(Set<String> filterDocumentSet){
+    public void filterDocumentMetaData(Set<String> filterDocumentSet) {
 
         List<DocumentHashToken> caseDocumentList = caseDocumentsMetadata.getDocumentHashToken().stream()
-            .filter(document -> filterDocumentSet.contains(document.getId()))
-            .collect(Collectors.toList());
+                                                                        .filter(document -> filterDocumentSet.contains(document.getId()))
+                                                                        .collect(Collectors.toList());
         caseDocumentsMetadata.setDocumentHashToken(caseDocumentList);
 
     }
