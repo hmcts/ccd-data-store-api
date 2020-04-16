@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.v2.internal.resource;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
@@ -28,6 +29,8 @@ public class UISearchInputsResource extends RepresentationModel {
         private String label;
         private int order;
         private Field field;
+        @JsonProperty("display_context_parameter")
+        private String displayContextParameter;
     }
 
     public UISearchInputsResource(SearchInput[] searchInputs, String caseTypeId) {
@@ -47,6 +50,7 @@ public class UISearchInputsResource extends RepresentationModel {
         uiSearchInput.setField(searchInput.getField());
         uiSearchInput.setLabel(searchInput.getLabel());
         uiSearchInput.setOrder(searchInput.getOrder());
+        uiSearchInput.setDisplayContextParameter(searchInput.getDisplayContextParameter());
         return uiSearchInput;
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 @ApiModel(description = "")
 public class WizardPageComplexFieldOverride implements Serializable {
@@ -56,5 +57,12 @@ public class WizardPageComplexFieldOverride implements Serializable {
 
     public void setShowCondition(String showCondition) {
         this.showCondition = showCondition;
+    }
+
+    public DisplayContext displayContextType() {
+        return Optional.ofNullable(getDisplayContext())
+            .filter(dc -> !dc.equals("HIDDEN"))
+            .map(DisplayContext::valueOf)
+            .orElse(null);
     }
 }

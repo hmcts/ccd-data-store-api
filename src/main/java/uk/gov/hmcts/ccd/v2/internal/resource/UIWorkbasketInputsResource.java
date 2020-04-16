@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,8 @@ public class UIWorkbasketInputsResource extends RepresentationModel {
         private String label;
         private int order;
         private Field field;
+        @JsonProperty("display_context_parameter")
+        private String displayContextParameter;
     }
 
     private UIWorkbasketInput[] workbasketInputs;
@@ -46,6 +49,7 @@ public class UIWorkbasketInputsResource extends RepresentationModel {
         uiWorkbasketInput.setField(workbasketInput.getField());
         uiWorkbasketInput.setLabel(workbasketInput.getLabel());
         uiWorkbasketInput.setOrder(workbasketInput.getOrder());
+        uiWorkbasketInput.setDisplayContextParameter(workbasketInput.getDisplayContextParameter());
         return uiWorkbasketInput;
     }
 }
