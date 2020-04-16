@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 
 @Named
 @Singleton
@@ -38,7 +38,7 @@ public class UIDefinitionRepository {
         return cachedUiDefinitionGateway.getSearchResult(version.getVersion(), caseTypeId);
     }
 
-    public SearchInputDefinition getSearchInputDefinitions(final String caseTypeId) {
+    public SearchInputFieldsDefinition getSearchInputDefinitions(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
         return cachedUiDefinitionGateway.getSearchInputDefinitions(version.getVersion(), caseTypeId);
     }
@@ -48,7 +48,7 @@ public class UIDefinitionRepository {
         return cachedUiDefinitionGateway.getWizardPageCollection(version.getVersion(), caseTypeId, eventTriggerId);
     }
 
-    public WorkbasketInputDefinition getWorkbasketInputDefinitions(final String caseTypeId) {
+    public WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
         return cachedUiDefinitionGateway.getWorkbasketInputDefinitions(version.getVersion(), caseTypeId);
     }

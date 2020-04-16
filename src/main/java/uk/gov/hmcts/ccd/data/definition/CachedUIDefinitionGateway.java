@@ -11,10 +11,10 @@ import org.springframework.cache.annotation.Cacheable;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 
 @Named
 @Qualifier("Cache")
@@ -45,14 +45,14 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
 
     @Override
     @Cacheable("searchInputDefinitionCache")
-    public SearchInputDefinition getSearchInputDefinitions(final int version, final String caseTypeId) {
+    public SearchInputFieldsDefinition getSearchInputDefinitions(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of search input definitions for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getSearchInputDefinitions(version, caseTypeId);
     }
 
     @Override
     @Cacheable("workbasketInputDefinitionCache")
-    public WorkbasketInputDefinition getWorkbasketInputDefinitions(final int version, final String caseTypeId) {
+    public WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of workbasket input definitions for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getWorkbasketInputDefinitions(version, caseTypeId);
     }

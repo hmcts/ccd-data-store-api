@@ -12,8 +12,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CriteriaField;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
@@ -52,14 +52,14 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         List<CriteriaInput> criteriaInputs;
         if (criteriaType.equals(WORKBASKET)) {
-            WorkbasketInputDefinition workbasketInputDefinition = uiDefinitionRepository.getWorkbasketInputDefinitions(caseTypeId);
-            criteriaInputs = workbasketInputDefinition.getFields()
+            WorkbasketInputFieldsDefinition workbasketInputFieldsDefinition = uiDefinitionRepository.getWorkbasketInputDefinitions(caseTypeId);
+            criteriaInputs = workbasketInputFieldsDefinition.getFields()
                 .stream()
                 .map(field -> toCriteriaInput(field, caseTypeDefinition, criteriaType))
                 .collect(toList());
         } else if (criteriaType.equals(SEARCH)) {
-            final SearchInputDefinition searchInputDefinition = uiDefinitionRepository.getSearchInputDefinitions(caseTypeId);
-            criteriaInputs = searchInputDefinition.getFields()
+            final SearchInputFieldsDefinition searchInputFieldsDefinition = uiDefinitionRepository.getSearchInputDefinitions(caseTypeId);
+            criteriaInputs = searchInputFieldsDefinition.getFields()
                 .stream()
                 .map(field -> toCriteriaInput(field, caseTypeDefinition, criteriaType))
                 .collect(toList());

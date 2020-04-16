@@ -64,7 +64,7 @@ public class DefinitionsCachingIT {
     CaseTypeDefinition mockCaseTypeDefinition;
 
     @Mock
-    WorkbasketInputDefinition workbasketInputDefinition;
+    WorkbasketInputFieldsDefinition workbasketInputFieldsDefinition;
 
     @Mock
     SearchResult searchResult;
@@ -73,7 +73,7 @@ public class DefinitionsCachingIT {
     CaseTypeTabsDefinition caseTypeTabsDefinition;
 
     @Mock
-    SearchInputDefinition searchInputDefinition;
+    SearchInputFieldsDefinition searchInputFieldsDefinition;
 
     @SpyBean
     private DefaultUserRepository userRepository;
@@ -203,7 +203,7 @@ public class DefinitionsCachingIT {
     @Test
     public void testWorkbasketInputDefinitionsAreCached() {
 
-        doReturn(workbasketInputDefinition).when(this.httpUIDefinitionGateway).getWorkbasketInputDefinitions(VERSION_1, ID_1);
+        doReturn(workbasketInputFieldsDefinition).when(this.httpUIDefinitionGateway).getWorkbasketInputDefinitions(VERSION_1, ID_1);
 
         uiDefinitionRepository.getWorkbasketInputDefinitions(ID_1);
         uiDefinitionRepository.getWorkbasketInputDefinitions(ID_1);
@@ -251,7 +251,7 @@ public class DefinitionsCachingIT {
     @Test
     public void testSearchInputDefinitionsAreCached() {
 
-        doReturn(searchInputDefinition).when(this.httpUIDefinitionGateway).getSearchInputDefinitions(VERSION_1, ID_1);
+        doReturn(searchInputFieldsDefinition).when(this.httpUIDefinitionGateway).getSearchInputDefinitions(VERSION_1, ID_1);
 
         uiDefinitionRepository.getSearchInputDefinitions(ID_1);
         uiDefinitionRepository.getSearchInputDefinitions(ID_1);

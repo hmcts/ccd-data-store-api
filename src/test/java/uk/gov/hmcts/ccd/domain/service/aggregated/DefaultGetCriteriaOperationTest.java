@@ -20,9 +20,9 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -176,29 +176,29 @@ public class DefaultGetCriteriaOperationTest {
             is("CaseField with id=[field1] and path=[null] not found"));
     }
 
-    private WorkbasketInputDefinition generateWorkbasketInput() {
-        WorkbasketInputDefinition workbasketInputDefinition = new WorkbasketInputDefinition();
-        workbasketInputDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        workbasketInputDefinition.setFields(
+    private WorkbasketInputFieldsDefinition generateWorkbasketInput() {
+        WorkbasketInputFieldsDefinition workbasketInputFieldsDefinition = new WorkbasketInputFieldsDefinition();
+        workbasketInputFieldsDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        workbasketInputFieldsDefinition.setFields(
             asList(getWorkbasketInputField(caseFieldDefinition1.getId(), 1),
                 getWorkbasketInputField(caseFieldDefinition2.getId(), 2),
                 getWorkbasketInputField(caseFieldDefinition3.getId(), 3),
                 getWorkbasketInputField(caseFieldDefinition4.getId(), 4)));
-        return workbasketInputDefinition;
+        return workbasketInputFieldsDefinition;
     }
 
-    private WorkbasketInputDefinition generateWorkbasketInputWithPathElements() {
+    private WorkbasketInputFieldsDefinition generateWorkbasketInputWithPathElements() {
         String path = PERSON + "." + NAME;
-        WorkbasketInputDefinition workbasketInputDefinition = new WorkbasketInputDefinition();
-        workbasketInputDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        workbasketInputDefinition.setFields(asList(
+        WorkbasketInputFieldsDefinition workbasketInputFieldsDefinition = new WorkbasketInputFieldsDefinition();
+        workbasketInputFieldsDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        workbasketInputFieldsDefinition.setFields(asList(
             getWorkbasketInputField(caseFieldDefinition1.getId(), 1),
             getWorkbasketInputField(caseFieldDefinition2.getId(), 2),
             getWorkbasketInputField(caseFieldDefinition3.getId(), 3),
             getWorkbasketInputField(caseFieldDefinition4.getId(), 4),
             getWorkbasketInputField(debtorDetails.getId(), 5, path)
         ));
-        return workbasketInputDefinition;
+        return workbasketInputFieldsDefinition;
     }
 
     private WorkbasketInputField getWorkbasketInputField(String id, int order) {
@@ -214,27 +214,27 @@ public class DefaultGetCriteriaOperationTest {
         return workbasketInputField;
     }
 
-    private SearchInputDefinition generateSearchInputWithPathElements() {
+    private SearchInputFieldsDefinition generateSearchInputWithPathElements() {
         String path = PERSON + "." + NAME;
-        SearchInputDefinition searchInputDefinition = new SearchInputDefinition();
-        searchInputDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        searchInputDefinition.setFields(asList(
+        SearchInputFieldsDefinition searchInputFieldsDefinition = new SearchInputFieldsDefinition();
+        searchInputFieldsDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        searchInputFieldsDefinition.setFields(asList(
             getSearchInputField(caseFieldDefinition1.getId(), 1),
             getSearchInputField(caseFieldDefinition2.getId(), 2),
             getSearchInputField(caseFieldDefinition3.getId(), 3),
             getSearchInputField(caseFieldDefinition4.getId(), 4),
             getSearchInputField(debtorDetails.getId(), 5, path)));
-        return searchInputDefinition;
+        return searchInputFieldsDefinition;
     }
 
-    private SearchInputDefinition generateSearchInput() {
-        SearchInputDefinition searchInputDefinition = new SearchInputDefinition();
-        searchInputDefinition.setCaseTypeId(caseTypeDefinition.getId());
-        searchInputDefinition.setFields(asList(getSearchInputField(caseFieldDefinition1.getId(), 1),
+    private SearchInputFieldsDefinition generateSearchInput() {
+        SearchInputFieldsDefinition searchInputFieldsDefinition = new SearchInputFieldsDefinition();
+        searchInputFieldsDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        searchInputFieldsDefinition.setFields(asList(getSearchInputField(caseFieldDefinition1.getId(), 1),
             getSearchInputField(caseFieldDefinition2.getId(), 2),
             getSearchInputField(caseFieldDefinition3.getId(), 3),
             getSearchInputField(caseFieldDefinition4.getId(), 4)));
-        return searchInputDefinition;
+        return searchInputFieldsDefinition;
 
     }
 

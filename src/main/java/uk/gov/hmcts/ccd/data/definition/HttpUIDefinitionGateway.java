@@ -20,11 +20,11 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 /**
@@ -77,16 +77,16 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public SearchInputDefinition getSearchInputDefinitions(int version, String caseTypeId) {
+    public SearchInputFieldsDefinition getSearchInputDefinitions(int version, String caseTypeId) {
         try {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            final SearchInputDefinition
+            final SearchInputFieldsDefinition
                     definition =
                     restTemplate.exchange(withVersionQueryParam(applicationParams.searchInputDefinition(caseTypeId), version),
                             HttpMethod.GET,
                             requestEntity,
-                            SearchInputDefinition.class).getBody();
+                            SearchInputFieldsDefinition.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             LOG.debug("Rest API getSearchInputDefinitionsGetHttp called for {}, finished in {}",
                     caseTypeId,
@@ -101,16 +101,16 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public WorkbasketInputDefinition getWorkbasketInputDefinitions(int version, String caseTypeId) {
+    public WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(int version, String caseTypeId) {
         try {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            final WorkbasketInputDefinition
+            final WorkbasketInputFieldsDefinition
                     definition =
                     restTemplate.exchange(withVersionQueryParam(applicationParams.workbasketInputDefinition(caseTypeId), version),
                             HttpMethod.GET,
                             requestEntity,
-                            WorkbasketInputDefinition.class).getBody();
+                            WorkbasketInputFieldsDefinition.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             LOG.debug("Rest API getWorkbasketInputDefinitionsGetHttp called for {}, finished in {}",
                     caseTypeId,

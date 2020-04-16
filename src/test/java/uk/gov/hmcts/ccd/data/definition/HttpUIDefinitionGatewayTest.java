@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 
 public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
 
@@ -31,9 +31,9 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
     @Test
     @DisplayName("should Return Workbasket Input Definitions")
     public void shouldReturnWorkbasketInputDefinitions() {
-        final WorkbasketInputDefinition workbasketInputDefinitions = httpUIDefinitionGateway
+        final WorkbasketInputFieldsDefinition workbasketInputFieldsDefinitions = httpUIDefinitionGateway
             .getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
-        assertThat(workbasketInputDefinitions.getFields().size(), is(3));
+        assertThat(workbasketInputFieldsDefinitions.getFields().size(), is(3));
     }
 
     @Test
