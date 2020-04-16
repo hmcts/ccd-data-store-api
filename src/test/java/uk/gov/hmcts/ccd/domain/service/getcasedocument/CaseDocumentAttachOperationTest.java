@@ -45,21 +45,10 @@ import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 class CaseDocumentAttachOperationTest {
 
-    private static final String CASE_TYPE_ID = "TestCaseType";
-    private static final Integer VERSION = 67;
-
-    private static final String CASE_UID = "1234123412341236";
-    private static final String CASE_ID = "45677";
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
     public static final String DOCUMENT_CASE_FIELD_URL_ATTRIBUTE = "document_url";
-    public static final String DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE = "document_binary_url";
-    public static final String BAD_REQUEST_EXCEPTION_DOCUMENT_INVALID = "DocumentId is not valid";
     public static final String HASH_TOKEN_STRING = "hashToken";
-    public static final String CONTENT_TYPE = "content-type";
-    public static final String BINARY = "/binary";
-    public static final String CASE_DATA_PARSING_EXCEPTION = "Exception while extracting the document fields from Case payload";
-    public static final String DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION = "The documents have been altered outside the create case transaction";
 
     private CaseDetails caseDetails;
 

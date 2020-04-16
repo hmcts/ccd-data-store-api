@@ -84,18 +84,9 @@ class SubmitCaseTransactionTest {
     public static final String DESCRIPTION = "Description";
     public static final String URL = "http://www.yahooo.com";
     public static final SignificantItemType DOCUMENT = SignificantItemType.DOCUMENT;
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
-    public static final String DOCUMENT_CASE_FIELD_URL_ATTRIBUTE = "document_url";
-    public static final String DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE = "document_binary_url";
-    public static final String BAD_REQUEST_EXCEPTION_DOCUMENT_INVALID = "DocumentId is not valid";
-    public static final String HASH_CODE_STRING = "hashcode";
-    public static final String CONTENT_TYPE = "content-type";
-    public static final String BINARY = "/binary";
-    public static final String CASE_DATA_PARSING_EXCEPTION = "Exception while extracting the document fields from Case payload";
-    public static final String DOCUMENTS_ALTERED_OUTSIDE_TRANSACTION = "The documents have been altered outside the create case transaction";
 
 
     @Mock
