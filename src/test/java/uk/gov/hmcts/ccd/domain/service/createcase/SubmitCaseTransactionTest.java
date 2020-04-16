@@ -233,7 +233,43 @@ class SubmitCaseTransactionTest {
 
     @Test
     @DisplayName("should create a case for V2.1 endpoint")
-    void shouldPersistV2Event() throws IOException {
+    void shouldPersistCreateCaseEventV2() throws IOException {
+        doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
+        CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setState("SomeState");
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+                                                                             null,
+                                                                             inputCaseDetails, caseType, IGNORE_WARNING
+                                                                            );
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        inputCaseDetails.setData(dataMap);
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
+        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
+        doReturn(responseEntity).when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         inputCaseDetails,
+                                         IGNORE_WARNING);
+
+        verify(caseDocumentAttachOperation , times(1)).beforeCallbackPrepareDocumentMetaData(dataMap);
+        verify(caseDocumentAttachOperation , times(1)).filterDocumentFields();
+        verify(caseDocumentAttachOperation , times(1)).restCallToAttachCaseDocuments();
+
+    }
+
+    @Test
+    @DisplayName("should create a case for V2.1 endpoint")
+    void shouldPersistCreateCaseEventV2NoCallback() throws IOException {
         doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
