@@ -156,7 +156,7 @@ public class AuditEntry {
             (isNotBlank(eventSelected) ? ", eventSelected:" + eventSelected : "") +
            (isNotBlank(targetIdamId) ? ", idamIdOfTarget:" + targetIdamId : "") +
 //            (isNotBlank(listOfCaseTypes) ? ", listOfCaseTypes:" + listOfCaseTypes : "") +
-            (!targetCaseRoles.isEmpty() ? ", targetCaseRoles:" +
+            (targetCaseRoles != null && !targetCaseRoles.isEmpty() ? ", targetCaseRoles:" +
                 targetCaseRoles.stream().map(String::toString).collect(Collectors.joining(",")) : "") +
             (isNotBlank(requestId) ? ", X-Request-ID:" + requestId : "") +
             '}';

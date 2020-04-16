@@ -63,7 +63,8 @@ public class StartTriggerController {
             message = EVENT_TRIGGER_NOT_FOUND
         )
     })
-    @LogAudit(operationType = OperationType.CREATE_CASE)
+    @LogAudit(operationType = OperationType.CREATE_CASE, jurisdiction = "#result.body.caseDetails.jurisdiction",
+        caseType = "#caseTypeId", eventName="#triggerId")
     public ResponseEntity<StartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
                                                                     @PathVariable("triggerId") String triggerId,
                                                                     @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
@@ -107,7 +108,8 @@ public class StartTriggerController {
             message = EVENT_TRIGGER_NOT_FOUND
         )
     })
-    @LogAudit(operationType = OperationType.UPDATE_CASE)
+    @LogAudit(operationType = OperationType.UPDATE_CASE, jurisdiction = "#result.body.caseDetails.jurisdiction",
+        caseType = "#result.body.caseDetails.caseTypeId", eventName="#triggerId", caseId = "#caseId")
     public ResponseEntity<StartTriggerResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
                                                                      @PathVariable("triggerId") String triggerId,
                                                                      @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
