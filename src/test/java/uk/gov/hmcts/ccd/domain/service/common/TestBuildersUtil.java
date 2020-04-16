@@ -40,7 +40,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
@@ -1453,13 +1453,13 @@ public class TestBuildersUtil {
     }
 
     public static class CaseTypeTabBuilder {
-        private final CaseTypeTab caseTypeTab;
+        private final CaseTypeTabDefinition caseTypeTabDefinition;
         private final List<CaseTypeTabField> caseTypeTabFields;
 
         private CaseTypeTabBuilder() {
             this.caseTypeTabFields = newArrayList();
-            this.caseTypeTab = new CaseTypeTab();
-            this.caseTypeTab.setTabFields(caseTypeTabFields);
+            this.caseTypeTabDefinition = new CaseTypeTabDefinition();
+            this.caseTypeTabDefinition.setTabFields(caseTypeTabFields);
         }
 
         public CaseTypeTabBuilder withTabField(CaseTypeTabField field) {
@@ -1467,8 +1467,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseTypeTab build() {
-            return this.caseTypeTab;
+        public CaseTypeTabDefinition build() {
+            return this.caseTypeTabDefinition;
         }
 
         public static CaseTypeTabBuilder newCaseTab() {
@@ -1478,7 +1478,7 @@ public class TestBuildersUtil {
     }
 
     public static class CaseTabCollectionBuilder {
-        private final List<CaseTypeTab> tabs;
+        private final List<CaseTypeTabDefinition> tabs;
         private final CaseTypeTabsDefinition caseTypeTabsDefinition;
 
         private CaseTabCollectionBuilder() {
@@ -1492,7 +1492,7 @@ public class TestBuildersUtil {
         }
 
         public CaseTabCollectionBuilder withFieldIds(String... caseFieldIds) {
-            CaseTypeTab tab = new CaseTypeTab();
+            CaseTypeTabDefinition tab = new CaseTypeTabDefinition();
             List<CaseTypeTabField> tabFields = new ArrayList<>();
             asList(caseFieldIds).forEach(caseFieldId -> {
                 CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
@@ -1508,14 +1508,14 @@ public class TestBuildersUtil {
             });
             tab.setShowCondition("tabShowCondition");
             tab.setTabFields(tabFields);
-            List<CaseTypeTab> tabs = new ArrayList<>();
+            List<CaseTypeTabDefinition> tabs = new ArrayList<>();
             tabs.add(tab);
             caseTypeTabsDefinition.setTabs(tabs);
 
             return this;
         }
 
-        public CaseTabCollectionBuilder withTab(CaseTypeTab tab) {
+        public CaseTabCollectionBuilder withTab(CaseTypeTabDefinition tab) {
             tabs.add(tab);
             return this;
         }

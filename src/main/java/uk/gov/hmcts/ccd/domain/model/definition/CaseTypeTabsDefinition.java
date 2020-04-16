@@ -11,7 +11,7 @@ public class CaseTypeTabsDefinition implements Serializable {
     @JsonProperty("case_type_id")
     private String caseTypeId = null;
     private List<String> channels = new ArrayList<>();
-    private List<CaseTypeTab> tabs = new ArrayList<>();
+    private List<CaseTypeTabDefinition> tabs = new ArrayList<>();
 
     public String getCaseTypeId() {
         return caseTypeId;
@@ -29,11 +29,11 @@ public class CaseTypeTabsDefinition implements Serializable {
         this.channels = channels;
     }
 
-    public List<CaseTypeTab> getTabs() {
+    public List<CaseTypeTabDefinition> getTabs() {
         return tabs;
     }
 
-    public void setTabs(List<CaseTypeTab> tabs) {
+    public void setTabs(List<CaseTypeTabDefinition> tabs) {
         this.tabs = tabs;
     }
 

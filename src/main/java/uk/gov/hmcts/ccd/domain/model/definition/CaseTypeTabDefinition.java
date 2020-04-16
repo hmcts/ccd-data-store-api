@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel(description = "")
-public class CaseTypeTab implements Serializable {
+public class CaseTypeTabDefinition implements Serializable {
 
     private String id = null;
     private String label = null;
