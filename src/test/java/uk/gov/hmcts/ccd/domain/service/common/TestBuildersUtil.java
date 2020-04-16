@@ -1107,7 +1107,7 @@ public class TestBuildersUtil {
         }
 
         public CaseFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
-            caseField.setDisplayContext(displayContextParameter);
+            caseField.setDisplayContextParameter(displayContextParameter);
             return this;
         }
 

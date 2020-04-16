@@ -50,7 +50,7 @@ public class UISearchInputsResource extends RepresentationModel {
         uiSearchInput.setField(searchInput.getField());
         uiSearchInput.setLabel(searchInput.getLabel());
         uiSearchInput.setOrder(searchInput.getOrder());
-        uiSearchInput.setDisplayContextParameter(uiSearchInput.getDisplayContextParameter());
+        uiSearchInput.setDisplayContextParameter(searchInput.getDisplayContextParameter());
         return uiSearchInput;
     }
 }

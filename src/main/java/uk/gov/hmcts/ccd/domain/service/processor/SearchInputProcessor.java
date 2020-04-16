@@ -1,10 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
+import com.google.common.primitives.Ints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
@@ -33,22 +36,22 @@ public class SearchInputProcessor {
     }
 
     public Map<String, String> execute(String view, MetaData metadata, Map<String, String> queryParameters) {
-        List<? extends CriteriaInput> criteriaInputs =
+        final List<? extends CriteriaInput> criteriaInputs =
             getCriteriaOperation.execute(metadata.getCaseTypeId(), null,
                 view == null ? CriteriaType.SEARCH : CriteriaType.valueOf(view));
 
         Map<String, String> newParams = new HashMap<>();
         queryParameters.entrySet().stream().forEach(entry -> {
-            Optional<? extends CriteriaInput> input = criteriaInputs.stream()
-                .filter(i -> i.getField().getId().equals(entry.getKey()))
+            final Optional<? extends CriteriaInput> input = criteriaInputs.stream()
+                .filter(i -> i.getField().getId().equals(entry.getKey().split("\\.")[0]))
                 .findAny();
 
-            if (input.isPresent() &&
-                DisplayContextParameter
-                    .hasDisplayContextParameterType(input.get().getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)) {
-                newParams.put(entry.getKey(),
-                    processValue(entry.getKey(), input.get().getDisplayContextParameter(),
-                        entry.getValue(), input.get().getField().getType()));
+            if (input.isPresent()) {
+                if (isComplexPath(entry.getKey()) && Strings.isNullOrEmpty(input.get().getDisplayContextParameter())) {
+                    handleNested(entry.getKey(), entry.getValue(), input.get(), newParams);
+                } else {
+                    handleTopLevel(entry.getKey(), entry.getValue(), input.get(), newParams);
+                }
             } else {
                 newParams.put(entry.getKey(), entry.getValue());
             }
@@ -57,12 +60,41 @@ public class SearchInputProcessor {
         return newParams;
     }
 
+    private void handleTopLevel(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
+        if (DisplayContextParameter
+            .hasDisplayContextParameterType(criteriaInput.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)) {
+            newParams.put(fieldPath,
+                processValue(fieldPath, criteriaInput.getDisplayContextParameter(), queryValue, criteriaInput.getField().getType()));
+        } else {
+            newParams.put(fieldPath, queryValue);
+        }
+    }
+
+    private void handleNested(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
+        final Optional<CommonField> field = criteriaInput.getField().getType().getNestedField(fieldPath, true);
+
+        if (field.isPresent() && DisplayContextParameter
+            .hasDisplayContextParameterType(field.get().getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)) {
+            newParams.put(fieldPath,
+                processValue(fieldPath, field.get().getDisplayContextParameter(), queryValue, field.get().getFieldType()));
+        } else {
+            newParams.put(fieldPath, queryValue);
+        }
+    }
+
+    private boolean isComplexPath(String path) {
+        final String[] splitPath = path.split("\\.");
+        return splitPath.length > 1 && Ints.tryParse(splitPath[1]) == null;
+    }
+
     private String processValue(String id, String displayContextParameter, String value, FieldType fieldType) {
         try {
             if (fieldType.getType().equals(FieldType.DATE)) {
                 return dateTimeFormatParser.convertDateToIso8601(format(displayContextParameter, fieldType), value);
             } else if (fieldType.getType().equals(FieldType.DATETIME)) {
                 return dateTimeFormatParser.convertDateTimeToIso8601(format(displayContextParameter, fieldType), value);
+            } else if (fieldType.getType().equals(FieldType.COLLECTION)) {
+                return processValue(id, displayContextParameter, value, fieldType.getCollectionFieldType());
             } else {
                 return value;
             }
