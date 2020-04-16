@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -233,7 +232,7 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("should persist V2.1 Case creation event")
+    @DisplayName("should create a case for V2.1 endpoint")
     void shouldPersistV2Event() throws IOException {
         doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
         CaseDetails inputCaseDetails = new CaseDetails();
@@ -269,7 +268,7 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("should persist V2.1 Case creation event")
+    @DisplayName("should not invoke any methods corresponding to create case v2.1")
     void shouldNotInvokeAttachDocumentToCase() throws IOException {
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
