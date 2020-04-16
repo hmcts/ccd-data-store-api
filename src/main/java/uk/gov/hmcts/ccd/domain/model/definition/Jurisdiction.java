@@ -19,7 +19,7 @@ public class Jurisdiction implements Serializable {
     private Date liveFrom = null;
     private Date liveUntil = null;
 
-    private List<CaseType> caseTypes = new ArrayList<>();
+    private List<CaseTypeDefinition> caseTypeDefinitions = new ArrayList<>();
 
     /**
      **/
@@ -85,12 +85,12 @@ public class Jurisdiction implements Serializable {
      **/
     @ApiModelProperty(value = "")
     @JsonProperty("case_types")
-    public List<CaseType> getCaseTypes() {
-        return caseTypes;
+    public List<CaseTypeDefinition> getCaseTypeDefinitions() {
+        return caseTypeDefinitions;
     }
 
-    public void setCaseTypes(List<CaseType> caseTypes) {
-        this.caseTypes = caseTypes;
+    public void setCaseTypeDefinitions(List<CaseTypeDefinition> caseTypeDefinitions) {
+        this.caseTypeDefinitions = caseTypeDefinitions;
     }
 
 }

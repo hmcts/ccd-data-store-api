@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
@@ -81,7 +81,7 @@ class AuthorisedGetCaseViewOperationTest {
         .withJurisdictionId(JURISDICTION_ID)
         .withName(JURISDICTION_ID)
         .build();
-    private static final CaseType TEST_CASE_TYPE = newCaseType()
+    private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType()
         .withId(CASE_TYPE_ID)
         .withJurisdiction(jurisdiction)
         .withEvent(CASE_EVENT)
@@ -287,9 +287,9 @@ class AuthorisedGetCaseViewOperationTest {
     @Test
     @DisplayName("should return Case Type")
     void shouldReturnCaseType() {
-        CaseType caseType = authorisedGetCaseViewOperation.getCaseType(CASE_TYPE_ID);
+        CaseTypeDefinition caseTypeDefinition = authorisedGetCaseViewOperation.getCaseType(CASE_TYPE_ID);
 
-        assertThat(caseType, is(TEST_CASE_TYPE));
+        assertThat(caseTypeDefinition, is(TEST_CASE_TYPE));
     }
 
     @Test

@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
-public class DefaultGetCaseTypeOperationTest {
+public class DefaultGetCaseTypeDefinitionOperationTest {
 
     private static final String CASE_TYPE_ID = "caseTypeId";
 
@@ -25,7 +25,7 @@ public class DefaultGetCaseTypeOperationTest {
     private DefaultGetCaseTypeOperation operation;
 
     @Mock
-    private CaseType caseTypeMock;
+    private CaseTypeDefinition caseTypeDefinitionMock;
 
     @BeforeEach
     public void setup() {
@@ -35,11 +35,11 @@ public class DefaultGetCaseTypeOperationTest {
     @Test
     public void shouldInvokeCaseTypeService() {
 
-        when(caseTypeService.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeMock);
+        when(caseTypeService.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinitionMock);
 
-        Optional<CaseType> caseTypeOptional = operation.execute(CASE_TYPE_ID, null);
+        Optional<CaseTypeDefinition> caseTypeOptional = operation.execute(CASE_TYPE_ID, null);
 
-        assertThat(caseTypeOptional, equalTo(Optional.of(caseTypeMock)));
+        assertThat(caseTypeOptional, equalTo(Optional.of(caseTypeDefinitionMock)));
     }
 
 }

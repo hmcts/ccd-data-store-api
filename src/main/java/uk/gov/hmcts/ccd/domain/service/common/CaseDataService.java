@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 @Service
@@ -33,11 +33,11 @@ public class CaseDataService {
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
 
-    public Map<String, JsonNode> getDefaultSecurityClassifications(final CaseType caseType,
+    public Map<String, JsonNode> getDefaultSecurityClassifications(final CaseTypeDefinition caseTypeDefinition,
                                                                    final Map<String, JsonNode> caseData,
                                                                    final Map<String, JsonNode> currentDataClassification) {
         final JsonNode clonedDataClassification = cloneAndConvertDataMap(caseData);
-        deduceDefaultClassifications(clonedDataClassification, MAPPER.convertValue(currentDataClassification, JsonNode.class), caseType.getCaseFields(), EMPTY_STRING);
+        deduceDefaultClassifications(clonedDataClassification, MAPPER.convertValue(currentDataClassification, JsonNode.class), caseTypeDefinition.getCaseFields(), EMPTY_STRING);
         return MAPPER.convertValue(clonedDataClassification, STRING_JSON_MAP);
     }
 

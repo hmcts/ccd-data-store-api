@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -51,7 +51,7 @@ public class CallbackInvoker {
     }
 
     public void invokeAboutToStartCallback(final CaseEvent caseEvent,
-                                           final CaseType caseType,
+                                           final CaseTypeDefinition caseTypeDefinition,
                                            final CaseDetails caseDetails,
                                            final Boolean ignoreWarning) {
         final Optional<CallbackResponse> callbackResponse;
@@ -64,7 +64,7 @@ public class CallbackInvoker {
                 caseEvent, null, caseDetails, false);
         }
 
-        callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseType,
+        callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseTypeDefinition,
             caseDetails,
             ignoreWarning,
             response));
@@ -73,7 +73,7 @@ public class CallbackInvoker {
     public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEvent eventTrigger,
                                                                      final CaseDetails caseDetailsBefore,
                                                                      final CaseDetails caseDetails,
-                                                                     final CaseType caseType,
+                                                                     final CaseTypeDefinition caseTypeDefinition,
                                                                      final Boolean ignoreWarning) {
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent())) {
@@ -86,7 +86,7 @@ public class CallbackInvoker {
         }
 
         if (callbackResponse.isPresent()) {
-            return validateAndSetFromAboutToSubmitCallback(caseType,
+            return validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
                 caseDetails,
                 ignoreWarning,
                 callbackResponse.get());
@@ -116,7 +116,7 @@ public class CallbackInvoker {
     }
 
     public CaseDetails invokeMidEventCallback(final WizardPage wizardPage,
-                                              final CaseType caseType,
+                                              final CaseTypeDefinition caseTypeDefinition,
                                               final CaseEvent caseEvent,
                                               final CaseDetails caseDetailsBefore,
                                               final CaseDetails caseDetails,
@@ -140,7 +140,7 @@ public class CallbackInvoker {
 
             callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
             if (callbackResponse.getData() != null) {
-                validateAndSetData(caseType, caseDetails, callbackResponse.getData());
+                validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData());
             }
         }
 
@@ -151,18 +151,18 @@ public class CallbackInvoker {
         return retriesTimeouts != null && retriesTimeouts.size() == 1 && retriesTimeouts.get(0) == 0;
     }
 
-    private void validateAndSetFromAboutToStartCallback(CaseType caseType,
+    private void validateAndSetFromAboutToStartCallback(CaseTypeDefinition caseTypeDefinition,
                                                         CaseDetails caseDetails,
                                                         Boolean ignoreWarning,
                                                         CallbackResponse callbackResponse) {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
 
         if (callbackResponse.getData() != null) {
-            validateAndSetData(caseType, caseDetails, callbackResponse.getData());
+            validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData());
         }
     }
 
-    private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseType caseType,
+    private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition caseTypeDefinition,
                                                                                   final CaseDetails caseDetails,
                                                                                   final Boolean ignoreWarning,
                                                                                   final CallbackResponse callbackResponse) {
@@ -177,12 +177,12 @@ public class CallbackInvoker {
             caseDetails.setState(callbackResponse.getState());
         }
         if (callbackResponse.getData() != null) {
-            validateAndSetData(caseType, caseDetails, callbackResponse.getData());
+            validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
                 securityValidationService.setClassificationFromCallbackIfValid(
                     callbackResponse,
                     caseDetails,
-                    deduceDefaultClassificationForExistingFields(caseType, caseDetails)
+                    deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails)
                 );
             }
         }
@@ -194,26 +194,26 @@ public class CallbackInvoker {
         return (callbackResponse.getSecurityClassification() != null && callbackResponse.getDataClassification() != null) ? true : false;
     }
 
-    private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseType caseType,
+    private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseTypeDefinition caseTypeDefinition,
                                                                                CaseDetails caseDetails) {
         Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
-            caseType,
+                caseTypeDefinition,
             caseDetails.getData(),
             EMPTY_DATA_CLASSIFICATION);
         return defaultSecurityClassifications;
     }
 
-    private void validateAndSetData(final CaseType caseType,
+    private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
                                     final CaseDetails caseDetails,
                                     final Map<String, JsonNode> responseData) {
-        caseTypeService.validateData(responseData, caseType);
-        caseDetails.setData(caseSanitiser.sanitise(caseType, responseData));
-        deduceDataClassificationForNewFields(caseType, caseDetails);
+        caseTypeService.validateData(responseData, caseTypeDefinition);
+        caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, responseData));
+        deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
     }
 
-    private void deduceDataClassificationForNewFields(CaseType caseType, CaseDetails caseDetails) {
+    private void deduceDataClassificationForNewFields(CaseTypeDefinition caseTypeDefinition, CaseDetails caseDetails) {
         Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
-            caseType,
+                caseTypeDefinition,
             caseDetails.getData(),
             ofNullable(caseDetails.getDataClassification()).orElse(
                 newHashMap()));

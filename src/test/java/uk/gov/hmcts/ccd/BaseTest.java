@@ -260,26 +260,26 @@ public abstract class BaseTest {
         final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(jurisdictionId);
 
-        final CaseType caseType = new CaseType();
-        caseType.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(caseTypeId);
 
         final CaseEvent eventTrigger = new CaseEvent();
         eventTrigger.setId(eventId);
 
-        return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdiction, caseType);
+        return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdiction, caseTypeDefinition);
     }
 
     protected String generateEventTokenNewCase(String userId, String jurisdictionId, String caseTypeId, String eventId) {
         final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(jurisdictionId);
 
-        final CaseType caseType = new CaseType();
-        caseType.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(caseTypeId);
 
         final CaseEvent eventTrigger = new CaseEvent();
         eventTrigger.setId(eventId);
 
-        return eventTokenService.generateToken(userId, eventTrigger, jurisdiction, caseType);
+        return eventTokenService.generateToken(userId, eventTrigger, jurisdiction, caseTypeDefinition);
     }
 
     protected CaseDetails getCase(JdbcTemplate template, String caseReference) {

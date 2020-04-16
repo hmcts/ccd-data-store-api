@@ -39,7 +39,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
@@ -429,12 +429,12 @@ public class TestBuildersUtil {
     }
 
     public static class CaseTypeBuilder {
-        private final CaseType caseType;
+        private final CaseTypeDefinition caseTypeDefinition;
         private final List<AccessControlList> acls = newArrayList();
 
         private CaseTypeBuilder() {
-            this.caseType = new CaseType();
-            caseType.setJurisdiction(new Jurisdiction());
+            this.caseTypeDefinition = new CaseTypeDefinition();
+            caseTypeDefinition.setJurisdiction(new Jurisdiction());
         }
 
         public static CaseTypeBuilder newCaseType() {
@@ -442,43 +442,43 @@ public class TestBuildersUtil {
         }
 
         public CaseTypeBuilder withId(String id) {
-            caseType.setId(id);
+            caseTypeDefinition.setId(id);
             return this;
 
         }
 
         public CaseTypeBuilder withJurisdiction(Jurisdiction jurisdiction) {
-            caseType.setJurisdiction(jurisdiction);
+            caseTypeDefinition.setJurisdiction(jurisdiction);
             return this;
         }
 
         public CaseTypeBuilder withCaseTypeId(String caseTypeId) {
-            caseType.setId(caseTypeId);
+            caseTypeDefinition.setId(caseTypeId);
             return this;
         }
 
         public CaseTypeBuilder withEvent(CaseEvent event) {
-            caseType.getEvents().add(event);
+            caseTypeDefinition.getEvents().add(event);
             return this;
         }
 
         public CaseTypeBuilder withEvents(List<CaseEvent> event) {
-            caseType.getEvents().addAll(event);
+            caseTypeDefinition.getEvents().addAll(event);
             return this;
         }
 
         public CaseTypeBuilder withCaseFields(List<CaseField> fields) {
-            caseType.getCaseFields().addAll(fields);
+            caseTypeDefinition.getCaseFields().addAll(fields);
             return this;
         }
 
         public CaseTypeBuilder withState(CaseState state) {
-            caseType.getStates().add(state);
+            caseTypeDefinition.getStates().add(state);
             return this;
         }
 
         public CaseTypeBuilder withField(CaseField field) {
-            caseType.getCaseFields().add(field);
+            caseTypeDefinition.getCaseFields().add(field);
             return this;
         }
 
@@ -487,13 +487,13 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseType build() {
-            caseType.setAccessControlLists(this.acls);
-            return caseType;
+        public CaseTypeDefinition build() {
+            caseTypeDefinition.setAccessControlLists(this.acls);
+            return caseTypeDefinition;
         }
 
         public CaseTypeBuilder withSecurityClassification(SecurityClassification securityClassification) {
-            caseType.setSecurityClassification(securityClassification);
+            caseTypeDefinition.setSecurityClassification(securityClassification);
             return this;
         }
     }
@@ -1284,8 +1284,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public JurisdictionBuilder withCaseType(CaseType caseType) {
-            jurisdiction.getCaseTypes().add(caseType);
+        public JurisdictionBuilder withCaseType(CaseTypeDefinition caseTypeDefinition) {
+            jurisdiction.getCaseTypeDefinitions().add(caseTypeDefinition);
             return this;
         }
 

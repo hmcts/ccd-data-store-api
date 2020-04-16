@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -105,7 +105,7 @@ class DefaultCreateCaseOperationTest {
     private static final String DRAFT_ID = "1";
 
     private static final IdamUser IDAM_USER = buildIdamUser();
-    private static final CaseType CASE_TYPE = buildCaseType();
+    private static final CaseTypeDefinition CASE_TYPE = buildCaseType();
     private CaseEvent eventTrigger;
 
     @BeforeEach
@@ -432,16 +432,16 @@ class DefaultCreateCaseOperationTest {
         return properties;
     }
 
-    private static CaseType buildCaseType() {
+    private static CaseTypeDefinition buildCaseType() {
         final Jurisdiction j = buildJurisdiction();
         final Version version = new Version();
         version.setNumber(67);
-        final CaseType caseType = new CaseType();
-        caseType.setId("caseTypeId");
-        caseType.setName("case type name");
-        caseType.setJurisdiction(j);
-        caseType.setVersion(version);
-        return caseType;
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId("caseTypeId");
+        caseTypeDefinition.setName("case type name");
+        caseTypeDefinition.setJurisdiction(j);
+        caseTypeDefinition.setVersion(version);
+        return caseTypeDefinition;
     }
 
     private static Jurisdiction buildJurisdiction() {

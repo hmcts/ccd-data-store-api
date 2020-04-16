@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CriteriaField;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
@@ -49,19 +49,19 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
     public <T> List<? extends CriteriaInput> execute(final String caseTypeId, final Predicate<AccessControlList> access, CriteriaType criteriaType) {
         LOG.debug("Finding WorkbasketInput fields for caseType={}", caseTypeId);
 
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         List<CriteriaInput> criteriaInputs;
         if (criteriaType.equals(WORKBASKET)) {
             WorkbasketInputDefinition workbasketInputDefinition = uiDefinitionRepository.getWorkbasketInputDefinitions(caseTypeId);
             criteriaInputs = workbasketInputDefinition.getFields()
                 .stream()
-                .map(field -> toCriteriaInput(field, caseType, criteriaType))
+                .map(field -> toCriteriaInput(field, caseTypeDefinition, criteriaType))
                 .collect(toList());
         } else if (criteriaType.equals(SEARCH)) {
             final SearchInputDefinition searchInputDefinition = uiDefinitionRepository.getSearchInputDefinitions(caseTypeId);
             criteriaInputs = searchInputDefinition.getFields()
                 .stream()
-                .map(field -> toCriteriaInput(field, caseType, criteriaType))
+                .map(field -> toCriteriaInput(field, caseTypeDefinition, criteriaType))
                 .collect(toList());
         } else {
             throw new IllegalArgumentException("Unknown criteria type");
@@ -69,7 +69,7 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         return criteriaInputs;
     }
 
-    private CriteriaInput toCriteriaInput(final CriteriaField in, final CaseType caseType, CriteriaType criteriaType) {
+    private CriteriaInput toCriteriaInput(final CriteriaField in, final CaseTypeDefinition caseTypeDefinition, CriteriaType criteriaType) {
         CriteriaInput result;
         if (criteriaType.equals(WORKBASKET)) {
             result = new WorkbasketInput();
@@ -80,7 +80,7 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         result.setOrder(in.getDisplayOrder());
         result.setRole(in.getRole());
 
-        CaseField caseField = caseType.getCaseField(in.getCaseFieldId())
+        CaseField caseField = caseTypeDefinition.getCaseField(in.getCaseFieldId())
             .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(), in.getCaseFieldPath())));
 
         CaseField caseFieldByPath = (CaseField) caseField.getComplexFieldNestedField(in.getCaseFieldPath())

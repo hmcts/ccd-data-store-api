@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidDefinitionException;
 
 import javax.inject.Named;
@@ -12,9 +12,9 @@ import static uk.gov.hmcts.ccd.domain.model.definition.CaseState.ANY;
 @Named
 @Singleton
 public class EventTriggerService {
-    public CaseEvent findCaseEvent(final CaseType caseType,
+    public CaseEvent findCaseEvent(final CaseTypeDefinition caseTypeDefinition,
                                    final String eventId) {
-        return caseType.findCaseEvent(eventId).orElse(null);
+        return caseTypeDefinition.findCaseEvent(eventId).orElse(null);
     }
 
     public Boolean isPreStateValid(final String preStateId,

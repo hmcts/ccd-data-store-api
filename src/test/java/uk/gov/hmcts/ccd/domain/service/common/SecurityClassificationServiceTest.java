@@ -36,7 +36,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 public class SecurityClassificationServiceTest {
@@ -76,7 +76,7 @@ public class SecurityClassificationServiceTest {
         private final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
         private final CaseField CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
         private final CaseField CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
-        private final CaseType testCaseType = newCaseType()
+        private final CaseTypeDefinition testCaseTypeDefinition = newCaseType()
             .withId(CASE_TYPE_ONE)
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)
@@ -87,7 +87,7 @@ public class SecurityClassificationServiceTest {
         void userHasEnoughSecurityClassificationForField() {
             doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
             assertTrue(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-                testCaseType,
+                testCaseTypeDefinition,
                 CASE_FIELD_ID_1_1));
         }
 
@@ -96,7 +96,7 @@ public class SecurityClassificationServiceTest {
         void userDoesNotHaveEnoughSecurityClassificationForField() {
             doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
             assertFalse(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-                testCaseType,
+                testCaseTypeDefinition,
                 CASE_FIELD_ID_1_2));
         }
     }
@@ -269,7 +269,7 @@ public class SecurityClassificationServiceTest {
     @DisplayName("getClassificationForEvent()")
     class getSecurityClassificationForEvent {
 
-        private final CaseType caseType = new CaseType();
+        private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
         @BeforeEach
         void setUp() throws IOException {
@@ -280,7 +280,7 @@ public class SecurityClassificationServiceTest {
             updateEvent.setId("updateEvent");
             updateEvent.setSecurityClassification(PRIVATE);
             List<CaseEvent> events = Arrays.asList(createEvent, updateEvent);
-            caseType.setEvents(events);
+            caseTypeDefinition.setEvents(events);
         }
 
         @Test
@@ -288,7 +288,7 @@ public class SecurityClassificationServiceTest {
         void shouldGetClassificationForEvent() {
             CaseEvent eventTrigger = new CaseEvent();
             eventTrigger.setId("createEvent");
-            SecurityClassification result = securityClassificationService.getClassificationForEvent(caseType,
+            SecurityClassification result = securityClassificationService.getClassificationForEvent(caseTypeDefinition,
                                                                                                     eventTrigger);
 
             assertThat(result, is(equalTo(RESTRICTED)));
@@ -301,7 +301,7 @@ public class SecurityClassificationServiceTest {
             eventTrigger.setId("unknown");
 
             assertThrows(RuntimeException.class, () ->
-                securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
+                securityClassificationService.getClassificationForEvent(caseTypeDefinition, eventTrigger));
         }
     }
 

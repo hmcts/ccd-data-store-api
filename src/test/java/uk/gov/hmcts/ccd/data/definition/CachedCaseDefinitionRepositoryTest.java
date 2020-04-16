@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
@@ -46,18 +46,18 @@ class CachedCaseDefinitionRepositoryTest {
 
     @Nested
     @DisplayName("getCaseTypesForJurisdiction()")
-    class getCaseTypesForJurisdiction {
+    class getCaseTypeDefinitionsForJurisdiction {
 
         @Test
         @DisplayName("should initially retrieve case types from decorated repository")
         void shouldRetrieveCaseTypesFromDecorated() {
-            final List<CaseType> expectedCaseTypes = Lists.newArrayList(new CaseType(), new CaseType());
-            doReturn(expectedCaseTypes).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
+            final List<CaseTypeDefinition> expectedCaseTypeDefinitions = Lists.newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition());
+            doReturn(expectedCaseTypeDefinitions).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
-            final List<CaseType> caseTypes = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
+            final List<CaseTypeDefinition> caseTypeDefinitions = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             assertAll(
-                () -> assertThat(caseTypes, is(expectedCaseTypes)),
+                () -> assertThat(caseTypeDefinitions, is(expectedCaseTypeDefinitions)),
                 () -> verify(caseDefinitionRepository, times(1)).getCaseTypesForJurisdiction(JURISDICTION_ID)
             );
         }
@@ -65,19 +65,19 @@ class CachedCaseDefinitionRepositoryTest {
         @Test
         @DisplayName("should cache case types for subsequent calls")
         void shouldCacheCaseTypesForSubsequentCalls() {
-            final List<CaseType> expectedCaseTypes = Lists.newArrayList(new CaseType(), new CaseType());
-            doReturn(expectedCaseTypes).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
+            final List<CaseTypeDefinition> expectedCaseTypeDefinitions = Lists.newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition());
+            doReturn(expectedCaseTypeDefinitions).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             verify(caseDefinitionRepository, times(1)).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
-            doReturn(newArrayList(new CaseType(), new CaseType())).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
+            doReturn(newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition())).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
-            final List<CaseType> caseTypes = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
+            final List<CaseTypeDefinition> caseTypeDefinitions = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             assertAll(
-                () -> assertThat(caseTypes, is(expectedCaseTypes)),
+                () -> assertThat(caseTypeDefinitions, is(expectedCaseTypeDefinitions)),
                 () -> verifyNoMoreInteractions(caseDefinitionRepository)
             );
         }

@@ -95,7 +95,7 @@ class UIStartTriggerControllerTest {
 
     @Nested
     @DisplayName("GET /internal/case-types/{caseTypeId}/trigger/{triggerId}")
-    class StartTriggerForCaseType {
+    class StartTriggerForCaseTypeDefinition {
 
         @Test
         @DisplayName("should return 200 when start trigger found")

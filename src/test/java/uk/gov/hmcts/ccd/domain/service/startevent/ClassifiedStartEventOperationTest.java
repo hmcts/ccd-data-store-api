@@ -25,7 +25,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -58,7 +58,7 @@ class ClassifiedStartEventOperationTest {
     private CaseDetails caseDetails;
     private CaseDetails classifiedDetails;
     private StartEventTrigger startEvent;
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
 
     @BeforeEach
     void setUp() {
@@ -67,7 +67,7 @@ class ClassifiedStartEventOperationTest {
         caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
         startEvent = new StartEventTrigger();
         startEvent.setCaseDetails(caseDetails);
-        caseType = newCaseType().build();
+        caseTypeDefinition = newCaseType().build();
 
         classifiedDetails = new CaseDetails();
         doReturn(Optional.of(classifiedDetails)).when(classificationService).applyClassification(caseDetails);
@@ -181,7 +181,7 @@ class ClassifiedStartEventOperationTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+            doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
             doReturn(startEvent).when(startEventOperation).triggerStartForDraft(DRAFT_REFERENCE,
                                                                                 IGNORE_WARNING);
             when(draftGateway.getCaseDetails(Draft.stripId(DRAFT_REFERENCE))).thenReturn(caseDetails);
@@ -204,7 +204,7 @@ class ClassifiedStartEventOperationTest {
 
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> verify(caseDataService).getDefaultSecurityClassifications(eq(caseType), eq(caseDetails.getData()), eq(Maps.newHashMap()))
+                () -> verify(caseDataService).getDefaultSecurityClassifications(eq(caseTypeDefinition), eq(caseDetails.getData()), eq(Maps.newHashMap()))
             );
         }
 

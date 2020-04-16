@@ -54,7 +54,7 @@ class CaseEventTriggerBuilderTest {
     private final List<CaseEvent> events = Lists.newArrayList(newCaseEvent().build());
     private final List<CaseField> caseFields = Lists.newArrayList(newCaseField().build());
     private final List<CaseEventField> eventFields = Lists.newArrayList();
-    private final CaseType caseType = newCaseType().withCaseTypeId(CASE_TYPE_ID).withEvents(events).withCaseFields(caseFields).build();
+    private final CaseTypeDefinition caseTypeDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID).withEvents(events).withCaseFields(caseFields).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
     private final StartEventTrigger startEventTrigger = newStartEventTrigger().withCaseDetails(caseDetails).withEventToken(TOKEN).build();
     private final List<WizardPage> wizardPageCollection = Lists.newArrayList();
@@ -78,8 +78,8 @@ class CaseEventTriggerBuilderTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
-        when(eventTriggerService.findCaseEvent(caseType, EVENT_TRIGGER_ID)).thenReturn(caseEvent);
+        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
+        when(eventTriggerService.findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID)).thenReturn(caseEvent);
         when(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)).thenReturn(wizardPageCollection);
         when(caseViewFieldBuilder.build(caseFields, eventFields, caseDetails.getData())).thenReturn(viewFields);
 
@@ -112,7 +112,7 @@ class CaseEventTriggerBuilderTest {
             () -> assertThat(caseEventTrigger, hasProperty("caseFields", equalTo(viewFields))),
             () -> assertThat(caseEventTrigger, hasProperty("wizardPages", equalTo(wizardPageCollection))),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-            () -> inOrder.verify(eventTriggerService).findCaseEvent(caseType, EVENT_TRIGGER_ID),
+            () -> inOrder.verify(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID),
             () -> inOrder.verify(caseViewFieldBuilder).build(caseFields, eventFields, caseDetails.getCaseDataAndMetadata()),
             () -> inOrder.verify(uiDefinitionRepository).getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)
 
@@ -134,7 +134,7 @@ class CaseEventTriggerBuilderTest {
     @Test
     @DisplayName("should fail if no event trigger")
     void shouldFailIfNoEventTrigger() {
-        when(eventTriggerService.findCaseEvent(caseType, EVENT_TRIGGER_ID)).thenReturn(null);
+        when(eventTriggerService.findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID)).thenReturn(null);
 
         assertThrows(ResourceNotFoundException.class, () -> caseEventTriggerBuilder.build(startEventTrigger,
                                                                                           CASE_TYPE_ID,

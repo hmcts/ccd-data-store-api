@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
@@ -36,7 +36,7 @@ class DocumentSanitiserTest {
 
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
-    private static final CaseType CASE_TYPE = new CaseType();
+    private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
 
     private static final String TYPE_DOCUMENT = "Document";
     private static final FieldType DOCUMENT_FIELD_TYPE = new FieldType();

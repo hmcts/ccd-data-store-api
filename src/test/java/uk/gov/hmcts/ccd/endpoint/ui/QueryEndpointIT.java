@@ -40,7 +40,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
@@ -1359,29 +1359,29 @@ public class QueryEndpointIT extends WireMockBaseTest {
                                         .andExpect(status().is(200))
                                         .andReturn();
 
-        final CaseType[] caseTypes = mapper.readValue(result.getResponse().getContentAsString(), CaseType[].class);
+        final CaseTypeDefinition[] caseTypeDefinitions = mapper.readValue(result.getResponse().getContentAsString(), CaseTypeDefinition[].class);
 
         assertAll(
-            () -> assertThat(caseTypes.length, is(equalTo(3))),
-            () -> assertThat(caseTypes[0], hasProperty("id", equalTo("TestAddressBookCase"))),
-            () -> assertThat(caseTypes[0].getEvents(), hasSize(1)),
+            () -> assertThat(caseTypeDefinitions.length, is(equalTo(3))),
+            () -> assertThat(caseTypeDefinitions[0], hasProperty("id", equalTo("TestAddressBookCase"))),
+            () -> assertThat(caseTypeDefinitions[0].getEvents(), hasSize(1)),
             // added a create event with read access for testing drafts properly
-            () -> assertThat(caseTypes[0].getCaseFields(), hasSize(3)),
-            () -> assertThat(caseTypes[0].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonFirstName")),
+            () -> assertThat(caseTypeDefinitions[0].getCaseFields(), hasSize(3)),
+            () -> assertThat(caseTypeDefinitions[0].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonFirstName")),
                                                                     hasProperty("id", equalTo("PersonLastName")),
                                                                     hasProperty("id", equalTo("PersonAddress")))),
-            () -> assertThat(caseTypes[1], hasProperty("id", equalTo("TestAddressBookCase3"))),
-            () -> assertThat(caseTypes[1].getEvents(), hasSize(1)),
-            () -> assertThat(caseTypes[1].getEvents(), hasItems(hasProperty("id", equalTo("TEST_EVENT_3")))),
-            () -> assertThat(caseTypes[1].getCaseFields(), hasSize(2)),
-            () -> assertThat(caseTypes[1].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonLastName")),
+            () -> assertThat(caseTypeDefinitions[1], hasProperty("id", equalTo("TestAddressBookCase3"))),
+            () -> assertThat(caseTypeDefinitions[1].getEvents(), hasSize(1)),
+            () -> assertThat(caseTypeDefinitions[1].getEvents(), hasItems(hasProperty("id", equalTo("TEST_EVENT_3")))),
+            () -> assertThat(caseTypeDefinitions[1].getCaseFields(), hasSize(2)),
+            () -> assertThat(caseTypeDefinitions[1].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonLastName")),
                                                                     hasProperty("id", equalTo("PersonAddress")))),
-            () -> assertThat(caseTypes[2], hasProperty("id", equalTo("TestAddressBookCaseNoReadFieldAccess"))),
-            () -> assertThat(caseTypes[2].getEvents(), hasSize(1)),
-            () -> assertThat(caseTypes[2].getEvents(),
+            () -> assertThat(caseTypeDefinitions[2], hasProperty("id", equalTo("TestAddressBookCaseNoReadFieldAccess"))),
+            () -> assertThat(caseTypeDefinitions[2].getEvents(), hasSize(1)),
+            () -> assertThat(caseTypeDefinitions[2].getEvents(),
                              hasItems(hasProperty("id", equalTo("TEST_EVENT_NO_READ_FIELD_ACCESS")))),
-            () -> assertThat(caseTypes[2].getCaseFields(), hasSize(2)),
-            () -> assertThat(caseTypes[2].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonLastName")),
+            () -> assertThat(caseTypeDefinitions[2].getCaseFields(), hasSize(2)),
+            () -> assertThat(caseTypeDefinitions[2].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonLastName")),
                                                                     hasProperty("id", equalTo("PersonAddress"))))
         );
     }
@@ -1401,9 +1401,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         assertAll(
             () -> assertThat(jurisdictions.length, is(equalTo(3))),
-            () -> assertThat(jurisdictions[0].getCaseTypes().size(), is(equalTo(1))),
-            () -> assertThat(jurisdictions[0].getCaseTypes().get(0).getStates().size(), is(equalTo(2))),
-            () -> assertThat(jurisdictions[0].getCaseTypes().get(0).getEvents().size(), is(equalTo(2)))
+            () -> assertThat(jurisdictions[0].getCaseTypeDefinitions().size(), is(equalTo(1))),
+            () -> assertThat(jurisdictions[0].getCaseTypeDefinitions().get(0).getStates().size(), is(equalTo(2))),
+            () -> assertThat(jurisdictions[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(equalTo(2)))
         );
     }
 

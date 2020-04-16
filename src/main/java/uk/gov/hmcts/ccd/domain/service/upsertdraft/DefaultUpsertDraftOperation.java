@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -48,46 +48,46 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
     @Override
     public DraftResponse executeSave(final String caseTypeId, final CaseDataContent caseDataContent) {
         final DraftResponse draftResponse = new DraftResponse();
-        CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         final String eventId = caseDataContent.getEventId();
-        if (!caseType.hasEventId(eventId)) {
+        if (!caseTypeDefinition.hasEventId(eventId)) {
             throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type definition");
         }
-        draftResponse.setId(createDraft(caseDataContent, caseType, eventId));
+        draftResponse.setId(createDraft(caseDataContent, caseTypeDefinition, eventId));
         return draftResponse;
     }
 
     @Override
     public DraftResponse executeUpdate(final String caseTypeId, final String draftId, final CaseDataContent caseDataContent) {
-        CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         final String eventId = caseDataContent.getEventId();
-        if (!caseType.hasEventId(eventId)) {
+        if (!caseTypeDefinition.hasEventId(eventId)) {
             throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type definition");
         }
         return draftGateway.update(buildUpdateCaseDraft(userAuthorisation.getUserId(),
-                                                        caseType,
+            caseTypeDefinition,
                                                         eventId,
                                                         caseDataContent),
                                    draftId);
     }
 
-    private String createDraft(CaseDataContent caseDataContent, CaseType caseType, String eventId) {
+    private String createDraft(CaseDataContent caseDataContent, CaseTypeDefinition caseTypeDefinition, String eventId) {
         return draftGateway.create(buildCreateCaseDraft(userAuthorisation.getUserId(),
-                                                        caseType,
+            caseTypeDefinition,
                                                         eventId,
                                                         caseDataContent)).toString();
     }
 
     private CreateCaseDraftRequest buildCreateCaseDraft(String uid,
-                                                        CaseType caseType,
+                                                        CaseTypeDefinition caseTypeDefinition,
                                                         String eventTriggerId,
                                                         CaseDataContent caseDataContent) {
-        caseDataContent.setData(caseSanitiser.sanitise(caseType, caseDataContent.getData()));
+        caseDataContent.setData(caseSanitiser.sanitise(caseTypeDefinition, caseDataContent.getData()));
 
         final CaseDraft caseDraft = new CaseDraft();
         caseDraft.setUserId(uid);
-        caseDraft.setJurisdictionId(caseType.getJurisdictionId());
-        caseDraft.setCaseTypeId(caseType.getId());
+        caseDraft.setJurisdictionId(caseTypeDefinition.getJurisdictionId());
+        caseDraft.setCaseTypeId(caseTypeDefinition.getId());
         caseDraft.setEventTriggerId(eventTriggerId);
         caseDraft.setCaseDataContent(caseDataContent);
 
@@ -99,15 +99,15 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
     }
 
     private UpdateCaseDraftRequest buildUpdateCaseDraft(String uid,
-                                                        CaseType caseType,
+                                                        CaseTypeDefinition caseTypeDefinition,
                                                         String eventTriggerId,
                                                         CaseDataContent caseDataContent) {
-        caseDataContent.setData(caseSanitiser.sanitise(caseType, caseDataContent.getData()));
+        caseDataContent.setData(caseSanitiser.sanitise(caseTypeDefinition, caseDataContent.getData()));
 
         final CaseDraft caseDraft = new CaseDraft();
         caseDraft.setUserId(uid);
-        caseDraft.setJurisdictionId(caseType.getJurisdictionId());
-        caseDraft.setCaseTypeId(caseType.getId());
+        caseDraft.setJurisdictionId(caseTypeDefinition.getJurisdictionId());
+        caseDraft.setCaseTypeId(caseTypeDefinition.getId());
         caseDraft.setEventTriggerId(eventTriggerId);
         caseDraft.setCaseDataContent(caseDataContent);
 

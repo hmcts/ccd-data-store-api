@@ -18,7 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
@@ -47,7 +47,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     private static final String DOCUMENT_FIELD_ID = "D8Document";
     private static final FieldType DOCUMENT_FIELD_TYPE = new FieldType();
     private static final CaseField DOCUMENT_FIELD = new CaseField();
-    private static final CaseType CASE_TYPE = new CaseType();
+    private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
     private static final ObjectNode DOCUMENT_VALUE_INITIAL = JSON_FACTORY.objectNode();
     private static final ObjectNode DOCUMENT_VALUE_SANITISED = JSON_FACTORY.objectNode();
     private static final String BEARER_TEST_JWT = "Bearer testJwt";

@@ -95,7 +95,7 @@ class CreateCaseEventServiceTest {
     private Event event;
 
     private Map<String, JsonNode> data;
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
     private CaseEvent eventTrigger;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
@@ -121,10 +121,10 @@ class CreateCaseEventServiceTest {
         jurisdiction.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
-        caseType = new CaseType();
-        caseType.setId(CASE_TYPE_ID);
-        caseType.setJurisdiction(jurisdiction);
-        caseType.setVersion(version);
+        caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition.setJurisdiction(jurisdiction);
+        caseTypeDefinition.setVersion(version);
         eventTrigger = new CaseEvent();
         eventTrigger.setPostState(POST_STATE);
         final SignificantItem significantItem = new SignificantItem();
@@ -148,15 +148,15 @@ class CreateCaseEventServiceTest {
         doReturn(fixedClock.instant()).when(clock).instant();
         doReturn(fixedClock.getZone()).when(clock).getZone();
 
-        doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseType);
-        doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseType, EVENT_ID);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+        doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseTypeDefinition);
+        doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, eventTrigger);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
-        doReturn(postState).when(caseTypeService).findState(caseType, POST_STATE);
+        doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(user).when(userRepository).getUser();
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
         given(callbackInvoker.invokeAboutToSubmitCallback(any(),
@@ -197,9 +197,9 @@ class CreateCaseEventServiceTest {
         CaseState state = new CaseState();
         state.setId(PRE_STATE_ID);
 
-        doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseType, EVENT_ID);
+        doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, eventTrigger);
-        doReturn(state).when(caseTypeService).findState(caseType, PRE_STATE_ID);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, PRE_STATE_ID);
 
         CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
@@ -215,7 +215,7 @@ class CreateCaseEventServiceTest {
         verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
             caseDetailsBefore,
             caseDetails,
-            caseType,
+            caseTypeDefinition,
             IGNORE_WARNING);
     }
 

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -33,15 +33,15 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldGetCaseTypesForJurisdiction() {
-        final List<CaseType> caseTypes = caseDefinitionRepository.getCaseTypesForJurisdiction("probate");
-        assertEquals("HTTP call results failed", 2, caseTypes.size());
+        final List<CaseTypeDefinition> caseTypeDefinitions = caseDefinitionRepository.getCaseTypesForJurisdiction("probate");
+        assertEquals("HTTP call results failed", 2, caseTypeDefinitions.size());
 
     }
 
     @Test
     public void shouldGetCaseType() {
-        final CaseType caseType = caseDefinitionRepository.getCaseType("TestAddressBookCase");
-        assertEquals("Incorrect Case Type", "TestAddressBookCase", caseType.getId());
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType("TestAddressBookCase");
+        assertEquals("Incorrect Case Type", "TestAddressBookCase", caseTypeDefinition.getId());
     }
 
     @Test

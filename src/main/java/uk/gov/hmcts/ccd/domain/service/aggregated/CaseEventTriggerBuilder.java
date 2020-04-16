@@ -41,11 +41,11 @@ public class CaseEventTriggerBuilder {
             throw new ResourceNotFoundException("Case not found");
         }
 
-        final CaseType caseType = getCaseType(caseTypeId);
-        final CaseEvent eventTrigger = getEventTrigger(eventTriggerId, caseType);
+        final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
+        final CaseEvent eventTrigger = getEventTrigger(eventTriggerId, caseTypeDefinition);
         final CaseEventTrigger caseEventTrigger = buildCaseEventTrigger(eventTrigger);
         caseEventTrigger.setCaseId(caseReference);
-        caseEventTrigger.setCaseFields(mergeEventFields(startEventTrigger.getCaseDetails(), caseType, eventTrigger));
+        caseEventTrigger.setCaseFields(mergeEventFields(startEventTrigger.getCaseDetails(), caseTypeDefinition, eventTrigger));
         caseEventTrigger.setEventToken(startEventTrigger.getToken());
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
                                                                                                      eventTriggerId);
@@ -53,20 +53,20 @@ public class CaseEventTriggerBuilder {
         return caseEventTrigger;
     }
 
-    private CaseType getCaseType(String caseTypeId) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+    private CaseTypeDefinition getCaseType(String caseTypeId) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
 
-        if (null == caseType) {
+        if (null == caseTypeDefinition) {
             throw new ResourceNotFoundException("Case type not found");
         }
-        return caseType;
+        return caseTypeDefinition;
     }
 
-    private CaseEvent getEventTrigger(String eventTriggerId, CaseType caseType) {
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, eventTriggerId);
+    private CaseEvent getEventTrigger(String eventTriggerId, CaseTypeDefinition caseTypeDefinition) {
+        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventTriggerId);
 
         if (null == eventTrigger) {
-            throw new ResourceNotFoundException(eventTriggerId + " is not a known event ID for the specified case type: " + caseType.getId());
+            throw new ResourceNotFoundException(eventTriggerId + " is not a known event ID for the specified case type: " + caseTypeDefinition.getId());
         }
         return eventTrigger;
     }
@@ -84,9 +84,9 @@ public class CaseEventTriggerBuilder {
         return caseTrigger;
     }
 
-    private List<CaseViewField> mergeEventFields(CaseDetails caseDetails, CaseType caseType, CaseEvent eventTrigger) {
+    private List<CaseViewField> mergeEventFields(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, CaseEvent eventTrigger) {
         final List<CaseEventField> eventFields = eventTrigger.getCaseFields();
-        final List<CaseField> caseFields = caseType.getCaseFields();
+        final List<CaseField> caseFields = caseTypeDefinition.getCaseFields();
 
         return caseViewFieldBuilder.build(caseFields, eventFields, caseDetails != null ? caseDetails.getCaseDataAndMetadata() : null);
     }

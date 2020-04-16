@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -112,28 +112,28 @@ public class CreateCaseEventService {
     public CreateCaseEventResult createCaseEvent(String caseReference, CaseDataContent content) {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-        final CaseEvent eventTrigger = findAndValidateCaseEvent(caseType, content.getEvent());
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+        final CaseEvent eventTrigger = findAndValidateCaseEvent(caseTypeDefinition, content.getEvent());
         final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
         String uid = userAuthorisation.getUserId();
 
-        eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
+        eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition);
 
         validatePreState(caseDetails, eventTrigger);
-        mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
+        mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseTypeDefinition);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
             caseDetailsBefore,
             caseDetails,
-            caseType,
+            caseTypeDefinition,
             content.getIgnoreWarning());
 
         final Optional<String>
             newState = aboutToSubmitCallbackResponse.getState();
 
-        validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
+        validateCaseFieldsOperation.validateData(caseDetails.getData(), caseTypeDefinition);
         LocalDateTime timeNow = now();
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, eventTrigger, newState, timeNow);
-        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType, timeNow);
+        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseTypeDefinition, timeNow);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
@@ -142,11 +142,11 @@ public class CreateCaseEventService {
             .build();
     }
 
-    private CaseEvent findAndValidateCaseEvent(final CaseType caseType,
+    private CaseEvent findAndValidateCaseEvent(final CaseTypeDefinition caseTypeDefinition,
                                                final Event event) {
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, event.getEventId());
+        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
         if (eventTrigger == null) {
-            throw new ValidationException(format("%s is not a known event ID for the specified case type %s", event.getEventId(), caseType.getId()));
+            throw new ValidationException(format("%s is not a known event ID for the specified case type %s", event.getEventId(), caseTypeDefinition.getId()));
         }
         return eventTrigger;
     }
@@ -191,13 +191,13 @@ public class CreateCaseEventService {
     private void mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,
                                                  final CaseDetails caseDetails,
                                                  final CaseEvent caseEvent,
-                                                 final CaseType caseType) {
+                                                 final CaseTypeDefinition caseTypeDefinition) {
         if (null != data) {
-            final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseType, data);
+            final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, data);
             for (Map.Entry<String, JsonNode> field : sanitisedData.entrySet()) {
                 caseDetails.getData().put(field.getKey(), field.getValue());
             }
-            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification()));
+            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, caseDetails.getData(), caseDetails.getDataClassification()));
         }
         caseDetails.setLastModified(now());
         if (!StringUtils.equalsAnyIgnoreCase(CaseState.ANY, caseEvent.getPostState())) {
@@ -209,9 +209,9 @@ public class CreateCaseEventService {
                                               final Event event,
                                               final CaseEvent eventTrigger,
                                               final CaseDetails caseDetails,
-                                              final CaseType caseType, LocalDateTime timeNow) {
+                                              final CaseTypeDefinition caseTypeDefinition, LocalDateTime timeNow) {
         final IdamUser user = userRepository.getUser();
-        final CaseState caseState = caseTypeService.findState(caseType, caseDetails.getState());
+        final CaseState caseState = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
 
         auditEvent.setEventId(event.getEventId());
@@ -222,13 +222,13 @@ public class CreateCaseEventService {
         auditEvent.setData(caseDetails.getData());
         auditEvent.setStateId(caseDetails.getState());
         auditEvent.setStateName(caseState.getName());
-        auditEvent.setCaseTypeId(caseType.getId());
-        auditEvent.setCaseTypeVersion(caseType.getVersion().getNumber());
+        auditEvent.setCaseTypeId(caseTypeDefinition.getId());
+        auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
         auditEvent.setUserId(user.getId());
         auditEvent.setUserLastName(user.getSurname());
         auditEvent.setUserFirstName(user.getForename());
         auditEvent.setCreatedDate(timeNow);
-        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
+        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition, eventTrigger));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 

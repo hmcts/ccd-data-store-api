@@ -36,7 +36,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -98,7 +98,7 @@ class AuthorisedCreateEventOperationTest {
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
     private CaseDetails classifiedCase;
     private JsonNode authorisedCaseNode;
-    private final CaseType caseType = new CaseType();
+    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private final List<CaseField> caseFields = Lists.newArrayList();
     private final List<CaseEvent> events = Lists.newArrayList();
 
@@ -126,13 +126,13 @@ class AuthorisedCreateEventOperationTest {
         classifiedCase.setData(classifiedData);
         doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT);
-        caseType.setEvents(events);
-        caseType.setCaseFields(caseFields);
-        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
+        caseTypeDefinition.setEvents(events);
+        caseTypeDefinition.setCaseFields(caseFields);
+        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getUserRoles()).thenReturn(USER_ROLES);
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
             true);
-        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
+        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
             true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID),
             eq(events),
@@ -142,7 +142,7 @@ class AuthorisedCreateEventOperationTest {
             any(JsonNode.class),
             eq(caseFields),
             eq(USER_ROLES))).thenReturn(true);
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType),
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
             eq(USER_ROLES),
             eq(CAN_READ))).thenReturn(true);
         authorisedCaseNode = MAPPER.createObjectNode();
@@ -199,7 +199,7 @@ class AuthorisedCreateEventOperationTest {
             () -> inOrder.verify(getCaseOperation).execute(CASE_REFERENCE),
             () -> inOrder.verify(caseAccessService).getUserRoles(),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                 eq(USER_ROLES),
                 eq(CAN_UPDATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_ID),
@@ -212,7 +212,7 @@ class AuthorisedCreateEventOperationTest {
                 eq(USER_ROLES)),
             () -> inOrder.verify(createEventOperation).createCaseEvent(CASE_REFERENCE,
                 CASE_DATA_CONTENT),
-            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                 eq(USER_ROLES),
                 eq(CAN_READ)),
             () -> inOrder.verify(accessControlService, times(2)).filterCaseFieldsByAccess(any(JsonNode.class),
@@ -261,7 +261,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if no update case access")
     void shouldFailIfNoUpdateCaseAccess() {
 
-        when(accessControlService.canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_UPDATE)).thenReturn(false);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, USER_ROLES, CAN_UPDATE)).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT));
@@ -270,7 +270,7 @@ class AuthorisedCreateEventOperationTest {
     @Test
     @DisplayName("should fail when user has no state update access")
     void shouldFailWhenUserCannotUpdateState() {
-        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
+        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
             false);
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT));
@@ -315,7 +315,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should return empty case if no read case access")
     void shouldFailIfNoCaseReadAccess() {
 
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType),
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
             eq(USER_ROLES),
             eq(CAN_READ))).thenReturn(false);
 

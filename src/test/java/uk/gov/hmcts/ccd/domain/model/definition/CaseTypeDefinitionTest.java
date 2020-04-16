@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
-class CaseTypeTest {
+class CaseTypeDefinitionTest {
 
     private static final String TEXT_TYPE = "Text";
     private static final String NAME = "Name";
@@ -23,7 +23,7 @@ class CaseTypeTest {
     private CaseField name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private CaseField surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
 
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
 
     @Nested
     @DisplayName("CaseField tests")
@@ -31,14 +31,14 @@ class CaseTypeTest {
 
         @BeforeEach
         void setUp() {
-            caseType = new CaseType();
-            caseType.setCaseFields(Arrays.asList(name, surname));
+            caseTypeDefinition = new CaseTypeDefinition();
+            caseTypeDefinition.setCaseFields(Arrays.asList(name, surname));
         }
 
         @Test
         @DisplayName("returns caseField optional for a valid caseFieldId")
         void getCaseFieldReturnsCaseFieldOptionalForValidCaseFieldId() {
-            Optional<CaseField> caseFieldOptional = caseType.getCaseField(surname.getId());
+            Optional<CaseField> caseFieldOptional = caseTypeDefinition.getCaseField(surname.getId());
 
             assertTrue(caseFieldOptional.isPresent());
             assertThat(surname, is(caseFieldOptional.get()));
@@ -47,7 +47,7 @@ class CaseTypeTest {
         @Test
         @DisplayName("returns empty optional when caseFieldId is invalid")
         void getCaseFieldReturnsEmptyOptionalWhenCaseFieldIdIsInvalid() {
-            Optional<CaseField> caseFieldOptional = caseType.getCaseField("invalidId");
+            Optional<CaseField> caseFieldOptional = caseTypeDefinition.getCaseField("invalidId");
 
             assertThat(Optional.empty(), is(caseFieldOptional));
         }

@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
@@ -43,26 +43,26 @@ public class MergeDataToSearchResultOperation {
         this.userRepository = userRepository;
     }
 
-    public SearchResultView execute(final CaseType caseType,
+    public SearchResultView execute(final CaseTypeDefinition caseTypeDefinition,
                                     final SearchResult searchResult,
                                     final List<CaseDetails> caseDetails,
                                     final String resultError) {
 
-        final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseType, searchResult);
+        final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseTypeDefinition, searchResult);
 
         final List<SearchResultViewItem> viewItems = caseDetails.stream()
-            .map(caseData -> buildSearchResultViewItem(caseData, caseType, searchResult))
+            .map(caseData -> buildSearchResultViewItem(caseData, caseTypeDefinition, searchResult))
             .collect(Collectors.toList());
 
         return new SearchResultView(viewColumns, viewItems, resultError);
     }
 
-    private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseType caseType,
+    private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseTypeDefinition caseTypeDefinition,
                                                                      SearchResult searchResult) {
         final HashSet<String> addedFields = new HashSet<>();
 
         return Arrays.stream(searchResult.getFields())
-            .flatMap(searchResultField -> caseType.getCaseFields().stream()
+            .flatMap(searchResultField -> caseTypeDefinition.getCaseFields().stream()
                     .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                     .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
                     .map(caseField -> createSearchResultViewColumn(searchResultField, caseField))
@@ -100,12 +100,12 @@ public class MergeDataToSearchResultOperation {
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
-                                                           final CaseType caseType,
+                                                           final CaseTypeDefinition caseTypeDefinition,
                                                            final SearchResult searchResult) {
 
         Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
         Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
-        Map<String, TextNode> labels = getLabelsFromCaseFields(caseType);
+        Map<String, TextNode> labels = getLabelsFromCaseFields(caseTypeDefinition);
         Map<String, Object> caseFields = prepareData(searchResult, caseData, caseMetadata, labels);
 
         String caseId = caseDetails.hasCaseReference() ? caseDetails.getReferenceAsString() : caseDetails.getId();
@@ -155,8 +155,8 @@ public class MergeDataToSearchResultOperation {
         }
     }
 
-    private Map<String, TextNode> getLabelsFromCaseFields(CaseType caseType) {
-        return caseType.getCaseFields()
+    private Map<String, TextNode> getLabelsFromCaseFields(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeDefinition.getCaseFields()
             .stream()
             .filter(caseField -> LABEL.equals(caseField.getFieldType().getType()))
             .collect(Collectors.toMap(CaseField::getId, caseField -> instance.textNode(caseField.getLabel())));

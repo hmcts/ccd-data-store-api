@@ -29,7 +29,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -71,10 +71,10 @@ public class DocumentsOperationTest extends BaseTest {
         Mockito.when(mockCaseDetailsRepository.findByReference(TEST_CASE_REFERENCE)).thenReturn(caseDetailsOptional);
         ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
 
-        final CaseType caseType = new CaseType();
-        caseType.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
         final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
-        Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
+        Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseTypeDefinition);
         ReflectionTestUtils.setField(documentsOperation, "caseTypeService", mockCaseTypeService);
     }
 

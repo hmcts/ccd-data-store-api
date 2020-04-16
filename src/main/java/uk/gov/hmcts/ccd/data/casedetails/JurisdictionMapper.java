@@ -13,7 +13,7 @@ public class JurisdictionMapper {
         result.setId(jurisdiction.getId());
         result.setName(jurisdiction.getName());
         result.setDescription(jurisdiction.getDescription());
-        result.setCaseTypes(jurisdiction.getCaseTypes());
+        result.setCaseTypeDefinitions(jurisdiction.getCaseTypeDefinitions());
         return result;
     }
 }

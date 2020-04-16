@@ -15,7 +15,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.Workbasket
 
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -75,14 +75,14 @@ class AuthorisedGetCriteriaOperationTest {
             aSearchInput().withFieldId(CASE_FIELD_ID_1_5).withUserRole(ROLE1).build(),
             aSearchInput().withFieldId(CASE_FIELD_ID_1_5).withUserRole(ROLE2).build()
         );
-        CaseType testCaseType = newCaseType()
+        CaseTypeDefinition testCaseTypeDefinition = newCaseType()
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)
             .withField(CASE_FIELD_1_3)
             .withField(CASE_FIELD_1_5)
             .build();
-        testCaseType.setId(CASE_TYPE_ONE);
-        Optional<CaseType> testCaseTypeOpt = Optional.of(testCaseType);
+        testCaseTypeDefinition.setId(CASE_TYPE_ONE);
+        Optional<CaseTypeDefinition> testCaseTypeOpt = Optional.of(testCaseTypeDefinition);
 
         doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 

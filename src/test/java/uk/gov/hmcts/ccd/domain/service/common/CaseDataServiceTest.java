@@ -29,7 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 class CaseDataServiceTest {
@@ -37,14 +37,14 @@ class CaseDataServiceTest {
     };
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final CaseDataService caseDataService = new CaseDataService();
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
 
     @BeforeEach
     public void setUp() {
-        setCaseType(RESTRICTED);
+        setCaseTypeDefinition(RESTRICTED);
     }
 
-    private void setCaseType(SecurityClassification securityClassification) {
+    private void setCaseTypeDefinition(SecurityClassification securityClassification) {
         final FieldType textFieldType = aFieldType().withType("Text")
                                            .build();
 
@@ -149,7 +149,7 @@ class CaseDataServiceTest {
                                                      .build())
                                .build())
             .build();
-        caseType = TestBuildersUtil.CaseTypeBuilder.newCaseType()
+        caseTypeDefinition = TestBuildersUtil.CaseTypeBuilder.newCaseType()
             .withField(newCaseField()
                            .withId("ClientsAddresses")
                            .withSC(PRIVATE.name())
@@ -239,7 +239,7 @@ class CaseDataServiceTest {
                 "}\n"
         ), STRING_JSON_MAP);
 
-        final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(caseType, DATA, Maps.newHashMap());
+        final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, DATA, Maps.newHashMap());
         final String expectedResult = "{  \n" +
             "   \"Company\":{  \n" +
             "      \"classification\":\"PUBLIC\",\n" +
@@ -339,7 +339,7 @@ class CaseDataServiceTest {
                 "  }\n"
         ), STRING_JSON_MAP);
         // first to set default classification
-        final Map<String, JsonNode> defaultClassifications = caseDataService.getDefaultSecurityClassifications(caseType, DATA, Maps.newHashMap());
+        final Map<String, JsonNode> defaultClassifications = caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, DATA, Maps.newHashMap());
         final String expectedDefaultResult = "{  \n" +
             "   \"ClientsAddresses\":{  \n" +
             "      \"classification\":\"PRIVATE\",\n" +
@@ -423,10 +423,10 @@ class CaseDataServiceTest {
                 "       ]\n" +
                 "}\n"
         ), STRING_JSON_MAP);
-        setCaseType(PUBLIC);
+        setCaseTypeDefinition(PUBLIC);
 
         // ACT
-        final Map<String, JsonNode> newClassifications = caseDataService.getDefaultSecurityClassifications(caseType, NEW_DATA, defaultClassifications);
+        final Map<String, JsonNode> newClassifications = caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, NEW_DATA, defaultClassifications);
 
         // ASSERT
         JsonNode newClassificationsResult = MAPPER.convertValue(newClassifications, JsonNode.class);
@@ -504,7 +504,7 @@ class CaseDataServiceTest {
                                                          .build();
 
         final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(
-            caseType,
+            caseTypeDefinition,
             caseData,
             new HashMap<>());
 
@@ -537,7 +537,7 @@ class CaseDataServiceTest {
                                 .build();
 
         final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(
-            caseType,
+            caseTypeDefinition,
             caseData,
             existingClassification);
 

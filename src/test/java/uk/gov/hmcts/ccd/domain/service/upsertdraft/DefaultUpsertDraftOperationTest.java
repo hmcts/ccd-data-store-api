@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -49,7 +49,7 @@ class DefaultUpsertDraftOperationTest {
     private static final String CTID = "TestAddressBookCase";
     private static final String ETID = "createCase";
     private static final String DID = "5";
-    private static final CaseType CASE_TYPE = newCaseType()
+    private static final CaseTypeDefinition CASE_TYPE = newCaseType()
         .withId(CTID)
         .withJurisdiction(newJurisdiction().withJurisdictionId(JID).build())
         .withEvent(newCaseEvent().withId(ETID).build())

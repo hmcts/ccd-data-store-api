@@ -15,7 +15,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
@@ -92,8 +92,8 @@ class MergeDataToSearchResultOperationTest {
     private MergeDataToSearchResultOperation classUnderTest;
 
     private List<CaseDetails> caseDetailsList;
-    private CaseType caseType;
-    private CaseType caseTypeWithLabels;
+    private CaseTypeDefinition caseTypeDefinition;
+    private CaseTypeDefinition caseTypeDefinitionWithLabels;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -131,7 +131,7 @@ class MergeDataToSearchResultOperationTest {
                 .withComplexField(familyAddress)
                 .build();
 
-        caseType = newCaseType()
+        caseTypeDefinition = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID)
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build())
             .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build())
@@ -142,7 +142,7 @@ class MergeDataToSearchResultOperationTest {
             .build();
 
         final CaseField labelField = buildLabelCaseField(LABEL_ID, LABEL_TEXT);
-        caseTypeWithLabels = newCaseType()
+        caseTypeDefinitionWithLabels = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID)
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build())
             .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build())
@@ -163,7 +163,7 @@ class MergeDataToSearchResultOperationTest {
                 buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
@@ -183,7 +183,7 @@ class MergeDataToSearchResultOperationTest {
                 buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getLabel(), is(CASE_FIELD_1)),
@@ -210,7 +210,7 @@ class MergeDataToSearchResultOperationTest {
 
         doReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1)).when(userRepository).getUserRoles();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
@@ -246,7 +246,7 @@ class MergeDataToSearchResultOperationTest {
 
         doReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2)).when(userRepository).getUserRoles();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
@@ -281,7 +281,7 @@ class MergeDataToSearchResultOperationTest {
         doReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2)).when(userRepository).getUserRoles();
 
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
@@ -304,7 +304,7 @@ class MergeDataToSearchResultOperationTest {
                 buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeWithLabels,
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinitionWithLabels,
             searchResult, caseDetailsList,
             NO_ERROR);
         assertAll(
@@ -325,7 +325,7 @@ class MergeDataToSearchResultOperationTest {
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType, searchResult, caseDetailsList, TIMEOUT_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, TIMEOUT_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
@@ -343,7 +343,7 @@ class MergeDataToSearchResultOperationTest {
                 buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getLabel(), is(CASE_FIELD_2)),
@@ -361,7 +361,7 @@ class MergeDataToSearchResultOperationTest {
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeWithLabels,
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinitionWithLabels,
             searchResult, caseDetailsList,
             NO_ERROR);
         assertAll(
@@ -384,7 +384,7 @@ class MergeDataToSearchResultOperationTest {
                 FAMILY_DETAILS))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType,
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition,
             searchResult, caseDetailsList,
             NO_ERROR);
 
@@ -408,7 +408,7 @@ class MergeDataToSearchResultOperationTest {
                 FAMILY_DETAILS))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType,
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition,
             searchResult, caseDetailsList,
             NO_ERROR);
 
@@ -433,7 +433,7 @@ class MergeDataToSearchResultOperationTest {
             .build();
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> classUnderTest.execute(caseType, searchResult, caseDetailsList, NO_ERROR));
+            () -> classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR));
 
         Assert.assertThat(exception.getMessage(),
             Matchers.is("CaseField " + FAMILY_DETAILS + " has no nested elements with code InvalidElement."));
@@ -451,9 +451,9 @@ class MergeDataToSearchResultOperationTest {
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
             () -> {
-                CaseType caseTypeWithoutCaseField = newCaseType().withCaseTypeId(CASE_TYPE_ID)
+                CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID)
                     .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()).build();
-                classUnderTest.execute(caseTypeWithoutCaseField, searchResult, caseDetailsList, NO_ERROR);
+                classUnderTest.execute(caseTypeWithoutCaseFieldDefinition, searchResult, caseDetailsList, NO_ERROR);
             });
 
         Assert.assertThat(exception.getMessage(),

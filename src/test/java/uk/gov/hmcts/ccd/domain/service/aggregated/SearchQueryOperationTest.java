@@ -79,7 +79,7 @@ public class SearchQueryOperationTest {
     private HashMap<String, String> criteria;
     private List<CaseDetails> drafts = Lists.newArrayList();
     private List<CaseDetails> cases = Lists.newArrayList();
-    private CaseType testCaseType;
+    private CaseTypeDefinition testCaseTypeDefinition;
 
     @Captor
     private ArgumentCaptor<List<CaseDetails>> argument;
@@ -88,14 +88,14 @@ public class SearchQueryOperationTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseType = newCaseType()
+        testCaseTypeDefinition = newCaseType()
             .withId(CASE_TYPE_ID)
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)
             .withField(CASE_FIELD_1_3)
             .withEvent(newCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build())
             .build();
-        Optional<CaseType> testCaseTypeOpt = Optional.of(testCaseType);
+        Optional<CaseTypeDefinition> testCaseTypeOpt = Optional.of(testCaseTypeDefinition);
 
         doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
         searchQueryOperation = new SearchQueryOperation(searchOperation,
@@ -152,7 +152,7 @@ public class SearchQueryOperationTest {
     @Test
     @DisplayName("should not call draft-store if drafts are not enabled")
     public void shouldNotCallDraftStore() {
-        testCaseType.getEvents().get(0).setCanSaveDraft(false);
+        testCaseTypeDefinition.getEvents().get(0).setCanSaveDraft(false);
         doReturn(drafts).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
 

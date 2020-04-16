@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -59,8 +59,8 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("No data provided");
         }
 
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
@@ -68,19 +68,19 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
         Event event = caseDataContent.getEvent();
         Map<String, JsonNode> data = caseDataContent.getData();
-        verifyCreateAccess(event, data, caseType, userRoles);
+        verifyCreateAccess(event, data, caseTypeDefinition, userRoles);
 
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId,
                                                                               caseDataContent,
                                                                               ignoreWarning);
-        return verifyReadAccess(caseType, userRoles, caseDetails);
+        return verifyReadAccess(caseTypeDefinition, userRoles, caseDetails);
     }
 
-    private CaseDetails verifyReadAccess(CaseType caseType, Set<String> userRoles, CaseDetails caseDetails) {
+    private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseDetails caseDetails) {
 
         if (caseDetails != null) {
             if (!accessControlService.canAccessCaseTypeWithCriteria(
-                caseType,
+                caseTypeDefinition,
                 userRoles,
                 CAN_READ)) {
                 return null;
@@ -89,14 +89,14 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             caseDetails.setData(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                    caseType.getCaseFields(),
+                    caseTypeDefinition.getCaseFields(),
                     userRoles,
                     CAN_READ, false),
                 STRING_JSON_MAP));
             caseDetails.setDataClassification(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                    caseType.getCaseFields(),
+                    caseTypeDefinition.getCaseFields(),
                     userRoles,
                     CAN_READ,
                     true),
@@ -105,9 +105,9 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         return caseDetails;
     }
 
-    private void verifyCreateAccess(Event event, Map<String, JsonNode> data, CaseType caseType, Set<String> userRoles) {
+    private void verifyCreateAccess(Event event, Map<String, JsonNode> data, CaseTypeDefinition caseTypeDefinition, Set<String> userRoles) {
         if (!accessControlService.canAccessCaseTypeWithCriteria(
-            caseType,
+            caseTypeDefinition,
             userRoles,
             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
@@ -115,7 +115,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
         if (event == null || !accessControlService.canAccessCaseEventWithCriteria(
             event.getEventId(),
-            caseType.getEvents(),
+            caseTypeDefinition.getEvents(),
             userRoles,
             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
@@ -123,7 +123,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
         if (!accessControlService.canAccessCaseFieldsWithCriteria(
             MAPPER.convertValue(data, JsonNode.class),
-            caseType.getCaseFields(),
+            caseTypeDefinition.getCaseFields(),
             userRoles,
             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_FIELD_FOUND);

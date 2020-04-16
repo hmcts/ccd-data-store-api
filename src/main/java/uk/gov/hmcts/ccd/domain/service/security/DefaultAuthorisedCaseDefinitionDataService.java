@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
@@ -37,10 +37,10 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     }
 
     @Override
-    public Optional<CaseType> getAuthorisedCaseType(String caseTypeId, Predicate<AccessControlList> access) {
-        CaseType caseType = caseTypeService.getCaseType(caseTypeId);
-        if (verifyAclOnCaseType(caseType, access) && verifySecurityClassificationOnCaseType(caseType)) {
-            return Optional.of(caseType);
+    public Optional<CaseTypeDefinition> getAuthorisedCaseType(String caseTypeId, Predicate<AccessControlList> access) {
+        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
+        if (verifyAclOnCaseType(caseTypeDefinition, access) && verifySecurityClassificationOnCaseType(caseTypeDefinition)) {
+            return Optional.of(caseTypeDefinition);
         }
         return Optional.empty();
     }
@@ -53,23 +53,23 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     @Override
     public List<CaseState> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
-        CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction);
-        return filterCaseStatesForUser(caseType.getStates(), access);
+        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction);
+        return filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
     }
 
     @Override
     public List<String> getUserAuthorisedCaseStateIds(String caseTypeId, Predicate<AccessControlList> access) {
-        CaseType caseType = caseTypeService.getCaseType(caseTypeId);
-        List<CaseState> caseStates = filterCaseStatesForUser(caseType.getStates(), access);
+        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
+        List<CaseState> caseStates = filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
         return collectCaseStateIds(caseStates);
     }
 
-    private boolean verifyAclOnCaseType(CaseType caseType, Predicate<AccessControlList> access) {
-        return accessControlService.canAccessCaseTypeWithCriteria(caseType, getUserRoles(), access);
+    private boolean verifyAclOnCaseType(CaseTypeDefinition caseTypeDefinition, Predicate<AccessControlList> access) {
+        return accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, getUserRoles(), access);
     }
 
-    private boolean verifySecurityClassificationOnCaseType(CaseType caseType) {
-        return userRepository.getHighestUserClassification(caseType.getJurisdiction().getId()).higherOrEqualTo(caseType.getSecurityClassification());
+    private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
+        return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdiction().getId()).higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
     }
 
     private List<CaseState> filterCaseStatesForUser(List<CaseState> caseStates, Predicate<AccessControlList> access) {

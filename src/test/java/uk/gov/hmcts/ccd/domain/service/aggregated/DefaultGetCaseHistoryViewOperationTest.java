@@ -97,14 +97,14 @@ class DefaultGetCaseHistoryViewOperationTest {
                                                                                   "dataTestField2").build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        CaseType caseType = new CaseType();
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
-        caseType.setJurisdiction(jurisdiction);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        caseTypeDefinition.setJurisdiction(jurisdiction);
+        doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
         CaseState caseState = new CaseState();
-        doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
+        doReturn(caseState).when(caseTypeService).findState(caseTypeDefinition, STATE);
     }
 
     @Test

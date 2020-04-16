@@ -61,7 +61,7 @@ public class DefinitionsCachingIT {
     private HttpUIDefinitionGateway httpUIDefinitionGateway;
 
     @Mock
-    CaseType mockCaseType;
+    CaseTypeDefinition mockCaseTypeDefinition;
 
     @Mock
     WorkbasketInputDefinition workbasketInputDefinition;
@@ -97,7 +97,7 @@ public class DefinitionsCachingIT {
         doReturn(JURISDICTION_1).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J1");
         doReturn(JURISDICTION_2).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J2");
         doReturn(JURISDICTION_3).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J3");
-        doReturn(mockCaseType).when(this.caseDefinitionRepository).getCaseType(ID_1);
+        doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
     }
 
     @Test

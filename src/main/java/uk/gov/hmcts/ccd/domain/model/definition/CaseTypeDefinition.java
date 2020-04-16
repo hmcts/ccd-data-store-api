@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ToString
-public class CaseType implements Serializable {
+public class CaseTypeDefinition implements Serializable {
     private static final long serialVersionUID = 5688786015302840008L;
     private String id;
     private String description;

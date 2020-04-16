@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -86,12 +86,12 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot create case because of event is not specified");
         }
 
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
 
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, event.getEventId());
+        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
         if (eventTrigger == null) {
             throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeId);
         }
@@ -101,7 +101,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         }
 
         String token = caseDataContent.getToken();
-        eventTokenService.validateToken(token, userRepository.getUserId(), eventTrigger, caseType.getJurisdiction(), caseType);
+        eventTokenService.validateToken(token, userRepository.getUserId(), eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition);
 
         Map<String, JsonNode> data = caseDataContent.getData();
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
@@ -109,15 +109,15 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         final CaseDetails newCaseDetails = new CaseDetails();
 
         newCaseDetails.setCaseTypeId(caseTypeId);
-        newCaseDetails.setJurisdiction(caseType.getJurisdictionId());
+        newCaseDetails.setJurisdiction(caseTypeDefinition.getJurisdictionId());
         newCaseDetails.setState(eventTrigger.getPostState());
-        newCaseDetails.setSecurityClassification(caseType.getSecurityClassification());
-        newCaseDetails.setData(caseSanitiser.sanitise(caseType, data));
-        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
+        newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
+        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, data));
+        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, newCaseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
 
         final IdamUser idamUser = userRepository.getUser();
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
-                                                                              caseType,
+            caseTypeDefinition,
                                                                               idamUser,
                                                                               eventTrigger,
                                                                               newCaseDetails,

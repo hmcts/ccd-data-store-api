@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -98,7 +98,7 @@ class DefaultGetCaseViewOperationTest {
     private AuditEvent event1;
     private AuditEvent event2;
     private CaseTabCollection caseTabCollection;
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
     private CaseState caseState;
     private JsonNode eventsNode;
 
@@ -129,22 +129,22 @@ class DefaultGetCaseViewOperationTest {
         caseTabCollection = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        caseType = new CaseType();
+        caseTypeDefinition = new CaseTypeDefinition();
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
-        caseType.setJurisdiction(jurisdiction);
+        caseTypeDefinition.setJurisdiction(jurisdiction);
         CaseField caseField = new CaseField();
         caseField.setId(MetaData.CaseField.CASE_TYPE.getReference());
         caseField.setMetadata(true);
         caseField.setFieldType(new FieldType());
-        caseType.setCaseFields(singletonList(caseField));
+        caseTypeDefinition.setCaseFields(singletonList(caseField));
 
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
         caseState = new CaseState();
         caseState.setId(STATE);
         caseState.setTitleDisplay(TITLE_DISPLAY);
-        doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
+        doReturn(caseState).when(caseTypeService).findState(caseTypeDefinition, STATE);
     }
 
     @Nested
@@ -166,8 +166,8 @@ class DefaultGetCaseViewOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseType.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
-            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+            caseTypeDefinition.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
 
@@ -199,13 +199,13 @@ class DefaultGetCaseViewOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseType.setCaseFields(singletonList(newCaseField()
+            caseTypeDefinition.setCaseFields(singletonList(newCaseField()
                                                      .withId(CASE_HISTORY_VIEWER)
                                                      .withFieldType(aFieldType()
                                                                         .withType(CASE_HISTORY_VIEWER)
                                                                         .build())
                                                      .build()));
-            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
 

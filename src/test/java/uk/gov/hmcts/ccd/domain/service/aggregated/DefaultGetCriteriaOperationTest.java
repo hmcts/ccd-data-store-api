@@ -18,7 +18,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
@@ -45,7 +45,7 @@ public class DefaultGetCriteriaOperationTest {
     private static final String SURNAME = "Surname";
     private static final String SHOW_CONDITION = "some show condition";
 
-    private final CaseType caseType = new CaseType();
+    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private final CaseField caseField1 = new CaseField();
     private final CaseField caseField2 = new CaseField();
     private final CaseField caseField3 = new CaseField();
@@ -78,19 +78,19 @@ public class DefaultGetCriteriaOperationTest {
         caseField4.setId("field4");
         caseField4.setFieldType(fieldType);
         caseField4.setMetadata(true);
-        caseType.setId("Test case type");
-        caseType.setCaseFields(asList(caseField1, caseField2, caseField3, caseField4, debtorDetails));
+        caseTypeDefinition.setId("Test case type");
+        caseTypeDefinition.setCaseFields(asList(caseField1, caseField2, caseField3, caseField4, debtorDetails));
 
         defaultGetCriteriaOperation = new DefaultGetCriteriaOperation(uiDefinitionRepository, caseDefinitionRepository);
 
-        doReturn(caseType).when(caseDefinitionRepository).getCaseType(caseType.getId());
-        doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseType.getId());
-        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputDefinitions(caseType.getId());
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(caseTypeDefinition.getId());
+        doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseTypeDefinition.getId());
+        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputDefinitions(caseTypeDefinition.getId());
     }
 
     @Test
     void shouldReturnWorkbasketInputs() {
-        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET);
+        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(4)),
@@ -101,7 +101,7 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldReturnSearchInputs() {
-        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH);
+        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(4)),
@@ -112,14 +112,14 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldReturnSearchInputsWithShowCondition() {
-        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH);
+        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH);
 
         assertThat(searchInputs, hasItems(hasProperty("field", hasProperty("showCondition", equalTo(SHOW_CONDITION)))));
     }
 
     @Test
     void shouldReturnWorkbasketInputsWithNullShowCondition() {
-        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET);
+        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, WORKBASKET);
 
         assertThat(workbasketInputs, hasItems(hasProperty("field", hasProperty("showCondition", nullValue()))));
     }
@@ -127,8 +127,8 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldReturnWorkbasketInputsWhenCaseFieldElementPathDefined() {
-        doReturn(generateWorkbasketInputWithPathElements()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseType.getId());
-        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET);
+        doReturn(generateWorkbasketInputWithPathElements()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseTypeDefinition.getId());
+        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(5)),
@@ -141,11 +141,11 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldThrowResourceNotFoundExceptionWhenCaseFieldNotFoundInCaseTypeForWorkbasketInput() {
-        doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseType.getId());
-        caseType.setCaseFields(Collections.emptyList());
+        doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseTypeDefinition.getId());
+        caseTypeDefinition.setCaseFields(Collections.emptyList());
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET));
+            () -> defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, WORKBASKET));
 
         assertThat(exception.getMessage(),
             is("CaseField with id=[field1] and path=[null] not found"));
@@ -153,8 +153,8 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldReturnSearchInputsWhenCaseFieldElementPathDefined() {
-        doReturn(generateSearchInputWithPathElements()).when(uiDefinitionRepository).getSearchInputDefinitions(caseType.getId());
-        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH);
+        doReturn(generateSearchInputWithPathElements()).when(uiDefinitionRepository).getSearchInputDefinitions(caseTypeDefinition.getId());
+        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(5)),
@@ -166,11 +166,11 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldThrowResourceNotFoundExceptionWhenCaseFieldNotFoundInCaseTypeForSearchInput() {
-        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputDefinitions(caseType.getId());
-        caseType.setCaseFields(Collections.emptyList());
+        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputDefinitions(caseTypeDefinition.getId());
+        caseTypeDefinition.setCaseFields(Collections.emptyList());
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH));
+            () -> defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH));
 
         assertThat(exception.getMessage(),
             is("CaseField with id=[field1] and path=[null] not found"));
@@ -178,7 +178,7 @@ public class DefaultGetCriteriaOperationTest {
 
     private WorkbasketInputDefinition generateWorkbasketInput() {
         WorkbasketInputDefinition workbasketInputDefinition = new WorkbasketInputDefinition();
-        workbasketInputDefinition.setCaseTypeId(caseType.getId());
+        workbasketInputDefinition.setCaseTypeId(caseTypeDefinition.getId());
         workbasketInputDefinition.setFields(
             asList(getWorkbasketInputField(caseField1.getId(), 1),
                 getWorkbasketInputField(caseField2.getId(), 2),
@@ -190,7 +190,7 @@ public class DefaultGetCriteriaOperationTest {
     private WorkbasketInputDefinition generateWorkbasketInputWithPathElements() {
         String path = PERSON + "." + NAME;
         WorkbasketInputDefinition workbasketInputDefinition = new WorkbasketInputDefinition();
-        workbasketInputDefinition.setCaseTypeId(caseType.getId());
+        workbasketInputDefinition.setCaseTypeId(caseTypeDefinition.getId());
         workbasketInputDefinition.setFields(asList(
             getWorkbasketInputField(caseField1.getId(), 1),
             getWorkbasketInputField(caseField2.getId(), 2),
@@ -217,7 +217,7 @@ public class DefaultGetCriteriaOperationTest {
     private SearchInputDefinition generateSearchInputWithPathElements() {
         String path = PERSON + "." + NAME;
         SearchInputDefinition searchInputDefinition = new SearchInputDefinition();
-        searchInputDefinition.setCaseTypeId(caseType.getId());
+        searchInputDefinition.setCaseTypeId(caseTypeDefinition.getId());
         searchInputDefinition.setFields(asList(
             getSearchInputField(caseField1.getId(), 1),
             getSearchInputField(caseField2.getId(), 2),
@@ -229,7 +229,7 @@ public class DefaultGetCriteriaOperationTest {
 
     private SearchInputDefinition generateSearchInput() {
         SearchInputDefinition searchInputDefinition = new SearchInputDefinition();
-        searchInputDefinition.setCaseTypeId(caseType.getId());
+        searchInputDefinition.setCaseTypeId(caseTypeDefinition.getId());
         searchInputDefinition.setFields(asList(getSearchInputField(caseField1.getId(), 1),
             getSearchInputField(caseField2.getId(), 2),
             getSearchInputField(caseField3.getId(), 3),

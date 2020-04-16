@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -65,7 +65,7 @@ class AuthorisedSearchOperationTest {
 
     private MetaData metaData;
     private HashMap<String, String> criteria;
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
     private final List<CaseField> caseFields = Lists.newArrayList();
 
     private JsonNode classifiedDataNode1;
@@ -86,13 +86,13 @@ class AuthorisedSearchOperationTest {
 
         metaData = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
-        caseType = new CaseType();
-        caseType.setCaseFields(caseFields);
+        caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFields(caseFields);
 
-        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
+        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(userRepository.getUserRoles()).thenReturn(USER_ROLES);
 
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, USER_ROLES, CAN_READ);
 
         caseFields.addAll(getCaseFieldsWithIds("dataTestField11", "dataTestField12", "classificationTestField11", "classificationTestField12"));
 
@@ -131,8 +131,8 @@ class AuthorisedSearchOperationTest {
         classifiedCase2.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode2, STRING_JSON_MAP));
 
         doReturn(Arrays.asList(classifiedCase1, classifiedCase2)).when(nextOperationInChain).execute(metaData, criteria);
-        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase1.getState()), eq(caseType), eq(USER_ROLES), eq(CAN_READ));
-        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase2.getState()), eq(caseType), eq(USER_ROLES), eq(CAN_READ));
+        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase1.getState()), eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_READ));
+        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase2.getState()), eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_READ));
 
         doReturn(authorisedDataNode1).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataNode1),
@@ -219,7 +219,7 @@ class AuthorisedSearchOperationTest {
             () -> inOrder.verify(nextOperationInChain).execute(metaData, criteria),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(userRepository).getUserRoles(),
-            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                 eq(USER_ROLES),
                 eq(CAN_READ)),
             () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedDataNode1),
@@ -265,7 +265,7 @@ class AuthorisedSearchOperationTest {
     @Test
     @DisplayName("should return no results when no case type read access")
     void shouldReturnEmptyResultsIfNoCaseTypeReadAccess() {
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, USER_ROLES, CAN_READ);
 
         final List<CaseDetails> output = authorisedSearchOperation.execute(metaData, criteria);
 

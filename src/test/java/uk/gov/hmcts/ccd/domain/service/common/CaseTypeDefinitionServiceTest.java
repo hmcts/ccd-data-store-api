@@ -16,10 +16,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
-class CaseTypeServiceTest {
+class CaseTypeDefinitionServiceTest {
 
     private static final String CASE_TYPE_ID = "caseTypeId";
 
@@ -41,7 +41,7 @@ class CaseTypeServiceTest {
         @Test
         @DisplayName("happy path finding a state")
         void happyPathFindState() {
-            final CaseType c = new CaseType();
+            final CaseTypeDefinition c = new CaseTypeDefinition();
             final CaseState caseState = buildCaseState("ngitb");
             c.setStates(Arrays.asList(buildCaseState("hemanth"), caseState));
             final CaseState found = subject.findState(c, "ngitb");
@@ -51,7 +51,7 @@ class CaseTypeServiceTest {
         @Test
         @DisplayName("cannot find state by id")
         void cannotFindState() {
-            final CaseType c = new CaseType();
+            final CaseTypeDefinition c = new CaseTypeDefinition();
             c.setId("nOonEhaStimEtodomYcodEreview");
             c.setStates(Arrays.asList(buildCaseState("hemanth"), buildCaseState("ngitw")));
             final ResourceNotFoundException
@@ -69,17 +69,17 @@ class CaseTypeServiceTest {
 
     @Nested
     @DisplayName("Get case type")
-    class GetCaseType {
+    class GetCaseTypeDefinition {
 
         @Test
         @DisplayName("should return case type when case type is found for id")
         void shouldReturnCaseType() {
-            CaseType caseType = new CaseType();
-            when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
+            CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+            when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
 
-            CaseType result = subject.getCaseType(CASE_TYPE_ID);
+            CaseTypeDefinition result = subject.getCaseType(CASE_TYPE_ID);
 
-            assertThat(result, is(caseType));
+            assertThat(result, is(caseTypeDefinition));
             verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         }
 

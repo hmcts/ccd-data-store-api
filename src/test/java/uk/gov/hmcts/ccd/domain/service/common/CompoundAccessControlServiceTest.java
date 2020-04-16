@@ -25,7 +25,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACL
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.io.IOException;
 import java.util.Map;
@@ -321,8 +321,8 @@ class CompoundAccessControlServiceTest {
                     .withCreate(true)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
@@ -338,8 +338,8 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
@@ -356,8 +356,8 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
@@ -385,8 +385,8 @@ class CompoundAccessControlServiceTest {
                     .withCreate(false)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
@@ -408,8 +408,8 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
@@ -432,8 +432,8 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
@@ -456,8 +456,8 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
@@ -480,8 +480,8 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
@@ -510,8 +510,8 @@ class CompoundAccessControlServiceTest {
                     .withCreate(true)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
@@ -531,8 +531,8 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1);
 
@@ -549,8 +549,8 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + name + personEnd);
 
@@ -567,8 +567,8 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + name + personEnd);
 
@@ -586,8 +586,8 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + addressesStart + existingAddress1 + addressEnd + personEnd);
 
@@ -605,8 +605,8 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
@@ -633,8 +633,8 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
@@ -663,8 +663,8 @@ class CompoundAccessControlServiceTest {
                     .withUpdate(false)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p);
@@ -700,8 +700,8 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
@@ -740,8 +740,8 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddress1NullLine1 + "," + existingAddress2 + addressEnd + personEnd;
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
@@ -790,8 +790,8 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddressWNullLines + "," + existingAddress2 + addressEnd + personEnd;
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
@@ -830,8 +830,8 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
@@ -870,8 +870,8 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddress1NullLine1 + "," + existingAddress2 + addressEnd + personEnd;
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
@@ -910,8 +910,8 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
@@ -950,8 +950,8 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddressWMissingLines + "," + existingAddress2 + addressEnd + personEnd;
             JsonNode dataNode = generatePeopleDataWithPerson(p1);
@@ -987,8 +987,8 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
@@ -1013,8 +1013,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
@@ -1031,8 +1031,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
@@ -1049,8 +1049,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1);
@@ -1069,8 +1069,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person1, p2);
@@ -1095,8 +1095,8 @@ class CompoundAccessControlServiceTest {
                     .withDelete(false)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1);
@@ -1120,8 +1120,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
@@ -1144,8 +1144,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
@@ -1168,8 +1168,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1195,8 +1195,8 @@ class CompoundAccessControlServiceTest {
                     .withDelete(true)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1216,8 +1216,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1237,8 +1237,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + ",    \"BirthInfo\": {}" + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1258,8 +1258,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1279,8 +1279,8 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + ",    \"BirthInfo\": null" + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1422,7 +1422,7 @@ class CompoundAccessControlServiceTest {
             + "}";
         private final String noteStart = "{\n  \"Note\": \n";
         private final String noteEnd = "  \n}";
-        private CaseType caseType;
+        private CaseTypeDefinition caseTypeDefinition;
         private CaseField note;
 
         @BeforeEach
@@ -1442,7 +1442,7 @@ class CompoundAccessControlServiceTest {
                     .withComplexField(getTagFieldDefinition())
                     .build())
                 .build();
-            caseType = newCaseType().withField(note).build();
+            caseTypeDefinition = newCaseType().withField(note).build();
         }
 
         @Test
@@ -1453,7 +1453,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWOutTags + noteEnd);
 
@@ -1468,7 +1468,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithMultipleNewTags + noteEnd);
 
@@ -1483,7 +1483,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
@@ -1498,7 +1498,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWOutTags + noteEnd);
 
@@ -1514,7 +1514,7 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
@@ -1529,7 +1529,7 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
@@ -1544,7 +1544,7 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(false)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
@@ -1559,7 +1559,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
@@ -1574,7 +1574,7 @@ class CompoundAccessControlServiceTest {
                 .withDelete(false)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 

@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -39,7 +39,7 @@ public class UIJurisdictionResource extends RepresentationModel {
         private String id;
         private String name;
         private String description;
-        private List<CaseType> caseTypes = new ArrayList<>();
+        private List<CaseTypeDefinition> caseTypeDefinitions = new ArrayList<>();
     }
 
     private void copyProperties(JurisdictionDisplayProperties[] displayProperties) {
@@ -51,7 +51,7 @@ public class UIJurisdictionResource extends RepresentationModel {
     private UIJurisdiction buildUIJurisdiction(JurisdictionDisplayProperties displayProperties) {
         UIJurisdiction uiJurisdiction = new UIJurisdiction();
         uiJurisdiction.setId(displayProperties.getId());
-        uiJurisdiction.setCaseTypes(displayProperties.getCaseTypes());
+        uiJurisdiction.setCaseTypeDefinitions(displayProperties.getCaseTypeDefinitions());
         uiJurisdiction.setDescription(displayProperties.getDescription());
         uiJurisdiction.setName(displayProperties.getName());
         return uiJurisdiction;

@@ -28,7 +28,7 @@ import java.util.Map;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -66,10 +66,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Deprecated
     @SuppressWarnings("squid:S1133")
     @Override
-    public List<CaseType> getCaseTypesForJurisdiction(final String jurisdictionId) {
+    public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            return Arrays.asList(restTemplate.exchange(applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId), HttpMethod.GET, requestEntity, CaseType[].class).getBody());
+            return Arrays.asList(restTemplate.exchange(applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId), HttpMethod.GET, requestEntity, CaseTypeDefinition[].class).getBody());
         } catch (Exception e) {
             LOG.warn("Error while retrieving base type", e);
             if (e instanceof HttpClientErrorException
@@ -83,18 +83,18 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     @Cacheable("caseTypeDefinitionsCache")
-    public CaseType getCaseType(int version, String caseTypeId) {
+    public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
         return this.getCaseType(caseTypeId);
     }
 
     @Override
-    public CaseType getCaseType(final String caseTypeId) {
+    public CaseTypeDefinition getCaseType(final String caseTypeId) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
-            final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
-            final CaseType caseType = restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
-            caseType.getCaseFields().stream().forEach(CaseField::propagateACLsToNestedFields);
-            return caseType;
+            final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
+            final CaseTypeDefinition caseTypeDefinition = restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseTypeDefinition.class).getBody();
+            caseTypeDefinition.getCaseFields().stream().forEach(CaseField::propagateACLsToNestedFields);
+            return caseTypeDefinition;
 
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
@@ -110,7 +110,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<FieldType> getBaseTypes() {
         try {
-            final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
+            final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
             return Arrays.asList(restTemplate.exchange(applicationParams.baseTypesURL(), HttpMethod.GET, requestEntity, FieldType[].class).getBody());
         } catch (Exception e) {
             LOG.warn("Error while retrieving base types", e);
@@ -127,7 +127,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Cacheable("userRolesCache")
     public UserRole getUserRoleClassifications(String userRole) {
         try {
-            final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
+            final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("userRole", encodeBase64(userRole));
             return restTemplate.exchange(applicationParams.userRoleClassification(), HttpMethod.GET, requestEntity, UserRole.class, queryParams).getBody();
@@ -149,7 +149,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (userRoles.isEmpty()) {
                 return Collections.emptyList();
             }
-            final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
+            final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("roles", StringUtils.join(userRoles, ","));
             return Arrays.asList(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET, requestEntity, UserRole[].class, queryParams).getBody());
@@ -167,7 +167,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
         try {
-            final HttpEntity<CaseType> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
             CaseTypeDefinitionVersion version = restTemplate.exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId),
                     HttpMethod.GET, requestEntity, CaseTypeDefinitionVersion.class).getBody();
             LOG.debug("retrieved latest version for case type: {}: {}", caseTypeId, version);

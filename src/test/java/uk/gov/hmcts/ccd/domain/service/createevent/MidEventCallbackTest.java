@@ -27,7 +27,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -62,7 +62,7 @@ class MidEventCallbackTest {
     @Mock
     private CaseEvent caseEvent;
     @Mock
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
     private Event event;
     private final Map<String, JsonNode> data = new HashMap<>();
     private CaseDetails caseDetails;
@@ -75,9 +75,9 @@ class MidEventCallbackTest {
         event = new Event();
         event.setEventId("createCase");
 
-        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseType);
-        given(eventTriggerService.findCaseEvent(caseType, event.getEventId())).willReturn(caseEvent);
-        given(caseType.getJurisdictionId()).willReturn(JURISDICTION_ID);
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
+        given(eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId())).willReturn(caseEvent);
+        given(caseTypeDefinition.getJurisdictionId()).willReturn(JURISDICTION_ID);
         caseDetails = caseDetails(data);
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
@@ -97,7 +97,7 @@ class MidEventCallbackTest {
         when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
 
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
+            caseTypeDefinition,
             caseEvent,
             existingCaseDetails,
             caseDetails,
@@ -112,7 +112,7 @@ class MidEventCallbackTest {
         );
 
         verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
+            caseTypeDefinition,
             caseEvent,
             existingCaseDetails,
             caseDetails,
@@ -133,7 +133,7 @@ class MidEventCallbackTest {
             .build();
         when(caseService.clone(updatedCaseDetails)).thenReturn(updatedCaseDetails);
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
+            caseTypeDefinition,
             caseEvent,
             null,
             caseDetails,
@@ -187,7 +187,7 @@ class MidEventCallbackTest {
             .build();
 
         when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
+            caseTypeDefinition,
             caseEvent,
             null,
             caseDetails,
@@ -208,7 +208,7 @@ class MidEventCallbackTest {
 
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
-            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, caseDetails, IGNORE_WARNINGS),
+            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseTypeDefinition, caseEvent, null, caseDetails, IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
             () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData));
     }
@@ -245,7 +245,7 @@ class MidEventCallbackTest {
             .build();
 
         when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
+            caseTypeDefinition,
             caseEvent,
             existingCaseDetails,
             combineCaseDetails,
@@ -271,7 +271,7 @@ class MidEventCallbackTest {
 
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
-            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, existingCaseDetails, combineCaseDetails, IGNORE_WARNINGS),
+            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseTypeDefinition, caseEvent, existingCaseDetails, combineCaseDetails, IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, combineData));
     }
 

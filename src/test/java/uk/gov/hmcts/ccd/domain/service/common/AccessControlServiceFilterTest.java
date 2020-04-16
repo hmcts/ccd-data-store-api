@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.util.Arrays;
 import java.util.List;
@@ -138,7 +138,7 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter caseFields if CREATE ACL is missing for some fields")
         void filterCaseFieldsUserHasAccess() {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(newCaseField()
                     .withId("Name")
                     .withAcl(anAcl()
@@ -176,7 +176,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -189,7 +189,7 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter all caseFields if CREATE ACL is missing")
         void filterCaseFieldsUserHasNoAccess() {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(newCaseField()
                     .withId("Name")
                     .withAcl(anAcl()
@@ -228,7 +228,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -238,7 +238,7 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter caseFields definition is missing for those fields")
         void filterCaseFieldsWithNoDefinition() {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(newCaseField()
                     .withId("Surname")
                     .withAcl(anAcl()
@@ -268,7 +268,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -285,7 +285,7 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter child fields of a complex caseField if CREATE ACL is missing for child fields")
         void filterComplexCaseFieldChildrenByCreateAccess() {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(newCaseField()
                     .withId("Name")
                     .withFieldType(aFieldType()
@@ -337,7 +337,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -365,7 +365,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -427,7 +427,7 @@ class AccessControlServiceFilterTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(people)
                 .withField(newCaseField()
                     .withId("Name")
@@ -452,7 +452,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -484,7 +484,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -549,7 +549,7 @@ class AccessControlServiceFilterTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(people)
                 .withField(newCaseField()
                     .withId("Name")
@@ -574,7 +574,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -606,7 +606,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -717,7 +717,7 @@ class AccessControlServiceFilterTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(people)
                 .withField(newCaseField()
                     .withId("Name")
@@ -742,7 +742,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -792,7 +792,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -923,7 +923,7 @@ class AccessControlServiceFilterTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(people)
                 .withField(newCaseField()
                     .withId("Name")
@@ -948,7 +948,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -980,7 +980,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -993,7 +993,7 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should leave Complex Field properly for predefined complex sub fields")
         void leaveComplexCaseFieldWithPredefinedChildrenByUpdateAccess() {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(newCaseField()
                     .withId("Name")
                     .withFieldType(aFieldType()
@@ -1028,8 +1028,8 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFields().get(2).getFieldType().setComplexFields(getPredefinedAddressFields());
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().get(2).getFieldType().setComplexFields(getPredefinedAddressFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -1061,7 +1061,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -1074,7 +1074,7 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should filter Complex Field properly for predefined complex sub fields with no access")
         void filterComplexCaseFieldChildrenByUpdateAccessWhenAllAccessIsOnCreate() {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseTypeDefinition = newCaseType()
                 .withField(newCaseField()
                     .withId("Name")
                     .withFieldType(aFieldType()
@@ -1109,8 +1109,8 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFields().get(2).getFieldType().setComplexFields(getPredefinedAddressFields());
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFields().get(2).getFieldType().setComplexFields(getPredefinedAddressFields());
+            caseTypeDefinition.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -1142,7 +1142,7 @@ class AccessControlServiceFilterTest {
 
             CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 USER_ROLES,
                 CAN_CREATE);
 

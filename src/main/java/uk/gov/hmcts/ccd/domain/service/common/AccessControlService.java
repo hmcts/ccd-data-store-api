@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
@@ -72,15 +72,15 @@ public class AccessControlService {
     }
 
 
-    public boolean canAccessCaseTypeWithCriteria(final CaseType caseType,
+    public boolean canAccessCaseTypeWithCriteria(final CaseTypeDefinition caseTypeDefinition,
                                                  final Set<String> userRoles,
                                                  final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = caseType != null
-            && hasAccessControlList(userRoles, criteria, caseType.getAccessControlLists());
+        boolean hasAccess = caseTypeDefinition != null
+            && hasAccessControlList(userRoles, criteria, caseTypeDefinition.getAccessControlLists());
 
         if (!hasAccess) {
             LOG.debug("No relevant case type access for caseTypeACLs={}, userRoles={}",
-                caseType != null ? caseType.getAccessControlLists() : newArrayList(),
+                caseTypeDefinition != null ? caseTypeDefinition.getAccessControlLists() : newArrayList(),
                 userRoles);
         }
 
@@ -88,10 +88,10 @@ public class AccessControlService {
     }
 
     public boolean canAccessCaseStateWithCriteria(final String caseState,
-                                                  final CaseType caseType,
+                                                  final CaseTypeDefinition caseTypeDefinition,
                                                   final Set<String> userRoles,
                                                   final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasAccessControlList(userRoles, criteria, caseType.getStates()
+        boolean hasAccess = hasAccessControlList(userRoles, criteria, caseTypeDefinition.getStates()
             .stream()
             .filter(cState -> cState.getId().equalsIgnoreCase(caseState))
             .map(CaseState::getAccessControlLists)
@@ -101,7 +101,7 @@ public class AccessControlService {
         if (!hasAccess) {
             LOG.debug("No relevant case state access for caseState= {}, caseTypeACLs={}, userRoles={}",
                 caseState,
-                caseType.getAccessControlLists(),
+                caseTypeDefinition.getAccessControlLists(),
                 userRoles);
         }
         return hasAccess;

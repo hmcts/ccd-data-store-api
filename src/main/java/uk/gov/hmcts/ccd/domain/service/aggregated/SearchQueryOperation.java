@@ -55,7 +55,7 @@ public class SearchQueryOperation {
                                     final MetaData metadata,
                                     final Map<String, String> queryParameters) {
 
-        Optional<CaseType> caseType = this.getCaseTypeOperation.execute(metadata.getCaseTypeId(), CAN_READ);
+        Optional<CaseTypeDefinition> caseType = this.getCaseTypeOperation.execute(metadata.getCaseTypeId(), CAN_READ);
 
         if (!caseType.isPresent()) {
             return new SearchResultView(Collections.emptyList(), Collections.emptyList(), NO_ERROR);
@@ -80,11 +80,11 @@ public class SearchQueryOperation {
         return mergeDataToSearchResultOperation.execute(caseType.get(), searchResult, draftsAndCases, draftResultError);
     }
 
-    private SearchResult getSearchResultDefinition(final CaseType caseType, final String view) {
+    private SearchResult getSearchResultDefinition(final CaseTypeDefinition caseTypeDefinition, final String view) {
         if (WORKBASKET.equalsIgnoreCase(view)) {
-            return uiDefinitionRepository.getWorkBasketResult(caseType.getId());
+            return uiDefinitionRepository.getWorkBasketResult(caseTypeDefinition.getId());
         }
-        return uiDefinitionRepository.getSearchResult(caseType.getId());
+        return uiDefinitionRepository.getSearchResult(caseTypeDefinition.getId());
     }
 
     private void addSortOrderFields(MetaData metadata,SearchResult searchResult) {

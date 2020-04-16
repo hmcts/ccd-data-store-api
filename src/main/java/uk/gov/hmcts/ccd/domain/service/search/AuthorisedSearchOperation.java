@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -51,31 +51,31 @@ public class AuthorisedSearchOperation implements SearchOperation {
     public List<CaseDetails> execute(MetaData metaData, Map<String, String> criteria) {
 
         final List<CaseDetails> results = searchOperation.execute(metaData, criteria);
-        CaseType caseType = getCaseType(metaData.getCaseTypeId());
+        CaseTypeDefinition caseTypeDefinition = getCaseType(metaData.getCaseTypeId());
         Set<String> userRoles = getUserRoles();
 
-        return (null == results || !accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ))
-            ? Lists.newArrayList() : filterByReadAccess(results, caseType, userRoles);
+        return (null == results || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            ? Lists.newArrayList() : filterByReadAccess(results, caseTypeDefinition, userRoles);
     }
 
-    private List<CaseDetails> filterByReadAccess(List<CaseDetails> results, CaseType caseType, Set<String> userRoles) {
+    private List<CaseDetails> filterByReadAccess(List<CaseDetails> results, CaseTypeDefinition caseTypeDefinition, Set<String> userRoles) {
 
         return results.stream()
-            .filter(caseDetails -> accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseType, userRoles, CAN_READ))
+            .filter(caseDetails -> accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseTypeDefinition, userRoles, CAN_READ))
             .collect(Collectors.toList())
             .stream()
-            .map(caseDetails -> verifyFieldReadAccess(caseType, userRoles, caseDetails))
+            .map(caseDetails -> verifyFieldReadAccess(caseTypeDefinition, userRoles, caseDetails))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
     }
 
-    private CaseType getCaseType(String caseTypeId) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+    private CaseTypeDefinition getCaseType(String caseTypeId) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
-        return caseType;
+        return caseTypeDefinition;
 
     }
 
@@ -87,16 +87,16 @@ public class AuthorisedSearchOperation implements SearchOperation {
         return userRoles;
     }
 
-    private Optional<CaseDetails> verifyFieldReadAccess(CaseType caseType, Set<String> userRoles, CaseDetails caseDetails) {
+    private Optional<CaseDetails> verifyFieldReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseDetails caseDetails) {
 
-        if (caseType == null || caseDetails == null || CollectionUtils.isEmpty(userRoles)) {
+        if (caseTypeDefinition == null || caseDetails == null || CollectionUtils.isEmpty(userRoles)) {
             return Optional.empty();
         }
 
         caseDetails.setData(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 userRoles,
                 CAN_READ,
                 false),
@@ -104,7 +104,7 @@ public class AuthorisedSearchOperation implements SearchOperation {
         caseDetails.setDataClassification(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                caseType.getCaseFields(),
+                caseTypeDefinition.getCaseFields(),
                 userRoles,
                 CAN_READ,
                 true),

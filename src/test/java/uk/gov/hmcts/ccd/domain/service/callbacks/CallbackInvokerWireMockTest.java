@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
@@ -71,7 +71,7 @@ public class CallbackInvokerWireMockTest {
     private CallbackResponse callbackResponse;
     private CaseDetails caseDetails = new CaseDetails();
     private final CaseEvent caseEvent = new CaseEvent();
-    private final CaseType caseType = new CaseType();
+    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private String testUrl;
 
     @Before
@@ -107,7 +107,7 @@ public class CallbackInvokerWireMockTest {
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490)));
 
         Instant start = Instant.now();
-        callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, false);
+        callbackInvoker.invokeAboutToStartCallback(caseEvent, caseTypeDefinition, caseDetails, false);
 
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.49s readTimeout
@@ -128,7 +128,7 @@ public class CallbackInvokerWireMockTest {
         Instant start = Instant.now();
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
-            callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, false));
+            callbackInvoker.invokeAboutToStartCallback(caseEvent, caseTypeDefinition, caseDetails, false));
         Assert.assertThat(callbackException.getMessage(), is("Callback to service has been unsuccessful for event Test"));
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout and no follow up retries

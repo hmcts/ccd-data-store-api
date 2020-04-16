@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -92,12 +92,12 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                                                                                                       ignoreWarning));
     }
 
-    private CaseType getCaseType(String caseTypeId) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+    private CaseTypeDefinition getCaseType(String caseTypeId) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
-        return caseType;
+        return caseTypeDefinition;
     }
 
     private Set<String> getCaseRoles(CaseDetails caseDetails) {
@@ -110,14 +110,14 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
     private StartEventTrigger verifyReadAccess(final String caseTypeId, final StartEventTrigger startEventTrigger) {
 
-        final CaseType caseType = getCaseType(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
         Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventTrigger.getCaseDetails()));
 
         CaseDetails caseDetails = startEventTrigger.getCaseDetails();
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(
-            caseType,
+            caseTypeDefinition,
             userRoles,
             CAN_READ)) {
             caseDetails.setData(newHashMap());
@@ -129,7 +129,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
             caseDetails.setData(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                    caseType.getCaseFields(),
+                    caseTypeDefinition.getCaseFields(),
                     userRoles,
                     CAN_READ,
                     false),
@@ -137,7 +137,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
             caseDetails.setDataClassification(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                    caseType.getCaseFields(),
+                    caseTypeDefinition.getCaseFields(),
                     userRoles,
                     CAN_READ,
                     true),

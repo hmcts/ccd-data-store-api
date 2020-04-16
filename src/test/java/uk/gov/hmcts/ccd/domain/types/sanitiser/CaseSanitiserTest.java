@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 import java.util.Collections;
@@ -20,7 +20,7 @@ public class CaseSanitiserTest {
 
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
-    private static final CaseType CASE_TYPE = new CaseType();
+    private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
 
     private static final String TYPE_SIMPLE = "Simple";
     private static final FieldType SIMPLE_FIELD_TYPE = new FieldType();

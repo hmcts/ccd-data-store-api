@@ -56,7 +56,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -1174,8 +1174,8 @@ public class CallbackTest extends WireMockBaseTest {
     public void shouldReturn422WhenPostCreateEventWithInvalidCallbackDataForCaseworker() throws Exception {
         final String EVENT_ID = "UPDATE-EVENT";
         final String CASE_TYPE_ID = "CallbackCase";
-        final CaseType caseType = new CaseType();
-        caseType.setId(CASE_TYPE_ID);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(CASE_TYPE_ID);
         final String JURISDICTION_ID = "TEST";
         final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(JURISDICTION_ID);
@@ -1216,8 +1216,8 @@ public class CallbackTest extends WireMockBaseTest {
     public void shouldReturn422WhenPostCreateEventWithInvalidCallbackDataForCitizen() throws Exception {
         final String EVENT_ID = "UPDATE-EVENT";
         final String CASE_TYPE_ID = "CallbackCase";
-        final CaseType caseType = new CaseType();
-        caseType.setId(CASE_TYPE_ID);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(CASE_TYPE_ID);
         final String JURISDICTION_ID = "TEST";
         final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(JURISDICTION_ID);

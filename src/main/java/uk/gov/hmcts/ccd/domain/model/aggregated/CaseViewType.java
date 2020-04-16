@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 public class CaseViewType {
     private String id;
@@ -57,11 +57,11 @@ public class CaseViewType {
 
     public void setPrintEnabled(boolean printEnabled) { this.isPrintEnabled = printEnabled; }
 
-    public static CaseViewType createFrom(CaseType caseType) {
-        return new CaseViewType(caseType.getId(),
-                                caseType.getName(),
-                                caseType.getDescription(),
-                                CaseViewJurisdiction.createFrom(caseType.getJurisdiction()),
-                                caseType.getPrintableDocumentsUrl() != null);
+    public static CaseViewType createFrom(CaseTypeDefinition caseTypeDefinition) {
+        return new CaseViewType(caseTypeDefinition.getId(),
+                                caseTypeDefinition.getName(),
+                                caseTypeDefinition.getDescription(),
+                                CaseViewJurisdiction.createFrom(caseTypeDefinition.getJurisdiction()),
+                                caseTypeDefinition.getPrintableDocumentsUrl() != null);
     }
 }

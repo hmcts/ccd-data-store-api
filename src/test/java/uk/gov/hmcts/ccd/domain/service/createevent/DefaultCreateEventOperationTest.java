@@ -58,7 +58,7 @@ class DefaultCreateEventOperationTest {
     private Event event;
 
     private Map<String, JsonNode> data;
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
     private CaseEvent eventTrigger;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
@@ -84,10 +84,10 @@ class DefaultCreateEventOperationTest {
         jurisdiction.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
-        caseType = new CaseType();
-        caseType.setId(CASE_TYPE_ID);
-        caseType.setJurisdiction(jurisdiction);
-        caseType.setVersion(version);
+        caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition.setJurisdiction(jurisdiction);
+        caseTypeDefinition.setVersion(version);
 
         eventTrigger = new CaseEvent();
         eventTrigger.setPostState(POST_STATE);

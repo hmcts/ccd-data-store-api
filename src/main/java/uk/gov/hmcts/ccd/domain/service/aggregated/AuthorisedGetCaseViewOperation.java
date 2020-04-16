@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -45,13 +45,13 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     public CaseView execute(String caseReference) {
         CaseView caseView = getCaseViewOperation.execute(caseReference);
 
-        CaseType caseType = getCaseType(caseView.getCaseType().getId());
+        CaseTypeDefinition caseTypeDefinition = getCaseType(caseView.getCaseType().getId());
         String caseId = getCaseId(caseReference);
         Set<String> userRoles = getUserRoles(caseId);
-        verifyCaseTypeReadAccess(caseType, userRoles);
+        verifyCaseTypeReadAccess(caseTypeDefinition, userRoles);
         filterCaseTabFieldsByReadAccess(caseView, userRoles);
         filterAllowedTabsWithFields(caseView, userRoles);
-        return filterUpsertAccess(caseType, userRoles, caseView);
+        return filterUpsertAccess(caseTypeDefinition, userRoles, caseView);
     }
 
     private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<String> userRoles) {
@@ -64,19 +64,19 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
             }).toArray(CaseViewTab[]::new));
     }
 
-    private CaseView filterUpsertAccess(CaseType caseType, Set<String> userRoles, CaseView caseView) {
+    private CaseView filterUpsertAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseView caseView) {
         CaseViewTrigger[] authorisedTriggers;
-        if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseType,
+        if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseTypeDefinition,
                                                                      userRoles,
                                                                      CAN_UPDATE)
             || !getAccessControlService().canAccessCaseStateWithCriteria(caseView.getState().getId(),
-                                                                      caseType,
+            caseTypeDefinition,
                                                                       userRoles,
                                                                       CAN_UPDATE)) {
             authorisedTriggers = new CaseViewTrigger[]{};
         } else {
             authorisedTriggers = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getTriggers(),
-                                                                                                caseType.getEvents(),
+                                                                                                caseTypeDefinition.getEvents(),
                                                                                                 userRoles);
         }
 

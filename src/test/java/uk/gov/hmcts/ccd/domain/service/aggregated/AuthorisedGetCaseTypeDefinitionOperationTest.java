@@ -33,10 +33,10 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
-class AuthorisedGetCaseTypeOperationTest {
+class AuthorisedGetCaseTypeDefinitionOperationTest {
 
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
@@ -165,9 +165,9 @@ class AuthorisedGetCaseTypeOperationTest {
 
 
 
-    private CaseType testCaseType1;
-    private CaseType testCaseType2;
-    private CaseType testCaseType3;
+    private CaseTypeDefinition testCaseTypeDefinition1;
+    private CaseTypeDefinition testCaseTypeDefinition2;
+    private CaseTypeDefinition testCaseTypeDefinition3;
 
     @Mock
     private AccessControlService accessControlService;
@@ -183,7 +183,7 @@ class AuthorisedGetCaseTypeOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseType1 = newCaseType()
+        testCaseTypeDefinition1 = newCaseType()
             .withId(CASE_TYPE_ID)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -204,7 +204,7 @@ class AuthorisedGetCaseTypeOperationTest {
             .withField(CASE_FIELD_1_3)
             .build();
 
-        testCaseType2 = newCaseType()
+        testCaseTypeDefinition2 = newCaseType()
             .withId(CASE_TYPE_ID)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -240,7 +240,7 @@ class AuthorisedGetCaseTypeOperationTest {
             .withField(CASE_FIELD_2_3)
             .build();
 
-        testCaseType3 = newCaseType()
+        testCaseTypeDefinition3 = newCaseType()
             .withId(CASE_TYPE_ID)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -260,15 +260,15 @@ class AuthorisedGetCaseTypeOperationTest {
 
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
 
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType1, USER_ROLES, CAN_CREATE);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType1, USER_ROLES, CAN_UPDATE);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType1, USER_ROLES, CAN_READ);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType2, USER_ROLES, CAN_CREATE);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType2, USER_ROLES, CAN_UPDATE);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType2, USER_ROLES, CAN_READ);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType3, USER_ROLES, CAN_CREATE);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType3, USER_ROLES, CAN_UPDATE);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType3, USER_ROLES, CAN_READ);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES, CAN_CREATE);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES, CAN_UPDATE);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES, CAN_READ);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2, USER_ROLES, CAN_CREATE);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2, USER_ROLES, CAN_UPDATE);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2, USER_ROLES, CAN_READ);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES, CAN_CREATE);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES, CAN_UPDATE);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES, CAN_READ);
         authorisedGetCaseTypeOperation = new AuthorisedGetCaseTypeOperation(accessControlService,
             userRepository,
             getCaseTypeOperation);
@@ -276,24 +276,24 @@ class AuthorisedGetCaseTypeOperationTest {
 
     @Nested
     @DisplayName("case type tests")
-    class ReturnsCaseTypeWithMatchingAccessCriteria {
+    class ReturnsCaseTypeDefinitionWithMatchingAccessCriteria {
 
         @Test
         @DisplayName("Should return case type that has matching access rights")
         void shouldReturnCreateAccessCaseType() {
-            doReturn(Optional.of(testCaseType2)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
+            doReturn(Optional.of(testCaseTypeDefinition2)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
 
-            Optional<CaseType> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
+            Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
 
-            assertThat(caseTypeOpt.get(), equalTo(testCaseType2));
+            assertThat(caseTypeOpt.get(), equalTo(testCaseTypeDefinition2));
         }
 
         @Test
         @DisplayName("Should not return case type that hasn't matching access rights")
         void shouldNotReturnCaseTypeIfNoCreateAccess() {
-            doReturn(Optional.of(testCaseType1)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
+            doReturn(Optional.of(testCaseTypeDefinition1)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
 
-            Optional<CaseType> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
+            Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
 
             assertThat(caseTypeOpt, equalTo(Optional.empty()));
         }
@@ -306,15 +306,15 @@ class AuthorisedGetCaseTypeOperationTest {
         @Test
         @DisplayName("Should return case states that have matching access rights")
         void shouldReturnCorrectCaseStatesThatHaveAccessRights() {
-            doReturn(Optional.of(testCaseType1)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
-            doReturn(newArrayList(CASE_STATE_1_1)).when(accessControlService).filterCaseStatesByAccess(testCaseType1.getStates(),
+            doReturn(Optional.of(testCaseTypeDefinition1)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
+            doReturn(newArrayList(CASE_STATE_1_1)).when(accessControlService).filterCaseStatesByAccess(testCaseTypeDefinition1.getStates(),
                 USER_ROLES,
                 CAN_READ);
 
-            Optional<CaseType> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_READ);
+            Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_READ);
 
             assertAll(
-                () -> assertThat(caseTypeOpt.get(), is(testCaseType1)),
+                () -> assertThat(caseTypeOpt.get(), is(testCaseTypeDefinition1)),
                 () -> assertThat(caseTypeOpt.get().getStates(), hasItems(CASE_STATE_1_1)),
                 () -> assertThat(caseTypeOpt.get().getStates(), not(hasItems(CASE_STATE_1_2)))
             );
@@ -323,9 +323,9 @@ class AuthorisedGetCaseTypeOperationTest {
         @Test
         @DisplayName("Should return no states if no matching access rights")
         void shouldNotReturnCaseTypeIfNoStatesThatHaveAccessRights() {
-            doReturn(Optional.of(testCaseType1)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
+            doReturn(Optional.of(testCaseTypeDefinition1)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
 
-            Optional<CaseType> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_READ);
+            Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_READ);
 
             assertThat(caseTypeOpt.get().getStates(), hasSize(0));
         }
@@ -338,13 +338,13 @@ class AuthorisedGetCaseTypeOperationTest {
         @Test
         @DisplayName("Should return case events that have matching access rights")
         void shouldReturnEventsWithMatchingAccessRights() {
-            doReturn(Optional.of(testCaseType3)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
+            doReturn(Optional.of(testCaseTypeDefinition3)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
             doReturn(newArrayList(CASE_EVENT_3_1, CASE_EVENT_3_3)).when(accessControlService).filterCaseEventsByAccess(
-                testCaseType3.getEvents(),
+                testCaseTypeDefinition3.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
 
-            Optional<CaseType> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
+            Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
 
             assertThat(caseTypeOpt.get().getEvents(), hasSize(2));
             assertThat(caseTypeOpt.get().getEvents(),
@@ -354,9 +354,9 @@ class AuthorisedGetCaseTypeOperationTest {
         @Test
         @DisplayName("Should return empty events if no event that have matching access rights")
         void shouldReturnNoEventsIfNoAccessRights() {
-            doReturn(Optional.of(testCaseType3)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
+            doReturn(Optional.of(testCaseTypeDefinition3)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
 
-            Optional<CaseType> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
+            Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
 
             assertThat(caseTypeOpt.get().getEvents(), hasSize(0));
         }
@@ -364,17 +364,17 @@ class AuthorisedGetCaseTypeOperationTest {
 
     @Nested
     @DisplayName("fields tests")
-    class ReturnsCaseTypeWithFieldsThatMatchAccessCriteria {
+    class ReturnsCaseTypeDefinitionWithFieldsThatMatchAccessCriteria {
 
         @Test
         @DisplayName("Should return case type with case fields that have matching access rights")
         void shouldReturnCaseTypeWithMatchingAccessFields() {
-            doReturn(Optional.of(testCaseType2)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
-            doReturn(newArrayList(CASE_FIELD_2_3)).when(accessControlService).filterCaseFieldsByAccess(testCaseType2.getCaseFields(),
+            doReturn(Optional.of(testCaseTypeDefinition2)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
+            doReturn(newArrayList(CASE_FIELD_2_3)).when(accessControlService).filterCaseFieldsByAccess(testCaseTypeDefinition2.getCaseFields(),
                 USER_ROLES,
                 CAN_CREATE);
 
-            Optional<CaseType> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
+            Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
 
             assertThat(caseTypeOpt.get().getCaseFields(), hasSize(1));
             assertThat(caseTypeOpt.get().getCaseFields(),

@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -71,12 +71,12 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     private void deduceDefaultClassificationIfCaseDetailsPresent(String caseTypeId, CaseDetails caseDetails) {
         if (null != caseDetails) {
-            final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-            if (caseType == null) {
+            final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+            if (caseTypeDefinition == null) {
                 throw new ValidationException("Cannot find case type definition for " + caseTypeId);
             }
-            caseDetails.setSecurityClassification(caseType.getSecurityClassification());
-            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
+            caseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
+            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, caseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
         }
     }
 

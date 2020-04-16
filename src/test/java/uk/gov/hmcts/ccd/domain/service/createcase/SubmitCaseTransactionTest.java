@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -93,7 +93,7 @@ class SubmitCaseTransactionTest {
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
     private IdamUser idamUser;
     private CaseEvent eventTrigger;
     private CaseState state;
@@ -112,14 +112,14 @@ class SubmitCaseTransactionTest {
                                                           userAuthorisation);
 
         event = buildEvent();
-        caseType = buildCaseType();
+        caseTypeDefinition = buildCaseType();
         idamUser = buildIdamUser();
         eventTrigger = buildEventTrigger();
         state = buildState();
         final AboutToSubmitCallbackResponse response = buildResponse();
         doReturn(STATE_ID).when(savedCaseDetails).getState();
 
-        doReturn(state).when(caseTypeService).findState(caseType, STATE_ID);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, STATE_ID);
 
         doReturn(CASE_UID).when(uidService).generateUID();
 
@@ -129,7 +129,7 @@ class SubmitCaseTransactionTest {
 
         doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
                                                                              null,
-                                                                             this.caseDetails, caseType, IGNORE_WARNING
+                                                                             this.caseDetails, caseTypeDefinition, IGNORE_WARNING
         );
 
     }
@@ -155,7 +155,7 @@ class SubmitCaseTransactionTest {
     @DisplayName("should persist case")
     void shouldPersistCase() {
         final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
-                                                                               caseType,
+            caseTypeDefinition,
                                                                                idamUser,
                                                                                eventTrigger,
                                                                                this.caseDetails,
@@ -178,7 +178,7 @@ class SubmitCaseTransactionTest {
         final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
 
         submitCaseTransaction.submitCase(event,
-                                         caseType,
+            caseTypeDefinition,
                                          idamUser,
                                          eventTrigger,
                                          this.caseDetails,
@@ -196,7 +196,7 @@ class SubmitCaseTransactionTest {
         final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
 
         submitCaseTransaction.submitCase(event,
-                                         caseType,
+            caseTypeDefinition,
                                          idamUser,
                                          eventTrigger,
                                          this.caseDetails,
@@ -214,7 +214,7 @@ class SubmitCaseTransactionTest {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
 
         submitCaseTransaction.submitCase(event,
-                                         caseType,
+            caseTypeDefinition,
                                          idamUser,
                                          eventTrigger,
                                          this.caseDetails,
@@ -229,7 +229,7 @@ class SubmitCaseTransactionTest {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
 
         submitCaseTransaction.submitCase(event,
-                                         caseType,
+            caseTypeDefinition,
                                          idamUser,
                                          eventTrigger,
                                          this.caseDetails,
@@ -242,13 +242,13 @@ class SubmitCaseTransactionTest {
     @DisplayName("should invoke callback")
     void shouldInvokeCallback() {
         submitCaseTransaction.submitCase(event,
-                                         caseType,
+            caseTypeDefinition,
                                          idamUser,
                                          eventTrigger,
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger, null, caseDetails, caseType, IGNORE_WARNING);
+        verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger, null, caseDetails, caseTypeDefinition, IGNORE_WARNING);
     }
 
     private void assertAuditEvent(final AuditEvent auditEvent) {
@@ -294,13 +294,13 @@ class SubmitCaseTransactionTest {
         return event;
     }
 
-    private CaseType buildCaseType() {
+    private CaseTypeDefinition buildCaseType() {
         final Version version = new Version();
         version.setNumber(VERSION);
-        final CaseType caseType = new CaseType();
-        caseType.setId(CASE_TYPE_ID);
-        caseType.setVersion(version);
-        return caseType;
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition.setVersion(version);
+        return caseTypeDefinition;
     }
 
     private CaseEvent buildEventTrigger() {

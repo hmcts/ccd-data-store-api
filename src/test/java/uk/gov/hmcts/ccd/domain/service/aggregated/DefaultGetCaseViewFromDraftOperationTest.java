@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -88,7 +88,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     private GetCaseViewOperation getDraftViewOperation;
 
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
     private CaseTabCollection caseTabCollection;
     private DraftResponse draftResponse;
     private CaseDetails caseDetails;
@@ -136,11 +136,11 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                   .build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        caseType = new CaseType();
+        caseTypeDefinition = new CaseTypeDefinition();
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
-        caseType.setJurisdiction(jurisdiction);
-        doReturn(caseType).when(caseTypeService).getCaseType(CASE_TYPE_ID);
+        caseTypeDefinition.setJurisdiction(jurisdiction);
+        doReturn(caseTypeDefinition).when(caseTypeService).getCaseType(CASE_TYPE_ID);
 
         doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
 
@@ -214,13 +214,13 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseType.setCaseFields(singletonList(newCaseField()
+            caseTypeDefinition.setCaseFields(singletonList(newCaseField()
                                                      .withId(CASE_HISTORY_VIEWER)
                                                      .withFieldType(aFieldType()
                                                                         .withType(CASE_HISTORY_VIEWER)
                                                                         .build())
                                                      .build()));
-            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 
@@ -258,8 +258,8 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseType.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
-            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+            caseTypeDefinition.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 

@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 import javax.inject.Inject;
@@ -25,7 +25,7 @@ public class CaseSanitiser {
         });
     }
 
-    public Map<String, JsonNode> sanitise(final CaseType caseType, final Map<String, JsonNode> caseData) {
+    public Map<String, JsonNode> sanitise(final CaseTypeDefinition caseTypeDefinition, final Map<String, JsonNode> caseData) {
 
         final Map<String, JsonNode> sanitisedData = new HashMap<>();
 
@@ -35,7 +35,7 @@ public class CaseSanitiser {
 
         final Map<String, CaseField> fieldsMap = new HashMap<>();
 
-        caseType.getCaseFields().forEach(field -> {
+        caseTypeDefinition.getCaseFields().forEach(field -> {
             fieldsMap.put(field.getId(), field);
         });
 

@@ -47,7 +47,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
@@ -121,8 +121,8 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "List of case types for the given access criteria"),
         @ApiResponse(code = 404, message = "No case types found for given access criteria")})
     @SuppressWarnings("squid:CallToDeprecatedMethod")
-    public List<CaseType> getCaseTypes(@PathVariable("jid") final String jurisdictionId,
-                                       @RequestParam(value = "access", required = true) String access) {
+    public List<CaseTypeDefinition> getCaseTypes(@PathVariable("jid") final String jurisdictionId,
+                                                 @RequestParam(value = "access", required = true) String access) {
         return getCaseTypesOperation.execute(jurisdictionId, ofNullable(accessMap.get(access))
             .orElseThrow(() -> new ResourceNotFoundException("No case types found")));
     }
