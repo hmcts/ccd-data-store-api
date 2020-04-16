@@ -85,7 +85,7 @@ public class CaseEventTriggerBuilder {
     }
 
     private List<CaseViewField> mergeEventFields(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, CaseEvent eventTrigger) {
-        final List<CaseEventField> eventFields = eventTrigger.getCaseFields();
+        final List<CaseEventFieldDefinition> eventFields = eventTrigger.getCaseFields();
         final List<CaseFieldDefinition> caseFieldDefinitions = caseTypeDefinition.getCaseFieldDefinitions();
 
         return caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails != null ? caseDetails.getCaseDataAndMetadata() : null);

@@ -17,7 +17,7 @@ public class CaseEvent implements Serializable {
     @JsonProperty("order")
     private Integer displayOrder = null;
     @JsonProperty("case_fields")
-    private List<CaseEventField> caseFields = new ArrayList<>();
+    private List<CaseEventFieldDefinition> caseFields = new ArrayList<>();
     @JsonProperty("pre_states")
     private List<String> preStates = new ArrayList<>();
     @JsonProperty("post_state")
@@ -79,11 +79,11 @@ public class CaseEvent implements Serializable {
         this.displayOrder = displayOrder;
     }
 
-    public List<CaseEventField> getCaseFields() {
+    public List<CaseEventFieldDefinition> getCaseFields() {
         return caseFields;
     }
 
-    public void setCaseFields(List<CaseEventField> caseFields) {
+    public void setCaseFields(List<CaseEventFieldDefinition> caseFields) {
         this.caseFields = caseFields;
     }
 

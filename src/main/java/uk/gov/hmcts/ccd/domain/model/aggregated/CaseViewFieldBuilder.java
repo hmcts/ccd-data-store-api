@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
@@ -23,7 +23,7 @@ public class CaseViewFieldBuilder {
         this.compoundFieldOrderService = compoundFieldOrderService;
     }
 
-    public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventField eventField) {
+    public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventFieldDefinition eventField) {
         final CaseViewField field = new CaseViewField();
 
         field.setId(eventField.getCaseFieldId());
@@ -45,19 +45,19 @@ public class CaseViewFieldBuilder {
         return field;
     }
 
-    private void buildFieldType(final CaseFieldDefinition caseFieldDefinition, final CaseEventField eventField, final CaseViewField field) {
+    private void buildFieldType(final CaseFieldDefinition caseFieldDefinition, final CaseEventFieldDefinition eventField, final CaseViewField field) {
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseFieldDefinition, eventField.getCaseEventFieldComplex(), ROOT);
         field.setFieldType(caseFieldDefinition.getFieldType());
     }
 
-    public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventField eventField, Object value) {
+    public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventFieldDefinition eventField, Object value) {
         final CaseViewField field = build(caseFieldDefinition, eventField);
         field.setValue(value);
 
         return field;
     }
 
-    public List<CaseViewField> build(List<CaseFieldDefinition> caseFieldDefinitions, List<CaseEventField> eventFields, Map<String, ?> data) {
+    public List<CaseViewField> build(List<CaseFieldDefinition> caseFieldDefinitions, List<CaseEventFieldDefinition> eventFields, Map<String, ?> data) {
         final Map<String, CaseFieldDefinition> caseFieldMap = caseFieldDefinitions.stream()
             .collect(Collectors.toMap(CaseFieldDefinition::getId, Function.identity()));
 

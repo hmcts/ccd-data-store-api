@@ -11,7 +11,7 @@ import lombok.ToString;
 
 @ToString
 @ApiModel(description = "")
-public class CaseEventField implements Serializable {
+public class CaseEventFieldDefinition implements Serializable {
 
     private String caseFieldId = null;
     private String displayContext = null;

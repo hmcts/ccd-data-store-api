@@ -53,7 +53,7 @@ class CaseEventTriggerBuilderTest {
         .build();
     private final List<CaseEvent> events = Lists.newArrayList(newCaseEvent().build());
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList(newCaseField().build());
-    private final List<CaseEventField> eventFields = Lists.newArrayList();
+    private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
     private final CaseTypeDefinition caseTypeDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID).withEvents(events).withCaseFields(caseFieldDefinitions).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
     private final StartEventTrigger startEventTrigger = newStartEventTrigger().withCaseDetails(caseDetails).withEventToken(TOKEN).build();

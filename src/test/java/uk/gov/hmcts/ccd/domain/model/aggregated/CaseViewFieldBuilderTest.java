@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
@@ -42,9 +42,9 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 public class CaseViewFieldBuilderTest {
 
     private static final CaseFieldDefinition CASE_FIELD_2 = new CaseFieldDefinition();
-    private static final CaseEventField EVENT_FIELD = new CaseEventField();
-    private static final CaseEventField EVENT_FIELD_2 = new CaseEventField();
-    private static final CaseEventField EVENT_FIELD_3 = new CaseEventField();
+    private static final CaseEventFieldDefinition EVENT_FIELD = new CaseEventFieldDefinition();
+    private static final CaseEventFieldDefinition EVENT_FIELD_2 = new CaseEventFieldDefinition();
+    private static final CaseEventFieldDefinition EVENT_FIELD_3 = new CaseEventFieldDefinition();
     private static final String FIRST_NAME = "Patrick";
     private static final String LAST_NAME = "Smith";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -144,7 +144,7 @@ public class CaseViewFieldBuilderTest {
             doReturn(expectedField2).when(fieldBuilder).build(CASE_FIELD_2, EVENT_FIELD_2);
 
             final List<CaseFieldDefinition> caseFieldDefinitions = asList(CASE_FIELD, CASE_FIELD_2);
-            final List<CaseEventField> eventFields = asList(EVENT_FIELD, EVENT_FIELD_2);
+            final List<CaseEventFieldDefinition> eventFields = asList(EVENT_FIELD, EVENT_FIELD_2);
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("PersonFirstName", JSON_NODE_FACTORY.textNode(FIRST_NAME));
             data.put("PersonLastName", JSON_NODE_FACTORY.textNode(LAST_NAME));
@@ -165,7 +165,7 @@ public class CaseViewFieldBuilderTest {
             doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD, EVENT_FIELD);
 
             final List<CaseFieldDefinition> caseFieldDefinitions = asList(CASE_FIELD);
-            final List<CaseEventField> eventFields = asList(EVENT_FIELD, EVENT_FIELD_2);
+            final List<CaseEventFieldDefinition> eventFields = asList(EVENT_FIELD, EVENT_FIELD_2);
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("PersonFirstName", JSON_NODE_FACTORY.textNode(FIRST_NAME));
             data.put("PersonLastName", JSON_NODE_FACTORY.textNode(LAST_NAME));
@@ -176,7 +176,7 @@ public class CaseViewFieldBuilderTest {
             assertThat(fields, contains(expectedField));
 
             verify(fieldBuilder).build(CASE_FIELD, EVENT_FIELD, data.get("PersonFirstName"));
-            verify(fieldBuilder, times(1)).build(Mockito.any(CaseFieldDefinition.class), Mockito.any(CaseEventField.class), any());
+            verify(fieldBuilder, times(1)).build(Mockito.any(CaseFieldDefinition.class), Mockito.any(CaseEventFieldDefinition.class), any());
         }
 
         @Test
@@ -186,7 +186,7 @@ public class CaseViewFieldBuilderTest {
             doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD, EVENT_FIELD);
 
             final List<CaseFieldDefinition> caseFieldDefinitions = asList(CASE_FIELD, CASE_FIELD_2);
-            final List<CaseEventField> eventFields = asList(EVENT_FIELD);
+            final List<CaseEventFieldDefinition> eventFields = asList(EVENT_FIELD);
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("PersonFirstName", JSON_NODE_FACTORY.textNode(FIRST_NAME));
             data.put("PersonLastName", JSON_NODE_FACTORY.textNode(LAST_NAME));
@@ -197,7 +197,7 @@ public class CaseViewFieldBuilderTest {
             assertThat(fields, contains(expectedField));
 
             verify(fieldBuilder).build(CASE_FIELD, EVENT_FIELD, data.get("PersonFirstName"));
-            verify(fieldBuilder, times(1)).build(Mockito.any(CaseFieldDefinition.class), Mockito.any(CaseEventField.class), any());
+            verify(fieldBuilder, times(1)).build(Mockito.any(CaseFieldDefinition.class), Mockito.any(CaseEventFieldDefinition.class), any());
         }
 
         @Test
@@ -207,7 +207,7 @@ public class CaseViewFieldBuilderTest {
             doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD, EVENT_FIELD);
 
             final List<CaseFieldDefinition> caseFieldDefinitions = asList(CASE_FIELD);
-            final List<CaseEventField> eventFields = asList(EVENT_FIELD);
+            final List<CaseEventFieldDefinition> eventFields = asList(EVENT_FIELD);
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("PersonLastName", JSON_NODE_FACTORY.textNode(LAST_NAME));
 
@@ -225,11 +225,11 @@ public class CaseViewFieldBuilderTest {
             String overriddenHint = "overridden hint";
             CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
             caseFieldDefinition.setFieldType(textFieldType);
-            CaseEventField caseEventField = new CaseEventField();
-            caseEventField.setLabel(overriddenLabel);
-            caseEventField.setHintText(overriddenHint);
+            CaseEventFieldDefinition caseEventFieldDefinition = new CaseEventFieldDefinition();
+            caseEventFieldDefinition.setLabel(overriddenLabel);
+            caseEventFieldDefinition.setHintText(overriddenHint);
 
-            CaseViewField caseViewField = fieldBuilder.build(caseFieldDefinition, caseEventField);
+            CaseViewField caseViewField = fieldBuilder.build(caseFieldDefinition, caseEventFieldDefinition);
 
             assertThat(caseViewField.getLabel(), is(overriddenLabel));
             assertThat(caseViewField.getHintText(), is(overriddenHint));

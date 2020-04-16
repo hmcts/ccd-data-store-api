@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -56,7 +56,7 @@ class DefaultGetEventTriggerOperationTest {
     private final DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withEventTriggerId(EVENT_TRIGGER_ID).build()).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
     private final CaseEvent caseEvent = new CaseEvent();
-    private final List<CaseEventField> eventFields = Lists.newArrayList();
+    private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
     private final StartEventTrigger startEventTrigger = newStartEventTrigger().withEventToken(TOKEN).withCaseDetails(caseDetails).build();
     private final CaseEventTrigger caseEventTrigger = newCaseEventTrigger().build();
 
