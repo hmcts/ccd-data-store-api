@@ -252,7 +252,8 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
         doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
-        doReturn(AUTH_CASE_VIEW_TRIGGERS).when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
+        doReturn(AUTH_CASE_VIEW_TRIGGERS).when(accessControlService)
+            .filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
         assertThat(caseView.getTriggers(), arrayWithSize(1));
@@ -264,7 +265,8 @@ class AuthorisedGetCaseViewOperationTest {
     void shouldReturnEmptyCaseViewTriggersWhenNotAuthorisedByAccess() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
-        doReturn(EMPTY_TRIGGERS).when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
+        doReturn(EMPTY_TRIGGERS).when(accessControlService)
+            .filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 

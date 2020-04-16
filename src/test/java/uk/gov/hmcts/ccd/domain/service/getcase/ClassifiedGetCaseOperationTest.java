@@ -49,7 +49,7 @@ class ClassifiedGetCaseOperationTest {
 
     @Nested
     @DisplayName("execute(jurisdictionId, caseTypeId, caseReference)")
-    class execute_jurisdictionCaseTypeReference {
+    class ExecuteJurisdictionCaseTypeReference {
         @Test
         @DisplayName("should call decorated implementation")
         void shouldCallDecoratedImplementation() {
@@ -99,7 +99,7 @@ class ClassifiedGetCaseOperationTest {
 
     @Nested
     @DisplayName("execute(caseReference)")
-    class execute_reference {
+    class ExecuteReference {
         @Test
         @DisplayName("should call decorated implementation")
         void shouldCallDecoratedImplementation() {

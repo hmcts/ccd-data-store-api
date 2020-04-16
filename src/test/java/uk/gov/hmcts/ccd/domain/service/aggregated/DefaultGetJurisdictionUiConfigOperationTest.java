@@ -49,9 +49,9 @@ class DefaultGetJurisdictionUiConfigOperationTest {
         List<JurisdictionUiConfig> configs = defaultGetJurisdictionUiConfigOperation.execute(jurisdictionReferences);
         assertEquals(2, configs.size());
     }
-    
+
     private JurisdictionUiConfigResult createConfigResultWithEmptyCollection() {
-    	JurisdictionUiConfigResult jurisdictionUiConfigResult = new JurisdictionUiConfigResult(Lists.emptyList());
+        JurisdictionUiConfigResult jurisdictionUiConfigResult = new JurisdictionUiConfigResult(Lists.emptyList());
         return jurisdictionUiConfigResult;
     }
 

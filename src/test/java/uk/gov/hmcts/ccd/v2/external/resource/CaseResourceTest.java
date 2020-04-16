@@ -47,7 +47,7 @@ class CaseResourceTest {
 
     @BeforeEach
     void setUp() {
-        caseDetails = aCaseDetails();
+        caseDetails = caseDetails();
         caseDataContent = newCaseDataContent().build();
     }
 
@@ -55,7 +55,7 @@ class CaseResourceTest {
     @DisplayName("Get case")
     class GetCase {
 
-        private final String LINK_SELF = String.format("/cases/%s", REFERENCE);
+        private final String linkSelf = String.format("/cases/%s", REFERENCE);
 
         @Test
         @DisplayName("should copy case details")
@@ -86,7 +86,7 @@ class CaseResourceTest {
             final CaseResource caseResource = new CaseResource(caseDetails);
 
             Optional<Link> self = caseResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(LINK_SELF));
+            assertThat(self.get().getHref(), equalTo(linkSelf));
         }
     }
 
@@ -94,7 +94,7 @@ class CaseResourceTest {
     @DisplayName("Create event")
     class CreateEvent {
 
-        private final String LINK_SELF = String.format("/cases/%s/events", REFERENCE);
+        private final String linkSelf = String.format("/cases/%s/events", REFERENCE);
 
         @Test
         @DisplayName("should copy case details")
@@ -125,7 +125,7 @@ class CaseResourceTest {
             final CaseResource caseResource = new CaseResource(caseDetails, caseDataContent);
 
             Optional<Link> self = caseResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(LINK_SELF));
+            assertThat(self.get().getHref(), equalTo(linkSelf));
         }
     }
 
@@ -133,7 +133,7 @@ class CaseResourceTest {
     @DisplayName("Create case")
     class CreateCase {
 
-        private final String LINK_SELF = String.format("/case-types/%s/cases?ignore-warning=%s", CASE_TYPE, IGNORE_WARNING);
+        private final String linkSelf = String.format("/case-types/%s/cases?ignore-warning=%s", CASE_TYPE, IGNORE_WARNING);
 
         @Test
         @DisplayName("should copy case details")
@@ -164,11 +164,11 @@ class CaseResourceTest {
             final CaseResource caseResource = new CaseResource(caseDetails, caseDataContent, IGNORE_WARNING);
 
             Optional<Link> self = caseResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(LINK_SELF));
+            assertThat(self.get().getHref(), equalTo(linkSelf));
         }
     }
 
-    private CaseDetails aCaseDetails() {
+    private CaseDetails caseDetails() {
         final CaseDetails caseDetails = new CaseDetails();
 
         caseDetails.setReference(REFERENCE);

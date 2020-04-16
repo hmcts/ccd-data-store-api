@@ -11,7 +11,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.*;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.aSearchResult;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
@@ -102,7 +102,7 @@ public class SearchQueryOperationTest {
                                                         mergeDataToSearchResultOperation,
                                                         getCaseTypeOperation,
                                                         getDraftsOperation, uiDefinitionRepository, userRepository);
-        SearchResult searchResult = aSearchResult()
+        SearchResult searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2))
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
@@ -219,7 +219,7 @@ public class SearchQueryOperationTest {
     @Test
     @DisplayName("should get workBasketResult and pass to mergeDataToSearchResultOperation")
     public void shouldGetWorkBasketResultAndMerge() {
-        SearchResult searchResult = aSearchResult()
+        SearchResult searchResult = searchResult()
              .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2))
              .build();
         doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
@@ -235,7 +235,7 @@ public class SearchQueryOperationTest {
     @Test
     @DisplayName("should get searchResult and pass to mergeDataToSearchResultOperation")
     public void shouldGetSearchResultsAndMerge() {
-        SearchResult searchResult = aSearchResult()
+        SearchResult searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2))
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
@@ -253,7 +253,7 @@ public class SearchQueryOperationTest {
     public void shouldBuildSortOrderFieldsFromSortResultsFieldsOnly() {
         SearchResultField nonSortField = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2);
         SearchResultField sortField = buildSortResultField(CASE_FIELD_2, "", null, ASC, 1);
-        SearchResult searchResult = aSearchResult()
+        SearchResult searchResult = searchResult()
             .withSearchResultFields(nonSortField, sortField)
             .build();
 
@@ -272,7 +272,7 @@ public class SearchQueryOperationTest {
     public void shouldBuildSortOrderFieldsInTheOrderOfPriority() {
         SearchResultField sortField1 = buildSortResultField(CASE_FIELD_ID_1_1, "", null, ASC, 2);
         SearchResultField sortField2 = buildSortResultField(CASE_FIELD_ID_1_2, "", null, DESC, 1);
-        SearchResult searchResult = aSearchResult()
+        SearchResult searchResult = searchResult()
             .withSearchResultFields(sortField1, sortField2)
             .build();
 
@@ -292,7 +292,7 @@ public class SearchQueryOperationTest {
     public void shouldFilterSortOrderFieldsBasedOnUserRole() {
         SearchResultField sortField1 = buildSortResultField(CASE_FIELD_ID_1_1, "", USER_ROLE_1, ASC, 2);
         SearchResultField sortField2 = buildSortResultField(CASE_FIELD_ID_1_2, CASE_FIELD_PATH, USER_ROLE_2, DESC, 1);
-        SearchResult searchResult = aSearchResult()
+        SearchResult searchResult = searchResult()
             .withSearchResultFields(sortField1, sortField2)
             .build();
 

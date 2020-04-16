@@ -91,7 +91,7 @@ class UIDefinitionControllerTest {
 
     @Mock
     private GetBannerOperation getBannerOperation;
-    
+
     @Mock
     private GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation;
 
@@ -276,7 +276,7 @@ class UIDefinitionControllerTest {
             );
         }
     }
-  
+
     @Nested
     @DisplayName("GET /internal/jurisdiction-ui-configs")
     class GetJurisdictionUiConfigs {
@@ -289,8 +289,8 @@ class UIDefinitionControllerTest {
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                	UIJurisdictionConfigResource uiJurisdictionConfigResource = response.getBody();
-                    assertThat(Lists.newArrayList(uiJurisdictionConfigResource.getConfigs()),hasItems(
+                    UIJurisdictionConfigResource uiJurisdictionConfigResource = response.getBody();
+                    assertThat(Lists.newArrayList(uiJurisdictionConfigResource.getConfigs()), hasItems(
                         hasProperty("id", is("Reference 1")),
                         hasProperty("id", is("Reference 2")),
                         hasProperty("name", is("Name 1")),

@@ -46,7 +46,7 @@ class CachedCaseDefinitionRepositoryTest {
 
     @Nested
     @DisplayName("getCaseTypesForJurisdiction()")
-    class getCaseTypeDefinitionsForJurisdiction {
+    class GetCaseTypeDefinitionsForJurisdiction {
 
         @Test
         @DisplayName("should initially retrieve case types from decorated repository")
@@ -72,7 +72,8 @@ class CachedCaseDefinitionRepositoryTest {
 
             verify(caseDefinitionRepository, times(1)).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
-            doReturn(newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition())).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
+            doReturn(newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition()))
+                .when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             final List<CaseTypeDefinition> caseTypeDefinitions = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
 
@@ -85,7 +86,7 @@ class CachedCaseDefinitionRepositoryTest {
 
     @Nested
     @DisplayName("getBaseTypes()")
-    class getBaseTypes {
+    class GetBaseTypes {
 
         @Test
         @DisplayName("should initially retrieve base types from decorated repository")

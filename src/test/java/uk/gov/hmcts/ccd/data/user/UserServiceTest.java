@@ -59,7 +59,7 @@ public class UserServiceTest {
     public void testReturnsUserProfileDiscardingUnknownJurisdictions() {
 
         when(userRepoMock.getUserDetails()).thenReturn(mockIDAMProps);
-        UserDefault userDefaultMock = aUserDefault();
+        UserDefault userDefaultMock = userDefault();
         when(userRepoMock.getUserDefaultSettings("email")).thenReturn(userDefaultMock);
         when(jurisdictionsResolver.getJurisdictions()).thenReturn(Lists.newArrayList("J1", "J2", "J3"));
         when(caseDefinitionRepoMock.getJurisdiction("J1")).thenReturn(j1);
@@ -103,7 +103,7 @@ public class UserServiceTest {
         assertNull(workbasketDefault);
     }
 
-    private UserDefault aUserDefault() {
+    private UserDefault userDefault() {
         UserDefault userDefault = new UserDefault();
         userDefault.setWorkBasketDefaultJurisdiction("J1");
         userDefault.setWorkBasketDefaultCaseType("CT");

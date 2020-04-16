@@ -29,12 +29,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 public class DocumentValidatorTest implements IVallidatorTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String CASE_FIELD_STRING =
-        "{\n" +
-        "  \"id\": \"DOCUMENT_FIELD_ID\",\n" +
-        "  \"field_type\": {\n" +
-        "    \"type\": \"Document\"\n" +
-        "    }\n" +
-        "}";
+        "{\n"
+            + "  \"id\": \"DOCUMENT_FIELD_ID\",\n"
+            + "  \"field_type\": {\n"
+            + "    \"type\": \"Document\"\n"
+            + "    }\n"
+            + "}";
     private static final String VALID_DOCUMENT_URL = "https://dm.reform.hmcts.net/documents/a1-2Z-3-x";
     private static final String MISSING_DOCUMENT_PATH_URL = "https://dm.reform.hmcts.net/docs/a1-2Z-3-x";
     private static final String UNKNOWN_DOCUMENT_DOMAIN_URL = "https://example.com/documents/a1-2Z-3-x";

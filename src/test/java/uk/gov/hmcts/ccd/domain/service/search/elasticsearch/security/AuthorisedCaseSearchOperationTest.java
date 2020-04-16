@@ -104,7 +104,9 @@ class AuthorisedCaseSearchOperationTest {
             when(userRepository.getUserRoles()).thenReturn(userRoles);
             when(objectMapperService.convertObjectToJsonNode(unFilteredData)).thenReturn(jsonNode);
             CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-            when(accessControlService.filterCaseFieldsByAccess(jsonNode, caseTypeDefinition.getCaseFieldDefinitions(), userRoles, CAN_READ, false)).thenReturn(jsonNode);
+            when(accessControlService.filterCaseFieldsByAccess(jsonNode,
+                caseTypeDefinition.getCaseFieldDefinitions(),
+                userRoles, CAN_READ, false)).thenReturn(jsonNode);
             Map<String, JsonNode> filteredData = new HashMap<>();
             when(objectMapperService.convertJsonNodeToMap(jsonNode)).thenReturn(filteredData);
 

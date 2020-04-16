@@ -45,7 +45,7 @@ class CreatorGetCaseOperationTest {
 
     @Nested
     @DisplayName("execute(String jurisdictionId, String caseTypeId, String caseReference)")
-    class deprecated_method {
+    class DeprecatedMethod {
 
         @Test
         @DisplayName("Should return an Optional containing the case if the case is visible")
@@ -74,7 +74,7 @@ class CreatorGetCaseOperationTest {
 
     @Nested
     @DisplayName("execute(String caseReference)")
-    class contemporary_method {
+    class ContemporaryMethod {
 
         @Test
         @DisplayName("Should return an Optional containing the case if the case is visible")
@@ -113,8 +113,7 @@ class CreatorGetCaseOperationTest {
 
         if (args.length == 1) {
             verify(getCaseOperation).execute(same(JURISDICTION_ID));
-        }
-        else {
+        } else {
             verify(getCaseOperation).execute(same(JURISDICTION_ID), same(CASE_TYPE_ID), same(CASE_REFERENCE));
         }
 

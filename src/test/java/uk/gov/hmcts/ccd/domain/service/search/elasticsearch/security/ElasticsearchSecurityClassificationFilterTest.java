@@ -42,13 +42,13 @@ class ElasticsearchSecurityClassificationFilterTest {
 
     @Test
     void shouldCreateTermsQueryBuilder() {
-        String caseTypeId = "caseType";
         String jurisdictionId = "jurisdiction";
         when(userRepository.getHighestUserClassification(jurisdictionId)).thenReturn(PRIVATE);
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(jurisdictionId);
         caseTypeDefinition.setJurisdiction(jurisdiction);
+        String caseTypeId = "caseType";
         when(caseTypeService.getCaseType(caseTypeId)).thenReturn(caseTypeDefinition);
 
         Optional<QueryBuilder> optQueryBuilder = filter.getFilter(caseTypeId);

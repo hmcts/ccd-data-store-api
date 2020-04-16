@@ -145,11 +145,11 @@ public abstract class BaseTest {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         jdbcTemplate.queryForList(
-            "SELECT " +
-                "'TRUNCATE TABLE \"' || tablename || '\" CASCADE;' as truncate_statement " +
-            "FROM pg_tables " +
-            "WHERE schemaname = 'public' " +
-            "AND tablename NOT IN ('databasechangeloglock','databasechangelog')"
+            "SELECT "
+                + "'TRUNCATE TABLE \"' || tablename || '\" CASCADE;' as truncate_statement "
+                + "FROM pg_tables "
+                + "WHERE schemaname = 'public' "
+                + "AND tablename NOT IN ('databasechangeloglock','databasechangelog')"
         ).stream()
             .map(resultRow -> resultRow.get("truncate_statement"))
             .forEach(truncateStatement ->

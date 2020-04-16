@@ -57,7 +57,8 @@ class DefaultGetCaseTypesOperationTestDefinition {
             () -> assertThat(updateCaseTypeDefinitions, is(equalTo(createCaseTypeDefinitions))),
             () -> assertThat(readCaseTypeDefinitions, is(equalTo(updateCaseTypeDefinitions))),
             () -> assertThat(updateCaseTypeDefinitions, is(equalTo(readCaseTypeDefinitions))),
-            () -> assertThat(createCaseTypeDefinitions, IsCollectionContaining.hasItems(testCaseTypeDefinition1, testCaseTypeDefinition2, testCaseTypeDefinition3))
+            () -> assertThat(createCaseTypeDefinitions, IsCollectionContaining.hasItems(testCaseTypeDefinition1,
+                                                        testCaseTypeDefinition2, testCaseTypeDefinition3))
         );
     }
 

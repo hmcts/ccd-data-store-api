@@ -30,8 +30,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class CaseRolesIT extends WireMockBaseTest {
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE = "/aggregated/caseworkers/0/jurisdictions/PROBATE" +
-        "/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE = "/aggregated/caseworkers/0/jurisdictions/PROBATE"
+        + "/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
 
     @Inject
     private WebApplicationContext wac;
@@ -57,7 +57,7 @@ public class CaseRolesIT extends WireMockBaseTest {
     }
 
     @Test
-    public void getEventTriggerForCaseType_200_shouldAddFieldsWithCREATORCaseRole() throws Exception {
+    public void getEventTriggerForCaseType_200_shouldAddFieldsWith_CREATOR_CaseRole() throws Exception {
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE)
             .contentType(JSON_CONTENT_TYPE)

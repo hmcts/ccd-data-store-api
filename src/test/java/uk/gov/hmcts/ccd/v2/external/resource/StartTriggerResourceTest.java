@@ -27,11 +27,11 @@ class StartTriggerResourceTest {
     @BeforeEach
     void setUp() {
         CASE_DETAILS.setCaseTypeId(CASE_TYPE_ID);
-        startEventTrigger = aStartEventTrigger();
+        startEventTrigger = startEventTrigger();
         ignoreWarning = true;
     }
 
-    private StartEventTrigger aStartEventTrigger() {
+    private StartEventTrigger startEventTrigger() {
         final StartEventTrigger startEventTrigger = new StartEventTrigger();
 
         startEventTrigger.setCaseDetails(CASE_DETAILS);
@@ -79,7 +79,7 @@ class StartTriggerResourceTest {
             CASE_DETAILS.setReference(CASE_REFERENCE);
             startEventTrigger.setCaseDetails(CASE_DETAILS);
             CASE_DETAILS.setCaseTypeId(CASE_TYPE_ID);
-            startEventTrigger = aStartEventTrigger();
+            startEventTrigger = startEventTrigger();
             ignoreWarning = true;
         }
 

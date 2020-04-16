@@ -67,10 +67,10 @@ public class DraftsEndpointIT extends WireMockBaseTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
-        data = mapper.readTree("{\n" +
-                                "    \"PersonFirstName\": \"John\",\n" +
-                                "    \"PersonLastName\": \"Smith\"\n" +
-                                " }\n");
+        data = mapper.readTree("{\n"
+            + "    \"PersonFirstName\": \"John\",\n"
+            + "    \"PersonLastName\": \"Smith\"\n"
+            + " }\n");
     }
 
     @Test

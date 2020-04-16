@@ -18,6 +18,9 @@ public class MockUtils {
     public static final String CASE_ROLE_CAN_UPDATE = "[CAN_UPDATE]";
     public static final String CASE_ROLE_CAN_DELETE = "[CAN_DELETE]";
 
+    private MockUtils() {
+    }
+
     public static final void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
         String username = "123";
         String token = "Bearer jwtToken";

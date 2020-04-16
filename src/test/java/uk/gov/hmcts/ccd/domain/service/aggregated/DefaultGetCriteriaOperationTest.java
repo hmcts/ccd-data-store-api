@@ -79,7 +79,9 @@ public class DefaultGetCriteriaOperationTest {
         caseFieldDefinition4.setFieldType(fieldType);
         caseFieldDefinition4.setMetadata(true);
         caseTypeDefinition.setId("Test case type");
-        caseTypeDefinition.setCaseFieldDefinitions(asList(caseFieldDefinition1, caseFieldDefinition2, caseFieldDefinition3, caseFieldDefinition4, debtorDetails));
+        caseTypeDefinition.setCaseFieldDefinitions(asList(caseFieldDefinition1,
+                                                    caseFieldDefinition2, caseFieldDefinition3,
+                                                    caseFieldDefinition4, debtorDetails));
 
         defaultGetCriteriaOperation = new DefaultGetCriteriaOperation(uiDefinitionRepository, caseDefinitionRepository);
 

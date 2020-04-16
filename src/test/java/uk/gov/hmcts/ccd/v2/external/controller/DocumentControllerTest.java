@@ -84,7 +84,7 @@ class DocumentControllerTest {
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
         assertThrows(BadRequestException.class,
-                     () -> documentController.getDocuments(CASE_REFERENCE));
+            () -> documentController.getDocuments(CASE_REFERENCE));
     }
 
     @Test
@@ -93,7 +93,7 @@ class DocumentControllerTest {
         when(documentController.getDocuments(CASE_REFERENCE)).thenThrow(RuntimeException.class);
 
         assertThrows(RuntimeException.class,
-                     () -> documentController.getDocuments(CASE_REFERENCE));
+            () -> documentController.getDocuments(CASE_REFERENCE));
     }
 
 }
