@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.auditlog;
 
 import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContextHolder;
@@ -19,8 +18,8 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-                           @Nullable ModelAndView modelAndView) {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+                           @Nullable Exception ex) {
         if (handler instanceof HandlerMethod && ((HandlerMethod) handler).hasMethodAnnotation(LogAudit.class)) {
             AuditContext auditContext = AuditContextHolder.getAuditContext();
             auditService.audit(request, response.getStatus(), auditContext);
