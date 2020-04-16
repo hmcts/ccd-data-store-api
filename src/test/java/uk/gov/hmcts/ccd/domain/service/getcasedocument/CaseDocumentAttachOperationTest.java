@@ -173,7 +173,7 @@ class CaseDocumentAttachOperationTest {
     void shouldExtractDocumentsFromCaseDataBeforeCallBack() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        caseDocumentAttachOperation.documentSetBeforeCallback = new HashMap<>();
+        caseDocumentAttachOperation.documentTokenMap = new HashMap<>();
 
         caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(dataMap);
 
@@ -185,7 +185,7 @@ class CaseDocumentAttachOperationTest {
             }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
         assertAll(
-            () -> assertEquals(caseDocumentAttachOperation.documentSetBeforeCallback, expectedMap));
+            () -> assertEquals(caseDocumentAttachOperation.documentTokenMap, expectedMap));
     }
 
     @Test
@@ -193,7 +193,7 @@ class CaseDocumentAttachOperationTest {
     void shouldRemoveHashTokenFromDocuments() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        caseDocumentAttachOperation.documentSetBeforeCallback = new HashMap<>();
+        caseDocumentAttachOperation.documentTokenMap = new HashMap<>();
 
         caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(dataMap);
 

@@ -32,7 +32,7 @@ public class CaseDocumentAttachOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseDocumentAttachOperation.class);
 
-    Map<String, String> documentSetBeforeCallback = null;
+    Map<String, String> documentTokenMap = null;
     Map<String, String> documentAfterCallback = null;
     CaseDocumentsMetadata caseDocumentsMetadata = null;
     public static final String CASE_DATA_PARSING_EXCEPTION = "Exception while extracting the document fields from Case payload";
@@ -58,8 +58,8 @@ public class CaseDocumentAttachOperation {
     }
 
     public void beforeCallbackPrepareDocumentMetaData(Map<String, JsonNode> caseData) {
-        documentSetBeforeCallback = new HashMap<>();
-        extractDocumentFieldsBeforeCallback(caseData, documentSetBeforeCallback);
+        documentTokenMap = new HashMap<>();
+        extractDocumentFieldsBeforeCallback(caseData, documentTokenMap);
     }
 
     public void afterCallbackPrepareDocumentMetaData(CaseDetails caseDetails, boolean callBackResult) {
@@ -84,7 +84,7 @@ public class CaseDocumentAttachOperation {
     }
 
     public void filterDocumentFields() {
-        filterDocumentFields(caseDocumentsMetadata, documentSetBeforeCallback, documentAfterCallback);
+        filterDocumentFields(caseDocumentsMetadata, documentTokenMap, documentAfterCallback);
     }
 
     public void restCallToAttachCaseDocuments() {
@@ -98,21 +98,21 @@ public class CaseDocumentAttachOperation {
         }
     }
 
-    public void extractDocumentFieldsBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
+    public void extractDocumentFieldsBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentTokenMap) {
         data.forEach((field, jsonNode) -> {
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 if (jsonNode.get(HASH_TOKEN_STRING) == null) {
-                    throw new BadRequestException("The document does not has the hashToken");
+                    throw new BadRequestException("Hash token is not provided for the document.");
                 }
 
                 String documentId = extractDocumentId(jsonNode);
-                documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
+                documentTokenMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                 if (jsonNode instanceof ObjectNode) {
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
                 }
             } else {
                 jsonNode.fields().forEachRemaining(node -> extractDocumentFieldsBeforeCallback(
-                    Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+                    Collections.singletonMap(node.getKey(), node.getValue()), documentTokenMap));
             }
         });
     }
