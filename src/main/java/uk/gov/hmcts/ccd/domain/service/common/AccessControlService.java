@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterUtil;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
@@ -494,17 +494,17 @@ public class AccessControlService {
             .collect(toList());
     }
 
-    public CaseViewTrigger[] filterCaseViewTriggersByCreateAccess(final CaseViewTrigger[] caseViewTriggers,
-                                                                  final List<CaseEvent> caseEventDefinitions,
-                                                                  final Set<String> userRoles) {
-        return stream(caseViewTriggers)
+    public CaseViewActionableEvent[] filterCaseViewTriggersByCreateAccess(final CaseViewActionableEvent[] caseViewActionableEvents,
+                                                                          final List<CaseEvent> caseEventDefinitions,
+                                                                          final Set<String> userRoles) {
+        return stream(caseViewActionableEvents)
             .filter(caseViewTrigger -> hasAccessControlList(userRoles,
                 CAN_CREATE,
                 getCaseEventById(caseEventDefinitions, caseViewTrigger)
                     .map(CaseEvent::getAccessControlLists)
                     .orElse(newArrayList()))
             )
-            .toArray(CaseViewTrigger[]::new);
+            .toArray(CaseViewActionableEvent[]::new);
     }
 
     public List<CaseFieldDefinition> filterCaseFieldsByAccess(final List<CaseFieldDefinition> caseFieldDefinitions,
@@ -546,15 +546,15 @@ public class AccessControlService {
             .collect(toList());
     }
 
-    private Optional<CaseEvent> getCaseEventById(List<CaseEvent> caseEventDefinitions, CaseViewTrigger caseViewTrigger) {
+    private Optional<CaseEvent> getCaseEventById(List<CaseEvent> caseEventDefinitions, CaseViewActionableEvent caseViewActionableEvent) {
         return caseEventDefinitions
             .stream()
-            .filter(event -> hasEqualIds(caseViewTrigger, event))
+            .filter(event -> hasEqualIds(caseViewActionableEvent, event))
             .findAny();
     }
 
-    private boolean hasEqualIds(CaseViewTrigger caseViewTrigger, CaseEvent event) {
-        return event.getId().equals(caseViewTrigger.getId());
+    private boolean hasEqualIds(CaseViewActionableEvent caseViewActionableEvent, CaseEvent event) {
+        return event.getId().equals(caseViewActionableEvent.getId());
     }
 
     private List<AccessControlList> getCaseEventAcls(List<CaseEvent> caseEventDefinitions, String eventId) {

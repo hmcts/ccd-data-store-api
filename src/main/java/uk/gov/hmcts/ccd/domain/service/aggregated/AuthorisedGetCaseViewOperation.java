@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
@@ -65,7 +65,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     }
 
     private CaseView filterUpsertAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseView caseView) {
-        CaseViewTrigger[] authorisedTriggers;
+        CaseViewActionableEvent[] authorisedTriggers;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseTypeDefinition,
                                                                      userRoles,
                                                                      CAN_UPDATE)
@@ -73,7 +73,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
             caseTypeDefinition,
                                                                       userRoles,
                                                                       CAN_UPDATE)) {
-            authorisedTriggers = new CaseViewTrigger[]{};
+            authorisedTriggers = new CaseViewActionableEvent[]{};
         } else {
             authorisedTriggers = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getTriggers(),
                                                                                                 caseTypeDefinition.getEvents(),

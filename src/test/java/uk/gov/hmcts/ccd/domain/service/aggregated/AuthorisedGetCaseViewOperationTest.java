@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
@@ -70,12 +70,12 @@ class AuthorisedGetCaseViewOperationTest {
     private static final String ROLE_IN_CASE_ROLES_2 = "[DEFENDANT]";
     private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES_2);
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
-    private static final CaseViewTrigger[] EMPTY_TRIGGERS = new CaseViewTrigger[]{};
+    private static final CaseViewActionableEvent[] EMPTY_TRIGGERS = new CaseViewActionableEvent[]{};
     private static final CaseEvent CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
     private static final CaseEvent CASE_EVENT_2 = newCaseEvent().withId("event2").build();
-    private static final CaseViewTrigger CASE_VIEW_TRIGGER = aViewTrigger().withId(EVENT_ID_STRING).build();
-    private static final CaseViewTrigger CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
-    private static final CaseViewTrigger[] AUTH_CASE_VIEW_TRIGGERS = new CaseViewTrigger[]{CASE_VIEW_TRIGGER};
+    private static final CaseViewActionableEvent CASE_VIEW_TRIGGER = aViewTrigger().withId(EVENT_ID_STRING).build();
+    private static final CaseViewActionableEvent CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
+    private static final CaseViewActionableEvent[] AUTH_CASE_VIEW_TRIGGERS = new CaseViewActionableEvent[]{CASE_VIEW_TRIGGER};
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_ID).build();
     private static final Jurisdiction jurisdiction = newJurisdiction()
         .withJurisdictionId(JURISDICTION_ID)

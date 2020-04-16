@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
@@ -82,18 +82,18 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTypeTabsDefinition));
         caseView.setMetadataFields(getMetadataFields(caseTypeDefinition, caseDetails));
 
-        final CaseViewTrigger[] triggers = caseTypeDefinition.getEvents()
+        final CaseViewActionableEvent[] triggers = caseTypeDefinition.getEvents()
             .stream()
             .filter(event -> eventTriggerService.isPreStateValid(caseStateDefinition.getId(), event))
             .map(event -> {
-                final CaseViewTrigger trigger = new CaseViewTrigger();
+                final CaseViewActionableEvent trigger = new CaseViewActionableEvent();
                 trigger.setId(event.getId());
                 trigger.setName(event.getName());
                 trigger.setDescription(event.getDescription());
                 trigger.setOrder(event.getDisplayOrder());
                 return trigger;
             })
-            .toArray(CaseViewTrigger[]::new);
+            .toArray(CaseViewActionableEvent[]::new);
         caseView.setTriggers(triggers);
 
         caseView.setEvents(caseViewEvents);

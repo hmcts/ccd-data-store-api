@@ -73,7 +73,7 @@ class DefaultGetEventTriggerOperationTest {
     private DraftGateway draftGateway;
 
     @Mock
-    private CaseEventTriggerBuilder caseEventTriggerBuilder;
+    private CaseUpdateViewEventBuilder caseUpdateViewEventBuilder;
 
     private DefaultGetEventTriggerOperation defaultGetEventTriggerOperation;
 
@@ -86,7 +86,7 @@ class DefaultGetEventTriggerOperationTest {
             uidService,
             startEventOperation,
             draftGateway,
-            caseEventTriggerBuilder);
+            caseUpdateViewEventBuilder);
 
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
@@ -99,15 +99,15 @@ class DefaultGetEventTriggerOperationTest {
                                                      IGNORE)).thenReturn(startEventTrigger);
         when(startEventOperation.triggerStartForDraft(DRAFT_ID,
                                                       IGNORE)).thenReturn(startEventTrigger);
-        when(caseEventTriggerBuilder.build(startEventTrigger,
+        when(caseUpdateViewEventBuilder.build(startEventTrigger,
                                            CASE_TYPE_ID,
                                            EVENT_TRIGGER_ID,
                                            null)).thenReturn(caseUpdateViewEvent);
-        when(caseEventTriggerBuilder.build(startEventTrigger,
+        when(caseUpdateViewEventBuilder.build(startEventTrigger,
                                            CASE_TYPE_ID,
                                            EVENT_TRIGGER_ID,
                                            CASE_REFERENCE)).thenReturn(caseUpdateViewEvent);
-        when(caseEventTriggerBuilder.build(startEventTrigger,
+        when(caseUpdateViewEventBuilder.build(startEventTrigger,
                                            CASE_TYPE_ID,
                                            EVENT_TRIGGER_ID,
                                            DRAFT_ID)).thenReturn(caseUpdateViewEvent);
@@ -124,12 +124,12 @@ class DefaultGetEventTriggerOperationTest {
                                                                                          EVENT_TRIGGER_ID,
                                                                                          IGNORE);
             InOrder inOrder = inOrder(startEventOperation,
-                                      caseEventTriggerBuilder);
+                caseUpdateViewEventBuilder);
 
             assertAll(
                 () -> assertThat(result, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE),
-                () -> inOrder.verify(caseEventTriggerBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, null)
+                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, null)
             );
         }
     }
@@ -181,13 +181,13 @@ class DefaultGetEventTriggerOperationTest {
             InOrder inOrder = inOrder(caseDetailsRepository,
                                       startEventOperation,
                                       uidService,
-                                      caseEventTriggerBuilder);
+                caseUpdateViewEventBuilder);
             assertAll(
                 () -> assertThat(result, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(uidService).validateUID(CASE_REFERENCE),
                 () -> inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE),
                 () -> inOrder.verify(startEventOperation).triggerStartForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE),
-                () -> inOrder.verify(caseEventTriggerBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, CASE_REFERENCE),
+                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, CASE_REFERENCE),
                 () -> inOrder.verifyNoMoreInteractions()
             );
         }
@@ -231,13 +231,13 @@ class DefaultGetEventTriggerOperationTest {
             InOrder inOrder = inOrder(draftGateway,
                                       startEventOperation,
                                       uidService,
-                                      caseEventTriggerBuilder);
+                caseUpdateViewEventBuilder);
 
             assertAll(
                 () -> assertThat(result, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(draftGateway).getCaseDetails(Draft.stripId(DRAFT_ID)),
                 () -> inOrder.verify(startEventOperation).triggerStartForDraft(DRAFT_ID, IGNORE),
-                () -> inOrder.verify(caseEventTriggerBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, DRAFT_ID)
+                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, DRAFT_ID)
             );
         }
     }

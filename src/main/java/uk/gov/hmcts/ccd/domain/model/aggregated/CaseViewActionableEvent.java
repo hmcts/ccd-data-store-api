@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-public class CaseViewTrigger {
+public class CaseViewActionableEvent {
     private String id;
     private String name;
     private String description;

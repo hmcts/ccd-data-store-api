@@ -72,7 +72,7 @@ class CaseUpdateViewEventBuilderTest {
     @Mock
     private CaseViewFieldBuilder caseViewFieldBuilder;
 
-    private CaseEventTriggerBuilder caseEventTriggerBuilder;
+    private CaseUpdateViewEventBuilder caseUpdateViewEventBuilder;
 
     @BeforeEach
     void setUp() {
@@ -83,7 +83,7 @@ class CaseUpdateViewEventBuilderTest {
         when(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)).thenReturn(wizardPageCollection);
         when(caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails.getData())).thenReturn(viewFields);
 
-        caseEventTriggerBuilder = new CaseEventTriggerBuilder(caseDefinitionRepository,
+        caseUpdateViewEventBuilder = new CaseUpdateViewEventBuilder(caseDefinitionRepository,
                                                               uiDefinitionRepository,
                                                               eventTriggerService,
                                                               caseViewFieldBuilder);
@@ -93,7 +93,7 @@ class CaseUpdateViewEventBuilderTest {
     @DisplayName("should build trigger")
     void shouldBuildTrigger() {
 
-        final CaseUpdateViewEvent caseUpdateViewEvent = caseEventTriggerBuilder.build(startEventTrigger,
+        final CaseUpdateViewEvent caseUpdateViewEvent = caseUpdateViewEventBuilder.build(startEventTrigger,
                                                                                 CASE_TYPE_ID,
                                                                                 EVENT_TRIGGER_ID,
                                                                                 CASE_REFERENCE);
@@ -125,7 +125,7 @@ class CaseUpdateViewEventBuilderTest {
     void shouldFailIfNoCaseType() {
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(null);
 
-        assertThrows(ResourceNotFoundException.class, () -> caseEventTriggerBuilder.build(startEventTrigger,
+        assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventTrigger,
                                                                                           CASE_TYPE_ID,
                                                                                           EVENT_TRIGGER_ID,
                                                                                           CASE_REFERENCE));
@@ -136,7 +136,7 @@ class CaseUpdateViewEventBuilderTest {
     void shouldFailIfNoEventTrigger() {
         when(eventTriggerService.findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID)).thenReturn(null);
 
-        assertThrows(ResourceNotFoundException.class, () -> caseEventTriggerBuilder.build(startEventTrigger,
+        assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventTrigger,
                                                                                           CASE_TYPE_ID,
                                                                                           EVENT_TRIGGER_ID,
                                                                                           CASE_REFERENCE));
@@ -147,7 +147,7 @@ class CaseUpdateViewEventBuilderTest {
     void shouldFailIfNoCaseDetails() {
         startEventTrigger.setCaseDetails(null);
 
-        final Exception exception = assertThrows(ResourceNotFoundException.class, () -> caseEventTriggerBuilder.build(startEventTrigger,
+        final Exception exception = assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventTrigger,
                                                                                                                       CASE_TYPE_ID,
                                                                                                                       EVENT_TRIGGER_ID,
                                                                                                                       CASE_REFERENCE));

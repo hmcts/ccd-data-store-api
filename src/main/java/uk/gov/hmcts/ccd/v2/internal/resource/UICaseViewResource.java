@@ -35,7 +35,7 @@ public class UICaseViewResource extends RepresentationModel {
     private ProfileCaseState state;
 
     @JsonProperty("triggers")
-    private CaseViewTrigger[] triggers;
+    private CaseViewActionableEvent[] triggers;
 
     @JsonProperty("events")
     private CaseViewEvent[] events;

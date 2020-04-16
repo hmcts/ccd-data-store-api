@@ -19,17 +19,17 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Named
 @Singleton
-public class CaseEventTriggerBuilder {
+public class CaseUpdateViewEventBuilder {
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final UIDefinitionRepository uiDefinitionRepository;
     private final EventTriggerService eventTriggerService;
     private final CaseViewFieldBuilder caseViewFieldBuilder;
 
-    public CaseEventTriggerBuilder(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                   final UIDefinitionRepository uiDefinitionRepository,
-                                   final EventTriggerService eventTriggerService,
-                                   final CaseViewFieldBuilder caseViewFieldBuilder) {
+    public CaseUpdateViewEventBuilder(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                      final UIDefinitionRepository uiDefinitionRepository,
+                                      final EventTriggerService eventTriggerService,
+                                      final CaseViewFieldBuilder caseViewFieldBuilder) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.eventTriggerService = eventTriggerService;

@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.domain.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
@@ -25,7 +25,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
 import java.util.ArrayList;
 
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEventBuilder.anCaseViewTrigger;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
 
 @Service
@@ -34,7 +34,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
     public static final String QUALIFIER = "defaultDraft";
     protected static final String DELETE = "DELETE";
-    private static final CaseViewTrigger DELETE_TRIGGER = anCaseViewTrigger()
+    private static final CaseViewActionableEvent DELETE_TRIGGER = anCaseViewTrigger()
         .withId(DELETE)
         .withName("Delete")
         .withDescription("Delete draft")
@@ -67,7 +67,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
         CaseTypeDefinition caseTypeDefinition = getCaseType(draftResponse.getCaseTypeId());
 
-        final CaseViewTrigger resumeTrigger = buildResumeTriggerFromDraft(draftResponse);
+        final CaseViewActionableEvent resumeTrigger = buildResumeTriggerFromDraft(draftResponse);
 
         final CaseTypeTabsDefinition caseTypeTabsDefinition = getCaseTabCollection(draftResponse.getCaseTypeId());
 
@@ -101,7 +101,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
         return events.toArray(new CaseViewEvent[events.size()]);
     }
 
-    private CaseViewTrigger buildResumeTriggerFromDraft(DraftResponse draftResponse) {
+    private CaseViewActionableEvent buildResumeTriggerFromDraft(DraftResponse draftResponse) {
         return anCaseViewTrigger()
             .withId(draftResponse.getDocument().getEventTriggerId())
             .withName(RESUME)
@@ -110,7 +110,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
             .build();
     }
 
-    private CaseView merge(CaseDetails caseDetails, CaseViewTrigger resumeTrigger, CaseViewEvent[] events, CaseTypeDefinition caseTypeDefinition,
+    private CaseView merge(CaseDetails caseDetails, CaseViewActionableEvent resumeTrigger, CaseViewEvent[] events, CaseTypeDefinition caseTypeDefinition,
                            CaseTypeTabsDefinition caseTypeTabsDefinition) {
         CaseView caseView = new CaseView();
         caseView.setCaseId(caseDetails.getId().toString());
@@ -123,7 +123,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
         caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTypeTabsDefinition));
         caseView.setMetadataFields(getMetadataFields(caseTypeDefinition, caseDetails));
 
-        caseView.setTriggers(new CaseViewTrigger[]{resumeTrigger, DELETE_TRIGGER});
+        caseView.setTriggers(new CaseViewActionableEvent[]{resumeTrigger, DELETE_TRIGGER});
         caseView.setEvents(events);
 
         return caseView;

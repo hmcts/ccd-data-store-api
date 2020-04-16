@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DefaultSettings;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
@@ -571,7 +571,7 @@ public class TestBuildersUtil {
 
     public static class CaseViewBuilder {
         private final CaseView caseView;
-        private final List<CaseViewTrigger> caseViewTriggers = newArrayList();
+        private final List<CaseViewActionableEvent> caseViewActionableEvents = newArrayList();
 
         private CaseViewBuilder() {
             this.caseView = new CaseView();
@@ -582,8 +582,8 @@ public class TestBuildersUtil {
             return new CaseViewBuilder();
         }
 
-        public CaseViewBuilder withCaseViewTrigger(CaseViewTrigger caseViewTrigger) {
-            this.caseViewTriggers.add(caseViewTrigger);
+        public CaseViewBuilder withCaseViewTrigger(CaseViewActionableEvent caseViewActionableEvent) {
+            this.caseViewActionableEvents.add(caseViewActionableEvent);
             return this;
         }
 
@@ -611,7 +611,7 @@ public class TestBuildersUtil {
         }
 
         public CaseView build() {
-            caseView.setTriggers(caseViewTriggers.toArray(new CaseViewTrigger[]{}));
+            caseView.setTriggers(caseViewActionableEvents.toArray(new CaseViewActionableEvent[]{}));
             return caseView;
         }
     }
@@ -852,10 +852,10 @@ public class TestBuildersUtil {
     }
 
     public static class CaseViewTriggerBuilder {
-        private final CaseViewTrigger caseViewTrigger;
+        private final CaseViewActionableEvent caseViewActionableEvent;
 
         private CaseViewTriggerBuilder() {
-            this.caseViewTrigger = new CaseViewTrigger();
+            this.caseViewActionableEvent = new CaseViewActionableEvent();
         }
 
         public static CaseViewTriggerBuilder aViewTrigger() {
@@ -863,12 +863,12 @@ public class TestBuildersUtil {
         }
 
         public CaseViewTriggerBuilder withId(String id) {
-            caseViewTrigger.setId(id);
+            caseViewActionableEvent.setId(id);
             return this;
         }
 
-        public CaseViewTrigger build() {
-            return caseViewTrigger;
+        public CaseViewActionableEvent build() {
+            return caseViewActionableEvent;
         }
     }
 

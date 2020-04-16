@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -55,11 +55,11 @@ class AccessControlServiceFilterTest {
     private static final String EVENT_ID_1 = "EVENT_ID_1";
     private static final String EVENT_ID_2 = "EVENT_ID_2";
     private static final String EVENT_ID_3 = "EVENT_ID_3";
-    private static final CaseViewTrigger CASE_VIEW_TRIGGER_1 = aViewTrigger().withId(EVENT_ID_1).build();
-    private static final CaseViewTrigger CASE_VIEW_TRIGGER_2 = aViewTrigger().withId(EVENT_ID_2).build();
-    private static final CaseViewTrigger CASE_VIEW_TRIGGER_3 = aViewTrigger().withId(EVENT_ID_3).build();
+    private static final CaseViewActionableEvent CASE_VIEW_TRIGGER_1 = aViewTrigger().withId(EVENT_ID_1).build();
+    private static final CaseViewActionableEvent CASE_VIEW_TRIGGER_2 = aViewTrigger().withId(EVENT_ID_2).build();
+    private static final CaseViewActionableEvent CASE_VIEW_TRIGGER_3 = aViewTrigger().withId(EVENT_ID_3).build();
 
-    final CaseViewTrigger[] caseViewTriggers = {CASE_VIEW_TRIGGER_1, CASE_VIEW_TRIGGER_2, CASE_VIEW_TRIGGER_3};
+    final CaseViewActionableEvent[] caseViewActionableEvents = {CASE_VIEW_TRIGGER_1, CASE_VIEW_TRIGGER_2, CASE_VIEW_TRIGGER_3};
     AccessControlService accessControlService;
 
     @BeforeEach
@@ -96,9 +96,9 @@ class AccessControlServiceFilterTest {
                     .build()).build();
             final List<CaseEvent> caseEventDefinitions = Arrays.asList(event1, event2, event3);
 
-            final CaseViewTrigger[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(
-                caseViewTriggers, caseEventDefinitions, USER_ROLES);
-            assertArrayEquals(caseViewTriggers, filteredTriggers);
+            final CaseViewActionableEvent[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(
+                caseViewActionableEvents, caseEventDefinitions, USER_ROLES);
+            assertArrayEquals(caseViewActionableEvents, filteredTriggers);
         }
 
         @Test
@@ -124,7 +124,7 @@ class AccessControlServiceFilterTest {
                     .build()).build();
             final List<CaseEvent> caseEventDefinitions = Arrays.asList(event1, event2, event3);
 
-            final CaseViewTrigger[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(caseViewTriggers, caseEventDefinitions, USER_ROLES);
+            final CaseViewActionableEvent[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(caseViewActionableEvents, caseEventDefinitions, USER_ROLES);
             assertAll(
                 () -> assertThat(filteredTriggers.length, is(1)),
                 () -> assertThat(filteredTriggers[0], is(CASE_VIEW_TRIGGER_3))

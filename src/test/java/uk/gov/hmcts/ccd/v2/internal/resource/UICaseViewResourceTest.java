@@ -31,7 +31,7 @@ class UICaseViewResourceTest {
     private ProfileCaseState state;
 
     private CaseViewTab[] tabs;
-    private CaseViewTrigger[] triggers;
+    private CaseViewActionableEvent[] triggers;
     private CaseViewEvent[] events;
 
     private CaseView caseView;
@@ -72,7 +72,7 @@ class UICaseViewResourceTest {
 
     private void mockArrays() {
         tabs = new CaseViewTab[]{};
-        triggers = new CaseViewTrigger[]{};
+        triggers = new CaseViewActionableEvent[]{};
         events = new CaseViewEvent[]{};
     }
 
