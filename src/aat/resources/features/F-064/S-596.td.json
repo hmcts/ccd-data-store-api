@@ -41,7 +41,8 @@
             "complex_fields" : [ ],
             "collection_field_type" : null
           }
-        }
+        },
+        "display_context_parameter" : null
       }, {
         "label" : "Last State Modified Date",
         "order" : 2,
@@ -60,7 +61,8 @@
             "complex_fields" : [ ],
             "collection_field_type" : null
           }
-        }
+        },
+        "display_context_parameter" : null
       } ],
       "_links" : {
         "self" : {
