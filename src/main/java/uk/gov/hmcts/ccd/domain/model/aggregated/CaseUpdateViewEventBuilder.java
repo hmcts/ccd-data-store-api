@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.aggregated;
+package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
