@@ -80,7 +80,7 @@ class CaseDocumentAttachOperationTest {
     }
 
     @Test
-    @DisplayName("should extract only documents with hashcode from Case Data")
+    @DisplayName("should extract only the documents having hashToken from Case Data")
     void shouldExtractDocumentsFromCaseDataBeforeCallBack() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
@@ -100,7 +100,7 @@ class CaseDocumentAttachOperationTest {
     }
 
     @Test
-    @DisplayName("should extract only documents with hashcode from Case Data")
+    @DisplayName("Verify that hashToken is removed from the case data payload.")
     void shouldRemoveHashTokenFromDocuments() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
@@ -116,7 +116,7 @@ class CaseDocumentAttachOperationTest {
     }
 
     @Test
-    @DisplayName("should throw exception while getting documents without hashcode from Case Data")
+    @DisplayName("should throw exception while getting documents without hashToken from Case Data")
     void shouldThrowExceptionWhileExtractingDocumentsFromCaseData() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadDocumentUpload.json");
@@ -188,7 +188,7 @@ class CaseDocumentAttachOperationTest {
     }
 
     @Test
-    @DisplayName("Should call the Case Document AM API to attach document to a case")
+    @DisplayName("Should Not call the Case Document AM API to attach document to a case for empty payload")
     void shouldNotCallRestClientToAttachDocumentToCaseForNoEligibleDocuments() {
         caseDocumentAttachOperation.caseDocumentsMetadata =
             CaseDocumentsMetadata.builder()
