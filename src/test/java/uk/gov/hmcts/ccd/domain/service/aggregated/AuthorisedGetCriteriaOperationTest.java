@@ -189,7 +189,7 @@ class AuthorisedGetCriteriaOperationTest {
             () -> assertThat(workbasketInputs.get(3), is(testWorkbasketInputs.get(4)))
         );
     }
-    
+
     @Test
     @DisplayName("should not return return duplicate workbasket input field when user has more than necessary role")
     void shouldReturnDistinctWorkbasketInputWhenRoleExists() {

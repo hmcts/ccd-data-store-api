@@ -162,7 +162,7 @@ class AuthorisedGetCaseTypeOperationTest {
             .withRead(true)
             .build())
         .build();
-    
+
 
 
     private CaseType testCaseType1;

@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -45,7 +45,7 @@ public class DocumentsOperationTest extends BaseTest {
 
     private CaseDetails caseDetails = new CaseDetails();
     private Optional<CaseDetails> caseDetailsOptional = Optional.of(caseDetails);
-    
+
     @Inject
     private DocumentsOperation documentsOperation;
 

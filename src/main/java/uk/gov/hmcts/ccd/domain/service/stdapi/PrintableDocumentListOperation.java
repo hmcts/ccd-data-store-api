@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 
 import java.util.Collections;

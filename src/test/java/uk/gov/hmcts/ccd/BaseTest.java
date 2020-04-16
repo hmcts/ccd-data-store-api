@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;

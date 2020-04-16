@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;

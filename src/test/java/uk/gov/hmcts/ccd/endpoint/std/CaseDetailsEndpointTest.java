@@ -31,7 +31,7 @@ import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;

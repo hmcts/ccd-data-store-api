@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
+import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 

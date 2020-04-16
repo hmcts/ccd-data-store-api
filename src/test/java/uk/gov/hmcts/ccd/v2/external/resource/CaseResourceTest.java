@@ -10,7 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import java.time.LocalDateTime;

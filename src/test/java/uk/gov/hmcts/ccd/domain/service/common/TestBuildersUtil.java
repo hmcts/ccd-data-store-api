@@ -34,7 +34,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
@@ -553,7 +553,7 @@ public class TestBuildersUtil {
             this.jurisdictionUiConfig.setShuttered(shuttered);
             return this;
         }
-        
+
         public JurisdictionUiConfigBuilder withId(String id) {
             this.jurisdictionUiConfig.setId(id);
             return this;

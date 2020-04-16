@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.data.draft;
 
 import java.util.List;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;

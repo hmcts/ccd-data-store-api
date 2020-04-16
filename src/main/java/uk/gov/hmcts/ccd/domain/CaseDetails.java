@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.definition;
+package uk.gov.hmcts.ccd.domain;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.http.HttpStatus.SC_OK;
