@@ -22,7 +22,6 @@
 			"Content-Type": "[[ANY_STRING_NULLABLE]]",
 			"Vary": "Accept-Encoding"
 		},
-    "body": {
-    }
+    "body": null
 	}
 }
