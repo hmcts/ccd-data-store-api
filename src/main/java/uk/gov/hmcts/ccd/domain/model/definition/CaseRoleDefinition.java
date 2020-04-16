@@ -9,7 +9,7 @@ import lombok.ToString;
 
 @ApiModel(description = "")
 @ToString
-public class CaseRole implements Serializable {
+public class CaseRoleDefinition implements Serializable {
 
     private String id = null;
     private String name = null;

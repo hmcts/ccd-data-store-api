@@ -20,9 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseRole;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseRoleDefinition;
 
-class DefaultCaseRoleRepositoryTest {
+class DefaultCaseRoleDefinitionRepositoryTest {
     @Mock
     private RestTemplate restTemplate;
 
@@ -36,20 +36,20 @@ class DefaultCaseRoleRepositoryTest {
     private HttpHeaders httpHeaders;
 
     @Mock
-    private ResponseEntity<CaseRole[]> responseEntity;
+    private ResponseEntity<CaseRoleDefinition[]> responseEntity;
 
     private DefaultCaseRoleRepository caseRoleRepository;
 
-    private CaseRole caseRole1 = new CaseRole();
-    private CaseRole caseRole2 = new  CaseRole();
-    private CaseRole[] caseRoles = {caseRole1, caseRole2};
+    private CaseRoleDefinition caseRoleDefinition1 = new CaseRoleDefinition();
+    private CaseRoleDefinition caseRoleDefinition2 = new CaseRoleDefinition();
+    private CaseRoleDefinition[] caseRoleDefinitions = {caseRoleDefinition1, caseRoleDefinition2};
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         caseRoleRepository = new DefaultCaseRoleRepository(applicationParams, securityUtils, restTemplate);
-        caseRole1.setId("role1");
-        caseRole2.setId("role2");
+        caseRoleDefinition1.setId("role1");
+        caseRoleDefinition2.setId("role2");
     }
 
     @Test
@@ -58,8 +58,8 @@ class DefaultCaseRoleRepositoryTest {
 
         when(securityUtils.authorizationHeaders()).thenReturn(httpHeaders);
         when(applicationParams.caseRolesURL()).thenReturn("someURL");
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(), eq(CaseRole[].class));
-        when(responseEntity.getBody()).thenReturn(caseRoles);
+        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(), eq(CaseRoleDefinition[].class));
+        when(responseEntity.getBody()).thenReturn(caseRoleDefinitions);
         Set<String> caseRoleSet = caseRoleRepository.getCaseRoles("caseTypeId");
 
         assertThat(caseRoleSet.size(), is(2));
@@ -71,8 +71,8 @@ class DefaultCaseRoleRepositoryTest {
 
         when(securityUtils.userAuthorizationHeaders()).thenReturn(httpHeaders);
         when(applicationParams.caseRolesURL()).thenReturn("someURL");
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(), eq(CaseRole[].class));
-        when(responseEntity.getBody()).thenReturn(new CaseRole[0]);
+        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(), eq(CaseRoleDefinition[].class));
+        when(responseEntity.getBody()).thenReturn(new CaseRoleDefinition[0]);
         Set<String> caseRoleSet = caseRoleRepository.getCaseRoles("caseTypeId");
 
         assertThat(caseRoleSet.size(), is(0));
