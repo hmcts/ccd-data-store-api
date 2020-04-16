@@ -262,13 +262,4 @@ public class CaseDocumentAttachOperation {
             }
         });
     }
-
-    public void filterDocumentMetaData(Set<String> filterDocumentSet) {
-
-        List<DocumentHashToken> caseDocumentList = caseDocumentsMetadata.getDocumentHashToken().stream()
-                                                                        .filter(document -> filterDocumentSet.contains(document.getId()))
-                                                                        .collect(Collectors.toList());
-        caseDocumentsMetadata.setDocumentHashToken(caseDocumentList);
-
-    }
 }
