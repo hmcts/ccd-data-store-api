@@ -156,7 +156,6 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    @LogAudit(operationType = CREATE_CASE)
     public ResponseEntity<UIStartTriggerResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,
                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
