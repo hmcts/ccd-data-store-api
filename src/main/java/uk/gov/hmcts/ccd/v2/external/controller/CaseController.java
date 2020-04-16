@@ -212,11 +212,86 @@ public class CaseController {
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
-        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
-
-        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
+        return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
     }
 
+    @Transactional
+    @PostMapping(
+        path = "/case-types/{caseTypeId}/cases",
+        headers = {
+            V2.EXPERIMENTAL_HEADER
+        },
+        produces = {
+            V2.MediaType.CREATE_CASE
+        },
+        consumes = {
+            V2.MediaType.CREATE_CASE_2_1
+        }
+    )
+    @ApiOperation(
+        value = "Submit case creation V2.1",
+        notes = V2.EXPERIMENTAL_WARNING
+    )
+    @ApiResponses({
+          @ApiResponse(
+              code = 201,
+              message = "Created",
+              response = CaseResource.class
+          ),
+          @ApiResponse(
+              code = 400,
+              message = V2.Error.MISSING_EVENT_TOKEN
+          ),
+          @ApiResponse(
+              code = 404,
+              message = V2.Error.EVENT_TRIGGER_NOT_FOUND
+          ),
+          @ApiResponse(
+              code = 404,
+              message = V2.Error.NO_MATCHING_EVENT_TRIGGER
+          ),
+          @ApiResponse(
+              code = 409,
+              message = V2.Error.CASE_ALTERED
+          ),
+          @ApiResponse(
+              code = 422,
+              message = V2.Error.CASE_DATA_NOT_FOUND
+          ),
+          @ApiResponse(
+              code = 422,
+              message = V2.Error.CASE_TYPE_NOT_FOUND
+          ),
+          @ApiResponse(
+              code = 422,
+              message = V2.Error.USER_ROLE_NOT_FOUND
+          ),
+          @ApiResponse(
+              code = 422,
+              message = V2.Error.EVENT_TRIGGER_NOT_SPECIFIED
+          ),
+          @ApiResponse(
+              code = 422,
+              message = V2.Error.EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE
+          ),
+          @ApiResponse(
+              code = 422,
+              message = V2.Error.EVENT_TRIGGER_HAS_PRE_STATE
+          ),
+          @ApiResponse(
+              code = 422,
+              message = V2.Error.CASE_FIELD_INVALID
+          ),
+          @ApiResponse(
+              code = 504,
+              message = V2.Error.CALLBACK_EXCEPTION
+          )
+    })
+    public ResponseEntity<CaseResource> createCaseV21(@PathVariable("caseTypeId") String caseTypeId,
+                                                   @RequestBody final CaseDataContent content,
+                                                   @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+        return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
+    }
 
     @GetMapping(
         path = "/cases/{caseId}/events",
@@ -262,5 +337,15 @@ public class CaseController {
         final List<AuditEvent> auditEvents = getEventsOperation.getEvents(caseId);
 
         return ResponseEntity.ok(new CaseEventsResource(caseId, auditEvents));
+    }
+
+
+    private ResponseEntity<CaseResource> getCaseResourceResponseEntity(@PathVariable("caseTypeId") String caseTypeId,
+                                                                       @RequestBody CaseDataContent content,
+                                                                       @RequestParam(value = "ignore-warning",
+                                                                                     required = false) Boolean ignoreWarning) {
+        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
+
+        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
     }
 }

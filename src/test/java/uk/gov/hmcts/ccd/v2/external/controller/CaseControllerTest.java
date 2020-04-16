@@ -173,6 +173,21 @@ class CaseControllerTest {
         }
 
         @Test
+        @DisplayName("should call V2.1 endpoint and return 201 when case is created")
+        void caseEventCreatedV21() {
+            LocalDateTime stateModified = LocalDateTime.now();
+            when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
+
+            final ResponseEntity<CaseResource> response = caseController.createCaseV21(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
+                () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE)),
+                () -> assertThat(response.getBody().getLastStateModifiedOn(), is(stateModified))
+                     );
+        }
+
+        @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
             when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING)).thenThrow(RuntimeException.class);
