@@ -63,17 +63,6 @@ public class CaseDocumentAttachOperation {
         extractDocumentFieldsBeforeCallback(caseData, documentSetBeforeCallback);
     }
 
-    public void beforeCallbackPrepareDocumentMetaData(CaseDataContent contentData) {
-        try {
-            LOG.debug("Updating  case using Version 2.1 of case create API");
-            documentSetBeforeCallback = new HashMap<>();
-            extractDocumentFieldsBeforeCallback(contentData.getData(), documentSetBeforeCallback);
-        } catch (Exception e) {
-            LOG.error(CASE_DATA_PARSING_EXCEPTION);
-            throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
-        }
-    }
-
     public void afterCallbackPrepareDocumentMetaData(CaseDetails caseDetails, boolean callBackResult) {
         try {
             documentAfterCallback = new HashMap<>();

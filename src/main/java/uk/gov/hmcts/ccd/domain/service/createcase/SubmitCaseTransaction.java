@@ -39,7 +39,7 @@ import uk.gov.hmcts.ccd.v2.V2;
 @Service
 class SubmitCaseTransaction {
 
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final CaseTypeService caseTypeService;
