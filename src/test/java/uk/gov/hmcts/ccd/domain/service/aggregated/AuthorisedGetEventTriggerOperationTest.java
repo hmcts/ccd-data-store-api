@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -80,7 +80,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private EventTriggerService eventTriggerService;
 
     private AuthorisedGetEventTriggerOperation authorisedGetEventTriggerOperation;
-    private CaseEventTrigger caseEventTrigger;
+    private CaseUpdateViewEvent caseUpdateViewEvent;
     private final CaseDetails caseDetails = new CaseDetails();
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
@@ -105,7 +105,7 @@ class AuthorisedGetEventTriggerOperationTest {
             accessControlService,
             eventTriggerService,
             draftGateway);
-        caseEventTrigger = new CaseEventTrigger();
+        caseUpdateViewEvent = new CaseUpdateViewEvent();
 
         caseTypeDefinition.setId(CASE_TYPE_ID);
         caseTypeDefinition.setEvents(events);
@@ -142,7 +142,7 @@ class AuthorisedGetEventTriggerOperationTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForCaseType(CASE_TYPE_ID,
+            doReturn(caseUpdateViewEvent).when(getEventTriggerOperation).executeForCaseType(CASE_TYPE_ID,
                                                                                          EVENT_TRIGGER_ID,
                                                                                          IGNORE);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition,
@@ -155,28 +155,28 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      events,
                                                                                      createCaseUserRoles,
                                                                                      CAN_CREATE);
-            doReturn(caseEventTrigger).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
+            doReturn(caseUpdateViewEvent).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseUpdateViewEvent,
                 caseFieldDefinitions,
                                                                                                         createCaseUserRoles,
                                                                                                         CAN_CREATE);
-            doReturn(caseEventTrigger).when(accessControlService).filterCaseViewFieldsByAccess(caseEventTrigger,
+            doReturn(caseUpdateViewEvent).when(accessControlService).filterCaseViewFieldsByAccess(caseUpdateViewEvent,
                 caseFieldDefinitions,
                                                                                                createCaseUserRoles,
                                                                                                CAN_CREATE);
-            doReturn(caseEventTrigger).when(accessControlService)
-                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, createCaseUserRoles);
+            doReturn(caseUpdateViewEvent).when(accessControlService)
+                .updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, createCaseUserRoles);
         }
 
         @Test
         @DisplayName("should call decorated get event trigger operation as is")
         void shouldCallDecoratedGetEventTriggerOperation() {
 
-            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
+            final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                                                                                                   EVENT_TRIGGER_ID,
                                                                                                   IGNORE);
 
             assertAll(
-                () -> assertThat(output, sameInstance(caseEventTrigger)),
+                () -> assertThat(output, sameInstance(caseUpdateViewEvent)),
                 () -> verify(getEventTriggerOperation).executeForCaseType(CASE_TYPE_ID,
                                                                           EVENT_TRIGGER_ID,
                                                                           IGNORE)
@@ -187,7 +187,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should return event trigger and perform operations in order")
         void shouldReturnEventTriggerAndPerformOperationsInOrder() {
 
-            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
+            final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                                                                                                   EVENT_TRIGGER_ID,
                                                                                                   IGNORE);
 
@@ -196,7 +196,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                       accessControlService,
                                       getEventTriggerOperation);
             assertAll(
-                () -> assertThat(output, sameInstance(caseEventTrigger)),
+                () -> assertThat(output, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
@@ -209,12 +209,12 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(getEventTriggerOperation).executeForCaseType(CASE_TYPE_ID,
                                                                                   EVENT_TRIGGER_ID,
                                                                                   IGNORE),
-                () -> inOrder.verify(accessControlService).filterCaseViewFieldsByAccess(eq(caseEventTrigger),
+                () -> inOrder.verify(accessControlService).filterCaseViewFieldsByAccess(eq(caseUpdateViewEvent),
                                                                                         eq(caseFieldDefinitions),
                                                                                         eq(createCaseUserRoles),
                                                                                         eq(CAN_CREATE)),
                 () -> inOrder.verify(accessControlService)
-                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(createCaseUserRoles))
+                    .updateCollectionDisplayContextParameterByAccess(eq(caseUpdateViewEvent), eq(createCaseUserRoles))
             );
         }
 
@@ -270,7 +270,7 @@ class AuthorisedGetEventTriggerOperationTest {
         void setUp() {
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
-            doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
+            doReturn(caseUpdateViewEvent).when(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                                      EVENT_TRIGGER_ID,
                                                                                      IGNORE);
             doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG);
@@ -288,24 +288,24 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      eq(caseTypeDefinition),
                                                                                      eq(userRoles),
                                                                                      eq(CAN_UPDATE));
-            doReturn(caseEventTrigger).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
+            doReturn(caseUpdateViewEvent).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseUpdateViewEvent,
                 caseFieldDefinitions,
                                                                                                         userRoles,
                                                                                                         CAN_UPDATE);
-            doReturn(caseEventTrigger).when(accessControlService)
-                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
+            doReturn(caseUpdateViewEvent).when(accessControlService)
+                .updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, userRoles);
         }
 
         @Test
         @DisplayName("should call decorated get event trigger operation as is")
         void shouldCallDecoratedGetEventTriggerOperation() {
 
-            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
+            final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                               EVENT_TRIGGER_ID,
                                                                                               IGNORE);
 
             assertAll(
-                () -> assertThat(output, sameInstance(caseEventTrigger)),
+                () -> assertThat(output, sameInstance(caseUpdateViewEvent)),
                 () -> verify(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                       EVENT_TRIGGER_ID,
                                                                       IGNORE)
@@ -316,7 +316,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should return event trigger and perform operations in order")
         void shouldReturnEventTriggerAndPerformOperationsInOrder() {
 
-            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
+            final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                               EVENT_TRIGGER_ID,
                                                                                               IGNORE);
 
@@ -325,7 +325,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                       accessControlService,
                                       getEventTriggerOperation);
             assertAll(
-                () -> assertThat(output, sameInstance(caseEventTrigger)),
+                () -> assertThat(output, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseAccessService).getUserRoles(),
                 () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID),
@@ -339,12 +339,12 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                               EVENT_TRIGGER_ID,
                                                                               IGNORE),
-                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(caseEventTrigger),
+                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(caseUpdateViewEvent),
                                                                                                  eq(caseFieldDefinitions),
                                                                                                  eq(userRoles),
                                                                                                  eq(CAN_UPDATE)),
                 () -> inOrder.verify(accessControlService)
-                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(userRoles))
+                    .updateCollectionDisplayContextParameterByAccess(eq(caseUpdateViewEvent), eq(userRoles))
                      );
         }
 

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
 
 import java.util.Optional;
@@ -33,17 +33,17 @@ class UIStartTriggerResourceTest {
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String ID = "createCase";
 
-    private CaseEventTrigger caseEventTrigger;
+    private CaseUpdateViewEvent caseUpdateViewEvent;
     private boolean ignoreWarning;
 
     @BeforeEach
     void setUp() {
-        caseEventTrigger = newCaseEventTrigger();
+        caseUpdateViewEvent = newCaseEventTrigger();
         ignoreWarning = true;
     }
 
 
-    private CaseEventTrigger newCaseEventTrigger() {
+    private CaseUpdateViewEvent newCaseEventTrigger() {
         return TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger()
             .withId(ID)
             .withName(NAME)
@@ -72,28 +72,28 @@ class UIStartTriggerResourceTest {
         @Test
         @DisplayName("should copy case event trigger")
         void shouldCopyCaseDetails() {
-            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCaseType(caseEventTrigger, CASE_TYPE_ID, ignoreWarning);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCaseType(caseUpdateViewEvent, CASE_TYPE_ID, ignoreWarning);
 
             assertAll(
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getId(), equalTo(ID)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getName(), equalTo(NAME)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getDescription(), equalTo(DESCRIPTION)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseId(), equalTo(CASE_ID)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getId(), equalTo(ID)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getName(), equalTo(NAME)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getDescription(), equalTo(DESCRIPTION)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getCaseId(), equalTo(CASE_ID)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", is(FIELD_ID))),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
 
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCaseType(caseEventTrigger, CASE_TYPE_ID, ignoreWarning);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCaseType(caseUpdateViewEvent, CASE_TYPE_ID, ignoreWarning);
 
             Optional<Link> self = uiStartTriggerResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelfForCase));
@@ -110,28 +110,28 @@ class UIStartTriggerResourceTest {
         @Test
         @DisplayName("should copy case event trigger")
         void shouldCopyCaseDetails() {
-            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCase(caseEventTrigger, caseReference.toString(), ignoreWarning);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCase(caseUpdateViewEvent, caseReference.toString(), ignoreWarning);
 
             assertAll(
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getId(), equalTo(ID)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getName(), equalTo(NAME)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getDescription(), equalTo(DESCRIPTION)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseId(), equalTo(CASE_ID)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getId(), equalTo(ID)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getName(), equalTo(NAME)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getDescription(), equalTo(DESCRIPTION)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getCaseId(), equalTo(CASE_ID)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", is(FIELD_ID))),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
 
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCase(caseEventTrigger, caseReference.toString(), ignoreWarning);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCase(caseUpdateViewEvent, caseReference.toString(), ignoreWarning);
 
             Optional<Link> self = uiStartTriggerResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelfForEvent));
@@ -148,28 +148,28 @@ class UIStartTriggerResourceTest {
         @Test
         @DisplayName("should copy case event trigger")
         void shouldCopyCaseDetails() {
-            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forDraft(caseEventTrigger, draftReference, ignoreWarning);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forDraft(caseUpdateViewEvent, draftReference, ignoreWarning);
 
             assertAll(
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getId(), equalTo(ID)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getName(), equalTo(NAME)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getDescription(), equalTo(DESCRIPTION)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseId(), equalTo(CASE_ID)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getId(), equalTo(ID)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getName(), equalTo(NAME)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getDescription(), equalTo(DESCRIPTION)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getCaseId(), equalTo(CASE_ID)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", is(FIELD_ID))),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(uiStartTriggerResource.getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
 
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forDraft(caseEventTrigger, draftReference, ignoreWarning);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forDraft(caseUpdateViewEvent, draftReference, ignoreWarning);
 
             Optional<Link> self = uiStartTriggerResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelfForEvent));

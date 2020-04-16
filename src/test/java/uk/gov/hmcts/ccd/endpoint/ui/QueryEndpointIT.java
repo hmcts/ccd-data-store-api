@@ -1171,8 +1171,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
                                         .andExpect(status().is(200))
                                         .andReturn();
 
-        final CaseEventTrigger eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
-                                                               CaseEventTrigger.class);
+        final CaseUpdateViewEvent eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
+                                                               CaseUpdateViewEvent.class);
         assertNotNull("Event Trigger is null", eventTrigger);
 
         assertThat("Unexpected Case ID", eventTrigger.getCaseId(), is(nullValue()));
@@ -1234,8 +1234,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
                                         .andExpect(status().is(200))
                                         .andReturn();
 
-        final CaseEventTrigger eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
-                                                               CaseEventTrigger.class);
+        final CaseUpdateViewEvent eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
+                                                               CaseUpdateViewEvent.class);
         assertNotNull("Event Trigger is null", eventTrigger);
 
         assertEquals("Unexpected Case Reference", "1504259907353545", eventTrigger.getCaseId());

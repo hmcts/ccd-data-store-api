@@ -81,13 +81,13 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
             mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
         assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
 
-        assertThat("Unexpected Case ID", uiStartTriggerResource.getCaseEventTrigger().getCaseId(), is(nullValue()));
-        assertEquals("Unexpected Event Name", "CREATE-CASE", uiStartTriggerResource.getCaseEventTrigger().getName());
-        assertEquals("Unexpected Event Show Event Notes", true, uiStartTriggerResource.getCaseEventTrigger().getShowEventNotes());
-        assertEquals("Unexpected Event Description", "Creation event", uiStartTriggerResource.getCaseEventTrigger().getDescription());
-        assertEquals("Unexpected Case Fields", 1, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
+        assertThat("Unexpected Case ID", uiStartTriggerResource.getCaseUpdateViewEvent().getCaseId(), is(nullValue()));
+        assertEquals("Unexpected Event Name", "CREATE-CASE", uiStartTriggerResource.getCaseUpdateViewEvent().getName());
+        assertEquals("Unexpected Event Show Event Notes", true, uiStartTriggerResource.getCaseUpdateViewEvent().getShowEventNotes());
+        assertEquals("Unexpected Event Description", "Creation event", uiStartTriggerResource.getCaseUpdateViewEvent().getDescription());
+        assertEquals("Unexpected Case Fields", 1, uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().size());
 
-        final CaseViewField field1 = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(0);
+        final CaseViewField field1 = uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().get(0);
         assertThat(field1.getId(), equalTo("PersonFirstName"));
 
         assertThat(field1.getAccessControlLists().get(0).getRole(), equalTo("caseworker-probate-public"));
@@ -121,9 +121,9 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         final UIStartTriggerResource uiStartTriggerResource =
             mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
         assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
-        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
+        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().size());
 
-        final CaseViewField children = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(1);
+        final CaseViewField children = uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().get(1);
         assertThat(children.getFieldType().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
 
@@ -150,9 +150,9 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         final UIStartTriggerResource uiStartTriggerResource =
             mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
         assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
-        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
+        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().size());
 
-        final CaseViewField children = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(1);
+        final CaseViewField children = uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().get(1);
         assertThat(children.getFieldType().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
 
@@ -186,9 +186,9 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         final UIStartTriggerResource uiStartTriggerResource =
             mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
         assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
-        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
+        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().size());
 
-        final CaseViewField children = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(1);
+        final CaseViewField children = uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().get(1);
         assertThat(children.getFieldType().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
 
@@ -215,9 +215,9 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         final UIStartTriggerResource uiStartTriggerResource =
             mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
         assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
-        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
+        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().size());
 
-        final CaseViewField children = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(1);
+        final CaseViewField children = uiStartTriggerResource.getCaseUpdateViewEvent().getCaseFields().get(1);
         assertThat(children.getFieldType().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
 

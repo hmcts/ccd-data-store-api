@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -58,7 +58,7 @@ class UIStartTriggerControllerTest {
     @InjectMocks
     private UIStartTriggerController uiStartTriggerController;
 
-    private CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+    private CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
         .withId(EVENT_ID)
         .withName(NAME)
         .withDescription(DESCRIPTION)
@@ -87,9 +87,9 @@ class UIStartTriggerControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(caseEventTrigger);
-        when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(caseEventTrigger);
-        when(getEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE_WARNING)).thenReturn(caseEventTrigger);
+        when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(caseUpdateViewEvent);
+        when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(caseUpdateViewEvent);
+        when(getEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE_WARNING)).thenReturn(caseUpdateViewEvent);
         when(caseReferenceService.validateUID(CASE_ID)).thenReturn(true);
     }
 
@@ -105,33 +105,33 @@ class UIStartTriggerControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getId(), is(EVENT_TRIGGER_ID)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getName(), is(NAME)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getDescription(), is(DESCRIPTION)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getCaseId(), is(CASE_ID)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getId(), is(EVENT_TRIGGER_ID)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getName(), is(NAME)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getDescription(), is(DESCRIPTION)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseId(), is(CASE_ID)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
                         .getComplexFieldOverrides().get(0),
                     hasProperty("complexFieldElementId", CoreMatchers.is(FIELD_ID))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
                         .getComplexFieldOverrides().get(0),
                     hasProperty("displayContext", CoreMatchers.is("MANDATORY"))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
                         .getComplexFieldOverrides().get(0),
                     hasProperty("label", CoreMatchers.is(FIELD_LABEL))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
                         .getComplexFieldOverrides().get(0),
                     hasProperty("hintText", CoreMatchers.is(FIELD_HINT_TEXT))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
                         .getComplexFieldOverrides().get(0),
                     hasProperty("showCondition", CoreMatchers.nullValue())),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
 
@@ -156,18 +156,18 @@ class UIStartTriggerControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getId(), is(EVENT_TRIGGER_ID)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getName(), is(NAME)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getDescription(), is(DESCRIPTION)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getCaseId(), is(CASE_ID)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getId(), is(EVENT_TRIGGER_ID)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getName(), is(NAME)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getDescription(), is(DESCRIPTION)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseId(), is(CASE_ID)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
 
@@ -200,18 +200,18 @@ class UIStartTriggerControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getId(), is(EVENT_TRIGGER_ID)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getName(), is(NAME)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getDescription(), is(DESCRIPTION)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getCaseId(), is(CASE_ID)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getId(), is(EVENT_TRIGGER_ID)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getName(), is(NAME)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getDescription(), is(DESCRIPTION)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseId(), is(CASE_ID)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(response.getBody().getCaseEventTrigger().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
 

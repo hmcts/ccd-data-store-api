@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 
 import javax.inject.Inject;
@@ -65,8 +65,8 @@ public class CaseRolesIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final CaseEventTrigger eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
-            CaseEventTrigger.class);
+        final CaseUpdateViewEvent eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
+            CaseUpdateViewEvent.class);
         assertNotNull("Event Trigger is null", eventTrigger);
 
         assertThat("Unexpected Case ID", eventTrigger.getCaseId(), is(nullValue()));

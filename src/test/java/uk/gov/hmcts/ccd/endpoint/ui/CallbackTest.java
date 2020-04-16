@@ -41,7 +41,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
@@ -152,10 +152,10 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final CaseEventTrigger caseEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseEventTrigger.class);
-        assertThat(caseEventTrigger.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
-        assertThat(caseEventTrigger.getCaseFields(), hasSize(3));
-        assertTrue("No token", !caseEventTrigger.getEventToken().isEmpty());
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseUpdateViewEvent.class);
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasSize(3));
+        assertTrue("No token", !caseUpdateViewEvent.getEventToken().isEmpty());
     }
 
     @Test
@@ -214,10 +214,10 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final CaseEventTrigger caseEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseEventTrigger.class);
-        assertThat(caseEventTrigger.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
-        assertThat(caseEventTrigger.getCaseFields(), hasSize(3));
-        assertTrue("No token", !caseEventTrigger.getEventToken().isEmpty());
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseUpdateViewEvent.class);
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasSize(3));
+        assertTrue("No token", !caseUpdateViewEvent.getEventToken().isEmpty());
     }
 
     @Test
@@ -322,10 +322,10 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final CaseEventTrigger caseEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseEventTrigger.class);
-        assertThat(caseEventTrigger.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
-        assertThat(caseEventTrigger.getCaseFields(), hasSize(3));
-        assertTrue("No token", !caseEventTrigger.getEventToken().isEmpty());
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseUpdateViewEvent.class);
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasSize(3));
+        assertTrue("No token", !caseUpdateViewEvent.getEventToken().isEmpty());
     }
 
     @Test
@@ -384,10 +384,10 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final CaseEventTrigger caseEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseEventTrigger.class);
-        assertThat(caseEventTrigger.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
-        assertThat(caseEventTrigger.getCaseFields(), hasSize(3));
-        assertTrue("No token", !caseEventTrigger.getEventToken().isEmpty());
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseUpdateViewEvent.class);
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasSize(3));
+        assertTrue("No token", !caseUpdateViewEvent.getEventToken().isEmpty());
     }
 
     @Test

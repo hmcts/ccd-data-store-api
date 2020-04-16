@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
@@ -236,11 +236,11 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Empty pre-state conditions"),
         @ApiResponse(code = 422, message = "The case status did not qualify for the event")
     })
-    public CaseEventTrigger getEventTriggerForCaseType(@PathVariable("uid") String userId,
-                                                       @PathVariable("jid") String jurisdictionId,
-                                                       @PathVariable("ctid") String casetTypeId,
-                                                       @PathVariable("etid") String eventTriggerId,
-                                                       @RequestParam(value = "ignore-warning",
+    public CaseUpdateViewEvent getEventTriggerForCaseType(@PathVariable("uid") String userId,
+                                                          @PathVariable("jid") String jurisdictionId,
+                                                          @PathVariable("ctid") String casetTypeId,
+                                                          @PathVariable("etid") String eventTriggerId,
+                                                          @RequestParam(value = "ignore-warning",
                                                            required = false) Boolean ignoreWarning) {
         return getEventTriggerOperation.executeForCaseType(casetTypeId, eventTriggerId, ignoreWarning);
     }
@@ -253,12 +253,12 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Valid pre-state conditions")
     })
-    public CaseEventTrigger getEventTriggerForCase(@PathVariable("uid") String userId,
-                                                   @PathVariable("jid") String jurisdictionId,
-                                                   @PathVariable("ctid") String caseTypeId,
-                                                   @PathVariable("cid") String caseId,
-                                                   @PathVariable("etid") String eventTriggerId,
-                                                   @RequestParam(value = "ignore-warning",
+    public CaseUpdateViewEvent getEventTriggerForCase(@PathVariable("uid") String userId,
+                                                      @PathVariable("jid") String jurisdictionId,
+                                                      @PathVariable("ctid") String caseTypeId,
+                                                      @PathVariable("cid") String caseId,
+                                                      @PathVariable("etid") String eventTriggerId,
+                                                      @RequestParam(value = "ignore-warning",
                                                        required = false) Boolean ignoreWarning) {
         return getEventTriggerOperation.executeForCase(caseId, eventTriggerId, ignoreWarning);
     }
@@ -271,12 +271,12 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Valid pre-state conditions")
     })
-    public CaseEventTrigger getEventTriggerForDraft(@PathVariable("uid") String userId,
-                                                    @PathVariable("jid") String jurisdictionId,
-                                                    @PathVariable("ctid") String caseTypeId,
-                                                    @PathVariable("did") String draftId,
-                                                    @PathVariable("etid") String eventTriggerId,
-                                                    @RequestParam(value = "ignore-warning",
+    public CaseUpdateViewEvent getEventTriggerForDraft(@PathVariable("uid") String userId,
+                                                       @PathVariable("jid") String jurisdictionId,
+                                                       @PathVariable("ctid") String caseTypeId,
+                                                       @PathVariable("did") String draftId,
+                                                       @PathVariable("etid") String eventTriggerId,
+                                                       @RequestParam(value = "ignore-warning",
                                                         required = false) Boolean ignoreWarning) {
         return getEventTriggerOperation.executeForDraft(draftId, ignoreWarning);
     }

@@ -7,7 +7,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
@@ -41,7 +41,7 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     }
 
     @Override
-    public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
+    public CaseUpdateViewEvent executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCaseType(caseTypeId,
                                                                                           eventTriggerId,
                                                                                           ignoreWarning);
@@ -52,9 +52,9 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     }
 
     @Override
-    public CaseEventTrigger executeForCase(String caseReference,
-                                           String eventTriggerId,
-                                           Boolean ignoreWarning) {
+    public CaseUpdateViewEvent executeForCase(String caseReference,
+                                              String eventTriggerId,
+                                              Boolean ignoreWarning) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
 
         StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCase(caseReference,
@@ -67,8 +67,8 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     }
 
     @Override
-    public CaseEventTrigger executeForDraft(String draftReference,
-                                            Boolean ignoreWarning) {
+    public CaseUpdateViewEvent executeForDraft(String draftReference,
+                                               Boolean ignoreWarning) {
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
 

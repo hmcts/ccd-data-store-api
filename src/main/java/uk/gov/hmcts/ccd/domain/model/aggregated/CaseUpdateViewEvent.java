@@ -5,7 +5,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 
 import java.util.List;
 
-public class CaseEventTrigger {
+public class CaseUpdateViewEvent {
     private String id;
     private String name;
     private String description;

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
@@ -873,12 +873,12 @@ public class TestBuildersUtil {
     }
 
     public static class CaseEventTriggerBuilder {
-        private final CaseEventTrigger caseEventTrigger;
+        private final CaseUpdateViewEvent caseUpdateViewEvent;
         private final List<CaseViewField> caseFields = Lists.newArrayList();
         private final List<WizardPage> wizardPages = Lists.newArrayList();
 
         private CaseEventTriggerBuilder() {
-            this.caseEventTrigger = new CaseEventTrigger();
+            this.caseUpdateViewEvent = new CaseUpdateViewEvent();
         }
 
         public static CaseEventTriggerBuilder newCaseEventTrigger() {
@@ -886,7 +886,7 @@ public class TestBuildersUtil {
         }
 
         public CaseEventTriggerBuilder withId(String id) {
-            caseEventTrigger.setId(id);
+            caseUpdateViewEvent.setId(id);
             return this;
         }
 
@@ -896,7 +896,7 @@ public class TestBuildersUtil {
         }
 
         public CaseEventTriggerBuilder withCaseId(String caseId) {
-            this.caseEventTrigger.setCaseId(caseId);
+            this.caseUpdateViewEvent.setCaseId(caseId);
             return this;
         }
 
@@ -906,44 +906,44 @@ public class TestBuildersUtil {
         }
 
         public CaseEventTriggerBuilder withName(String name) {
-            this.caseEventTrigger.setName(name);
+            this.caseUpdateViewEvent.setName(name);
             return this;
         }
 
         public CaseEventTriggerBuilder withDescription(String description) {
-            this.caseEventTrigger.setDescription(description);
+            this.caseUpdateViewEvent.setDescription(description);
             return this;
         }
 
         public CaseEventTriggerBuilder withEventToken(String token) {
-            this.caseEventTrigger.setEventToken(token);
+            this.caseUpdateViewEvent.setEventToken(token);
             return this;
         }
 
         public CaseEventTriggerBuilder withShowSummary(Boolean isShowSummary) {
-            this.caseEventTrigger.setShowSummary(isShowSummary);
+            this.caseUpdateViewEvent.setShowSummary(isShowSummary);
             return this;
         }
 
         public CaseEventTriggerBuilder withShowEventNotes(Boolean isShowEventNotes) {
-            this.caseEventTrigger.setShowEventNotes(isShowEventNotes);
+            this.caseUpdateViewEvent.setShowEventNotes(isShowEventNotes);
             return this;
         }
 
         public CaseEventTriggerBuilder withEndButtonLabel(String endButtonLabel) {
-            this.caseEventTrigger.setEndButtonLabel(endButtonLabel);
+            this.caseUpdateViewEvent.setEndButtonLabel(endButtonLabel);
             return this;
         }
 
         public CaseEventTriggerBuilder withCanSaveDraft(boolean isSaveDraft) {
-            this.caseEventTrigger.setCanSaveDraft(isSaveDraft);
+            this.caseUpdateViewEvent.setCanSaveDraft(isSaveDraft);
             return this;
         }
 
-        public CaseEventTrigger build() {
-            this.caseEventTrigger.setCaseFields(this.caseFields);
-            caseEventTrigger.setWizardPages(this.wizardPages);
-            return caseEventTrigger;
+        public CaseUpdateViewEvent build() {
+            this.caseUpdateViewEvent.setCaseFields(this.caseFields);
+            caseUpdateViewEvent.setWizardPages(this.wizardPages);
+            return caseUpdateViewEvent;
         }
     }
 

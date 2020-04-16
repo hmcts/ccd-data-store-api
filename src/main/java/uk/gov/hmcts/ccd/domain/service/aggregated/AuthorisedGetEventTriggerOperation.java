@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -64,26 +64,26 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     @Override
-    public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
+    public CaseUpdateViewEvent executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
 
         Set<String> userRoles = caseAccessService.getCaseCreationRoles();
 
         verifyRequiredAccessExistsForCaseType(eventTriggerId, caseTypeDefinition, userRoles);
 
-        CaseEventTrigger caseEventTrigger = filterCaseFieldsByCreateAccess(caseTypeDefinition,
+        CaseUpdateViewEvent caseUpdateViewEvent = filterCaseFieldsByCreateAccess(caseTypeDefinition,
             userRoles,
             getEventTriggerOperation.executeForCaseType(caseTypeId,
                 eventTriggerId,
                 ignoreWarning));
 
-        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
+        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, userRoles);
     }
 
     @Override
-    public CaseEventTrigger executeForCase(String caseReference,
-                                           String eventTriggerId,
-                                           Boolean ignoreWarning) {
+    public CaseUpdateViewEvent executeForCase(String caseReference,
+                                              String eventTriggerId,
+                                              Boolean ignoreWarning) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEvent eventTrigger = getEventTrigger(eventTriggerId, caseTypeDefinition);
@@ -94,14 +94,14 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         verifyMandatoryAccessForCase(eventTriggerId, caseDetails, caseTypeDefinition, userRoles);
 
-        CaseEventTrigger caseEventTrigger = filterUpsertAccessForCase(caseTypeDefinition, userRoles, getEventTriggerOperation.executeForCase(caseReference,
+        CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseTypeDefinition, userRoles, getEventTriggerOperation.executeForCase(caseReference,
                                                                                                       eventTriggerId,
                                                                                                       ignoreWarning));
-        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
+        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, userRoles);
     }
 
     @Override
-    public CaseEventTrigger executeForDraft(String draftReference, Boolean ignoreWarning) {
+    public CaseUpdateViewEvent executeForDraft(String draftReference, Boolean ignoreWarning) {
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
@@ -110,9 +110,9 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         verifyRequiredAccessExistsForCaseType(draftResponse.getDocument().getEventTriggerId(), caseTypeDefinition, userRoles);
 
-        CaseEventTrigger caseEventTrigger = filterCaseFieldsByCreateAccess(caseTypeDefinition, userRoles, getEventTriggerOperation.executeForDraft(draftReference,
+        CaseUpdateViewEvent caseUpdateViewEvent = filterCaseFieldsByCreateAccess(caseTypeDefinition, userRoles, getEventTriggerOperation.executeForDraft(draftReference,
                                                                                                             ignoreWarning));
-        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
+        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, userRoles);
     }
 
     private CaseDetails getCaseDetails(String caseReference) {
@@ -170,17 +170,17 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         }
     }
 
-    private CaseEventTrigger filterCaseFieldsByCreateAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseEventTrigger caseEventTrigger) {
+    private CaseUpdateViewEvent filterCaseFieldsByCreateAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseUpdateViewEvent caseUpdateViewEvent) {
         return accessControlService.filterCaseViewFieldsByAccess(
-            caseEventTrigger,
+            caseUpdateViewEvent,
             caseTypeDefinition.getCaseFieldDefinitions(),
             userRoles,
             CAN_CREATE);
     }
 
-    private CaseEventTrigger filterUpsertAccessForCase(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseEventTrigger caseEventTrigger) {
+    private CaseUpdateViewEvent filterUpsertAccessForCase(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseUpdateViewEvent caseUpdateViewEvent) {
         return accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
-            caseEventTrigger,
+            caseUpdateViewEvent,
             caseTypeDefinition.getCaseFieldDefinitions(),
             userRoles,
             CAN_UPDATE);

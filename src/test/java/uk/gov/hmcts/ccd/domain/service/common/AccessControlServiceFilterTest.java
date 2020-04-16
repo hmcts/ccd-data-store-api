@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
@@ -163,7 +163,7 @@ class AccessControlServiceFilterTest {
                 .withId("Surname")
                 .build();
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withWizardPage(newWizardPage()
@@ -174,8 +174,8 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
@@ -214,7 +214,7 @@ class AccessControlServiceFilterTest {
                 .withId("Surname")
                 .build();
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withWizardPage(newWizardPage()
@@ -226,8 +226,8 @@ class AccessControlServiceFilterTest {
                 .build();
 
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
@@ -255,7 +255,7 @@ class AccessControlServiceFilterTest {
                 .withId("Surname")
                 .build();
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withWizardPage(newWizardPage()
@@ -266,8 +266,8 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
@@ -350,7 +350,7 @@ class AccessControlServiceFilterTest {
                 .withFieldType(getAddressFieldType())
                 .build();
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -363,8 +363,8 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
@@ -469,7 +469,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -482,8 +482,8 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
@@ -591,7 +591,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -604,8 +604,8 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
@@ -759,7 +759,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -790,8 +790,8 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
@@ -965,7 +965,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -978,8 +978,8 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
@@ -1046,7 +1046,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setComplexFields(getPredefinedAddressFields());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -1059,8 +1059,8 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
@@ -1127,7 +1127,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setComplexFields(getPredefinedAddressFields());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -1140,8 +1140,8 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
@@ -1186,7 +1186,7 @@ class AccessControlServiceFilterTest {
                 .withUpdate(false)
                 .build()));
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withWizardPage(newWizardPage()
                         .withId("Page One")
@@ -1195,8 +1195,8 @@ class AccessControlServiceFilterTest {
                                )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
+                caseUpdateViewEvent,
                 USER_ROLES);
 
             assertThat("There should be only one caseField", eventTrigger.getCaseFields(), hasSize(1));
@@ -1242,7 +1242,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withWizardPage(newWizardPage()
                         .withId("Page One")
@@ -1251,8 +1251,8 @@ class AccessControlServiceFilterTest {
                                )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
+                caseUpdateViewEvent,
                 USER_ROLES);
 
             CaseViewField people = eventTrigger.getCaseFields().stream()
@@ -1285,7 +1285,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
                 .withField(caseViewField1)
                 .withWizardPage(newWizardPage()
                         .withId("Page One")
@@ -1294,8 +1294,8 @@ class AccessControlServiceFilterTest {
                                )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
-                caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
+                caseUpdateViewEvent,
                 USER_ROLES);
 
             CaseViewField people = eventTrigger.getCaseFields().stream()

@@ -27,7 +27,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
@@ -35,7 +35,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
-class CaseEventTriggerBuilderTest {
+class CaseUpdateViewEventBuilderTest {
 
     private static final String TOKEN = "testToken";
     private static final String EVENT_TRIGGER_ID = "testEventTriggerId";
@@ -93,7 +93,7 @@ class CaseEventTriggerBuilderTest {
     @DisplayName("should build trigger")
     void shouldBuildTrigger() {
 
-        final CaseEventTrigger caseEventTrigger = caseEventTriggerBuilder.build(startEventTrigger,
+        final CaseUpdateViewEvent caseUpdateViewEvent = caseEventTriggerBuilder.build(startEventTrigger,
                                                                                 CASE_TYPE_ID,
                                                                                 EVENT_TRIGGER_ID,
                                                                                 CASE_REFERENCE);
@@ -102,15 +102,15 @@ class CaseEventTriggerBuilderTest {
                                   eventTriggerService,
                                   caseViewFieldBuilder);
         assertAll(
-            () -> assertThat(caseEventTrigger, hasProperty("id", equalTo(EVENT_TRIGGER_ID))),
-            () -> assertThat(caseEventTrigger, hasProperty("name", equalTo(EVENT_TRIGGER_NAME))),
-            () -> assertThat(caseEventTrigger, hasProperty("description", equalTo(EVENT_TRIGGER_DESCRIPTION))),
-            () -> assertThat(caseEventTrigger, hasProperty("showSummary", equalTo(EVENT_TRIGGER_SHOW_SUMMARY))),
-            () -> assertThat(caseEventTrigger, hasProperty("showEventNotes", equalTo(EVENT_TRIGGER_SHOW_EVENT_NOTES))),
-            () -> assertThat(caseEventTrigger, hasProperty("eventToken", equalTo(TOKEN))),
-            () -> assertThat(caseEventTrigger, hasProperty("caseId", equalTo(CASE_REFERENCE))),
-            () -> assertThat(caseEventTrigger, hasProperty("caseFields", equalTo(viewFields))),
-            () -> assertThat(caseEventTrigger, hasProperty("wizardPages", equalTo(wizardPageCollection))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("id", equalTo(EVENT_TRIGGER_ID))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("name", equalTo(EVENT_TRIGGER_NAME))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("description", equalTo(EVENT_TRIGGER_DESCRIPTION))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("showSummary", equalTo(EVENT_TRIGGER_SHOW_SUMMARY))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("showEventNotes", equalTo(EVENT_TRIGGER_SHOW_EVENT_NOTES))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("eventToken", equalTo(TOKEN))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("caseId", equalTo(CASE_REFERENCE))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("caseFields", equalTo(viewFields))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("wizardPages", equalTo(wizardPageCollection))),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID),
             () -> inOrder.verify(caseViewFieldBuilder).build(caseFieldDefinitions, eventFields, caseDetails.getCaseDataAndMetadata()),

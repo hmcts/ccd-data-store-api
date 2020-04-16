@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -68,11 +68,11 @@ public class UIStartTriggerController {
                                                                       @PathVariable("triggerId") String triggerId,
                                                                       @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        final CaseEventTrigger caseEventTrigger = this.getEventTriggerOperation.executeForCaseType(caseTypeId,
+        final CaseUpdateViewEvent caseUpdateViewEvent = this.getEventTriggerOperation.executeForCaseType(caseTypeId,
                                                                                                    triggerId,
                                                                                                    ignoreWarning);
 
-        return ResponseEntity.ok(forCaseType(caseEventTrigger, caseTypeId, ignoreWarning));
+        return ResponseEntity.ok(forCaseType(caseUpdateViewEvent, caseTypeId, ignoreWarning));
     }
 
     @GetMapping(
@@ -114,11 +114,11 @@ public class UIStartTriggerController {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
 
-        final CaseEventTrigger caseEventTrigger = this.getEventTriggerOperation.executeForCase(caseId,
+        final CaseUpdateViewEvent caseUpdateViewEvent = this.getEventTriggerOperation.executeForCase(caseId,
                                                                                                triggerId,
                                                                                                ignoreWarning);
 
-        return ResponseEntity.ok(forCase(caseEventTrigger, caseId, ignoreWarning));
+        return ResponseEntity.ok(forCase(caseUpdateViewEvent, caseId, ignoreWarning));
     }
 
     @GetMapping(
@@ -152,9 +152,9 @@ public class UIStartTriggerController {
     public ResponseEntity<UIStartTriggerResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,
                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        final CaseEventTrigger caseEventTrigger = getEventTriggerOperation.executeForDraft(draftId,
+        final CaseUpdateViewEvent caseUpdateViewEvent = getEventTriggerOperation.executeForDraft(draftId,
                                                                                            ignoreWarning);
 
-        return ResponseEntity.ok(forDraft(caseEventTrigger, draftId, ignoreWarning));
+        return ResponseEntity.ok(forDraft(caseUpdateViewEvent, draftId, ignoreWarning));
     }
 }
