@@ -31,7 +31,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -119,44 +119,44 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
             .build())
         .build();
 
-    private static final CaseField CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1)
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .build())
         .build();
-    private static final CaseField CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2)
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withRead(true)
             .build())
         .build();
-    private static final CaseField CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3)
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .build())
         .build();
-    private static final CaseField CASE_FIELD_2_3 = newCaseField().withId(CASE_FIELD_ID_2_3)
+    private static final CaseFieldDefinition CASE_FIELD_2_3 = newCaseField().withId(CASE_FIELD_ID_2_3)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withCreate(true)
             .withRead(true)
             .build())
         .build();
-    private static final CaseField CASE_FIELD_3_1 = newCaseField().withId(CASE_FIELD_ID_3_1)
+    private static final CaseFieldDefinition CASE_FIELD_3_1 = newCaseField().withId(CASE_FIELD_ID_3_1)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withUpdate(true)
             .withRead(true)
             .build())
         .build();
-    private static final CaseField CASE_FIELD_3_2 = newCaseField().withId(CASE_FIELD_ID_3_2)
+    private static final CaseFieldDefinition CASE_FIELD_3_2 = newCaseField().withId(CASE_FIELD_ID_3_2)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withUpdate(true)
             .withCreate(true)
             .build())
         .build();
-    private static final CaseField CASE_FIELD_3_3 = newCaseField().withId(CASE_FIELD_ID_3_3)
+    private static final CaseFieldDefinition CASE_FIELD_3_3 = newCaseField().withId(CASE_FIELD_ID_3_3)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withRead(true)
@@ -370,14 +370,14 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
         @DisplayName("Should return case type with case fields that have matching access rights")
         void shouldReturnCaseTypeWithMatchingAccessFields() {
             doReturn(Optional.of(testCaseTypeDefinition2)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_CREATE);
-            doReturn(newArrayList(CASE_FIELD_2_3)).when(accessControlService).filterCaseFieldsByAccess(testCaseTypeDefinition2.getCaseFields(),
+            doReturn(newArrayList(CASE_FIELD_2_3)).when(accessControlService).filterCaseFieldsByAccess(testCaseTypeDefinition2.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
 
             Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_CREATE);
 
-            assertThat(caseTypeOpt.get().getCaseFields(), hasSize(1));
-            assertThat(caseTypeOpt.get().getCaseFields(),
+            assertThat(caseTypeOpt.get().getCaseFieldDefinitions(), hasSize(1));
+            assertThat(caseTypeOpt.get().getCaseFieldDefinitions(),
                 hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_2_3))));
         }
     }

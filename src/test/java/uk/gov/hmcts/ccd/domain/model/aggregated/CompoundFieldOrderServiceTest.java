@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 class CompoundFieldOrderServiceTest {
 
     private static final FieldType textFieldType = aFieldType().withId("Text").withType("Text").build();
-    private static final CaseField CASE_FIELD = newCaseField()
+    private static final CaseFieldDefinition CASE_FIELD = newCaseField()
         .withFieldType(textFieldType)
         .withId("PersonFirstName")
         .build();
@@ -52,7 +52,7 @@ class CompoundFieldOrderServiceTest {
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, null, ROOT);
 
-        List<CaseField> complexFields = CASE_FIELD.getFieldType().getChildren();
+        List<CaseFieldDefinition> complexFields = CASE_FIELD.getFieldType().getChildren();
         assertThat(complexFields, contains(allOf(hasProperty("id", is("Three")),
                                                  hasProperty("order", is(1))),
                                            allOf(hasProperty("id", is("One")),
@@ -78,7 +78,7 @@ class CompoundFieldOrderServiceTest {
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, EMPTY_CASE_EVENT_COMPLEX_FIELDS, ROOT);
 
-        List<CaseField> complexFields = CASE_FIELD.getFieldType().getChildren();
+        List<CaseFieldDefinition> complexFields = CASE_FIELD.getFieldType().getChildren();
         assertThat(complexFields, contains(allOf(hasProperty("id", is("Three")),
                                                  hasProperty("order", is(1))),
                                            allOf(hasProperty("id", is("One")),
@@ -106,7 +106,7 @@ class CompoundFieldOrderServiceTest {
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
-        List<CaseField> complexFields = CASE_FIELD.getFieldType().getChildren();
+        List<CaseFieldDefinition> complexFields = CASE_FIELD.getFieldType().getChildren();
         assertThat(complexFields, contains(allOf(hasProperty("id", is("Three")),
                                                  hasProperty("order", is(1))),
                                            allOf(hasProperty("id", is("One")),
@@ -134,7 +134,7 @@ class CompoundFieldOrderServiceTest {
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
-        List<CaseField> complexFields = CASE_FIELD.getFieldType().getChildren();
+        List<CaseFieldDefinition> complexFields = CASE_FIELD.getFieldType().getChildren();
         assertThat(complexFields, contains(allOf(hasProperty("id", is("Three")),
                                                  hasProperty("order", is(1))),
                                            allOf(hasProperty("id", is("One")),
@@ -166,7 +166,7 @@ class CompoundFieldOrderServiceTest {
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
-        List<CaseField> complexFields = CASE_FIELD.getFieldType().getChildren();
+        List<CaseFieldDefinition> complexFields = CASE_FIELD.getFieldType().getChildren();
         assertThat(complexFields, is(hasSize(3)));
         assertThat(complexFields, contains(allOf(hasProperty("id", is("Three")),
                                                  hasProperty("order", is(3))),
@@ -251,8 +251,8 @@ class CompoundFieldOrderServiceTest {
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
-        List<CaseField> complexChildren = CASE_FIELD.getFieldType().getChildren();
-        List<CaseField> complex1Children = complexChildren.get(2).getFieldType().getChildren();
+        List<CaseFieldDefinition> complexChildren = CASE_FIELD.getFieldType().getChildren();
+        List<CaseFieldDefinition> complex1Children = complexChildren.get(2).getFieldType().getChildren();
         assertThat(complexChildren, contains(allOf(hasProperty("id", is("simple15")),
                                                    hasProperty("order", is(5))),
                                              allOf(hasProperty("id", is("simple16")),
@@ -273,14 +273,14 @@ class CompoundFieldOrderServiceTest {
                                                     hasProperty("order", is(1))),
                                               allOf(hasProperty("id", is("simple6")),
                                                     hasProperty("order", is(4)))));
-        List<CaseField> complex2Children = complexChildren.get(3).getFieldType().getChildren();
+        List<CaseFieldDefinition> complex2Children = complexChildren.get(3).getFieldType().getChildren();
         assertThat(complex2Children, contains(allOf(hasProperty("id", is("simple13")),
                                                    hasProperty("order", is(5))),
                                              allOf(hasProperty("id", is("simple14")),
                                                    hasProperty("order", is(4))),
                                              allOf(hasProperty("id", is("complex3")),
                                                    hasProperty("order", is(1)))));
-        List<CaseField> complex3Children = complex2Children.get(2).getFieldType().getChildren();
+        List<CaseFieldDefinition> complex3Children = complex2Children.get(2).getFieldType().getChildren();
         assertThat(complex3Children, contains(allOf(hasProperty("id", is("simple3")),
                                                     hasProperty("order", is(5))),
                                               allOf(hasProperty("id", is("simple2")),
@@ -291,7 +291,7 @@ class CompoundFieldOrderServiceTest {
                                                     hasProperty("order", is(2))),
                                               allOf(hasProperty("id", is("simple4")),
                                                     hasProperty("order", is(1)))));
-        List<CaseField> complex4Children = complexChildren.get(4).getFieldType().getChildren();
+        List<CaseFieldDefinition> complex4Children = complexChildren.get(4).getFieldType().getChildren();
         assertThat(complex4Children, contains(allOf(hasProperty("id", is("simple11")),
                                                     hasProperty("order", is(1))),
                                               allOf(hasProperty("id", is("simple12")),
@@ -352,8 +352,8 @@ class CompoundFieldOrderServiceTest {
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
-        List<CaseField> complexChildren = CASE_FIELD.getFieldType().getChildren();
-        List<CaseField> complex1Children = complexChildren.get(0).getFieldType().getChildren();
+        List<CaseFieldDefinition> complexChildren = CASE_FIELD.getFieldType().getChildren();
+        List<CaseFieldDefinition> complex1Children = complexChildren.get(0).getFieldType().getChildren();
         assertThat(complex1Children, contains(allOf(hasProperty("id", is("simple9")),
                                                     hasProperty("order", is(1))),
                                               allOf(hasProperty("id", is("simple8")),
@@ -364,8 +364,8 @@ class CompoundFieldOrderServiceTest {
                                                     hasProperty("order", is(4))),
                                               allOf(hasProperty("id", is("simple10")),
                                                     hasProperty("order", is(5)))));
-        List<CaseField> complex2Children = complexChildren.get(1).getFieldType().getChildren();
-        List<CaseField> complex3Children = complex2Children.get(0).getFieldType().getChildren();
+        List<CaseFieldDefinition> complex2Children = complexChildren.get(1).getFieldType().getChildren();
+        List<CaseFieldDefinition> complex3Children = complex2Children.get(0).getFieldType().getChildren();
         assertThat(complex3Children, contains(allOf(hasProperty("id", is("simple3")),
                                                     hasProperty("order", is(5))),
                                               allOf(hasProperty("id", is("simple4")),
@@ -378,7 +378,7 @@ class CompoundFieldOrderServiceTest {
                                                     hasProperty("order", is(4)))));
     }
 
-    private CaseField simpleField(final String id, final Integer order) {
+    private CaseFieldDefinition simpleField(final String id, final Integer order) {
         return newCaseField()
             .withId(id)
             .withFieldType(simpleType())

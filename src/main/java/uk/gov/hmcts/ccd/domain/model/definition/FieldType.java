@@ -36,7 +36,7 @@ public class FieldType implements Serializable {
     @JsonProperty("fixed_list_items")
     private List<FixedListItem> fixedListItems = new ArrayList<>();
     @JsonProperty("complex_fields")
-    private List<CaseField> complexFields = new ArrayList<>();
+    private List<CaseFieldDefinition> complexFields = new ArrayList<>();
     @JsonProperty("collection_field_type")
     private FieldType collectionFieldType = null;
 
@@ -80,16 +80,16 @@ public class FieldType implements Serializable {
         this.fixedListItems = fixedListItems;
     }
 
-    public List<CaseField> getComplexFields() {
+    public List<CaseFieldDefinition> getComplexFields() {
         return complexFields;
     }
 
-    public void setComplexFields(List<CaseField> complexFields) {
+    public void setComplexFields(List<CaseFieldDefinition> complexFields) {
         this.complexFields = complexFields;
     }
 
     @JsonIgnore
-    public List<CaseField> getChildren() {
+    public List<CaseFieldDefinition> getChildren() {
         if (type.equalsIgnoreCase(COMPLEX)) {
             return complexFields;
         } else if (type.equalsIgnoreCase(COLLECTION)) {
@@ -103,11 +103,11 @@ public class FieldType implements Serializable {
     }
 
     @JsonIgnore
-    public void setChildren(List<CaseField> caseFields) {
+    public void setChildren(List<CaseFieldDefinition> caseFieldDefinitions) {
         if (type.equalsIgnoreCase(COMPLEX)) {
-            complexFields = caseFields;
+            complexFields = caseFieldDefinitions;
         } else if (type.equalsIgnoreCase(COLLECTION) && collectionFieldType != null) {
-            collectionFieldType.complexFields = caseFields;
+            collectionFieldType.complexFields = caseFieldDefinitions;
         }
     }
 

@@ -38,7 +38,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.JsonPathExtension;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
@@ -104,7 +104,7 @@ class AuthorisedCaseSearchOperationTest {
             when(userRepository.getUserRoles()).thenReturn(userRoles);
             when(objectMapperService.convertObjectToJsonNode(unFilteredData)).thenReturn(jsonNode);
             CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-            when(accessControlService.filterCaseFieldsByAccess(jsonNode, caseTypeDefinition.getCaseFields(), userRoles, CAN_READ, false)).thenReturn(jsonNode);
+            when(accessControlService.filterCaseFieldsByAccess(jsonNode, caseTypeDefinition.getCaseFieldDefinitions(), userRoles, CAN_READ, false)).thenReturn(jsonNode);
             Map<String, JsonNode> filteredData = new HashMap<>();
             when(objectMapperService.convertJsonNodeToMap(jsonNode)).thenReturn(filteredData);
 
@@ -123,7 +123,7 @@ class AuthorisedCaseSearchOperationTest {
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class)),
                 () -> verify(userRepository).getUserRoles(),
                 () -> verify(objectMapperService).convertObjectToJsonNode(unFilteredData),
-                () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode, caseTypeDefinition.getCaseFields(), userRoles, CAN_READ, false),
+                () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode, caseTypeDefinition.getCaseFieldDefinitions(), userRoles, CAN_READ, false),
                 () -> verify(objectMapperService).convertJsonNodeToMap(jsonNode),
                 () -> verify(classificationService).applyClassification(caseDetails)
             );
@@ -197,12 +197,12 @@ class AuthorisedCaseSearchOperationTest {
         @Test
         @DisplayName("should transform alias field for a collection field in source filter ")
         void shouldTransformAliasFieldForCollection() {
-            CaseField collectionField = new CaseField();
+            CaseFieldDefinition collectionField = new CaseFieldDefinition();
             FieldType fieldType = new FieldType();
             fieldType.setType(FieldType.COLLECTION);
             collectionField.setFieldType(fieldType);
             collectionField.setId("collectionField");
-            caseTypeDefinition.getCaseFields().add(collectionField);
+            caseTypeDefinition.getCaseFieldDefinitions().add(collectionField);
 
             ObjectNode dataNode = JsonNodeFactory.instance.objectNode();
             ObjectNode textNode = JsonNodeFactory.instance.objectNode();

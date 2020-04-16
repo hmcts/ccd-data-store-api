@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
@@ -95,17 +95,17 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     }
 
     List<CaseViewField> getMetadataFields(CaseTypeDefinition caseTypeDefinition, CaseDetails caseDetails) {
-        return caseTypeDefinition.getCaseFields().stream()
-            .filter(CaseField::isMetadata)
+        return caseTypeDefinition.getCaseFieldDefinitions().stream()
+            .filter(CaseFieldDefinition::isMetadata)
             .map(caseField -> CaseViewField.createFrom(caseField, caseDetails.getCaseDataAndMetadata()))
             .collect(Collectors.toList());
     }
 
     protected void hydrateHistoryField(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, List<CaseViewEvent> events) {
-        for (CaseField caseField : caseTypeDefinition.getCaseFields()) {
-            if (caseField.getFieldType().getType().equals(CASE_HISTORY_VIEWER)) {
+        for (CaseFieldDefinition caseFieldDefinition : caseTypeDefinition.getCaseFieldDefinitions()) {
+            if (caseFieldDefinition.getFieldType().getType().equals(CASE_HISTORY_VIEWER)) {
                 JsonNode eventsNode = objectMapperService.convertObjectToJsonNode(events);
-                caseDetails.getData().put(caseField.getId(), eventsNode);
+                caseDetails.getData().put(caseFieldDefinition.getId(), eventsNode);
                 return;
             }
         }

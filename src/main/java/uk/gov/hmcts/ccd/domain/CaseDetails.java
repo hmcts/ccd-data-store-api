@@ -254,16 +254,16 @@ public class CaseDetails implements Cloneable {
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
         return isFieldWithNoValue(caseTypeTabField)
             || hasDataForTabField(caseTypeTabField)
-            || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
+            || getMetadata().containsKey(caseTypeTabField.getCaseFieldDefinition().getId());
     }
 
     private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
-        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
+        return data.keySet().contains(caseTypeTabField.getCaseFieldDefinition().getId());
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
-        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL)
-            || caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
+        return caseTypeTabField.getCaseFieldDefinition().getFieldType().getType().equals(LABEL)
+            || caseTypeTabField.getCaseFieldDefinition().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
     }
 
     @JsonIgnore

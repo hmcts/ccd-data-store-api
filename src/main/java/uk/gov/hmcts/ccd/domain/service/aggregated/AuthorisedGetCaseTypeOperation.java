@@ -64,7 +64,7 @@ public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
                                                                          userRoles,
                                                                          access));
 
-        caseTypeDefinition.setCaseFields(accessControlService.filterCaseFieldsByAccess(caseTypeDefinition.getCaseFields(),
+        caseTypeDefinition.setCaseFieldDefinitions(accessControlService.filterCaseFieldsByAccess(caseTypeDefinition.getCaseFieldDefinitions(),
                                                                              userRoles,
                                                                              access));
 

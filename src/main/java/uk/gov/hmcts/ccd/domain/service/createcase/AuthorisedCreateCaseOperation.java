@@ -89,14 +89,14 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             caseDetails.setData(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                    caseTypeDefinition.getCaseFields(),
+                    caseTypeDefinition.getCaseFieldDefinitions(),
                     userRoles,
                     CAN_READ, false),
                 STRING_JSON_MAP));
             caseDetails.setDataClassification(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                    caseTypeDefinition.getCaseFields(),
+                    caseTypeDefinition.getCaseFieldDefinitions(),
                     userRoles,
                     CAN_READ,
                     true),
@@ -123,7 +123,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
         if (!accessControlService.canAccessCaseFieldsWithCriteria(
             MAPPER.convertValue(data, JsonNode.class),
-            caseTypeDefinition.getCaseFields(),
+            caseTypeDefinition.getCaseFieldDefinitions(),
             userRoles,
             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_FIELD_FOUND);

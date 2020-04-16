@@ -27,7 +27,7 @@ import java.util.Map;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -93,7 +93,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
             final CaseTypeDefinition caseTypeDefinition = restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseTypeDefinition.class).getBody();
-            caseTypeDefinition.getCaseFields().stream().forEach(CaseField::propagateACLsToNestedFields);
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
             return caseTypeDefinition;
 
         } catch (Exception e) {

@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
@@ -115,14 +115,14 @@ class MergeDataToSearchResultOperationTest {
 
         caseDetailsList = Arrays.asList(caseDetails1, caseDetails2);
 
-        final CaseField fatherName = newCaseField().withId(FATHER_NAME).withFieldType(textFieldType()).build();
-        final CaseField motherName = newCaseField().withId(MOTHER_NAME).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition fatherName = newCaseField().withId(FATHER_NAME).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition motherName = newCaseField().withId(MOTHER_NAME).withFieldType(textFieldType()).build();
 
-        final CaseField addressLine1 = newCaseField().withId(ADDRESS_LINE_1).withFieldType(textFieldType()).build();
-        final CaseField postCode = newCaseField().withId(POSTCODE).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition addressLine1 = newCaseField().withId(ADDRESS_LINE_1).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE).withFieldType(textFieldType()).build();
         final FieldType addressFieldType = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
             .withComplexField(addressLine1).withComplexField(postCode).build();
-        final CaseField familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldType).build();
+        final CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldType).build();
 
         final FieldType familyDetailsFieldType =
             aFieldType().withId(FAMILY).withType(COMPLEX)
@@ -141,7 +141,7 @@ class MergeDataToSearchResultOperationTest {
             .withField(newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldType).build())
             .build();
 
-        final CaseField labelField = buildLabelCaseField(LABEL_ID, LABEL_TEXT);
+        final CaseFieldDefinition labelField = buildLabelCaseField(LABEL_ID, LABEL_TEXT);
         caseTypeDefinitionWithLabels = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID)
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build())
@@ -464,8 +464,8 @@ class MergeDataToSearchResultOperationTest {
         return aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build();
     }
 
-    private CaseField buildLabelCaseField(final String labelId, final String labelText) {
-        final CaseField caseField = newCaseField()
+    private CaseFieldDefinition buildLabelCaseField(final String labelId, final String labelText) {
+        final CaseFieldDefinition caseFieldDefinition = newCaseField()
             .withId(labelId)
             .withFieldType(aFieldType()
                 .withType(LABEL)
@@ -473,6 +473,6 @@ class MergeDataToSearchResultOperationTest {
                 .build())
             .withFieldLabelText(labelText)
             .build();
-        return caseField;
+        return caseFieldDefinition;
     }
 }

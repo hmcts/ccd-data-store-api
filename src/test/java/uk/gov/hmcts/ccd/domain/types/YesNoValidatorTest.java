@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
 
 import java.util.Collections;
@@ -35,7 +35,7 @@ class YesNoValidatorTest {
     private CaseDefinitionRepository definitionRepository;
 
     private YesNoValidator validator;
-    private CaseField caseField;
+    private CaseFieldDefinition caseFieldDefinition;
 
     @BeforeEach
     void setUp() {
@@ -50,7 +50,7 @@ class YesNoValidatorTest {
 
         validator = new YesNoValidator();
 
-        caseField = caseField().build();
+        caseFieldDefinition = caseField().build();
     }
 
     @Test
@@ -61,35 +61,35 @@ class YesNoValidatorTest {
         final JsonNode LOWER_NO = NODE_FACTORY.textNode("no");
 
         assertAll(
-            () -> assertEquals(0, validator.validate(FIELD_ID, UPPER_YES, caseField).size(), "YES should be valid"),
-            () -> assertEquals(0, validator.validate(FIELD_ID, UPPER_NO, caseField).size(), "NO should be valid"),
-            () -> assertEquals(0, validator.validate(FIELD_ID, LOWER_YES, caseField).size(), "yes should be valid"),
-            () -> assertEquals(0, validator.validate(FIELD_ID, LOWER_NO, caseField).size(), "no should be valid")
+            () -> assertEquals(0, validator.validate(FIELD_ID, UPPER_YES, caseFieldDefinition).size(), "YES should be valid"),
+            () -> assertEquals(0, validator.validate(FIELD_ID, UPPER_NO, caseFieldDefinition).size(), "NO should be valid"),
+            () -> assertEquals(0, validator.validate(FIELD_ID, LOWER_YES, caseFieldDefinition).size(), "yes should be valid"),
+            () -> assertEquals(0, validator.validate(FIELD_ID, LOWER_NO, caseFieldDefinition).size(), "no should be valid")
         );
     }
 
     @Test
     void incorrectValue() {
         final JsonNode anything = NODE_FACTORY.textNode("dasdahsaAAA");
-        assertEquals(1, validator.validate(FIELD_ID, anything, caseField).size(), "Did not catch non YES/NO");
+        assertEquals(1, validator.validate(FIELD_ID, anything, caseFieldDefinition).size(), "Did not catch non YES/NO");
     }
 
     @Test
     void nullValue() {
-        assertEquals(0, validator.validate(FIELD_ID, null, caseField).size(), "Did not catch NULL");
+        assertEquals(0, validator.validate(FIELD_ID, null, caseFieldDefinition).size(), "Did not catch NULL");
     }
 
     @Test
     void nullNode() {
         final JsonNode nullNode = NODE_FACTORY.nullNode();
-        assertEquals(0, validator.validate(FIELD_ID, nullNode, caseField).size(), "Did not catch NULL");
+        assertEquals(0, validator.validate(FIELD_ID, nullNode, caseFieldDefinition).size(), "Did not catch NULL");
     }
 
     @Test
     void shouldFail_whenValidatingBooleanNode() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.booleanNode(true), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.booleanNode(true), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("true is not " + YesNoValidator.TYPE_ID));
     }
@@ -98,7 +98,7 @@ class YesNoValidatorTest {
     void shouldFail_whenValidatingArrayNode() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.arrayNode(), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.arrayNode(), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("[] is not " + YesNoValidator.TYPE_ID));
     }
@@ -107,7 +107,7 @@ class YesNoValidatorTest {
     void shouldFail_whenValidatingBinaryNode() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.binaryNode("Yes".getBytes()), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.binaryNode("Yes".getBytes()), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), endsWith(" is not " + YesNoValidator.TYPE_ID));
     }
@@ -116,7 +116,7 @@ class YesNoValidatorTest {
     void shouldPass_whenValidatingObjectNode() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.objectNode(), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.objectNode(), caseFieldDefinition);
         assertThat(result, empty());
     }
 
@@ -124,7 +124,7 @@ class YesNoValidatorTest {
     void shouldPass_whenValidatingPojoNode() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.pojoNode("Yes"), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.pojoNode("Yes"), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("\"Yes\" is not " + YesNoValidator.TYPE_ID));
     }
@@ -133,7 +133,7 @@ class YesNoValidatorTest {
     void shouldPass_whenValidatingNumberNode() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.numberNode(1), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.numberNode(1), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("1 is not " + YesNoValidator.TYPE_ID));
     }
@@ -142,7 +142,7 @@ class YesNoValidatorTest {
     void shouldPass_whenValidatingNullNode() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.nullNode(), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.nullNode(), caseFieldDefinition);
         assertThat(result, empty());
     }
 
@@ -150,7 +150,7 @@ class YesNoValidatorTest {
     void shouldPass_whenValidatingNullValue() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.textNode(null), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.textNode(null), caseFieldDefinition);
         assertThat(result, empty());
     }
 

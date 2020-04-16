@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
 
 @DisplayName("DynamicListValidator")
@@ -30,7 +30,7 @@ class DynamicListValidatorTest {
     private CaseDefinitionRepository definitionRepository;
 
     private DynamicListValidator validator;
-    private CaseField caseField;
+    private CaseFieldDefinition caseFieldDefinition;
 
     @BeforeEach
     public void setUp() {
@@ -46,7 +46,7 @@ class DynamicListValidatorTest {
 
         validator = new DynamicListValidator();
 
-        caseField = caseField().build();
+        caseFieldDefinition = caseField().build();
     }
 
     @Test
@@ -82,7 +82,7 @@ class DynamicListValidatorTest {
 
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
             dataValue,
-            caseField);
+                caseFieldDefinition);
         assertEquals(0, result01.size());
     }
 
@@ -121,7 +121,7 @@ class DynamicListValidatorTest {
 
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
             dataValue,
-            caseField);
+                caseFieldDefinition);
         assertEquals(1, result01.size(), result01.toString());
     }
 

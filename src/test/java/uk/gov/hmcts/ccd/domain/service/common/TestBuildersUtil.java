@@ -36,7 +36,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -467,8 +467,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseTypeBuilder withCaseFields(List<CaseField> fields) {
-            caseTypeDefinition.getCaseFields().addAll(fields);
+        public CaseTypeBuilder withCaseFields(List<CaseFieldDefinition> fields) {
+            caseTypeDefinition.getCaseFieldDefinitions().addAll(fields);
             return this;
         }
 
@@ -477,8 +477,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseTypeBuilder withField(CaseField field) {
-            caseTypeDefinition.getCaseFields().add(field);
+        public CaseTypeBuilder withField(CaseFieldDefinition field) {
+            caseTypeDefinition.getCaseFieldDefinitions().add(field);
             return this;
         }
 
@@ -1058,13 +1058,13 @@ public class TestBuildersUtil {
     }
 
     public static class CaseFieldBuilder {
-        private final CaseField caseField;
+        private final CaseFieldDefinition caseFieldDefinition;
         private final List<AccessControlList> accessControlLists = newArrayList();
         private final List<ComplexACL> complexACLs = newArrayList();
         private FieldType caseFieldType;
 
         private CaseFieldBuilder() {
-            this.caseField = new CaseField();
+            this.caseFieldDefinition = new CaseFieldDefinition();
         }
 
         public static CaseFieldBuilder newCaseField() {
@@ -1072,12 +1072,12 @@ public class TestBuildersUtil {
         }
 
         public CaseFieldBuilder withId(String id) {
-            caseField.setId(id);
+            caseFieldDefinition.setId(id);
             return this;
         }
 
         public CaseFieldBuilder withSC(String securityClassification) {
-            caseField.setSecurityLabel(securityClassification);
+            caseFieldDefinition.setSecurityLabel(securityClassification);
             return this;
         }
 
@@ -1087,7 +1087,7 @@ public class TestBuildersUtil {
         }
 
         public CaseFieldBuilder withFieldLabelText(String label) {
-            caseField.setLabel(label);
+            caseFieldDefinition.setLabel(label);
             return this;
         }
 
@@ -1102,20 +1102,20 @@ public class TestBuildersUtil {
         }
 
         public CaseFieldBuilder withOrder(final int order) {
-            caseField.setOrder(order);
+            caseFieldDefinition.setOrder(order);
             return this;
         }
 
         public CaseFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
-            caseField.setDisplayContext(displayContextParameter);
+            caseFieldDefinition.setDisplayContext(displayContextParameter);
             return this;
         }
 
-        public CaseField build() {
-            caseField.setAccessControlLists(accessControlLists);
-            caseField.setComplexACLs(complexACLs);
-            caseField.setFieldType(caseFieldType);
-            return caseField;
+        public CaseFieldDefinition build() {
+            caseFieldDefinition.setAccessControlLists(accessControlLists);
+            caseFieldDefinition.setComplexACLs(complexACLs);
+            caseFieldDefinition.setFieldType(caseFieldType);
+            return caseFieldDefinition;
         }
     }
 
@@ -1147,7 +1147,7 @@ public class TestBuildersUtil {
 
     public static class FieldTypeBuilder {
         private final FieldType fieldType;
-        private final List<CaseField> complexFields;
+        private final List<CaseFieldDefinition> complexFields;
 
         private FieldTypeBuilder() {
             this.fieldType = new FieldType();
@@ -1168,7 +1168,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public FieldTypeBuilder withComplexField(CaseField complexField) {
+        public FieldTypeBuilder withComplexField(CaseFieldDefinition complexField) {
             complexFields.add(complexField);
             return this;
         }
@@ -1178,7 +1178,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public FieldTypeBuilder withCollectionField(CaseField complexField) {
+        public FieldTypeBuilder withCollectionField(CaseFieldDefinition complexField) {
             fieldType.setCollectionFieldType(aFieldType()
                 .withComplexField(complexField)
                 .withType(COMPLEX)
@@ -1437,8 +1437,8 @@ public class TestBuildersUtil {
             this.caseTypeTabField = new CaseTypeTabField();
         }
 
-        public CaseTypeTabFieldBuilder withCaseField(CaseField caseField) {
-            this.caseTypeTabField.setCaseField(caseField);
+        public CaseTypeTabFieldBuilder withCaseField(CaseFieldDefinition caseFieldDefinition) {
+            this.caseTypeTabField.setCaseFieldDefinition(caseFieldDefinition);
             return this;
         }
 
@@ -1495,13 +1495,13 @@ public class TestBuildersUtil {
             CaseTypeTab tab = new CaseTypeTab();
             List<CaseTypeTabField> tabFields = new ArrayList<>();
             asList(caseFieldIds).forEach(caseFieldId -> {
-                CaseField caseField = new CaseField();
-                caseField.setId(caseFieldId);
+                CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+                caseFieldDefinition.setId(caseFieldId);
                 FieldType fieldType = new FieldType();
                 fieldType.setType("YesOrNo");
-                caseField.setFieldType(fieldType);
+                caseFieldDefinition.setFieldType(fieldType);
                 CaseTypeTabField tabField = new CaseTypeTabField();
-                tabField.setCaseField(caseField);
+                tabField.setCaseFieldDefinition(caseFieldDefinition);
                 tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
                 tabField.setDisplayContextParameter("#TABLE(Title, FirstName, MiddleName)");
                 tabFields.add(tabField);

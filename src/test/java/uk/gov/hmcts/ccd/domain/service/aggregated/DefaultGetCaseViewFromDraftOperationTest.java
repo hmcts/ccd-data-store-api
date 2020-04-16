@@ -214,7 +214,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseTypeDefinition.setCaseFields(singletonList(newCaseField()
+            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField()
                                                      .withId(CASE_HISTORY_VIEWER)
                                                      .withFieldType(aFieldType()
                                                                         .withType(CASE_HISTORY_VIEWER)
@@ -258,7 +258,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseTypeDefinition.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
             doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);

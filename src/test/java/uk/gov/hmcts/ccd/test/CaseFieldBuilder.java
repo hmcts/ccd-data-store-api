@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.test;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 
@@ -11,15 +11,15 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FixedListI
 
 public class CaseFieldBuilder {
 
-    private final CaseField caseField = new CaseField();
+    private final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
 
     public CaseFieldBuilder(final String fieldId) {
-        caseField.setId(fieldId);
-        caseField.setFieldType(new FieldType());
+        caseFieldDefinition.setId(fieldId);
+        caseFieldDefinition.setFieldType(new FieldType());
     }
 
     public CaseFieldBuilder withType(String type) {
-        caseField.getFieldType().setType(type);
+        caseFieldDefinition.getFieldType().setType(type);
         return this;
     }
 
@@ -32,7 +32,7 @@ public class CaseFieldBuilder {
     }
 
     public CaseFieldBuilder withMax(BigDecimal max) {
-        caseField.getFieldType().setMax(max);
+        caseFieldDefinition.getFieldType().setMax(max);
         return this;
     }
 
@@ -45,43 +45,43 @@ public class CaseFieldBuilder {
     }
 
     public CaseFieldBuilder withMin(BigDecimal min) {
-        caseField.getFieldType().setMin(min);
+        caseFieldDefinition.getFieldType().setMin(min);
         return this;
     }
 
     public CaseFieldBuilder withRegExp(String regExp) {
-        caseField.getFieldType().setRegularExpression(regExp);
+        caseFieldDefinition.getFieldType().setRegularExpression(regExp);
         return this;
     }
 
-    public CaseField build() {
-        return caseField;
+    public CaseFieldDefinition build() {
+        return caseFieldDefinition;
     }
 
     public CaseFieldBuilder withFixedListItem(String itemCode) {
-        if (null == caseField.getFieldType().getFixedListItems()) {
-            caseField.getFieldType().setFixedListItems(new ArrayList<>());
+        if (null == caseFieldDefinition.getFieldType().getFixedListItems()) {
+            caseFieldDefinition.getFieldType().setFixedListItems(new ArrayList<>());
         }
 
         final FixedListItem item = aFixedListItem().build();
         item.setCode(itemCode);
 
-        caseField.getFieldType()
+        caseFieldDefinition.getFieldType()
             .getFixedListItems()
             .add(item);
         return this;
     }
 
     public CaseFieldBuilder withDynamicListItem(String itemCode, String itemValue) {
-        if (null == caseField.getFieldType().getFixedListItems()) {
-            caseField.getFieldType().setFixedListItems(new ArrayList<>());
+        if (null == caseFieldDefinition.getFieldType().getFixedListItems()) {
+            caseFieldDefinition.getFieldType().setFixedListItems(new ArrayList<>());
         }
 
         final FixedListItem item = aFixedListItem().build();
         item.setCode(itemCode);
         item.setLabel(itemValue);
 
-        caseField.getFieldType()
+        caseFieldDefinition.getFieldType()
             .getFixedListItems()
             .add(item);
         return this;

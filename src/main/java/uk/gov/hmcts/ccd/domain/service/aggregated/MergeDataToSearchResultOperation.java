@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
@@ -62,7 +62,7 @@ public class MergeDataToSearchResultOperation {
         final HashSet<String> addedFields = new HashSet<>();
 
         return Arrays.stream(searchResult.getFields())
-            .flatMap(searchResultField -> caseTypeDefinition.getCaseFields().stream()
+            .flatMap(searchResultField -> caseTypeDefinition.getCaseFieldDefinitions().stream()
                     .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                     .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
                     .map(caseField -> createSearchResultViewColumn(searchResultField, caseField))
@@ -70,10 +70,10 @@ public class MergeDataToSearchResultOperation {
             .collect(Collectors.toList());
     }
 
-    private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseField caseField) {
+    private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseFieldDefinition caseFieldDefinition) {
         return new SearchResultViewColumn(
             searchResultField.buildCaseFieldId(),
-            buildCaseFieldType(searchResultField, caseField),
+            buildCaseFieldType(searchResultField, caseFieldDefinition),
             searchResultField.getLabel(),
             searchResultField.getDisplayOrder(),
             searchResultField.isMetadata());
@@ -93,9 +93,9 @@ public class MergeDataToSearchResultOperation {
         }
     }
 
-    private FieldType buildCaseFieldType(SearchResultField searchResultField, CaseField caseField) {
-        CommonField resultField = caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
-            .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseField.getId(), searchResultField.getCaseFieldPath())));
+    private FieldType buildCaseFieldType(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {
+        CommonField resultField = caseFieldDefinition.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
+            .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseFieldDefinition.getId(), searchResultField.getCaseFieldPath())));
         return resultField.getFieldType();
     }
 
@@ -156,10 +156,10 @@ public class MergeDataToSearchResultOperation {
     }
 
     private Map<String, TextNode> getLabelsFromCaseFields(CaseTypeDefinition caseTypeDefinition) {
-        return caseTypeDefinition.getCaseFields()
+        return caseTypeDefinition.getCaseFieldDefinitions()
             .stream()
             .filter(caseField -> LABEL.equals(caseField.getFieldType().getType()))
-            .collect(Collectors.toMap(CaseField::getId, caseField -> instance.textNode(caseField.getLabel())));
+            .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField -> instance.textNode(caseField.getLabel())));
     }
 
 }

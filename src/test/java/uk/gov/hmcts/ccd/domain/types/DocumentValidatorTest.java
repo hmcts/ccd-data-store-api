@@ -23,7 +23,7 @@ import java.util.List;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 public class DocumentValidatorTest implements IVallidatorTest {
@@ -43,7 +43,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public static final String DOCUMENT_FIELD_ID = "DOCUMENT_FIELD_ID";
 
     private DocumentValidator validator;
-    private CaseField caseField;
+    private CaseFieldDefinition caseFieldDefinition;
 
     @BeforeClass
     public static void setUpClass() {
@@ -61,7 +61,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
         final ObjectNode data = createDoc(DOCUMENT_URL_WITH_PORT);
         final List<ValidationResult> validDocumentUrlResult = validatorWithPort.validate(DOCUMENT_FIELD_ID,
-            data, caseField);
+            data, caseFieldDefinition);
         assertThat(validDocumentUrlResult, empty());
     }
 
@@ -72,7 +72,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final ObjectNode data = createDoc(DOCUMENT_URL_WITH_PORT);
         final List<ValidationResult> validDocumentUrlResult = validatorWithPort.validate(DOCUMENT_FIELD_ID,
             data,
-            caseField);
+                caseFieldDefinition);
         assertThat(validDocumentUrlResult, hasSize(1));
         assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
             is(DOCUMENT_URL_WITH_PORT + " does not match Document Management domain or expected URL path"));
@@ -89,14 +89,14 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final ApplicationParams applicationParams = mock(ApplicationParams.class);
         when(applicationParams.getValidDMDomain()).thenReturn("https://dm.reform.hmcts.net");
         validator = new DocumentValidator(applicationParams);
-        caseField = MAPPER.readValue(CASE_FIELD_STRING, CaseField.class);
+        caseFieldDefinition = MAPPER.readValue(CASE_FIELD_STRING, CaseFieldDefinition.class);
     }
 
     @Test
     public void shouldNotValidateIfDocumentUrlIsNotText() {
         ObjectNode data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, true);
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
@@ -104,7 +104,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldNotValidateIfDocumentUrlDoesNotExist() {
         ObjectNode data = MAPPER.createObjectNode();
         data.put("some_data", "some_value");
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
@@ -112,42 +112,42 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldNotValidateIfDocumentUrlIsNull() {
         ObjectNode data = MAPPER.createObjectNode();
         data.set(DOCUMENT_URL, null);
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
     @Test
     public void shouldValidateDocumentWithValidUrlAndDomain() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL);
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithMissingDocumentPath() {
         ObjectNode data = createDoc(MISSING_DOCUMENT_PATH_URL);
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithUnknownDomain() {
         ObjectNode data = createDoc(UNKNOWN_DOCUMENT_DOMAIN_URL);
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithUnknownParentDomain() {
         ObjectNode data = createDoc(UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL);
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
     @Test
     public void shouldValidateDocumentWithValidBinaryUrlAndDomain() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL, VALID_DOCUMENT_URL + "/binary");
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
     }
 
@@ -156,28 +156,28 @@ public class DocumentValidatorTest implements IVallidatorTest {
         ObjectNode data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, VALID_DOCUMENT_URL);
         data.set("document_binary_url", null);
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithMissingDocumentPathToBinary() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL, MISSING_DOCUMENT_PATH_URL + "/binary");
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithUnknownDomainForBinary() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL, UNKNOWN_DOCUMENT_DOMAIN_URL + "/binary");
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithUnknownParentDomainForBinary() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL, UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL + "/binary");
-        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
@@ -188,18 +188,18 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
     @Test
     public void nullValue() {
-        assertEquals("Did not catch NULL", 0, validator.validate(DOCUMENT_FIELD_ID, null, caseField).size());
+        assertEquals("Did not catch NULL", 0, validator.validate(DOCUMENT_FIELD_ID, null, caseFieldDefinition).size());
     }
 
     @Test
     public void nullObjectValue() {
-        assertEquals("Did not catch NULL", 0, validator.validate(DOCUMENT_FIELD_ID, new ObjectNode(null), caseField).size());
+        assertEquals("Did not catch NULL", 0, validator.validate(DOCUMENT_FIELD_ID, new ObjectNode(null), caseFieldDefinition).size());
     }
 
     @Test
     public void emptyObjectNode() {
         ObjectNode data = MAPPER.createObjectNode();
-        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, empty());
     }
 
@@ -207,7 +207,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void invalidObjectNode() {
         ObjectNode data = MAPPER.createObjectNode();
         data.put("ngitb", "most definitely");
-        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("object does not have document_url key specified"));
     }
@@ -216,7 +216,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFailWhenValidatingBinaryNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.binaryNode("Ngitb".getBytes()), caseField);
+            validator.validate("TEST_FIELD_ID", NODE_FACTORY.binaryNode("Ngitb".getBytes()), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("binary does not have document_url key specified"));
     }
@@ -225,7 +225,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFailWhenValidatingArrayNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.arrayNode(), caseField);
+            validator.validate("TEST_FIELD_ID", NODE_FACTORY.arrayNode(), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("array does not have document_url key specified"));
     }
@@ -234,7 +234,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFailWhenValidatingBooleanNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.booleanNode(true), caseField);
+            validator.validate("TEST_FIELD_ID", NODE_FACTORY.booleanNode(true), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("boolean does not have document_url key specified"));
     }
@@ -243,7 +243,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFailWhenValidatingTextNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("IATB"), caseField);
+            validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("IATB"), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("string does not have document_url key specified"));
     }
@@ -252,7 +252,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFailWhenValidatingNumberNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.numberNode(678), caseField);
+            validator.validate("TEST_FIELD_ID", NODE_FACTORY.numberNode(678), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("number does not have document_url key specified"));
     }
@@ -261,7 +261,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFailWhenValidatingPojoNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.pojoNode(1), caseField);
+            validator.validate("TEST_FIELD_ID", NODE_FACTORY.pojoNode(1), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("pojo does not have document_url key specified"));
     }
@@ -270,7 +270,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFail_whenValidatingBooleanDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, NODE_FACTORY.booleanNode(true));
-        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
@@ -279,7 +279,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFail_whenValidatingObjectDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, NODE_FACTORY.objectNode());
-        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
@@ -288,7 +288,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFail_whenValidatingArrayDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, NODE_FACTORY.arrayNode());
-        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
@@ -297,7 +297,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFail_whenValidatingNumberDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, NODE_FACTORY.numberNode(1));
-        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
@@ -306,7 +306,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFail_whenValidatingPojoDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, NODE_FACTORY.pojoNode("text"));
-        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
@@ -315,7 +315,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFail_whenValidatingBinaryDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, NODE_FACTORY.binaryNode("n".getBytes()));
-        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
+        final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }

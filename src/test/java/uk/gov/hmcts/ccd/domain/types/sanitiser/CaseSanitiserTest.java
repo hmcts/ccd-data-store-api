@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
@@ -25,7 +25,7 @@ public class CaseSanitiserTest {
     private static final String TYPE_SIMPLE = "Simple";
     private static final FieldType SIMPLE_FIELD_TYPE = new FieldType();
     private static final String SIMPLE_FIELD_ID = "FirstName";
-    private static final CaseField SIMPLE_FIELD = new CaseField();
+    private static final CaseFieldDefinition SIMPLE_FIELD = new CaseFieldDefinition();
     private static final JsonNode SIMPLE_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value");
     private static final JsonNode SIMPLE_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value");
     private static final String TYPE_OTHER = "Other";
@@ -36,7 +36,7 @@ public class CaseSanitiserTest {
         SIMPLE_FIELD.setId(SIMPLE_FIELD_ID);
         SIMPLE_FIELD.setFieldType(SIMPLE_FIELD_TYPE);
 
-        CASE_TYPE.setCaseFields(Collections.singletonList(SIMPLE_FIELD));
+        CASE_TYPE.setCaseFieldDefinitions(Collections.singletonList(SIMPLE_FIELD));
     }
 
     private CaseSanitiser caseSanitiser;

@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CriteriaField;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
@@ -80,17 +80,17 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         result.setOrder(in.getDisplayOrder());
         result.setRole(in.getRole());
 
-        CaseField caseField = caseTypeDefinition.getCaseField(in.getCaseFieldId())
+        CaseFieldDefinition caseFieldDefinition = caseTypeDefinition.getCaseField(in.getCaseFieldId())
             .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(), in.getCaseFieldPath())));
 
-        CaseField caseFieldByPath = (CaseField) caseField.getComplexFieldNestedField(in.getCaseFieldPath())
-            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, caseField.getId(), in.getCaseFieldPath())));
+        CaseFieldDefinition caseFieldDefinitionByPath = (CaseFieldDefinition) caseFieldDefinition.getComplexFieldNestedField(in.getCaseFieldPath())
+            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, caseFieldDefinition.getId(), in.getCaseFieldPath())));
 
         final Field field = new Field();
         field.setId(in.getCaseFieldId());
-        field.setType(caseFieldByPath.getFieldType());
+        field.setType(caseFieldDefinitionByPath.getFieldType());
         field.setElementPath(in.getCaseFieldPath());
-        field.setMetadata(caseFieldByPath.isMetadata());
+        field.setMetadata(caseFieldDefinitionByPath.isMetadata());
         field.setShowCondition(in.getShowCondition());
         result.setField(field);
         return result;

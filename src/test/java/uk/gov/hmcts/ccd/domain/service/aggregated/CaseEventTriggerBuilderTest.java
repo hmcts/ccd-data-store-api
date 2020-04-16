@@ -52,9 +52,9 @@ class CaseEventTriggerBuilderTest {
         .withShowEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES)
         .build();
     private final List<CaseEvent> events = Lists.newArrayList(newCaseEvent().build());
-    private final List<CaseField> caseFields = Lists.newArrayList(newCaseField().build());
+    private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList(newCaseField().build());
     private final List<CaseEventField> eventFields = Lists.newArrayList();
-    private final CaseTypeDefinition caseTypeDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID).withEvents(events).withCaseFields(caseFields).build();
+    private final CaseTypeDefinition caseTypeDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID).withEvents(events).withCaseFields(caseFieldDefinitions).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
     private final StartEventTrigger startEventTrigger = newStartEventTrigger().withCaseDetails(caseDetails).withEventToken(TOKEN).build();
     private final List<WizardPage> wizardPageCollection = Lists.newArrayList();
@@ -81,7 +81,7 @@ class CaseEventTriggerBuilderTest {
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(eventTriggerService.findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID)).thenReturn(caseEvent);
         when(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)).thenReturn(wizardPageCollection);
-        when(caseViewFieldBuilder.build(caseFields, eventFields, caseDetails.getData())).thenReturn(viewFields);
+        when(caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails.getData())).thenReturn(viewFields);
 
         caseEventTriggerBuilder = new CaseEventTriggerBuilder(caseDefinitionRepository,
                                                               uiDefinitionRepository,
@@ -113,7 +113,7 @@ class CaseEventTriggerBuilderTest {
             () -> assertThat(caseEventTrigger, hasProperty("wizardPages", equalTo(wizardPageCollection))),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID),
-            () -> inOrder.verify(caseViewFieldBuilder).build(caseFields, eventFields, caseDetails.getCaseDataAndMetadata()),
+            () -> inOrder.verify(caseViewFieldBuilder).build(caseFieldDefinitions, eventFields, caseDetails.getCaseDataAndMetadata()),
             () -> inOrder.verify(uiDefinitionRepository).getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)
 
         );

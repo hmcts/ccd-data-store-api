@@ -23,29 +23,29 @@ public class FieldTypeTest {
             FieldType fieldType = new FieldType();
             fieldType.setType("Text");
 
-            List<CaseField> children = fieldType.getChildren();
+            List<CaseFieldDefinition> children = fieldType.getChildren();
 
             assertThat(children, is(emptyList()));
         }
 
         @Test
         public void getChildrenOfCollectionType() {
-            CaseField caseField1 = new CaseField();
-            caseField1.setId("caseField1");
-            CaseField caseField2 = new CaseField();
-            caseField2.setId("caseField2");
+            CaseFieldDefinition caseFieldDefinition1 = new CaseFieldDefinition();
+            caseFieldDefinition1.setId("caseField1");
+            CaseFieldDefinition caseFieldDefinition2 = new CaseFieldDefinition();
+            caseFieldDefinition2.setId("caseField2");
 
             FieldType collectionFieldType = new FieldType();
-            collectionFieldType.setComplexFields(asList(caseField1, caseField2));
+            collectionFieldType.setComplexFields(asList(caseFieldDefinition1, caseFieldDefinition2));
             FieldType fieldType = new FieldType();
             fieldType.setType("Collection");
             fieldType.setCollectionFieldType(collectionFieldType);
 
-            List<CaseField> children = fieldType.getChildren();
+            List<CaseFieldDefinition> children = fieldType.getChildren();
 
             assertThat(children.size(), is(2));
-            assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseField1.getId())));
-            assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseField2.getId())));
+            assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseFieldDefinition1.getId())));
+            assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseFieldDefinition2.getId())));
         }
 
         @Test
@@ -53,26 +53,26 @@ public class FieldTypeTest {
             FieldType fieldType = new FieldType();
             fieldType.setType("Collection");
 
-            List<CaseField> children = fieldType.getChildren();
+            List<CaseFieldDefinition> children = fieldType.getChildren();
 
             assertThat(children, is(emptyList()));
         }
 
         @Test
         public void getChildrenOfComplexType() {
-            CaseField caseField1 = new CaseField();
-            caseField1.setId("caseField1");
-            CaseField caseField2 = new CaseField();
-            caseField2.setId("caseField2");
+            CaseFieldDefinition caseFieldDefinition1 = new CaseFieldDefinition();
+            caseFieldDefinition1.setId("caseField1");
+            CaseFieldDefinition caseFieldDefinition2 = new CaseFieldDefinition();
+            caseFieldDefinition2.setId("caseField2");
             FieldType fieldType = new FieldType();
             fieldType.setType("Complex");
-            fieldType.setComplexFields(asList(caseField1, caseField2));
+            fieldType.setComplexFields(asList(caseFieldDefinition1, caseFieldDefinition2));
 
-            List<CaseField> children = fieldType.getChildren();
+            List<CaseFieldDefinition> children = fieldType.getChildren();
 
             assertThat(children.size(), is(2));
-            assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseField1.getId())));
-            assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseField2.getId())));
+            assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseFieldDefinition1.getId())));
+            assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseFieldDefinition2.getId())));
         }
     }
 }

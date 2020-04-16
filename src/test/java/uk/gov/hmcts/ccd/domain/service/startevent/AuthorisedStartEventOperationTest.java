@@ -36,7 +36,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -87,7 +87,7 @@ class AuthorisedStartEventOperationTest {
     private JsonNode classifiedCaseDetailsClassificationNode;
     private StartEventTrigger classifiedStartEvent;
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-    private final List<CaseField> caseFields = Lists.newArrayList();
+    private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3,
@@ -128,17 +128,17 @@ class AuthorisedStartEventOperationTest {
             uidService,
             draftGateway,
             caseAccessService);
-        caseTypeDefinition.setCaseFields(caseFields);
+        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getUserRoles()).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
-            eq(caseFields),
+            eq(caseFieldDefinitions),
             eq(userRoles),
             eq(CAN_READ),
             anyBoolean())).thenReturn(authorisedCaseDetailsNode);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
-            eq(caseFields),
+            eq(caseFieldDefinitions),
             eq(userRoles),
             eq(CAN_READ), anyBoolean())).thenReturn(
             authorisedCaseDetailsClassificationNode);
@@ -326,12 +326,12 @@ class AuthorisedStartEventOperationTest {
                     eq(userRoles),
                     eq(CAN_READ)),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
-                    eq(caseFields),
+                    eq(caseFieldDefinitions),
                     eq(userRoles),
                     eq(CAN_READ),
                     anyBoolean()),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
-                    eq(caseFields),
+                    eq(caseFieldDefinitions),
                     eq(userRoles),
                     eq(CAN_READ),
                     anyBoolean())

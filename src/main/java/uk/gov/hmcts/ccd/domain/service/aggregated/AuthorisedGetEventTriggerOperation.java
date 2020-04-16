@@ -173,7 +173,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     private CaseEventTrigger filterCaseFieldsByCreateAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseEventTrigger caseEventTrigger) {
         return accessControlService.filterCaseViewFieldsByAccess(
             caseEventTrigger,
-            caseTypeDefinition.getCaseFields(),
+            caseTypeDefinition.getCaseFieldDefinitions(),
             userRoles,
             CAN_CREATE);
     }
@@ -181,7 +181,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     private CaseEventTrigger filterUpsertAccessForCase(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseEventTrigger caseEventTrigger) {
         return accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
             caseEventTrigger,
-            caseTypeDefinition.getCaseFields(),
+            caseTypeDefinition.getCaseFieldDefinitions(),
             userRoles,
             CAN_UPDATE);
     }

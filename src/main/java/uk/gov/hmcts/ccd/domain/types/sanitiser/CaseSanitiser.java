@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
@@ -33,16 +33,16 @@ public class CaseSanitiser {
             return sanitisedData;
         }
 
-        final Map<String, CaseField> fieldsMap = new HashMap<>();
+        final Map<String, CaseFieldDefinition> fieldsMap = new HashMap<>();
 
-        caseTypeDefinition.getCaseFields().forEach(field -> {
+        caseTypeDefinition.getCaseFieldDefinitions().forEach(field -> {
             fieldsMap.put(field.getId(), field);
         });
 
         caseData.forEach((key, value) -> {
             if (fieldsMap.containsKey(key)) {
-                final CaseField caseField = fieldsMap.get(key);
-                final FieldType fieldType = caseField.getFieldType();
+                final CaseFieldDefinition caseFieldDefinition = fieldsMap.get(key);
+                final FieldType fieldType = caseFieldDefinition.getFieldType();
 
                 if (sanitisers.containsKey(fieldType.getType())) {
                     final Sanitiser sanitiser = sanitisers.get(fieldType.getType());

@@ -14,7 +14,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInpu
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
@@ -41,10 +41,10 @@ class AuthorisedGetCriteriaOperationTest {
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
     private static final String CASE_FIELD_ID_1_4 = "CASE_FIELD_1_4";
     private static final String CASE_FIELD_ID_1_5 = "CASE_FIELD_1_5";
-    private static final CaseField CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).build();
-    private static final CaseField CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).build();
-    private static final CaseField CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).build();
-    private static final CaseField CASE_FIELD_1_5 = newCaseField().withId(CASE_FIELD_ID_1_5).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_5 = newCaseField().withId(CASE_FIELD_ID_1_5).build();
     private static List<WorkbasketInput> testWorkbasketInputs;
     private static List<SearchInput> testSearchInputs;
     @Mock

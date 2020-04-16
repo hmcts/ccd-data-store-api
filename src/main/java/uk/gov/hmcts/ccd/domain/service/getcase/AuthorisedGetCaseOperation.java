@@ -91,7 +91,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         caseDetails.setData(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                caseTypeDefinition.getCaseFields(),
+                caseTypeDefinition.getCaseFieldDefinitions(),
                 userRoles,
                 CAN_READ,
                 false),
@@ -99,7 +99,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         caseDetails.setDataClassification(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                caseTypeDefinition.getCaseFields(),
+                caseTypeDefinition.getCaseFieldDefinitions(),
                 userRoles,
                 CAN_READ,
                 true),

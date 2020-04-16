@@ -57,7 +57,7 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
 
     private boolean criteriaAllowedByCRUD(CaseTypeDefinition caseTypeDefinition, CriteriaInput criteriaInput) {
         return caseTypeDefinition
-            .getCaseFields()
+            .getCaseFieldDefinitions()
             .stream()
             .anyMatch(caseField -> caseField.getId().equalsIgnoreCase(criteriaInput.getField().getId()));
     }

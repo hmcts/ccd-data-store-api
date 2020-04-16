@@ -23,7 +23,7 @@ public class CaseTypeDefinition implements Serializable {
     private List<CaseEvent> events = new ArrayList<>();
     private List<CaseState> states = new ArrayList<>();
     @JsonProperty("case_fields")
-    private List<CaseField> caseFields = new ArrayList<>();
+    private List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
     @JsonProperty("printable_document_url")
     private String printableDocumentsUrl;
     @JsonProperty("acls")
@@ -99,12 +99,12 @@ public class CaseTypeDefinition implements Serializable {
         this.states = states;
     }
 
-    public List<CaseField> getCaseFields() {
-        return caseFields;
+    public List<CaseFieldDefinition> getCaseFieldDefinitions() {
+        return caseFieldDefinitions;
     }
 
-    public void setCaseFields(List<CaseField> caseFields) {
-        this.caseFields = caseFields;
+    public void setCaseFieldDefinitions(List<CaseFieldDefinition> caseFieldDefinitions) {
+        this.caseFieldDefinitions = caseFieldDefinitions;
     }
 
     public String getPrintableDocumentsUrl() {
@@ -124,7 +124,7 @@ public class CaseTypeDefinition implements Serializable {
     }
 
     public SecurityClassification getClassificationForField(String fieldId) {
-        return SecurityClassification.valueOf(caseFields
+        return SecurityClassification.valueOf(caseFieldDefinitions
             .stream()
             .filter(cf -> cf.getId().equals(fieldId))
             .findFirst()
@@ -160,11 +160,11 @@ public class CaseTypeDefinition implements Serializable {
 
     @JsonIgnore
     public boolean isCaseFieldACollection(String caseFieldId) {
-        return getCaseField(caseFieldId).map(CaseField::isCollectionFieldType).orElse(false);
+        return getCaseField(caseFieldId).map(CaseFieldDefinition::isCollectionFieldType).orElse(false);
     }
 
     @JsonIgnore
-    public Optional<CaseField> getCaseField(String caseFieldId) {
-        return caseFields.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
+    public Optional<CaseFieldDefinition> getCaseField(String caseFieldId) {
+        return caseFieldDefinitions.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
     }
 }

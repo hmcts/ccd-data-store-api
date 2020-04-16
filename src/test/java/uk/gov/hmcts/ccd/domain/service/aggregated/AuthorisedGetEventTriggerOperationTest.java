@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -83,7 +83,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private CaseEventTrigger caseEventTrigger;
     private final CaseDetails caseDetails = new CaseDetails();
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-    private final List<CaseField> caseFields = Lists.newArrayList();
+    private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3);
@@ -109,7 +109,7 @@ class AuthorisedGetEventTriggerOperationTest {
 
         caseTypeDefinition.setId(CASE_TYPE_ID);
         caseTypeDefinition.setEvents(events);
-        caseTypeDefinition.setCaseFields(caseFields);
+        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         caseDetails.setReference(CASE_REFERENCE_LONG);
         caseDetails.setState(STATE);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
@@ -127,7 +127,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                  eq(userRoles),
                                                                  eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class),
-                                                                  eq(caseFields),
+                                                                  eq(caseFieldDefinitions),
                                                                   eq(userRoles),
                                                                   eq(CAN_CREATE))).thenReturn(true);
 
@@ -156,11 +156,11 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      createCaseUserRoles,
                                                                                      CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                                                                                                        caseFields,
+                caseFieldDefinitions,
                                                                                                         createCaseUserRoles,
                                                                                                         CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService).filterCaseViewFieldsByAccess(caseEventTrigger,
-                                                                                               caseFields,
+                caseFieldDefinitions,
                                                                                                createCaseUserRoles,
                                                                                                CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService)
@@ -210,7 +210,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                   EVENT_TRIGGER_ID,
                                                                                   IGNORE),
                 () -> inOrder.verify(accessControlService).filterCaseViewFieldsByAccess(eq(caseEventTrigger),
-                                                                                        eq(caseFields),
+                                                                                        eq(caseFieldDefinitions),
                                                                                         eq(createCaseUserRoles),
                                                                                         eq(CAN_CREATE)),
                 () -> inOrder.verify(accessControlService)
@@ -289,7 +289,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      eq(userRoles),
                                                                                      eq(CAN_UPDATE));
             doReturn(caseEventTrigger).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                                                                                                        caseFields,
+                caseFieldDefinitions,
                                                                                                         userRoles,
                                                                                                         CAN_UPDATE);
             doReturn(caseEventTrigger).when(accessControlService)
@@ -340,7 +340,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                               EVENT_TRIGGER_ID,
                                                                               IGNORE),
                 () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(caseEventTrigger),
-                                                                                                 eq(caseFields),
+                                                                                                 eq(caseFieldDefinitions),
                                                                                                  eq(userRoles),
                                                                                                  eq(CAN_UPDATE)),
                 () -> inOrder.verify(accessControlService)

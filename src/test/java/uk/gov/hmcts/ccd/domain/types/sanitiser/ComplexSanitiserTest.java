@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 public class ComplexSanitiserTest {
@@ -24,14 +24,14 @@ public class ComplexSanitiserTest {
     private static final String TYPE_1 = "Type1";
     private static final FieldType FIELD_1_TYPE = new FieldType();
     private static final String FIELD_1_ID = "FirstName";
-    private static final CaseField FIELD_1 = new CaseField();
+    private static final CaseFieldDefinition FIELD_1 = new CaseFieldDefinition();
     private static final JsonNode FIELD_1_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 1");
     private static final JsonNode FIELD_1_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 1");
 
     private static final String TYPE_2 = "Type2";
     private static final FieldType FIELD_2_TYPE = new FieldType();
     private static final String FIELD_2_ID = "Money";
-    private static final CaseField FIELD_2 = new CaseField();
+    private static final CaseFieldDefinition FIELD_2 = new CaseFieldDefinition();
     private static final JsonNode FIELD_2_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 2");
     private static final JsonNode FIELD_2_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 2");
 

@@ -90,7 +90,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             caseDetails.setData(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                    caseTypeDefinition.getCaseFields(),
+                    caseTypeDefinition.getCaseFieldDefinitions(),
                     userRoles,
                     CAN_READ,
                     false),
@@ -98,7 +98,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             caseDetails.setDataClassification(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                    caseTypeDefinition.getCaseFields(),
+                    caseTypeDefinition.getCaseFieldDefinitions(),
                     userRoles,
                     CAN_READ,
                     true),
@@ -126,7 +126,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         if (!accessControlService.canAccessCaseFieldsForUpsert(
             MAPPER.convertValue(newData, JsonNode.class),
             MAPPER.convertValue(existingCaseDetails.getData(), JsonNode.class),
-            caseTypeDefinition.getCaseFields(),
+            caseTypeDefinition.getCaseFieldDefinitions(),
             userRoles)) {
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }

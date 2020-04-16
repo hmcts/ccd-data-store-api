@@ -28,7 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
@@ -48,7 +48,7 @@ class CaseDataServiceTest {
         final FieldType textFieldType = aFieldType().withType("Text")
                                            .build();
 
-        CaseField postalAddress = newCaseField()
+        CaseFieldDefinition postalAddress = newCaseField()
             .withId("PostalAddress")
             .withSC(SecurityClassification.PRIVATE.name())
             .withFieldType(aFieldType()

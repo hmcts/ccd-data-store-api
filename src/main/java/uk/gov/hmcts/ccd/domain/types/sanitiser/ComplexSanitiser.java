@@ -13,7 +13,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 @Named
@@ -42,7 +42,7 @@ public class ComplexSanitiser implements Sanitiser {
     @Override
     public JsonNode sanitise(FieldType fieldType, JsonNode fieldData) {
         final ObjectNode sanitisedData = JSON_NODE_FACTORY.objectNode();
-        final Map<String, CaseField> fieldsMap = new HashMap<>();
+        final Map<String, CaseFieldDefinition> fieldsMap = new HashMap<>();
 
         fieldType.getComplexFields().forEach(field -> {
             fieldsMap.put(field.getId(), field);
@@ -57,8 +57,8 @@ public class ComplexSanitiser implements Sanitiser {
             final JsonNode value = field.getValue();
 
             if (fieldsMap.containsKey(key)) {
-                final CaseField caseField = fieldsMap.get(key);
-                final FieldType childType = caseField.getFieldType();
+                final CaseFieldDefinition caseFieldDefinition = fieldsMap.get(key);
+                final FieldType childType = caseFieldDefinition.getFieldType();
 
                 if (sanitisers.containsKey(childType.getType())) {
                     final Sanitiser sanitiser = sanitisers.get(childType.getType());

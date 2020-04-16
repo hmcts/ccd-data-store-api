@@ -96,7 +96,7 @@ public class AuthorisedSearchOperation implements SearchOperation {
         caseDetails.setData(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                caseTypeDefinition.getCaseFields(),
+                caseTypeDefinition.getCaseFieldDefinitions(),
                 userRoles,
                 CAN_READ,
                 false),
@@ -104,7 +104,7 @@ public class AuthorisedSearchOperation implements SearchOperation {
         caseDetails.setDataClassification(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                caseTypeDefinition.getCaseFields(),
+                caseTypeDefinition.getCaseFieldDefinitions(),
                 userRoles,
                 CAN_READ,
                 true),

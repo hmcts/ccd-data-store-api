@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,43 +23,43 @@ public class CaseViewFieldBuilder {
         this.compoundFieldOrderService = compoundFieldOrderService;
     }
 
-    public CaseViewField build(CaseField caseField, CaseEventField eventField) {
+    public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventField eventField) {
         final CaseViewField field = new CaseViewField();
 
         field.setId(eventField.getCaseFieldId());
-        buildFieldType(caseField, eventField, field);
-        field.setHidden(caseField.getHidden());
-        field.setHintText(ofNullable(eventField.getHintText()).orElse(caseField.getHintText()));
-        field.setLabel(ofNullable(eventField.getLabel()).orElse(caseField.getLabel()));
-        field.setSecurityLabel(caseField.getSecurityLabel());
+        buildFieldType(caseFieldDefinition, eventField, field);
+        field.setHidden(caseFieldDefinition.getHidden());
+        field.setHintText(ofNullable(eventField.getHintText()).orElse(caseFieldDefinition.getHintText()));
+        field.setLabel(ofNullable(eventField.getLabel()).orElse(caseFieldDefinition.getLabel()));
+        field.setSecurityLabel(caseFieldDefinition.getSecurityLabel());
         field.setDisplayContext(eventField.getDisplayContext());
         field.setDisplayContextParameter(eventField.getDisplayContextParamter());
         field.setShowCondition(eventField.getShowCondition());
         field.setShowSummaryChangeOption(eventField.getShowSummaryChangeOption());
         field.setShowSummaryContentOption(eventField.getShowSummaryContentOption());
-        field.setAccessControlLists(caseField.getAccessControlLists());
-        field.setMetadata(caseField.isMetadata());
+        field.setAccessControlLists(caseFieldDefinition.getAccessControlLists());
+        field.setMetadata(caseFieldDefinition.isMetadata());
 
-        caseField.propagateACLsToNestedFields();
+        caseFieldDefinition.propagateACLsToNestedFields();
 
         return field;
     }
 
-    private void buildFieldType(final CaseField caseField, final CaseEventField eventField, final CaseViewField field) {
-        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseField, eventField.getCaseEventFieldComplex(), ROOT);
-        field.setFieldType(caseField.getFieldType());
+    private void buildFieldType(final CaseFieldDefinition caseFieldDefinition, final CaseEventField eventField, final CaseViewField field) {
+        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseFieldDefinition, eventField.getCaseEventFieldComplex(), ROOT);
+        field.setFieldType(caseFieldDefinition.getFieldType());
     }
 
-    public CaseViewField build(CaseField caseField, CaseEventField eventField, Object value) {
-        final CaseViewField field = build(caseField, eventField);
+    public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventField eventField, Object value) {
+        final CaseViewField field = build(caseFieldDefinition, eventField);
         field.setValue(value);
 
         return field;
     }
 
-    public List<CaseViewField> build(List<CaseField> caseFields, List<CaseEventField> eventFields, Map<String, ?> data) {
-        final Map<String, CaseField> caseFieldMap = caseFields.stream()
-            .collect(Collectors.toMap(CaseField::getId, Function.identity()));
+    public List<CaseViewField> build(List<CaseFieldDefinition> caseFieldDefinitions, List<CaseEventField> eventFields, Map<String, ?> data) {
+        final Map<String, CaseFieldDefinition> caseFieldMap = caseFieldDefinitions.stream()
+            .collect(Collectors.toMap(CaseFieldDefinition::getId, Function.identity()));
 
         return eventFields.stream()
             .filter(eventField -> caseFieldMap.containsKey(eventField.getCaseFieldId()))

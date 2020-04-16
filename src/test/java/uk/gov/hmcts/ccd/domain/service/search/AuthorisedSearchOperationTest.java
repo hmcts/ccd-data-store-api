@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -66,7 +66,7 @@ class AuthorisedSearchOperationTest {
     private MetaData metaData;
     private HashMap<String, String> criteria;
     private CaseTypeDefinition caseTypeDefinition;
-    private final List<CaseField> caseFields = Lists.newArrayList();
+    private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
 
     private JsonNode classifiedDataNode1;
     private JsonNode classifiedDataClassificationNode1;
@@ -87,14 +87,14 @@ class AuthorisedSearchOperationTest {
         metaData = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
         caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setCaseFields(caseFields);
+        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
 
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(userRepository.getUserRoles()).thenReturn(USER_ROLES);
 
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, USER_ROLES, CAN_READ);
 
-        caseFields.addAll(getCaseFieldsWithIds("dataTestField11", "dataTestField12", "classificationTestField11", "classificationTestField12"));
+        caseFieldDefinitions.addAll(getCaseFieldsWithIds("dataTestField11", "dataTestField12", "classificationTestField11", "classificationTestField12"));
 
         classifiedDataNode1 = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) classifiedDataNode1).put("dataTestField11", "dataTestValue11");
@@ -112,7 +112,7 @@ class AuthorisedSearchOperationTest {
         classifiedCase1.setData(MAPPER.convertValue(classifiedDataNode1, STRING_JSON_MAP));
         classifiedCase1.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode1, STRING_JSON_MAP));
 
-        caseFields.addAll(getCaseFieldsWithIds("dataTestField21", "dataTestField22", "classificationTestField21", "classificationTestField22"));
+        caseFieldDefinitions.addAll(getCaseFieldsWithIds("dataTestField21", "dataTestField22", "classificationTestField21", "classificationTestField22"));
 
         classifiedDataNode2 = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) classifiedDataNode2).put("dataTestField21", "dataTestValue21");
@@ -136,26 +136,26 @@ class AuthorisedSearchOperationTest {
 
         doReturn(authorisedDataNode1).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataNode1),
-            eq(caseFields),
+            eq(caseFieldDefinitions),
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean());
         doReturn(authorisedDataClassificationNode1).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataClassificationNode1),
-            eq(caseFields),
+            eq(caseFieldDefinitions),
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean());
 
         doReturn(authorisedDataNode2).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataNode2),
-            eq(caseFields),
+            eq(caseFieldDefinitions),
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean());
         doReturn(authorisedDataClassificationNode2).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataClassificationNode2),
-            eq(caseFields),
+            eq(caseFieldDefinitions),
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean());
@@ -164,12 +164,12 @@ class AuthorisedSearchOperationTest {
             caseDefinitionRepository, accessControlService, userRepository);
     }
 
-    private List<CaseField> getCaseFieldsWithIds(String... dataTestFields) {
+    private List<CaseFieldDefinition> getCaseFieldsWithIds(String... dataTestFields) {
         return Stream.of(dataTestFields)
             .map(field -> {
-                CaseField caseField = new CaseField();
-                caseField.setId(field);
-                return caseField;
+                CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+                caseFieldDefinition.setId(field);
+                return caseFieldDefinition;
             })
             .collect(Collectors.toList());
     }
@@ -223,22 +223,22 @@ class AuthorisedSearchOperationTest {
                 eq(USER_ROLES),
                 eq(CAN_READ)),
             () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedDataNode1),
-                eq(caseFields),
+                eq(caseFieldDefinitions),
                 eq(USER_ROLES),
                 eq(CAN_READ),
                 anyBoolean()),
             () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedDataClassificationNode1),
-                eq(caseFields),
+                eq(caseFieldDefinitions),
                 eq(USER_ROLES),
                 eq(CAN_READ),
                 anyBoolean()),
             () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedDataNode2),
-                eq(caseFields),
+                eq(caseFieldDefinitions),
                 eq(USER_ROLES),
                 eq(CAN_READ),
                 anyBoolean()),
             () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedDataClassificationNode2),
-                eq(caseFields),
+                eq(caseFieldDefinitions),
                 eq(USER_ROLES),
                 eq(CAN_READ),
                 anyBoolean())
@@ -272,7 +272,7 @@ class AuthorisedSearchOperationTest {
         assertAll(
             () -> assertThat(output, is(notNullValue())),
             () -> assertThat(output, hasSize(0)),
-            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
+            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
         );
     }
 }

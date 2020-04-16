@@ -59,7 +59,7 @@ public class CaseTypeService {
 
     public void validateData(final Map<String, JsonNode> data,
                              final CaseTypeDefinition caseTypeDefinition) {
-        final List<ValidationResult> dataValidationResults = caseDataValidator.validate(data, caseTypeDefinition.getCaseFields());
+        final List<ValidationResult> dataValidationResults = caseDataValidator.validate(data, caseTypeDefinition.getCaseFieldDefinitions());
         if (!dataValidationResults.isEmpty()) {
             LOG.warn("There have been validation errors={}", dataValidationResults);
             final List<CaseFieldValidationError> fieldErrors = dataValidationResults.stream()

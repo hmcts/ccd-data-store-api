@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -133,11 +133,11 @@ class DefaultGetCaseViewOperationTest {
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
         caseTypeDefinition.setJurisdiction(jurisdiction);
-        CaseField caseField = new CaseField();
-        caseField.setId(MetaData.CaseField.CASE_TYPE.getReference());
-        caseField.setMetadata(true);
-        caseField.setFieldType(new FieldType());
-        caseTypeDefinition.setCaseFields(singletonList(caseField));
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setId(MetaData.CaseField.CASE_TYPE.getReference());
+        caseFieldDefinition.setMetadata(true);
+        caseFieldDefinition.setFieldType(new FieldType());
+        caseTypeDefinition.setCaseFieldDefinitions(singletonList(caseFieldDefinition));
 
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
@@ -166,7 +166,7 @@ class DefaultGetCaseViewOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseTypeDefinition.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
             doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
@@ -199,7 +199,7 @@ class DefaultGetCaseViewOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseTypeDefinition.setCaseFields(singletonList(newCaseField()
+            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField()
                                                      .withId(CASE_HISTORY_VIEWER)
                                                      .withFieldType(aFieldType()
                                                                         .withType(CASE_HISTORY_VIEWER)

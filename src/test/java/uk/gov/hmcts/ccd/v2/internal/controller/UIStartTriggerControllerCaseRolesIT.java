@@ -15,7 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
@@ -127,7 +127,7 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertThat(children.getFieldType().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
 
-        final CaseField hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        final CaseFieldDefinition hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
     }
@@ -156,7 +156,7 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertThat(children.getFieldType().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
 
-        final CaseField hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        final CaseFieldDefinition hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
 
@@ -192,7 +192,7 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertThat(children.getFieldType().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
 
-        final CaseField hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        final CaseFieldDefinition hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
     }
@@ -221,7 +221,7 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertThat(children.getFieldType().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
 
-        final CaseField hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        final CaseFieldDefinition hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
     }

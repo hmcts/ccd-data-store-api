@@ -39,7 +39,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
@@ -1070,11 +1070,11 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field field type", "Complex", companyField.getFieldType().getType());
 
         // Check complex fields are mapped correctly
-        final List<CaseField> companyComplexFields = companyField.getFieldType().getComplexFields();
+        final List<CaseFieldDefinition> companyComplexFields = companyField.getFieldType().getComplexFields();
         assertEquals("Unexpected number of Complex Fields", 2, companyComplexFields.size());
 
         // Get the Address complex field from the Company
-        final CaseField addressField = companyComplexFields.get(1);
+        final CaseFieldDefinition addressField = companyComplexFields.get(1);
         assertEquals("Unexpected Field id", "PostalAddress", addressField.getId());
         assertEquals("Unexpected Field label", "Postal Address", addressField.getLabel());
         assertEquals("Unexpected Field type", "Address", addressField.getFieldType().getId());
@@ -1082,7 +1082,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected number of complex fields", 6, addressField.getFieldType().getComplexFields().size());
 
         // Get the Occupant complex field from the Address
-        final CaseField occupantField = addressField.getFieldType().getComplexFields().get(5);
+        final CaseFieldDefinition occupantField = addressField.getFieldType().getComplexFields().get(5);
         assertEquals("Unexpected Field id", "Occupant", occupantField.getId());
         assertEquals("Unexpected Field label", "Occupant", occupantField.getLabel());
         assertEquals("Unexpected Field type", "Person", occupantField.getFieldType().getId());
@@ -1366,22 +1366,22 @@ public class QueryEndpointIT extends WireMockBaseTest {
             () -> assertThat(caseTypeDefinitions[0], hasProperty("id", equalTo("TestAddressBookCase"))),
             () -> assertThat(caseTypeDefinitions[0].getEvents(), hasSize(1)),
             // added a create event with read access for testing drafts properly
-            () -> assertThat(caseTypeDefinitions[0].getCaseFields(), hasSize(3)),
-            () -> assertThat(caseTypeDefinitions[0].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonFirstName")),
+            () -> assertThat(caseTypeDefinitions[0].getCaseFieldDefinitions(), hasSize(3)),
+            () -> assertThat(caseTypeDefinitions[0].getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo("PersonFirstName")),
                                                                     hasProperty("id", equalTo("PersonLastName")),
                                                                     hasProperty("id", equalTo("PersonAddress")))),
             () -> assertThat(caseTypeDefinitions[1], hasProperty("id", equalTo("TestAddressBookCase3"))),
             () -> assertThat(caseTypeDefinitions[1].getEvents(), hasSize(1)),
             () -> assertThat(caseTypeDefinitions[1].getEvents(), hasItems(hasProperty("id", equalTo("TEST_EVENT_3")))),
-            () -> assertThat(caseTypeDefinitions[1].getCaseFields(), hasSize(2)),
-            () -> assertThat(caseTypeDefinitions[1].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonLastName")),
+            () -> assertThat(caseTypeDefinitions[1].getCaseFieldDefinitions(), hasSize(2)),
+            () -> assertThat(caseTypeDefinitions[1].getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo("PersonLastName")),
                                                                     hasProperty("id", equalTo("PersonAddress")))),
             () -> assertThat(caseTypeDefinitions[2], hasProperty("id", equalTo("TestAddressBookCaseNoReadFieldAccess"))),
             () -> assertThat(caseTypeDefinitions[2].getEvents(), hasSize(1)),
             () -> assertThat(caseTypeDefinitions[2].getEvents(),
                              hasItems(hasProperty("id", equalTo("TEST_EVENT_NO_READ_FIELD_ACCESS")))),
-            () -> assertThat(caseTypeDefinitions[2].getCaseFields(), hasSize(2)),
-            () -> assertThat(caseTypeDefinitions[2].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonLastName")),
+            () -> assertThat(caseTypeDefinitions[2].getCaseFieldDefinitions(), hasSize(2)),
+            () -> assertThat(caseTypeDefinitions[2].getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo("PersonLastName")),
                                                                     hasProperty("id", equalTo("PersonAddress"))))
         );
     }

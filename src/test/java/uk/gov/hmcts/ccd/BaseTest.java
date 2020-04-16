@@ -300,7 +300,7 @@ public abstract class BaseTest {
             .next();
     }
 
-    public static List<CaseField> getCaseFieldsFromJson(String json) throws IOException {
-        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+    public static List<CaseFieldDefinition> getCaseFieldsFromJson(String json) throws IOException {
+        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
     }
 }

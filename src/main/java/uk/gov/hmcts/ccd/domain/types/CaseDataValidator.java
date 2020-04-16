@@ -12,7 +12,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 @Named
@@ -32,12 +32,12 @@ public class CaseDataValidator {
     }
 
     public List<ValidationResult> validate(final Map<String, JsonNode> data,
-                                           final List<CaseField> caseFieldDefinitions) {
+                                           final List<CaseFieldDefinition> caseFieldDefinitions) {
         return validate(data, caseFieldDefinitions, CaseDataValidator.EMPTY_STRING);
     }
 
     public List<ValidationResult> validate(final Map<String, JsonNode> data,
-                                           final List<CaseField> caseFieldDefinitions,
+                                           final List<CaseFieldDefinition> caseFieldDefinitions,
                                            final String fieldIdPrefix) {
         return (data == null) ?
             new ArrayList<>() :
@@ -54,7 +54,7 @@ public class CaseDataValidator {
 
     private List<ValidationResult> validateField(final String dataFieldId,
                                                  final JsonNode dataValue,
-                                                 final CaseField caseFieldDefinition,
+                                                 final CaseFieldDefinition caseFieldDefinition,
                                                  final String fieldIdPrefix) {
         final String caseFieldType = caseFieldDefinition.getFieldType().getType();
 
@@ -93,7 +93,7 @@ public class CaseDataValidator {
 
     private List<ValidationResult> validateSimpleField(final String dataFieldId,
                                                        final JsonNode dataValue,
-                                                       final CaseField caseFieldDefinition,
+                                                       final CaseFieldDefinition caseFieldDefinition,
                                                        final String fieldIdPrefix,
                                                        final BaseType fieldType) {
         return validators.stream()
@@ -123,10 +123,10 @@ public class CaseDataValidator {
 
             final BaseType baseType = BaseType.get(fieldType.getType());
 
-            final CaseField caseField = new CaseField();
-            caseField.setFieldType(fieldType);
-            caseField.setId(index);
-            return validateSimpleField(index, itemValue, caseField, fieldIdPrefix, baseType);
+            final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+            caseFieldDefinition.setFieldType(fieldType);
+            caseFieldDefinition.setId(index);
+            return validateSimpleField(index, itemValue, caseFieldDefinition, fieldIdPrefix, baseType);
         } else if (itemValue.isObject()) {
             return validate(
                 MAPPER.convertValue(itemValue, STRING_JSON_MAP),

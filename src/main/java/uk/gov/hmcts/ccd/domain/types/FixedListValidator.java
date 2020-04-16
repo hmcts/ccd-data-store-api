@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 
 import javax.inject.Named;
@@ -24,7 +24,7 @@ public class FixedListValidator implements BaseTypeValidator {
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
-                                           final CaseField caseFieldDefinition) {
+                                           final CaseFieldDefinition caseFieldDefinition) {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
@@ -44,7 +44,7 @@ public class FixedListValidator implements BaseTypeValidator {
 
     private List<ValidationResult> typeChecks(final String dataFieldId,
                                               final String value,
-                                              final CaseField caseFieldDefinition) {
+                                              final CaseFieldDefinition caseFieldDefinition) {
         if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), value)) {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }

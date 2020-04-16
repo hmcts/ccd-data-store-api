@@ -21,7 +21,7 @@ import lombok.ToString;
 
 @ToString
 @ApiModel(description = "")
-public class CaseField implements Serializable, CommonField {
+public class CaseFieldDefinition implements Serializable, CommonField {
 
     private static final long serialVersionUID = -4257574164546267919L;
 
@@ -190,7 +190,7 @@ public class CaseField implements Serializable, CommonField {
 
     private void applyComplexACLs() {
         this.complexACLs.forEach(complexACL -> {
-            final CaseField nestedField = (CaseField) this.getComplexFieldNestedField(complexACL.getListElementCode())
+            final CaseFieldDefinition nestedField = (CaseFieldDefinition) this.getComplexFieldNestedField(complexACL.getListElementCode())
                 .orElseThrow(() -> new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), complexACL.getListElementCode())));
             nestedField.getAccessControlListByRole(complexACL.getRole())
                 .ifPresent(accessControlList -> nestedField.accessControlLists.remove(accessControlList));
@@ -218,7 +218,7 @@ public class CaseField implements Serializable, CommonField {
 
     private void removeACLS(final List<String> siblingsWithNoComplexACLs, final String role) {
         siblingsWithNoComplexACLs.stream().forEach(s -> {
-            final CaseField nestedElement = (CaseField) this.getComplexFieldNestedField(s)
+            final CaseFieldDefinition nestedElement = (CaseFieldDefinition) this.getComplexFieldNestedField(s)
                 .orElseThrow(() -> new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), s)));
             nestedElement.getAccessControlListByRole(role).ifPresent(acl -> nestedElement.getAccessControlLists().remove(acl));
             propagateACLsToNestedFields(nestedElement, nestedElement.getAccessControlLists());
@@ -274,24 +274,24 @@ public class CaseField implements Serializable, CommonField {
         }
     }
 
-    private List<String> buildAllDottedComplexFieldPossibilities(List<CaseField> caseFieldEntities) {
+    private List<String> buildAllDottedComplexFieldPossibilities(List<CaseFieldDefinition> caseFieldDefinitions) {
         List<String> allSubTypePossibilities = new ArrayList<>();
-        List<CaseField> fieldEntities = caseFieldEntities.stream()
+        List<CaseFieldDefinition> fieldEntities = caseFieldDefinitions.stream()
             .filter(Objects::nonNull)
-            .collect(Collectors.<CaseField>toList());
+            .collect(Collectors.<CaseFieldDefinition>toList());
         prepare(allSubTypePossibilities, "", fieldEntities);
         return allSubTypePossibilities;
     }
 
     private void prepare(List<String> allSubTypePossibilities,
                          String startingString,
-                         List<CaseField> caseFieldEntities) {
+                         List<CaseFieldDefinition> caseFieldDefinitions) {
 
         String concatenationCharacter = isBlank(startingString) ? "" : ".";
-        caseFieldEntities.forEach(caseField -> {
+        caseFieldDefinitions.forEach(caseField -> {
             allSubTypePossibilities.add(startingString + concatenationCharacter + caseField.getId());
 
-            List<CaseField> complexFields;
+            List<CaseFieldDefinition> complexFields;
             if (caseField.getFieldType() == null) {
                 complexFields = Collections.emptyList();
             } else if (isCollection(caseField)) {
@@ -302,7 +302,7 @@ public class CaseField implements Serializable, CommonField {
 
             prepare(allSubTypePossibilities,
                 startingString + concatenationCharacter + caseField.getId(),
-                complexFields.stream().map(CaseField.class::cast).collect(toList()));
+                complexFields.stream().map(CaseFieldDefinition.class::cast).collect(toList()));
         });
     }
 
