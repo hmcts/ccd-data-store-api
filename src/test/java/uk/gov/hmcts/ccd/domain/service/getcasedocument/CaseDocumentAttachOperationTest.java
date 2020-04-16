@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,8 +67,12 @@ class CaseDocumentAttachOperationTest {
     private CaseDocumentAttachOperation caseDocumentAttachOperation;
 
     @BeforeEach
-    void setup() {
+    void setup() throws IOException {
         MockitoAnnotations.initMocks(this);
+        caseDetails = new CaseDetails();
+        caseDetailsBefore = buildCaseData("case-detail-before-update.json");
+        caseDataContent = buildCaseData("case-detail-after-update.json");
+        caseDetails.setData(caseDetailsBefore);
         doReturn("http://localhost:4455").when(applicationParams).getCaseDocumentAmApiHost();
         doReturn("/cases/documents/attachToCase").when(applicationParams).getAttachDocumentPath();
         ResponseEntity<String> responseEntity = new ResponseEntity<String>("Success", HttpStatus.OK);
@@ -77,6 +83,89 @@ class CaseDocumentAttachOperationTest {
             ArgumentMatchers.any(HttpMethod.class),
             ArgumentMatchers.any(),
             ArgumentMatchers.<Class<String>>any());
+    }
+
+    HashMap<String, JsonNode> caseDetailsBefore;
+    HashMap<String, JsonNode> caseDataContent;
+
+
+    @Test
+    @DisplayName("should return document fields differences once updated ")
+    void shouldReturnDeltaWhenDocumentFieldsUpdate() {
+        Set<String> expectedOutput = new HashSet();
+        expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
+
+        final Set<String> output = caseDocumentAttachOperation.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+
+        assertAll(
+            () -> assertEquals(output, expectedOutput)
+
+                 );
+    }
+
+    @Test
+    @DisplayName("should return document fields differences once document Fields inside Complex Field ")
+    void shouldReturnDeltaWhenDocumentFieldsInsideComplexElement() throws IOException {
+        HashMap<String, JsonNode> caseDataContent = buildCaseData("case-detail-after-with-complexFields-update.json");
+        Set<String> expectedOutput = new HashSet();
+        expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
+
+        final Set<String> output = caseDocumentAttachOperation.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+
+        assertAll(
+            () -> assertEquals(output, expectedOutput)
+
+                 );
+    }
+
+
+    @Test
+    @DisplayName("should return empty document set in case of CaseDataContent is empty")
+    void shouldReturnEmptyDocumentSet() {
+        caseDataContent = null;
+        Set<String> expectedOutput = new HashSet();
+        final Set<String> output = caseDocumentAttachOperation.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+
+        assertAll(
+            () -> assertEquals(output, expectedOutput)
+
+                 );
+    }
+
+    @Test
+    @DisplayName(
+        "should  filter the Case Document Meta Data while  2 documents with hashcode coming from request and  2 documents without hash token from callback " +
+        "response")
+    void shouldFilterCaseDocumentMetaData() {
+        Map<String, String> beforeCallBack = new HashMap<>();
+        beforeCallBack.put("b6ee2bff-8244-431f-94ec-9d8ecace8dd6", "4d49edc151423fb7b2e1f22d89a2d041b43");
+        beforeCallBack.put("e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", "4d49edc151423fb7b2e1f22d87b2d041b34");
+
+        Map<String, String> afterCallBack = new HashMap<>();
+        afterCallBack.put("320233b8-fb61-4b58-8731-23c83638c9c6", null);
+        afterCallBack.put("f5bd63a2-65c5-435e-a972-98ed658ad7d6", null);
+        afterCallBack.put("b6ee2bff-8244-431f-94ec-9d8ecace8dd6", null);
+        afterCallBack.put("e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", null);
+
+        CaseDocumentsMetadata caseDocumentsMetadata = CaseDocumentsMetadata.builder()
+                                                                           .caseId("12345556")
+                                                                           .caseTypeId("BEFTA_CASETYPE_2")
+                                                                           .jurisdictionId("BEFTA_JURISDICTION_2")
+                                                                           .documentHashToken(new ArrayList<>())
+                                                                           .build();
+        List<DocumentHashToken> expected = Arrays.asList(DocumentHashToken.builder().id("b6ee2bff-8244-431f-94ec-9d8ecace8dd6")
+                                                                          .hashToken("4d49edc151423fb7b2e1f22d89a2d041b43").build(),
+                                                         DocumentHashToken.builder().id("e16f2ae0-d6ce-4bd0-a652-47b3c4d86292")
+                                                                          .hashToken("4d49edc151423fb7b2e1f22d87b2d041b34").build());
+
+        caseDocumentAttachOperation.filterDocumentFields(caseDocumentsMetadata, beforeCallBack, afterCallBack);
+
+        List<DocumentHashToken> actual = caseDocumentsMetadata.getDocumentHashToken();
+
+        assertAll(
+            () -> assertEquals(actual, expected)
+
+                 );
     }
 
     @Test

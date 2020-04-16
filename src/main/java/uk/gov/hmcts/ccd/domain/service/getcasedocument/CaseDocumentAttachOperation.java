@@ -220,4 +220,55 @@ public class CaseDocumentAttachOperation {
         }
 
     }
+
+    public Set<String> differenceBeforeAndAfterInCaseDetails(final CaseDetails caseDetails, final Map<String, JsonNode> caseData) {
+
+        final Map<String, JsonNode> documentsDifference = new HashMap<>();
+        final Set<String> filterDocumentSet = new HashSet<>();
+
+        if (null == caseData) {
+            return filterDocumentSet;
+        }
+
+        caseData.forEach((key, value) -> {
+
+            if (caseDetails.getData().containsKey(key) && (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(
+                DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null)) {
+                if (!value.equals(caseDetails.getData().get(key))) {
+                    documentsDifference.put(key, value);
+                }
+            } else if (value.findValue(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null || value.findValue(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null) {
+                documentsDifference.put(key, value);
+            }
+        });
+        //Find documentId based on filter Map. So that I can filter the DocumentMetaData Object before calling the case document am Api.
+        findDocumentsId(documentsDifference, filterDocumentSet);
+        return filterDocumentSet;
+    }
+
+    private void findDocumentsId(Map<String, JsonNode> sanitisedDataToAttachDoc, Set<String> filterDocumentSet) {
+
+        sanitisedDataToAttachDoc.forEach((field, jsonNode) -> {
+            //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
+            //This quick check will reduce the processing time as most of filtering will be done at top level.
+            //****** Every document should have hashcode, else throw error
+            if (jsonNode != null && isDocumentField(jsonNode)) {
+                String documentId = extractDocumentId(jsonNode);
+                filterDocumentSet.add(documentId);
+
+            } else {
+                jsonNode.fields().forEachRemaining(node -> findDocumentsId(
+                    Collections.singletonMap(node.getKey(), node.getValue()), filterDocumentSet));
+            }
+        });
+    }
+
+    public void filterDocumentMetaData(Set<String> filterDocumentSet) {
+
+        List<DocumentHashToken> caseDocumentList = caseDocumentsMetadata.getDocumentHashToken().stream()
+                                                                        .filter(document -> filterDocumentSet.contains(document.getId()))
+                                                                        .collect(Collectors.toList());
+        caseDocumentsMetadata.setDocumentHashToken(caseDocumentList);
+
+    }
 }
