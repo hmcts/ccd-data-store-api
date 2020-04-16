@@ -22,4 +22,8 @@ public @interface LogAudit {
 
     String eventName() default "";
 
+    String targetIdamId() default "";
+
+    String targetCaseRoles() default "";
+
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 @Aspect
 @Component
@@ -39,6 +40,8 @@ public class AuditAspect {
             String caseType =  getValue(joinPoint, logAudit.caseType(), result, String.class);
             String jurisdiction =  getValue(joinPoint, logAudit.jurisdiction(), result, String.class);
             String eventName =  getValue(joinPoint, logAudit.eventName(), result, String.class);
+            String targetIdamId =  getValue(joinPoint, logAudit.targetIdamId(), result, String.class);
+            List<String> targetCaseRoles =  getValue(joinPoint, logAudit.targetCaseRoles(), result, List.class);
 
             AuditContextHolder.setAuditContext(AuditContext.auditContextWith()
                 .operationType(logAudit.operationType())
@@ -46,6 +49,8 @@ public class AuditAspect {
                 .caseType(caseType)
                 .jurisdiction(jurisdiction)
                 .eventName(eventName)
+                .targetIdamId(targetIdamId)
+                .targetCaseRoles(targetCaseRoles)
                 .build());
         }
     }

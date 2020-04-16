@@ -2,6 +2,9 @@ package uk.gov.hmcts.ccd.auditlog;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.builder.ToStringStyle.JSON_STYLE;
 
@@ -21,6 +24,8 @@ public class AuditEntry {
     private String invokingService;
     private String operationType;
     private String requestId;
+    private String targetIdamId;
+    private List<String> targetCaseRoles;
 
     public void setDateTime(String time) {
         this.dateTime = time;
@@ -122,6 +127,22 @@ public class AuditEntry {
         this.requestId = requestId;
     }
 
+    public String getTargetIdamId() {
+        return targetIdamId;
+    }
+
+    public void setTargetIdamId(String targetIdamId) {
+        this.targetIdamId = targetIdamId;
+    }
+
+    public List<String> getTargetCaseRoles() {
+        return targetCaseRoles;
+    }
+
+    public void setTargetCaseRoles(List<String> targetCaseRoles) {
+        this.targetCaseRoles = targetCaseRoles;
+    }
+
     @Override
     public String toString() {
         return TAG + " " + dateTime + " operationType:" + operationType +
@@ -133,9 +154,10 @@ public class AuditEntry {
             (isNotBlank(caseType) ? ", caseType:" + caseType : "") +
             (isNotBlank(jurisdiction) ? ", jurisdiction:" + jurisdiction : "") +
             (isNotBlank(eventSelected) ? ", eventSelected:" + eventSelected : "") +
-//            (isNotBlank(idamIdOfTarget) ? ", idamIdOfTarget:" + idamIdOfTarget : "") +
+           (isNotBlank(targetIdamId) ? ", idamIdOfTarget:" + targetIdamId : "") +
 //            (isNotBlank(listOfCaseTypes) ? ", listOfCaseTypes:" + listOfCaseTypes : "") +
-//            (isNotBlank(targetCaseRoles) ? ", targetCaseRoles:" + targetCaseRoles : "") +
+            (!targetCaseRoles.isEmpty() ? ", targetCaseRoles:" +
+                targetCaseRoles.stream().map(String::toString).collect(Collectors.joining(",")) : "") +
             (isNotBlank(requestId) ? ", X-Request-ID:" + requestId : "") +
             '}';
     }

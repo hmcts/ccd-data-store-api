@@ -49,6 +49,8 @@ public class AuditService {
             entry.setCaseId(auditContext.getCaseId());
             entry.setCaseType(auditContext.getCaseType());
             entry.setEventSelected(auditContext.getEventName());
+            entry.setTargetIdamId(auditContext.getTargetIdamId());
+            entry.setTargetCaseRoles(auditContext.getTargetCaseRoles());
         }
 
         entry.setRequestId(request.getHeader("request-id"));
