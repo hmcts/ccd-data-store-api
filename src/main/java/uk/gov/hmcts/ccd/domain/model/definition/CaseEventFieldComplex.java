@@ -11,13 +11,23 @@ public class CaseEventFieldComplex implements Serializable {
 
     private Integer order;
 
+    private String displayContextParameter;
+
     public CaseEventFieldComplex() {
     }
 
     public CaseEventFieldComplex(String reference,
-                                 Integer order) {
+                                  Integer order) {
         this.reference = reference;
         this.order = order;
+    }
+
+    public CaseEventFieldComplex(String reference,
+                                 Integer order,
+                                 String displayContextParameter) {
+        this.reference = reference;
+        this.order = order;
+        this.displayContextParameter = displayContextParameter;
     }
 
     public String getReference() {
@@ -36,4 +46,11 @@ public class CaseEventFieldComplex implements Serializable {
         this.order = order;
     }
 
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
+    }
+
+    public void setDisplayContextParameter(String displayContextParameter) {
+        this.displayContextParameter = displayContextParameter;
+    }
 }

@@ -553,7 +553,7 @@ public class TestBuildersUtil {
             this.jurisdictionUiConfig.setShuttered(shuttered);
             return this;
         }
-        
+
         public JurisdictionUiConfigBuilder withId(String id) {
             this.jurisdictionUiConfig.setId(id);
             return this;
@@ -1107,7 +1107,12 @@ public class TestBuildersUtil {
         }
 
         public CaseFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
-            caseField.setDisplayContext(displayContextParameter);
+            caseField.setDisplayContextParameter(displayContextParameter);
+            return this;
+        }
+
+        public CaseFieldBuilder withFormattedValue(final String formattedValue) {
+            caseField.setFormattedValue(formattedValue);
             return this;
         }
 
@@ -1332,6 +1337,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public WorkbasketInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.workbasketInput.setDisplayContextParameter(displayContextParameter);
+            return this;
+        }
+
         public WorkbasketInput build() {
             return this.workbasketInput;
         }
@@ -1364,6 +1374,11 @@ public class TestBuildersUtil {
         public SearchInputBuilder withShowCondition(String showCondition) {
             field.setShowCondition(showCondition);
             this.searchInput.setField(field);
+            return this;
+        }
+
+        public SearchInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.searchInput.setDisplayContextParameter(displayContextParameter);
             return this;
         }
 
@@ -1448,6 +1463,11 @@ public class TestBuildersUtil {
 
         public static CaseTypeTabFieldBuilder newCaseTabField() {
             return new CaseTypeTabFieldBuilder();
+        }
+
+        public CaseTypeTabFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
+            caseTypeTabField.setDisplayContextParameter(displayContextParameter);
+            return this;
         }
 
     }
