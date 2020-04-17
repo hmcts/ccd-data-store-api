@@ -1,0 +1,68 @@
+{
+  "_guid_": "S-1030",
+  "_extends_": "F-1003_Test_Base_data",
+  "title": "must successfully create a case with new document uploded",
+  "specs": [
+    "is to attach the document uploaded above to a new case",
+    "contains necessary details about the document attached to the case"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "arrayInMap": [
+        {
+          "id": "BEFTA_JURISDICTION_1",
+          "name": "BEFTA_JURISDICTION_1",
+          "description": "Content for the Test Jurisdiction.",
+          "caseTypes": [
+            {
+              "id": "BEFTA_CASETYPE_1_1",
+              "description": "Create a case of type BEFTA_CASETYPE_1_1",
+              "version": null,
+              "name": "BEFTA Case Type 1 1",
+              "jurisdiction": null,
+              "events": "[[ANYTHING_PRESENT]]",
+              "states": "[[ANYTHING_PRESENT]]",
+              "searchAliasFields": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": [
+                {
+                  "role": "caseworker-befta_jurisdiction_1",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
+            },
+            {
+              "id": "CASE_TYPE_WITH_NO_CASES",
+              "description": "Create a case of type CASE_TYPE_WITH_NO_CASES",
+              "version": null,
+              "name": "CT With No Cases -Don't Create",
+              "jurisdiction": null,
+              "events": "[[ANYTHING_PRESENT]]",
+              "states": "[[ANYTHING_PRESENT]]",
+              "searchAliasFields": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": [
+                {
+                  "role": "caseworker-befta_jurisdiction_1",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -255,7 +255,7 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '1.2.3'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '2.1.1'
 
 }
 // end::dependencies[]
@@ -646,7 +646,7 @@ task functional(type: Test) {
     setClasspath(sourceSets.aat.runtimeClasspath)
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-    useJUnitPlatform()
+//    useJUnitPlatform()
 
     doFirst {
         generateCucumberReports.enabled = true
@@ -654,7 +654,7 @@ task functional(type: Test) {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
-                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
+                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features/F-1003']
         }
     }
 }

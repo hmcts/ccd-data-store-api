@@ -1,0 +1,29 @@
+{
+  "_guid_": "Common_Response_Body_Document_Base",
+  "size": "[[ANYTHING_PRESENT]]",
+  "mimeType": "[[ANYTHING_PRESENT]]",
+  "originalDocumentName": "[[ANYTHING_PRESENT]]",
+  "modifiedOn": "[[ANYTHING_PRESENT]]",
+  "createdBy": "[[ANYTHING_PRESENT]]",
+  "createdOn": "[[ANYTHING_PRESENT]]",
+  "lastModifiedBy": "[[ANYTHING_PRESENT]]",
+  "classification": "PUBLIC",
+  "roles": [
+    "caseworker"
+  ],
+  "metadata": {
+    "caseTypeId": "BEFTA_CASETYPE_2_2",
+    "jurisdictionId": "BEFTA_JURISDICTION_2",
+    "caseId" : "1111222233334444"
+  },
+  "hashcode": "[[ANYTHING_PRESENT]]",
+  "ttl": "[[ANYTHING_PRESENT]]",
+  "_links": {
+    "self": {
+      "href": "[[ANYTHING_PRESENT]]"
+    },
+    "binary": {
+      "href": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
