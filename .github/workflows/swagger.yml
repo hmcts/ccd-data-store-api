@@ -33,7 +33,7 @@ jobs:
           repo=`echo "$GITHUB_REPOSITORY" | cut -f2- -d/`
           echo "$(cat /tmp/ccd-data-store-api.v1.json)" > "docs/specs/ccd-data-store-api.v1.json"
           echo "$(cat /tmp/ccd-data-store-api.v2.json)" > "docs/specs/ccd-data-store-api.v2.json"
-          git add "docs/specs/docs/specs/ccd-data-store-api.v1.json"
-          git add "docs/specs/docs/specs/ccd-data-store-api.v2.json"
+          git add "docs/specs/ccd-data-store-api.v1.json"
+          git add "docs/specs/ccd-data-store-api.v2.json"
           # Only commit and push if we have changes.
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update spec for $repo#${GITHUB_SHA:7}"; git push --set-upstream upstream master)
