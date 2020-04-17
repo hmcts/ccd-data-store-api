@@ -66,6 +66,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
+@SuppressWarnings("checkstyle:TypeName") // too many legacy TypeName occurrences on '@Nested' classes
 public class AccessControlServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -1722,7 +1723,10 @@ public class AccessControlServiceTest {
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").textValue(), is("Fatih")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("LastName"), is(nullValue())),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value").get("Name").textValue(), is("home")),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(1).get("value").get("Address").get("Line1").textValue(), is("41 Kings Road")),
+                () -> assertThat(
+                    jsonNode.get("People").get(0).get("value").get("Addresses").get(1).get("value").get("Address").get("Line1").textValue(),
+                    is("41 Kings Road")
+                ),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Txt").textValue(), is("someNote11")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").size(), is(3))
             );
@@ -1811,7 +1815,10 @@ public class AccessControlServiceTest {
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("LastName"), is(nullValue())),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCity").textValue(), is("Salihli")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCountry"), is(nullValue())),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornAddress").get("Address").get("Line1").textValue(), is("23 Lampton Road")),
+                () -> assertThat(
+                    jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornAddress").get("Address").get("Line1").textValue(),
+                    is("23 Lampton Road")
+                ),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value").get("Name").textValue(), is("home")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value").get("Address"), is(nullValue())),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Note"), is(nullValue())),
@@ -2587,10 +2594,22 @@ public class AccessControlServiceTest {
 
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").orElseThrow(() -> new RuntimeException("Line 2 is not there")), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").orElseThrow(() -> new RuntimeException("Line 2 is not there")), hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(0).getDisplayContext(), is(OPTIONAL)),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1).getDisplayContext(), is(READONLY))
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").orElseThrow(() -> new RuntimeException("Line 2 is not there")),
+                    not(hasProperty("displayContext", is(READONLY)))
+                ),
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").orElseThrow(() -> new RuntimeException("Line 2 is not there")),
+                    hasProperty("displayContext", is(READONLY))
+                ),
+                () -> assertThat(
+                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(0).getDisplayContext(),
+                    is(OPTIONAL)
+                ),
+                () -> assertThat(
+                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1).getDisplayContext(),
+                    is(READONLY)
+                )
             );
         }
 
@@ -2787,8 +2806,14 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
                 () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses"), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line1"), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line2"), not(hasProperty("displayContext", is(READONLY))))
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line1"), not(hasProperty("displayContext",
+                    is(READONLY)))
+                ),
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line2"), not(hasProperty("displayContext",
+                    is(READONLY)))
+                )
             );
         }
 
@@ -3776,11 +3801,11 @@ public class AccessControlServiceTest {
     static JsonNode generatePeopleData() throws IOException {
         final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
             "{\n"
-                + "  \"People\": [\n" +
-                person1 +
-                "    ,\n" +
-                person2 +
-                "  ]\n"
+                + "  \"People\": [\n"
+                    + person1
+                + "    ,\n"
+                    + person2
+                + "  ]\n"
                 + "}"
         ), STRING_JSON_MAP);
 

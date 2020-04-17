@@ -153,6 +153,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assertThat(byMetaData.getTotalResultsCount(), is(0));
     }
 
+//CHECKSTYLE.OFF: CommentsIndentation
 //  This test should be uncommented as part of future RDM-7408
 //    @Test(expected = IllegalArgumentException.class)
 //    public void validateInputsMainQuerySortOrder() {
@@ -173,6 +174,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 //        // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql injection vulnerability
 //        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
 //    }
+    //CHECKSTYLE.ON: CommentsIndentation
+
 
     @Test
     public void sanitiseInputMainQuerySortOrderForDirection() {

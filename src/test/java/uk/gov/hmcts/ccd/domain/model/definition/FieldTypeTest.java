@@ -23,6 +23,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 
 public class FieldTypeTest {
 
+    private static final String TEXT_FIELD_TYPE = "Text";
+    private static final String COMPLEX_FIELD_TYPE = "Complex";
+    private static final String COLLECTION_FIELD_TYPE = "Collection";
+
     @Nested
     @DisplayName("getChildren test")
     class FieldTypeGetChildrenTest {
@@ -88,10 +92,6 @@ public class FieldTypeTest {
     @Nested
     @DisplayName("getNestedField test")
     class FieldTypeGetNestedFieldTest {
-
-        private final String TEXT_FIELD_TYPE = "Text";
-        private final String COMPLEX_FIELD_TYPE = "Complex";
-        private final String COLLECTION_FIELD_TYPE = "Collection";
 
         @ParameterizedTest
         @ArgumentsSource(BasicNestedFieldTestData.class)

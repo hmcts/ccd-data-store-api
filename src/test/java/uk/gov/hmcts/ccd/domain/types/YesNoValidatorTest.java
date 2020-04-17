@@ -55,16 +55,16 @@ class YesNoValidatorTest {
 
     @Test
     void correctValue() {
-        final JsonNode UPPER_YES = NODE_FACTORY.textNode("YES");
-        final JsonNode LOWER_YES = NODE_FACTORY.textNode("yes");
-        final JsonNode UPPER_NO = NODE_FACTORY.textNode("NO");
-        final JsonNode LOWER_NO = NODE_FACTORY.textNode("no");
+        final JsonNode upperYes = NODE_FACTORY.textNode("YES");
+        final JsonNode lowerYes = NODE_FACTORY.textNode("yes");
+        final JsonNode upperNo = NODE_FACTORY.textNode("NO");
+        final JsonNode lowerNo = NODE_FACTORY.textNode("no");
 
         assertAll(
-            () -> assertEquals(0, validator.validate(FIELD_ID, UPPER_YES, caseField).size(), "YES should be valid"),
-            () -> assertEquals(0, validator.validate(FIELD_ID, UPPER_NO, caseField).size(), "NO should be valid"),
-            () -> assertEquals(0, validator.validate(FIELD_ID, LOWER_YES, caseField).size(), "yes should be valid"),
-            () -> assertEquals(0, validator.validate(FIELD_ID, LOWER_NO, caseField).size(), "no should be valid")
+            () -> assertEquals(0, validator.validate(FIELD_ID, upperYes, caseField).size(), "YES should be valid"),
+            () -> assertEquals(0, validator.validate(FIELD_ID, upperNo, caseField).size(), "NO should be valid"),
+            () -> assertEquals(0, validator.validate(FIELD_ID, lowerYes, caseField).size(), "yes should be valid"),
+            () -> assertEquals(0, validator.validate(FIELD_ID, lowerNo, caseField).size(), "no should be valid")
         );
     }
 

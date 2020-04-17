@@ -28,7 +28,7 @@ public class CollectionValidatorTest {
     private CaseField caseField;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         validator = new CollectionValidator();
 
         final FieldType collectionFieldType = new FieldType();
@@ -91,14 +91,16 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_shouldBeValidWhenIDsUnique() throws IOException {
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\", \"value\": \"V2\"} ]"), caseField);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\", \"value\": \"V2\"} ]"), caseField);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
 
     @Test
     public void validate_shouldBeInvalidWhenMultipleItemsHaveSameID() throws IOException {
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"1\", \"value\": \"V2\"} ]"), caseField);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"1\", \"value\": \"V2\"} ]"), caseField);
 
         assertThat(results, hasSize(1));
     }
@@ -112,7 +114,8 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_shouldBeInvalidWhenAnItemIsMissingValue() throws IOException {
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\"} ]"), caseField);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\"} ]"), caseField);
 
         assertThat(results, hasSize(1));
     }

@@ -82,7 +82,8 @@ class AuthorisedGetCaseOperationTest {
         doReturn(caseDetailsOptional).when(classifiedGetCaseOperation).execute(CASE_REFERENCE);
 
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ));
-        doReturn(filteredDataNode).when(accessControlService).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean());
+        doReturn(filteredDataNode)
+            .when(accessControlService).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean());
         doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(caseDetails.getState()), eq(caseType), eq(userRoles), eq(CAN_READ));
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(userRoles).when(userRepository).getUserRoles();
@@ -97,7 +98,7 @@ class AuthorisedGetCaseOperationTest {
 
     @Nested
     @DisplayName("execute(jurisdictionId, caseTypeId, caseReference)")
-    class execute_jurisdictionCaseTypeReference {
+    class ExecuteJurisdictionCaseTypeReference {
         @Test
         @DisplayName("should call decorated implementation")
         void shouldCallDecoratedImplementation() {
@@ -136,10 +137,13 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService).canAccessCaseStateWithCriteria(eq(caseDetails.getState()), eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, times(2)).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService)
+                    .canAccessCaseStateWithCriteria(eq(caseDetails.getState()), eq(caseType), eq(userRoles), eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService, times(2))
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.get(), sameInstance(caseDetails)),
-                () -> assertThat(resultNode.has("testField"), is(true)));
+                () -> assertThat(resultNode.has("testField"), is(true))
+            );
         }
 
         @Test
@@ -157,7 +161,8 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
                 () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService, never())
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -176,8 +181,10 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
-                () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService, never())
+                    .canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService, never())
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -197,7 +204,8 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
                 () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService, never())
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -217,7 +225,8 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService, never())
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -226,7 +235,7 @@ class AuthorisedGetCaseOperationTest {
 
     @Nested
     @DisplayName("execute(caseReference)")
-    class execute_reference {
+    class ExecuteReference {
         @Test
         @DisplayName("should call decorated implementation")
         void shouldCallDecoratedImplementation() {
@@ -262,8 +271,10 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService).canAccessCaseStateWithCriteria(eq(caseDetails.getState()), eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, times(2)).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService)
+                    .canAccessCaseStateWithCriteria(eq(caseDetails.getState()), eq(caseType), eq(userRoles), eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService, times(2))
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.get(), sameInstance(caseDetails)),
                 () -> assertThat(resultNode.has("testField"), is(true)));
         }
@@ -281,7 +292,8 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
                 () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService, never())
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -299,7 +311,8 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
                 () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService, never())
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -317,7 +330,8 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
                 () -> inOrder.verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService, never())
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }
@@ -335,7 +349,8 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(userRepository).getUserRoles(),
                 () -> inOrder.verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-                () -> inOrder.verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
+                () -> inOrder.verify(accessControlService, never())
+                    .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFields()), eq(userRoles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.isPresent(), is(false))
             );
         }

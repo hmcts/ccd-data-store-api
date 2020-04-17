@@ -12,14 +12,14 @@ import static org.hamcrest.Matchers.is;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MetaDataTest {
-    private final String CASE_TYPE_ID = "CaseOne";
-    private final String JURISDICTION_ID = "JurisdictionOne";
-    private final String STATE = "StateOne";
-    private final String CASE_REFERENCE = "REF#8888";
-    private final String SECURITY_CLASSIFICATION = "Public";
-    private final String PAGE = "PageOne";
-    private final String CREATED_DATE = "Now";
-    private final String MODIFIED_DATE = "Then";
+    private static final String CASE_TYPE_ID = "CaseOne";
+    private static final String JURISDICTION_ID = "JurisdictionOne";
+    private static final String STATE = "StateOne";
+    private static final String CASE_REFERENCE = "REF#8888";
+    private static final String SECURITY_CLASSIFICATION = "Public";
+    private static final String PAGE = "PageOne";
+    private static final String CREATED_DATE = "Now";
+    private static final String MODIFIED_DATE = "Then";
 
 
 

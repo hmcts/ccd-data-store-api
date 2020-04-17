@@ -64,11 +64,11 @@ class TextValidatorTest {
     @Test
     @DisplayName("should NOT be valid when text length outside of min and max")
     void textFieldWithInvalidMinMax() {
-        final JsonNode INVALID_MIN = NODE_FACTORY.textNode("Test");
-        final List<ValidationResult> validMinResults = validator.validate(FIELD_ID, INVALID_MIN, caseField);
+        final JsonNode invalidMin = NODE_FACTORY.textNode("Test");
+        final List<ValidationResult> validMinResults = validator.validate(FIELD_ID, invalidMin, caseField);
 
-        final JsonNode INVALID_MAX = NODE_FACTORY.textNode("Test Test Test");
-        final List<ValidationResult> validMaxResults = validator.validate(FIELD_ID, INVALID_MAX, caseField);
+        final JsonNode invalidMax = NODE_FACTORY.textNode("Test Test Test");
+        final List<ValidationResult> validMaxResults = validator.validate(FIELD_ID, invalidMax, caseField);
 
         assertAll(
             () -> assertThat("Min not catched", validMinResults, hasSize(1)),

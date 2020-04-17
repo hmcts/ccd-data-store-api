@@ -305,19 +305,21 @@ class DefaultCreateCaseOperationTest {
         final ArgumentCaptor<CaseDetails> caseDetailsArgumentCaptor = ArgumentCaptor.forClass(CaseDetails.class);
 
 
-        assertAll(() -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
-                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
-                  () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                                                                       same(CASE_TYPE),
-                                                                       same(IDAM_USER),
-                                                                       same(eventTrigger),
-                                                                       caseDetailsArgumentCaptor.capture(),
-                                                                       same(IGNORE_WARNING)),
-                  () -> order.verify(draftGateway).delete(DRAFT_ID),
-                  () -> verifyZeroInteractions(callbackInvoker),
-                  () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
-                  () -> assertThat(caseDetails, is(savedCaseType)));
+        assertAll(
+            () -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
+            () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                                                                 same(CASE_TYPE),
+                                                                 same(IDAM_USER),
+                                                                 same(eventTrigger),
+                                                                 caseDetailsArgumentCaptor.capture(),
+                                                                 same(IGNORE_WARNING)),
+            () -> order.verify(draftGateway).delete(DRAFT_ID),
+            () -> verifyZeroInteractions(callbackInvoker),
+            () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
+            () -> assertThat(caseDetails, is(savedCaseType))
+        );
     }
 
     @Test
@@ -360,17 +362,18 @@ class DefaultCreateCaseOperationTest {
             draftGateway);
 
         assertAll("case details saved when call back fails",
-                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
-                  () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                                                                       same(CASE_TYPE),
-                                                                       same(IDAM_USER),
-                                                                       same(eventTrigger),
-                                                                       any(CaseDetails.class),
-                                                                       same(IGNORE_WARNING)),
-                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
-                  () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
-                  () -> order.verify(draftGateway).delete(DRAFT_ID));
+            () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                                                                 same(CASE_TYPE),
+                                                                 same(IDAM_USER),
+                                                                 same(eventTrigger),
+                                                                 any(CaseDetails.class),
+                                                                 same(IGNORE_WARNING)),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
+            () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
+            () -> order.verify(draftGateway).delete(DRAFT_ID)
+        );
     }
 
     @Test
@@ -416,18 +419,19 @@ class DefaultCreateCaseOperationTest {
                                       draftGateway);
 
         assertAll("Call back response returned successfully",
-                  () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
-                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
-                  () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                                                                       same(CASE_TYPE),
-                                                                       same(IDAM_USER),
-                                                                       same(eventTrigger),
-                                                                       any(CaseDetails.class),
-                                                                       same(IGNORE_WARNING)),
-                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
-                  () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
-                  () -> order.verify(draftGateway).delete(DRAFT_ID));
+            () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
+            () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                                                                 same(CASE_TYPE),
+                                                                 same(IDAM_USER),
+                                                                 same(eventTrigger),
+                                                                 any(CaseDetails.class),
+                                                                 same(IGNORE_WARNING)),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
+            () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
+            () -> order.verify(draftGateway).delete(DRAFT_ID)
+        );
     }
 
     private void assertCaseDetails(final CaseDetails details) {
@@ -444,7 +448,14 @@ class DefaultCreateCaseOperationTest {
     }
 
     private Map<String, JsonNode> buildJsonNodeData() throws IOException {
-        final JsonNode node = new ObjectMapper().readTree("{\n" + "  \"PersonFirstName\": \"ccd-First Name\",\n" + "  \"PersonLastName\": \"Last Name\",\n" + "  " + "\"PersonAddress\": {\n" + "    \"AddressLine1\": \"Address Line 1\",\n" + "    \"AddressLine2\": " + "\"Address Line 2\"\n" + "  }\n" + "}\n");
+        final JsonNode node = new ObjectMapper().readTree("{\n"
+            + "  \"PersonFirstName\": \"ccd-First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": " + "\"Address Line 2\"\n"
+            + "  }\n"
+            + "}\n");
         final Map<String, JsonNode> map = new HashMap<>();
         map.put("xyz", node);
         return map;

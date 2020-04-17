@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final TypeReference<HashMap<String, JsonNode>> STRING_NODE_TYPE = new TypeReference<HashMap<String, JsonNode>>() {};
@@ -32,7 +33,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     private List<CaseField> caseFields;
 
     @BeforeClass
-    public static void setUpClass() throws IOException {
+    public static void setUpClass() {
         CASE_FIELDS_STRING = BaseTest.getResourceAsString(CASE_FIELD_JSON);
     }
 
@@ -336,7 +337,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "    \"min\": 10\n" +
             "  }\n" +
             "}]";
-        final List<CaseField> caseFields = MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+        final List<CaseField> caseFields =
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
 
@@ -344,7 +346,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     }
 
     /**
-     * This test is only meant to ensure that validators are invoked and not to test the TextValidator which has it own test
+     * This test is only meant to ensure that validators are invoked and not to test the TextValidator which has it own test.
      */
     public void textFieldWithInvalidMaxMin() throws Exception {
         final String caseFieldString =
@@ -358,7 +360,9 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "    \"min\": 5\n" +
             "  }\n" +
             "}]";
-        final List<CaseField> caseFields = MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+
+        final List<CaseField> caseFields =
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
 
         final Map<String, JsonNode> invalidMaxVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}", STRING_NODE_TYPE);
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(invalidMaxVal, caseFields).size());

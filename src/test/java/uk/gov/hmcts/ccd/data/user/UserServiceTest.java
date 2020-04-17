@@ -32,7 +32,7 @@ public class UserServiceTest {
     @Mock
     private JurisdictionMapper jurisdictionMapperMock;
     @Mock
-    private IDAMProperties mockIDAMProps;
+    private IDAMProperties mockIdamProps;
     @Mock
     private JurisdictionDisplayProperties jdp1;
     @Mock
@@ -51,15 +51,15 @@ public class UserServiceTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         userService = new UserService(userRepoMock, caseDefinitionRepoMock, jurisdictionMapperMock,jurisdictionsResolver);
-        when(mockIDAMProps.getEmail()).thenReturn("email");
+        when(mockIdamProps.getEmail()).thenReturn("email");
         initialiseJurisdictions();
     }
 
     @Test
     public void testReturnsUserProfileDiscardingUnknownJurisdictions() {
 
-        when(userRepoMock.getUserDetails()).thenReturn(mockIDAMProps);
-        UserDefault userDefaultMock = aUserDefault();
+        when(userRepoMock.getUserDetails()).thenReturn(mockIdamProps);
+        UserDefault userDefaultMock = newUserDefault();
         when(userRepoMock.getUserDefaultSettings("email")).thenReturn(userDefaultMock);
         when(jurisdictionsResolver.getJurisdictions()).thenReturn(Lists.newArrayList("J1", "J2", "J3"));
         when(caseDefinitionRepoMock.getJurisdiction("J1")).thenReturn(j1);
@@ -71,7 +71,7 @@ public class UserServiceTest {
 
         UserProfile userProfile = userService.getUserProfile();
 
-        assertThat(userProfile.getUser().getIdamProperties(), is(mockIDAMProps));
+        assertThat(userProfile.getUser().getIdamProperties(), is(mockIdamProps));
         assertThat(userProfile.getJurisdictions(),
                 equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
         WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
@@ -83,7 +83,7 @@ public class UserServiceTest {
     @Test
     public void testReturnsUserProfileNoWorkBasketDefaults() {
 
-        when(userRepoMock.getUserDetails()).thenReturn(mockIDAMProps);
+        when(userRepoMock.getUserDetails()).thenReturn(mockIdamProps);
         when(userRepoMock.getUserDefaultSettings("email"))
             .thenThrow(new ResourceNotFoundException("No User profile exists for this userId email"));
         when(jurisdictionsResolver.getJurisdictions()).thenReturn(Lists.newArrayList("J1", "J2", "J3"));
@@ -96,14 +96,14 @@ public class UserServiceTest {
 
         UserProfile userProfile = userService.getUserProfile();
 
-        assertThat(userProfile.getUser().getIdamProperties(), is(mockIDAMProps));
+        assertThat(userProfile.getUser().getIdamProperties(), is(mockIdamProps));
         assertThat(userProfile.getJurisdictions(),
             equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
         WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
         assertNull(workbasketDefault);
     }
 
-    private UserDefault aUserDefault() {
+    private UserDefault newUserDefault() {
         UserDefault userDefault = new UserDefault();
         userDefault.setWorkBasketDefaultJurisdiction("J1");
         userDefault.setWorkBasketDefaultCaseType("CT");
