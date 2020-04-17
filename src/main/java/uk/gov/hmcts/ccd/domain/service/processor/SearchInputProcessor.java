@@ -37,7 +37,7 @@ public class SearchInputProcessor {
         this.getCriteriaOperation = getCriteriaOperation;
     }
 
-    public Map<String, String> execute(String view, MetaData metadata, Map<String, String> queryParameters) {
+    public Map<String, String> executeQueryParams(String view, MetaData metadata, Map<String, String> queryParameters) {
         final List<? extends CriteriaInput> criteriaInputs = getCriteriaInputs(view, metadata);
 
         Map<String, String> newParams = new HashMap<>();
@@ -67,15 +67,18 @@ public class SearchInputProcessor {
                 final String id = input.getField().getId();
                 if (LAST_MODIFIED_DATE.getReference().equals(id) && metadata.getLastModified().isPresent()) {
                     metadata.setLastModified(Optional.of(
-                        processValue(id, input.getDisplayContextParameter(), metadata.getLastModified().get(), input.getField().getType())
+                        processValue(id, input.getDisplayContextParameter(),
+                            metadata.getLastModified().get(), input.getField().getType())
                     ));
                 } else if (CREATED_DATE.getReference().equals(id) && metadata.getCreatedDate().isPresent()) {
                     metadata.setCreatedDate(Optional.of(
-                        processValue(id, input.getDisplayContextParameter(), metadata.getCreatedDate().get(), input.getField().getType())
+                        processValue(id, input.getDisplayContextParameter(),
+                            metadata.getCreatedDate().get(), input.getField().getType())
                     ));
-                } else if (LAST_STATE_MODIFIED_DATE.getParameterName().equals(id) && metadata.getLastStateModifiedDate().isPresent()) {
+                } else if (LAST_STATE_MODIFIED_DATE.getReference().equals(id) && metadata.getLastStateModifiedDate().isPresent()) {
                     metadata.setLastStateModifiedDate(Optional.of(
-                        processValue(id, input.getDisplayContextParameter(), metadata.getLastStateModifiedDate().get(), input.getField().getType())
+                        processValue(id, input.getDisplayContextParameter(),
+                            metadata.getLastStateModifiedDate().get(), input.getField().getType())
                     ));
                 }
         });

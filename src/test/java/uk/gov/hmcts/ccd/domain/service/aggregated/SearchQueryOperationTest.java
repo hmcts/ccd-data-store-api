@@ -109,7 +109,7 @@ public class SearchQueryOperationTest {
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
         doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
-        doAnswer(i -> i.getArgument(2)).when(searchInputProcessor).execute(Mockito.any(), Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(2)).when(searchInputProcessor).executeQueryParams(Mockito.any(), Mockito.any(), Mockito.any());
 
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
