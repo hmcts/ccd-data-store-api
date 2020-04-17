@@ -64,7 +64,7 @@ public class StartTriggerController {
         )
     })
     @LogAudit(operationType = OperationType.CREATE_CASE, jurisdiction = "#result.body.caseDetails.jurisdiction",
-        caseType = "#caseTypeId", eventName="#triggerId")
+        caseType = "#caseTypeId", eventName = "#triggerId")
     public ResponseEntity<StartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
                                                                     @PathVariable("triggerId") String triggerId,
                                                                     @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
@@ -109,7 +109,7 @@ public class StartTriggerController {
         )
     })
     @LogAudit(operationType = OperationType.UPDATE_CASE, jurisdiction = "#result.body.caseDetails.jurisdiction",
-        caseType = "#result.body.caseDetails.caseTypeId", eventName="#triggerId", caseId = "#caseId")
+        caseType = "#result.body.caseDetails.caseTypeId", eventName = "#triggerId", caseId = "#caseId")
     public ResponseEntity<StartTriggerResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
                                                                      @PathVariable("triggerId") String triggerId,
                                                                      @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {

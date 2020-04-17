@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import static uk.gov.hmcts.ccd.auditlog.OperationType.CREATE_CASE;
-import static uk.gov.hmcts.ccd.auditlog.OperationType.UPDATE_CASE;
-import static uk.gov.hmcts.ccd.auditlog.OperationType.VIEW_CASE;
-import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCase;
-import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCaseType;
-import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forDraft;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -15,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
@@ -23,6 +15,10 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
+
+import static uk.gov.hmcts.ccd.auditlog.OperationType.CREATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.OperationType.UPDATE_CASE;
+import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.*;
 
 @RestController
 @RequestMapping(path = "/internal")
