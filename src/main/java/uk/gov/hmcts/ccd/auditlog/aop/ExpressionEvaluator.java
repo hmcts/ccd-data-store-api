@@ -37,9 +37,7 @@ public class ExpressionEvaluator extends CachedExpressionEvaluator {
         Method targetMethod = this.targetMethodCache.get(methodKey);
         if (targetMethod == null) {
             targetMethod = AopUtils.getMostSpecificMethod(method, targetClass);
-            if (targetMethod == null) {
-                targetMethod = method;
-            }
+
             this.targetMethodCache.put(methodKey, targetMethod);
         }
         return targetMethod;
