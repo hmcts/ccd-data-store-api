@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class SearchInputProcessor {
@@ -58,6 +59,34 @@ public class SearchInputProcessor {
         });
 
         return newParams;
+    }
+
+    public MetaData executeMetadata(String view, MetaData metadata) {
+        final List<? extends CriteriaInput> criteriaInputs =
+            getCriteriaOperation.execute(metadata.getCaseTypeId(), null,
+                view == null ? CriteriaType.SEARCH : CriteriaType.valueOf(view));
+
+        final List<? extends CriteriaInput> metadataInputs = criteriaInputs.stream().filter(i -> i.getField().isMetadata()).collect(Collectors.toList());
+
+        metadataInputs.stream().forEach(input -> {
+            String id = input.getField().getId();
+
+            if ("[LAST_MODIFIED_DATE]".equals(id) && metadata.getLastModified().isPresent()) {
+                metadata.setLastModified(Optional.of(
+                    processValue(id, input.getDisplayContextParameter(), metadata.getLastModified().get(), input.getField().getType())
+                ));
+            } else if ("[CREATED_DATE]".equals(id) && metadata.getCreatedDate().isPresent()) {
+                metadata.setCreatedDate(Optional.of(
+                    processValue(id, input.getDisplayContextParameter(), metadata.getCreatedDate().get(), input.getField().getType())
+                ));
+            } else if ("[LAST_STATE_MODIFIED_DATE]".equals(id) && metadata.getLastStateModifiedDate().isPresent()) {
+                metadata.setCreatedDate(Optional.of(
+                    processValue(id, input.getDisplayContextParameter(), metadata.getLastStateModifiedDate().get(), input.getField().getType())
+                ));
+            }
+        });
+
+        return metadata;
     }
 
     private void handleTopLevel(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
@@ -113,7 +142,7 @@ public class SearchInputProcessor {
             .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
             .map(DisplayContextParameter::getValue)
             .orElseGet(() -> fieldType.getType().equals(FieldType.DATE) ?
-                DateTimeFormatParser.DATE_FORMAT.toString() :
-                DateTimeFormatParser.DATE_TIME_FORMAT.toString());
+                DateTimeFormatParser.DATE_FORMAT :
+                DateTimeFormatParser.DATE_TIME_FORMAT);
     }
 }
