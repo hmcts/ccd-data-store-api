@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -48,7 +51,9 @@ class SubmitCaseTransaction {
     private final SecurityClassificationService securityClassificationService;
     private final CaseUserRepository caseUserRepository;
     private final UserAuthorisation userAuthorisation;
-    private final CaseDocumentAttachOperation caseDocumentAttachOperation;
+    private final RestTemplate restTemplate;
+    private final ApplicationParams applicationParams;
+    private final SecurityUtils securityUtils;
 
    @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
@@ -60,8 +65,10 @@ class SubmitCaseTransaction {
                                  final @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation,
                                  final HttpServletRequest request,
-                                 final CaseDocumentAttachOperation caseDocumentAttachOperation
-                                ) {
+                                 final RestTemplate restTemplate,
+                                 final ApplicationParams applicationParams,
+                                 final SecurityUtils securityUtils
+                                 ) {
         this.request = request;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -71,8 +78,10 @@ class SubmitCaseTransaction {
         this.securityClassificationService = securityClassificationService;
         this.caseUserRepository = caseUserRepository;
         this.userAuthorisation = userAuthorisation;
-        this.caseDocumentAttachOperation = caseDocumentAttachOperation;
-    }
+       this.restTemplate = restTemplate;
+       this.applicationParams = applicationParams;
+       this.securityUtils = securityUtils;
+   }
 
     @Transactional(REQUIRES_NEW)
     @Retryable(
@@ -87,6 +96,7 @@ class SubmitCaseTransaction {
                                   CaseDetails newCaseDetails, Boolean ignoreWarning) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        CaseDocumentAttachOperation caseDocumentAttachOperation = null;
 
         newCaseDetails.setCreatedDate(now);
         newCaseDetails.setLastStateModifiedDate(now);
@@ -96,6 +106,7 @@ class SubmitCaseTransaction {
             && request.getContentType().equals(V2.MediaType.CREATE_CASE_2_1);
 
         if (isApiVersion21) {
+            caseDocumentAttachOperation = new CaseDocumentAttachOperation(restTemplate, applicationParams, securityUtils);
             caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(newCaseDetails.getData());
         }
 
@@ -118,8 +129,7 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion21) {
-            caseDocumentAttachOperation.afterCallbackPrepareDocumentMetaData(newCaseDetails, aboutToSubmitCallbackResponse.getState().isPresent());
-            caseDocumentAttachOperation.filterDocumentFields();
+            caseDocumentAttachOperation.attachDocumentDuringCaseCreation(newCaseDetails, aboutToSubmitCallbackResponse.getState().isPresent());
             caseDocumentAttachOperation.restCallToAttachCaseDocuments();
         }
 
