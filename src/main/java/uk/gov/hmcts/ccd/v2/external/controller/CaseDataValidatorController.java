@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import java.util.HashMap;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,14 +9,14 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(path = "/case-types")
@@ -65,7 +63,6 @@ public class CaseDataValidatorController {
             message = "One of: Event trigger not provided, case type does not exist or case data validation failed"
         )
     })
-    @LogAudit(operationType = OperationType.CREATE_CASE)
     public ResponseEntity<CaseDataResource> validate(@PathVariable("caseTypeId") String caseTypeId,
                                                      @RequestParam(required = false) final String pageId,
                                                      @RequestBody final CaseDataContent content) {
