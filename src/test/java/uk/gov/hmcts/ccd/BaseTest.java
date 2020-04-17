@@ -52,6 +52,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyBoolean;
@@ -141,20 +142,39 @@ public abstract class BaseTest {
 
     @After
     public void clearDownData() {
-
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-        jdbcTemplate.queryForList(
-            "SELECT " +
-                "'TRUNCATE TABLE \"' || tablename || '\" CASCADE;' as truncate_statement " +
-            "FROM pg_tables " +
-            "WHERE schemaname = 'public' " +
-            "AND tablename NOT IN ('databasechangeloglock','databasechangelog')"
-        ).stream()
-            .map(resultRow -> resultRow.get("truncate_statement"))
-            .forEach(truncateStatement ->
-                            jdbcTemplate.execute(truncateStatement.toString())
-            );
+        List<String> tables = determineTables(jdbcTemplate);
+        List<String> sequences = determineSequences(jdbcTemplate);
 
+        String query =
+            "START TRANSACTION;\n" +
+                tables.stream()
+                    .map(record -> String.format("TRUNCATE TABLE %s CASCADE;", record))
+                    .collect(Collectors.joining("\n")) +
+                "\nCOMMIT;";
+        jdbcTemplate.execute(query);
+
+        sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));
+    }
+
+    private List<String> determineTables(JdbcTemplate jdbcTemplate) {
+        return jdbcTemplate.queryForList("SELECT * FROM pg_catalog.pg_tables").stream()
+            .filter(tableInfo -> tableInfo.get("schemaname").equals("public"))
+            .map(tableInfo -> (String)tableInfo.get("tablename"))
+            .filter(BaseTest::notLiquibase)
+            .collect(Collectors.toList());
+    }
+
+    private static boolean notLiquibase(String tableName) {
+        return !tableName.equals("databasechangelog") && !tableName.equals("databasechangeloglock");
+    }
+
+    private List<String> determineSequences(JdbcTemplate jdbcTemplate) {
+        final String SEQUENCE_NAME_KEY = "relname";
+        String query = "SELECT c.relname FROM pg_class c WHERE c.relkind = 'S'";
+        return jdbcTemplate.queryForList(query).stream()
+            .map(sequenceInfo -> (String) sequenceInfo.get(SEQUENCE_NAME_KEY))
+            .collect(Collectors.toList());
     }
 
     protected CaseDetails mapCaseData(ResultSet resultSet, Integer i) throws SQLException {
