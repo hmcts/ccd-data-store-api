@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.*;
-
 @Component
 public class SearchInputProcessor {
 
@@ -65,21 +63,11 @@ public class SearchInputProcessor {
             .filter(i -> i.getField().isMetadata() && !Strings.isNullOrEmpty(i.getDisplayContextParameter()))
             .forEach(input -> {
                 final String id = input.getField().getId();
-                if (LAST_MODIFIED_DATE.getReference().equals(id) && metadata.getLastModified().isPresent()) {
-                    metadata.setLastModified(Optional.of(
+                final MetaData.CaseField field = MetaData.CaseField.valueOfReference(id);
+                if (MetaData.DATE_FIELDS.contains(field) && metadata.getOptionalMetadata(field).isPresent()) {
+                    metadata.setOptionalMetadata(field,
                         processValue(id, input.getDisplayContextParameter(),
-                            metadata.getLastModified().get(), input.getField().getType())
-                    ));
-                } else if (CREATED_DATE.getReference().equals(id) && metadata.getCreatedDate().isPresent()) {
-                    metadata.setCreatedDate(Optional.of(
-                        processValue(id, input.getDisplayContextParameter(),
-                            metadata.getCreatedDate().get(), input.getField().getType())
-                    ));
-                } else if (LAST_STATE_MODIFIED_DATE.getReference().equals(id) && metadata.getLastStateModifiedDate().isPresent()) {
-                    metadata.setLastStateModifiedDate(Optional.of(
-                        processValue(id, input.getDisplayContextParameter(),
-                            metadata.getLastStateModifiedDate().get(), input.getField().getType())
-                    ));
+                            metadata.getOptionalMetadata(field).get(), input.getField().getType()));
                 }
         });
 

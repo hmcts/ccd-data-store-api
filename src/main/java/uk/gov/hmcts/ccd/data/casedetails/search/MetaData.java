@@ -1,7 +1,10 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
+import com.google.common.base.CaseFormat;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,6 +22,11 @@ public class MetaData {
 
     public static final String PAGE_PARAM = "page";
     public static final String SORT_PARAM = "sortDirection";
+    public static final List<CaseField> DATE_FIELDS = newArrayList(
+        CREATED_DATE,
+        LAST_MODIFIED_DATE,
+        LAST_STATE_MODIFIED_DATE
+    );
     private static final List<String> METADATA_QUERY_PARAMETERS = newArrayList(STATE.getParameterName(),
                                                                                CASE_REFERENCE.getParameterName(),
                                                                                CREATED_DATE.getParameterName(),
@@ -57,6 +65,10 @@ public class MetaData {
         public String getReference() {
             return String.join(getParameterName().toUpperCase(), "[", "]");
         }
+
+        public static CaseField valueOfReference(String reference) {
+            return valueOf(reference.replace("[", "").replace("]", ""));
+        }
     }
 
     private final String caseTypeId;
@@ -64,7 +76,7 @@ public class MetaData {
     private Optional<String> state = Optional.empty();
     private Optional<String> caseReference = Optional.empty();
     private Optional<String> createdDate = Optional.empty();
-    private Optional<String> lastModified = Optional.empty();
+    private Optional<String> lastModifiedDate = Optional.empty();
     private Optional<String> lastStateModifiedDate = Optional.empty();
     private Optional<String> securityClassification = Optional.empty();
     private Optional<String> page = Optional.empty();
@@ -108,8 +120,8 @@ public class MetaData {
         this.createdDate = createdDate;
     }
 
-    public void setLastModified(Optional<String> lastModified) {
-        this.lastModified = lastModified;
+    public void setLastModifiedDate(Optional<String> lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public Optional<String> getLastStateModifiedDate() {
@@ -120,8 +132,8 @@ public class MetaData {
         this.lastStateModifiedDate = lastStateModifiedDate;
     }
 
-    public Optional<String> getLastModified() {
-        return lastModified;
+    public Optional<String> getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
     public void setSecurityClassification(Optional<String> securityClassification) {
@@ -168,6 +180,43 @@ public class MetaData {
         return s.trim().toLowerCase();
     }
 
+    @SuppressWarnings("unchecked")
+    public Optional<String> getOptionalMetadata(CaseField metadataField) {
+        final String methodName = getMethodName(metadataField, "get");
+        try {
+            final Method method = getClass().getMethod(methodName);
+            return (Optional<String>) method.invoke(this);
+        } catch (NoSuchMethodException | ClassCastException e) {
+            throw new IllegalArgumentException(
+                String.format("No getter method with Optional<String> return value found for '%s'; looking for '%s()'",
+                    metadataField.getParameterName(), methodName));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalArgumentException(
+                String.format("Failed to invoke method '%s'",
+                    methodName));
+        }
+    }
+
+    public void setOptionalMetadata(CaseField metadataField, String value) {
+        final String methodName = getMethodName(metadataField, "set");
+        try {
+            final Method method = getClass().getMethod(methodName, Optional.class);
+            method.invoke(this, Optional.ofNullable(value));
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(
+                String.format("No setter method with Optional argument found for '%s'; looking for '%s()'",
+                    metadataField.getParameterName(), methodName));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalArgumentException(
+                String.format("Failed to invoke method '%s' with Optional String value of '%s'",
+                    methodName, value));
+        }
+    }
+
+    private String getMethodName(CaseField metadataField, String prefix) {
+        return prefix + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, metadataField.getParameterName());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -178,15 +227,15 @@ public class MetaData {
         }
         MetaData metaData = (MetaData) o;
         return Objects.equals(caseTypeId, metaData.caseTypeId) &&
-            Objects.equals(jurisdiction, metaData.jurisdiction) &&
-            Objects.equals(state, metaData.state) &&
-            Objects.equals(caseReference, metaData.caseReference) &&
-            Objects.equals(createdDate, metaData.createdDate) &&
-            Objects.equals(lastModified, metaData.lastModified) &&
-            Objects.equals(lastStateModifiedDate, metaData.lastStateModifiedDate) &&
-            Objects.equals(securityClassification, metaData.securityClassification) &&
-            Objects.equals(page, metaData.page) &&
-            Objects.equals(sortDirection, metaData.sortDirection);
+               Objects.equals(jurisdiction, metaData.jurisdiction) &&
+               Objects.equals(state, metaData.state) &&
+               Objects.equals(caseReference, metaData.caseReference) &&
+               Objects.equals(createdDate, metaData.createdDate) &&
+               Objects.equals(lastModifiedDate, metaData.lastModifiedDate) &&
+               Objects.equals(lastStateModifiedDate, metaData.lastStateModifiedDate) &&
+               Objects.equals(securityClassification, metaData.securityClassification) &&
+               Objects.equals(page, metaData.page) &&
+               Objects.equals(sortDirection, metaData.sortDirection);
     }
 
     @Override
@@ -196,7 +245,7 @@ public class MetaData {
                             state,
                             caseReference,
                             createdDate,
-                            lastModified,
+                            lastModifiedDate,
                             lastStateModifiedDate,
                             securityClassification,
                             page,
