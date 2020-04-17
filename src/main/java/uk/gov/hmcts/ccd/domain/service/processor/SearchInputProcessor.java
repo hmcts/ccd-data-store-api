@@ -37,9 +37,7 @@ public class SearchInputProcessor {
     }
 
     public Map<String, String> execute(String view, MetaData metadata, Map<String, String> queryParameters) {
-        final List<? extends CriteriaInput> criteriaInputs =
-            getCriteriaOperation.execute(metadata.getCaseTypeId(), null,
-                view == null ? CriteriaType.SEARCH : CriteriaType.valueOf(view));
+        final List<? extends CriteriaInput> criteriaInputs = getCriteriaInputs(view, metadata);
 
         Map<String, String> newParams = new HashMap<>();
         queryParameters.entrySet().stream().forEach(entry -> {
@@ -62,31 +60,32 @@ public class SearchInputProcessor {
     }
 
     public MetaData executeMetadata(String view, MetaData metadata) {
-        final List<? extends CriteriaInput> criteriaInputs =
-            getCriteriaOperation.execute(metadata.getCaseTypeId(), null,
-                view == null ? CriteriaType.SEARCH : CriteriaType.valueOf(view));
+        getCriteriaInputs(view, metadata).stream()
+            .filter(i -> i.getField().isMetadata() && !Strings.isNullOrEmpty(i.getDisplayContextParameter()))
+            .forEach(input -> {
+                final String id = input.getField().getId();
 
-        final List<? extends CriteriaInput> metadataInputs = criteriaInputs.stream().filter(i -> i.getField().isMetadata()).collect(Collectors.toList());
-
-        metadataInputs.stream().forEach(input -> {
-            String id = input.getField().getId();
-
-            if ("[LAST_MODIFIED_DATE]".equals(id) && metadata.getLastModified().isPresent()) {
-                metadata.setLastModified(Optional.of(
-                    processValue(id, input.getDisplayContextParameter(), metadata.getLastModified().get(), input.getField().getType())
-                ));
-            } else if ("[CREATED_DATE]".equals(id) && metadata.getCreatedDate().isPresent()) {
-                metadata.setCreatedDate(Optional.of(
-                    processValue(id, input.getDisplayContextParameter(), metadata.getCreatedDate().get(), input.getField().getType())
-                ));
-            } else if ("[LAST_STATE_MODIFIED_DATE]".equals(id) && metadata.getLastStateModifiedDate().isPresent()) {
-                metadata.setCreatedDate(Optional.of(
-                    processValue(id, input.getDisplayContextParameter(), metadata.getLastStateModifiedDate().get(), input.getField().getType())
-                ));
-            }
+                if ("[LAST_MODIFIED_DATE]".equals(id) && metadata.getLastModified().isPresent()) {
+                    metadata.setLastModified(Optional.of(
+                        processValue(id, input.getDisplayContextParameter(), metadata.getLastModified().get(), input.getField().getType())
+                    ));
+                } else if ("[CREATED_DATE]".equals(id) && metadata.getCreatedDate().isPresent()) {
+                    metadata.setCreatedDate(Optional.of(
+                        processValue(id, input.getDisplayContextParameter(), metadata.getCreatedDate().get(), input.getField().getType())
+                    ));
+                } else if ("[LAST_STATE_MODIFIED_DATE]".equals(id) && metadata.getLastStateModifiedDate().isPresent()) {
+                    metadata.setCreatedDate(Optional.of(
+                        processValue(id, input.getDisplayContextParameter(), metadata.getLastStateModifiedDate().get(), input.getField().getType())
+                    ));
+                }
         });
 
         return metadata;
+    }
+
+    private List<? extends CriteriaInput> getCriteriaInputs(String view, MetaData metadata) {
+        return getCriteriaOperation.execute(metadata.getCaseTypeId(), null,
+            view == null ? CriteriaType.SEARCH : CriteriaType.valueOf(view));
     }
 
     private void handleTopLevel(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
