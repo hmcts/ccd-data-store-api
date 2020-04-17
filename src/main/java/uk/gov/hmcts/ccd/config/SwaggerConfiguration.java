@@ -77,7 +77,7 @@ public class SwaggerConfiguration {
             .description("Keyword `Bearer` followed by a valid IDAM user token")
             .modelRef(new ModelRef("string"))
             .parameterType("header")
-                .required(false)
+            .required(true)
             .build();
     }
 
@@ -87,7 +87,7 @@ public class SwaggerConfiguration {
             .description("Valid Service-to-Service JWT token for a whitelisted micro-service")
             .modelRef(new ModelRef("string"))
             .parameterType("header")
-                .required(false)
+            .required(true)
             .build();
     }
 }
