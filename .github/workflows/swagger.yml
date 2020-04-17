@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - RDM-7740-final
 jobs:
   build:
     runs-on: ubuntu-latest
