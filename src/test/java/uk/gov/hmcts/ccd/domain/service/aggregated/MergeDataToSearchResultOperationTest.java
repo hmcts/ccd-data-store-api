@@ -59,7 +59,7 @@ class MergeDataToSearchResultOperationTest {
     private static final String FAMILY_DETAILS = "FamilyDetails";
     private static final String FATHER_NAME_VALUE = "Simmon";
     private static final String MOTHER_NAME_VALUE = "Hanna";
-    private static final String POSTCODE_VALUE = "SW1P 4ER";
+    private static final String POSTCODE_VALUE = "HX08 5TG";
     private static final String FAMILY_DETAILS_VALUE = "{\"FatherName\":\"" + FATHER_NAME_VALUE + "\"," +
         "\"MotherName\":\"" + MOTHER_NAME_VALUE + "\"," +
         "\"FamilyAddress\":{" +

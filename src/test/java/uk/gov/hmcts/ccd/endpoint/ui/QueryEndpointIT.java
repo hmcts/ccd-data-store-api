@@ -179,7 +179,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(2).getCaseId());
@@ -251,7 +251,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
             .get("Postcode"));
     }
 
@@ -329,7 +329,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
     }
 
@@ -530,7 +530,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
@@ -595,7 +595,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
@@ -854,7 +854,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected address value", "Fake Street", addressNode.get("AddressLine2"));
         assertEquals("Unexpected address value", "Hexton", addressNode.get("AddressLine3"));
         assertEquals("Unexpected address value", "England", addressNode.get("Country"));
-        assertEquals("Unexpected address value", "HX08 UTG", addressNode.get("Postcode"));
+        assertEquals("Unexpected address value", "HX08 5TG", addressNode.get("Postcode"));
 
         final CaseViewTab documentTab = caseViewTabs[2];
         assertNotNull("First tab is null", documentTab);
@@ -1499,7 +1499,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected address value", "Fake Street", addressNode.get("AddressLine2"));
         assertEquals("Unexpected address value", "Hexton", addressNode.get("AddressLine3"));
         assertEquals("Unexpected address value", "England", addressNode.get("Country"));
-        assertEquals("Unexpected address value", "HX08 UTG", addressNode.get("Postcode"));
+        assertEquals("Unexpected address value", "HX08 5TG", addressNode.get("Postcode"));
 
         final CaseViewTab documentTab = caseViewTabs[2];
         assertNotNull("First tab is null", documentTab);

@@ -972,7 +972,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("Fake Street", caseDetails.getData().get("PersonAddress").get("AddressLine2").asText());
             assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
             assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
-            assertEquals("HX08 UTG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
+            assertEquals("HX08 5TG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
             assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
                 caseDetails.getData().get("D8Document").get("document_url").asText());
             assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
@@ -1065,7 +1065,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("Fake Street", caseDetails.getData().get("PersonAddress").get("AddressLine2").asText());
             assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
             assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
-            assertEquals("HX08 UTG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
+            assertEquals("HX08 5TG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
             assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
                 caseDetails.getData().get("D8Document").get("document_url").asText());
             assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
@@ -3251,7 +3251,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 () -> assertThat(nodeData.get("PersonLastName"), CoreMatchers.is(getTextNode("Parker"))),
                 () -> assertThat(nodeData.has("PersonAddress"), CoreMatchers.is(true)),
                 () -> assertThat(nodeData.get("PersonAddress").get("Country"), CoreMatchers.is(getTextNode("England"))),
-                () -> assertThat(nodeData.get("PersonAddress").get("Postcode"), CoreMatchers.is(getTextNode("HX08 UTG"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("Postcode"), CoreMatchers.is(getTextNode("HX08 5TG"))),
                 () -> assertThat(nodeData.get("PersonAddress").get("AddressLine1"), CoreMatchers.is(getTextNode("123"))),
                 () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"), CoreMatchers.is(getTextNode("Fake Street"))),
                 () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"), CoreMatchers.is(getTextNode("Hexton"))),
@@ -3619,7 +3619,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(result.getResponse().getContentAsString(), containsString("Parker"));
         assertThat(result.getResponse().getContentAsString(), containsString("Fake Street"));
         assertThat(result.getResponse().getContentAsString(), containsString("Hexton"));
-        assertThat(result.getResponse().getContentAsString(), containsString("HX08 UTG"));
+        assertThat(result.getResponse().getContentAsString(), containsString("HX08 5TG"));
         assertThat(result.getResponse().getContentAsString(), containsString("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
     }
 

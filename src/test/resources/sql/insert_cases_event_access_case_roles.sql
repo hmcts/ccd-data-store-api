@@ -12,7 +12,7 @@ VALUES (1, 'TestAddressBookNoEventAccessToCaseRole', 'PROBATE', 'CaseCreated', '
             "AddressLine3": "Hexton",
             "AddressLine2": "Fake Street",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
