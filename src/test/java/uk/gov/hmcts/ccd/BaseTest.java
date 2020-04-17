@@ -22,6 +22,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -86,6 +88,9 @@ public abstract class BaseTest {
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     private CaseDefinitionRepository caseDefinitionRepository;
     @Inject
+    @Qualifier(DefaultCaseRoleRepository.QUALIFIER)
+    private CaseRoleRepository caseRoleRepository;
+    @Inject
     private HttpUIDefinitionGateway uiDefinitionRepository;
     @Inject
     @Qualifier(DefaultUserRepository.QUALIFIER)
@@ -109,6 +114,7 @@ public abstract class BaseTest {
         final SecurityUtils securityUtils = mock(SecurityUtils.class);
         Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
+        ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
