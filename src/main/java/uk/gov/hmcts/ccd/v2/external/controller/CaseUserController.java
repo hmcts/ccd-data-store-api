@@ -73,7 +73,7 @@ public class CaseUserController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
-    @LogAudit(operationType = OperationType.GRANT_CASE_ROLE, caseId = "#caseReference", targetIdamId = "#userId",
+    @LogAudit(operationType = OperationType.UPDATE_CASE_ACCESS, caseId = "#caseReference", targetIdamId = "#userId",
         targetCaseRoles = "#caseUser.caseRoles")
     public ResponseEntity<Void> putUser(
         @PathVariable("caseReference") String caseReference,
