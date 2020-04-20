@@ -110,7 +110,7 @@ public class CaseDocumentAttacherTest {
 
         caseDocumentAttacher.consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata,beforeCallBack,afterCallBack);
 
-        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocuments();
+        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
             () -> assertEquals(actual, expected)
@@ -140,7 +140,7 @@ public class CaseDocumentAttacherTest {
 
         caseDocumentAttacher.consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata,beforeCallBack,afterCallBack);
 
-        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocuments();
+        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
             () -> assertEquals(actual, expected)
@@ -165,7 +165,7 @@ public class CaseDocumentAttacherTest {
 
         caseDocumentAttacher.consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata,beforeCallBack,afterCallBack);
 
-        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocuments();
+        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
             () -> assertEquals(actual, expected)
@@ -191,7 +191,7 @@ public class CaseDocumentAttacherTest {
 
         caseDocumentAttacher.consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata,beforeCallBack,afterCallBack);
 
-        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocuments();
+        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
             () -> assertEquals(actual, expected)
@@ -213,7 +213,7 @@ public class CaseDocumentAttacherTest {
 
         caseDocumentAttacher.consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata,beforeCallBack,afterCallBack);
 
-        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocuments();
+        List<DocumentHashToken> actual=caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
             () -> assertEquals(actual, expected)
@@ -273,7 +273,7 @@ public class CaseDocumentAttacherTest {
                                                      .caseId("12345556")
                                                      .caseTypeId("BEFTA_CASETYPE_2")
                                                      .jurisdictionId("BEFTA_JURISDICTION_2")
-                                                     .documents(new ArrayList<>())
+                                                     .documentHashToken(new ArrayList<>())
                                                      .build();
 
     }

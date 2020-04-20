@@ -40,6 +40,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -56,7 +57,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttachOperation;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -120,7 +121,10 @@ class SubmitCaseTransactionTest {
     private ApplicationParams applicationParams;
 
     @Mock
-    private CaseDocumentAttachOperation caseDocumentAttachOperation;
+    private CaseDocumentAttacher caseDocumentAttacher;
+
+    @Mock
+    private SecurityUtils securityUtils;
 
     @Mock
     private HttpServletRequest request;
@@ -146,8 +150,10 @@ class SubmitCaseTransactionTest {
                                                           caseUserRepository,
                                                           userAuthorisation,
                                                           request,
-                                                          caseDocumentAttachOperation
-                                                         );
+                                                          restTemplate,
+                                                          applicationParams,
+                                                          securityUtils
+        );
 
         event = buildEvent();
         caseType = buildCaseType();
@@ -261,9 +267,8 @@ class SubmitCaseTransactionTest {
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseDocumentAttachOperation , times(1)).beforeCallbackPrepareDocumentMetaData(dataMap);
-        verify(caseDocumentAttachOperation , times(1)).filterDocumentFields();
-        verify(caseDocumentAttachOperation , times(1)).restCallToAttachCaseDocuments();
+        verify(caseDocumentAttacher , times(1)).extractDocumentsWithHashTokenBeforeCallback(dataMap);
+        verify(caseDocumentAttacher , times(1)).restCallToAttachCaseDocuments();
 
     }
 
@@ -297,9 +302,8 @@ class SubmitCaseTransactionTest {
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseDocumentAttachOperation , times(1)).beforeCallbackPrepareDocumentMetaData(dataMap);
-        verify(caseDocumentAttachOperation , times(1)).filterDocumentFields();
-        verify(caseDocumentAttachOperation , times(1)).restCallToAttachCaseDocuments();
+        verify(caseDocumentAttacher , times(1)).extractDocumentsWithHashTokenBeforeCallback(dataMap);
+        verify(caseDocumentAttacher , times(1)).restCallToAttachCaseDocuments();
 
     }
 
@@ -327,9 +331,8 @@ class SubmitCaseTransactionTest {
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseDocumentAttachOperation , times(0)).beforeCallbackPrepareDocumentMetaData(dataMap);
-        verify(caseDocumentAttachOperation , times(0)).filterDocumentFields();
-        verify(caseDocumentAttachOperation , times(0)).restCallToAttachCaseDocuments();
+        verify(caseDocumentAttacher , times(0)).extractDocumentsWithHashTokenBeforeCallback(dataMap);
+        verify(caseDocumentAttacher , times(0)).restCallToAttachCaseDocuments();
 
     }
 

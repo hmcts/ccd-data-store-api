@@ -45,7 +45,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-class CaseDocumentAttachOperationTest {
+class caseDocumentAttacherTest {
 
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
@@ -64,7 +64,7 @@ class CaseDocumentAttachOperationTest {
     private SecurityUtils securityUtils;
 
     @InjectMocks
-    private CaseDocumentAttachOperation caseDocumentAttachOperation;
+    private CaseDocumentAttacher caseDocumentAttacher;
 
     @BeforeEach
     void setup() throws IOException {
@@ -95,7 +95,7 @@ class CaseDocumentAttachOperationTest {
         Set<String> expectedOutput = new HashSet();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
 
-        final Set<String> output = caseDocumentAttachOperation.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
 
         assertAll(
             () -> assertEquals(output, expectedOutput)
@@ -110,7 +110,7 @@ class CaseDocumentAttachOperationTest {
         Set<String> expectedOutput = new HashSet();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
 
-        final Set<String> output = caseDocumentAttachOperation.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
 
         assertAll(
             () -> assertEquals(output, expectedOutput)
@@ -124,7 +124,7 @@ class CaseDocumentAttachOperationTest {
     void shouldReturnEmptyDocumentSet() {
         caseDataContent = null;
         Set<String> expectedOutput = new HashSet();
-        final Set<String> output = caseDocumentAttachOperation.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
 
         assertAll(
             () -> assertEquals(output, expectedOutput)
@@ -158,7 +158,7 @@ class CaseDocumentAttachOperationTest {
                                                          DocumentHashToken.builder().id("e16f2ae0-d6ce-4bd0-a652-47b3c4d86292")
                                                                           .hashToken("4d49edc151423fb7b2e1f22d87b2d041b34").build());
 
-        caseDocumentAttachOperation.filterDocumentFields(caseDocumentsMetadata, beforeCallBack, afterCallBack);
+        caseDocumentAttacher.filterDocumentFields(caseDocumentsMetadata, beforeCallBack, afterCallBack);
 
         List<DocumentHashToken> actual = caseDocumentsMetadata.getDocumentHashToken();
 
@@ -173,9 +173,9 @@ class CaseDocumentAttachOperationTest {
     void shouldExtractDocumentsFromCaseDataBeforeCallBack() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        caseDocumentAttachOperation.documentTokenMap = new HashMap<>();
+        caseDocumentAttacher.documentTokenMap = new HashMap<>();
 
-        caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(dataMap);
+        caseDocumentAttacher.beforeCallbackPrepareDocumentMetaData(dataMap);
 
         Map<String, String> expectedMap = Stream.of(new String[][] {
             {"388a1ce0-f132-4680-90e9-5e782721cabb", "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a"},
@@ -185,7 +185,7 @@ class CaseDocumentAttachOperationTest {
             }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
         assertAll(
-            () -> assertEquals(caseDocumentAttachOperation.documentTokenMap, expectedMap));
+            () -> assertEquals(caseDocumentAttacher.documentTokenMap, expectedMap));
     }
 
     @Test
@@ -193,9 +193,9 @@ class CaseDocumentAttachOperationTest {
     void shouldRemoveHashTokenFromDocuments() throws IOException {
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
-        caseDocumentAttachOperation.documentTokenMap = new HashMap<>();
+        caseDocumentAttacher.documentTokenMap = new HashMap<>();
 
-        caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(dataMap);
+        caseDocumentAttacher.beforeCallbackPrepareDocumentMetaData(dataMap);
 
         JsonNode documentField9 = dataMap.get("DocumentField4");
 
@@ -212,7 +212,7 @@ class CaseDocumentAttachOperationTest {
         Map<String, String> documentMap = new HashMap<>();
 
         Assertions.assertThrows(BadRequestException.class,
-                                () -> caseDocumentAttachOperation.extractDocumentFieldsBeforeCallback(dataMap, documentMap));
+                                () -> caseDocumentAttacher.extractDocumentFieldsBeforeCallback(dataMap, documentMap));
     }
 
     @Test
@@ -225,13 +225,13 @@ class CaseDocumentAttachOperationTest {
         caseDetails.setReference(1111122222333334L);
         caseDetails.setCaseTypeId("BEFTA_CASETYPE_2");
 
-        caseDocumentAttachOperation.caseDocumentsMetadata = CaseDocumentsMetadata.builder()
+        caseDocumentAttacher.caseDocumentsMetadata = CaseDocumentsMetadata.builder()
                                                                                  .caseId("11111122222333334")
                                                                                  .caseTypeId("BEFTA_CASETYPE_2")
                                                                                  .documentHashToken(new ArrayList<>())
                                                                                  .build();
 
-        caseDocumentAttachOperation.afterCallbackPrepareDocumentMetaData(caseDetails, true);
+        caseDocumentAttacher.afterCallbackPrepareDocumentMetaData(caseDetails, true);
         List<DocumentHashToken> listDocumentHashToken = Arrays.asList(
             DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build(),
@@ -243,7 +243,7 @@ class CaseDocumentAttachOperationTest {
                              .hashToken("7b8930ef-2bcd-44cd-8a78-17b8930ef-27b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec").build());
 
         assertAll(
-            () -> assertTrue(caseDocumentAttachOperation.caseDocumentsMetadata.getDocumentHashToken().containsAll(listDocumentHashToken)));
+            () -> assertTrue(caseDocumentAttacher.caseDocumentsMetadata.getDocumentHashToken().containsAll(listDocumentHashToken)));
     }
 
     @Test
@@ -254,13 +254,13 @@ class CaseDocumentAttachOperationTest {
         Map<String, String> documentMap = new HashMap<>();
 
         Assertions.assertThrows(BadRequestException.class,
-                                () -> caseDocumentAttachOperation.extractDocumentFieldsAfterCallback(null, dataMap, documentMap));
+                                () -> caseDocumentAttacher.extractDocumentFieldsAfterCallback(null, dataMap, documentMap));
     }
 
     @Test
     @DisplayName("Should call the Case Document AM API to attach document to a case")
     void shouldCallRestclientToAttachDocumentToCase() {
-        caseDocumentAttachOperation.caseDocumentsMetadata =
+        caseDocumentAttacher.caseDocumentsMetadata =
             CaseDocumentsMetadata.builder()
                                  .documentHashToken(Arrays.asList(
                                      DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
@@ -268,7 +268,7 @@ class CaseDocumentAttachOperationTest {
                                                           "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build()
                                                                  )).build();
 
-        caseDocumentAttachOperation.restCallToAttachCaseDocuments();
+        caseDocumentAttacher.restCallToAttachCaseDocuments();
 
         verify(restTemplate, times(1)).exchange(ArgumentMatchers.anyString(),
                                                 ArgumentMatchers.any(HttpMethod.class),
@@ -279,11 +279,11 @@ class CaseDocumentAttachOperationTest {
     @Test
     @DisplayName("Should Not call the Case Document AM API to attach document to a case for empty payload")
     void shouldNotCallRestClientToAttachDocumentToCaseForNoEligibleDocuments() {
-        caseDocumentAttachOperation.caseDocumentsMetadata =
+        caseDocumentAttacher.caseDocumentsMetadata =
             CaseDocumentsMetadata.builder()
                                  .documentHashToken(Collections.emptyList()).build();
 
-        caseDocumentAttachOperation.restCallToAttachCaseDocuments();
+        caseDocumentAttacher.restCallToAttachCaseDocuments();
         verify(restTemplate, times(0)).exchange(ArgumentMatchers.anyString(),
                                                 ArgumentMatchers.any(HttpMethod.class),
                                                 ArgumentMatchers.any(),
@@ -292,7 +292,7 @@ class CaseDocumentAttachOperationTest {
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
         InputStream inputStream =
-            CaseDocumentAttachOperationTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
+            caseDocumentAttacherTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
 
         return
             new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {

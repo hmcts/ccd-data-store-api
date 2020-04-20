@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-public class CaseDocumentAttachOperation {
+public class adssaas {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseDocumentAttachOperation.class);
 
@@ -254,3 +255,4 @@ public class CaseDocumentAttachOperation {
         });
     }
 }
+*/

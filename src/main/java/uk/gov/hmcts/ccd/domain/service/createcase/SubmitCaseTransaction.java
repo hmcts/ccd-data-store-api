@@ -42,9 +42,7 @@ import uk.gov.hmcts.ccd.v2.V2;
 @Service
 class SubmitCaseTransaction {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SubmitCaseTransaction.class);
-
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final CaseTypeService caseTypeService;
@@ -98,7 +96,7 @@ class SubmitCaseTransaction {
                                   CaseDetails newCaseDetails, Boolean ignoreWarning) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-        CaseDocumentAttachOperation caseDocumentAttachOperation = null;
+        CaseDocumentAttacher caseDocumentAttacher = null;
 
         newCaseDetails.setCreatedDate(now);
         newCaseDetails.setLastStateModifiedDate(now);
@@ -108,8 +106,8 @@ class SubmitCaseTransaction {
             && request.getContentType().equals(V2.MediaType.CREATE_CASE_2_1);
 
         if (isApiVersion21) {
-            caseDocumentAttachOperation = new CaseDocumentAttachOperation(restTemplate, applicationParams, securityUtils);
-            caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(newCaseDetails.getData());
+            caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
+            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(newCaseDetails.getData());
         }
 
         /*
@@ -131,8 +129,8 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion21) {
-            caseDocumentAttachOperation.attachDocumentDuringCaseCreation(newCaseDetails, aboutToSubmitCallbackResponse.getState().isPresent());
-            caseDocumentAttachOperation.restCallToAttachCaseDocuments();
+            caseDocumentAttacher.caseDocumentAttachOperation(newCaseDetails, null, event.getEventId(), aboutToSubmitCallbackResponse.getState().isPresent());
+            caseDocumentAttacher.restCallToAttachCaseDocuments();
         }
 
         return savedCaseDetails;
