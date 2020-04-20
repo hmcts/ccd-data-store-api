@@ -11,10 +11,13 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -48,6 +51,12 @@ public class CaseDocumentAttacherTest {
     @Mock
     private RestTemplate restTemplate;
 
+    @Mock
+    private SecurityUtils securityUtils;
+
+    @Mock
+    private ApplicationParams applicationParams;
+
     @InjectMocks
     private CaseDocumentAttacher caseDocumentAttacher;
 
@@ -71,7 +80,9 @@ public class CaseDocumentAttacherTest {
         caseDataContent = buildCaseData("case-detail-after-update.json");
         caseDetails.setData(caseDetailsBefore);
         ResponseEntity<String> responseEntity = new ResponseEntity<>("Success", HttpStatus.OK);
-
+        doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
+        doReturn("http://localhost:4455").when(applicationParams).getCaseDocumentAmApiHost();
+        doReturn("/cases/documents/attachToCase").when(applicationParams).getAttachDocumentPath();
         doReturn(responseEntity).when(restTemplate).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
@@ -387,18 +398,15 @@ public class CaseDocumentAttacherTest {
                                                                           .build();
 
         caseDocumentAttacher.extractDocumentsAfterCallBack(caseDetails, true);
-        List<DocumentHashToken> listDocumentHashToken = Arrays.asList(
-            DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
-                             .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build(),
-            DocumentHashToken.builder().id("f0550adc-eaea-4232-b52f-1c4ac0534d60")
-                             .hashToken("UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q").build(),
-            DocumentHashToken.builder().id("5c4b5564-a29f-47d3-8c51-50e2d4629435").hashToken("6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc")
-                             .build(),
-            DocumentHashToken.builder().id("7b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec")
-                             .hashToken("7b8930ef-2bcd-44cd-8a78-17b8930ef-27b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec").build());
+        Map<String, String> expectedMap = Stream.of(new String[][] {
+            {"388a1ce0-f132-4680-90e9-5e782721cabb", "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a"},
+            {"f0550adc-eaea-4232-b52f-1c4ac0534d60", "UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q"},
+            {"5c4b5564-a29f-47d3-8c51-50e2d4629435", "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc"},
+            {"7b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec", "7b8930ef-2bcd-44cd-8a78-17b8930ef-27b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec"},
+            }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
         assertAll(
-            () -> assertTrue(caseDocumentAttacher.caseDocumentsMetadata.getDocumentHashToken().containsAll(listDocumentHashToken)));
+            () -> assertTrue(caseDocumentAttacher.documentsAfterCallback.equals(expectedMap)));
     }
 
   /*  @Test
