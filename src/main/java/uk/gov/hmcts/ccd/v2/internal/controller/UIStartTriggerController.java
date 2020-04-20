@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCase;
-import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCaseType;
-import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forDraft;
+import static uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.forCase;
+import static uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.forCaseType;
+import static uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.forDraft;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 
 @RestController
 @RequestMapping(path = "/internal")
@@ -53,7 +53,7 @@ public class UIStartTriggerController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIStartTriggerResource.class
+            response = CaseUpdateViewEventResource.class
         ),
         @ApiResponse(
             code = 422,
@@ -64,9 +64,9 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    public ResponseEntity<UIStartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
-                                                                      @PathVariable("triggerId") String triggerId,
-                                                                      @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+    public ResponseEntity<CaseUpdateViewEventResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
+                                                                           @PathVariable("triggerId") String triggerId,
+                                                                           @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         final CaseUpdateViewEvent caseUpdateViewEvent = this.getEventTriggerOperation.executeForCaseType(caseTypeId,
                                                                                                    triggerId,
@@ -92,7 +92,7 @@ public class UIStartTriggerController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIStartTriggerResource.class
+            response = CaseUpdateViewEventResource.class
         ),
         @ApiResponse(
             code = 422,
@@ -107,9 +107,9 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    public ResponseEntity<UIStartTriggerResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
-                                                                       @PathVariable("triggerId") String triggerId,
-                                                                       @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+    public ResponseEntity<CaseUpdateViewEventResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
+                                                                            @PathVariable("triggerId") String triggerId,
+                                                                            @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
@@ -138,7 +138,7 @@ public class UIStartTriggerController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIStartTriggerResource.class
+            response = CaseUpdateViewEventResource.class
         ),
         @ApiResponse(
             code = 422,
@@ -149,8 +149,8 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    public ResponseEntity<UIStartTriggerResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,
-                                                                       @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+    public ResponseEntity<CaseUpdateViewEventResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,
+                                                                            @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         final CaseUpdateViewEvent caseUpdateViewEvent = getEventTriggerOperation.executeForDraft(draftId,
                                                                                            ignoreWarning);

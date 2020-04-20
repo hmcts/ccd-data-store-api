@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.v2.internal.controller.UIDraftsController;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class DraftViewResource extends RepresentationModel {
-    private static final Logger LOG = LoggerFactory.getLogger(UIStartTriggerResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaseUpdateViewEventResource.class);
 
     @JsonUnwrapped
     private DraftResponse draftResponse;

@@ -37,7 +37,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionConfigViewResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.WorkbasketInputsViewResource;
 
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
@@ -90,18 +90,18 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIWorkbasketInputsResource.class
+            response = WorkbasketInputsViewResource.class
         ),
         @ApiResponse(
             code = 404,
             message = "Case type not found"
         )
     })
-    public ResponseEntity<UIWorkbasketInputsResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
+    public ResponseEntity<WorkbasketInputsViewResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
 
         WorkbasketInput[] workbasketInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, WORKBASKET).toArray(new WorkbasketInput[0]);
 
-        return ResponseEntity.ok(new UIWorkbasketInputsResource(workbasketInputs, caseTypeId));
+        return ResponseEntity.ok(new WorkbasketInputsViewResource(workbasketInputs, caseTypeId));
     }
 
     @GetMapping(

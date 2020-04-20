@@ -20,24 +20,24 @@ import uk.gov.hmcts.ccd.v2.internal.controller.UIStartTriggerController;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIStartTriggerResource extends RepresentationModel {
-    private static final Logger LOG = LoggerFactory.getLogger(UIStartTriggerResource.class);
+public class CaseUpdateViewEventResource extends RepresentationModel {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseUpdateViewEventResource.class);
 
     private enum Origin { DRAFT, CASE, CASE_TYPE }
 
     @JsonUnwrapped
     private CaseUpdateViewEvent caseUpdateViewEvent;
 
-    public static UIStartTriggerResource forCase(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String caseId, Boolean ignoreWarning) {
-        return new UIStartTriggerResource(caseUpdateViewEvent, caseId, ignoreWarning, Origin.CASE);
+    public static CaseUpdateViewEventResource forCase(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String caseId, Boolean ignoreWarning) {
+        return new CaseUpdateViewEventResource(caseUpdateViewEvent, caseId, ignoreWarning, Origin.CASE);
     }
 
-    public static UIStartTriggerResource forCaseType(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String caseType, Boolean ignoreWarning) {
-        return new UIStartTriggerResource(caseUpdateViewEvent, caseType, ignoreWarning, Origin.CASE_TYPE);
+    public static CaseUpdateViewEventResource forCaseType(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String caseType, Boolean ignoreWarning) {
+        return new CaseUpdateViewEventResource(caseUpdateViewEvent, caseType, ignoreWarning, Origin.CASE_TYPE);
     }
 
-    public static UIStartTriggerResource forDraft(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String draftId, Boolean ignoreWarning) {
-        return new UIStartTriggerResource(caseUpdateViewEvent, draftId, ignoreWarning, Origin.DRAFT);
+    public static CaseUpdateViewEventResource forDraft(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String draftId, Boolean ignoreWarning) {
+        return new CaseUpdateViewEventResource(caseUpdateViewEvent, draftId, ignoreWarning, Origin.DRAFT);
     }
 
     @JsonIgnore
@@ -45,7 +45,7 @@ public class UIStartTriggerResource extends RepresentationModel {
         return caseUpdateViewEvent;
     }
 
-    private UIStartTriggerResource(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String id, Boolean ignoreWarning, Origin origin) {
+    private CaseUpdateViewEventResource(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String id, Boolean ignoreWarning, Origin origin) {
         copyProperties(caseUpdateViewEvent);
 
         switch (origin) {

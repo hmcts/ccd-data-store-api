@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import java.util.Optional;
 
 @DisplayName("UserProfileResource")
-class UIUserProfileResourceTest {
+class UserProfileViewResourceTest {
     private static final String LINK_SELF = String.format("/internal/profile");
 
     @Mock
@@ -62,7 +62,7 @@ class UIUserProfileResourceTest {
     @Test
     @DisplayName("should copy user profile")
     void shouldCopyUserProfile() {
-        final UIUserProfileResource resource = new UIUserProfileResource(userProfile);
+        final UserProfileViewResource resource = new UserProfileViewResource(userProfile);
 
         assertAll(
             () -> assertThat(resource.getUserProfile().getUser(), sameInstance(user)),
@@ -75,7 +75,7 @@ class UIUserProfileResourceTest {
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final UIUserProfileResource resource = new UIUserProfileResource(userProfile);
+        final UserProfileViewResource resource = new UserProfileViewResource(userProfile);
 
         Optional<Link> self = resource.getLink("self");
 

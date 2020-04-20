@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class UIWorkbasketInputsResourceTest {
+class WorkbasketInputsViewResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final String LINK_SELF = String.format("/internal/case-types/%s/work-basket-inputs", CASE_TYPE_ID);
     private WorkbasketInput workbasketInput1 = aWorkbasketInput().withFieldId("field1").build();
@@ -30,9 +30,9 @@ class UIWorkbasketInputsResourceTest {
     @Test
     @DisplayName("should copy workbasket inputs")
     void shouldCopyWorkbasketInputs() {
-        final UIWorkbasketInputsResource resource = new UIWorkbasketInputsResource(workbasketInputs, CASE_TYPE_ID);
+        final WorkbasketInputsViewResource resource = new WorkbasketInputsViewResource(workbasketInputs, CASE_TYPE_ID);
 
-        List<UIWorkbasketInputsResource.UIWorkbasketInput> workbasketInputs = Lists.newArrayList(resource.getWorkbasketInputs());
+        List<WorkbasketInputsViewResource.UIWorkbasketInput> workbasketInputs = Lists.newArrayList(resource.getWorkbasketInputs());
         assertAll(
             () -> assertThat(resource.getWorkbasketInputs(), not(sameInstance(this.workbasketInputs))),
             () -> assertThat(workbasketInputs, hasItems(hasProperty("field", hasProperty("id", is("field1"))),
@@ -43,7 +43,7 @@ class UIWorkbasketInputsResourceTest {
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final UIWorkbasketInputsResource resource = new UIWorkbasketInputsResource(workbasketInputs, CASE_TYPE_ID);
+        final WorkbasketInputsViewResource resource = new WorkbasketInputsViewResource(workbasketInputs, CASE_TYPE_ID);
 
         Optional<Link> self = resource.getLink("self");
 

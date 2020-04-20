@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIWorkbasketInputsResource extends RepresentationModel {
+public class WorkbasketInputsViewResource extends RepresentationModel {
 
     @Data
     @NoArgsConstructor
@@ -29,7 +29,7 @@ public class UIWorkbasketInputsResource extends RepresentationModel {
 
     private UIWorkbasketInput[] workbasketInputs;
 
-    public UIWorkbasketInputsResource(WorkbasketInput[] workbasketInputs, String caseTypeId) {
+    public WorkbasketInputsViewResource(WorkbasketInput[] workbasketInputs, String caseTypeId) {
         copyProperties(workbasketInputs);
 
         add(linkTo(methodOn(UIDefinitionController.class).getWorkbasketInputsDetails(caseTypeId)).withSelfRel());

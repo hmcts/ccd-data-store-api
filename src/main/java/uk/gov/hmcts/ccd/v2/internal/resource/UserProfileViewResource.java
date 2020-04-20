@@ -15,12 +15,12 @@ import uk.gov.hmcts.ccd.v2.internal.controller.UIUserProfileController;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIUserProfileResource extends RepresentationModel {
+public class UserProfileViewResource extends RepresentationModel {
 
     @JsonUnwrapped
     private UserProfile userProfile;
 
-    public UIUserProfileResource(@NonNull UserProfile userProfile) {
+    public UserProfileViewResource(@NonNull UserProfile userProfile) {
         copyProperties(userProfile);
 
         add(linkTo(methodOn(UIUserProfileController.class).getUserProfile()).withSelfRel());

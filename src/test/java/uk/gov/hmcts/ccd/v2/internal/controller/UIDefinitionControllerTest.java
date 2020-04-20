@@ -29,7 +29,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionViewResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionConfigViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.WorkbasketInputsViewResource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
@@ -118,12 +118,12 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when case found")
         void caseFound() {
-            final ResponseEntity<UIWorkbasketInputsResource> response = uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID);
+            final ResponseEntity<WorkbasketInputsViewResource> response = uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                    UIWorkbasketInputsResource.UIWorkbasketInput[] workbasketInputs = response.getBody().getWorkbasketInputs();
+                    WorkbasketInputsViewResource.UIWorkbasketInput[] workbasketInputs = response.getBody().getWorkbasketInputs();
                     assertThat(Lists.newArrayList(workbasketInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
                         hasProperty("field", hasProperty("id", is("field2"))),
                             hasProperty("field", hasProperty("showCondition", is(SHOW_CONDITION)))));

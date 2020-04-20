@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.WorkbasketInputsViewResource;
 
 import javax.inject.Inject;
 
@@ -64,8 +64,8 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        UIWorkbasketInputsResource response = mapper.readValue(result.getResponse().getContentAsString(), UIWorkbasketInputsResource.class);
-        UIWorkbasketInputsResource.UIWorkbasketInput[] workbasketInputs = response.getWorkbasketInputs();
+        WorkbasketInputsViewResource response = mapper.readValue(result.getResponse().getContentAsString(), WorkbasketInputsViewResource.class);
+        WorkbasketInputsViewResource.UIWorkbasketInput[] workbasketInputs = response.getWorkbasketInputs();
 
         assertThat(workbasketInputs[0].getLabel(), is("First Name"));
         assertThat(workbasketInputs[0].getField().getId(), is("PersonFirstName"));

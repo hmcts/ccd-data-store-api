@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -100,7 +100,7 @@ class UIStartTriggerControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<UIStartTriggerResource> response =
+            final ResponseEntity<CaseUpdateViewEventResource> response =
                 uiStartTriggerController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
@@ -152,7 +152,7 @@ class UIStartTriggerControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<UIStartTriggerResource> response = uiStartTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<CaseUpdateViewEventResource> response = uiStartTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -196,7 +196,7 @@ class UIStartTriggerControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<UIStartTriggerResource> response = uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, IGNORE_WARNING);
+            final ResponseEntity<CaseUpdateViewEventResource> response = uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
