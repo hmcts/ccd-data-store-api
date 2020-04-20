@@ -22,6 +22,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
                            @Nullable Exception ex) {
         if (handler instanceof HandlerMethod && ((HandlerMethod) handler).hasMethodAnnotation(LogAudit.class)) {
             AuditContext auditContext = AuditContextHolder.getAuditContext();
+            // FIXME : suppress 404 and 403/401 requests
             auditService.audit(request, response.getStatus(), auditContext);
             AuditContextHolder.remove();
         }
