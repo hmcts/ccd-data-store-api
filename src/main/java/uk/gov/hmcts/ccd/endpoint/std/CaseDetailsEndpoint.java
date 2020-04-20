@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
@@ -70,8 +72,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "/", description = "Standard case API")
 public class CaseDetailsEndpoint {
-
-    public static final int MAX_CASE_IDS_LIST = 10;
 
     private final GetCaseOperation getCaseOperation;
     private final CreateCaseOperation createCaseOperation;
@@ -535,6 +535,6 @@ public class CaseDetailsEndpoint {
     public static String buildCaseIds(List<CaseDetails> caseDetails) {
         return caseDetails.stream().limit(MAX_CASE_IDS_LIST)
             .map(c -> String.valueOf(c.getReference()))
-            .collect(Collectors.joining(","));
+            .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 }

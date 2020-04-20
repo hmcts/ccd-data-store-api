@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -24,8 +25,10 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -37,6 +40,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -96,6 +102,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
     @Inject
     private WebApplicationContext wac;
+
+    @SpyBean
+    private AuditRepository auditRepository;
 
     @Mock
     private Authentication authentication;
@@ -195,6 +204,15 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("Country"));
         assertEquals("W11 5DF", ((Map) searchResultViewItems.get(2).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
+
+        // audit-log assertions
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(OperationType.SEARCH_CASE.getLabel()));
+        assertThat(captor.getValue().getJurisdiction(), is(TEST_JURISDICTION));
+        assertThat(captor.getValue().getCaseType(), is(TEST_CASE_TYPE));
+        assertThat(captor.getValue().getCaseId(), is("DRAFT5,1504259907353529,1504259907353545"));
     }
 
     @Test
@@ -925,6 +943,15 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Trigger Name", "HAS PRE STATES EVENT", triggers[0].getName());
         assertEquals("Trigger Description", "Test event for non null pre-states", triggers[0].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
+
+        // audit-log assertions
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(OperationType.SEARCH_CASE.getLabel()));
+        assertThat(captor.getValue().getJurisdiction(), is(TEST_JURISDICTION));
+        assertThat(captor.getValue().getCaseType(), is(TEST_CASE_TYPE));
+        assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
     }
 
     @Test
