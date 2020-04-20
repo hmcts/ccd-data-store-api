@@ -12,7 +12,9 @@ import org.springframework.expression.Expression;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
+/**
+ *  Utility class handling the SpEL expression parsing
+ */
 public class ExpressionEvaluator extends CachedExpressionEvaluator {
 
     // shared param discoverer since it caches data internally
@@ -36,10 +38,28 @@ public class ExpressionEvaluator extends CachedExpressionEvaluator {
         AnnotatedElementKey methodKey = new AnnotatedElementKey(method, targetClass);
         Method targetMethod = this.targetMethodCache.get(methodKey);
         if (targetMethod == null) {
-            targetMethod = AopUtils.getMostSpecificMethod(method, targetClass);
-
+            Method mostSpecificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
+            targetMethod = mostSpecificMethod != null ? mostSpecificMethod : method;
             this.targetMethodCache.put(methodKey, targetMethod);
         }
         return targetMethod;
+    }
+
+    private static class ExpressionRootObject{
+        private final Object object;
+        private final Object[] args;
+
+        public ExpressionRootObject(Object object, Object[] args) {
+            this.object = object;
+            this.args = args;
+        }
+
+        public Object getObject() {
+            return object;
+        }
+
+        public Object[] getArgs() {
+            return args;
+        }
     }
 }
