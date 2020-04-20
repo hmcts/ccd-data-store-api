@@ -33,7 +33,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.BannerViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionConfigViewResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
@@ -207,7 +207,7 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIJurisdictionResource.class
+            response = JurisdictionViewResource.class
         ),
         @ApiResponse(
             code = 404,
@@ -218,7 +218,7 @@ public class UIDefinitionController {
             message = "Access can only be 'create', 'read' or 'update'"
         )
     })
-    public ResponseEntity<UIJurisdictionResource> getJurisdictions(@RequestParam(value = "access") String access) {
+    public ResponseEntity<JurisdictionViewResource> getJurisdictions(@RequestParam(value = "access") String access) {
         if (accessMap.get(access) == null) {
             throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
         }
@@ -226,6 +226,6 @@ public class UIDefinitionController {
         if (jurisdictions == null || jurisdictions.length == 0) {
             throw new ResourceNotFoundException("No jurisdictions found");
         }
-        return ResponseEntity.ok(new UIJurisdictionResource(jurisdictions, access));
+        return ResponseEntity.ok(new JurisdictionViewResource(jurisdictions, access));
     }
 }

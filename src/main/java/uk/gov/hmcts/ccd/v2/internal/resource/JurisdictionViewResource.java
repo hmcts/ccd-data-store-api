@@ -18,12 +18,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIJurisdictionResource extends RepresentationModel {
+public class JurisdictionViewResource extends RepresentationModel {
 
 
     private UIJurisdiction[] jurisdictions;
 
-    public UIJurisdictionResource(JurisdictionDisplayProperties[] displayProperties, String access) {
+    public JurisdictionViewResource(JurisdictionDisplayProperties[] displayProperties, String access) {
         copyProperties(displayProperties);
 
         add(linkTo(methodOn(UIDefinitionController.class).getJurisdictions(access)).withSelfRel());

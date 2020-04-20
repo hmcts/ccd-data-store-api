@@ -25,7 +25,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.internal.resource.BannerViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionViewResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionConfigViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
@@ -268,7 +268,7 @@ class UIDefinitionControllerTest {
             when(userProfile.getJurisdictions()).thenReturn(jurisdictionDisplayProperties);
             when(getUserProfileOperation.execute(ArgumentMatchers.any())).thenReturn(userProfile);
 
-            ResponseEntity<UIJurisdictionResource> response = uiDefinitionController.getJurisdictions("create");
+            ResponseEntity<JurisdictionViewResource> response = uiDefinitionController.getJurisdictions("create");
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),

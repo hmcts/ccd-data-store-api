@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("UIJurisdictionResourceTest")
-class UIJurisdictionResourceTest {
+class JurisdictionViewResourceTest {
 
     private static final String ACCESS = "create";
     private static final String LINK_SELF = String.format("/internal/jurisdictions?access=%s", ACCESS);
@@ -29,7 +29,7 @@ class UIJurisdictionResourceTest {
     @Test
     @DisplayName("should copy jurisdiction display properties")
     void shouldCopySearchInputs() {
-        final UIJurisdictionResource resource = new UIJurisdictionResource(displayProperties, ACCESS);
+        final JurisdictionViewResource resource = new JurisdictionViewResource(displayProperties, ACCESS);
 
         assertAll(
             () -> assertThat(resource.getJurisdictions(), not(sameInstance(this.displayProperties)))
@@ -39,7 +39,7 @@ class UIJurisdictionResourceTest {
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final UIJurisdictionResource resource = new UIJurisdictionResource(this.displayProperties, ACCESS);
+        final JurisdictionViewResource resource = new JurisdictionViewResource(this.displayProperties, ACCESS);
         Optional<Link> link = resource.getLink("self");
 
         assertThat(link.get().getHref(), equalTo(LINK_SELF));
