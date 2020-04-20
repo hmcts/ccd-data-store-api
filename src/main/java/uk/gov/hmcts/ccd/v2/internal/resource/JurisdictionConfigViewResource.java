@@ -13,11 +13,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIJurisdictionConfigResource extends RepresentationModel {
+public class JurisdictionConfigViewResource extends RepresentationModel {
 
     private List<JurisdictionUiConfig> configs;
 
-    public UIJurisdictionConfigResource(@NonNull List<JurisdictionUiConfig> listOfConfigs) {
+    public JurisdictionConfigViewResource(@NonNull List<JurisdictionUiConfig> listOfConfigs) {
         copyProperties(listOfConfigs);
     }
 

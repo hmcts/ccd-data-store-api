@@ -34,7 +34,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.BannerViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionConfigResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionConfigViewResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
@@ -180,14 +180,14 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIJurisdictionConfigResource.class
+            response = JurisdictionConfigViewResource.class
         )
     })
-    public ResponseEntity<UIJurisdictionConfigResource> getJurisdictionUiConfigs(@RequestParam("ids") Optional<List<String>> idsOptional) {
+    public ResponseEntity<JurisdictionConfigViewResource> getJurisdictionUiConfigs(@RequestParam("ids") Optional<List<String>> idsOptional) {
         List<JurisdictionUiConfig> listOfConfigs = idsOptional.isPresent()
                                         ? getJurisdictionUiConfigOperation.execute(idsOptional.get())
                                         : Lists.newArrayList();
-        return ResponseEntity.ok(new UIJurisdictionConfigResource(listOfConfigs));
+        return ResponseEntity.ok(new JurisdictionConfigViewResource(listOfConfigs));
     }
 
   @GetMapping(

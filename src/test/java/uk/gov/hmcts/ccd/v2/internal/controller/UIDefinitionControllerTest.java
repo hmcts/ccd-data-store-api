@@ -27,7 +27,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.internal.resource.BannerViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionConfigResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionConfigViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
 
@@ -284,13 +284,13 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when jurisdiction UI configs found")
         void caseFound() {
-            final ResponseEntity<UIJurisdictionConfigResource> response = uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes));
+            final ResponseEntity<JurisdictionConfigViewResource> response = uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes));
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                    UIJurisdictionConfigResource uiJurisdictionConfigResource = response.getBody();
-                    assertThat(Lists.newArrayList(uiJurisdictionConfigResource.getConfigs()), hasItems(
+                    JurisdictionConfigViewResource jurisdictionConfigViewResource = response.getBody();
+                    assertThat(Lists.newArrayList(jurisdictionConfigViewResource.getConfigs()), hasItems(
                         hasProperty("id", is("Reference 1")),
                         hasProperty("id", is("Reference 2")),
                         hasProperty("name", is("Name 1")),
