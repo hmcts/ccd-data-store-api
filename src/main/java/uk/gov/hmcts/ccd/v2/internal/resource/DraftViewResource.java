@@ -17,13 +17,13 @@ import uk.gov.hmcts.ccd.v2.internal.controller.UIDraftsController;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIDraftResource extends RepresentationModel {
+public class DraftViewResource extends RepresentationModel {
     private static final Logger LOG = LoggerFactory.getLogger(UIStartTriggerResource.class);
 
     @JsonUnwrapped
     private DraftResponse draftResponse;
 
-    public UIDraftResource(@NonNull DraftResponse draftResponse, String caseTypeId) {
+    public DraftViewResource(@NonNull DraftResponse draftResponse, String caseTypeId) {
         copyProperties(draftResponse);
 
         add(linkTo(methodOn(UIDraftsController.class).saveDraft(caseTypeId, draftResponse.getCaseDataContent())).withSelfRel());

@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 
 import java.util.Optional;
 
-class UIDraftResourceTest {
+class DraftViewResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final String LINK_SELF = String.format("/internal/case-types/%s/drafts", CASE_TYPE_ID);
     private DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withCaseTypeId(CASE_TYPE_ID).build()).build();
@@ -29,7 +29,7 @@ class UIDraftResourceTest {
     @Test
     @DisplayName("should copy draft response profile")
     void shouldCopyUserProfile() {
-        final UIDraftResource resource = new UIDraftResource(draftResponse, CASE_TYPE_ID);
+        final DraftViewResource resource = new DraftViewResource(draftResponse, CASE_TYPE_ID);
 
         assertAll(
             () -> assertThat(resource.getDraftResponse(), sameInstance(draftResponse))
@@ -39,7 +39,7 @@ class UIDraftResourceTest {
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final UIDraftResource resource = new UIDraftResource(draftResponse, CASE_TYPE_ID);
+        final DraftViewResource resource = new DraftViewResource(draftResponse, CASE_TYPE_ID);
 
         Optional<Link> self = resource.getLink("self");
 

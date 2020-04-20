@@ -26,7 +26,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIDraftResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.DraftViewResource;
 
 @RestController
 @RequestMapping(path = "/internal")
@@ -66,13 +66,13 @@ public class UIDraftsController {
         @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
-    public ResponseEntity<UIDraftResource> saveDraft(
+    public ResponseEntity<DraftViewResource> saveDraft(
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @RequestBody final CaseDataContent caseDataContent) {
 
         ResponseEntity.BodyBuilder builder = status(HttpStatus.CREATED);
-        return builder.body(new UIDraftResource(upsertDraftOperation.executeSave(caseTypeId, caseDataContent), caseTypeId));
+        return builder.body(new DraftViewResource(upsertDraftOperation.executeSave(caseTypeId, caseDataContent), caseTypeId));
     }
 
     @PutMapping(
@@ -93,12 +93,12 @@ public class UIDraftsController {
         @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
-    public ResponseEntity<UIDraftResource> updateDraft(
+    public ResponseEntity<DraftViewResource> updateDraft(
         @PathVariable("ctid") final String caseTypeId,
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return ResponseEntity.ok(new UIDraftResource(upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent), caseTypeId));
+        return ResponseEntity.ok(new DraftViewResource(upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent), caseTypeId));
     }
 
     @Transactional
