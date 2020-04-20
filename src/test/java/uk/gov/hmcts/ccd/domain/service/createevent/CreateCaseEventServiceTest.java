@@ -263,7 +263,7 @@ class CreateCaseEventServiceTest {
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         aboutToSubmitCallbackResponse.setState(Optional.empty());
 
-        CreateCaseEventResult caseEventResult= createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
+        CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isEqualTo(LocalDateTime.now(clock));
