@@ -65,7 +65,7 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
             .andReturn();
 
         WorkbasketInputsViewResource response = mapper.readValue(result.getResponse().getContentAsString(), WorkbasketInputsViewResource.class);
-        WorkbasketInputsViewResource.UIWorkbasketInput[] workbasketInputs = response.getWorkbasketInputs();
+        WorkbasketInputsViewResource.WorkbasketInputView[] workbasketInputs = response.getWorkbasketInputs();
 
         assertThat(workbasketInputs[0].getLabel(), is("First Name"));
         assertThat(workbasketInputs[0].getField().getId(), is("PersonFirstName"));
@@ -88,7 +88,7 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
             .andReturn();
 
         SearchInputsViewResource response = mapper.readValue(result.getResponse().getContentAsString(), SearchInputsViewResource.class);
-        SearchInputsViewResource.UISearchInput[] searchInputs = response.getSearchInputs();
+        SearchInputsViewResource.SearchInputView[] searchInputs = response.getSearchInputs();
 
         assertThat(searchInputs[0].getLabel(), is("First Name"));
         assertThat(searchInputs[0].getField().getId(), is("PersonFirstName"));

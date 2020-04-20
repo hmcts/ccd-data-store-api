@@ -21,7 +21,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class JurisdictionViewResource extends RepresentationModel {
 
 
-    private UIJurisdiction[] jurisdictions;
+    private JurisdictionView[] jurisdictions;
 
     public JurisdictionViewResource(JurisdictionDisplayProperties[] displayProperties, String access) {
         copyProperties(displayProperties);
@@ -29,13 +29,13 @@ public class JurisdictionViewResource extends RepresentationModel {
         add(linkTo(methodOn(UIDefinitionController.class).getJurisdictions(access)).withSelfRel());
     }
 
-    public UIJurisdiction[] getJurisdictions() {
+    public JurisdictionView[] getJurisdictions() {
         return jurisdictions;
     }
 
     @Data
     @NoArgsConstructor
-    public class UIJurisdiction {
+    public class JurisdictionView {
         private String id;
         private String name;
         private String description;
@@ -45,16 +45,16 @@ public class JurisdictionViewResource extends RepresentationModel {
     private void copyProperties(JurisdictionDisplayProperties[] displayProperties) {
         this.jurisdictions = Arrays.stream(displayProperties)
             .map(this::buildUIJurisdiction)
-            .collect(Collectors.toList()).toArray(new UIJurisdiction[]{});
+            .collect(Collectors.toList()).toArray(new JurisdictionView[]{});
     }
 
-    private UIJurisdiction buildUIJurisdiction(JurisdictionDisplayProperties displayProperties) {
-        UIJurisdiction uiJurisdiction = new UIJurisdiction();
-        uiJurisdiction.setId(displayProperties.getId());
-        uiJurisdiction.setCaseTypeDefinitions(displayProperties.getCaseTypeDefinitions());
-        uiJurisdiction.setDescription(displayProperties.getDescription());
-        uiJurisdiction.setName(displayProperties.getName());
-        return uiJurisdiction;
+    private JurisdictionView buildUIJurisdiction(JurisdictionDisplayProperties displayProperties) {
+        JurisdictionView jurisdictionView = new JurisdictionView();
+        jurisdictionView.setId(displayProperties.getId());
+        jurisdictionView.setCaseTypeDefinitions(displayProperties.getCaseTypeDefinitions());
+        jurisdictionView.setDescription(displayProperties.getDescription());
+        jurisdictionView.setName(displayProperties.getName());
+        return jurisdictionView;
     }
 
 }

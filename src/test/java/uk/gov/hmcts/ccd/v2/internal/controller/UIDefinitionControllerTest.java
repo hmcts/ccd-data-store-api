@@ -123,7 +123,7 @@ class UIDefinitionControllerTest {
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                    WorkbasketInputsViewResource.UIWorkbasketInput[] workbasketInputs = response.getBody().getWorkbasketInputs();
+                    WorkbasketInputsViewResource.WorkbasketInputView[] workbasketInputs = response.getBody().getWorkbasketInputs();
                     assertThat(Lists.newArrayList(workbasketInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
                         hasProperty("field", hasProperty("id", is("field2"))),
                             hasProperty("field", hasProperty("showCondition", is(SHOW_CONDITION)))));
@@ -153,7 +153,7 @@ class UIDefinitionControllerTest {
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                    SearchInputsViewResource.UISearchInput[] searchInputs = response.getBody().getSearchInputs();
+                    SearchInputsViewResource.SearchInputView[] searchInputs = response.getBody().getSearchInputs();
                     assertThat(Lists.newArrayList(searchInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
                                                                           hasProperty("field", hasProperty("id", is("field2"))),
                                                                           hasProperty("field", hasProperty("showCondition", is(SHOW_CONDITION)))));

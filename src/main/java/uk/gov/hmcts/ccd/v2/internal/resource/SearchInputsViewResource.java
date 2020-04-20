@@ -20,11 +20,11 @@ import org.springframework.hateoas.RepresentationModel;
 @NoArgsConstructor
 public class SearchInputsViewResource extends RepresentationModel {
 
-    private UISearchInput[] searchInputs;
+    private SearchInputView[] searchInputs;
 
     @Data
     @NoArgsConstructor
-    public static class UISearchInput {
+    public static class SearchInputView {
         private String label;
         private int order;
         private Field field;
@@ -39,14 +39,14 @@ public class SearchInputsViewResource extends RepresentationModel {
     private void copyProperties(SearchInput[] searchInputs) {
         this.searchInputs = Arrays.stream(searchInputs)
             .map(this::buildUISearchInput)
-            .collect(Collectors.toList()).toArray(new UISearchInput[]{});
+            .collect(Collectors.toList()).toArray(new SearchInputView[]{});
     }
 
-    private UISearchInput buildUISearchInput(SearchInput searchInput) {
-        UISearchInput uiSearchInput = new UISearchInput();
-        uiSearchInput.setField(searchInput.getField());
-        uiSearchInput.setLabel(searchInput.getLabel());
-        uiSearchInput.setOrder(searchInput.getOrder());
-        return uiSearchInput;
+    private SearchInputView buildUISearchInput(SearchInput searchInput) {
+        SearchInputView searchInputView = new SearchInputView();
+        searchInputView.setField(searchInput.getField());
+        searchInputView.setLabel(searchInput.getLabel());
+        searchInputView.setOrder(searchInput.getOrder());
+        return searchInputView;
     }
 }

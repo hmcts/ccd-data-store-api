@@ -21,13 +21,13 @@ public class WorkbasketInputsViewResource extends RepresentationModel {
 
     @Data
     @NoArgsConstructor
-    public static class UIWorkbasketInput {
+    public static class WorkbasketInputView {
         private String label;
         private int order;
         private Field field;
     }
 
-    private UIWorkbasketInput[] workbasketInputs;
+    private WorkbasketInputView[] workbasketInputs;
 
     public WorkbasketInputsViewResource(WorkbasketInput[] workbasketInputs, String caseTypeId) {
         copyProperties(workbasketInputs);
@@ -38,14 +38,14 @@ public class WorkbasketInputsViewResource extends RepresentationModel {
     private void copyProperties(WorkbasketInput[] workbasketInputs) {
         this.workbasketInputs = Arrays.stream(workbasketInputs)
             .map(this::buildUIWorkbasketInput)
-            .collect(Collectors.toList()).toArray(new UIWorkbasketInput[]{});
+            .collect(Collectors.toList()).toArray(new WorkbasketInputView[]{});
     }
 
-    private UIWorkbasketInput buildUIWorkbasketInput(WorkbasketInput workbasketInput) {
-        UIWorkbasketInput uiWorkbasketInput = new UIWorkbasketInput();
-        uiWorkbasketInput.setField(workbasketInput.getField());
-        uiWorkbasketInput.setLabel(workbasketInput.getLabel());
-        uiWorkbasketInput.setOrder(workbasketInput.getOrder());
-        return uiWorkbasketInput;
+    private WorkbasketInputView buildUIWorkbasketInput(WorkbasketInput workbasketInput) {
+        WorkbasketInputView workbasketInputView = new WorkbasketInputView();
+        workbasketInputView.setField(workbasketInput.getField());
+        workbasketInputView.setLabel(workbasketInput.getLabel());
+        workbasketInputView.setOrder(workbasketInput.getOrder());
+        return workbasketInputView;
     }
 }
