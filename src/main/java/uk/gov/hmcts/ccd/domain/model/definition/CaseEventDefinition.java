@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ToString
-public class CaseEvent implements Serializable {
+public class CaseEventDefinition implements Serializable {
 
     private String id = null;
     private String name = null;
