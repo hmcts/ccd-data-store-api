@@ -66,9 +66,9 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
 
     @Override
     @Cacheable("wizardPageCollectionCache")
-    public List<WizardPage> getWizardPageCollection(final int version, final String caseTypeId, final String eventTriggerId) {
-        LOG.debug("remote retrieving version {} of wizard page collection for {} - {}", version, caseTypeId, eventTriggerId);
-        return httpUiDefinitionGateway.getWizardPageCollection(version, caseTypeId, eventTriggerId);
+    public List<WizardPage> getWizardPageCollection(final int version, final String caseTypeId, final String eventId) {
+        LOG.debug("remote retrieving version {} of wizard page collection for {} - {}", version, caseTypeId, eventId);
+        return httpUiDefinitionGateway.getWizardPageCollection(version, caseTypeId, eventId);
     }
 
     @Override

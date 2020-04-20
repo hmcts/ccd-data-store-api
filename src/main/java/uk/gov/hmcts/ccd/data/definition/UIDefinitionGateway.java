@@ -21,7 +21,7 @@ public interface UIDefinitionGateway {
 
     CaseTypeTabsDefinition getCaseTabCollection(int version, String caseTypeId);
 
-    List<WizardPage> getWizardPageCollection(int version, String caseTypeId, String eventTriggerId);
+    List<WizardPage> getWizardPageCollection(int version, String caseTypeId, String eventId);
 
     BannersResult getBanners(final List<String> jurisdictionIds);
 

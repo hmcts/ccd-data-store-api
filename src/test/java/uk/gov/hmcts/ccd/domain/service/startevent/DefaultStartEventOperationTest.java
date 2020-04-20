@@ -108,7 +108,7 @@ public class DefaultStartEventOperationTest {
         .build();
     private final CaseDraft caseDraft = newCaseDraft()
         .withCaseTypeId(TEST_CASE_TYPE_ID)
-        .withEventTriggerId(TEST_EVENT_TRIGGER_ID)
+        .withEventId(TEST_EVENT_TRIGGER_ID)
         .withJurisdictionId(TEST_JURISDICTION_ID)
         .withCaseDataContent(caseDataContent)
         .build();

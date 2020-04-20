@@ -42,28 +42,28 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     }
 
     @Override
-    public CaseUpdateViewEvent executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
+    public CaseUpdateViewEvent executeForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
         StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCaseType(caseTypeId,
-                                                                                          eventTriggerId,
+                                                                                          eventId,
                                                                                           ignoreWarning);
         return caseUpdateViewEventBuilder.build(startEventTrigger,
                                              caseTypeId,
-                                             eventTriggerId,
+                                             eventId,
                                              null);
     }
 
     @Override
     public CaseUpdateViewEvent executeForCase(String caseReference,
-                                              String eventTriggerId,
+                                              String eventId,
                                               Boolean ignoreWarning) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
 
         StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCase(caseReference,
-                                                                                      eventTriggerId,
+                                                                                      eventId,
                                                                                       ignoreWarning);
         return caseUpdateViewEventBuilder.build(startEventTrigger,
                                              caseDetails.getCaseTypeId(),
-                                             eventTriggerId,
+                                             eventId,
                                              caseReference);
     }
 
@@ -73,12 +73,12 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
 
-        String eventTriggerId = draftResponse.getDocument().getEventTriggerId();
+        String eventId = draftResponse.getDocument().getEventId();
         StartEventTrigger startEventTrigger = startEventOperation.triggerStartForDraft(draftReference,
                                                                                        ignoreWarning);
         return caseUpdateViewEventBuilder.build(startEventTrigger,
                                              caseDetails.getCaseTypeId(),
-                                             eventTriggerId,
+                                             eventId,
                                              draftReference);
     }
 

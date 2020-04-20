@@ -5,11 +5,11 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 public interface GetEventTriggerOperation {
 
     CaseUpdateViewEvent executeForCaseType(String caseTypeId,
-                                           String eventTriggerId,
+                                           String eventId,
                                            Boolean ignoreWarning);
 
     CaseUpdateViewEvent executeForCase(String caseReference,
-                                       String eventTriggerId,
+                                       String eventId,
                                        Boolean ignoreWarning);
 
     CaseUpdateViewEvent executeForDraft(String draftReference,

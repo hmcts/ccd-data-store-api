@@ -103,7 +103,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
     private CaseViewActionableEvent buildResumeTriggerFromDraft(DraftResponse draftResponse) {
         return anCaseViewTrigger()
-            .withId(draftResponse.getDocument().getEventTriggerId())
+            .withId(draftResponse.getDocument().getEventId())
             .withName(RESUME)
             .withDescription(draftResponse.getDocument().getCaseDataContent().getEvent().getDescription())
             .withOrder(1)

@@ -54,7 +54,7 @@ class DefaultGetEventTriggerOperationTest {
     private static final String CASE_TYPE_ID = "Grant";
     private static final Boolean IGNORE = Boolean.TRUE;
     private static final String TOKEN = "testToken";
-    private final DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withEventTriggerId(EVENT_TRIGGER_ID).build()).build();
+    private final DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withEventId(EVENT_TRIGGER_ID).build()).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
     private final CaseEvent caseEvent = new CaseEvent();
     private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();

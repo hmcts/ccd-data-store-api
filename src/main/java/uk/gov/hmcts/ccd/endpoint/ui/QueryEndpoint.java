@@ -239,10 +239,10 @@ public class QueryEndpoint {
     public CaseUpdateViewEvent getEventTriggerForCaseType(@PathVariable("uid") String userId,
                                                           @PathVariable("jid") String jurisdictionId,
                                                           @PathVariable("ctid") String casetTypeId,
-                                                          @PathVariable("etid") String eventTriggerId,
+                                                          @PathVariable("etid") String eventId,
                                                           @RequestParam(value = "ignore-warning",
                                                            required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForCaseType(casetTypeId, eventTriggerId, ignoreWarning);
+        return getEventTriggerOperation.executeForCaseType(casetTypeId, eventId, ignoreWarning);
     }
 
     @Transactional
@@ -257,10 +257,10 @@ public class QueryEndpoint {
                                                       @PathVariable("jid") String jurisdictionId,
                                                       @PathVariable("ctid") String caseTypeId,
                                                       @PathVariable("cid") String caseId,
-                                                      @PathVariable("etid") String eventTriggerId,
+                                                      @PathVariable("etid") String eventId,
                                                       @RequestParam(value = "ignore-warning",
                                                        required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForCase(caseId, eventTriggerId, ignoreWarning);
+        return getEventTriggerOperation.executeForCase(caseId, eventId, ignoreWarning);
     }
 
     @Transactional
@@ -275,7 +275,7 @@ public class QueryEndpoint {
                                                        @PathVariable("jid") String jurisdictionId,
                                                        @PathVariable("ctid") String caseTypeId,
                                                        @PathVariable("did") String draftId,
-                                                       @PathVariable("etid") String eventTriggerId,
+                                                       @PathVariable("etid") String eventId,
                                                        @RequestParam(value = "ignore-warning",
                                                         required = false) Boolean ignoreWarning) {
         return getEventTriggerOperation.executeForDraft(draftId, ignoreWarning);

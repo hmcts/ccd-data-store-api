@@ -142,12 +142,12 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public List<WizardPage> getWizardPageCollection(int version, String caseTypeId, String eventTriggerId) {
+    public List<WizardPage> getWizardPageCollection(int version, String caseTypeId, String eventId) {
         final Instant start = Instant.now();
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
         final WizardPageCollection
                 wpc =
-                restTemplate.exchange(withVersionQueryParam(applicationParams.displayWizardPageCollection(caseTypeId, eventTriggerId), version),
+                restTemplate.exchange(withVersionQueryParam(applicationParams.displayWizardPageCollection(caseTypeId, eventId), version),
                         HttpMethod.GET,
                         requestEntity,
                         WizardPageCollection.class).getBody();

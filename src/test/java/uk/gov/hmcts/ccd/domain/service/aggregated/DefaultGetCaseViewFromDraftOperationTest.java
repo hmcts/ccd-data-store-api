@@ -109,7 +109,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
             .withId(DRAFT_ID)
             .withDocument(newCaseDraft()
                               .withCaseTypeId(CASE_TYPE_ID)
-                              .withEventTriggerId(EVENT_TRIGGER_ID)
+                              .withEventId(EVENT_TRIGGER_ID)
                               .withCaseDataContent(newCaseDataContent()
                                                        .withData(data)
                                                        .withEvent(anEvent()

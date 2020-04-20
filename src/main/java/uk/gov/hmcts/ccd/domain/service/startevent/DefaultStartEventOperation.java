@@ -68,7 +68,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventTrigger triggerStartForCaseType(final String caseTypeId,
-                                                     final String eventTriggerId,
+                                                     final String eventId,
                                                      final Boolean ignoreWarning) {
 
         String uid = userAuthorisation.getUserId();
@@ -77,14 +77,14 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         return buildStartEventTrigger(uid,
             caseTypeDefinition,
-                                      eventTriggerId,
+                                      eventId,
                                       ignoreWarning,
                                       () -> caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), Maps.newHashMap()));
     }
 
     @Override
     public StartEventTrigger triggerStartForCase(final String caseReference,
-                                                 final String eventTriggerId,
+                                                 final String eventId,
                                                  final Boolean ignoreWarning) {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
@@ -93,7 +93,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
 
-        final CaseEvent eventTrigger = getEventTrigger(eventTriggerId, caseTypeDefinition);
+        final CaseEvent eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
@@ -101,7 +101,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseTypeDefinition, caseDetails, ignoreWarning);
 
-        return buildStartEventTrigger(eventTriggerId, eventToken, caseDetails);
+        return buildStartEventTrigger(eventId, eventToken, caseDetails);
 
     }
 
@@ -117,17 +117,17 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         return buildStartEventTrigger(uid,
             caseTypeDefinition,
-                                      draftResponse.getDocument().getEventTriggerId(),
+                                      draftResponse.getDocument().getEventId(),
                                       ignoreWarning,
                                       () -> caseDetails);
     }
 
     private StartEventTrigger buildStartEventTrigger(final String uid,
                                                      final CaseTypeDefinition caseTypeDefinition,
-                                                     final String eventTriggerId,
+                                                     final String eventId,
                                                      final Boolean ignoreWarning,
                                                      final Supplier<CaseDetails> caseDetailsSupplier) {
-        final CaseEvent eventTrigger = getEventTrigger(eventTriggerId, caseTypeDefinition);
+        final CaseEvent eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
 
         final CaseDetails caseDetails = caseDetailsSupplier.get();
 
@@ -138,14 +138,14 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseTypeDefinition, caseDetails, ignoreWarning);
 
-        return buildStartEventTrigger(eventTriggerId, eventToken, caseDetails);
+        return buildStartEventTrigger(eventId, eventToken, caseDetails);
     }
 
-    private StartEventTrigger buildStartEventTrigger(String eventTriggerId, String eventToken, CaseDetails caseDetails) {
+    private StartEventTrigger buildStartEventTrigger(String eventId, String eventToken, CaseDetails caseDetails) {
         final StartEventTrigger startEventTrigger = new StartEventTrigger();
         startEventTrigger.setCaseDetails(caseDetails);
         startEventTrigger.setToken(eventToken);
-        startEventTrigger.setEventId(eventTriggerId);
+        startEventTrigger.setEventId(eventId);
         return startEventTrigger;
     }
 
@@ -158,10 +158,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
             () -> new CaseNotFoundException(caseReference));
     }
 
-    private CaseEvent getEventTrigger(String eventTriggerId, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventTriggerId);
+    private CaseEvent getEventTrigger(String eventId, CaseTypeDefinition caseTypeDefinition) {
+        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
         if (eventTrigger == null) {
-            throw new ResourceNotFoundException("Cannot find event " + eventTriggerId + " for case type " + caseTypeDefinition.getId());
+            throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());
         }
         return eventTrigger;
     }

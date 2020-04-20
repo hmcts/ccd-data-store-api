@@ -84,12 +84,12 @@ class GetUIStartTriggerTest extends BaseTest {
                 .statusCode(404);
         }
 
-        private RequestSpecification callGetStartTrigger(String caseTypeId, String eventTriggerId) {
+        private RequestSpecification callGetStartTrigger(String caseTypeId, String eventId) {
             return asAutoTestCaseworker(FALSE)
                 .get()
                 .given()
                 .pathParam("caseTypeId", caseTypeId)
-                .pathParam("triggerId", eventTriggerId)
+                .pathParam("triggerId", eventId)
                 .accept(V2.MediaType.UI_START_CASE_TRIGGER)
                 .header("experimental", "true");
         }
@@ -177,12 +177,12 @@ class GetUIStartTriggerTest extends BaseTest {
                 .statusCode(404);
         }
 
-        private RequestSpecification callGetStartEventTrigger(String caseId, String eventTriggerId) {
+        private RequestSpecification callGetStartEventTrigger(String caseId, String eventId) {
             return asAutoTestCaseworker(FALSE)
                 .get()
                 .given()
                 .pathParam("caseId", caseId)
-                .pathParam("triggerId", eventTriggerId)
+                .pathParam("triggerId", eventId)
                 .accept(V2.MediaType.UI_START_EVENT_TRIGGER)
                 .header("experimental", "true");
         }

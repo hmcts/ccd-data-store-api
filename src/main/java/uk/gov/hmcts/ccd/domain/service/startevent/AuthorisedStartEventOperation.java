@@ -63,14 +63,14 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
+    public StartEventTrigger triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
         return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForCaseType(caseTypeId,
-                                                                                        eventTriggerId,
+                                                                                        eventId,
                                                                                         ignoreWarning));
     }
 
     @Override
-    public StartEventTrigger triggerStartForCase(String caseReference, String eventTriggerId, Boolean ignoreWarning) {
+    public StartEventTrigger triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
 
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
@@ -78,7 +78,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
         return caseDetailsRepository.findByReference(caseReference)
             .map(caseDetails -> verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForCase(caseReference,
-                                                                                                                      eventTriggerId,
+                                                                                                                      eventId,
                                                                                                                       ignoreWarning)))
             .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }

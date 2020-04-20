@@ -33,19 +33,19 @@ public class CaseUpdateViewEventBuilder {
         this.caseViewFieldBuilder = caseViewFieldBuilder;
     }
 
-    public CaseUpdateViewEvent build(StartEventTrigger startEventTrigger, String caseTypeId, String eventTriggerId, String caseReference) {
+    public CaseUpdateViewEvent build(StartEventTrigger startEventTrigger, String caseTypeId, String eventId, String caseReference) {
         if (startEventTrigger.getCaseDetails() == null) {
             throw new ResourceNotFoundException("Case not found");
         }
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
-        final CaseEvent eventTrigger = getEventTrigger(eventTriggerId, caseTypeDefinition);
+        final CaseEvent eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
         final CaseUpdateViewEvent caseUpdateViewEvent = buildCaseEventTrigger(eventTrigger);
         caseUpdateViewEvent.setCaseId(caseReference);
         caseUpdateViewEvent.setCaseFields(mergeEventFields(startEventTrigger.getCaseDetails(), caseTypeDefinition, eventTrigger));
         caseUpdateViewEvent.setEventToken(startEventTrigger.getToken());
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
-                                                                                                     eventTriggerId);
+                                                                                                     eventId);
         caseUpdateViewEvent.setWizardPages(wizardPageCollection);
         return caseUpdateViewEvent;
     }
@@ -59,11 +59,11 @@ public class CaseUpdateViewEventBuilder {
         return caseTypeDefinition;
     }
 
-    private CaseEvent getEventTrigger(String eventTriggerId, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventTriggerId);
+    private CaseEvent getEventTrigger(String eventId, CaseTypeDefinition caseTypeDefinition) {
+        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
 
         if (null == eventTrigger) {
-            throw new ResourceNotFoundException(eventTriggerId + " is not a known event ID for the specified case type: " + caseTypeDefinition.getId());
+            throw new ResourceNotFoundException(eventId + " is not a known event ID for the specified case type: " + caseTypeDefinition.getId());
         }
         return eventTrigger;
     }

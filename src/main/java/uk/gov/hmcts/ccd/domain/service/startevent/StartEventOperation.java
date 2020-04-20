@@ -4,11 +4,11 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 
 public interface StartEventOperation {
     StartEventTrigger triggerStartForCaseType(String caseTypeId,
-                                              String eventTriggerId,
+                                              String eventId,
                                               Boolean ignoreWarning);
 
     StartEventTrigger triggerStartForCase(String caseReference,
-                                          String eventTriggerId,
+                                          String eventId,
                                           Boolean ignoreWarning);
 
     StartEventTrigger triggerStartForDraft(String draftReference,

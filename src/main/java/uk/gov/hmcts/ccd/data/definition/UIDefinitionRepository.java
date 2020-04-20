@@ -43,9 +43,9 @@ public class UIDefinitionRepository {
         return cachedUiDefinitionGateway.getSearchInputDefinitions(version.getVersion(), caseTypeId);
     }
 
-    public List<WizardPage> getWizardPageCollection(final String caseTypeId, final String eventTriggerId) {
+    public List<WizardPage> getWizardPageCollection(final String caseTypeId, final String eventId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getWizardPageCollection(version.getVersion(), caseTypeId, eventTriggerId);
+        return cachedUiDefinitionGateway.getWizardPageCollection(version.getVersion(), caseTypeId, eventId);
     }
 
     public WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(final String caseTypeId) {

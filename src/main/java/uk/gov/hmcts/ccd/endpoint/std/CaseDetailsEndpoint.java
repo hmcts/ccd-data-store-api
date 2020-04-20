@@ -170,11 +170,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @ApiParam(value = "Event ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCase(caseId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
     }
 
     @Transactional
@@ -195,11 +195,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @ApiParam(value = "Event ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCase(caseId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
     }
 
     @Transactional
@@ -217,11 +217,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Event ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCaseType(caseTypeId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
     @Transactional
@@ -239,11 +239,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Event ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCaseType(caseTypeId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")

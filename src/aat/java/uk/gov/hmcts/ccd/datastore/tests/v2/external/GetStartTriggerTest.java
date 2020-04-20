@@ -215,22 +215,22 @@ class GetStartTriggerTest extends BaseTest {
         }
     }
 
-    private RequestSpecification callGetStartCaseTrigger(String caseTypeId, String eventTriggerId) {
+    private RequestSpecification callGetStartCaseTrigger(String caseTypeId, String eventId) {
         return asAutoTestCaseworker(FALSE)
             .get()
             .given()
             .pathParam("caseTypeId", caseTypeId)
-            .pathParam("triggerId", eventTriggerId)
+            .pathParam("triggerId", eventId)
             .accept(V2.MediaType.START_CASE_TRIGGER)
             .header("experimental", "true");
     }
 
-    private RequestSpecification callGetStartEventTrigger(String caseId, String eventTriggerId) {
+    private RequestSpecification callGetStartEventTrigger(String caseId, String eventId) {
         return asAutoTestCaseworker(FALSE)
             .get()
             .given()
             .pathParam("caseId", caseId)
-            .pathParam("triggerId", eventTriggerId)
+            .pathParam("triggerId", eventId)
             .accept(V2.MediaType.START_EVENT_TRIGGER)
             .header("experimental", "true");
     }

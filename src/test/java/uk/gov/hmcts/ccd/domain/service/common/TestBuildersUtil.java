@@ -275,8 +275,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseDraftBuilder withEventTriggerId(String eventTriggerId) {
-            this.caseDraft.setEventTriggerId(eventTriggerId);
+        public CaseDraftBuilder withEventId(String eventId) {
+            this.caseDraft.setEventId(eventId);
             return this;
         }
 

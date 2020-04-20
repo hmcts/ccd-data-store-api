@@ -80,7 +80,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
 
     private CreateCaseDraftRequest buildCreateCaseDraft(String uid,
                                                         CaseTypeDefinition caseTypeDefinition,
-                                                        String eventTriggerId,
+                                                        String eventId,
                                                         CaseDataContent caseDataContent) {
         caseDataContent.setData(caseSanitiser.sanitise(caseTypeDefinition, caseDataContent.getData()));
 
@@ -88,7 +88,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
         caseDraft.setUserId(uid);
         caseDraft.setJurisdictionId(caseTypeDefinition.getJurisdictionId());
         caseDraft.setCaseTypeId(caseTypeDefinition.getId());
-        caseDraft.setEventTriggerId(eventTriggerId);
+        caseDraft.setEventId(eventId);
         caseDraft.setCaseDataContent(caseDataContent);
 
         final CreateCaseDraftRequest createCaseDraftRequest = new CreateCaseDraftRequest();
@@ -100,7 +100,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
 
     private UpdateCaseDraftRequest buildUpdateCaseDraft(String uid,
                                                         CaseTypeDefinition caseTypeDefinition,
-                                                        String eventTriggerId,
+                                                        String eventId,
                                                         CaseDataContent caseDataContent) {
         caseDataContent.setData(caseSanitiser.sanitise(caseTypeDefinition, caseDataContent.getData()));
 
@@ -108,7 +108,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
         caseDraft.setUserId(uid);
         caseDraft.setJurisdictionId(caseTypeDefinition.getJurisdictionId());
         caseDraft.setCaseTypeId(caseTypeDefinition.getId());
-        caseDraft.setEventTriggerId(eventTriggerId);
+        caseDraft.setEventId(eventId);
         caseDraft.setCaseDataContent(caseDataContent);
 
         final UpdateCaseDraftRequest updateCaseDraftRequest = new UpdateCaseDraftRequest();
