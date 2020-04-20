@@ -41,6 +41,7 @@ public class AuditAspect {
             String jurisdiction =  getValue(joinPoint, logAudit.jurisdiction(), result, String.class);
             String eventName =  getValue(joinPoint, logAudit.eventName(), result, String.class);
             String targetIdamId =  getValue(joinPoint, logAudit.targetIdamId(), result, String.class);
+            String caseTypeIds =  getValue(joinPoint, logAudit.caseTypeIds(), result, String.class);
             List<String> targetCaseRoles =  getValue(joinPoint, logAudit.targetCaseRoles(), result, List.class);
 
             AuditContextHolder.setAuditContext(AuditContext.auditContextWith()
@@ -50,6 +51,7 @@ public class AuditAspect {
                 .jurisdiction(jurisdiction)
                 .eventName(eventName)
                 .targetIdamId(targetIdamId)
+                .caseTypeIds(caseTypeIds)
                 .targetCaseRoles(targetCaseRoles)
                 .build());
         }

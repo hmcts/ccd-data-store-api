@@ -19,6 +19,7 @@ public class AuditEntry {
     private String idamId;
     private String caseId;
     private String caseType;
+    private String caseTypeIds;
     private String jurisdiction;
     private String eventSelected;
     private String invokingService;
@@ -111,6 +112,14 @@ public class AuditEntry {
         this.caseType = caseType;
     }
 
+    public String getCaseTypeIds() {
+        return caseTypeIds;
+    }
+
+    public void setCaseTypeIds(String caseTypeIds) {
+        this.caseTypeIds = caseTypeIds;
+    }
+
     public String getEventSelected() {
         return eventSelected;
     }
@@ -152,6 +161,7 @@ public class AuditEntry {
             (isNotBlank(path) ? ", endpointCalled:" + httpMethod + " " + path : "") +
             ", operationOutcome:" + httpStatus +
             (isNotBlank(caseType) ? ", caseType:" + caseType : "") +
+            (isNotBlank(caseTypeIds) ? ", caseTypeIds:" + caseTypeIds : "") +
             (isNotBlank(jurisdiction) ? ", jurisdiction:" + jurisdiction : "") +
             (isNotBlank(eventSelected) ? ", eventSelected:" + eventSelected : "") +
            (isNotBlank(targetIdamId) ? ", idamIdOfTarget:" + targetIdamId : "") +

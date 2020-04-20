@@ -32,7 +32,8 @@ public class CallbackEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Printable documents list retrieved")
     })
-    @LogAudit(operationType = OperationType.SEARCH_CASE)
+    @LogAudit(operationType = OperationType.VIEW_CASE, caseId = "#caseDetails.reference", caseType = "#caseTypeId",
+        jurisdiction = "#jurisdictionId")
     public List<Document> getPrintableDocuments(
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,

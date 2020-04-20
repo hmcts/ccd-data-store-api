@@ -50,6 +50,7 @@ public class AuditService {
             entry.setCaseType(auditContext.getCaseType());
             entry.setEventSelected(auditContext.getEventName());
             entry.setTargetIdamId(auditContext.getTargetIdamId());
+            entry.setCaseTypeIds(auditContext.getCaseTypeIds());
             entry.setTargetCaseRoles(auditContext.getTargetCaseRoles());
         }
 

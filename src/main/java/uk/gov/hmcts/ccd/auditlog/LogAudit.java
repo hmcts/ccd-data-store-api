@@ -24,6 +24,9 @@ public @interface LogAudit {
 
     String targetIdamId() default "";
 
+    // for search cases
+    String caseTypeIds() default "";
+
     String targetCaseRoles() default "";
 
 }

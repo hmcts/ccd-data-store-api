@@ -7,61 +7,23 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
-import uk.gov.hmcts.ccd.domain.model.aggregated.DefaultSettings;
-import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
-import uk.gov.hmcts.ccd.domain.model.aggregated.User;
-import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
-import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
+import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.Banner;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
-import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
-import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
-import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.function.Consumer;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
@@ -357,6 +319,11 @@ public class TestBuildersUtil {
 
         public CaseDetailsBuilder() {
             caseDetails = new CaseDetails();
+        }
+
+        public CaseDetailsBuilder withReference(Long reference) {
+            caseDetails.setReference(reference);
+            return this;
         }
 
         public CaseDetailsBuilder withSecurityClassification(SecurityClassification securityClassification) {
