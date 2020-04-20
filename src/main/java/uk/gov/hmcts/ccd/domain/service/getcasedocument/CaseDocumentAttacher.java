@@ -140,7 +140,7 @@ public class CaseDocumentAttacher {
 
     public void extractDocumentsAfterCallback(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
-            if (jsonNode != null && isDocumentField(jsonNode)) {
+            if (jsonNode != null && isDocumentField(jsonNode) && jsonNode.get(HASH_TOKEN_STRING) != null) {
 
                 String documentId = extractDocumentId(jsonNode);
                 documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
@@ -150,7 +150,8 @@ public class CaseDocumentAttacher {
 
             } else {
                 jsonNode.fields().forEachRemaining(node -> extractDocumentsAfterCallback(caseDocumentsMetadata,
-                                                           Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+                                                                                         Collections.singletonMap(node.getKey(), node.getValue()),
+                                                                                         documentMap));
             }
         });
 

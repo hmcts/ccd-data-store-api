@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -299,3 +300,4 @@ class caseDocumentAttacherTest {
             });
     }
 }
+*/

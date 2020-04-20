@@ -267,8 +267,12 @@ class SubmitCaseTransactionTest {
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseDocumentAttacher , times(1)).extractDocumentsWithHashTokenBeforeCallback(dataMap);
-        verify(caseDocumentAttacher , times(1)).restCallToAttachCaseDocuments();
+
+        verify(restTemplate , times(1)).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
 
     }
 
@@ -302,9 +306,11 @@ class SubmitCaseTransactionTest {
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseDocumentAttacher , times(1)).extractDocumentsWithHashTokenBeforeCallback(dataMap);
-        verify(caseDocumentAttacher , times(1)).restCallToAttachCaseDocuments();
-
+        verify(restTemplate , times(1)).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
     }
 
     @Test
@@ -331,9 +337,11 @@ class SubmitCaseTransactionTest {
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseDocumentAttacher , times(0)).extractDocumentsWithHashTokenBeforeCallback(dataMap);
-        verify(caseDocumentAttacher , times(0)).restCallToAttachCaseDocuments();
-
+        verify(restTemplate , times(0)).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
     }
 
     @Test
