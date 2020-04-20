@@ -143,7 +143,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
         assertThat(captor.getValue().getHttpStatus(), is(200));
-        assertThat(captor.getValue().getCaseTypeIds(), is("TestAddressBookCase,TestAddressBookCase4"));
+        assertThat(captor.getValue().getListOfCaseTypes(), is("TestAddressBookCase,TestAddressBookCase4"));
     }
 
     private String createCaseDetailsElastic(String reference) {

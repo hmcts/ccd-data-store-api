@@ -19,7 +19,7 @@ public class AuditEntry {
     private String idamId;
     private String caseId;
     private String caseType;
-    private String caseTypeIds;
+    private String listOfCaseTypes;
     private String jurisdiction;
     private String eventSelected;
     private String invokingService;
@@ -112,12 +112,12 @@ public class AuditEntry {
         this.caseType = caseType;
     }
 
-    public String getCaseTypeIds() {
-        return caseTypeIds;
+    public String getListOfCaseTypes() {
+        return listOfCaseTypes;
     }
 
-    public void setCaseTypeIds(String caseTypeIds) {
-        this.caseTypeIds = caseTypeIds;
+    public void setListOfCaseTypes(String listOfCaseTypes) {
+        this.listOfCaseTypes = listOfCaseTypes;
     }
 
     public String getEventSelected() {
@@ -161,11 +161,10 @@ public class AuditEntry {
             (isNotBlank(path) ? ", endpointCalled:" + httpMethod + " " + path : "") +
             ", operationOutcome:" + httpStatus +
             (isNotBlank(caseType) ? ", caseType:" + caseType : "") +
-            (isNotBlank(caseTypeIds) ? ", caseTypeIds:" + caseTypeIds : "") +
             (isNotBlank(jurisdiction) ? ", jurisdiction:" + jurisdiction : "") +
             (isNotBlank(eventSelected) ? ", eventSelected:" + eventSelected : "") +
            (isNotBlank(targetIdamId) ? ", idamIdOfTarget:" + targetIdamId : "") +
-//            (isNotBlank(listOfCaseTypes) ? ", listOfCaseTypes:" + listOfCaseTypes : "") +
+            (isNotBlank(listOfCaseTypes) ? ", listOfCaseTypes:" + listOfCaseTypes : "") +
             (targetCaseRoles != null && !targetCaseRoles.isEmpty() ? ", targetCaseRoles:" +
                 targetCaseRoles.stream().map(String::toString).collect(Collectors.joining(",")) : "") +
             (isNotBlank(requestId) ? ", X-Request-ID:" + requestId : "") +
