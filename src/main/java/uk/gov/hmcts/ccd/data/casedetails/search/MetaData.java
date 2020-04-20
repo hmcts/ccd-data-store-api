@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
 import com.google.common.base.CaseFormat;
+import com.google.common.collect.ImmutableList;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -22,7 +23,7 @@ public class MetaData {
 
     public static final String PAGE_PARAM = "page";
     public static final String SORT_PARAM = "sortDirection";
-    public static final List<CaseField> DATE_FIELDS = newArrayList(
+    public static final ImmutableList<CaseField> DATE_FIELDS = ImmutableList.of(
         CREATED_DATE,
         LAST_MODIFIED_DATE,
         LAST_STATE_MODIFIED_DATE
