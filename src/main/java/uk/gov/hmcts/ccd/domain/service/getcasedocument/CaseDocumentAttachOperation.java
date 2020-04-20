@@ -88,6 +88,7 @@ public class CaseDocumentAttachOperation {
         afterCallbackPrepareDocumentMetaData(caseDetails, isCallbackResponseValid);
         filterDocumentFields();
     }
+
     public void filterDocumentFields() {
         filterDocumentFields(caseDocumentsMetadata, documentTokenMap, documentAfterCallback);
     }
