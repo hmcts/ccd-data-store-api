@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.CaseDetails;
 
 import java.util.ArrayList;
 import java.util.HashMap;

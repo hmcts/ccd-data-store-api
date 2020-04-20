@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
-import uk.gov.hmcts.ccd.domain.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;

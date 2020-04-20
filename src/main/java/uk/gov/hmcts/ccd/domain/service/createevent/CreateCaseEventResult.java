@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import uk.gov.hmcts.ccd.domain.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 
 @Getter

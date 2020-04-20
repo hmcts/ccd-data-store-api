@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain;
+package uk.gov.hmcts.ccd.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;

@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import uk.gov.hmcts.ccd.domain.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.CaseDetails;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;

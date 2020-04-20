@@ -1,12 +1,11 @@
-package uk.gov.hmcts.ccd.domain;
-
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+package uk.gov.hmcts.ccd.domain.model;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 
-import static uk.gov.hmcts.ccd.domain.CaseDetails.DRAFT_ID;
+import static uk.gov.hmcts.ccd.domain.model.CaseDetails.DRAFT_ID;
 
 @Named
 @Singleton

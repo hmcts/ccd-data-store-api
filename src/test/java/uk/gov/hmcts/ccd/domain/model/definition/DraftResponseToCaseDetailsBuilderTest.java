@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.CaseDetails;
-import uk.gov.hmcts.ccd.domain.DraftResponseToCaseDetailsBuilder;
+import uk.gov.hmcts.ccd.domain.model.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.callbacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.gov.hmcts.ccd.domain.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.CaseDetails;
 
 public class CallbackRequest {
 

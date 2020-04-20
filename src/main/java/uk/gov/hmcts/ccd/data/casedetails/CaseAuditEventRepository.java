@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.ccd.domain.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 
-import uk.gov.hmcts.ccd.domain.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.CaseDetails;
 
 public class CaseSearchResult {
 
