@@ -11,7 +11,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.Arrays;
 import java.util.HashMap;

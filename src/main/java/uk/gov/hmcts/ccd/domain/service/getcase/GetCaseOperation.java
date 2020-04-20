@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
-import uk.gov.hmcts.ccd.domain.model.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.Optional;
 

@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.hmcts.ccd.domain.model.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
