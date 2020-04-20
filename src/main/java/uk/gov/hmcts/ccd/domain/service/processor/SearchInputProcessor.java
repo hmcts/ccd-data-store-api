@@ -63,8 +63,18 @@ public class SearchInputProcessor {
             .filter(i -> i.getField().isMetadata() && !Strings.isNullOrEmpty(i.getDisplayContextParameter()))
             .forEach(input -> {
                 final String id = input.getField().getId();
-                final MetaData.CaseField field = MetaData.CaseField.valueOfReference(id);
-                if (MetaData.DATE_FIELDS.contains(field) && metadata.getOptionalMetadata(field).isPresent()) {
+                MetaData.CaseField field;
+                try {
+                    field = MetaData.CaseField.valueOfReference(id);
+                } catch (IllegalArgumentException ex) {
+                    throw new DataProcessingException().withDetails(
+                        String.format("Unable to process unknown metadata field %s.", id)
+                    );
+                }
+                if (DisplayContextParameter
+                        .hasDisplayContextParameterType(input.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
+                    && MetaData.DATE_FIELDS.contains(field)
+                    && metadata.getOptionalMetadata(field).isPresent()) {
                     metadata.setOptionalMetadata(field,
                         processValue(id, input.getDisplayContextParameter(),
                             metadata.getOptionalMetadata(field).get(), input.getField().getType()));
