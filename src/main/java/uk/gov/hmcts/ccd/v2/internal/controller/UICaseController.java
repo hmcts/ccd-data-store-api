@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
 
 @RestController
@@ -59,7 +59,7 @@ public class UICaseController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UICaseViewResource.class
+            response = CaseViewResource.class
         ),
         @ApiResponse(
             code = 400,
@@ -70,14 +70,14 @@ public class UICaseController {
             message = "Case not found"
         )
     })
-    public ResponseEntity<UICaseViewResource> getCase(@PathVariable("caseId") String caseId) {
+    public ResponseEntity<CaseViewResource> getCaseVieew(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
 
         final CaseView caseView = getCaseViewOperation.execute(caseId);
 
-        return ResponseEntity.ok(new UICaseViewResource(caseView));
+        return ResponseEntity.ok(new CaseViewResource(caseView));
     }
 
     @GetMapping(

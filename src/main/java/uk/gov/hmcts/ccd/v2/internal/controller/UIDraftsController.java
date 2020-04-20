@@ -25,7 +25,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOpe
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIDraftResource;
 
 @RestController
@@ -116,12 +116,12 @@ public class UIDraftsController {
         @ApiResponse(code = 200, message = "A displayable draft"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
-    public ResponseEntity<UICaseViewResource> findDraft(@PathVariable("did") final String did) {
+    public ResponseEntity<CaseViewResource> findDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
         CaseView caseView = getDraftViewOperation.execute(did);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("findDraft has been completed in {} millisecs...", between.toMillis());
-        return ResponseEntity.ok(new UICaseViewResource(caseView));
+        return ResponseEntity.ok(new CaseViewResource(caseView));
     }
 
     @Transactional

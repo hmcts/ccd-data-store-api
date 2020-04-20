@@ -17,7 +17,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UICaseViewResource extends RepresentationModel {
+public class CaseViewResource extends RepresentationModel {
 
     @JsonProperty("case_id")
     private String reference;
@@ -40,10 +40,10 @@ public class UICaseViewResource extends RepresentationModel {
     @JsonProperty("events")
     private CaseViewEvent[] events;
 
-    public UICaseViewResource(@NonNull CaseView caseView) {
+    public CaseViewResource(@NonNull CaseView caseView) {
         copyProperties(caseView);
 
-        add(linkTo(methodOn(UICaseController.class).getCase(reference)).withSelfRel());
+        add(linkTo(methodOn(UICaseController.class).getCaseVieew(reference)).withSelfRel());
     }
 
     private void copyProperties(CaseView caseView) {

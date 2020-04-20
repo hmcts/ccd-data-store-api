@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("UICaseViewResource")
-class UICaseViewResourceTest {
+class CaseViewResourceTest {
     private static final String REFERENCE = "1234123412341238";
     private static final String LINK_SELF = String.format("/internal/cases/%s", REFERENCE);
 
@@ -48,7 +48,7 @@ class UICaseViewResourceTest {
     @Test
     @DisplayName("should copy case view")
     void shouldCopyCaseView() {
-        final UICaseViewResource resource = new UICaseViewResource(caseView);
+        final CaseViewResource resource = new CaseViewResource(caseView);
 
         assertAll(
             () -> assertThat(resource.getReference(), equalTo(REFERENCE)),
@@ -64,7 +64,7 @@ class UICaseViewResourceTest {
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final UICaseViewResource resource = new UICaseViewResource(caseView);
+        final CaseViewResource resource = new CaseViewResource(caseView);
 
         Optional<Link> self = resource.getLink("self");
         assertThat(self.get().getHref(), equalTo(LINK_SELF));
