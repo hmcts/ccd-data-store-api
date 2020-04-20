@@ -40,8 +40,7 @@ public class ExpressionEvaluator extends CachedExpressionEvaluator {
         AnnotatedElementKey methodKey = new AnnotatedElementKey(method, targetClass);
         Method targetMethod = this.targetMethodCache.get(methodKey);
         if (targetMethod == null) {
-            Method mostSpecificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
-            targetMethod = mostSpecificMethod != null ? mostSpecificMethod : method;
+            targetMethod = AopUtils.getMostSpecificMethod(method, targetClass);
             this.targetMethodCache.put(methodKey, targetMethod);
         }
         return targetMethod;
