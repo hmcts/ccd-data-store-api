@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.v2.internal.controller.UICaseController;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIEventViewResource extends RepresentationModel {
+public class CaseHistoryViewResource extends RepresentationModel {
 
     @JsonProperty("case_id")
     private String caseId;
@@ -28,10 +28,10 @@ public class UIEventViewResource extends RepresentationModel {
     @JsonProperty("event")
     private CaseViewEvent event;
 
-    public UIEventViewResource(@NonNull CaseHistoryView caseHistoryView, String caseId) {
+    public CaseHistoryViewResource(@NonNull CaseHistoryView caseHistoryView, String caseId) {
         copyProperties(caseHistoryView);
 
-        add(linkTo(methodOn(UICaseController.class).getCaseEvent(caseId, caseHistoryView.getEventId().toString())).withSelfRel());
+        add(linkTo(methodOn(UICaseController.class).getCaseHistoryView(caseId, caseHistoryView.getEventId().toString())).withSelfRel());
     }
 
     private void copyProperties(CaseHistoryView caseViewEvent) {

@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 
-class UIEventViewResourceTest {
+class CaseHistoryViewResourceTest {
 
     private static final String REFERENCE = "1234123412341238";
     private static final Long EVENT_ID = 100L;
@@ -45,7 +45,7 @@ class UIEventViewResourceTest {
     @Test
     @DisplayName("should copy case view")
     void shouldCopyCaseView() {
-        final UIEventViewResource resource = new UIEventViewResource(caseHistoryView, REFERENCE);
+        final CaseHistoryViewResource resource = new CaseHistoryViewResource(caseHistoryView, REFERENCE);
 
         assertAll(
             () -> assertThat(resource.getCaseId(), equalTo(REFERENCE)),
@@ -59,7 +59,7 @@ class UIEventViewResourceTest {
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final UIEventViewResource resource = new UIEventViewResource(caseHistoryView, REFERENCE);
+        final CaseHistoryViewResource resource = new CaseHistoryViewResource(caseHistoryView, REFERENCE);
 
         Optional<Link> self = resource.getLink("self");
         assertThat(self.get().getHref(), equalTo(LINK_SELF));

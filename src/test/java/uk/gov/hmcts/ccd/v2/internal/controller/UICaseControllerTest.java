@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -108,7 +108,7 @@ class UICaseControllerTest {
         @Test
         @DisplayName("should return 200 when event found")
         void caseFound() {
-            final ResponseEntity<UIEventViewResource> response = caseController.getCaseEvent(CASE_REFERENCE, EVENT_ID.toString());
+            final ResponseEntity<CaseHistoryViewResource> response = caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString());
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -123,7 +123,7 @@ class UICaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                () -> caseController.getCaseEvent(CASE_REFERENCE, EVENT_ID.toString()));
+                () -> caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString()));
         }
 
         @Test
@@ -132,7 +132,7 @@ class UICaseControllerTest {
             when(getCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class,
-                () -> caseController.getCaseEvent(CASE_REFERENCE, EVENT_ID.toString()));
+                () -> caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString()));
         }
     }
 

@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
 
 @RestController
 @RequestMapping(path = "/internal/cases")
@@ -97,7 +97,7 @@ public class UICaseController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIEventViewResource.class
+            response = CaseHistoryViewResource.class
         ),
         @ApiResponse(
             code = 400,
@@ -108,13 +108,13 @@ public class UICaseController {
             message = "Case event not found"
         )
     })
-    public ResponseEntity<UIEventViewResource> getCaseEvent(@PathVariable("caseId") String caseId, @PathVariable("eventId") String eventId) {
+    public ResponseEntity<CaseHistoryViewResource> getCaseHistoryView(@PathVariable("caseId") String caseId, @PathVariable("eventId") String eventId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
 
         final CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseId, Long.valueOf(eventId));
 
-        return ResponseEntity.ok(new UIEventViewResource(caseHistoryView, caseId));
+        return ResponseEntity.ok(new CaseHistoryViewResource(caseHistoryView, caseId));
     }
 }
