@@ -3,6 +3,9 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -25,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
@@ -38,8 +42,10 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -49,10 +55,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.v2.V2;
 
 @Service
 public class CreateCaseEventService {
 
+    private HttpServletRequest request;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private final UserRepository userRepository;
@@ -71,9 +79,15 @@ public class CreateCaseEventService {
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
     private final Clock clock;
+    public static final String CONTENT_TYPE = "content-type";
+    private final RestTemplate restTemplate;
+    private final ApplicationParams applicationParams;
+    private final SecurityUtils securityUtils;
+   // private final CaseDocumentAttachOperation  caseDocumentAttachOperation;
 
     @Inject
-    public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+    public CreateCaseEventService(HttpServletRequest request,
+                                  @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
@@ -88,7 +102,12 @@ public class CreateCaseEventService {
                                   final SecurityClassificationService securityClassificationService,
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
-                                  @Qualifier("utcClock") final Clock clock) {
+                                  @Qualifier("utcClock") final Clock clock,
+                                  @Qualifier("restTemplate") final RestTemplate restTemplate,
+                                  ApplicationParams applicationParams,
+                                  SecurityUtils securityUtils
+                                  ) {
+        this.request = request;
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -105,6 +124,9 @@ public class CreateCaseEventService {
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.userAuthorisation = userAuthorisation;
         this.clock = clock;
+        this.restTemplate = restTemplate;
+        this.applicationParams = applicationParams;
+        this.securityUtils = securityUtils;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -120,21 +142,46 @@ public class CreateCaseEventService {
         eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
 
         validatePreState(caseDetails, eventTrigger);
+
+        // Logic start from here to attach document with case ID
+        boolean isApiVersion21 = request.getContentType() != null
+            && request.getContentType().equals(V2.MediaType.CREATE_EVENT_2_1);
+
+        CaseDocumentAttacher caseDocumentAttacher =null;
+        if (isApiVersion21) {
+            caseDocumentAttacher  = new CaseDocumentAttacher(restTemplate,applicationParams,securityUtils);
+            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(content.getData());
+        }
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
+
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
             caseDetailsBefore,
             caseDetails,
             caseType,
             content.getIgnoreWarning());
 
+
         final Optional<String>
             newState = aboutToSubmitCallbackResponse.getState();
 
         validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
         LocalDateTime timeNow = now();
+
+        if (isApiVersion21) {
+
+            caseDocumentAttacher.caseDocumentAttacherOperations(caseDetails, caseDetailsBefore,content.getEvent().getEventId(),newState.isPresent());
+
+        }
+
+
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, eventTrigger, newState, timeNow);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType, timeNow);
 
+
+        if (isApiVersion21) {
+            //rest api call
+            caseDocumentAttacher.restCallToAttachCaseDocuments();
+        }
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
             .savedCaseDetails(savedCaseDetails)
@@ -192,8 +239,11 @@ public class CreateCaseEventService {
                                                  final CaseDetails caseDetails,
                                                  final CaseEvent caseEvent,
                                                  final CaseType caseType) {
+
         if (null != data) {
+
             final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseType, data);
+
             for (Map.Entry<String, JsonNode> field : sanitisedData.entrySet()) {
                 caseDetails.getData().put(field.getKey(), field.getValue());
             }

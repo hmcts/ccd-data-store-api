@@ -64,7 +64,7 @@ public class CaseDocumentAttachOperation {
     }
 
     public void afterCallbackPrepareDocumentMetaData(CaseDetails caseDetails, boolean callbackWasCalled) {
-        try {
+
             documentAfterCallback = new HashMap<>();
             caseDocumentsMetadata = CaseDocumentsMetadata.builder()
                                                          .caseId(caseDetails.getReference().toString())
@@ -78,19 +78,6 @@ public class CaseDocumentAttachOperation {
             {
                 extractDocumentFieldsAfterCallback(caseDocumentsMetadata, caseDetails.getData(), documentAfterCallback);
             }
-        } catch (Exception e) {
-            LOG.error(CASE_DATA_PARSING_EXCEPTION);
-            throw new DataParsingException(CASE_DATA_PARSING_EXCEPTION);
-        }
-    }
-
-    public void attachDocumentDuringCaseCreation(CaseDetails caseDetails, boolean isCallbackResponseValid) {
-        afterCallbackPrepareDocumentMetaData(caseDetails, isCallbackResponseValid);
-        filterDocumentFields();
-    }
-
-    public void filterDocumentFields() {
-        filterDocumentFields(caseDocumentsMetadata, documentTokenMap, documentAfterCallback);
     }
 
     public void restCallToAttachCaseDocuments() {
@@ -138,9 +125,6 @@ public class CaseDocumentAttachOperation {
 
     public void extractDocumentFieldsAfterCallback(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
-            //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
-            //This quick check will reduce the processing time as most of filtering will be done at top level.
-            //****** Every document should have hashcode, else throw error
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 if (jsonNode.get(HASH_TOKEN_STRING) == null) {
                     throw new BadRequestException("The document does not has the hashcode");

@@ -45,17 +45,13 @@
     "ComplexNestedField" : {
       "NestedNumberField" : null,
       "NestedCollectionTextField" : [ ]
+
     },
     "ComplexFixedListField" : null
   },
   "FixedRadioListField" : null,
   "DateTimeField" : null,
   "PhoneUKField" : null,
-  "DocumentField7" : {
-    "document_url" : "http://dm-store:8080/documents/cd15dd39-5e2e-4e48-bccf-fce04b852c33",
-    "document_filename" : "Screenshot 2020-03-16 at 09.19.21.png",
-    "document_binary_url" : "http://dm-store:8080/documents/cd15dd39-5e2e-4e48-bccf-fce04b852c33/binary"
-  },
   "NumberField" : null,
   "MultiSelectListField" : [ ],
   "YesOrNoField" : "yes",
