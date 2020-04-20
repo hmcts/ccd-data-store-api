@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.config;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map; // generate a checkstyle issue of severity error
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
