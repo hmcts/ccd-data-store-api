@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class UISearchInputsResourceTest {
+class SearchInputsViewResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final String LINK_SELF = String.format("/internal/case-types/%s/search-inputs", CASE_TYPE_ID);
     private SearchInput searchInput1 = aSearchInput().withFieldId("field1").build();
@@ -30,9 +30,9 @@ class UISearchInputsResourceTest {
     @Test
     @DisplayName("should copy search inputs")
     void shouldCopySearchInputs() {
-        final UISearchInputsResource resource = new UISearchInputsResource(searchInputs, CASE_TYPE_ID);
+        final SearchInputsViewResource resource = new SearchInputsViewResource(searchInputs, CASE_TYPE_ID);
 
-        List<UISearchInputsResource.UISearchInput> workbasketInputs = Lists.newArrayList(resource.getSearchInputs());
+        List<SearchInputsViewResource.UISearchInput> workbasketInputs = Lists.newArrayList(resource.getSearchInputs());
         assertAll(
             () -> assertThat(resource.getSearchInputs(), not(sameInstance(this.searchInputs))),
             () -> assertThat(workbasketInputs, hasItems(hasProperty("field", hasProperty("id", is("field1"))),
@@ -43,7 +43,7 @@ class UISearchInputsResourceTest {
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final UISearchInputsResource resource = new UISearchInputsResource(searchInputs, CASE_TYPE_ID);
+        final SearchInputsViewResource resource = new SearchInputsViewResource(searchInputs, CASE_TYPE_ID);
 
         Optional<Link> self = resource.getLink("self");
         assertThat(self.get().getHref(), equalTo(LINK_SELF));

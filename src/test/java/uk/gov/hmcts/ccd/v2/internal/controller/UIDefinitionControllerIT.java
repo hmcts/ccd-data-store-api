@@ -16,7 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.SearchInputsViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.WorkbasketInputsViewResource;
 
 import javax.inject.Inject;
@@ -87,8 +87,8 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        UISearchInputsResource response = mapper.readValue(result.getResponse().getContentAsString(), UISearchInputsResource.class);
-        UISearchInputsResource.UISearchInput[] searchInputs = response.getSearchInputs();
+        SearchInputsViewResource response = mapper.readValue(result.getResponse().getContentAsString(), SearchInputsViewResource.class);
+        SearchInputsViewResource.UISearchInput[] searchInputs = response.getSearchInputs();
 
         assertThat(searchInputs[0].getLabel(), is("First Name"));
         assertThat(searchInputs[0].getField().getId(), is("PersonFirstName"));

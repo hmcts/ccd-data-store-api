@@ -18,7 +18,7 @@ import org.springframework.hateoas.RepresentationModel;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UISearchInputsResource extends RepresentationModel {
+public class SearchInputsViewResource extends RepresentationModel {
 
     private UISearchInput[] searchInputs;
 
@@ -30,7 +30,7 @@ public class UISearchInputsResource extends RepresentationModel {
         private Field field;
     }
 
-    public UISearchInputsResource(SearchInput[] searchInputs, String caseTypeId) {
+    public SearchInputsViewResource(SearchInput[] searchInputs, String caseTypeId) {
         copyProperties(searchInputs);
 
         add(linkTo(methodOn(UIDefinitionController.class).getSearchInputsDetails(caseTypeId)).withSelfRel());

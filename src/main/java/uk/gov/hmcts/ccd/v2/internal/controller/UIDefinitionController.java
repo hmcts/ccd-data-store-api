@@ -36,7 +36,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.BannerViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionConfigViewResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
-import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.SearchInputsViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.WorkbasketInputsViewResource;
 
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
@@ -121,18 +121,18 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UISearchInputsResource.class
+            response = SearchInputsViewResource.class
         ),
         @ApiResponse(
             code = 404,
             message = "Case type not found"
         )
     })
-    public ResponseEntity<UISearchInputsResource> getSearchInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
+    public ResponseEntity<SearchInputsViewResource> getSearchInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
 
         SearchInput[] searchInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, SEARCH).toArray(new SearchInput[0]);
 
-        return ResponseEntity.ok(new UISearchInputsResource(searchInputs, caseTypeId));
+        return ResponseEntity.ok(new SearchInputsViewResource(searchInputs, caseTypeId));
     }
 
     @GetMapping(
