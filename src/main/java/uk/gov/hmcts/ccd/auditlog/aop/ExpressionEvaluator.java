@@ -12,8 +12,10 @@ import org.springframework.expression.Expression;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 /**
  *  Utility class handling the SpEL expression parsing
+ *
  */
 public class ExpressionEvaluator extends CachedExpressionEvaluator {
 
@@ -45,7 +47,7 @@ public class ExpressionEvaluator extends CachedExpressionEvaluator {
         return targetMethod;
     }
 
-    private static class ExpressionRootObject{
+    private static class ExpressionRootObject {
         private final Object object;
         private final Object[] args;
 
