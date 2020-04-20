@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,11 +11,14 @@ import org.springframework.hateoas.RepresentationModel;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIDraftsController;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class DraftViewResource extends RepresentationModel {
-    private static final Logger LOG = LoggerFactory.getLogger(CaseUpdateViewEventResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DraftViewResource.class);
 
     @JsonUnwrapped
     private DraftResponse draftResponse;
