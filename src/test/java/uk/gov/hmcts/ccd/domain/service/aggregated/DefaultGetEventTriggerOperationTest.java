@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEventBuilder;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -56,7 +56,7 @@ class DefaultGetEventTriggerOperationTest {
     private static final String TOKEN = "testToken";
     private final DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withEventId(EVENT_TRIGGER_ID).build()).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
-    private final CaseEvent caseEvent = new CaseEvent();
+    private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
     private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
     private final StartEventTrigger startEventTrigger = newStartEventTrigger().withEventToken(TOKEN).withCaseDetails(caseDetails).build();
     private final CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger().build();
@@ -167,13 +167,13 @@ class DefaultGetEventTriggerOperationTest {
         @Test
         @DisplayName("should get trigger with all data set")
         void shouldGetTriggerWithAllDataSet() {
-            caseEvent.setId(EVENT_TRIGGER_ID);
-            caseEvent.setName(EVENT_TRIGGER_NAME);
-            caseEvent.setDescription(EVENT_TRIGGER_DESCRIPTION);
-            caseEvent.setShowSummary(EVENT_TRIGGER_SHOW_SUMMARY);
-            caseEvent.setShowEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES);
+            caseEventDefinition.setId(EVENT_TRIGGER_ID);
+            caseEventDefinition.setName(EVENT_TRIGGER_NAME);
+            caseEventDefinition.setDescription(EVENT_TRIGGER_DESCRIPTION);
+            caseEventDefinition.setShowSummary(EVENT_TRIGGER_SHOW_SUMMARY);
+            caseEventDefinition.setShowEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES);
 
-            caseEvent.setCaseFields(eventFields);
+            caseEventDefinition.setCaseFields(eventFields);
 
             CaseUpdateViewEvent result = defaultGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                      EVENT_TRIGGER_ID,

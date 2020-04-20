@@ -35,7 +35,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
@@ -457,12 +457,12 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseTypeBuilder withEvent(CaseEvent event) {
+        public CaseTypeBuilder withEvent(CaseEventDefinition event) {
             caseTypeDefinition.getEvents().add(event);
             return this;
         }
 
-        public CaseTypeBuilder withEvents(List<CaseEvent> event) {
+        public CaseTypeBuilder withEvents(List<CaseEventDefinition> event) {
             caseTypeDefinition.getEvents().addAll(event);
             return this;
         }
@@ -768,11 +768,11 @@ public class TestBuildersUtil {
     }
 
     public static class CaseEventBuilder {
-        private final CaseEvent caseEvent;
+        private final CaseEventDefinition caseEventDefinition;
         private final List<AccessControlList> accessControlLists = newArrayList();
 
         private CaseEventBuilder() {
-            this.caseEvent = new CaseEvent();
+            this.caseEventDefinition = new CaseEventDefinition();
         }
 
         public static CaseEventBuilder newCaseEvent() {
@@ -785,37 +785,37 @@ public class TestBuildersUtil {
         }
 
         public CaseEventBuilder withId(String id) {
-            caseEvent.setId(id);
+            caseEventDefinition.setId(id);
             return this;
         }
 
-        public CaseEvent build() {
-            caseEvent.setAccessControlLists(accessControlLists);
-            return caseEvent;
+        public CaseEventDefinition build() {
+            caseEventDefinition.setAccessControlLists(accessControlLists);
+            return caseEventDefinition;
         }
 
         public CaseEventBuilder withCanSaveDraft(Boolean canSaveDraft) {
-            caseEvent.setCanSaveDraft(canSaveDraft);
+            caseEventDefinition.setCanSaveDraft(canSaveDraft);
             return this;
         }
 
         public CaseEventBuilder withName(String name) {
-            caseEvent.setName(name);
+            caseEventDefinition.setName(name);
             return this;
         }
 
         public CaseEventBuilder withDescription(String description) {
-            caseEvent.setDescription(description);
+            caseEventDefinition.setDescription(description);
             return this;
         }
 
         public CaseEventBuilder withShowSummary(Boolean showSummary) {
-            caseEvent.setShowSummary(showSummary);
+            caseEventDefinition.setShowSummary(showSummary);
             return this;
         }
 
         public CaseEventBuilder withShowEventNotes(Boolean showEventNotes) {
-            caseEvent.setShowEventNotes(showEventNotes);
+            caseEventDefinition.setShowEventNotes(showEventNotes);
             return this;
         }
     }

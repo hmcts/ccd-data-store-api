@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
@@ -45,46 +45,46 @@ public class CallbackService {
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public Optional<CallbackResponse> send(final String url,
-                                           final CaseEvent caseEvent,
+                                           final CaseEventDefinition caseEventDefinition,
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails,
                                            final Boolean ignoreWarning) {
 
-        return sendSingleRequest(url, caseEvent, caseDetailsBefore, caseDetails, ignoreWarning);
+        return sendSingleRequest(url, caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
     }
 
-    public Optional<CallbackResponse> sendSingleRequest(final String url, final CaseEvent caseEvent, final CaseDetails caseDetailsBefore, final CaseDetails caseDetails, final Boolean ignoreWarning) {
+    public Optional<CallbackResponse> sendSingleRequest(final String url, final CaseEventDefinition caseEventDefinition, final CaseDetails caseDetailsBefore, final CaseDetails caseDetails, final Boolean ignoreWarning) {
         if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(), ignoreWarning);
+        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEventDefinition.getId(), ignoreWarning);
         final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url, CallbackResponse.class, callbackRequest);
         return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() -> {
-            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
-            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
+            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEventDefinition.getId());
+            return new CallbackException("Callback to service has been unsuccessful for event " + caseEventDefinition.getName());
         });
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public <T> ResponseEntity<T> send(final String url,
-                                      final CaseEvent caseEvent,
+                                      final CaseEventDefinition caseEventDefinition,
                                       final CaseDetails caseDetailsBefore,
                                       final CaseDetails caseDetails,
                                       final Class<T> clazz) {
-        return sendSingleRequest(url, caseEvent, caseDetailsBefore, caseDetails, clazz);
+        return sendSingleRequest(url, caseEventDefinition, caseDetailsBefore, caseDetails, clazz);
     }
 
     public <T> ResponseEntity<T> sendSingleRequest(final String url,
-                                               final CaseEvent caseEvent,
+                                               final CaseEventDefinition caseEventDefinition,
                                                final CaseDetails caseDetailsBefore,
                                                final CaseDetails caseDetails,
                                                final Class<T> clazz) {
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
+        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEventDefinition.getId());
         final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, clazz, callbackRequest);
         return requestEntity.orElseThrow(() -> {
-            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
-            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
+            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEventDefinition.getId());
+            return new CallbackException("Callback to service has been unsuccessful for event " + caseEventDefinition.getName());
         });
     }
 

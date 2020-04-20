@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -106,7 +106,7 @@ class DefaultCreateCaseOperationTest {
 
     private static final IdamUser IDAM_USER = buildIdamUser();
     private static final CaseTypeDefinition CASE_TYPE = buildCaseType();
-    private CaseEvent eventTrigger;
+    private CaseEventDefinition eventTrigger;
 
     @BeforeEach
     void setup() throws Exception {

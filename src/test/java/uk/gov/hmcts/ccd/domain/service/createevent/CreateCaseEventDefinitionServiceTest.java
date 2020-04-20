@@ -40,7 +40,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
-class CreateCaseEventServiceTest {
+class CreateCaseEventDefinitionServiceTest {
 
     private static final String USER_ID = "123";
     private static final String JURISDICTION_ID = "SSCS";
@@ -96,7 +96,7 @@ class CreateCaseEventServiceTest {
 
     private Map<String, JsonNode> data;
     private CaseTypeDefinition caseTypeDefinition;
-    private CaseEvent eventTrigger;
+    private CaseEventDefinition eventTrigger;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
     private CaseStateDefinition postState;
@@ -125,7 +125,7 @@ class CreateCaseEventServiceTest {
         caseTypeDefinition.setId(CASE_TYPE_ID);
         caseTypeDefinition.setJurisdiction(jurisdiction);
         caseTypeDefinition.setVersion(version);
-        eventTrigger = new CaseEvent();
+        eventTrigger = new CaseEventDefinition();
         eventTrigger.setPostState(POST_STATE);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("http://www.yahoo.com");
@@ -191,7 +191,7 @@ class CreateCaseEventServiceTest {
     void shouldNotUpdateLastStateModifiedWhenStateTransitionNotOccurred() {
         caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore.setState(PRE_STATE_ID);
-        eventTrigger = new CaseEvent();
+        eventTrigger = new CaseEventDefinition();
         eventTrigger.setPostState(PRE_STATE_ID);
 
         CaseStateDefinition state = new CaseStateDefinition();

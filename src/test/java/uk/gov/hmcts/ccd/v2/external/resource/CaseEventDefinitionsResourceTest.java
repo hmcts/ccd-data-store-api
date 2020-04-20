@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class CaseEventsResourceTest {
+class CaseEventDefinitionsResourceTest {
     private static final String REFERENCE = "1234123412341238";
     private static final String LINK_SELF = String.format("/cases/%s/events", REFERENCE);
 

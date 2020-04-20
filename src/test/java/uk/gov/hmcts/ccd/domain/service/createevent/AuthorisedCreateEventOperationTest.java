@@ -34,7 +34,7 @@ import org.mockito.MockitoAnnotations;
 
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -100,7 +100,7 @@ class AuthorisedCreateEventOperationTest {
     private JsonNode authorisedCaseNode;
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
-    private final List<CaseEvent> events = Lists.newArrayList();
+    private final List<CaseEventDefinition> events = Lists.newArrayList();
 
     @BeforeEach
     void setUp() {

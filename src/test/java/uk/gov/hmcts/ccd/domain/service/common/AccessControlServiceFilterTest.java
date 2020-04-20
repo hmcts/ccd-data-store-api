@@ -8,7 +8,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
@@ -76,55 +76,55 @@ class AccessControlServiceFilterTest {
         @Test
         @DisplayName("Should not change view trigger when all has required ACL")
         void doNotFilterCaseViewTriggersWhenACLsMatch() {
-            final CaseEvent event1 = newCaseEvent()
+            final CaseEventDefinition event1 = newCaseEvent()
                 .withId(EVENT_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
                     .build()).build();
-            final CaseEvent event2 = newCaseEvent()
+            final CaseEventDefinition event2 = newCaseEvent()
                 .withId(EVENT_ID_2)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
                     .build()).build();
-            final CaseEvent event3 = newCaseEvent()
+            final CaseEventDefinition event3 = newCaseEvent()
                 .withId(EVENT_ID_3)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
                     .build()).build();
-            final List<CaseEvent> caseEventDefinitions = Arrays.asList(event1, event2, event3);
+            final List<CaseEventDefinition> caseEventDefinitionDefinitions = Arrays.asList(event1, event2, event3);
 
             final CaseViewActionableEvent[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(
-                caseViewActionableEvents, caseEventDefinitions, USER_ROLES);
+                caseViewActionableEvents, caseEventDefinitionDefinitions, USER_ROLES);
             assertArrayEquals(caseViewActionableEvents, filteredTriggers);
         }
 
         @Test
         @DisplayName("Should filter view triggers according to the ACLs")
         void filterCaseViewTriggersWhenCreateACLIsMissing() {
-            final CaseEvent event1 = newCaseEvent()
+            final CaseEventDefinition event1 = newCaseEvent()
                 .withId(EVENT_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_NOT_IN_USER_ROLES)
                     .withCreate(true)
                     .build()).build();
-            final CaseEvent event2 = newCaseEvent()
+            final CaseEventDefinition event2 = newCaseEvent()
                 .withId(EVENT_ID_2)
                 .withAcl(anAcl()
                     .withRole(ROLE_NOT_IN_USER_ROLES_2)
                     .withCreate(true)
                     .build()).build();
-            final CaseEvent event3 = newCaseEvent()
+            final CaseEventDefinition event3 = newCaseEvent()
                 .withId(EVENT_ID_3)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(true)
                     .build()).build();
-            final List<CaseEvent> caseEventDefinitions = Arrays.asList(event1, event2, event3);
+            final List<CaseEventDefinition> caseEventDefinitionDefinitions = Arrays.asList(event1, event2, event3);
 
-            final CaseViewActionableEvent[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(caseViewActionableEvents, caseEventDefinitions, USER_ROLES);
+            final CaseViewActionableEvent[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(caseViewActionableEvents, caseEventDefinitionDefinitions, USER_ROLES);
             assertAll(
                 () -> assertThat(filteredTriggers.length, is(1)),
                 () -> assertThat(filteredTriggers[0], is(CASE_VIEW_TRIGGER_3))

@@ -45,14 +45,14 @@ class CaseUpdateViewEventBuilderTest {
     private static final Boolean EVENT_TRIGGER_SHOW_SUMMARY = true;
     private static final Boolean EVENT_TRIGGER_SHOW_EVENT_NOTES = false;
     private static final String CASE_REFERENCE = "1234567891012345";
-    private final CaseEvent caseEvent = newCaseEvent()
+    private final CaseEventDefinition caseEventDefinition = newCaseEvent()
         .withId(EVENT_TRIGGER_ID)
         .withName(EVENT_TRIGGER_NAME)
         .withDescription(EVENT_TRIGGER_DESCRIPTION)
         .withShowSummary(EVENT_TRIGGER_SHOW_SUMMARY)
         .withShowEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES)
         .build();
-    private final List<CaseEvent> events = Lists.newArrayList(newCaseEvent().build());
+    private final List<CaseEventDefinition> events = Lists.newArrayList(newCaseEvent().build());
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList(newCaseField().build());
     private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
     private final CaseTypeDefinition caseTypeDefinition = newCaseType()
@@ -83,7 +83,7 @@ class CaseUpdateViewEventBuilderTest {
         MockitoAnnotations.initMocks(this);
 
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
-        when(eventTriggerService.findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID)).thenReturn(caseEvent);
+        when(eventTriggerService.findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID)).thenReturn(caseEventDefinition);
         when(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)).thenReturn(wizardPageCollection);
         when(caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails.getData())).thenReturn(viewFields);
 

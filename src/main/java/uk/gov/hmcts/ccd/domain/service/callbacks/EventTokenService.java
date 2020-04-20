@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -46,7 +46,7 @@ public class EventTokenService {
     }
 
     public String generateToken(final String uid,
-                                final CaseEvent event,
+                                final CaseEventDefinition event,
                                 final Jurisdiction jurisdiction,
                                 final CaseTypeDefinition caseTypeDefinition) {
 
@@ -55,7 +55,7 @@ public class EventTokenService {
 
     public String generateToken(final String uid,
                                 final CaseDetails caseDetails,
-                                final CaseEvent event,
+                                final CaseEventDefinition event,
                                 final Jurisdiction jurisdiction,
                                 final CaseTypeDefinition caseTypeDefinition) {
         return Jwts.builder()
@@ -96,7 +96,7 @@ public class EventTokenService {
 
     public void validateToken(final String token,
                               final String uid,
-                              final CaseEvent event,
+                              final CaseEventDefinition event,
                               final Jurisdiction jurisdiction,
                               final CaseTypeDefinition caseTypeDefinition) {
         validateToken(token, uid, EMPTY_CASE, event, jurisdiction, caseTypeDefinition);
@@ -105,7 +105,7 @@ public class EventTokenService {
     public void validateToken(final String token,
                               final String uid,
                               final CaseDetails caseDetails,
-                              final CaseEvent event,
+                              final CaseEventDefinition event,
                               final Jurisdiction jurisdiction,
                               final CaseTypeDefinition caseTypeDefinition) {
         if (token == null || token.isEmpty()) {

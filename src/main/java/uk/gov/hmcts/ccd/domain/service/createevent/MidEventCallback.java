@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -54,7 +54,7 @@ public class MidEventCallback {
         if (!isBlank(pageId)) {
             Event event = content.getEvent();
             final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
-            final CaseEvent caseEvent = getCaseEvent(event, caseTypeDefinition);
+            final CaseEventDefinition caseEventDefinition = getCaseEvent(event, caseTypeDefinition);
 
             Optional<WizardPage> wizardPageOptional = uiDefinitionRepository
                 .getWizardPageCollection(caseTypeId, event.getEventId())
@@ -79,7 +79,7 @@ public class MidEventCallback {
 
                 CaseDetails caseDetailsFromMidEventCallback = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
                     caseTypeDefinition,
-                    caseEvent,
+                        caseEventDefinition,
                     caseDetailsBefore,
                     currentOrNewCaseDetails,
                     content.getIgnoreWarning());
@@ -105,11 +105,11 @@ public class MidEventCallback {
         return caseTypeDefinition;
     }
 
-    private CaseEvent getCaseEvent(Event event, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEvent caseEvent = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
-        if (caseEvent == null) {
+    private CaseEventDefinition getCaseEvent(Event event, CaseTypeDefinition caseTypeDefinition) {
+        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
+        if (caseEventDefinition == null) {
             throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeDefinition.getId());
         }
-        return caseEvent;
+        return caseEventDefinition;
     }
 }

@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -91,7 +91,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
 
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
+        final CaseEventDefinition eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
         if (eventTrigger == null) {
             throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeId);
         }
@@ -141,7 +141,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         }
     }
 
-    private void submittedCallback(CaseEvent eventTrigger, CaseDetails savedCaseDetails) {
+    private void submittedCallback(CaseEventDefinition eventTrigger, CaseDetails savedCaseDetails) {
         if (!isBlank(eventTrigger.getCallBackURLSubmittedEvent())) {
             try { // make a call back
                 final ResponseEntity<AfterSubmitCallbackResponse> callBackResponse =

@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -91,7 +91,7 @@ class AuthorisedGetEventTriggerOperationTest {
         CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3,
         GlobalCaseRole.CREATOR.getRole());
-    private final List<CaseEvent> events = Lists.newArrayList();
+    private final List<CaseEventDefinition> events = Lists.newArrayList();
 
     @BeforeEach
     void setUp() {
@@ -131,9 +131,9 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                   eq(userRoles),
                                                                   eq(CAN_CREATE))).thenReturn(true);
 
-        CaseEvent caseEvent = new CaseEvent();
-        when(eventTriggerService.findCaseEvent(eq(caseTypeDefinition), eq(EVENT_TRIGGER_ID))).thenReturn(caseEvent);
-        when(eventTriggerService.isPreStateValid(eq(STATE), eq(caseEvent))).thenReturn(true);
+        CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        when(eventTriggerService.findCaseEvent(eq(caseTypeDefinition), eq(EVENT_TRIGGER_ID))).thenReturn(caseEventDefinition);
+        when(eventTriggerService.isPreStateValid(eq(STATE), eq(caseEventDefinition))).thenReturn(true);
     }
 
     @Nested

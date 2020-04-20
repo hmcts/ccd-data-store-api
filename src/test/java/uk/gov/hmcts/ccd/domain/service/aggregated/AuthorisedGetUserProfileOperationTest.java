@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -37,7 +37,7 @@ class AuthorisedGetUserProfileOperationTest {
 
     private Set<String> userRoles = Sets.newHashSet("role1", "role2", "role3");
     private List<CaseStateDefinition> caseStateDefinitions = Arrays.asList(new CaseStateDefinition(), new CaseStateDefinition(), new CaseStateDefinition());
-    private List<CaseEvent> caseEvents = Arrays.asList(new CaseEvent(), new CaseEvent(), new CaseEvent(), new CaseEvent());
+    private List<CaseEventDefinition> caseEventDefinitions = Arrays.asList(new CaseEventDefinition(), new CaseEventDefinition(), new CaseEventDefinition(), new CaseEventDefinition());
 
     private CaseTypeDefinition notAllowedCaseTypeDefinition = new CaseTypeDefinition();
 
@@ -75,7 +75,7 @@ class AuthorisedGetUserProfileOperationTest {
     public void execute() {
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseTypeDefinition), eq(userRoles), eq(CAN_READ));
         doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(userRoles), eq(CAN_READ));
-        doReturn(caseEvents).when(accessControlService).filterCaseEventsByAccess(any(), eq(userRoles), eq(CAN_READ));
+        doReturn(caseEventDefinitions).when(accessControlService).filterCaseEventsByAccess(any(), eq(userRoles), eq(CAN_READ));
 
         UserProfile userProfile = classUnderTest.execute(CAN_READ);
 

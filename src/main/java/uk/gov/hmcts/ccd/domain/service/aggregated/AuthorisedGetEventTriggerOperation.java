@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -86,7 +86,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                               Boolean ignoreWarning) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-        final CaseEvent eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
+        final CaseEventDefinition eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
@@ -186,8 +186,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             CAN_UPDATE);
     }
 
-    private CaseEvent getEventTrigger(String eventId, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
+    private CaseEventDefinition getEventTrigger(String eventId, CaseTypeDefinition caseTypeDefinition) {
+        final CaseEventDefinition eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
         if (eventTrigger == null) {
             throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());
         }

@@ -21,7 +21,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
@@ -70,7 +70,7 @@ public class CallbackInvokerWireMockTest {
 
     private CallbackResponse callbackResponse;
     private CaseDetails caseDetails = new CaseDetails();
-    private final CaseEvent caseEvent = new CaseEvent();
+    private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private String testUrl;
 
@@ -83,8 +83,8 @@ public class CallbackInvokerWireMockTest {
         Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
         testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
-        caseEvent.setCallBackURLAboutToStartEvent(testUrl);
-        caseEvent.setName("Test");
+        caseEventDefinition.setCallBackURLAboutToStartEvent(testUrl);
+        caseEventDefinition.setName("Test");
         WireMock.resetAllScenarios();
         WireMock.resetAllRequests();
     }
@@ -107,7 +107,7 @@ public class CallbackInvokerWireMockTest {
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490)));
 
         Instant start = Instant.now();
-        callbackInvoker.invokeAboutToStartCallback(caseEvent, caseTypeDefinition, caseDetails, false);
+        callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false);
 
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.49s readTimeout
@@ -124,11 +124,11 @@ public class CallbackInvokerWireMockTest {
             .willSetStateTo("FirstFailedAttempt"));
 
         List<Integer> disabledRetries = Lists.newArrayList(0);
-        caseEvent.setRetriesTimeoutAboutToStartEvent(disabledRetries);
+        caseEventDefinition.setRetriesTimeoutAboutToStartEvent(disabledRetries);
         Instant start = Instant.now();
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
-            callbackInvoker.invokeAboutToStartCallback(caseEvent, caseTypeDefinition, caseDetails, false));
+            callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false));
         Assert.assertThat(callbackException.getMessage(), is("Callback to service has been unsuccessful for event Test"));
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout and no follow up retries

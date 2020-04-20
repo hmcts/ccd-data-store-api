@@ -37,7 +37,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -100,7 +100,7 @@ public class DefaultStartEventOperationTest {
     private final CaseDetails caseDetails = newCaseDetails().build();
     private final CaseTypeDefinition caseTypeDefinition = newCaseType().withCaseTypeId(TEST_CASE_TYPE_ID)
         .withJurisdiction(newJurisdiction().withJurisdictionId(TEST_JURISDICTION_ID).build()).build();
-    private final CaseEvent eventTrigger = newCaseEvent().build();
+    private final CaseEventDefinition eventTrigger = newCaseEvent().build();
     private final CaseDataContent caseDataContent = newCaseDataContent()
         .withSecurityClassification(PRIVATE)
         .withData(DATA)

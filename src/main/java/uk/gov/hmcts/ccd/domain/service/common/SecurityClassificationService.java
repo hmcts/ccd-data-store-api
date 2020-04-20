@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
@@ -91,7 +91,7 @@ public class SecurityClassificationService {
         return classifiedEvents;
     }
 
-    public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition, CaseEvent eventTrigger) {
+    public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition, CaseEventDefinition eventTrigger) {
         return caseTypeDefinition
             .getEvents()
             .stream()

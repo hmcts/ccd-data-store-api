@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -82,7 +82,7 @@ class AuthorisedGetEventsOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseTypeDefinition = new CaseTypeDefinition();
-        List<CaseEvent> eventsDefinition = new ArrayList<>();
+        List<CaseEventDefinition> eventsDefinition = new ArrayList<>();
         caseTypeDefinition.setEvents(eventsDefinition);
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
@@ -253,7 +253,7 @@ class AuthorisedGetEventsOperationTest {
     void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndEvent() {
         doReturn(Optional.of(event)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
         doReturn(singletonList(event)).when(accessControlService)
-            .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEvent.class), eq(CASE_USER_ROLES));
+            .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEventDefinition.class), eq(CASE_USER_ROLES));
 
         Optional<AuditEvent> optionalAuditEvent = authorisedOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 

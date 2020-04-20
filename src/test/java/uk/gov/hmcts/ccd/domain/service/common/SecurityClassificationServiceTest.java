@@ -34,7 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -273,20 +273,20 @@ public class SecurityClassificationServiceTest {
 
         @BeforeEach
         void setUp() throws IOException {
-            CaseEvent createEvent = new CaseEvent();
+            CaseEventDefinition createEvent = new CaseEventDefinition();
             createEvent.setId("createEvent");
             createEvent.setSecurityClassification(RESTRICTED);
-            CaseEvent updateEvent = new CaseEvent();
+            CaseEventDefinition updateEvent = new CaseEventDefinition();
             updateEvent.setId("updateEvent");
             updateEvent.setSecurityClassification(PRIVATE);
-            List<CaseEvent> events = Arrays.asList(createEvent, updateEvent);
+            List<CaseEventDefinition> events = Arrays.asList(createEvent, updateEvent);
             caseTypeDefinition.setEvents(events);
         }
 
         @Test
         @DisplayName("should return classification relevant for event")
         void shouldGetClassificationForEvent() {
-            CaseEvent eventTrigger = new CaseEvent();
+            CaseEventDefinition eventTrigger = new CaseEventDefinition();
             eventTrigger.setId("createEvent");
             SecurityClassification result = securityClassificationService.getClassificationForEvent(caseTypeDefinition,
                                                                                                     eventTrigger);
@@ -297,7 +297,7 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should fail to return fields when event not found")
         void shouldThrowRuntimeExceptionIfEventNotFound() {
-            CaseEvent eventTrigger = new CaseEvent();
+            CaseEventDefinition eventTrigger = new CaseEventDefinition();
             eventTrigger.setId("unknown");
 
             assertThrows(RuntimeException.class, () ->

@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -74,7 +74,7 @@ class SubmitCaseTransaction {
     public CaseDetails submitCase(Event event,
                                   CaseTypeDefinition caseTypeDefinition,
                                   IdamUser idamUser,
-                                  CaseEvent eventTrigger,
+                                  CaseEventDefinition eventTrigger,
                                   CaseDetails newCaseDetails, Boolean ignoreWarning) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -108,7 +108,7 @@ class SubmitCaseTransaction {
                                                      Event event,
                                                      CaseTypeDefinition caseTypeDefinition,
                                                      IdamUser idamUser,
-                                                     CaseEvent eventTrigger,
+                                                     CaseEventDefinition eventTrigger,
                                                      CaseDetails newCaseDetails) {
 
         final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);

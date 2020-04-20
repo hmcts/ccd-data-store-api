@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -75,7 +75,7 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
     private static final CaseStateDefinition CASE_STATE_2_2 = newState().withId(STATE_ID_2_2).build();
     private static final CaseStateDefinition CASE_STATE_3_1 = newState().withId(STATE_ID_3_1).build();
     private static final CaseStateDefinition CASE_STATE_3_2 = newState().withId(STATE_ID_3_2).build();
-    private static final CaseEvent CASE_EVENT_1_1 = newCaseEvent().withId(EVENT_ID_1_1)
+    private static final CaseEventDefinition CASE_EVENT_1_1 = newCaseEvent().withId(EVENT_ID_1_1)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withCreate(true)
@@ -83,35 +83,35 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
             .build())
         .build();
 
-    private static final CaseEvent CASE_EVENT_1_3 = newCaseEvent().withId(EVENT_ID_1_3)
+    private static final CaseEventDefinition CASE_EVENT_1_3 = newCaseEvent().withId(EVENT_ID_1_3)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withUpdate(true)
             .withRead(true)
             .build())
         .build();
-    private static final CaseEvent CASE_EVENT_2_3 = newCaseEvent().withId(EVENT_ID_2_3)
+    private static final CaseEventDefinition CASE_EVENT_2_3 = newCaseEvent().withId(EVENT_ID_2_3)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withCreate(true)
             .withRead(true)
             .build())
         .build();
-    private static final CaseEvent CASE_EVENT_3_1 = newCaseEvent().withId(EVENT_ID_3_1)
+    private static final CaseEventDefinition CASE_EVENT_3_1 = newCaseEvent().withId(EVENT_ID_3_1)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withCreate(true)
             .withRead(true)
             .build())
         .build();
-    private static final CaseEvent CASE_EVENT_3_2 = newCaseEvent().withId(EVENT_ID_3_2)
+    private static final CaseEventDefinition CASE_EVENT_3_2 = newCaseEvent().withId(EVENT_ID_3_2)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withUpdate(true)
             .withRead(true)
             .build())
         .build();
-    private static final CaseEvent CASE_EVENT_3_3 = newCaseEvent().withId(EVENT_ID_3_3)
+    private static final CaseEventDefinition CASE_EVENT_3_3 = newCaseEvent().withId(EVENT_ID_3_3)
         .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLES)
             .withCreate(true)

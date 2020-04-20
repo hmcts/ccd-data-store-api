@@ -20,7 +20,7 @@ public class CaseTypeDefinition implements Serializable {
     private Jurisdiction jurisdiction;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
-    private List<CaseEvent> events = new ArrayList<>();
+    private List<CaseEventDefinition> events = new ArrayList<>();
     private List<CaseStateDefinition> states = new ArrayList<>();
     @JsonProperty("case_fields")
     private List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
@@ -83,11 +83,11 @@ public class CaseTypeDefinition implements Serializable {
         this.securityClassification = securityClassification;
     }
 
-    public List<CaseEvent> getEvents() {
+    public List<CaseEventDefinition> getEvents() {
         return events;
     }
 
-    public void setEvents(List<CaseEvent> events) {
+    public void setEvents(List<CaseEventDefinition> events) {
         this.events = events;
     }
 
@@ -142,7 +142,7 @@ public class CaseTypeDefinition implements Serializable {
         return events.stream().anyMatch(event -> event.getId().equals(eventId));
     }
 
-    public Optional<CaseEvent> findCaseEvent(String eventId) {
+    public Optional<CaseEventDefinition> findCaseEvent(String eventId) {
         return events.stream()
             .filter(event -> event.getId().equalsIgnoreCase(eventId))
             .findFirst();

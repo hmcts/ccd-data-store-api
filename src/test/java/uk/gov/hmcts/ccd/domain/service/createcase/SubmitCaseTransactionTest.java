@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
@@ -95,7 +95,7 @@ class SubmitCaseTransactionTest {
     private Event event;
     private CaseTypeDefinition caseTypeDefinition;
     private IdamUser idamUser;
-    private CaseEvent eventTrigger;
+    private CaseEventDefinition eventTrigger;
     private CaseStateDefinition state;
 
     @BeforeEach
@@ -303,8 +303,8 @@ class SubmitCaseTransactionTest {
         return caseTypeDefinition;
     }
 
-    private CaseEvent buildEventTrigger() {
-        final CaseEvent event = new CaseEvent();
+    private CaseEventDefinition buildEventTrigger() {
+        final CaseEventDefinition event = new CaseEventDefinition();
         event.setId(EVENT_ID);
         event.setName(EVENT_NAME);
         return event;

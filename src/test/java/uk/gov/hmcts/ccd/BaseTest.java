@@ -263,7 +263,7 @@ public abstract class BaseTest {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEvent eventTrigger = new CaseEvent();
+        final CaseEventDefinition eventTrigger = new CaseEventDefinition();
         eventTrigger.setId(eventId);
 
         return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdiction, caseTypeDefinition);
@@ -276,7 +276,7 @@ public abstract class BaseTest {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEvent eventTrigger = new CaseEvent();
+        final CaseEventDefinition eventTrigger = new CaseEventDefinition();
         eventTrigger.setId(eventId);
 
         return eventTokenService.generateToken(userId, eventTrigger, jurisdiction, caseTypeDefinition);

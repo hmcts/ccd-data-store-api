@@ -39,7 +39,7 @@ public class CaseUpdateViewEventBuilder {
         }
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
-        final CaseEvent eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
+        final CaseEventDefinition eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
         final CaseUpdateViewEvent caseUpdateViewEvent = buildCaseEventTrigger(eventTrigger);
         caseUpdateViewEvent.setCaseId(caseReference);
         caseUpdateViewEvent.setCaseFields(mergeEventFields(startEventTrigger.getCaseDetails(), caseTypeDefinition, eventTrigger));
@@ -59,8 +59,8 @@ public class CaseUpdateViewEventBuilder {
         return caseTypeDefinition;
     }
 
-    private CaseEvent getEventTrigger(String eventId, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
+    private CaseEventDefinition getEventTrigger(String eventId, CaseTypeDefinition caseTypeDefinition) {
+        final CaseEventDefinition eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
 
         if (null == eventTrigger) {
             throw new ResourceNotFoundException(eventId + " is not a known event ID for the specified case type: " + caseTypeDefinition.getId());
@@ -68,7 +68,7 @@ public class CaseUpdateViewEventBuilder {
         return eventTrigger;
     }
 
-    private CaseUpdateViewEvent buildCaseEventTrigger(final CaseEvent eventTrigger) {
+    private CaseUpdateViewEvent buildCaseEventTrigger(final CaseEventDefinition eventTrigger) {
         final CaseUpdateViewEvent caseTrigger = new CaseUpdateViewEvent();
 
         caseTrigger.setId(eventTrigger.getId());
@@ -81,7 +81,7 @@ public class CaseUpdateViewEventBuilder {
         return caseTrigger;
     }
 
-    private List<CaseViewField> mergeEventFields(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, CaseEvent eventTrigger) {
+    private List<CaseViewField> mergeEventFields(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, CaseEventDefinition eventTrigger) {
         final List<CaseEventFieldDefinition> eventFields = eventTrigger.getCaseFields();
         final List<CaseFieldDefinition> caseFieldDefinitions = caseTypeDefinition.getCaseFieldDefinitions();
 

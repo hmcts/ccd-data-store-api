@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterUtil;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -108,14 +108,14 @@ public class AccessControlService {
     }
 
     public boolean canAccessCaseEventWithCriteria(final String eventId,
-                                                  final List<CaseEvent> caseEventDefinitions,
+                                                  final List<CaseEventDefinition> caseEventDefinitionDefinitions,
                                                   final Set<String> userRoles,
                                                   final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitions, userRoles, criteria);
+        boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitionDefinitions, userRoles, criteria);
         if (!hasAccess) {
             LOG.debug("No relevant event access for eventId={}, eventAcls={}, userRoles={}",
                 eventId,
-                getCaseEventAcls(caseEventDefinitions, eventId),
+                getCaseEventAcls(caseEventDefinitionDefinitions, eventId),
                 userRoles);
         }
         return hasAccess;
@@ -459,13 +459,13 @@ public class AccessControlService {
     }
 
     public List<AuditEvent> filterCaseAuditEventsByReadAccess(final List<AuditEvent> auditEvents,
-                                                              final List<CaseEvent> caseEventDefinitions,
+                                                              final List<CaseEventDefinition> caseEventDefinitionDefinitions,
                                                               final Set<String> userRoles) {
         List<AuditEvent> filteredAuditEvents = newArrayList();
         if (auditEvents != null) {
             filteredAuditEvents = auditEvents
                 .stream()
-                .filter(auditEvent -> hasCaseEventWithAccess(userRoles, auditEvent, caseEventDefinitions))
+                .filter(auditEvent -> hasCaseEventWithAccess(userRoles, auditEvent, caseEventDefinitionDefinitions))
                 .collect(toList());
 
         }
@@ -483,10 +483,10 @@ public class AccessControlService {
             .collect(toList());
     }
 
-    public List<CaseEvent> filterCaseEventsByAccess(final List<CaseEvent> caseEventDefinitions,
-                                                    final Set<String> userRoles,
-                                                    final Predicate<AccessControlList> access) {
-        return caseEventDefinitions
+    public List<CaseEventDefinition> filterCaseEventsByAccess(final List<CaseEventDefinition> caseEventDefinitionDefinitions,
+                                                              final Set<String> userRoles,
+                                                              final Predicate<AccessControlList> access) {
+        return caseEventDefinitionDefinitions
             .stream()
             .filter(caseEvent -> hasAccessControlList(userRoles,
                 access,
@@ -495,13 +495,13 @@ public class AccessControlService {
     }
 
     public CaseViewActionableEvent[] filterCaseViewTriggersByCreateAccess(final CaseViewActionableEvent[] caseViewActionableEvents,
-                                                                          final List<CaseEvent> caseEventDefinitions,
+                                                                          final List<CaseEventDefinition> caseEventDefinitionDefinitions,
                                                                           final Set<String> userRoles) {
         return stream(caseViewActionableEvents)
             .filter(caseViewTrigger -> hasAccessControlList(userRoles,
                 CAN_CREATE,
-                getCaseEventById(caseEventDefinitions, caseViewTrigger)
-                    .map(CaseEvent::getAccessControlLists)
+                getCaseEventById(caseEventDefinitionDefinitions, caseViewTrigger)
+                    .map(CaseEventDefinition::getAccessControlLists)
                     .orElse(newArrayList()))
             )
             .toArray(CaseViewActionableEvent[]::new);
@@ -546,29 +546,29 @@ public class AccessControlService {
             .collect(toList());
     }
 
-    private Optional<CaseEvent> getCaseEventById(List<CaseEvent> caseEventDefinitions, CaseViewActionableEvent caseViewActionableEvent) {
-        return caseEventDefinitions
+    private Optional<CaseEventDefinition> getCaseEventById(List<CaseEventDefinition> caseEventDefinitionDefinitions, CaseViewActionableEvent caseViewActionableEvent) {
+        return caseEventDefinitionDefinitions
             .stream()
             .filter(event -> hasEqualIds(caseViewActionableEvent, event))
             .findAny();
     }
 
-    private boolean hasEqualIds(CaseViewActionableEvent caseViewActionableEvent, CaseEvent event) {
+    private boolean hasEqualIds(CaseViewActionableEvent caseViewActionableEvent, CaseEventDefinition event) {
         return event.getId().equals(caseViewActionableEvent.getId());
     }
 
-    private List<AccessControlList> getCaseEventAcls(List<CaseEvent> caseEventDefinitions, String eventId) {
-        return caseEventDefinitions
+    private List<AccessControlList> getCaseEventAcls(List<CaseEventDefinition> caseEventDefinitionDefinitions, String eventId) {
+        return caseEventDefinitionDefinitions
             .stream()
             .filter(caseEventDef -> nonNull(caseEventDef.getAccessControlLists()) && caseEventDef.getId().equals(eventId))
-            .map(CaseEvent::getAccessControlLists)
+            .map(CaseEventDefinition::getAccessControlLists)
             .findAny().orElse(newArrayList());
     }
 
 
-    private boolean hasCaseEventWithAccess(Set<String> userRoles, AuditEvent auditEvent, List<CaseEvent> caseEventDefinitions) {
+    private boolean hasCaseEventWithAccess(Set<String> userRoles, AuditEvent auditEvent, List<CaseEventDefinition> caseEventDefinitionDefinitions) {
 
-        return caseEventDefinitions
+        return caseEventDefinitionDefinitions
             .stream()
             .anyMatch(caseEventDefinition ->
                 auditEvent.getEventId().equals(caseEventDefinition.getId())
@@ -599,10 +599,10 @@ public class AccessControlService {
         return StreamSupport.stream(spliteratorUnknownSize(newData.fieldNames(), Spliterator.ORDERED), false);
     }
 
-    private boolean hasCaseEventAccess(String eventId, List<CaseEvent> caseEventDefinitions, Set<String> userRoles, Predicate<AccessControlList> criteria) {
-        for (CaseEvent caseEvent : caseEventDefinitions) {
-            if (caseEvent.getId().equals(eventId)
-                && hasAccessControlList(userRoles, criteria, caseEvent.getAccessControlLists())) {
+    private boolean hasCaseEventAccess(String eventId, List<CaseEventDefinition> caseEventDefinitionDefinitions, Set<String> userRoles, Predicate<AccessControlList> criteria) {
+        for (CaseEventDefinition caseEventDefinition : caseEventDefinitionDefinitions) {
+            if (caseEventDefinition.getId().equals(eventId)
+                && hasAccessControlList(userRoles, criteria, caseEventDefinition.getAccessControlLists())) {
                 return true;
             }
         }

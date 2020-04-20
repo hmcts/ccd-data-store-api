@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
@@ -50,18 +50,18 @@ public class CallbackInvoker {
         this.securityValidationService = securityValidationService;
     }
 
-    public void invokeAboutToStartCallback(final CaseEvent caseEvent,
+    public void invokeAboutToStartCallback(final CaseEventDefinition caseEventDefinition,
                                            final CaseTypeDefinition caseTypeDefinition,
                                            final CaseDetails caseDetails,
                                            final Boolean ignoreWarning) {
         final Optional<CallbackResponse> callbackResponse;
-        if (isRetriesDisabled(caseEvent.getRetriesTimeoutAboutToStartEvent())) {
-            callbackResponse = callbackService.sendSingleRequest(caseEvent.getCallBackURLAboutToStartEvent(),
-                caseEvent, null, caseDetails, false);
+        if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutAboutToStartEvent())) {
+            callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToStartEvent(),
+                    caseEventDefinition, null, caseDetails, false);
         } else {
             callbackResponse = callbackService.send(
-                caseEvent.getCallBackURLAboutToStartEvent(),
-                caseEvent, null, caseDetails, false);
+                caseEventDefinition.getCallBackURLAboutToStartEvent(),
+                    caseEventDefinition, null, caseDetails, false);
         }
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseTypeDefinition,
@@ -70,7 +70,7 @@ public class CallbackInvoker {
             response));
     }
 
-    public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEvent eventTrigger,
+    public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEventDefinition eventTrigger,
                                                                      final CaseDetails caseDetailsBefore,
                                                                      final CaseDetails caseDetails,
                                                                      final CaseTypeDefinition caseTypeDefinition,
@@ -95,7 +95,7 @@ public class CallbackInvoker {
         return new AboutToSubmitCallbackResponse();
     }
 
-    public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEvent eventTrigger,
+    public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEventDefinition eventTrigger,
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
         ResponseEntity<AfterSubmitCallbackResponse> afterSubmitCallbackResponseEntity;
@@ -117,7 +117,7 @@ public class CallbackInvoker {
 
     public CaseDetails invokeMidEventCallback(final WizardPage wizardPage,
                                               final CaseTypeDefinition caseTypeDefinition,
-                                              final CaseEvent caseEvent,
+                                              final CaseEventDefinition caseEventDefinition,
                                               final CaseDetails caseDetailsBefore,
                                               final CaseDetails caseDetails,
                                               final Boolean ignoreWarning) {
@@ -125,12 +125,12 @@ public class CallbackInvoker {
         Optional<CallbackResponse> callbackResponseOptional;
         if (isRetriesDisabled(wizardPage.getRetriesTimeoutMidEvent())) {
             callbackResponseOptional = callbackService.sendSingleRequest(wizardPage.getCallBackURLMidEvent(),
-                caseEvent,
+                    caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails, false);
         } else {
             callbackResponseOptional = callbackService.send(wizardPage.getCallBackURLMidEvent(),
-                caseEvent,
+                    caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails, false);
         }

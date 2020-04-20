@@ -40,7 +40,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPage
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -1109,13 +1109,13 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case event ACL tests")
-    class CanAccessCaseEventWithCriteria_AclTests {
+    class CanAccessCaseEventDefinitionWithCriteria_AclTests {
 
         @Test
         @DisplayName("Should not grant access to event if acls are missing")
         void shouldNotGrantAccessToEventIfEventIsMissingAcls() throws IOException {
             final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-            CaseEvent eventDefinition = new CaseEvent();
+            CaseEventDefinition eventDefinition = new CaseEventDefinition();
             eventDefinition.setId(EVENT_ID);
             caseTypeDefinition.setEvents(Collections.singletonList(eventDefinition));
 
@@ -1132,7 +1132,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to event with relevant acl missing")
         void shouldNotGrantAccessToEventIfRelevantAclMissing() throws IOException {
             final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-            CaseEvent eventDefinition = new CaseEvent();
+            CaseEventDefinition eventDefinition = new CaseEventDefinition();
             eventDefinition.setId(EVENT_ID);
             AccessControlList accessControlList = new AccessControlList();
             accessControlList.setRole(ROLE_NOT_IN_USER_ROLES);
@@ -2059,7 +2059,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case audit events ACL tests")
-    class ReturnsDataWithCaseEventReadAccess_AclTests {
+    class ReturnsDataWithCaseEventDefinitionReadAccess_AclTests {
 
         @Test
         @DisplayName("Should not return audit event if event is missing")
@@ -2273,7 +2273,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case event trigger ACL tests")
-    class ReturnsCaseEventTriggerDataWithCaseUpdateViewFieldDefinitionReadonly_AclTests {
+    class ReturnsCaseUpdateViewEventDataWithCaseUpdateViewFieldDefinitionReadonly_AclTests {
 
         @Test
         @DisplayName("Should set readonly flag if relevant acl missing")
@@ -2999,7 +2999,7 @@ public class AccessControlServiceTest {
 
     @Nested
     @DisplayName("case event definitions ACL tests")
-    class ReturnsCaseEventsDataWithCaseEventAccess_AclTests {
+    class ReturnsCaseEventsDataWithCaseEventDefinitionAccess_AclTests {
 
         @Test
         @DisplayName("Should not return case event definition if relevant acl missing")
@@ -3019,7 +3019,7 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE),
-                is(emptyCollectionOf(CaseEvent.class)));
+                is(emptyCollectionOf(CaseEventDefinition.class)));
         }
 
         @Test
@@ -3040,7 +3040,7 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE),
-                is(emptyCollectionOf(CaseEvent.class)));
+                is(emptyCollectionOf(CaseEventDefinition.class)));
         }
 
         @Test
@@ -3056,7 +3056,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -3087,7 +3087,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
             assertAll(
@@ -3131,7 +3131,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
             assertAll(
@@ -3164,7 +3164,7 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE),
-                is(emptyCollectionOf(CaseEvent.class)));
+                is(emptyCollectionOf(CaseEventDefinition.class)));
         }
 
         @Test
@@ -3185,7 +3185,7 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE),
-                is(emptyCollectionOf(CaseEvent.class)));
+                is(emptyCollectionOf(CaseEventDefinition.class)));
         }
 
         @Test
@@ -3201,7 +3201,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -3232,7 +3232,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
             assertAll(
@@ -3276,7 +3276,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
             assertAll(
