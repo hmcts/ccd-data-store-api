@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -69,6 +70,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "/", description = "Standard case API")
 public class CaseDetailsEndpoint {
+
+    public static final int MAX_CASE_IDS_LIST = 10;
+
     private final GetCaseOperation getCaseOperation;
     private final CreateCaseOperation createCaseOperation;
     private final CreateEventOperation createEventOperation;
@@ -416,7 +420,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    @LogAudit(operationType = OperationType.SEARCH_CASE)
+    @LogAudit(operationType = OperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
+        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
                                                        @PathVariable("jid") final String jurisdictionId,
                                                        @PathVariable("ctid") final String caseTypeId,
@@ -429,7 +434,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    @LogAudit(operationType = OperationType.SEARCH_CASE)
+    @LogAudit(operationType = OperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
+        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCitizens(@PathVariable("uid") final String uid,
                                                     @PathVariable("jid") final String jurisdictionId,
                                                     @PathVariable("ctid") final String caseTypeId,
@@ -524,5 +530,11 @@ public class CaseDetailsEndpoint {
         metadata.setSortDirection(param(queryParameters, SORT_PARAM));
 
         return metadata;
+    }
+
+    public static String buildCaseIds(List<CaseDetails> caseDetails) {
+        return caseDetails.stream().limit(MAX_CASE_IDS_LIST)
+            .map(c -> String.valueOf(c.getReference()))
+            .collect(Collectors.joining(","));
     }
 }

@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
@@ -23,6 +25,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -98,6 +103,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private WebApplicationContext wac;
     private MockMvc mockMvc;
     private JdbcTemplate template;
+
+    @SpyBean
+    private AuditRepository auditRepository;
 
     @Mock
     private Authentication authentication;
@@ -3888,6 +3896,67 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         caseDetails = Arrays.asList(mapper.readValue(result.getResponse().getContentAsString(), CaseDetails[].class));
         assertThat(caseDetails, hasSize(0));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void shouldAuditLogCaseWorkerSearch() throws Exception {
+
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
+
+        MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
+            .contentType(JSON_CONTENT_TYPE)
+            .param("last_modified_date", "2016-08-24")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        List<CaseDetails> caseDetails = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
+
+        assertThat(caseDetails, hasSize(2));
+        assertThat(responseAsString, containsString("1504259907353545"));
+        assertThat(responseAsString, containsString("1504259907353537"));
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(OperationType.SEARCH_CASE.getLabel()));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getCaseId(), is("1504259907353545,1504259907353537"));
+
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void shouldAuditLogCitizenSearch() throws Exception {
+
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
+
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        MvcResult result = mockMvc.perform(get(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        List<CaseDetails> caseDetails = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
+
+        assertThat(caseDetails, hasSize(2));
+        assertThat(responseAsString, containsString("1504259907353545"));
+        assertThat(responseAsString, containsString("1504259907353529"));
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(OperationType.SEARCH_CASE.getLabel()));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getCaseId(), is("1504259907353529,1504259907353545"));
+
     }
 
     @Test
