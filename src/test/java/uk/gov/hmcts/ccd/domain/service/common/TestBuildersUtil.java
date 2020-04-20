@@ -31,7 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -989,10 +989,10 @@ public class TestBuildersUtil {
     }
 
     public static class StartEventTriggerBuilder {
-        private final StartEventTrigger startEventTrigger;
+        private final StartEventResult startEventResult;
 
         private StartEventTriggerBuilder() {
-            this.startEventTrigger = new StartEventTrigger();
+            this.startEventResult = new StartEventResult();
         }
 
         public static StartEventTriggerBuilder newStartEventTrigger() {
@@ -1000,17 +1000,17 @@ public class TestBuildersUtil {
         }
 
         public StartEventTriggerBuilder withCaseDetails(CaseDetails caseDetails) {
-            this.startEventTrigger.setCaseDetails(caseDetails);
+            this.startEventResult.setCaseDetails(caseDetails);
             return this;
         }
 
         public StartEventTriggerBuilder withEventToken(String token) {
-            this.startEventTrigger.setToken(token);
+            this.startEventResult.setToken(token);
             return this;
         }
 
-        public StartEventTrigger build() {
-            return startEventTrigger;
+        public StartEventResult build() {
+            return startEventResult;
         }
     }
 

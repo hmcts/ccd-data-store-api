@@ -35,7 +35,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -135,7 +135,7 @@ public class DefaultStartEventOperationTest {
 
     @Nested
     @DisplayName("case type tests")
-    class StartEventTriggerForCaseTypeDefinition {
+    class StartEventResultForCaseTypeDefinition {
 
         @BeforeEach
         void setUp() {
@@ -149,7 +149,7 @@ public class DefaultStartEventOperationTest {
         @DisplayName("Should successfully trigger start")
         void shouldSuccessfullyTriggerStart() {
 
-            StartEventTrigger actual = defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID,
+            StartEventResult actual = defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID,
                                                                                           TEST_EVENT_TRIGGER_ID,
                                                                                           IGNORE_WARNING);
             assertAll(
@@ -207,7 +207,7 @@ public class DefaultStartEventOperationTest {
 
     @Nested
     @DisplayName("case draft tests")
-    class StartEventTriggerForDraft {
+    class StartEventResultForDraft {
 
         @BeforeEach
         void setUp() {
@@ -227,7 +227,7 @@ public class DefaultStartEventOperationTest {
         @DisplayName("Should successfully trigger start")
         void shouldSuccessfullyTriggerStart() {
 
-            StartEventTrigger actual = defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
+            StartEventResult actual = defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
                                                                                        IGNORE_WARNING);
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID),
@@ -284,7 +284,7 @@ public class DefaultStartEventOperationTest {
 
     @Nested
     @DisplayName("case tests")
-    class StartEventTriggerForCase {
+    class StartEventResultForCase {
 
 
         @BeforeEach
@@ -304,7 +304,7 @@ public class DefaultStartEventOperationTest {
         @DisplayName("Should successfully get event trigger")
         void shouldSuccessfullyGetEventTrigger() {
 
-            StartEventTrigger actual = defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE,
+            StartEventResult actual = defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE,
                                                                                       TEST_EVENT_TRIGGER_ID,
                                                                                       IGNORE_WARNING);
 

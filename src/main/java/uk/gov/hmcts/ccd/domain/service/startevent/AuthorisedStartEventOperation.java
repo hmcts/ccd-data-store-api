@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
@@ -63,14 +63,14 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
         return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForCaseType(caseTypeId,
                                                                                         eventId,
                                                                                         ignoreWarning));
     }
 
     @Override
-    public StartEventTrigger triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
 
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
@@ -84,8 +84,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String draftReference,
-                                                  Boolean ignoreWarning) {
+    public StartEventResult triggerStartForDraft(String draftReference,
+                                                 Boolean ignoreWarning) {
 
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         return verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForDraft(draftReference,
@@ -108,13 +108,13 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         }
     }
 
-    private StartEventTrigger verifyReadAccess(final String caseTypeId, final StartEventTrigger startEventTrigger) {
+    private StartEventResult verifyReadAccess(final String caseTypeId, final StartEventResult startEventResult) {
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
-        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventTrigger.getCaseDetails()));
+        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventResult.getCaseDetails()));
 
-        CaseDetails caseDetails = startEventTrigger.getCaseDetails();
+        CaseDetails caseDetails = startEventResult.getCaseDetails();
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(
             caseTypeDefinition,
@@ -122,7 +122,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
             CAN_READ)) {
             caseDetails.setData(newHashMap());
             caseDetails.setDataClassification(newHashMap());
-            return startEventTrigger;
+            return startEventResult;
         }
 
         if (caseDetails != null) {
@@ -143,7 +143,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                     true),
                 STRING_JSON_MAP));
         }
-        return startEventTrigger;
+        return startEventResult;
     }
 
 

@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEventBuilder;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -43,10 +43,10 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
 
     @Override
     public CaseUpdateViewEvent executeForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
-        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCaseType(caseTypeId,
+        StartEventResult startEventResult = startEventOperation.triggerStartForCaseType(caseTypeId,
                                                                                           eventId,
                                                                                           ignoreWarning);
-        return caseUpdateViewEventBuilder.build(startEventTrigger,
+        return caseUpdateViewEventBuilder.build(startEventResult,
                                              caseTypeId,
                                              eventId,
                                              null);
@@ -58,10 +58,10 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                                               Boolean ignoreWarning) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
 
-        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCase(caseReference,
+        StartEventResult startEventResult = startEventOperation.triggerStartForCase(caseReference,
                                                                                       eventId,
                                                                                       ignoreWarning);
-        return caseUpdateViewEventBuilder.build(startEventTrigger,
+        return caseUpdateViewEventBuilder.build(startEventResult,
                                              caseDetails.getCaseTypeId(),
                                              eventId,
                                              caseReference);
@@ -74,9 +74,9 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
 
         String eventId = draftResponse.getDocument().getEventId();
-        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForDraft(draftReference,
+        StartEventResult startEventResult = startEventOperation.triggerStartForDraft(draftReference,
                                                                                        ignoreWarning);
-        return caseUpdateViewEventBuilder.build(startEventTrigger,
+        return caseUpdateViewEventBuilder.build(startEventResult,
                                              caseDetails.getCaseTypeId(),
                                              eventId,
                                              draftReference);

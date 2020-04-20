@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.hateoas.RepresentationModel;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.v2.external.controller.StartTriggerController;
 
@@ -24,19 +24,19 @@ public class StartTriggerResource extends RepresentationModel {
     private String eventId;
     private String token;
 
-    public StartTriggerResource(@NonNull StartEventTrigger startEventTrigger, Boolean ignoreWarning, Boolean withCase) {
-        copyProperties(startEventTrigger);
+    public StartTriggerResource(@NonNull StartEventResult startEventResult, Boolean ignoreWarning, Boolean withCase) {
+        copyProperties(startEventResult);
 
         if (withCase) {
-            add(linkTo(methodOn(StartTriggerController.class).getStartEventTrigger(startEventTrigger.getCaseReference(), eventId, ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(StartTriggerController.class).getStartEventTrigger(startEventResult.getCaseReference(), eventId, ignoreWarning)).withSelfRel());
         } else {
-            add(linkTo(methodOn(StartTriggerController.class).getStartCaseTrigger(startEventTrigger.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(StartTriggerController.class).getStartCaseTrigger(startEventResult.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
         }
     }
 
-    private void copyProperties(StartEventTrigger startEventTrigger) {
-        this.caseDetails = startEventTrigger.getCaseDetails();
-        this.eventId = startEventTrigger.getEventId();
-        this.token = startEventTrigger.getToken();
+    private void copyProperties(StartEventResult startEventResult) {
+        this.caseDetails = startEventResult.getCaseDetails();
+        this.eventId = startEventResult.getEventId();
+        this.token = startEventResult.getToken();
     }
 }

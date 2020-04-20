@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -67,9 +67,9 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(final String caseTypeId,
-                                                     final String eventId,
-                                                     final Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCaseType(final String caseTypeId,
+                                                    final String eventId,
+                                                    final Boolean ignoreWarning) {
 
         String uid = userAuthorisation.getUserId();
 
@@ -83,9 +83,9 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCase(final String caseReference,
-                                                 final String eventId,
-                                                 final Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCase(final String caseReference,
+                                                final String eventId,
+                                                final Boolean ignoreWarning) {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
 
@@ -93,7 +93,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
 
-        final CaseEventDefinition eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
+        final CaseEventDefinition eventTrigger = getCaseEventDefinition(eventId, caseTypeDefinition);
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
@@ -106,8 +106,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(final String draftReference,
-                                                  final Boolean ignoreWarning) {
+    public StartEventResult triggerStartForDraft(final String draftReference,
+                                                 final Boolean ignoreWarning) {
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
 
@@ -122,12 +122,12 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       () -> caseDetails);
     }
 
-    private StartEventTrigger buildStartEventTrigger(final String uid,
-                                                     final CaseTypeDefinition caseTypeDefinition,
-                                                     final String eventId,
-                                                     final Boolean ignoreWarning,
-                                                     final Supplier<CaseDetails> caseDetailsSupplier) {
-        final CaseEventDefinition eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
+    private StartEventResult buildStartEventTrigger(final String uid,
+                                                    final CaseTypeDefinition caseTypeDefinition,
+                                                    final String eventId,
+                                                    final Boolean ignoreWarning,
+                                                    final Supplier<CaseDetails> caseDetailsSupplier) {
+        final CaseEventDefinition eventTrigger = getCaseEventDefinition(eventId, caseTypeDefinition);
 
         final CaseDetails caseDetails = caseDetailsSupplier.get();
 
@@ -141,12 +141,12 @@ public class DefaultStartEventOperation implements StartEventOperation {
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
     }
 
-    private StartEventTrigger buildStartEventTrigger(String eventId, String eventToken, CaseDetails caseDetails) {
-        final StartEventTrigger startEventTrigger = new StartEventTrigger();
-        startEventTrigger.setCaseDetails(caseDetails);
-        startEventTrigger.setToken(eventToken);
-        startEventTrigger.setEventId(eventId);
-        return startEventTrigger;
+    private StartEventResult buildStartEventTrigger(String eventId, String eventToken, CaseDetails caseDetails) {
+        final StartEventResult startEventResult = new StartEventResult();
+        startEventResult.setCaseDetails(caseDetails);
+        startEventResult.setToken(eventToken);
+        startEventResult.setEventId(eventId);
+        return startEventResult;
     }
 
     private CaseDetails getCaseDetails(String caseReference) {
@@ -158,7 +158,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
             () -> new CaseNotFoundException(caseReference));
     }
 
-    private CaseEventDefinition getEventTrigger(String eventId, CaseTypeDefinition caseTypeDefinition) {
+    private CaseEventDefinition getCaseEventDefinition(String eventId, CaseTypeDefinition caseTypeDefinition) {
         final CaseEventDefinition eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
         if (eventTrigger == null) {
             throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());

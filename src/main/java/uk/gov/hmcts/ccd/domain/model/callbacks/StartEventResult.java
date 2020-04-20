@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-public class StartEventTrigger {
+public class StartEventResult {
     @JsonProperty("case_details")
     private CaseDetails caseDetails;
     @JsonProperty("event_id")

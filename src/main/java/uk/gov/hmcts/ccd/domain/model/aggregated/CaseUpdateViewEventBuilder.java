@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -33,8 +33,8 @@ public class CaseUpdateViewEventBuilder {
         this.caseViewFieldBuilder = caseViewFieldBuilder;
     }
 
-    public CaseUpdateViewEvent build(StartEventTrigger startEventTrigger, String caseTypeId, String eventId, String caseReference) {
-        if (startEventTrigger.getCaseDetails() == null) {
+    public CaseUpdateViewEvent build(StartEventResult startEventResult, String caseTypeId, String eventId, String caseReference) {
+        if (startEventResult.getCaseDetails() == null) {
             throw new ResourceNotFoundException("Case not found");
         }
 
@@ -42,8 +42,8 @@ public class CaseUpdateViewEventBuilder {
         final CaseEventDefinition eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
         final CaseUpdateViewEvent caseUpdateViewEvent = buildCaseEventTrigger(eventTrigger);
         caseUpdateViewEvent.setCaseId(caseReference);
-        caseUpdateViewEvent.setCaseFields(mergeEventFields(startEventTrigger.getCaseDetails(), caseTypeDefinition, eventTrigger));
-        caseUpdateViewEvent.setEventToken(startEventTrigger.getToken());
+        caseUpdateViewEvent.setCaseFields(mergeEventFields(startEventResult.getCaseDetails(), caseTypeDefinition, eventTrigger));
+        caseUpdateViewEvent.setEventToken(startEventResult.getToken());
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
                                                                                                      eventId);
         caseUpdateViewEvent.setWizardPages(wizardPageCollection);

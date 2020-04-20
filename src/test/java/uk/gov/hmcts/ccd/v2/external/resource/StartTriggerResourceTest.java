@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.Optional;
@@ -21,24 +21,24 @@ class StartTriggerResourceTest {
     private static final String EVENT_ID = "createCase";
     private static final CaseDetails CASE_DETAILS = new CaseDetails();
 
-    private StartEventTrigger startEventTrigger;
+    private StartEventResult startEventResult;
     private boolean ignoreWarning;
 
     @BeforeEach
     void setUp() {
         CASE_DETAILS.setCaseTypeId(CASE_TYPE_ID);
-        startEventTrigger = startEventTrigger();
+        startEventResult = startEventTrigger();
         ignoreWarning = true;
     }
 
-    private StartEventTrigger startEventTrigger() {
-        final StartEventTrigger startEventTrigger = new StartEventTrigger();
+    private StartEventResult startEventTrigger() {
+        final StartEventResult startEventResult = new StartEventResult();
 
-        startEventTrigger.setCaseDetails(CASE_DETAILS);
-        startEventTrigger.setEventId(EVENT_ID);
-        startEventTrigger.setToken(TOKEN);
+        startEventResult.setCaseDetails(CASE_DETAILS);
+        startEventResult.setEventId(EVENT_ID);
+        startEventResult.setToken(TOKEN);
 
-        return startEventTrigger;
+        return startEventResult;
     }
 
     @Nested
@@ -49,7 +49,7 @@ class StartTriggerResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventTrigger, ignoreWarning, false);
+            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventResult, ignoreWarning, false);
 
             assertAll(
                 () -> assertThat(startTriggerResource.getEventId(), equalTo(EVENT_ID.toString())),
@@ -61,7 +61,7 @@ class StartTriggerResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventTrigger, ignoreWarning, false);
+            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventResult, ignoreWarning, false);
 
             Optional<Link> self = startTriggerResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_CASE));
@@ -77,16 +77,16 @@ class StartTriggerResourceTest {
         @BeforeEach
         void setUp() {
             CASE_DETAILS.setReference(CASE_REFERENCE);
-            startEventTrigger.setCaseDetails(CASE_DETAILS);
+            startEventResult.setCaseDetails(CASE_DETAILS);
             CASE_DETAILS.setCaseTypeId(CASE_TYPE_ID);
-            startEventTrigger = startEventTrigger();
+            startEventResult = startEventTrigger();
             ignoreWarning = true;
         }
 
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventTrigger, ignoreWarning, true);
+            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventResult, ignoreWarning, true);
 
             assertAll(
                 () -> assertThat(startTriggerResource.getEventId(), equalTo(EVENT_ID.toString())),
@@ -98,7 +98,7 @@ class StartTriggerResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventTrigger, ignoreWarning, true);
+            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventResult, ignoreWarning, true);
 
             Optional<Link> self = startTriggerResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_EVENT));

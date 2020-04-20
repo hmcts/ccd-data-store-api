@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
@@ -41,32 +41,32 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
         return startEventOperation.triggerStartForCaseType(caseTypeId,
                                                            eventId,
                                                            ignoreWarning);
     }
 
     @Override
-    public StartEventTrigger triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
         return applyClassificationIfCaseDetailsExist(startEventOperation.triggerStartForCase(caseReference,
                                                                                              eventId,
                                                                                              ignoreWarning));
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String draftReference,
-                                                  Boolean ignoreWarning) {
+    public StartEventResult triggerStartForDraft(String draftReference,
+                                                 Boolean ignoreWarning) {
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         return applyClassificationIfCaseDetailsExist(deduceDefaultClassificationsForDraft(startEventOperation.triggerStartForDraft(draftReference,
                                                                                                                                    ignoreWarning),
                                                                                           caseDetails.getCaseTypeId()));
     }
 
-    private StartEventTrigger deduceDefaultClassificationsForDraft(StartEventTrigger startEventTrigger, String caseTypeId) {
-        CaseDetails caseDetails = startEventTrigger.getCaseDetails();
+    private StartEventResult deduceDefaultClassificationsForDraft(StartEventResult startEventResult, String caseTypeId) {
+        CaseDetails caseDetails = startEventResult.getCaseDetails();
         deduceDefaultClassificationIfCaseDetailsPresent(caseTypeId, caseDetails);
-        return startEventTrigger;
+        return startEventResult;
     }
 
     private void deduceDefaultClassificationIfCaseDetailsPresent(String caseTypeId, CaseDetails caseDetails) {
@@ -80,11 +80,11 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
         }
     }
 
-    private StartEventTrigger applyClassificationIfCaseDetailsExist(StartEventTrigger startEventTrigger) {
-        CaseDetails caseDetails = startEventTrigger.getCaseDetails();
+    private StartEventResult applyClassificationIfCaseDetailsExist(StartEventResult startEventResult) {
+        CaseDetails caseDetails = startEventResult.getCaseDetails();
         if (null != caseDetails) {
-            startEventTrigger.setCaseDetails(classificationService.applyClassification(caseDetails).orElse(null));
+            startEventResult.setCaseDetails(classificationService.applyClassification(caseDetails).orElse(null));
         }
-        return startEventTrigger;
+        return startEventResult;
     }
 }

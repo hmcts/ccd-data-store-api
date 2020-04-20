@@ -34,7 +34,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -85,7 +85,7 @@ class AuthorisedStartEventOperationTest {
     private JsonNode authorisedCaseDetailsClassificationNode;
     private JsonNode classifiedCaseDetailsNode;
     private JsonNode classifiedCaseDetailsClassificationNode;
-    private StartEventTrigger classifiedStartEvent;
+    private StartEventResult classifiedStartEvent;
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
@@ -116,7 +116,7 @@ class AuthorisedStartEventOperationTest {
         classifiedCaseDetails.setData(MAPPER.convertValue(classifiedCaseDetailsNode, STRING_JSON_MAP));
         classifiedCaseDetails.setDataClassification(MAPPER.convertValue(classifiedCaseDetailsClassificationNode,
             STRING_JSON_MAP));
-        classifiedStartEvent = new StartEventTrigger();
+        classifiedStartEvent = new StartEventResult();
         classifiedStartEvent.setCaseDetails(classifiedCaseDetails);
 
         caseDetailsOptional = Optional.of(newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build());
@@ -163,7 +163,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -182,7 +182,7 @@ class AuthorisedStartEventOperationTest {
 
             when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)).thenReturn(false);
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -215,7 +215,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -234,7 +234,7 @@ class AuthorisedStartEventOperationTest {
 
             when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)).thenReturn(false);
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -265,7 +265,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            StartEventTrigger output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+            StartEventResult output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -283,7 +283,7 @@ class AuthorisedStartEventOperationTest {
         void shouldReturnEventTriggerWhenCaseDetailsNull() {
             classifiedStartEvent.setCaseDetails(null);
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -297,7 +297,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should return event trigger with classified case details when not empty")
         void shouldReturnEventTriggerWithClassifiedCaseDetails() {
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 

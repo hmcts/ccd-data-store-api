@@ -31,7 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEventBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -60,7 +60,7 @@ class CaseUpdateViewEventBuilderTest {
                                                             .withEvents(events)
                                                             .withCaseFields(caseFieldDefinitions).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
-    private final StartEventTrigger startEventTrigger = newStartEventTrigger().withCaseDetails(caseDetails).withEventToken(TOKEN).build();
+    private final StartEventResult startEventResult = newStartEventTrigger().withCaseDetails(caseDetails).withEventToken(TOKEN).build();
     private final List<WizardPage> wizardPageCollection = Lists.newArrayList();
     private final List<CaseViewField> viewFields = Lists.newArrayList();
 
@@ -97,7 +97,7 @@ class CaseUpdateViewEventBuilderTest {
     @DisplayName("should build trigger")
     void shouldBuildTrigger() {
 
-        final CaseUpdateViewEvent caseUpdateViewEvent = caseUpdateViewEventBuilder.build(startEventTrigger,
+        final CaseUpdateViewEvent caseUpdateViewEvent = caseUpdateViewEventBuilder.build(startEventResult,
                                                                                 CASE_TYPE_ID,
                                                                                 EVENT_TRIGGER_ID,
                                                                                 CASE_REFERENCE);
@@ -129,7 +129,7 @@ class CaseUpdateViewEventBuilderTest {
     void shouldFailIfNoCaseType() {
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(null);
 
-        assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventTrigger,
+        assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventResult,
                                                                                           CASE_TYPE_ID,
                                                                                           EVENT_TRIGGER_ID,
                                                                                           CASE_REFERENCE));
@@ -140,7 +140,7 @@ class CaseUpdateViewEventBuilderTest {
     void shouldFailIfNoEventTrigger() {
         when(eventTriggerService.findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID)).thenReturn(null);
 
-        assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventTrigger,
+        assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventResult,
                                                                                           CASE_TYPE_ID,
                                                                                           EVENT_TRIGGER_ID,
                                                                                           CASE_REFERENCE));
@@ -149,9 +149,9 @@ class CaseUpdateViewEventBuilderTest {
     @Test
     @DisplayName("should fail if no case details")
     void shouldFailIfNoCaseDetails() {
-        startEventTrigger.setCaseDetails(null);
+        startEventResult.setCaseDetails(null);
 
-        final Exception exception = assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventTrigger,
+        final Exception exception = assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventResult,
                                                                                                                       CASE_TYPE_ID,
                                                                                                                       EVENT_TRIGGER_ID,
                                                                                                                       CASE_REFERENCE));

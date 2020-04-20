@@ -103,7 +103,7 @@ class GetStartTriggerTest extends BaseTest {
 
     @Nested
     @DisplayName("Start event trigger")
-    class StartEventTrigger {
+    class StartEventResult {
         private static final String INVALID_CASE_REFERENCE = "1234123412341234";
         private static final String NOT_FOUND_CASE_REFERENCE = "1234123412341238";
 

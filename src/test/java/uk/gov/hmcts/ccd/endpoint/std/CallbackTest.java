@@ -54,7 +54,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -772,9 +772,9 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
-        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
-        assertTrue("No token", !startEventTrigger.getToken().isEmpty());
+        final StartEventResult startEventResult = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
+        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventResult.getCaseDetails().getData());
+        assertTrue("No token", !startEventResult.getToken().isEmpty());
     }
 
     @Test
@@ -855,9 +855,9 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
-        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
-        assertTrue("No token", !startEventTrigger.getToken().isEmpty());
+        final StartEventResult startEventResult = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
+        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventResult.getCaseDetails().getData());
+        assertTrue("No token", !startEventResult.getToken().isEmpty());
     }
 
     @Test
@@ -913,9 +913,9 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
-        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
-        assertTrue("No token", !startEventTrigger.getToken().isEmpty());
+        final StartEventResult startEventResult = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
+        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventResult.getCaseDetails().getData());
+        assertTrue("No token", !startEventResult.getToken().isEmpty());
     }
 
     @Test
@@ -935,9 +935,9 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
-        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
-        assertTrue("No token", !startEventTrigger.getToken().isEmpty());
+        final StartEventResult startEventResult = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
+        assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventResult.getCaseDetails().getData());
+        assertTrue("No token", !startEventResult.getToken().isEmpty());
     }
 
     @Test

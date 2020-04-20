@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -65,11 +65,11 @@ public class StartTriggerController {
                                                                     @PathVariable("triggerId") String triggerId,
                                                                     @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        final StartEventTrigger startEventTrigger = this.startEventOperation.triggerStartForCaseType(caseTypeId,
+        final StartEventResult startEventResult = this.startEventOperation.triggerStartForCaseType(caseTypeId,
                                                                                                      triggerId,
                                                                                                      ignoreWarning);
 
-        return ResponseEntity.ok(new StartTriggerResource(startEventTrigger, ignoreWarning, false));
+        return ResponseEntity.ok(new StartTriggerResource(startEventResult, ignoreWarning, false));
     }
 
     @GetMapping(
@@ -111,11 +111,11 @@ public class StartTriggerController {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
 
-        final StartEventTrigger startEventTrigger = this.startEventOperation.triggerStartForCase(caseId,
+        final StartEventResult startEventResult = this.startEventOperation.triggerStartForCase(caseId,
                                                                                                  triggerId,
                                                                                                  ignoreWarning);
 
-        return ResponseEntity.ok(new StartTriggerResource(startEventTrigger, ignoreWarning, true));
+        return ResponseEntity.ok(new StartTriggerResource(startEventResult, ignoreWarning, true));
     }
 
 }

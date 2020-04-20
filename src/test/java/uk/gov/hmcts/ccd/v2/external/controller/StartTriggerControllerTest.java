@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -46,7 +46,7 @@ class StartTriggerControllerTest {
     @InjectMocks
     private StartTriggerController startTriggerController;
 
-    private StartEventTrigger startEventTrigger = new StartEventTrigger();
+    private StartEventResult startEventResult = new StartEventResult();
 
     @BeforeEach
     void setUp() {
@@ -57,12 +57,12 @@ class StartTriggerControllerTest {
         Map<String, JsonNode> dataClassification = Maps.newHashMap();
         dataClassification.put("classKey1", JSON_NODE_FACTORY.textNode("classValue1"));
         CASE_DETAILS.setDataClassification(dataClassification);
-        startEventTrigger.setCaseDetails(CASE_DETAILS);
-        startEventTrigger.setToken(TOKEN);
-        startEventTrigger.setEventId(EVENT_TRIGGER_ID);
+        startEventResult.setCaseDetails(CASE_DETAILS);
+        startEventResult.setToken(TOKEN);
+        startEventResult.setEventId(EVENT_TRIGGER_ID);
 
-        when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(startEventTrigger);
-        when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(startEventTrigger);
+        when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(startEventResult);
+        when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(startEventResult);
         when(caseReferenceService.validateUID(CASE_ID)).thenReturn(true);
     }
 
