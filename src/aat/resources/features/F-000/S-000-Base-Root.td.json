@@ -10,8 +10,7 @@
 	"request": {
 		"headers": {
 			"Authorization": "[[DEFAULT_AUTO_VALUE]]",
-			"ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
-			"Content-Type": "application/json"
+			"ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
 		}
 	}
 }

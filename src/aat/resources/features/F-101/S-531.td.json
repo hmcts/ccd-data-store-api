@@ -18,10 +18,9 @@
     }
   },
   "expectedResponse": {
-    "responseCode" : 204,
-    "responseMessage" : "No Content",
-    "headers" : {
-      "_extends_": "Common_204_Response_Headers"
+    "_extends_": "Common_204_Response",
+    "headers": {
+      "Content-Type": "[[ANY_STRING_NULLABLE]]"
     }
   }
 }
