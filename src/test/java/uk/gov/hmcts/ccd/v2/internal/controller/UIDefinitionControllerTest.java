@@ -24,7 +24,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIBannerResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.BannerViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionConfigResource;
@@ -177,12 +177,12 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when banners found")
         void bannerFound() {
-            final ResponseEntity<UIBannerResource> response = uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes));
+            final ResponseEntity<BannerViewResource> response = uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes));
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                    UIBannerResource bannerResource = response.getBody();
+                    BannerViewResource bannerResource = response.getBody();
                     assertThat(Lists.newArrayList(bannerResource.getBanners()), hasItems(hasProperty("bannerDescription", is("Test Description1")),
                         hasProperty("bannerDescription", is("Test Description2"))));
                 }
@@ -201,7 +201,7 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return empty list of banners")
         void shouldReturnEmptyBannersList() {
-            ResponseEntity<UIBannerResource>  responseEntity = uiDefinitionController.getBanners(Optional.empty());
+            ResponseEntity<BannerViewResource>  responseEntity = uiDefinitionController.getBanners(Optional.empty());
             assertEquals(0, responseEntity.getBody().getBanners().size());
         }
 

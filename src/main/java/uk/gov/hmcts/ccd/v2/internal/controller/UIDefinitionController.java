@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIBannerResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.BannerViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionConfigResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
@@ -52,7 +52,7 @@ public class UIDefinitionController {
     private final GetCriteriaOperation getCriteriaOperation;
 
     private final GetBannerOperation getBannerOperation;
-    
+
     private final GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation;
 
     private final GetUserProfileOperation getUserProfileOperation;
@@ -152,17 +152,17 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIBannerResource.class
+            response = BannerViewResource.class
         )
     })
-    public ResponseEntity<UIBannerResource> getBanners(@RequestParam("ids") Optional<List<String>> idsOptional) {
+    public ResponseEntity<BannerViewResource> getBanners(@RequestParam("ids") Optional<List<String>> idsOptional) {
         List<Banner> listOfBanners = idsOptional.isPresent()
                                         ? getBannerOperation.execute(idsOptional.get())
                                         : Lists.newArrayList();
-        return ResponseEntity.ok(new UIBannerResource(listOfBanners));
+        return ResponseEntity.ok(new BannerViewResource(listOfBanners));
     }
 
-  
+
    @GetMapping(
         path = "/jurisdiction-ui-configs",
         headers = {
@@ -189,7 +189,7 @@ public class UIDefinitionController {
                                         : Lists.newArrayList();
         return ResponseEntity.ok(new UIJurisdictionConfigResource(listOfConfigs));
     }
-  
+
   @GetMapping(
         path = "/jurisdictions",
         headers = {

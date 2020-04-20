@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("UIBannerResource")
-class UIBannerResourceTest {
+class BannerViewResourceTest {
 
     @BeforeEach
     void setUp() {
@@ -25,7 +25,7 @@ class UIBannerResourceTest {
     @DisplayName("should copy null banners")
     void shouldThrowException() {
         assertThrows(NullPointerException.class, () -> {
-            new UIBannerResource(null);
+            new BannerViewResource(null);
         });
     }
 
@@ -33,7 +33,7 @@ class UIBannerResourceTest {
     @DisplayName("should copy empty banners")
     void shouldCopyEmptyBannerList() {
         List<Banner> emptyList = Lists.emptyList();
-        final UIBannerResource resource = new UIBannerResource(emptyList);
+        final BannerViewResource resource = new BannerViewResource(emptyList);
         assertAll(
             () -> assertThat(resource.getBanners(), sameInstance(emptyList))
         );
@@ -43,7 +43,7 @@ class UIBannerResourceTest {
     @DisplayName("should copy banner list")
     void shouldCopyBannerList() {
         List<Banner> newArrayList = Lists.newArrayList(new Banner(), new Banner());
-        final UIBannerResource resource = new UIBannerResource(newArrayList);
+        final BannerViewResource resource = new BannerViewResource(newArrayList);
         assertAll(
             () -> assertThat(resource.getBanners(), sameInstance(newArrayList))
         );

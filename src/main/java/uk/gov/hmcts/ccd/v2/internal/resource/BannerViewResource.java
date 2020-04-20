@@ -11,11 +11,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIBannerResource extends RepresentationModel {
+public class BannerViewResource extends RepresentationModel {
 
     private List<Banner> banners;
 
-    public UIBannerResource(@NonNull List<Banner> listOfBanners) {
+    public BannerViewResource(@NonNull List<Banner> listOfBanners) {
         copyProperties(listOfBanners);
     }
 
