@@ -52,7 +52,7 @@ public class CaseViewResource extends RepresentationModel {
         this.tabs = caseView.getTabs();
         this.metadataFields = caseView.getMetadataFields();
         this.state = caseView.getState();
-        this.triggers = caseView.getTriggers();
+        this.triggers = caseView.getActionableEvents();
         this.events = caseView.getEvents();
     }
 }

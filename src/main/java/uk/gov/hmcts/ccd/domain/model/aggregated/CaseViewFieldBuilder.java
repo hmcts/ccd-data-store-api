@@ -23,20 +23,20 @@ public class CaseViewFieldBuilder {
         this.compoundFieldOrderService = compoundFieldOrderService;
     }
 
-    public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventFieldDefinition eventField) {
+    public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventFieldDefinition eventFieldDefinition) {
         final CaseViewField field = new CaseViewField();
 
-        field.setId(eventField.getCaseFieldId());
-        buildFieldType(caseFieldDefinition, eventField, field);
+        field.setId(eventFieldDefinition.getCaseFieldId());
+        buildFieldType(caseFieldDefinition, eventFieldDefinition, field);
         field.setHidden(caseFieldDefinition.getHidden());
-        field.setHintText(ofNullable(eventField.getHintText()).orElse(caseFieldDefinition.getHintText()));
-        field.setLabel(ofNullable(eventField.getLabel()).orElse(caseFieldDefinition.getLabel()));
+        field.setHintText(ofNullable(eventFieldDefinition.getHintText()).orElse(caseFieldDefinition.getHintText()));
+        field.setLabel(ofNullable(eventFieldDefinition.getLabel()).orElse(caseFieldDefinition.getLabel()));
         field.setSecurityLabel(caseFieldDefinition.getSecurityLabel());
-        field.setDisplayContext(eventField.getDisplayContext());
-        field.setDisplayContextParameter(eventField.getDisplayContextParamter());
-        field.setShowCondition(eventField.getShowCondition());
-        field.setShowSummaryChangeOption(eventField.getShowSummaryChangeOption());
-        field.setShowSummaryContentOption(eventField.getShowSummaryContentOption());
+        field.setDisplayContext(eventFieldDefinition.getDisplayContext());
+        field.setDisplayContextParameter(eventFieldDefinition.getDisplayContextParamter());
+        field.setShowCondition(eventFieldDefinition.getShowCondition());
+        field.setShowSummaryChangeOption(eventFieldDefinition.getShowSummaryChangeOption());
+        field.setShowSummaryContentOption(eventFieldDefinition.getShowSummaryContentOption());
         field.setAccessControlLists(caseFieldDefinition.getAccessControlLists());
         field.setMetadata(caseFieldDefinition.isMetadata());
 
@@ -45,9 +45,9 @@ public class CaseViewFieldBuilder {
         return field;
     }
 
-    private void buildFieldType(final CaseFieldDefinition caseFieldDefinition, final CaseEventFieldDefinition eventField, final CaseViewField field) {
-        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseFieldDefinition, eventField.getCaseEventFieldComplexDefinitions(), ROOT);
-        field.setFieldType(caseFieldDefinition.getFieldType());
+    private void buildFieldType(final CaseFieldDefinition caseFieldDefinition, final CaseEventFieldDefinition eventFieldDefinition, final CaseViewField caseViewField) {
+        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseFieldDefinition, eventFieldDefinition.getCaseEventFieldComplexDefinitions(), ROOT);
+        caseViewField.setFieldType(caseFieldDefinition.getFieldType());
     }
 
     public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventFieldDefinition eventField, Object value) {

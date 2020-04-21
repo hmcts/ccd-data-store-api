@@ -22,12 +22,12 @@ public class CaseView extends AbstractCaseView {
         this.channels = channels;
     }
 
-    public CaseViewActionableEvent[] getTriggers() {
+    public CaseViewActionableEvent[] getActionableEvents() {
         return triggers;
     }
 
-    public void setTriggers(CaseViewActionableEvent[] triggers) {
-        this.triggers = triggers;
+    public void setActionableEvents(CaseViewActionableEvent[] actionableEvents) {
+        this.triggers = actionableEvents;
     }
 
     public CaseViewEvent[] getEvents() {

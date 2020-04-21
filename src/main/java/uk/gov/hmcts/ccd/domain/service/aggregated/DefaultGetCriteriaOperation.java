@@ -58,7 +58,7 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
                 .map(field -> toCriteriaInput(field, caseTypeDefinition, criteriaType))
                 .collect(toList());
         } else if (criteriaType.equals(SEARCH)) {
-            final SearchInputFieldsDefinition searchInputFieldsDefinition = uiDefinitionRepository.getSearchInputDefinitions(caseTypeId);
+            final SearchInputFieldsDefinition searchInputFieldsDefinition = uiDefinitionRepository.getSearchInputFieldDefinitions(caseTypeId);
             criteriaInputs = searchInputFieldsDefinition.getFields()
                 .stream()
                 .map(field -> toCriteriaInput(field, caseTypeDefinition, criteriaType))

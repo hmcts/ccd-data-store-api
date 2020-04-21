@@ -84,7 +84,7 @@ class CaseViewResourceTest {
         caseView.setTabs(tabs);
         caseView.setMetadataFields(metadataFields);
         caseView.setState(state);
-        caseView.setTriggers(triggers);
+        caseView.setActionableEvents(triggers);
         caseView.setEvents(events);
 
         return caseView;

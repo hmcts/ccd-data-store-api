@@ -72,7 +72,7 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
             .contentType(JSON_CONTENT_TYPE)
-            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .accept(V2.MediaType.CASE_TYPE_UPDATE_VIEW_EVENT)
             .headers(headers))
             .andExpect(status().is(200))
             .andReturn();
@@ -113,7 +113,7 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
             .contentType(JSON_CONTENT_TYPE)
-            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .accept(V2.MediaType.CASE_TYPE_UPDATE_VIEW_EVENT)
             .headers(headers))
             .andExpect(status().is(200))
             .andReturn();
@@ -142,7 +142,7 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
             .contentType(JSON_CONTENT_TYPE)
-            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .accept(V2.MediaType.CASE_TYPE_UPDATE_VIEW_EVENT)
             .headers(headers))
             .andExpect(status().is(200))
             .andReturn();
@@ -178,7 +178,7 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
             .contentType(JSON_CONTENT_TYPE)
-            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .accept(V2.MediaType.CASE_TYPE_UPDATE_VIEW_EVENT)
             .headers(headers))
             .andExpect(status().is(200))
             .andReturn();
@@ -207,7 +207,7 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
             .contentType(JSON_CONTENT_TYPE)
-            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .accept(V2.MediaType.CASE_TYPE_UPDATE_VIEW_EVENT)
             .headers(headers))
             .andExpect(status().is(200))
             .andReturn();

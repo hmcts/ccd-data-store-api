@@ -262,7 +262,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Event State Name", "Draft", events[1].getStateName());
         assertEquals("Event State ID", "Draft", events[1].getStateId());
 
-        final CaseViewActionableEvent[] triggers = caseView.getTriggers();
+        final CaseViewActionableEvent[] triggers = caseView.getActionableEvents();
         assertNotNull("Triggers are null", triggers);
         assertEquals("Should only get resume and delete triggers", 2, triggers.length);
 

@@ -42,7 +42,7 @@ public class UIStartTriggerController {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.UI_START_CASE_TRIGGER
+            V2.MediaType.CASE_TYPE_UPDATE_VIEW_EVENT
         }
     )
     @ApiOperation(
@@ -64,9 +64,9 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    public ResponseEntity<CaseUpdateViewEventResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
-                                                                           @PathVariable("triggerId") String triggerId,
-                                                                           @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+    public ResponseEntity<CaseUpdateViewEventResource> getCaseUpdateViewEventByCaseType(@PathVariable("caseTypeId") String caseTypeId,
+                                                                                        @PathVariable("triggerId") String triggerId,
+                                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         final CaseUpdateViewEvent caseUpdateViewEvent = this.getEventTriggerOperation.executeForCaseType(caseTypeId,
                                                                                                    triggerId,
@@ -81,7 +81,7 @@ public class UIStartTriggerController {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.UI_START_EVENT_TRIGGER
+            V2.MediaType.CASE_UPDATE_VIEW_EVENT
         }
     )
     @ApiOperation(
@@ -107,9 +107,9 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    public ResponseEntity<CaseUpdateViewEventResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
-                                                                            @PathVariable("triggerId") String triggerId,
-                                                                            @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+    public ResponseEntity<CaseUpdateViewEventResource> getCaseUpdateViewEvent(@PathVariable("caseId") String caseId,
+                                                                              @PathVariable("triggerId") String triggerId,
+                                                                              @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }

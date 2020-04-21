@@ -101,7 +101,7 @@ class UIStartEventControllerTest {
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
             final ResponseEntity<CaseUpdateViewEventResource> response =
-                uiStartTriggerController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+                uiStartTriggerController.getCaseUpdateViewEventByCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -140,7 +140,7 @@ class UIStartEventControllerTest {
         void shouldPropagateExceptionWhenThrown() {
             when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> uiStartTriggerController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () -> uiStartTriggerController.getCaseUpdateViewEventByCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
     }
@@ -152,7 +152,7 @@ class UIStartEventControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<CaseUpdateViewEventResource> response = uiStartTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<CaseUpdateViewEventResource> response = uiStartTriggerController.getCaseUpdateViewEvent(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -176,7 +176,7 @@ class UIStartEventControllerTest {
         void shouldPropagateExceptionFromOperationWhenThrown() {
             when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> uiStartTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () -> uiStartTriggerController.getCaseUpdateViewEvent(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
         @Test
@@ -184,7 +184,7 @@ class UIStartEventControllerTest {
         void shouldFailWithBadRequestException() {
             when(caseReferenceService.validateUID(CASE_ID)).thenReturn(false);
 
-            assertThrows(BadRequestException.class, () -> uiStartTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(BadRequestException.class, () -> uiStartTriggerController.getCaseUpdateViewEvent(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
     }

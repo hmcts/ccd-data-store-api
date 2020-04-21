@@ -32,7 +32,7 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
     @DisplayName("should Return Workbasket Input Definitions")
     public void shouldReturnWorkbasketInputDefinitions() {
         final WorkbasketInputFieldsDefinition workbasketInputFieldsDefinitions = httpUIDefinitionGateway
-            .getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
+            .getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
         assertThat(workbasketInputFieldsDefinitions.getFields().size(), is(3));
     }
 

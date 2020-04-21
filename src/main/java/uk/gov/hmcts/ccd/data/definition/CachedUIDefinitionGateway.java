@@ -45,23 +45,23 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
 
     @Override
     @Cacheable("searchInputDefinitionCache")
-    public SearchInputFieldsDefinition getSearchInputDefinitions(final int version, final String caseTypeId) {
+    public SearchInputFieldsDefinition getSearchInputFieldDefinitions(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of search input definitions for {}", version, caseTypeId);
-        return httpUiDefinitionGateway.getSearchInputDefinitions(version, caseTypeId);
+        return httpUiDefinitionGateway.getSearchInputFieldDefinitions(version, caseTypeId);
     }
 
     @Override
     @Cacheable("workbasketInputDefinitionCache")
-    public WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(final int version, final String caseTypeId) {
+    public WorkbasketInputFieldsDefinition getWorkbasketInputFieldsDefinitions(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of workbasket input definitions for {}", version, caseTypeId);
-        return httpUiDefinitionGateway.getWorkbasketInputDefinitions(version, caseTypeId);
+        return httpUiDefinitionGateway.getWorkbasketInputFieldsDefinitions(version, caseTypeId);
     }
 
     @Override
     @Cacheable("caseTabCollectionCache")
-    public CaseTypeTabsDefinition getCaseTabCollection(final int version, final String caseTypeId) {
+    public CaseTypeTabsDefinition getCaseTypeTabsCollection(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of case tab collection for {}", version, caseTypeId);
-        return httpUiDefinitionGateway.getCaseTabCollection(version, caseTypeId);
+        return httpUiDefinitionGateway.getCaseTypeTabsCollection(version, caseTypeId);
     }
 
     @Override

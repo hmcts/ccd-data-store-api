@@ -15,11 +15,11 @@ public interface UIDefinitionGateway {
 
     SearchResult getSearchResult(int version, String caseTypeId);
 
-    SearchInputFieldsDefinition getSearchInputDefinitions(int version, String caseTypeId);
+    SearchInputFieldsDefinition getSearchInputFieldDefinitions(int version, String caseTypeId);
 
-    WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(int version, String caseTypeId);
+    WorkbasketInputFieldsDefinition getWorkbasketInputFieldsDefinitions(int version, String caseTypeId);
 
-    CaseTypeTabsDefinition getCaseTabCollection(int version, String caseTypeId);
+    CaseTypeTabsDefinition getCaseTypeTabsCollection(int version, String caseTypeId);
 
     List<WizardPage> getWizardPageCollection(int version, String caseTypeId, String eventId);
 

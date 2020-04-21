@@ -94,7 +94,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                 return trigger;
             })
             .toArray(CaseViewActionableEvent[]::new);
-        caseView.setTriggers(triggers);
+        caseView.setActionableEvents(triggers);
 
         caseView.setEvents(caseViewEvents);
 

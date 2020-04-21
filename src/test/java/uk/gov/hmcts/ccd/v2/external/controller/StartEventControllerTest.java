@@ -25,7 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
+import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 
 @DisplayName("StartTriggerController")
 class StartEventControllerTest {
@@ -73,7 +73,7 @@ class StartEventControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<StartTriggerResource> response = startEventController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<StartEventResource> response = startEventController.getStartCaseEvent(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -88,7 +88,7 @@ class StartEventControllerTest {
         void shouldPropagateExceptionWhenThrown() {
             when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> startEventController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () -> startEventController.getStartCaseEvent(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
 
@@ -102,7 +102,7 @@ class StartEventControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<StartTriggerResource> response = startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<StartEventResource> response = startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),

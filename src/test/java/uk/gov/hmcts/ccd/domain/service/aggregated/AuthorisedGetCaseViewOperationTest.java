@@ -231,7 +231,7 @@ class AuthorisedGetCaseViewOperationTest {
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
-        assertThat(caseView.getTriggers(), arrayWithSize(0));
+        assertThat(caseView.getActionableEvents(), arrayWithSize(0));
     }
 
     @Test
@@ -243,7 +243,7 @@ class AuthorisedGetCaseViewOperationTest {
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
-        assertThat(caseView.getTriggers(), arrayWithSize(0));
+        assertThat(caseView.getActionableEvents(), arrayWithSize(0));
     }
 
     @Test
@@ -253,11 +253,11 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
         doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
         doReturn(AUTH_CASE_VIEW_TRIGGERS).when(accessControlService)
-            .filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
+            .filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
-        assertThat(caseView.getTriggers(), arrayWithSize(1));
-        assertThat(caseView.getTriggers(), arrayContaining(CASE_VIEW_TRIGGER));
+        assertThat(caseView.getActionableEvents(), arrayWithSize(1));
+        assertThat(caseView.getActionableEvents(), arrayContaining(CASE_VIEW_TRIGGER));
     }
 
     @Test
@@ -266,11 +266,11 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
         doReturn(EMPTY_TRIGGERS).when(accessControlService)
-            .filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
+            .filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
-        assertThat(caseView.getTriggers(), arrayWithSize(0));
+        assertThat(caseView.getActionableEvents(), arrayWithSize(0));
     }
 
     @Test

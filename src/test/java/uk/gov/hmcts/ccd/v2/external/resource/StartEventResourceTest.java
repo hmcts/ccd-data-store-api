@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import java.util.Optional;
 
 @DisplayName("CaseResource")
-class StartTriggerResourceTest {
+class StartEventResourceTest {
     private static final String TOKEN = "Token";
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String EVENT_ID = "createCase";
@@ -49,21 +49,21 @@ class StartTriggerResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventResult, ignoreWarning, false);
+            final StartEventResource startEventResource = new StartEventResource(startEventResult, ignoreWarning, false);
 
             assertAll(
-                () -> assertThat(startTriggerResource.getEventId(), equalTo(EVENT_ID.toString())),
-                () -> assertThat(startTriggerResource.getToken(), equalTo(TOKEN)),
-                () -> assertThat(startTriggerResource.getCaseDetails(), equalTo(CASE_DETAILS))
+                () -> assertThat(startEventResource.getEventId(), equalTo(EVENT_ID.toString())),
+                () -> assertThat(startEventResource.getToken(), equalTo(TOKEN)),
+                () -> assertThat(startEventResource.getCaseDetails(), equalTo(CASE_DETAILS))
             );
         }
 
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventResult, ignoreWarning, false);
+            final StartEventResource startEventResource = new StartEventResource(startEventResult, ignoreWarning, false);
 
-            Optional<Link> self = startTriggerResource.getLink("self");
+            Optional<Link> self = startEventResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_CASE));
         }
     }
@@ -86,21 +86,21 @@ class StartTriggerResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventResult, ignoreWarning, true);
+            final StartEventResource startEventResource = new StartEventResource(startEventResult, ignoreWarning, true);
 
             assertAll(
-                () -> assertThat(startTriggerResource.getEventId(), equalTo(EVENT_ID.toString())),
-                () -> assertThat(startTriggerResource.getToken(), equalTo(TOKEN)),
-                () -> assertThat(startTriggerResource.getCaseDetails(), equalTo(CASE_DETAILS))
+                () -> assertThat(startEventResource.getEventId(), equalTo(EVENT_ID.toString())),
+                () -> assertThat(startEventResource.getToken(), equalTo(TOKEN)),
+                () -> assertThat(startEventResource.getCaseDetails(), equalTo(CASE_DETAILS))
             );
         }
 
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventResult, ignoreWarning, true);
+            final StartEventResource startEventResource = new StartEventResource(startEventResult, ignoreWarning, true);
 
-            Optional<Link> self = startTriggerResource.getLink("self");
+            Optional<Link> self = startEventResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_EVENT));
         }
     }

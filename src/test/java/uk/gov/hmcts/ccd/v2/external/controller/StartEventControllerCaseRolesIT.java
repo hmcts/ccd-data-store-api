@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.v2.CaseRolesTestData;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
+import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -105,19 +105,19 @@ public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_EXTERNAL)
             .contentType(JSON_CONTENT_TYPE)
-            .accept(V2.MediaType.START_CASE_TRIGGER)
+            .accept(V2.MediaType.START_CASE_EVENT)
             .headers(headers))
             .andExpect(status().is(200))
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
 
-        final StartTriggerResource startTriggerResource = mapper.readValue(result.getResponse().getContentAsString(), StartTriggerResource.class);
-        assertNotNull("UI Start Trigger Resource is null", startTriggerResource);
+        final StartEventResource startEventResource = mapper.readValue(result.getResponse().getContentAsString(), StartEventResource.class);
+        assertNotNull("UI Start Trigger Resource is null", startEventResource);
 
-        assertEquals("Unexpected CaseDetails.data size", 1, startTriggerResource.getCaseDetails().getData().size());
+        assertEquals("Unexpected CaseDetails.data size", 1, startEventResource.getCaseDetails().getData().size());
 
-        assertTrue(startTriggerResource.getCaseDetails().getData().containsKey("PersonFirstName"));
+        assertTrue(startEventResource.getCaseDetails().getData().containsKey("PersonFirstName"));
     }
 
     private Matcher<Iterable<? extends CaseViewField>> hasIds(String[] expectedIds) {

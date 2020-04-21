@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.v2.external.controller.StartEventController;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class StartTriggerResource extends RepresentationModel {
+public class StartEventResource extends RepresentationModel {
 
     @JsonProperty("case_details")
     private CaseDetails caseDetails;
@@ -24,13 +24,13 @@ public class StartTriggerResource extends RepresentationModel {
     private String eventId;
     private String token;
 
-    public StartTriggerResource(@NonNull StartEventResult startEventResult, Boolean ignoreWarning, Boolean withCase) {
+    public StartEventResource(@NonNull StartEventResult startEventResult, Boolean ignoreWarning, Boolean withCase) {
         copyProperties(startEventResult);
 
         if (withCase) {
             add(linkTo(methodOn(StartEventController.class).getStartEventTrigger(startEventResult.getCaseReference(), eventId, ignoreWarning)).withSelfRel());
         } else {
-            add(linkTo(methodOn(StartEventController.class).getStartCaseTrigger(startEventResult.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(StartEventController.class).getStartCaseEvent(startEventResult.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
         }
     }
 

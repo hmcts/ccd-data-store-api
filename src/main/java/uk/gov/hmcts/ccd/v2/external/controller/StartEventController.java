@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
+import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 
 import static uk.gov.hmcts.ccd.v2.V2.Error.EVENT_TRIGGER_NOT_FOUND;
 
@@ -39,7 +39,7 @@ public class StartEventController {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.START_CASE_TRIGGER
+            V2.MediaType.START_CASE_EVENT
         }
     )
     @ApiOperation(
@@ -50,7 +50,7 @@ public class StartEventController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = StartTriggerResource.class
+            response = StartEventResource.class
         ),
         @ApiResponse(
             code = 422,
@@ -61,15 +61,15 @@ public class StartEventController {
             message = EVENT_TRIGGER_NOT_FOUND
         )
     })
-    public ResponseEntity<StartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
-                                                                    @PathVariable("triggerId") String triggerId,
-                                                                    @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+    public ResponseEntity<StartEventResource> getStartCaseEvent(@PathVariable("caseTypeId") String caseTypeId,
+                                                                @PathVariable("triggerId") String triggerId,
+                                                                @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         final StartEventResult startEventResult = this.startEventOperation.triggerStartForCaseType(caseTypeId,
                                                                                                      triggerId,
                                                                                                      ignoreWarning);
 
-        return ResponseEntity.ok(new StartTriggerResource(startEventResult, ignoreWarning, false));
+        return ResponseEntity.ok(new StartEventResource(startEventResult, ignoreWarning, false));
     }
 
     @GetMapping(
@@ -89,7 +89,7 @@ public class StartEventController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = StartTriggerResource.class
+            response = StartEventResource.class
         ),
         @ApiResponse(
             code = 422,
@@ -104,9 +104,9 @@ public class StartEventController {
             message = EVENT_TRIGGER_NOT_FOUND
         )
     })
-    public ResponseEntity<StartTriggerResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
-                                                                     @PathVariable("triggerId") String triggerId,
-                                                                     @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+    public ResponseEntity<StartEventResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
+                                                                   @PathVariable("triggerId") String triggerId,
+                                                                   @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
@@ -115,7 +115,7 @@ public class StartEventController {
                                                                                                  triggerId,
                                                                                                  ignoreWarning);
 
-        return ResponseEntity.ok(new StartTriggerResource(startEventResult, ignoreWarning, true));
+        return ResponseEntity.ok(new StartEventResource(startEventResult, ignoreWarning, true));
     }
 
 }

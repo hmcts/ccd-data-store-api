@@ -87,7 +87,7 @@ public class DefaultGetCriteriaOperationTest {
 
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(caseTypeDefinition.getId());
         doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseTypeDefinition.getId());
-        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputDefinitions(caseTypeDefinition.getId());
+        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputFieldDefinitions(caseTypeDefinition.getId());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldReturnSearchInputsWhenCaseFieldElementPathDefined() {
-        doReturn(generateSearchInputWithPathElements()).when(uiDefinitionRepository).getSearchInputDefinitions(caseTypeDefinition.getId());
+        doReturn(generateSearchInputWithPathElements()).when(uiDefinitionRepository).getSearchInputFieldDefinitions(caseTypeDefinition.getId());
         List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH);
 
         assertAll(
@@ -168,7 +168,7 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldThrowResourceNotFoundExceptionWhenCaseFieldNotFoundInCaseTypeForSearchInput() {
-        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputDefinitions(caseTypeDefinition.getId());
+        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputFieldDefinitions(caseTypeDefinition.getId());
         caseTypeDefinition.setCaseFieldDefinitions(Collections.emptyList());
 
         final BadRequestException exception = assertThrows(BadRequestException.class,

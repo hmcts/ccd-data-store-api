@@ -17,7 +17,7 @@ public class HttpUIDefinitionGatewayServiceExceptionTest extends BaseTest {
 
     @Test(expected = ServiceException.class)
     public void shouldGetServiceExceptionWhenGettingWorkbasketInputDefinitions() {
-        httpUIDefinitionGateway.getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
+        httpUIDefinitionGateway.getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
     }
 
     @Test(expected = ServiceException.class)
@@ -27,7 +27,7 @@ public class HttpUIDefinitionGatewayServiceExceptionTest extends BaseTest {
 
     @Test(expected = ServiceException.class)
     public void shouldGetServiceExceptionWhenGettingSearchInputs() {
-        httpUIDefinitionGateway.getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
+        httpUIDefinitionGateway.getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
     }
 
     @Test(expected = ServiceException.class)

@@ -77,7 +77,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public SearchInputFieldsDefinition getSearchInputDefinitions(int version, String caseTypeId) {
+    public SearchInputFieldsDefinition getSearchInputFieldDefinitions(int version, String caseTypeId) {
         try {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
@@ -101,7 +101,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(int version, String caseTypeId) {
+    public WorkbasketInputFieldsDefinition getWorkbasketInputFieldsDefinitions(int version, String caseTypeId) {
         try {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
@@ -125,7 +125,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public CaseTypeTabsDefinition getCaseTabCollection(int version, String caseTypeId) {
+    public CaseTypeTabsDefinition getCaseTypeTabsCollection(int version, String caseTypeId) {
         final Instant start = Instant.now();
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
         final CaseTypeTabsDefinition
@@ -135,7 +135,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                         requestEntity,
                         CaseTypeTabsDefinition.class).getBody();
         final Duration duration = Duration.between(start, Instant.now());
-        LOG.debug("Rest API getCaseTabCollectionGetHttp called for {}, finished in {}",
+        LOG.debug("Rest API getCaseTypeTabsCollection called for {}, finished in {}",
                 caseTypeId,
                 duration.toMillis());
         return collection;

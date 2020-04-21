@@ -123,7 +123,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
         caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTypeTabsDefinition));
         caseView.setMetadataFields(getMetadataFields(caseTypeDefinition, caseDetails));
 
-        caseView.setTriggers(new CaseViewActionableEvent[]{resumeTrigger, DELETE_TRIGGER});
+        caseView.setActionableEvents(new CaseViewActionableEvent[]{resumeTrigger, DELETE_TRIGGER});
         caseView.setEvents(events);
 
         return caseView;

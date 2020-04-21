@@ -611,7 +611,7 @@ public class TestBuildersUtil {
         }
 
         public CaseView build() {
-            caseView.setTriggers(caseViewActionableEvents.toArray(new CaseViewActionableEvent[]{}));
+            caseView.setActionableEvents(caseViewActionableEvents.toArray(new CaseViewActionableEvent[]{}));
             return caseView;
         }
     }

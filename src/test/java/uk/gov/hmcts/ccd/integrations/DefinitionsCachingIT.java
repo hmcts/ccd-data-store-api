@@ -203,13 +203,13 @@ public class DefinitionsCachingIT {
     @Test
     public void testWorkbasketInputDefinitionsAreCached() {
 
-        doReturn(workbasketInputFieldsDefinition).when(this.httpUIDefinitionGateway).getWorkbasketInputDefinitions(VERSION_1, ID_1);
+        doReturn(workbasketInputFieldsDefinition).when(this.httpUIDefinitionGateway).getWorkbasketInputFieldsDefinitions(VERSION_1, ID_1);
 
         uiDefinitionRepository.getWorkbasketInputDefinitions(ID_1);
         uiDefinitionRepository.getWorkbasketInputDefinitions(ID_1);
         uiDefinitionRepository.getWorkbasketInputDefinitions(ID_1);
 
-        verify(httpUIDefinitionGateway, times(1)).getWorkbasketInputDefinitions(VERSION_1, ID_1);
+        verify(httpUIDefinitionGateway, times(1)).getWorkbasketInputFieldsDefinitions(VERSION_1, ID_1);
     }
 
     @Test
@@ -239,25 +239,25 @@ public class DefinitionsCachingIT {
     @Test
     public void testCaseTabsAreCached() {
 
-        doReturn(caseTypeTabsDefinition).when(this.httpUIDefinitionGateway).getCaseTabCollection(VERSION_1, ID_1);
+        doReturn(caseTypeTabsDefinition).when(this.httpUIDefinitionGateway).getCaseTypeTabsCollection(VERSION_1, ID_1);
 
         uiDefinitionRepository.getCaseTabCollection(ID_1);
         uiDefinitionRepository.getCaseTabCollection(ID_1);
         uiDefinitionRepository.getCaseTabCollection(ID_1);
 
-        verify(httpUIDefinitionGateway, times(1)).getCaseTabCollection(VERSION_1, ID_1);
+        verify(httpUIDefinitionGateway, times(1)).getCaseTypeTabsCollection(VERSION_1, ID_1);
     }
 
     @Test
     public void testSearchInputDefinitionsAreCached() {
 
-        doReturn(searchInputFieldsDefinition).when(this.httpUIDefinitionGateway).getSearchInputDefinitions(VERSION_1, ID_1);
+        doReturn(searchInputFieldsDefinition).when(this.httpUIDefinitionGateway).getSearchInputFieldDefinitions(VERSION_1, ID_1);
 
-        uiDefinitionRepository.getSearchInputDefinitions(ID_1);
-        uiDefinitionRepository.getSearchInputDefinitions(ID_1);
-        uiDefinitionRepository.getSearchInputDefinitions(ID_1);
+        uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);
+        uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);
+        uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);
 
-        verify(httpUIDefinitionGateway, times(1)).getSearchInputDefinitions(VERSION_1, ID_1);
+        verify(httpUIDefinitionGateway, times(1)).getSearchInputFieldDefinitions(VERSION_1, ID_1);
     }
 
     @Test

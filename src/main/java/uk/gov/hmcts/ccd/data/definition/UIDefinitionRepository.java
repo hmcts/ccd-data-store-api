@@ -38,9 +38,9 @@ public class UIDefinitionRepository {
         return cachedUiDefinitionGateway.getSearchResult(version.getVersion(), caseTypeId);
     }
 
-    public SearchInputFieldsDefinition getSearchInputDefinitions(final String caseTypeId) {
+    public SearchInputFieldsDefinition getSearchInputFieldDefinitions(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getSearchInputDefinitions(version.getVersion(), caseTypeId);
+        return cachedUiDefinitionGateway.getSearchInputFieldDefinitions(version.getVersion(), caseTypeId);
     }
 
     public List<WizardPage> getWizardPageCollection(final String caseTypeId, final String eventId) {
@@ -50,12 +50,12 @@ public class UIDefinitionRepository {
 
     public WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getWorkbasketInputDefinitions(version.getVersion(), caseTypeId);
+        return cachedUiDefinitionGateway.getWorkbasketInputFieldsDefinitions(version.getVersion(), caseTypeId);
     }
 
     public CaseTypeTabsDefinition getCaseTabCollection(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getCaseTabCollection(version.getVersion(), caseTypeId);
+        return cachedUiDefinitionGateway.getCaseTypeTabsCollection(version.getVersion(), caseTypeId);
     }
 
     public BannersResult getBanners(final List<String> jurisdictionReferences) {

@@ -75,12 +75,12 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
                                                                       CAN_UPDATE)) {
             authorisedTriggers = new CaseViewActionableEvent[]{};
         } else {
-            authorisedTriggers = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getTriggers(),
+            authorisedTriggers = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getActionableEvents(),
                                                                                                 caseTypeDefinition.getEvents(),
                                                                                                 userRoles);
         }
 
-        caseView.setTriggers(authorisedTriggers);
+        caseView.setActionableEvents(authorisedTriggers);
 
         return caseView;
     }

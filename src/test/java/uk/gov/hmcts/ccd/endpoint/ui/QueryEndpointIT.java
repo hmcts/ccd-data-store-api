@@ -741,7 +741,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Event State Name", "Draft", events[1].getStateName());
         assertEquals("Event State ID", "Draft", events[1].getStateId());
 
-        final CaseViewActionableEvent[] triggers = caseView.getTriggers();
+        final CaseViewActionableEvent[] triggers = caseView.getActionableEvents();
         assertNotNull("Triggers are null", triggers);
         assertEquals("Should only get resume and delete triggers", 2, triggers.length);
 
@@ -916,7 +916,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Comment", "Some comment", event2.getComment());
         assertEquals("Timestamp", "2017-05-09T14:31:43", event2.getTimestamp().format(DateTimeFormatter.ISO_DATE_TIME));
 
-        final CaseViewActionableEvent[] triggers = caseView.getTriggers();
+        final CaseViewActionableEvent[] triggers = caseView.getActionableEvents();
         assertNotNull("Triggers are null", triggers);
         assertEquals("Should only get valid triggers", 1, triggers.length);
 
@@ -948,7 +948,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull("Case View is null", caseView);
         assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
 
-        final CaseViewActionableEvent[] triggers = caseView.getTriggers();
+        final CaseViewActionableEvent[] triggers = caseView.getActionableEvents();
         assertEquals("Should only no valid triggers", 0, triggers.length);
     }
 

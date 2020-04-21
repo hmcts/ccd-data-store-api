@@ -34,7 +34,7 @@ class GetUIStartTriggerTest extends BaseTest {
         @Test
         @DisplayName("should retrieve trigger when the case type and event exists")
         void shouldRetrieveWhenExists() {
-            callGetStartTrigger(CASE_TYPE, CREATE)
+            callCaseTypeUpdateViewEvent(CASE_TYPE, CREATE)
                 .when()
                 .get("/internal/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
@@ -65,7 +65,7 @@ class GetUIStartTriggerTest extends BaseTest {
         @Test
         @DisplayName("should get 404 when case type does not exist")
         void should404WhenCaseTypeDoesNotExist() {
-            callGetStartTrigger(INVALID_CASE_TYPE_ID, CREATE)
+            callCaseTypeUpdateViewEvent(INVALID_CASE_TYPE_ID, CREATE)
                 .when()
                 .get("/internal/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
@@ -76,7 +76,7 @@ class GetUIStartTriggerTest extends BaseTest {
         @Test
         @DisplayName("should get 404 when event trigger does not exist")
         void should404WhenEventTriggerDoesNotExist() {
-            callGetStartTrigger(CASE_TYPE, INVALID_EVENT_TRIGGER_ID)
+            callCaseTypeUpdateViewEvent(CASE_TYPE, INVALID_EVENT_TRIGGER_ID)
                 .when()
                 .get("/internal/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
@@ -84,13 +84,13 @@ class GetUIStartTriggerTest extends BaseTest {
                 .statusCode(404);
         }
 
-        private RequestSpecification callGetStartTrigger(String caseTypeId, String eventId) {
+        private RequestSpecification callCaseTypeUpdateViewEvent(String caseTypeId, String eventId) {
             return asAutoTestCaseworker(FALSE)
                 .get()
                 .given()
                 .pathParam("caseTypeId", caseTypeId)
                 .pathParam("triggerId", eventId)
-                .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+                .accept(V2.MediaType.CASE_TYPE_UPDATE_VIEW_EVENT)
                 .header("experimental", "true");
         }
     }
@@ -110,7 +110,7 @@ class GetUIStartTriggerTest extends BaseTest {
                 .withData(FullCase.build())
                 .submitAndGetReference();
 
-            callGetStartEventTrigger(String.valueOf(caseReference), UPDATE)
+            callCaseUpdateViewEvent(String.valueOf(caseReference), UPDATE)
                 .when()
                 .get("/internal/cases/{caseId}/event-triggers/{triggerId}")
 
@@ -141,7 +141,7 @@ class GetUIStartTriggerTest extends BaseTest {
         @Test
         @DisplayName("should get 400 when case reference invalid")
         void should400WhenCaseReferenceInvalid() {
-            callGetStartEventTrigger(INVALID_CASE_REFERENCE, UPDATE)
+            callCaseUpdateViewEvent(INVALID_CASE_REFERENCE, UPDATE)
                 .when()
                 .get("/internal/cases/{caseId}/event-triggers/{triggerId}")
 
@@ -152,7 +152,7 @@ class GetUIStartTriggerTest extends BaseTest {
         @Test
         @DisplayName("should get 404 when case does not exist")
         void should404WhenCaseDoesNotExist() {
-            callGetStartEventTrigger(NOT_FOUND_CASE_REFERENCE, UPDATE)
+            callCaseUpdateViewEvent(NOT_FOUND_CASE_REFERENCE, UPDATE)
                 .when()
                 .get("/internal/cases/{caseId}/event-triggers/{triggerId}")
 
@@ -169,7 +169,7 @@ class GetUIStartTriggerTest extends BaseTest {
                 .withData(FullCase.build())
                 .submitAndGetReference();
 
-            callGetStartEventTrigger(String.valueOf(caseReference), INVALID_EVENT_TRIGGER_ID)
+            callCaseUpdateViewEvent(String.valueOf(caseReference), INVALID_EVENT_TRIGGER_ID)
                 .when()
                 .get("/internal/cases/{caseId}/event-triggers/{triggerId}")
 
@@ -177,13 +177,13 @@ class GetUIStartTriggerTest extends BaseTest {
                 .statusCode(404);
         }
 
-        private RequestSpecification callGetStartEventTrigger(String caseId, String eventId) {
+        private RequestSpecification callCaseUpdateViewEvent(String caseId, String eventId) {
             return asAutoTestCaseworker(FALSE)
                 .get()
                 .given()
                 .pathParam("caseId", caseId)
                 .pathParam("triggerId", eventId)
-                .accept(V2.MediaType.UI_START_EVENT_TRIGGER)
+                .accept(V2.MediaType.CASE_UPDATE_VIEW_EVENT)
                 .header("experimental", "true");
         }
     }
