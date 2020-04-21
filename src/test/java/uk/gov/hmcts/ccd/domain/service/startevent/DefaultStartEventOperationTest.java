@@ -142,7 +142,7 @@ public class DefaultStartEventOperationTest {
             doReturn(caseDetails).when(caseService).createNewCaseDetails(eq(TEST_CASE_TYPE_ID), eq(TEST_JURISDICTION_ID), eq(Maps.newHashMap()));
             doReturn(true).when(eventTriggerService).isPreStateEmpty(eventTrigger);
             doReturn(UID).when(userAuthorisation).getUserId();
-            doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition);
+            doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
         }
 
         @Test
@@ -157,7 +157,7 @@ public class DefaultStartEventOperationTest {
                 () -> verify(eventTriggerService).findCaseEvent(caseTypeDefinition, TEST_EVENT_TRIGGER_ID),
                 () -> verify(caseService).createNewCaseDetails(eq(TEST_CASE_TYPE_ID), eq(TEST_JURISDICTION_ID), eq(Maps.newHashMap())),
                 () -> verify(eventTriggerService).isPreStateEmpty(eventTrigger),
-                () -> verify(eventTokenService).generateToken(UID, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition),
+                () -> verify(eventTokenService).generateToken(UID, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition),
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(eventTrigger, caseTypeDefinition, caseDetails, IGNORE_WARNING),
                 () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),
@@ -212,7 +212,7 @@ public class DefaultStartEventOperationTest {
         @BeforeEach
         void setUp() {
             doReturn(true).when(eventTriggerService).isPreStateEmpty(eventTrigger);
-            doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition);
+            doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
             doReturn(caseDetails).when(draftGateway).getCaseDetails(TEST_DRAFT_ID);
             doReturn(draftResponse).when(draftGateway).get(TEST_DRAFT_ID);
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
@@ -234,7 +234,7 @@ public class DefaultStartEventOperationTest {
                 () -> verify(eventTriggerService).findCaseEvent(caseTypeDefinition, TEST_EVENT_TRIGGER_ID),
                 () -> verify(draftGateway).getCaseDetails(TEST_DRAFT_ID),
                 () -> verify(eventTriggerService).isPreStateEmpty(eventTrigger),
-                () -> verify(eventTokenService).generateToken(UID, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition),
+                () -> verify(eventTokenService).generateToken(UID, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition),
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(eq(eventTrigger), eq(caseTypeDefinition), any(CaseDetails.class), eq(IGNORE_WARNING)),
                 () -> assertThat(actual.getCaseDetails(), hasProperty("securityClassification", is(SecurityClassification.PRIVATE))),
                 () -> assertThat(actual.getCaseDetails(), hasProperty("data", is(DATA))),
@@ -294,7 +294,7 @@ public class DefaultStartEventOperationTest {
             doReturn(true).when(uidService).validateUID(TEST_CASE_REFERENCE);
             doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(TEST_JURISDICTION_ID, TEST_CASE_TYPE_ID, TEST_CASE_REFERENCE);
             doReturn(true).when(eventTriggerService).isPreStateValid(TEST_CASE_STATE, eventTrigger);
-            doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, caseDetails, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition);
+            doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, caseDetails, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
             doReturn(true).when(uidService).validateUID(TEST_CASE_REFERENCE);
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(TEST_CASE_REFERENCE);
             doReturn(UID).when(userAuthorisation).getUserId();
@@ -314,7 +314,7 @@ public class DefaultStartEventOperationTest {
                 () -> verify(uidService).validateUID(TEST_CASE_REFERENCE),
                 () -> verify(caseDetailsRepository).findByReference(TEST_CASE_REFERENCE),
                 () -> verify(eventTriggerService).isPreStateValid(TEST_CASE_STATE, eventTrigger),
-                () -> verify(eventTokenService).generateToken(UID, caseDetails, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition),
+                () -> verify(eventTokenService).generateToken(UID, caseDetails, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition),
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(eventTrigger, caseTypeDefinition, caseDetails, IGNORE_WARNING),
                 () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),

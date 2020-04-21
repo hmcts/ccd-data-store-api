@@ -5,7 +5,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
@@ -47,16 +47,16 @@ public class EventTokenService {
 
     public String generateToken(final String uid,
                                 final CaseEventDefinition event,
-                                final Jurisdiction jurisdiction,
+                                final JurisdictionDefinition jurisdictionDefinition,
                                 final CaseTypeDefinition caseTypeDefinition) {
 
-        return generateToken(uid, EMPTY_CASE, event, jurisdiction, caseTypeDefinition);
+        return generateToken(uid, EMPTY_CASE, event, jurisdictionDefinition, caseTypeDefinition);
     }
 
     public String generateToken(final String uid,
                                 final CaseDetails caseDetails,
                                 final CaseEventDefinition event,
-                                final Jurisdiction jurisdiction,
+                                final JurisdictionDefinition jurisdictionDefinition,
                                 final CaseTypeDefinition caseTypeDefinition) {
         return Jwts.builder()
             .setId(randomKeyGenerator.generate())
@@ -66,7 +66,7 @@ public class EventTokenService {
             .claim(EventTokenProperties.CASE_ID, caseDetails.getId())
             .claim(EventTokenProperties.TRIGGER_EVENT_ID, event.getId())
             .claim(EventTokenProperties.CASE_TYPE_ID, caseTypeDefinition.getId())
-            .claim(EventTokenProperties.JURISDICTION_ID, jurisdiction.getId())
+            .claim(EventTokenProperties.JURISDICTION_ID, jurisdictionDefinition.getId())
             .claim(EventTokenProperties.CASE_STATE, caseDetails.getState())
             .claim(EventTokenProperties.CASE_VERSION, caseService.hashData(caseDetails))
             .claim(EventTokenProperties.ENTITY_VERSION, caseDetails.getVersion())
@@ -97,16 +97,16 @@ public class EventTokenService {
     public void validateToken(final String token,
                               final String uid,
                               final CaseEventDefinition event,
-                              final Jurisdiction jurisdiction,
+                              final JurisdictionDefinition jurisdictionDefinition,
                               final CaseTypeDefinition caseTypeDefinition) {
-        validateToken(token, uid, EMPTY_CASE, event, jurisdiction, caseTypeDefinition);
+        validateToken(token, uid, EMPTY_CASE, event, jurisdictionDefinition, caseTypeDefinition);
     }
 
     public void validateToken(final String token,
                               final String uid,
                               final CaseDetails caseDetails,
                               final CaseEventDefinition event,
-                              final Jurisdiction jurisdiction,
+                              final JurisdictionDefinition jurisdictionDefinition,
                               final CaseTypeDefinition caseTypeDefinition) {
         if (token == null || token.isEmpty()) {
             throw new BadRequestException("Missing start trigger token");
@@ -117,7 +117,7 @@ public class EventTokenService {
 
             if (!(eventTokenProperties.getEventId() == null || eventTokenProperties.getEventId().equalsIgnoreCase(event.getId())
                 && eventTokenProperties.getCaseId() == null || eventTokenProperties.getCaseId().equalsIgnoreCase(caseDetails.getId().toString())
-                && eventTokenProperties.getJurisdictionId() == null || eventTokenProperties.getJurisdictionId().equalsIgnoreCase(jurisdiction.getId())
+                && eventTokenProperties.getJurisdictionId() == null || eventTokenProperties.getJurisdictionId().equalsIgnoreCase(jurisdictionDefinition.getId())
                 && eventTokenProperties.getCaseTypeId() == null || eventTokenProperties.getCaseTypeId().equalsIgnoreCase(caseTypeDefinition.getId())
                 && eventTokenProperties.getUid() == null || eventTokenProperties.getUid().equalsIgnoreCase(uid))) {
                 throw new ResourceNotFoundException("Cannot find matching start trigger");

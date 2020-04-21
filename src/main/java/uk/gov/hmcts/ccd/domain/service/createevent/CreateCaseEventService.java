@@ -117,7 +117,7 @@ public class CreateCaseEventService {
         final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
         String uid = userAuthorisation.getUserId();
 
-        eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition);
+        eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
 
         validatePreState(caseDetails, eventTrigger);
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseTypeDefinition);

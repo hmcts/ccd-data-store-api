@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
@@ -103,13 +103,13 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldGetJurisdictionsDefinition() {
-        List<Jurisdiction> allJurisdictions = newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
+        List<JurisdictionDefinition> allJurisdictionDefinitions = newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
                 .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
 
         assertAll(
-                () -> assertThat(allJurisdictions, hasSize(3)),
-                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("SSCS")))),
-                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("PROBATE"))))
+                () -> assertThat(allJurisdictionDefinitions, hasSize(3)),
+                () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
+                () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE"))))
         );
     }
 }

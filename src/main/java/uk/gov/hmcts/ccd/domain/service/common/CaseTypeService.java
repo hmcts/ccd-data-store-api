@@ -54,7 +54,7 @@ public class CaseTypeService {
                                        final CaseTypeDefinition caseTypeDefinition) {
         return null == caseTypeDefinition
                || null == jurisdictionId
-               || caseTypeDefinition.getJurisdiction().getId().equalsIgnoreCase(jurisdictionId);
+               || caseTypeDefinition.getJurisdictionDefinition().getId().equalsIgnoreCase(jurisdictionId);
     }
 
     public void validateData(final Map<String, JsonNode> data,
@@ -74,7 +74,7 @@ public class CaseTypeService {
                                                          final String jurisdictionId) {
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
-        if (null == jurisdictionId || !jurisdictionId.equalsIgnoreCase(caseTypeDefinition.getJurisdiction().getId())) {
+        if (null == jurisdictionId || !jurisdictionId.equalsIgnoreCase(caseTypeDefinition.getJurisdictionDefinition().getId())) {
             throw new ResourceNotFoundException(
                 String.format(
                     "Case type with id %s could not be found for jurisdiction %s",

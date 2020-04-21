@@ -45,7 +45,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
@@ -434,7 +434,7 @@ public class TestBuildersUtil {
 
         private CaseTypeBuilder() {
             this.caseTypeDefinition = new CaseTypeDefinition();
-            caseTypeDefinition.setJurisdiction(new Jurisdiction());
+            caseTypeDefinition.setJurisdictionDefinition(new JurisdictionDefinition());
         }
 
         public static CaseTypeBuilder newCaseType() {
@@ -447,8 +447,8 @@ public class TestBuildersUtil {
 
         }
 
-        public CaseTypeBuilder withJurisdiction(Jurisdiction jurisdiction) {
-            caseTypeDefinition.setJurisdiction(jurisdiction);
+        public CaseTypeBuilder withJurisdiction(JurisdictionDefinition jurisdictionDefinition) {
+            caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
             return this;
         }
 
@@ -504,7 +504,7 @@ public class TestBuildersUtil {
 
         private BannerBuilder() {
             this.banner = new Banner();
-            this.banner.setJurisdiction(new Jurisdiction());
+            this.banner.setJurisdictionDefinition(new JurisdictionDefinition());
         }
 
         public static BannerBuilder newBanner() {
@@ -1259,38 +1259,38 @@ public class TestBuildersUtil {
     }
 
     public static class JurisdictionBuilder {
-        private final Jurisdiction jurisdiction;
+        private final JurisdictionDefinition jurisdictionDefinition;
 
         public static JurisdictionBuilder newJurisdiction() {
             return new JurisdictionBuilder();
         }
 
         private JurisdictionBuilder() {
-            this.jurisdiction = new Jurisdiction();
+            this.jurisdictionDefinition = new JurisdictionDefinition();
         }
 
         public JurisdictionBuilder withJurisdictionId(String id) {
-            jurisdiction.setId(id);
+            jurisdictionDefinition.setId(id);
             return this;
         }
 
         public JurisdictionBuilder withName(String name) {
-            jurisdiction.setName(name);
+            jurisdictionDefinition.setName(name);
             return this;
         }
 
         public JurisdictionBuilder withDescription(String description) {
-            jurisdiction.setDescription(description);
+            jurisdictionDefinition.setDescription(description);
             return this;
         }
 
         public JurisdictionBuilder withCaseType(CaseTypeDefinition caseTypeDefinition) {
-            jurisdiction.getCaseTypeDefinitions().add(caseTypeDefinition);
+            jurisdictionDefinition.getCaseTypeDefinitions().add(caseTypeDefinition);
             return this;
         }
 
-        public Jurisdiction build() {
-            return jurisdiction;
+        public JurisdictionDefinition build() {
+            return jurisdictionDefinition;
         }
     }
 

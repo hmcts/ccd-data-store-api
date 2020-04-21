@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -130,9 +130,9 @@ class DefaultGetCaseViewOperationTest {
         doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         caseTypeDefinition = new CaseTypeDefinition();
-        Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setName(JURISDICTION_ID);
-        caseTypeDefinition.setJurisdiction(jurisdiction);
+        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setName(JURISDICTION_ID);
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setId(MetaData.CaseField.CASE_TYPE.getReference());
         caseFieldDefinition.setMetadata(true);

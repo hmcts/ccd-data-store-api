@@ -97,7 +97,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
-        final String eventToken = eventTokenService.generateToken(uid, caseDetails, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition);
+        final String eventToken = eventTokenService.generateToken(uid, caseDetails, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
 
         callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseTypeDefinition, caseDetails, ignoreWarning);
 
@@ -134,7 +134,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(eventTrigger));
 
         // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the relevant draft payload
-        final String eventToken = eventTokenService.generateToken(uid, eventTrigger, caseTypeDefinition.getJurisdiction(), caseTypeDefinition);
+        final String eventToken = eventTokenService.generateToken(uid, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
 
         callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseTypeDefinition, caseDetails, ignoreWarning);
 

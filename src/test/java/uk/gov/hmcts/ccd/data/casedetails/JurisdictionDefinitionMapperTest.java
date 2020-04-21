@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -14,7 +14,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
-class JurisdictionMapperTest {
+class JurisdictionDefinitionMapperTest {
     JurisdictionMapper jurisdictionMapper = new JurisdictionMapper();
 
     CaseStateDefinition caseStateDefinition1 = newState()
@@ -33,7 +33,7 @@ class JurisdictionMapperTest {
         .withState(caseStateDefinition2)
         .build();
 
-    Jurisdiction jurisdiction = newJurisdiction()
+    JurisdictionDefinition jurisdictionDefinition = newJurisdiction()
         .withJurisdictionId("jid")
         .withName("name")
         .withDescription("description")
@@ -44,11 +44,11 @@ class JurisdictionMapperTest {
     @Test
     void toResponse() {
 
-        final JurisdictionDisplayProperties response = jurisdictionMapper.toResponse(jurisdiction);
+        final JurisdictionDisplayProperties response = jurisdictionMapper.toResponse(jurisdictionDefinition);
         assertAll(
-            () -> assertThat(response.getId(), is(equalTo(jurisdiction.getId()))),
-            () -> assertThat(response.getName(), is(equalTo(jurisdiction.getName()))),
-            () -> assertThat(response.getDescription(), is(equalTo(jurisdiction.getDescription()))),
+            () -> assertThat(response.getId(), is(equalTo(jurisdictionDefinition.getId()))),
+            () -> assertThat(response.getName(), is(equalTo(jurisdictionDefinition.getName()))),
+            () -> assertThat(response.getDescription(), is(equalTo(jurisdictionDefinition.getDescription()))),
             () -> assertThat(response.getCaseTypeDefinitions().size(), is(2)),
             () -> assertThat(response.getCaseTypeDefinitions().get(0).getStates().size(), is(1)),
             () -> assertThat(response.getCaseTypeDefinitions().get(1).getStates().get(0).getId(), is(caseStateDefinition2.getId()))

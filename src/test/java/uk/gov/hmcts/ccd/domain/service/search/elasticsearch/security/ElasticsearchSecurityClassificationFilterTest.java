@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 class ElasticsearchSecurityClassificationFilterTest {
@@ -45,9 +45,9 @@ class ElasticsearchSecurityClassificationFilterTest {
         String jurisdictionId = "jurisdiction";
         when(userRepository.getHighestUserClassification(jurisdictionId)).thenReturn(PRIVATE);
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
-        caseTypeDefinition.setJurisdiction(jurisdiction);
+        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         String caseTypeId = "caseType";
         when(caseTypeService.getCaseType(caseTypeId)).thenReturn(caseTypeDefinition);
 

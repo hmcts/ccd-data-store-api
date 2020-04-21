@@ -61,7 +61,7 @@ public class CaseViewType {
         return new CaseViewType(caseTypeDefinition.getId(),
                                 caseTypeDefinition.getName(),
                                 caseTypeDefinition.getDescription(),
-                                CaseViewJurisdiction.createFrom(caseTypeDefinition.getJurisdiction()),
+                                CaseViewJurisdiction.createFrom(caseTypeDefinition.getJurisdictionDefinition()),
                                 caseTypeDefinition.getPrintableDocumentsUrl() != null);
     }
 }

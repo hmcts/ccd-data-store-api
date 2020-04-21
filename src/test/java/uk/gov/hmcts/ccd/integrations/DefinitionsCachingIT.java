@@ -41,9 +41,9 @@ public class DefinitionsCachingIT {
     private static final int VERSION_2 = 3311;
     private static final int VERSION_3 = 331111;
 
-    private static final Jurisdiction JURISDICTION_1 = new Jurisdiction();
-    private static final Jurisdiction JURISDICTION_2 = new Jurisdiction();
-    private static final Jurisdiction JURISDICTION_3 = new Jurisdiction();
+    private static final JurisdictionDefinition JURISDICTION_DEFINITION_1 = new JurisdictionDefinition();
+    private static final JurisdictionDefinition JURISDICTION_DEFINITION_2 = new JurisdictionDefinition();
+    private static final JurisdictionDefinition JURISDICTION_DEFINITION_3 = new JurisdictionDefinition();
 
     @SpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
@@ -94,9 +94,9 @@ public class DefinitionsCachingIT {
         doReturn(caseTypeDefinitionVersion(VERSION_1)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_1);
         doReturn(caseTypeDefinitionVersion(VERSION_2)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_2);
         doReturn(caseTypeDefinitionVersion(VERSION_3)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_3);
-        doReturn(JURISDICTION_1).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J1");
-        doReturn(JURISDICTION_2).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J2");
-        doReturn(JURISDICTION_3).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J3");
+        doReturn(JURISDICTION_DEFINITION_1).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J1");
+        doReturn(JURISDICTION_DEFINITION_2).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J2");
+        doReturn(JURISDICTION_DEFINITION_3).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J3");
         doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
     }
 

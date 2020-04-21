@@ -69,7 +69,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     }
 
     private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
-        return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdiction().getId()).higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
+        return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdictionDefinition().getId()).higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
     }
 
     private List<CaseStateDefinition> filterCaseStatesForUser(List<CaseStateDefinition> caseStateDefinitions, Predicate<AccessControlList> access) {

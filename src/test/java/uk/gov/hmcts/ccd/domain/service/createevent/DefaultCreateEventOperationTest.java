@@ -80,13 +80,13 @@ class DefaultCreateEventOperationTest {
         event = buildEvent();
         data = buildJsonNodeData();
         caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN).withIgnoreWarning(IGNORE_WARNING).build();
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(JURISDICTION_ID);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
         caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(CASE_TYPE_ID);
-        caseTypeDefinition.setJurisdiction(jurisdiction);
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         caseTypeDefinition.setVersion(version);
 
         eventTrigger = new CaseEventDefinition();

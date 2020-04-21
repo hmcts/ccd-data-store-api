@@ -98,9 +98,9 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setName(JURISDICTION_ID);
-        caseTypeDefinition.setJurisdiction(jurisdiction);
+        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setName(JURISDICTION_ID);
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
         CaseStateDefinition caseStateDefinition = new CaseStateDefinition();

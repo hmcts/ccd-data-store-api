@@ -257,8 +257,8 @@ public abstract class BaseTest {
     }
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, Long caseReference, String eventId) {
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
 
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(caseTypeId);
@@ -266,12 +266,12 @@ public abstract class BaseTest {
         final CaseEventDefinition eventTrigger = new CaseEventDefinition();
         eventTrigger.setId(eventId);
 
-        return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdiction, caseTypeDefinition);
+        return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdictionDefinition, caseTypeDefinition);
     }
 
     protected String generateEventTokenNewCase(String userId, String jurisdictionId, String caseTypeId, String eventId) {
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
 
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(caseTypeId);
@@ -279,7 +279,7 @@ public abstract class BaseTest {
         final CaseEventDefinition eventTrigger = new CaseEventDefinition();
         eventTrigger.setId(eventId);
 
-        return eventTokenService.generateToken(userId, eventTrigger, jurisdiction, caseTypeDefinition);
+        return eventTokenService.generateToken(userId, eventTrigger, jurisdictionDefinition, caseTypeDefinition);
     }
 
     protected CaseDetails getCase(JdbcTemplate template, String caseReference) {

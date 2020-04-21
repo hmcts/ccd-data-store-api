@@ -17,7 +17,7 @@ public class CaseTypeDefinition implements Serializable {
     private String description;
     private Version version;
     private String name;
-    private Jurisdiction jurisdiction;
+    private JurisdictionDefinition jurisdictionDefinition;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
     private List<CaseEventDefinition> events = new ArrayList<>();
@@ -64,15 +64,15 @@ public class CaseTypeDefinition implements Serializable {
 
     @JsonIgnore
     public String getJurisdictionId() {
-        return jurisdiction.getId();
+        return jurisdictionDefinition.getId();
     }
 
-    public Jurisdiction getJurisdiction() {
-        return jurisdiction;
+    public JurisdictionDefinition getJurisdictionDefinition() {
+        return jurisdictionDefinition;
     }
 
-    public void setJurisdiction(Jurisdiction jurisdiction) {
-        this.jurisdiction = jurisdiction;
+    public void setJurisdictionDefinition(JurisdictionDefinition jurisdictionDefinition) {
+        this.jurisdictionDefinition = jurisdictionDefinition;
     }
 
     public SecurityClassification getSecurityClassification() {

@@ -35,6 +35,6 @@ public class ElasticsearchSecurityClassificationFilter implements CaseSearchFilt
 
     private List<String> getSecurityClassifications(String caseTypeId) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
-        return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdiction().getId()).getClassificationsLowerOrEqualTo();
+        return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdictionDefinition().getId()).getClassificationsLowerOrEqualTo();
     }
 }

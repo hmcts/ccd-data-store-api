@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -279,7 +279,7 @@ class DefaultCreateCaseOperationTest {
 
 
         assertAll(() -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
-                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
@@ -333,7 +333,7 @@ class DefaultCreateCaseOperationTest {
             draftGateway);
 
         assertAll("case details saved when call back fails",
-                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
@@ -390,7 +390,7 @@ class DefaultCreateCaseOperationTest {
 
         assertAll("Call back response returned successfully",
                   () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
-                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
@@ -433,19 +433,19 @@ class DefaultCreateCaseOperationTest {
     }
 
     private static CaseTypeDefinition buildCaseType() {
-        final Jurisdiction j = buildJurisdiction();
+        final JurisdictionDefinition j = buildJurisdiction();
         final Version version = new Version();
         version.setNumber(67);
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId("caseTypeId");
         caseTypeDefinition.setName("case type name");
-        caseTypeDefinition.setJurisdiction(j);
+        caseTypeDefinition.setJurisdictionDefinition(j);
         caseTypeDefinition.setVersion(version);
         return caseTypeDefinition;
     }
 
-    private static Jurisdiction buildJurisdiction() {
-        final Jurisdiction j = new Jurisdiction();
+    private static JurisdictionDefinition buildJurisdiction() {
+        final JurisdictionDefinition j = new JurisdictionDefinition();
         j.setId(JURISDICTION_ID);
         return j;
     }

@@ -46,7 +46,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(caseTypeDefinition.getJurisdiction()).thenReturn(newJurisdiction().withJurisdictionId("jid").build());
+        when(caseTypeDefinition.getJurisdictionDefinition()).thenReturn(newJurisdiction().withJurisdictionId("jid").build());
     }
 
     @Nested

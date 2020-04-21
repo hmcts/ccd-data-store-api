@@ -11,7 +11,7 @@ import lombok.ToString;
 
 @ApiModel(description = "")
 @ToString
-public class Jurisdiction implements Serializable {
+public class JurisdictionDefinition implements Serializable {
 
     private String id = null;
     private String name = null;

@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -77,13 +77,13 @@ class AuthorisedGetCaseViewOperationTest {
     private static final CaseViewActionableEvent CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
     private static final CaseViewActionableEvent[] AUTH_CASE_VIEW_TRIGGERS = new CaseViewActionableEvent[]{CASE_VIEW_TRIGGER};
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_ID).build();
-    private static final Jurisdiction jurisdiction = newJurisdiction()
+    private static final JurisdictionDefinition JURISDICTION_DEFINITION = newJurisdiction()
         .withJurisdictionId(JURISDICTION_ID)
         .withName(JURISDICTION_ID)
         .build();
     private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType()
         .withId(CASE_TYPE_ID)
-        .withJurisdiction(jurisdiction)
+        .withJurisdiction(JURISDICTION_DEFINITION)
         .withEvent(CASE_EVENT)
         .withEvent(CASE_EVENT_2)
         .build();

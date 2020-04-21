@@ -98,7 +98,7 @@ class AuthorisedCreateCaseOperationTest {
                                                                                        EVENT_DATA,
                                                                                        IGNORE);
         caseTypeDefinition.setEvents(events);
-        caseTypeDefinition.setJurisdiction(newJurisdiction().withJurisdictionId(JURISDICTION_ID).build());
+        caseTypeDefinition.setJurisdictionDefinition(newJurisdiction().withJurisdictionId(JURISDICTION_ID).build());
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getCaseCreationRoles()).thenReturn(userRoles);

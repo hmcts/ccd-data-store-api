@@ -30,7 +30,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -186,30 +186,30 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Cacheable(value = "jurisdictionCache")
     @Override
-    public Jurisdiction getJurisdiction(String jurisdictionId) {
+    public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
         return getJurisdictionFromDefinitionStore(jurisdictionId);
     }
 
-    public Jurisdiction getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        List<Jurisdiction> jurisdictions = getJurisdictionsFromDefinitionStore(Arrays.asList(jurisdictionId));
-        if (jurisdictions.isEmpty()) {
+    public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Arrays.asList(jurisdictionId));
+        if (jurisdictionDefinitions.isEmpty()) {
             return null;
         }
-        return jurisdictions.get(0);
+        return jurisdictionDefinitions.get(0);
     }
 
-    private List<Jurisdiction> getJurisdictionsFromDefinitionStore(List<String> jurisdictionIds) {
+    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(List<String> jurisdictionIds) {
         try {
             LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
                     jurisdictionIds);
-            HttpEntity<List<Jurisdiction>> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            HttpEntity<List<JurisdictionDefinition>> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
                     .queryParam("ids", String.join(",", jurisdictionIds));
-            List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(),
-                    HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
+            List<JurisdictionDefinition> jurisdictionDefinitionList = restTemplate.exchange(builder.build().encode().toUri(),
+                    HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
                     }).getBody();
-            LOG.debug("Retrieved jurisdiction object(s) from definition store: {}.", jurisdictionList);
-            return jurisdictionList;
+            LOG.debug("Retrieved jurisdiction object(s) from definition store: {}.", jurisdictionDefinitionList);
+            return jurisdictionDefinitionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException

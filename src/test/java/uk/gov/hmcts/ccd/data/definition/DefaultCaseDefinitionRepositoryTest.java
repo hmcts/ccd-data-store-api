@@ -16,7 +16,7 @@ import java.util.List;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -178,10 +178,10 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     @Test
     public void shouldGetNullJurisdictionsDefinition() {
-        List<Jurisdiction> emptyJurisdictions = Lists.newArrayList();
-        doReturn(emptyJurisdictions).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
+        List<JurisdictionDefinition> emptyJurisdictionDefinitions = Lists.newArrayList();
+        doReturn(emptyJurisdictionDefinitions).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        Jurisdiction jurisdiction = caseDefinitionRepository.getJurisdiction("PROBATE_NOT_FOUND");
-        assertThat(jurisdiction, nullValue());
+        JurisdictionDefinition jurisdictionDefinition = caseDefinitionRepository.getJurisdiction("PROBATE_NOT_FOUND");
+        assertThat(jurisdictionDefinition, nullValue());
     }
 }

@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -137,9 +137,9 @@ class DefaultGetCaseViewFromDraftOperationTest {
         doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         caseTypeDefinition = new CaseTypeDefinition();
-        Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setName(JURISDICTION_ID);
-        caseTypeDefinition.setJurisdiction(jurisdiction);
+        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setName(JURISDICTION_ID);
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseType(CASE_TYPE_ID);
 
         doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
