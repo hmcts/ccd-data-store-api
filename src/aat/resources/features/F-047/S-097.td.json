@@ -8,6 +8,9 @@
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type": "[[ANY_STRING_NULLABLE]]"
+    },
     "body": {
       "arrayInMap": "[[ANYTHING_PRESENT]]"
     }
