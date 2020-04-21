@@ -10,13 +10,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode
 @Builder
-public class CaseDocument {
-    private String url;
-    private String name;
-    private String type;
-    private String description;
+public class DocumentPermissions {
     private String id;
     private List<Permission> permissions;
-    @JsonIgnore
-    private String hashedToken;
 }

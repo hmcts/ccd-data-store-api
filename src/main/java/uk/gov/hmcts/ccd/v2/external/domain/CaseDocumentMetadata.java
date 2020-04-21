@@ -8,8 +8,6 @@ import lombok.Data;
 public class CaseDocumentMetadata {
 
     private String caseId;
-    private String caseTypeId;
-    private String jurisdictionId;
-    private CaseDocument document;
+    private DocumentPermissions document;
 
 }

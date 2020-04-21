@@ -30,7 +30,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentPermissions;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 
@@ -85,14 +85,12 @@ public class GetCaseDocumentOperation {
 
         return CaseDocumentMetadata.builder()
             .caseId(caseDetails.getReferenceAsString())
-            .caseTypeId(caseDetails.getCaseTypeId())
-            .jurisdictionId(caseDetails.getJurisdiction())
             .document(getCaseDocument(caseDetails, documentId))
             .build();
 
     }
 
-    private CaseDocument getCaseDocument(CaseDetails caseDetails, String documentId) {
+    private DocumentPermissions getCaseDocument(CaseDetails caseDetails, String documentId) {
 
         String caseTypeId = caseDetails.getCaseTypeId();
         String jurisdictionId = caseDetails.getJurisdiction();
@@ -114,13 +112,11 @@ public class GetCaseDocumentOperation {
         JsonNode documentFieldsWithReadPermission = getDocumentFieldsWithReadPermission(caseDetails, documentCaseFields)
             .orElseThrow((() -> new CaseDocumentNotFoundException("User does not has read permissions on any document field")));
 
-        String documentUrl = getDocumentUrl(documentId, documentFieldsWithReadPermission);
 
-        if (!StringUtils.isEmpty(documentUrl)) {
+        if (isDocumentPresent(documentId, documentFieldsWithReadPermission)) {
             //build caseDocument and set permissions
-            return CaseDocument.builder()
+            return DocumentPermissions.builder()
                 .id(documentId)
-                .url(documentUrl)
                 .permissions(Arrays.asList(Permission.READ))
                 .build();
         } else {
@@ -130,19 +126,17 @@ public class GetCaseDocumentOperation {
         }
     }
 
-    private String getDocumentUrl(String documentId, JsonNode documentFieldsWithReadPermission) {
+    private Boolean isDocumentPresent(String documentId, JsonNode documentFieldsWithReadPermission) {
         for (JsonNode jsonNode : documentFieldsWithReadPermission) {
             if (jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null
                 && jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE).asText().contains(documentId)) {
-                String binaryUrl = jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE).asText();
-                return binaryUrl.substring(binaryUrl.length() - 43, binaryUrl.length() - 7);
+                return true;
             } else if (jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null
                        && jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText().contains(documentId)) {
-                String documentUrl = jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText();
-                return documentUrl.substring(documentUrl.length() - 36);
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     private void extractDocumentFieldsFromCaseDefinition(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {

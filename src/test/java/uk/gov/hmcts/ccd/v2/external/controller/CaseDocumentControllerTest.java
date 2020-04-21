@@ -9,7 +9,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.GetCaseDocumentOperation;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentPermissions;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDocumentResource;
@@ -49,13 +49,8 @@ class CaseDocumentControllerTest {
 
         CaseDocumentMetadata caseDocumentMetadata = CaseDocumentMetadata.builder()
             .caseId(CASE_REFERENCE)
-            .caseTypeId(CASE_TYPE_ID)
-            .jurisdictionId(JURISDICTION_ID)
-            .document(CaseDocument.builder()
+            .document(DocumentPermissions.builder()
                 .id(CASE_DOCUMENT_ID)
-                .url(DOCUMENT_URL)
-                .name(DOCUMENT_NAME)
-                .type(DOCUMENT_TYPE)
                 .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
                 .build())
             .build();
@@ -71,14 +66,8 @@ class CaseDocumentControllerTest {
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
             () -> assertThat(response.getBody().getDocumentMetadata().getCaseId(), is(CASE_REFERENCE)),
-            () -> assertThat(response.getBody().getDocumentMetadata().getCaseTypeId(), is(CASE_TYPE_ID)),
-            () -> assertThat(response.getBody().getDocumentMetadata().getJurisdictionId(), is(JURISDICTION_ID)),
             () -> assertThat(response.getBody().getDocumentMetadata().getDocument(),
-                allOf(
-                 hasProperty("id", is(CASE_DOCUMENT_ID)),
-                 hasProperty("url", is(DOCUMENT_URL)),
-                 hasProperty("name", is(DOCUMENT_NAME)),
-                 hasProperty("type", is(DOCUMENT_TYPE)))),
+                allOf(hasProperty("id", is(CASE_DOCUMENT_ID)))),
             () -> assertThat(response.getBody().getDocumentMetadata().getDocument().getPermissions(), hasSize(2)),
             () -> assertThat(response.getBody().getDocumentMetadata().getDocument().getPermissions(),
                 hasItems(Permission.READ, Permission.UPDATE))

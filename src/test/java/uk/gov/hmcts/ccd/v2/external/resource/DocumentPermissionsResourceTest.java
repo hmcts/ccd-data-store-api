@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.v2.external.resource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseDocument;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentPermissions;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 
@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("CaseDocumentResource")
-class CaseDocumentResourceTest {
+class DocumentPermissionsResourceTest {
     private static final String CASE_REFERENCE = "1234123412341238";
     private static final String CASE_TYPE_ID = "BEFTA_CASETYPE_2_1";
     private static final String JURISDICTION_ID = "BEFTA_JURISDICTION_2";
@@ -29,7 +29,7 @@ class CaseDocumentResourceTest {
         .caseId(CASE_REFERENCE)
             .caseTypeId(CASE_TYPE_ID)
             .jurisdictionId(JURISDICTION_ID)
-            .document(CaseDocument.builder()
+            .document(DocumentPermissions.builder()
                 .id(CASE_DOCUMENT_ID)
                 .url(DOCUMENT_URL)
                 .name(DOCUMENT_NAME)
