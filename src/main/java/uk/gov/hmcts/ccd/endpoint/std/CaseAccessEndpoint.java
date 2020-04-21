@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.std.UserId;
 import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
 
@@ -35,7 +33,6 @@ public class CaseAccessEndpoint {
         @ApiResponse(code = 200, message = "List of cases ids found"),
         @ApiResponse(code = 400, message = "Invalid case ID")
     })
-    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public List<String> findCaseIdsGivenUserIdHasAccessTo(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -61,7 +58,6 @@ public class CaseAccessEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID")
     })
     @ResponseStatus(value = HttpStatus.CREATED)
-    @LogAudit(operationType = OperationType.UPDATE_CASE_ACCESS)
     public void grantAccessToCase(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -88,7 +84,6 @@ public class CaseAccessEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID")
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @LogAudit(operationType = OperationType.UPDATE_CASE_ACCESS)
     public void revokeAccessToCase(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,

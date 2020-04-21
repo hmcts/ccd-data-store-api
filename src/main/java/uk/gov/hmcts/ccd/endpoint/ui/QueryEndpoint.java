@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
@@ -126,7 +124,6 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria"),
         @ApiResponse(code = 412, message = "Mismatch between case type and workbasket definitions")})
-    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public SearchResultView searchNew(@PathVariable("jid") final String jurisdictionId,
                                       @PathVariable("ctid") final String caseTypeId,
                                       @RequestParam java.util.Map<String, String> params) {
@@ -193,7 +190,6 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A displayable case")
     })
-    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public CaseView findCase(@PathVariable("jid") final String jurisdictionId,
                              @PathVariable("ctid") final String caseTypeId,
                              @PathVariable("cid") final String cid) {
@@ -212,7 +208,6 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Empty pre-state conditions"),
         @ApiResponse(code = 422, message = "The case status did not qualify for the event")
     })
-    @LogAudit(operationType = OperationType.CREATE_CASE)
     public CaseEventTrigger getEventTriggerForCaseType(@PathVariable("uid") String userId,
                                                        @PathVariable("jid") String jurisdictionId,
                                                        @PathVariable("ctid") String caseTypeId,
@@ -230,7 +225,6 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Valid pre-state conditions")
     })
-    @LogAudit(operationType = OperationType.UPDATE_CASE)
     public CaseEventTrigger getEventTriggerForCase(@PathVariable("uid") String userId,
                                                    @PathVariable("jid") String jurisdictionId,
                                                    @PathVariable("ctid") String caseTypeId,
@@ -249,7 +243,6 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Valid pre-state conditions")
     })
-    @LogAudit(operationType = OperationType.CREATE_CASE)
     public CaseEventTrigger getEventTriggerForDraft(@PathVariable("uid") String userId,
                                                     @PathVariable("jid") String jurisdictionId,
                                                     @PathVariable("ctid") String caseTypeId,
@@ -269,7 +262,6 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Displayable case data"),
         @ApiResponse(code = 404, message = "Invalid jurisdiction/case type/case reference or event id")
     })
-    @LogAudit(operationType = OperationType.VIEW_CASE)
     public CaseHistoryView getCaseHistoryForEvent(@PathVariable("jid") final String jurisdictionId,
                                                   @PathVariable("ctid") final String caseTypeId,
                                                   @PathVariable("cid") final String caseReference,
