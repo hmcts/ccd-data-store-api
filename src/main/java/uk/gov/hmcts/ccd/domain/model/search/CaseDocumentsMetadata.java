@@ -14,8 +14,6 @@ import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 @Data
 @Builder
 public class CaseDocumentsMetadata {
-    public CaseDocumentsMetadata() {
-    }
 
     public CaseDocumentsMetadata(String caseId, String caseTypeId, String jurisdictionId, List<DocumentHashToken> documentHashToken) {
         this.caseId = caseId;

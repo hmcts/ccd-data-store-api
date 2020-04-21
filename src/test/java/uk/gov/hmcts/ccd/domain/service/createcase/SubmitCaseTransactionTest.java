@@ -40,6 +40,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -56,7 +57,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttachOperation;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -120,7 +121,10 @@ class SubmitCaseTransactionTest {
     private ApplicationParams applicationParams;
 
     @Mock
-    private CaseDocumentAttachOperation caseDocumentAttachOperation;
+    private CaseDocumentAttacher caseDocumentAttacher;
+
+    @Mock
+    private SecurityUtils securityUtils;
 
     @Mock
     private HttpServletRequest request;
@@ -146,8 +150,10 @@ class SubmitCaseTransactionTest {
                                                           caseUserRepository,
                                                           userAuthorisation,
                                                           request,
-                                                          caseDocumentAttachOperation
-                                                         );
+                                                          restTemplate,
+                                                          applicationParams,
+                                                          securityUtils
+        );
 
         event = buildEvent();
         caseType = buildCaseType();
@@ -233,7 +239,7 @@ class SubmitCaseTransactionTest {
 
     @Test
     @DisplayName("should create a case for V2.1 endpoint")
-    void shouldPersistV2Event() throws IOException {
+    void shouldPersistCreateCaseEventV2() throws IOException {
         doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
@@ -261,10 +267,50 @@ class SubmitCaseTransactionTest {
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseDocumentAttachOperation , times(1)).beforeCallbackPrepareDocumentMetaData(dataMap);
-        verify(caseDocumentAttachOperation , times(1)).filterDocumentFields();
-        verify(caseDocumentAttachOperation , times(1)).restCallToAttachCaseDocuments();
 
+        verify(restTemplate , times(1)).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+    }
+
+    @Test
+    @DisplayName("should create a case for V2.1 endpoint")
+    void shouldPersistCreateCaseEventV2NoCallback() throws IOException {
+        doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
+        CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setState("SomeState");
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+                                                                             null,
+                                                                             inputCaseDetails, caseType, IGNORE_WARNING
+                                                                            );
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        inputCaseDetails.setData(dataMap);
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
+        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
+        doReturn(responseEntity).when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         inputCaseDetails,
+                                         IGNORE_WARNING);
+
+        verify(restTemplate , times(1)).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
     }
 
     @Test
@@ -291,10 +337,11 @@ class SubmitCaseTransactionTest {
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseDocumentAttachOperation , times(0)).beforeCallbackPrepareDocumentMetaData(dataMap);
-        verify(caseDocumentAttachOperation , times(0)).filterDocumentFields();
-        verify(caseDocumentAttachOperation , times(0)).restCallToAttachCaseDocuments();
-
+        verify(restTemplate , times(0)).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
     }
 
     @Test

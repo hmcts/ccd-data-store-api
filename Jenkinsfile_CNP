@@ -71,7 +71,7 @@ env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-552.service.core-compute-preview.internal"
 
 withPipeline(type, product, component) {
     onMaster {

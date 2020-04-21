@@ -4,9 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -19,19 +25,27 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.*;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.v2.V2;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -85,6 +99,18 @@ class CreateCaseEventServiceTest {
     private UserAuthorisation userAuthorisation;
     @Mock
     private Clock clock;
+
+    @Mock
+    private HttpServletRequest request;
+
+    @Mock
+    private CaseDocumentAttacher caseDocumentAttacher;
+
+    @Mock
+    private RestTemplate restTemplate;
+    @Mock
+    SecurityUtils securityUtils;
+
 
     private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
 
@@ -159,10 +185,10 @@ class CreateCaseEventServiceTest {
         doReturn(user).when(userRepository).getUser();
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
         given(callbackInvoker.invokeAboutToSubmitCallback(any(),
-            any(),
-            any(),
-            any(),
-            any())).willReturn(aboutToSubmitCallbackResponse);
+                                                          any(),
+                                                          any(),
+                                                          any(),
+                                                          any())).willReturn(aboutToSubmitCallbackResponse);
     }
 
     @Test
@@ -212,11 +238,55 @@ class CreateCaseEventServiceTest {
         createCaseEvent();
 
         verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
-            caseDetailsBefore,
-            caseDetails,
-            caseType,
-            IGNORE_WARNING);
+                                                            caseDetailsBefore,
+                                                            caseDetails,
+                                                            caseType,
+                                                            IGNORE_WARNING);
     }
+
+
+
+    @Test
+    @DisplayName("should update a case for V2.1 endpoint")
+    void shouldUpdateV2Event() throws IOException {
+        ResponseEntity<List> responseEntity = new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        doReturn(V2.MediaType.CREATE_EVENT_2_1).when(request).getContentType();
+        doReturn(responseEntity).when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+        caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
+        caseDetailsBefore.setState(PRE_STATE_ID);
+        caseDetails.setReference(10000L);
+
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+        aboutToSubmitCallbackResponse.setState(Optional.empty());
+
+        CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isEqualTo(LocalDateTime.now(clock));
+
+    }
+
+    @Test
+    @DisplayName("should not invoke any methods corresponding to create event v2.1")
+    void shouldNotInvokeAttachDocumentToCase() throws IOException {
+        caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
+        caseDetailsBefore.setState(PRE_STATE_ID);
+        Set<String> filterDocumentSet = new HashSet();
+
+        createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        verify(caseDocumentAttacher, times(0)).extractDocumentsWithHashTokenBeforeCallback(caseDataContent.getData());
+        verify(caseDocumentAttacher, times(0)).extractDocumentsAfterCallBack(caseDetails,false);
+        verify(caseDocumentAttacher, times(0)).differenceBeforeAndAfterInCaseDetails(caseDetailsBefore,caseDetails.getData());
+        verify(caseDocumentAttacher, times(0)).filterDocumentMetaData(filterDocumentSet);
+        verify(caseDocumentAttacher, times(0)).restCallToAttachCaseDocuments();
+
+    }
+
 
     private void createCaseEvent() {
         createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);

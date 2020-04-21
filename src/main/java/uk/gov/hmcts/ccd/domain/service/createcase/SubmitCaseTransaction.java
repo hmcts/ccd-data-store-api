@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -28,7 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttachOperation;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
@@ -39,7 +42,7 @@ import uk.gov.hmcts.ccd.v2.V2;
 @Service
 class SubmitCaseTransaction {
 
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final CaseTypeService caseTypeService;
@@ -48,7 +51,9 @@ class SubmitCaseTransaction {
     private final SecurityClassificationService securityClassificationService;
     private final CaseUserRepository caseUserRepository;
     private final UserAuthorisation userAuthorisation;
-    private final CaseDocumentAttachOperation caseDocumentAttachOperation;
+    private final RestTemplate restTemplate;
+    private final ApplicationParams applicationParams;
+    private final SecurityUtils securityUtils;
 
    @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
@@ -60,8 +65,10 @@ class SubmitCaseTransaction {
                                  final @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation,
                                  final HttpServletRequest request,
-                                 final CaseDocumentAttachOperation caseDocumentAttachOperation
-                                ) {
+                                 final RestTemplate restTemplate,
+                                 final ApplicationParams applicationParams,
+                                 final SecurityUtils securityUtils
+                                 ) {
         this.request = request;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -71,8 +78,10 @@ class SubmitCaseTransaction {
         this.securityClassificationService = securityClassificationService;
         this.caseUserRepository = caseUserRepository;
         this.userAuthorisation = userAuthorisation;
-        this.caseDocumentAttachOperation = caseDocumentAttachOperation;
-    }
+       this.restTemplate = restTemplate;
+       this.applicationParams = applicationParams;
+       this.securityUtils = securityUtils;
+   }
 
     @Transactional(REQUIRES_NEW)
     @Retryable(
@@ -87,6 +96,7 @@ class SubmitCaseTransaction {
                                   CaseDetails newCaseDetails, Boolean ignoreWarning) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        CaseDocumentAttacher caseDocumentAttacher = null;
 
         newCaseDetails.setCreatedDate(now);
         newCaseDetails.setLastStateModifiedDate(now);
@@ -96,7 +106,8 @@ class SubmitCaseTransaction {
             && request.getContentType().equals(V2.MediaType.CREATE_CASE_2_1);
 
         if (isApiVersion21) {
-            caseDocumentAttachOperation.beforeCallbackPrepareDocumentMetaData(newCaseDetails.getData());
+            caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
+            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(newCaseDetails.getData());
         }
 
         /*
@@ -118,13 +129,8 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion21) {
-            boolean callBackResult = false;
-            if (eventTrigger.getCallBackURLAboutToSubmitEvent() != null) {
-                callBackResult = true;
-            }
-            caseDocumentAttachOperation.afterCallbackPrepareDocumentMetaData(newCaseDetails, callBackResult);
-            caseDocumentAttachOperation.filterDocumentFields();
-            caseDocumentAttachOperation.restCallToAttachCaseDocuments();
+            caseDocumentAttacher.caseDocumentAttachOperation(newCaseDetails, null, event.getEventId(), aboutToSubmitCallbackResponse.getState().isPresent());
+            caseDocumentAttacher.restCallToAttachCaseDocuments();
         }
 
         return savedCaseDetails;

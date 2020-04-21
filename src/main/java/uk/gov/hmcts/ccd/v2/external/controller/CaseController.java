@@ -130,14 +130,7 @@ public class CaseController {
     })
     public ResponseEntity<CaseResource> createEvent(@PathVariable("caseId") String caseId,
                                                     @RequestBody final CaseDataContent content) {
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-        }
-
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId,
-            content);
-
-        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
+        return createCaseEvent(caseId, content);
     }
 
     @Transactional
@@ -339,6 +332,58 @@ public class CaseController {
         return ResponseEntity.ok(new CaseEventsResource(caseId, auditEvents));
     }
 
+    @Transactional
+    @PostMapping(
+        path = "/cases/{caseId}/events",
+        headers = {
+            V2.EXPERIMENTAL_HEADER
+        },
+        produces = {
+            V2.MediaType.CREATE_EVENT
+        },
+        consumes  = {
+        V2.MediaType.CREATE_EVENT_2_1
+        }
+
+    )
+    @ApiOperation(
+        value = "Submit event creation",
+        notes = V2.EXPERIMENTAL_WARNING
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 201,
+            message = "Created",
+            response = CaseResource.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = V2.Error.CASE_ID_INVALID
+        ),
+        @ApiResponse(
+            code = 404,
+            message = V2.Error.EVENT_TRIGGER_NOT_FOUND
+        ),
+        @ApiResponse(
+            code = 409,
+            message = V2.Error.CASE_ALTERED
+        )
+    })
+    public ResponseEntity<CaseResource> createEventV21(@PathVariable("caseId") String caseId,
+                                                    @RequestBody final CaseDataContent content) {
+        return createCaseEvent(caseId, content);
+    }
+
+    private ResponseEntity<CaseResource> createCaseEvent(@PathVariable("caseId") String caseId, @RequestBody CaseDataContent content) {
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+        }
+
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId,
+                                                                             content);
+
+        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
+    }
 
     private ResponseEntity<CaseResource> getCaseResourceResponseEntity(@PathVariable("caseTypeId") String caseTypeId,
                                                                        @RequestBody CaseDataContent content,

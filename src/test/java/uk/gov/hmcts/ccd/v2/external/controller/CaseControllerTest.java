@@ -135,6 +135,18 @@ class CaseControllerTest {
         }
 
         @Test
+        @DisplayName("should call V2.1 endpoint and return 201 when case event created")
+        void caseEventCreatedV21() {
+            final ResponseEntity<CaseResource> response = caseController.createEventV21(CASE_REFERENCE, CASE_DATA_CONTENT);
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
+                () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE))
+            );
+        }
+
+
+        @Test
         @DisplayName("should propagate BadRequestException when case reference not valid")
         void caseReferenceNotValid() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
