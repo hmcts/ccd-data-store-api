@@ -110,9 +110,9 @@ public class CaseDocumentAttacher {
                 //handle 400's
                 //Revisit this piece of code again.
                 if (restClientException.getStatusCode() != HttpStatus.FORBIDDEN) {
-                    if(restClientException.getStatusCode()==HttpStatus.BAD_REQUEST) {
+                    if (restClientException.getStatusCode() == HttpStatus.BAD_REQUEST) {
                         throw new BadSearchRequest(restClientException.getMessage());
-                    }else {
+                    } else {
                         throw new ResourceNotFoundException(restClientException.getMessage());
                     }
                 }
@@ -141,7 +141,7 @@ public class CaseDocumentAttacher {
 
             } else {
                 jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallback(
-                        Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+                    Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
             }
         });
     }
@@ -201,7 +201,8 @@ public class CaseDocumentAttacher {
             //find Hash token of documents belong to  before call back which are in After callback Map
             Map<String, String> commonDocumentIdsWithHashToken = documentsBeforeCallback.entrySet()
                                                                                         .stream()
-                                                                                        .filter(documentBeforeCallback -> commonDocumentIds.contains(documentBeforeCallback.getKey()))
+                                                                                        .filter(documentBeforeCallback -> commonDocumentIds
+                                                                                            .contains(documentBeforeCallback.getKey()))
                                                                                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
@@ -229,12 +230,12 @@ public class CaseDocumentAttacher {
         }
         //Filter DocumentHashToken based on consolidatedDocumentsWithHashToken
         consolidatedDocumentsWithHashToken.forEach((key, value) ->
-            caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken
-                                                                 .builder()
-                                                                 .id(key)
-                                                                 .hashToken(value)
-                                                                 .build())
-        );
+                                                       caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken
+                                                                                                            .builder()
+                                                                                                            .id(key)
+                                                                                                            .hashToken(value)
+                                                                                                            .build())
+                                                  );
     }
 
     public Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore, final Map<String, JsonNode> caseData) {
@@ -249,7 +250,7 @@ public class CaseDocumentAttacher {
         //Comparing two jsonNode entities at nested child level
         checkDocumentFieldsDifference(caseDataBefore, caseData, documentsDifference);
         //Find documentId based on filter Map. So that I can filter the DocumentMetaData Object before calling the case document am Api.
-        findDocumentsId(documentsDifference,filterDocumentSet);
+        findDocumentsId(documentsDifference, filterDocumentSet);
         return filterDocumentSet;
     }
 
@@ -275,8 +276,7 @@ public class CaseDocumentAttacher {
 
                     }
 
-                    value.fields().forEachRemaining
-                        (node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
+                    value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
                                                                Collections.singletonMap(node.getKey(), node.getValue()), documentsDifference));
                 }
 

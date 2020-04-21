@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -90,12 +89,13 @@ public class CaseDocumentAttacherTest {
             ArgumentMatchers.<Class<String>>any());
 
     }
+
     @Test
     @DisplayName("should not return document fields difference in case of non document fields update ")
     void shouldNotReturnDeltaInCaseOfNonDocumentFieldsUpdate() throws IOException {
         HashMap<String, JsonNode> caseDataContent = buildCaseData("case-detail-plain-fields-update.json");
         HashMap<String, JsonNode> caseDetailsBefore = buildCaseData("case-detail-before.json");
-        Set<String> expectedOutput = new HashSet();
+        Set<String> expectedOutput = new HashSet<>();
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetailsBefore,caseDataContent);
 
         assertAll(
@@ -103,6 +103,7 @@ public class CaseDocumentAttacherTest {
 
         );
     }
+
     @Test
     @DisplayName(
         "should  filter the Case Document Meta Data while  2 documents with hashcode  from request and  2 new documents without hash token from callback " +
@@ -175,7 +176,7 @@ public class CaseDocumentAttacherTest {
         afterCallBack.put("b6ee2bff-8244-431f-94ec-9d8ecace8dd6", null);
         afterCallBack.put("f5bd63a2-65c5-435e-a972-98ed658ad7d6", null);
 
-        List<DocumentHashToken> expected = Arrays.asList(
+        List<DocumentHashToken> expected = Collections.singletonList(
             DocumentHashToken.builder().id("b6ee2bff-8244-431f-94ec-9d8ecace8dd6")
                              .hashToken("4d49edc151423fb7b2e1f22d89a2d041b43").build()
 
@@ -284,7 +285,7 @@ public class CaseDocumentAttacherTest {
     @Test
     @DisplayName("should return document fields differences once updated ")
     void shouldReturnDeltaWhenDocumentFieldsUpdate() {
-        Set<String> expectedOutput = new HashSet();
+        Set<String> expectedOutput = new HashSet<>();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
 
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
@@ -430,7 +431,7 @@ public class CaseDocumentAttacherTest {
             }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
         assertAll(
-            () -> assertTrue(caseDocumentAttacher.documentsAfterCallback.equals(expectedMap)));
+            () -> assertEquals(caseDocumentAttacher.documentsAfterCallback, expectedMap));
     }
 
   /*  @Test
@@ -454,7 +455,7 @@ public class CaseDocumentAttacherTest {
     void shouldCallRestclientToAttachDocumentToCase() {
         caseDocumentAttacher.caseDocumentsMetadata =
             CaseDocumentsMetadata.builder()
-                                 .documentHashToken(Arrays.asList(
+                                 .documentHashToken(Collections.singletonList(
                                      DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
                                                       .hashToken(
                                                           "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build()

@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -73,8 +72,6 @@ class CreateCaseEventServiceTest {
     private CaseDetailsRepository caseDetailsRepository;
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
-    @Mock
-    private CaseAuditEventRepository caseAuditEventRepository;
     @Mock
     private EventTriggerService eventTriggerService;
     @Mock
@@ -275,7 +272,7 @@ class CreateCaseEventServiceTest {
     void shouldNotInvokeAttachDocumentToCase() throws IOException {
         caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore.setState(PRE_STATE_ID);
-        Set<String> filterDocumentSet = new HashSet();
+        Set<String> filterDocumentSet = new HashSet<>();
 
         createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
