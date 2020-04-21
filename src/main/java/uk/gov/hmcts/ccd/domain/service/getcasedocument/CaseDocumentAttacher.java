@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import liquibase.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -129,10 +130,10 @@ public class CaseDocumentAttacher {
     public void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
             if (jsonNode != null && isDocumentField(jsonNode)) {
-                if (jsonNode.get(HASH_TOKEN_STRING) == null) {
-                    throw new BadRequestException("The document does not has the hashcode");
-                }
                 String documentId = extractDocumentId(jsonNode);
+                if (jsonNode.get(HASH_TOKEN_STRING) == null) {
+                    throw new BadRequestException(String.format("The document %s does not has the hashcode", documentId));
+                }
                 documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                 if (jsonNode instanceof ObjectNode) {
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
@@ -169,8 +170,7 @@ public class CaseDocumentAttacher {
 
 
     private boolean isDocumentField(JsonNode jsonNode) {
-        return jsonNode.get(DOCUMENT_BINARY_URL) != null
-               || jsonNode.get(DOCUMENT_URL) != null;
+        return jsonNode.get(DOCUMENT_BINARY_URL) != null || jsonNode.get(DOCUMENT_URL) != null;
     }
 
     public String extractDocumentId(JsonNode jsonNode) {
@@ -194,55 +194,47 @@ public class CaseDocumentAttacher {
         if (documentsAfterCallback.size() > 0) {
 
             // find ids of document inside before call back map which are coming through after call back map
-            List<String> commonDocumentIds = documentsAfterCallback.keySet().stream().filter(str -> documentsBeforeCallback.containsKey(str))
+            List<String> commonDocumentIds = documentsAfterCallback.keySet().stream()
+                                                                   .filter(documentsBeforeCallback::containsKey)
                                                                    .collect(Collectors.toList());
 
             //find Hash token of documents belong to  before call back which are in After callback Map
             Map<String, String> commonDocumentIdsWithHashToken = documentsBeforeCallback.entrySet()
                                                                                         .stream()
-                                                                                        .filter(e -> commonDocumentIds.contains(e.getKey()))
+                                                                                        .filter(documentBeforeCallback -> commonDocumentIds.contains(documentBeforeCallback.getKey()))
                                                                                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
 
             // Check temper hashToken by call back service
             List<String> temperHashTokenDocumentIds =
                 commonDocumentIds.stream()
-                                 .map(documentId -> {
-                                     if (documentsAfterCallback.get(documentId) != null) {
-                                         return documentId;
-                                     }
-                                     return "";
-                                 }).collect(Collectors.toList());
-
-            //remove empty string from list
-            temperHashTokenDocumentIds.removeIf(String::isEmpty);
+                                 .filter(documentId -> StringUtils.isNotEmpty(documentsAfterCallback.get(documentId)))
+                                 .collect(Collectors.toList());
 
             if (!temperHashTokenDocumentIds.isEmpty()) {
                 throw new ServiceException("call back attempted to change the hashToken of the following documents:" + temperHashTokenDocumentIds);
             }
 
-
             //putting back documentIds with hashToken in after call back map  which belong to before callback Map
             documentsAfterCallback.putAll(commonDocumentIdsWithHashToken);
 
             // filter after callback  map having hash token
-            consolidatedDocumentsWithHashToken = documentsAfterCallback.entrySet().stream().filter(e -> e.getValue() != null)
+            consolidatedDocumentsWithHashToken = documentsAfterCallback.entrySet().stream()
+                                                                       .filter(e -> e.getValue() != null)
                                                                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
         } else {
             consolidatedDocumentsWithHashToken = documentsBeforeCallback;
-
         }
         //Filter DocumentHashToken based on consolidatedDocumentsWithHashToken
-        consolidatedDocumentsWithHashToken.forEach((key, value) -> {
+        consolidatedDocumentsWithHashToken.forEach((key, value) ->
             caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken
                                                                  .builder()
                                                                  .id(key)
                                                                  .hashToken(value)
-                                                                 .build());
-        });
-
-
+                                                                 .build())
+        );
     }
 
     public Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore, final Map<String, JsonNode> caseData) {
@@ -261,35 +253,35 @@ public class CaseDocumentAttacher {
         return filterDocumentSet;
     }
 
-    private void checkDocumentFieldsDifference(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> caseData, Map<String, JsonNode> documentsDifference) {
+    private void checkDocumentFieldsDifference(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> caseData,
+                                               Map<String, JsonNode> documentsDifference) {
         final JsonNode[] caseBeforeNode = {null};
         caseData.forEach((key, value) -> {
 
-            if (caseDataBefore.containsKey(key) ) {
-                caseBeforeNode[0] =caseDataBefore.get(key);
+            if (caseDataBefore.containsKey(key)) {
+                caseBeforeNode[0] = caseDataBefore.get(key);
                 if (value != null && isDocumentField(value)) {
-                    if(!value.equals(caseDataBefore.get(key)))
-                    {
-                        documentsDifference.put(key,value);
+                    if (!value.equals(caseDataBefore.get(key))) {
+                        documentsDifference.put(key, value);
                     }
 
                 } else {
 
                     Iterator<String> fieldNames = caseBeforeNode[0].fieldNames();
-                    while(fieldNames.hasNext()){
-                        String   fieldName =  fieldNames.next();
-                        JsonNode before= caseBeforeNode[0].get(fieldName);
-                        recursiveMapForCaseDetailsBefore.put(fieldName,before);
+                    while (fieldNames.hasNext()) {
+                        String fieldName = fieldNames.next();
+                        JsonNode before = caseBeforeNode[0].get(fieldName);
+                        recursiveMapForCaseDetailsBefore.put(fieldName, before);
 
                     }
 
                     value.fields().forEachRemaining
                         (node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
-                                                               Collections.singletonMap(node.getKey(), node.getValue()),documentsDifference));
+                                                               Collections.singletonMap(node.getKey(), node.getValue()), documentsDifference));
                 }
 
-            } else if(isDocumentFieldAtAnyLevel(value)){
-                documentsDifference.put(key,value);
+            } else if (isDocumentFieldAtAnyLevel(value)) {
+                documentsDifference.put(key, value);
             }
         });
     }
@@ -306,7 +298,7 @@ public class CaseDocumentAttacher {
 
             } else {
                 jsonNode.fields().forEachRemaining(node -> findDocumentsId(
-                        Collections.singletonMap(node.getKey(), node.getValue()), filterDocumentSet));
+                    Collections.singletonMap(node.getKey(), node.getValue()), filterDocumentSet));
             }
         });
 
