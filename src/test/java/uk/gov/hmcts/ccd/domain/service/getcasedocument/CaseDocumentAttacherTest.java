@@ -275,7 +275,7 @@ public class CaseDocumentAttacherTest {
         Set<String> expectedOutput = new HashSet();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
 
-        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
             () -> assertEquals(output, expectedOutput)
@@ -287,15 +287,13 @@ public class CaseDocumentAttacherTest {
     @DisplayName("should return document fields differences once document Fields inside Complex Field ")
     void shouldReturnDeltaWhenDocumentFieldsInsideComplexElement() throws IOException {
         HashMap<String, JsonNode> caseDataContent = buildCaseData("case-detail-after-with-complexFields-update.json");
-        Set<String> expectedOutput = new HashSet();
+        Set<String> expectedOutput = new HashSet<>();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
 
-        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
-            () -> assertEquals(output, expectedOutput)
-
-                 );
+            () -> assertEquals(output, expectedOutput));
     }
 
 
@@ -304,7 +302,7 @@ public class CaseDocumentAttacherTest {
     void shouldReturnEmptyDocumentSet() {
         caseDataContent = null;
         Set<String> expectedOutput = new HashSet<>();
-        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
             () -> assertEquals(output, expectedOutput)

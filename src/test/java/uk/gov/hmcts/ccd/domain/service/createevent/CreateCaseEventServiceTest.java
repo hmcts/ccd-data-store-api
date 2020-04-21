@@ -281,7 +281,7 @@ class CreateCaseEventServiceTest {
 
         verify(caseDocumentAttacher, times(0)).extractDocumentsWithHashTokenBeforeCallback(caseDataContent.getData());
         verify(caseDocumentAttacher, times(0)).extractDocumentsAfterCallBack(caseDetails,false);
-        verify(caseDocumentAttacher, times(0)).differenceBeforeAndAfterInCaseDetails(caseDetailsBefore,caseDetails.getData());
+        verify(caseDocumentAttacher, times(0)).differenceBeforeAndAfterInCaseDetails(caseDetailsBefore.getData(),caseDetails.getData());
         verify(caseDocumentAttacher, times(0)).filterDocumentMetaData(filterDocumentSet);
         verify(caseDocumentAttacher, times(0)).restCallToAttachCaseDocuments();
 
