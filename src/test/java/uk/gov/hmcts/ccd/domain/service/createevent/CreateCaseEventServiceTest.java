@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -73,6 +74,8 @@ class CreateCaseEventServiceTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
+    private CaseAuditEventRepository caseAuditEventRepository;
+    @Mock
     private EventTriggerService eventTriggerService;
     @Mock
     private EventTokenService eventTokenService;
@@ -94,6 +97,7 @@ class CreateCaseEventServiceTest {
     private CaseService caseService;
     @Mock
     private UserAuthorisation userAuthorisation;
+
     @Mock
     private Clock clock;
 
