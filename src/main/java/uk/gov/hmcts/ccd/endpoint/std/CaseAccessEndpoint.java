@@ -35,7 +35,6 @@ public class CaseAccessEndpoint {
         @ApiResponse(code = 200, message = "List of cases ids found"),
         @ApiResponse(code = 400, message = "Invalid case ID")
     })
-    @LogAudit(operationType = OperationType.SEARCH_CASE)
     public List<String> findCaseIdsGivenUserIdHasAccessTo(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -61,7 +60,7 @@ public class CaseAccessEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID")
     })
     @ResponseStatus(value = HttpStatus.CREATED)
-    @LogAudit(operationType = OperationType.UPDATE_CASE_ACCESS)
+    @LogAudit(operationType = OperationType.UPDATE_CASE_ACCESS, caseId = "#caseId", targetIdamId = "#userId.id")
     public void grantAccessToCase(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -71,10 +70,10 @@ public class CaseAccessEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
-        @RequestBody final UserId id
+        @RequestBody final UserId userId
     ) {
-        LOG.debug("Granting access to case: {}, for user: {}", caseId, id);
-        caseAccessOperation.grantAccess(jurisdictionId, caseId, id.getId());
+        LOG.debug("Granting access to case: {}, for user: {}", caseId, userId);
+        caseAccessOperation.grantAccess(jurisdictionId, caseId, userId.getId());
     }
 
     @RequestMapping(
@@ -88,7 +87,7 @@ public class CaseAccessEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID")
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @LogAudit(operationType = OperationType.UPDATE_CASE_ACCESS)
+    @LogAudit(operationType = OperationType.UPDATE_CASE_ACCESS, caseId = "#caseId", targetIdamId = "#idToDelete")
     public void revokeAccessToCase(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -101,7 +100,7 @@ public class CaseAccessEndpoint {
         @ApiParam(value = "Id to delete", required = true)
         @PathVariable("idToDelete") final String idToDelete
     ) {
-        LOG.debug("Revoking access to case: {}, for user: {}", caseId, idToDelete, idToDelete);
+        LOG.debug("Revoking access to case: {}, for user: {}", caseId, idToDelete);
         caseAccessOperation.revokeAccess(jurisdictionId, caseId, idToDelete);
     }
 }
