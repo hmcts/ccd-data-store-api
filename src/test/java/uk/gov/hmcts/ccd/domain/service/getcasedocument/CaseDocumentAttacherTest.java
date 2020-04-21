@@ -90,7 +90,19 @@ public class CaseDocumentAttacherTest {
             ArgumentMatchers.<Class<String>>any());
 
     }
+    @Test
+    @DisplayName("should not return document fields difference in case of non document fields update ")
+    void shouldNotReturnDeltaInCaseOfNonDocumentFieldsUpdate() throws IOException {
+        HashMap<String, JsonNode> caseDataContent = buildCaseData("case-detail-plain-fields-update.json");
+        HashMap<String, JsonNode> caseDetailsBefore = buildCaseData("case-detail-before.json");
+        Set<String> expectedOutput = new HashSet();
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetailsBefore,caseDataContent);
 
+        assertAll(
+            () -> assertEquals(output, expectedOutput)
+
+        );
+    }
     @Test
     @DisplayName(
         "should  filter the Case Document Meta Data while  2 documents with hashcode  from request and  2 new documents without hash token from callback " +
@@ -275,7 +287,7 @@ public class CaseDocumentAttacherTest {
         Set<String> expectedOutput = new HashSet();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
 
-        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
             () -> assertEquals(output, expectedOutput)
@@ -290,7 +302,7 @@ public class CaseDocumentAttacherTest {
         Set<String> expectedOutput = new HashSet();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
 
-        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
             () -> assertEquals(output, expectedOutput)
@@ -304,7 +316,7 @@ public class CaseDocumentAttacherTest {
     void shouldReturnEmptyDocumentSet() {
         caseDataContent = null;
         Set<String> expectedOutput = new HashSet<>();
-        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails, caseDataContent);
+        final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
             () -> assertEquals(output, expectedOutput)
