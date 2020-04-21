@@ -198,10 +198,22 @@ public class CaseField implements Serializable, CommonField {
         clearACLsForMissingComplexACLs();
     }
 
+    private static void propagateACLsToNestedFields(CommonField caseField, List<AccessControlList> acls) {
+        if (caseField.isCompoundFieldType()) {
+            caseField.getFieldType().getChildren().forEach(nestedField -> {
+                final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
+                nestedField.setAccessControlLists(cloneACLs);
+                propagateACLsToNestedFields(nestedField, acls);
+            });
+        }
+    }
+
     private void applyComplexACLs() {
         this.complexACLs.forEach(complexACL -> {
             final CaseField nestedField = (CaseField) this.getComplexFieldNestedField(complexACL.getListElementCode())
-                .orElseThrow(() -> new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), complexACL.getListElementCode())));
+                .orElseThrow(() ->
+                    new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), complexACL.getListElementCode()))
+                );
             nestedField.getAccessControlListByRole(complexACL.getRole())
                 .ifPresent(accessControlList -> nestedField.accessControlLists.remove(accessControlList));
             nestedField.getAccessControlLists().add(complexACL);
@@ -272,16 +284,6 @@ public class CaseField implements Serializable, CommonField {
     @JsonIgnore
     Optional<AccessControlList> getAccessControlListByRole(String role) {
         return this.accessControlLists.stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
-    }
-
-    private static void propagateACLsToNestedFields(CommonField caseField, List<AccessControlList> acls) {
-        if (caseField.isCompoundFieldType()) {
-            caseField.getFieldType().getChildren().forEach(nestedField -> {
-                final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
-                nestedField.setAccessControlLists(cloneACLs);
-                propagateACLsToNestedFields(nestedField, acls);
-            });
-        }
     }
 
     private List<String> buildAllDottedComplexFieldPossibilities(List<CaseField> caseFieldEntities) {

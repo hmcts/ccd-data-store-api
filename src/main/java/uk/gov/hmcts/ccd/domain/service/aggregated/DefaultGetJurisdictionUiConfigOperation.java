@@ -24,7 +24,7 @@ public class DefaultGetJurisdictionUiConfigOperation implements GetJurisdictionU
 
     @Override
     public List<JurisdictionUiConfig> execute(List<String> jurisdictionReferences) {
-    	JurisdictionUiConfigResult jurisdictionUiConfigResult = repository.getJurisdictionUiConfigs(jurisdictionReferences);
+        JurisdictionUiConfigResult jurisdictionUiConfigResult = repository.getJurisdictionUiConfigs(jurisdictionReferences);
         return jurisdictionUiConfigResult.getConfigs();
     }
 }

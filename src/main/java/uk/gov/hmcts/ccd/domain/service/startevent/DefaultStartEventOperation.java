@@ -79,7 +79,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       caseType,
                                       eventTriggerId,
                                       ignoreWarning,
-                                      () -> caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(), Maps.newHashMap()));
+                                      (() -> caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(), Maps.newHashMap())));
     }
 
     @Override
@@ -119,7 +119,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       caseType,
                                       draftResponse.getDocument().getEventTriggerId(),
                                       ignoreWarning,
-                                      () -> caseDetails);
+                                      (() -> caseDetails));
     }
 
     private StartEventTrigger buildStartEventTrigger(final String uid,

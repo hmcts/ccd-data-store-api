@@ -40,7 +40,14 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         CompoundFieldOrderService compoundFieldOrderService,
         FieldProcessorService fieldProcessorService) {
 
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService, compoundFieldOrderService, fieldProcessorService);
+        super(getCaseOperation,
+            uiDefinitionRepository,
+            caseTypeService,
+            uidService,
+            defaultObjectMapperService,
+            compoundFieldOrderService,
+            fieldProcessorService);
+
         this.getEventsOperation = getEventsOperation;
     }
 

@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Named
 @Singleton
+@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
 public class CaseTypeService {
     private final CaseDataValidator caseDataValidator;
     private final CaseDefinitionRepository caseDefinitionRepository;

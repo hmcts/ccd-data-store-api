@@ -63,7 +63,8 @@ public class CriterionFactory {
     }
 
     private void ifPresentAndNotBlank(Optional<String> metadata, Consumer<String> metadataConsumer) {
-        metadata.ifPresent(m -> { if (isNotBlank(m)) {
+        metadata.ifPresent(m -> {
+            if (isNotBlank(m)) {
                 metadataConsumer.accept(m);
             }
         });

@@ -84,7 +84,7 @@ public class CaseEventField implements Serializable {
     }
 
     /**
-     * event case field label
+     * event case field label.
      **/
     @ApiModelProperty(value = "")
     @JsonProperty("label")
@@ -97,7 +97,7 @@ public class CaseEventField implements Serializable {
     }
 
     /**
-     * event case field hint text
+     * event case field hint text.
      **/
     @ApiModelProperty(value = "")
     @JsonProperty("hint_text")

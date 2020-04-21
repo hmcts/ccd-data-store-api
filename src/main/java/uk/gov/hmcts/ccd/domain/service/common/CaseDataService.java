@@ -37,7 +37,10 @@ public class CaseDataService {
                                                                    final Map<String, JsonNode> caseData,
                                                                    final Map<String, JsonNode> currentDataClassification) {
         final JsonNode clonedDataClassification = cloneAndConvertDataMap(caseData);
-        deduceDefaultClassifications(clonedDataClassification, MAPPER.convertValue(currentDataClassification, JsonNode.class), caseType.getCaseFields(), EMPTY_STRING);
+        deduceDefaultClassifications(
+            clonedDataClassification,
+            MAPPER.convertValue(currentDataClassification, JsonNode.class), caseType.getCaseFields(),
+            EMPTY_STRING);
         return MAPPER.convertValue(clonedDataClassification, STRING_JSON_MAP);
     }
 
@@ -47,11 +50,11 @@ public class CaseDataService {
                                               final String fieldIdPrefix) {
         final Iterator<String> fieldNames = dataNode.fieldNames();
         while (fieldNames.hasNext()) {
-            Boolean found = false;
+            boolean found = false;
             final String fieldName = fieldNames.next();
-            Iterator<CaseField> cFIterator = caseFieldDefinitions.iterator();
-            while (!found && cFIterator.hasNext()) {
-                CaseField caseField = cFIterator.next();
+            Iterator<CaseField> cfIterator = caseFieldDefinitions.iterator();
+            while (!found && cfIterator.hasNext()) {
+                CaseField caseField = cfIterator.next();
                 if (caseField.getId().equalsIgnoreCase(fieldName)) {
                     final String caseFieldType = caseField.getFieldType().getType();
                     if (caseFieldType.equalsIgnoreCase(COMPLEX)) {
@@ -107,7 +110,11 @@ public class CaseDataService {
         return ofNullable(caseField.getSecurityLabel()).orElse(DEFAULT_CLASSIFICATION);
     }
 
-    private void deduceClassificationForCollectionType(JsonNode dataNode, JsonNode existingDataClassificationNode, String fieldIdPrefix, String fieldName, CaseField caseField) {
+    private void deduceClassificationForCollectionType(JsonNode dataNode,
+                                                       JsonNode existingDataClassificationNode,
+                                                       String fieldIdPrefix,
+                                                       String fieldName,
+                                                       CaseField caseField) {
         final JsonNode fieldNode = dataNode.get(fieldName);
         if (null != fieldNode && fieldNode.isArray()) {
             ArrayNode arrayNode = (ArrayNode) fieldNode;
@@ -145,7 +152,11 @@ public class CaseDataService {
         ((ObjectNode) dataNode).set(fieldName, valueNode);
     }
 
-    private void deduceClassificationForComplexType(JsonNode dataNode, JsonNode existingDataClassificationNode, String fieldIdPrefix, String fieldName, CaseField caseField) {
+    private void deduceClassificationForComplexType(JsonNode dataNode,
+                                                    JsonNode existingDataClassificationNode,
+                                                    String fieldIdPrefix,
+                                                    String fieldName,
+                                                    CaseField caseField) {
         deduceDefaultClassifications(
             dataNode.get(fieldName),
             getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, VALUE),

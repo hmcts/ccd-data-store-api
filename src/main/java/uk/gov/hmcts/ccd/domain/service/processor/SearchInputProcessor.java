@@ -112,8 +112,8 @@ public class SearchInputProcessor {
         return DisplayContextParameter
             .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
             .map(DisplayContextParameter::getValue)
-            .orElseGet(() -> fieldType.getType().equals(FieldType.DATE) ?
-                DateTimeFormatParser.DATE_FORMAT.toString() :
-                DateTimeFormatParser.DATE_TIME_FORMAT.toString());
+            .orElseGet(() -> fieldType.getType().equals(FieldType.DATE)
+                ? DateTimeFormatParser.DATE_FORMAT
+                : DateTimeFormatParser.DATE_TIME_FORMAT);
     }
 }

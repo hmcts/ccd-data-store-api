@@ -21,8 +21,6 @@ public class CaseState implements Serializable {
     private String titleDisplay;
     private List<AccessControlList> accessControlLists;
 
-    /**
-     **/
     @ApiModelProperty(required = true, value = "")
     @JsonProperty("id")
     public String getId() {
@@ -46,8 +44,6 @@ public class CaseState implements Serializable {
         this.name = name;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("description")
     public String getDescription() {

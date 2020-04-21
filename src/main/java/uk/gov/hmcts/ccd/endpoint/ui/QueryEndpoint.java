@@ -155,7 +155,7 @@ public class QueryEndpoint {
     public SearchResultView searchNew(@PathVariable("jid") final String jurisdictionId,
                                       @PathVariable("ctid") final String caseTypeId,
                                       @RequestParam java.util.Map<String, String> params) {
-        String view = params.get("view");
+        final String view = params.get("view");
         MetaData metadata = new MetaData(caseTypeId, jurisdictionId);
         metadata.setState(param(params, STATE.getParameterName()));
         metadata.setCaseReference(param(params, CASE_REFERENCE.getParameterName()));

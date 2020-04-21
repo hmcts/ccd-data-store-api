@@ -142,9 +142,12 @@ public class SearchResultProcessor {
         originalNode.forEach(item -> {
             JsonNode newItem = item.deepCopy();
             ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                item.get(CollectionValidator.VALUE) instanceof TextNode ?
-                    createTextNodeFrom((TextNode) item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix) :
-                    createObjectNodeFrom((ObjectNode) item.get(CollectionValidator.VALUE), viewColumn, viewColumn.getCaseFieldType().getChildren(), fieldPrefix));
+                item.get(CollectionValidator.VALUE) instanceof TextNode
+                    ? createTextNodeFrom((TextNode) item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix)
+                    : createObjectNodeFrom((ObjectNode) item.get(CollectionValidator.VALUE),
+                                           viewColumn,
+                                           viewColumn.getCaseFieldType().getChildren(),
+                                           fieldPrefix));
             newNode.add(newItem);
         });
 

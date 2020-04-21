@@ -35,16 +35,25 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
     }
 
     @Override
-    protected JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath, WizardPageComplexFieldOverride override, CommonField topLevelField) {
+    protected JsonNode executeSimple(JsonNode node,
+                                     CommonField field,
+                                     BaseType baseType,
+                                     String fieldPath,
+                                     WizardPageComplexFieldOverride override,
+                                     CommonField topLevelField) {
         return !isNullOrEmpty(node)
             && hasDisplayContextParameterType(field.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
-            && isSupportedBaseType(baseType, SUPPORTED_TYPES) ?
-            createNode(field.getDisplayContextParameter(), node.asText(), baseType, fieldPath) :
-            node;
+            && isSupportedBaseType(baseType, SUPPORTED_TYPES)
+            ? createNode(field.getDisplayContextParameter(), node.asText(), baseType, fieldPath)
+            : node;
     }
 
     @Override
-    protected JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField, String fieldPath, WizardPageComplexFieldOverride override, CommonField topLevelField) {
+    protected JsonNode executeCollection(JsonNode collectionNode,
+                                         CommonField caseViewField,
+                                         String fieldPath,
+                                         WizardPageComplexFieldOverride override,
+                                         CommonField topLevelField) {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
 
         if ((hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
@@ -54,9 +63,9 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                    isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES) ?
-                        createNode(caseViewField.getDisplayContextParameter(), item.get(CollectionValidator.VALUE).asText(), collectionFieldType, fieldPath) :
-                        executeComplex(item.get(CollectionValidator.VALUE), caseViewField.getFieldType().getChildren(), null, fieldPath, topLevelField));
+                    isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
+                        ? createNode(caseViewField.getDisplayContextParameter(), item.get(CollectionValidator.VALUE).asText(), collectionFieldType, fieldPath)
+                        : executeComplex(item.get(CollectionValidator.VALUE), caseViewField.getFieldType().getChildren(), null, fieldPath, topLevelField));
                 newNode.add(newItem);
             });
 
