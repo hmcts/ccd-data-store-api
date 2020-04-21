@@ -78,7 +78,7 @@ public class StartTriggerController {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.START_EVENT_TRIGGER
+            V2.MediaType.START_EVENT
         }
     )
     @ApiOperation(

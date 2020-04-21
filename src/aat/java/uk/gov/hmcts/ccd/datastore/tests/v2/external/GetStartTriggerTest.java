@@ -231,7 +231,7 @@ class GetStartTriggerTest extends BaseTest {
             .given()
             .pathParam("caseId", caseId)
             .pathParam("triggerId", eventId)
-            .accept(V2.MediaType.START_EVENT_TRIGGER)
+            .accept(V2.MediaType.START_EVENT)
             .header("experimental", "true");
     }
 }
