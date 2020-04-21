@@ -36,7 +36,7 @@ import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_DELETE;
 import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_READ;
 import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_UPDATE;
 
-public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
+public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase"
         + "/event-triggers/CREATE-CASE";
 

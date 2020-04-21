@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPage
 
 @DisplayName("UIStartTriggerControllerTest")
 
-class UIStartTriggerControllerTest {
+class UIStartEventControllerTest {
     private static final String NAME = "eventName";
     private static final String DESCRIPTION = "eventDescription";
     private static final String TOKEN = "Token";

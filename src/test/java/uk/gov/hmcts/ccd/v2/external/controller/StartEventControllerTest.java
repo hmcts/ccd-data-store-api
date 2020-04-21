@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
 
 @DisplayName("StartTriggerController")
-class StartTriggerControllerTest {
+class StartEventControllerTest {
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String CASE_ID = "1111222233334444";
     private static final String EVENT_TRIGGER_ID = "createCase";
@@ -44,7 +44,7 @@ class StartTriggerControllerTest {
     private UIDService caseReferenceService;
 
     @InjectMocks
-    private StartTriggerController startTriggerController;
+    private StartEventController startEventController;
 
     private StartEventResult startEventResult = new StartEventResult();
 
@@ -73,7 +73,7 @@ class StartTriggerControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<StartTriggerResource> response = startTriggerController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<StartTriggerResource> response = startEventController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -88,7 +88,7 @@ class StartTriggerControllerTest {
         void shouldPropagateExceptionWhenThrown() {
             when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> startTriggerController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () -> startEventController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
 
@@ -102,7 +102,7 @@ class StartTriggerControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<StartTriggerResource> response = startTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<StartTriggerResource> response = startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -117,7 +117,7 @@ class StartTriggerControllerTest {
         void shouldPropagateExceptionFromOperationWhenThrown() {
             when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> startTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () -> startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
         @Test
@@ -125,7 +125,7 @@ class StartTriggerControllerTest {
         void shouldFailWithBadRequestException() {
             when(caseReferenceService.validateUID(CASE_ID)).thenReturn(false);
 
-            assertThrows(BadRequestException.class, () -> startTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(BadRequestException.class, () -> startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
     }
 }

@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
-public class StartTriggerControllerCaseRolesIT extends WireMockBaseTest {
+public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_EXTERNAL = "/case-types/CaseRolesCase/event-triggers" +
         "/CREATE-CASE";
 
@@ -69,7 +69,7 @@ public class StartTriggerControllerCaseRolesIT extends WireMockBaseTest {
 
     private MockMvc mockMvc;
 
-    public StartTriggerControllerCaseRolesIT() throws IOException {
+    public StartEventControllerCaseRolesIT() throws IOException {
     }
 
     @Before

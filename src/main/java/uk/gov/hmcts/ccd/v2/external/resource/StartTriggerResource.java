@@ -11,7 +11,7 @@ import lombok.NonNull;
 import org.springframework.hateoas.RepresentationModel;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.v2.external.controller.StartTriggerController;
+import uk.gov.hmcts.ccd.v2.external.controller.StartEventController;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -28,9 +28,9 @@ public class StartTriggerResource extends RepresentationModel {
         copyProperties(startEventResult);
 
         if (withCase) {
-            add(linkTo(methodOn(StartTriggerController.class).getStartEventTrigger(startEventResult.getCaseReference(), eventId, ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(StartEventController.class).getStartEventTrigger(startEventResult.getCaseReference(), eventId, ignoreWarning)).withSelfRel());
         } else {
-            add(linkTo(methodOn(StartTriggerController.class).getStartCaseTrigger(startEventResult.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(StartEventController.class).getStartCaseTrigger(startEventResult.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
         }
     }
 
