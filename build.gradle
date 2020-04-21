@@ -226,7 +226,7 @@ dependencies {
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
-    testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
+    testCompile ('com.opentable.components:otj-pg-embedded:0.13.3')
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
     testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.1.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
