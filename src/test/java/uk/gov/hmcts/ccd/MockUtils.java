@@ -13,6 +13,7 @@ public class MockUtils {
     public static final String ROLE_CASEWORKER_PRIVATE = "caseworker-probate-private";
     public static final String ROLE_TEST_PUBLIC = "caseworker-test-public";
     public static final String ROLE_CITIZEN = "citizen";
+    public static final String ROLE_DCP_CASEWORKER = "caseworker-dcptest1";
     public static final String CASE_ROLE_CAN_CREATE = "[CAN_CREATE]";
     public static final String CASE_ROLE_CAN_READ = "[CAN_READ]";
     public static final String CASE_ROLE_CAN_UPDATE = "[CAN_UPDATE]";

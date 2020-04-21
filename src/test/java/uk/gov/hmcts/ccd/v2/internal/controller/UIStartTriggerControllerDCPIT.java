@@ -18,19 +18,19 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
 import javax.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -38,8 +38,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
 
-public class UICaseControllerDCPIT extends WireMockBaseTest {
-    private static final String GET_CASE = "/internal/cases/1587051668000989";
+public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
+    private static final String GET_START_TRIGGER = "/internal/cases/1587051668000989/event-triggers/UPDATE";
     private static final int NUMBER_OF_CASES = 2;
 
     @Inject
@@ -71,10 +71,11 @@ public class UICaseControllerDCPIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_case_dcp.sql" })
     @SuppressWarnings("unchecked")
-    public void shouldGetCaseWithDCPConfigured() throws Exception {
+    public void shouldGetStartTriggerForCaseWithDCPConfigured() throws Exception {
         assertCaseDataResultSetSize();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        final MvcResult result = mockMvc.perform(get(GET_CASE)
+        final MvcResult result = mockMvc.perform(get(GET_START_TRIGGER)
             .contentType(MediaType.APPLICATION_JSON)
             .header(AUTHORIZATION, "Bearer user1")
             .header(V2.EXPERIMENTAL_HEADER, "true"))
@@ -82,32 +83,32 @@ public class UICaseControllerDCPIT extends WireMockBaseTest {
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         String content = result.getResponse().getContentAsString();
-        UICaseViewResource savedCaseResource = mapper.readValue(content, UICaseViewResource.class);
+        UIStartTriggerResource uiStartTriggerResource = mapper.readValue(content, UIStartTriggerResource.class);
 
-        CaseViewTab[] tabs = savedCaseResource.getTabs();
+        List<CaseViewField> caseFields = uiStartTriggerResource.getCaseEventTrigger().getCaseFields();
 
-        CaseViewField textField = tabs[0].getFields()[0];
-        CaseViewField complexCollectionField = tabs[0].getFields()[1];
-        CaseViewField dateField = tabs[1].getFields()[0];
-        CaseViewField dateTimeField = tabs[1].getFields()[1];
-        CaseViewField collectionField = tabs[2].getFields()[0];
-        CaseViewField complexField = tabs[2].getFields()[1];
+        CaseViewField textField = caseFields.get(1);
+        CaseViewField dateField = caseFields.get(2);
+        CaseViewField dateTimeField = caseFields.get(3);
+        CaseViewField collectionField = caseFields.get(4);
+        CaseViewField complexField = caseFields.get(5);
+        CaseViewField complexCollectionField = caseFields.get(6);
 
         assertAll(
             () -> assertSimpleField(textField, TEXT_FIELD, null, "Case 1 Text", "Case 1 Text"),
-            () -> assertSimpleField(dateField, DATE_FIELD, "#DATETIMEDISPLAY(dd, MMM yyyy)", "2000-10-20", "20, Oct 2000"),
-            () -> assertSimpleField(dateTimeField, DATE_TIME_FIELD, null, "1987-11-15T12:30:00.000", "1987-11-15T12:30:00.000"),
+            () -> assertSimpleField(dateField, DATE_FIELD, null, "2000-10-20", "2000-10-20"),
+            () -> assertSimpleField(dateTimeField, DATE_TIME_FIELD, "#DATETIMEENTRY(yyyy-dd)", "1987-11-15T12:30:00.000", "1987-15"),
 
-            () -> assertCollectionField(collectionField, COLLECTION_FIELD, "#DATETIMEDISPLAY(dd/MM/yyyy)",
+            () -> assertCollectionField(collectionField, COLLECTION_FIELD, "#DATETIMEENTRY(yyyyHHmm),#COLLECTION(allowDelete,allowInsert)",
                 new String[]{"2004-03-02T05:06:07.000", "2010-09-08T11:12:13.000"},
-                new String[]{"02/03/2004", "08/09/2010"}),
+                new String[]{"20040506", "20101112"}),
 
             () -> assertThat(complexField.getFieldType().getChildren().get(0).getId(), is(COMPLEX_DATE_TIME_FIELD)),
             () -> assertThat(complexField.getFieldType().getChildren().get(0).getDisplayContextParameter(), is("#DATETIMEDISPLAY(yyyy),#DATETIMEENTRY(MM-yyyy)")),
             () -> assertThat(mapOf(complexField.getValue()).get(COMPLEX_DATE_TIME_FIELD), is("2005-03-28T07:45:30.000")),
-            () -> assertThat(mapOf(complexField.getFormattedValue()).get(COMPLEX_DATE_TIME_FIELD), is("2005")),
+            () -> assertThat(mapOf(complexField.getFormattedValue()).get(COMPLEX_DATE_TIME_FIELD), is("03-2005")),
 
             () -> assertThat(complexField.getFieldType().getChildren().get(1).getFieldType().getChildren().get(0)
                 .getId(), is(NESTED_NUMBER_FIELD)),
@@ -119,10 +120,7 @@ public class UICaseControllerDCPIT extends WireMockBaseTest {
                 .get(NESTED_NUMBER_FIELD), is(nullValue())),
 
             () -> assertThat(complexCollectionField.getId(), is(COLLECTION_COMPLEX_DATE_TIME)),
-            () -> assertComplexCollectionDCP(complexCollectionField, "#DATETIMEENTRY(dd-MM-yyyy),#DATETIMEDISPLAY(dd-MM-yyyy)",
-                null, "#DATETIMEENTRY(yyyy-MM-dd'T'HH:mm),#DATETIMEDISPLAY(yyyy-MM-dd'T'HH:mm)", null,
-                "#DATETIMEENTRY(MM-yyyy),#DATETIMEDISPLAY(MM-yyyy)", null,
-                "#DATETIMEENTRY(yyyy-MM-dd),#DATETIMEDISPLAY(yyyy-MM-dd)", null),
+            () -> assertComplexCollectionDCP(complexCollectionField),
             () -> assertComplexCollectionValues(arrayOf(complexCollectionField.getValue()), 0,
                 "1963-05-07", "1999-08-19" ,"2008-04-02T16:37:00.000",
                 "2010-06-17T19:20:00.000", "1981-02-08", "2020-02-19",
@@ -134,32 +132,24 @@ public class UICaseControllerDCPIT extends WireMockBaseTest {
         );
     }
 
-    private void assertComplexCollectionDCP(CaseViewField caseViewField,
-                                            String dateFieldValue,
-                                            String standardDateFieldValue,
-                                            String dateTimeFieldValue,
-                                            String standardDateTimeFieldValue,
-                                            String nestedDateFieldValue,
-                                            String nestedStandardDateFieldValue,
-                                            String nestedDateTimeFieldValue,
-                                            String nestedStandardDateTimeFieldValue) {
+    private void assertComplexCollectionDCP(CaseViewField caseViewField) {
         assertAll(
             () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(0).getDisplayContextParameter(),
-                is(dateFieldValue)),
+                is("#DATETIMEENTRY(dd-MM-yyyy),#DATETIMEDISPLAY(dd-MM-yyyy)")),
             () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(1).getDisplayContextParameter(),
-                is(dateTimeFieldValue)),
+                is("#DATETIMEENTRY(yyyy-MM-dd'T'HH:mm),#DATETIMEDISPLAY(yyyy-MM-dd'T'HH:mm)")),
             () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(2).getDisplayContextParameter(),
-                is(standardDateFieldValue)),
+                is((String) null)),
             () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(3).getDisplayContextParameter(),
-                is(standardDateTimeFieldValue)),
+                is((String) null)),
             () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(4).getFieldType()
-                .getChildren().get(0).getDisplayContextParameter(), is(nestedDateFieldValue)),
+                .getChildren().get(0).getDisplayContextParameter(), is("#DATETIMEENTRY(MM-yyyy),#DATETIMEDISPLAY(MM-yyyy)")),
             () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(4).getFieldType()
-                .getChildren().get(1).getDisplayContextParameter(), is(nestedDateTimeFieldValue)),
+                .getChildren().get(1).getDisplayContextParameter(), is("#DATETIMEENTRY(yyyy-MM-dd),#DATETIMEDISPLAY(yyyy-MM-dd)")),
             () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(4).getFieldType()
-                .getChildren().get(2).getDisplayContextParameter(), is(nestedStandardDateFieldValue)),
+                .getChildren().get(2).getDisplayContextParameter(), is((String) null)),
             () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(4).getFieldType()
-                .getChildren().get(3).getDisplayContextParameter(), is(nestedStandardDateTimeFieldValue))
+                .getChildren().get(3).getDisplayContextParameter(), is((String) null))
         );
     }
 
@@ -200,7 +190,6 @@ public class UICaseControllerDCPIT extends WireMockBaseTest {
         assertThat(caseViewField.getFormattedValue(), is(formattedValue));
     }
 
-    @SuppressWarnings("unchecked")
     private void assertCollectionField(CaseViewField caseViewField,
                                        String id,
                                        String displayContextParameter,
