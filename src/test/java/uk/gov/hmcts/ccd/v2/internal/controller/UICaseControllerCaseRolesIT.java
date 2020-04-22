@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,16 +20,16 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
-import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
 
+import javax.inject.Inject;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -158,7 +157,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.VIEW_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.VIEW_CASE_HISTORY.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
         assertThat(captor.getValue().getEventSelected(), is("TEST_EVENT_ACCESS"));
         assertThat(captor.getValue().getCaseType(), is("TestAddressBookNoEventAccessToCaseRole"));

@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
 
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.VIEW_CASE;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.VIEW_CASE_HISTORY;
 
 @RestController
 @RequestMapping(path = "/internal/cases")
@@ -113,7 +114,7 @@ public class UICaseController {
             message = "Case event not found"
         )
     })
-    @LogAudit(operationType = VIEW_CASE, caseId = "#caseId", eventName = "#result.body.event.eventId",
+    @LogAudit(operationType = VIEW_CASE_HISTORY, caseId = "#caseId", eventName = "#result.body.event.eventId",
         jurisdiction = "#result.body.caseType.jurisdiction.id", caseType = "#result.body.caseType.id")
     public ResponseEntity<UIEventViewResource> getCaseEvent(@PathVariable("caseId") String caseId, @PathVariable("eventId") String eventId) {
         if (!caseReferenceService.validateUID(caseId)) {
