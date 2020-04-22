@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -390,7 +392,7 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    @LogAudit(operationType = OperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
         caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
                                                        @PathVariable("jid") final String jurisdictionId,
@@ -404,7 +406,7 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    @LogAudit(operationType = OperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
         caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCitizens(@PathVariable("uid") final String uid,
                                                     @PathVariable("jid") final String jurisdictionId,
