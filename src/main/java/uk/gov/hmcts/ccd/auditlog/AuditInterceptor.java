@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 
@@ -25,7 +25,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 
     private final AuditService auditService;
 
-    private static final List<HttpStatus> IGNORED_STATUSES = Lists.newArrayList(NOT_FOUND, FORBIDDEN, UNAUTHORIZED);
+    private static final List<HttpStatus> IGNORED_STATUSES = Lists.newArrayList(NOT_FOUND);
 
     public AuditInterceptor(AuditService auditService) {
         this.auditService = auditService;
