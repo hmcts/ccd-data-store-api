@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 public @interface LogAudit {
 
-    OperationType operationType();
+    AuditOperationType operationType();
 
     String caseId() default "";
 

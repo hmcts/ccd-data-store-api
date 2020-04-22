@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
@@ -99,7 +99,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(OperationType.VIEW_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.VIEW_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
@@ -140,7 +140,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(OperationType.UPDATE_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
@@ -183,7 +183,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(OperationType.CREATE_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is("ccd-data"));

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.auditlog;
 
-public enum OperationType {
+public enum AuditOperationType {
     CREATE_CASE("Create case"),
     UPDATE_CASE("Update case"),
     VIEW_CASE("View case"),
@@ -9,7 +9,7 @@ public enum OperationType {
 
     private final String label;
 
-    OperationType(String label) {
+    AuditOperationType(String label) {
         this.label = label;
     }
 

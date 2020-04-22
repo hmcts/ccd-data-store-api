@@ -28,7 +28,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.status;
-import static uk.gov.hmcts.ccd.auditlog.OperationType.*;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.*;
 
 @RestController
 @RequestMapping(path = "/")

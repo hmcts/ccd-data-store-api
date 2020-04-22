@@ -24,7 +24,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
@@ -166,7 +166,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        Assert.assertThat(captor.getValue().getOperationType(), CoreMatchers.is(OperationType.VIEW_CASE.getLabel()));
+        Assert.assertThat(captor.getValue().getOperationType(), CoreMatchers.is(AuditOperationType.VIEW_CASE.getLabel()));
         Assert.assertThat(captor.getValue().getCaseId(), CoreMatchers.is(CASE_ID));
         Assert.assertThat(captor.getValue().getIdamId(), CoreMatchers.is("Cloud.Strife@test.com"));
         Assert.assertThat(captor.getValue().getInvokingService(), CoreMatchers.is("ccd-data"));

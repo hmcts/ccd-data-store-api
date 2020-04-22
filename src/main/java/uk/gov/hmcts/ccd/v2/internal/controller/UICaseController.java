@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
 
-import static uk.gov.hmcts.ccd.auditlog.OperationType.VIEW_CASE;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.VIEW_CASE;
 
 @RestController
 @RequestMapping(path = "/internal/cases")

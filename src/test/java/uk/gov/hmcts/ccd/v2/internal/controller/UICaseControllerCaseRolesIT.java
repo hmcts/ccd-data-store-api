@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
@@ -127,7 +127,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(OperationType.VIEW_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.VIEW_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
         assertThat(captor.getValue().getCaseType(), is("TestAddressBookNoEventAccessToCaseRole"));
         assertThat(captor.getValue().getJurisdiction(), is("PROBATE"));
@@ -158,7 +158,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(OperationType.VIEW_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.VIEW_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
         assertThat(captor.getValue().getEventSelected(), is("TEST_EVENT_ACCESS"));
         assertThat(captor.getValue().getCaseType(), is("TestAddressBookNoEventAccessToCaseRole"));

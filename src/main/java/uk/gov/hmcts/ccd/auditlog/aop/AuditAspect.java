@@ -42,7 +42,7 @@ public class AuditAspect {
             List<String> targetCaseRoles =  getValue(joinPoint, logAudit.targetCaseRoles(), result, List.class);
 
             AuditContextHolder.setAuditContext(AuditContext.auditContextWith()
-                .operationType(logAudit.operationType())
+                .auditOperationType(logAudit.operationType())
                 .caseId(caseId)
                 .caseType(caseType)
                 .jurisdiction(jurisdiction)
