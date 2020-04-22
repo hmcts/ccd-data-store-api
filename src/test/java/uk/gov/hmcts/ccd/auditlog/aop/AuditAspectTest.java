@@ -69,7 +69,7 @@ public class AuditAspectTest {
 
         public static final String JURISDICTION = "PROBATE";
 
-        @LogAudit(operationType = AuditOperationType.VIEW_CASE, caseId = "#reference",caseType = "#result.caseTypeId",
+        @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#reference",caseType = "#result.caseTypeId",
             jurisdiction = "#result.jurisdiction", eventName = "#eventName")
         public CaseDetails getCase(String reference, String eventName) {
             CaseDetails caseDetails = new CaseDetails();

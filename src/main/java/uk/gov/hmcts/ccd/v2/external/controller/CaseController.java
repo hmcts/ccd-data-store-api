@@ -82,7 +82,7 @@ public class CaseController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
-    @LogAudit(operationType = VIEW_CASE, caseId = "#caseId",
+    @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {

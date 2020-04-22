@@ -126,7 +126,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.VIEW_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
         assertThat(captor.getValue().getCaseType(), is("TestAddressBookNoEventAccessToCaseRole"));
         assertThat(captor.getValue().getJurisdiction(), is("PROBATE"));
