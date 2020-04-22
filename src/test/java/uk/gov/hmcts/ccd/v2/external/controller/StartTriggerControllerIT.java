@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -18,18 +17,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,7 +60,7 @@ public class StartTriggerControllerIT extends WireMockBaseTest {
     }
 
     @Test
-    public void externalGetStartCaseTrigger_200_shouldLogAudit() throws Exception {
+    public void getStartCaseTrigger_should_return_200() throws Exception {
         final String URL =  "/case-types/TestAddressBookCreatorCase/event-triggers/NO_PRE_STATES_EVENT";
 
         HttpHeaders headers = new HttpHeaders();
@@ -82,23 +77,11 @@ public class StartTriggerControllerIT extends WireMockBaseTest {
 
         final StartTriggerResource startTriggerResource = mapper.readValue(result.getResponse().getContentAsString(), StartTriggerResource.class);
         assertNotNull("UI Start Trigger Resource is null", startTriggerResource);
-
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
-        assertThat(captor.getValue().getHttpStatus(), is(200));
-        assertThat(captor.getValue().getCaseType(), is(startTriggerResource.getCaseDetails().getCaseTypeId()));
-        assertThat(captor.getValue().getJurisdiction(), is(startTriggerResource.getCaseDetails().getJurisdiction()));
-        assertThat(captor.getValue().getEventSelected(), is(startTriggerResource.getEventId()));
-        assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void externalGetStartEventTrigger_200_shouldLogAudit() throws Exception {
+    public void getStartEventTrigger_should_return_200() throws Exception {
         String caseId = "1504259907353529";
         String triggerId = "HAS_PRE_STATES_EVENT";
         final String URL =  "/cases/" + caseId + "/event-triggers/" + triggerId;
@@ -117,18 +100,5 @@ public class StartTriggerControllerIT extends WireMockBaseTest {
 
         final StartTriggerResource startTriggerResource = mapper.readValue(result.getResponse().getContentAsString(), StartTriggerResource.class);
         assertNotNull("UI Start Trigger Resource is null", startTriggerResource);
-
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is(caseId));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
-        assertThat(captor.getValue().getHttpStatus(), is(200));
-        assertThat(captor.getValue().getCaseType(), is(startTriggerResource.getCaseDetails().getCaseTypeId()));
-        assertThat(captor.getValue().getJurisdiction(), is(startTriggerResource.getCaseDetails().getJurisdiction()));
-        assertThat(captor.getValue().getEventSelected(), is(startTriggerResource.getEventId()));
-        assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
     }
 }

@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -63,8 +61,6 @@ public class StartTriggerController {
             message = EVENT_TRIGGER_NOT_FOUND
         )
     })
-    @LogAudit(operationType = AuditOperationType.CREATE_CASE, jurisdiction = "#result.body.caseDetails.jurisdiction",
-        caseType = "#caseTypeId", eventName = "#triggerId")
     public ResponseEntity<StartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
                                                                     @PathVariable("triggerId") String triggerId,
                                                                     @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
@@ -108,8 +104,6 @@ public class StartTriggerController {
             message = EVENT_TRIGGER_NOT_FOUND
         )
     })
-    @LogAudit(operationType = AuditOperationType.UPDATE_CASE, jurisdiction = "#result.body.caseDetails.jurisdiction",
-        caseType = "#result.body.caseDetails.caseTypeId", eventName = "#triggerId", caseId = "#caseId")
     public ResponseEntity<StartTriggerResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
                                                                      @PathVariable("triggerId") String triggerId,
                                                                      @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
