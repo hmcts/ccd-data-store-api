@@ -9,6 +9,8 @@ public class Field {
     @JsonProperty("field_type")
     private FieldType type;
     private boolean metadata;
+    @JsonProperty("show_condition")
+    private String showCondition;
 
     public String getId() {
         return id;
@@ -40,5 +42,13 @@ public class Field {
 
     public void setMetadata(boolean metadata) {
         this.metadata = metadata;
+    }
+
+    public String getShowCondition() {
+        return showCondition;
+    }
+
+    public void setShowCondition(String showCondition) {
+        this.showCondition = showCondition;
     }
 }

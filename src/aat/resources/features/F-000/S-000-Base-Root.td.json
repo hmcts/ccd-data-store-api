@@ -9,9 +9,8 @@
 	},
 	"request": {
 		"headers": {
-			"Authorization": "[[DYNAMIC]]",
-			"ServiceAuthorization": "[[DYNAMIC]]",
-			"Content-Type": "application/json"
+			"Authorization": "[[DEFAULT_AUTO_VALUE]]",
+			"ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
 		}
 	}
 }

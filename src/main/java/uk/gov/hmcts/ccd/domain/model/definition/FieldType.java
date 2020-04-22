@@ -2,14 +2,19 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 public class FieldType implements Serializable {
 
@@ -26,6 +31,8 @@ public class FieldType implements Serializable {
     public static final String PREDEFINED_COMPLEX_ADDRESS_UK = "AddressUK";
     public static final String PREDEFINED_COMPLEX_ORDER_SUMMARY = "OrderSummary";
     public static final String PREDEFINED_COMPLEX_CASELINK = "CaseLink";
+    public static final String DATETIME = "DateTime";
+    public static final String DATE = "Date";
 
     private String id = null;
     private String type = null;
@@ -125,6 +132,34 @@ public class FieldType implements Serializable {
 
     public void setCollectionFieldType(FieldType collectionFieldType) {
         this.collectionFieldType = collectionFieldType;
+    }
+
+    public Optional<CommonField> getNestedField(String path, boolean pathIncludesParent) {
+        if (StringUtils.isBlank(path) || this.getChildren().isEmpty() || (pathIncludesParent && path.trim().split("\\.").length == 1)) {
+            return Optional.empty();
+        }
+        List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(toList());
+
+        return reduce(this.getChildren(), pathIncludesParent ? pathElements.stream().skip(1).collect(toList()) : pathElements);
+    }
+
+    private Optional<CommonField> reduce(List<CaseField> caseFields, List<String> pathElements) {
+        String firstPathElement = pathElements.get(0);
+        Optional<CaseField> optionalCaseField = caseFields.stream().filter(e -> e.getId().equals(firstPathElement)).findFirst();
+        if (optionalCaseField.isPresent()) {
+            CommonField caseField = optionalCaseField.get();
+
+            if (pathElements.size() == 1) {
+                return Optional.of(caseField);
+            } else {
+                List<CaseField> newCaseFields = caseField.getFieldType().getChildren();
+                List<String> tail = pathElements.subList(1, pathElements.size());
+
+                return reduce(newCaseFields, tail);
+            }
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Named
@@ -24,15 +25,18 @@ public class CaseEventTriggerBuilder {
     private final UIDefinitionRepository uiDefinitionRepository;
     private final EventTriggerService eventTriggerService;
     private final CaseViewFieldBuilder caseViewFieldBuilder;
+    private final FieldProcessorService fieldProcessorService;
 
     public CaseEventTriggerBuilder(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                    final UIDefinitionRepository uiDefinitionRepository,
                                    final EventTriggerService eventTriggerService,
-                                   final CaseViewFieldBuilder caseViewFieldBuilder) {
+                                   final CaseViewFieldBuilder caseViewFieldBuilder,
+                                   final FieldProcessorService fieldProcessorService) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
         this.caseViewFieldBuilder = caseViewFieldBuilder;
+        this.fieldProcessorService = fieldProcessorService;
     }
 
     public CaseEventTrigger build(StartEventTrigger startEventTrigger, String caseTypeId, String eventTriggerId, String caseReference) {
@@ -44,7 +48,10 @@ public class CaseEventTriggerBuilder {
         final CaseEvent eventTrigger = getEventTrigger(eventTriggerId, caseType);
         final CaseEventTrigger caseEventTrigger = buildCaseEventTrigger(eventTrigger);
         caseEventTrigger.setCaseId(caseReference);
-        caseEventTrigger.setCaseFields(mergeEventFields(startEventTrigger.getCaseDetails(), caseType, eventTrigger));
+        caseEventTrigger.setCaseFields(
+            fieldProcessorService.processCaseViewFields(
+                mergeEventFields(startEventTrigger.getCaseDetails(), caseType, eventTrigger), caseType, eventTrigger)
+        );
         caseEventTrigger.setEventToken(startEventTrigger.getToken());
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
                                                                                                      eventTriggerId);

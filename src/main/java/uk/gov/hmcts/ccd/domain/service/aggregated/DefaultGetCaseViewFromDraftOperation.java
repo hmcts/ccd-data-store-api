@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 
 import java.util.ArrayList;
 
@@ -53,8 +54,9 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
                                                 @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                                 final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder,
                                                 final ObjectMapperService objectMapperService,
-                                                final CompoundFieldOrderService compoundFieldOrderService) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, compoundFieldOrderService);
+                                                final CompoundFieldOrderService compoundFieldOrderService,
+                                                final FieldProcessorService fieldProcessorService) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, compoundFieldOrderService, fieldProcessorService);
         this.draftGateway = draftGateway;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }

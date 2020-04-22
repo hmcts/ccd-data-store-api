@@ -15,7 +15,7 @@
 	],
 	"request": {
 		"pathVariables": {
-			"uid": "[[DYNAMIC]]",
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
 			"jid": "AUTOTEST1",
 			"ctid": "AAT"
 		},
@@ -24,18 +24,14 @@
 		}
 	},
 	"expectedResponse": {
-		"responseCode": 400,
-		"responseMessage": "Bad Request",
+    "_extends_": "Common_400_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
 			"timestamp": "[[ANYTHING_PRESENT]]",
-			"status": 400,
-			"error": "Bad Request",
 			"message": "unknown metadata search parameters: caseInvalidCaseParam.PersonFirstName",
 			"path": "[[ANYTHING_PRESENT]]",
 			"details": null,

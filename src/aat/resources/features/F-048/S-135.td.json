@@ -19,23 +19,19 @@
       "Authorization": "InvalidAuthorizationToken"
     },
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "AUTOTEST1",
       "ctid": "AAT"
     }
   },
   "expectedResponse": {
-    "responseCode": 403,
-    "responseMessage": "Forbidden",
+    "_extends_": "Common_403_Response",
     "headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json",
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
       "timestamp": "[[ANYTHING_PRESENT]]",
-      "status": 403,
-      "error": "Forbidden",
       "message": "Access Denied",
       "path": "[[ANYTHING_PRESENT]]"
     }
