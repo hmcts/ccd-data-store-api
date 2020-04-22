@@ -132,7 +132,7 @@ public class CaseDocumentAttacher {
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
                 if (jsonNode.get(HASH_TOKEN_STRING) == null) {
-                    throw new BadRequestException(String.format("The document %s does not has the hashcode", documentId));
+                    throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
                 }
                 documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                 if (jsonNode instanceof ObjectNode) {
