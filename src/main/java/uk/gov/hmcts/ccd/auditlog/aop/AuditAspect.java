@@ -33,8 +33,6 @@ public class AuditAspect {
         try {
             result = joinPoint.proceed();
             return result;
-        } catch (Exception ex) {
-            throw ex;
         } finally {
             String caseId =  getValue(joinPoint, logAudit.caseId(), result, String.class);
             String caseType =  getValue(joinPoint, logAudit.caseType(), result, String.class);

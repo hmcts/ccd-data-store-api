@@ -9,7 +9,7 @@ public enum OperationType {
 
     private final String label;
 
-    private OperationType(String label) {
+    OperationType(String label) {
         this.label = label;
     }
 
