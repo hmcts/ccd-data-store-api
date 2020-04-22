@@ -1,11 +1,12 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import lombok.Builder;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 import java.io.Serializable;
 
 @Builder
-public class CaseEventFieldComplex implements Serializable {
+public class CaseEventFieldComplex implements Serializable, CommonDCPModel {
 
     private String reference;
 

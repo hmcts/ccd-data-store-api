@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
@@ -11,7 +12,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
-public interface CommonField {
+public interface CommonField extends CommonDCPModel {
 
     FieldType getFieldType();
 
@@ -22,10 +23,6 @@ public interface CommonField {
     String getDisplayContext();
 
     void setDisplayContext(String displayContext);
-
-    String getDisplayContextParameter();
-
-    void setDisplayContextParameter(String displayContextParameter);
 
     Object getFormattedValue();
 

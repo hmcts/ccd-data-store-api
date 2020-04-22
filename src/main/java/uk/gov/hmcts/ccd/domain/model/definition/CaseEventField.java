@@ -8,10 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 @ToString
 @ApiModel(description = "")
-public class CaseEventField implements Serializable {
+public class CaseEventField implements Serializable, CommonDCPModel {
 
     private String caseFieldId = null;
     private String displayContext = null;

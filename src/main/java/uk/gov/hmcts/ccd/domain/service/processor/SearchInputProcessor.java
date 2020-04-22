@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
+import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameter;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
@@ -19,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEENTRY;
 
 @Component
 public class SearchInputProcessor {
@@ -61,10 +65,9 @@ public class SearchInputProcessor {
     }
 
     private void handleTopLevel(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
-        if (DisplayContextParameter
-            .hasDisplayContextParameterType(criteriaInput.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)) {
+        if (criteriaInput.hasDisplayContextParameter(DATETIMEENTRY)) {
             newParams.put(fieldPath,
-                processValue(fieldPath, criteriaInput.getDisplayContextParameter(), queryValue, criteriaInput.getField().getType()));
+                processValue(fieldPath, criteriaInput, queryValue, criteriaInput.getField().getType()));
         } else {
             newParams.put(fieldPath, queryValue);
         }
@@ -73,10 +76,9 @@ public class SearchInputProcessor {
     private void handleNested(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
         final Optional<CommonField> field = criteriaInput.getField().getType().getNestedField(fieldPath, true);
 
-        if (field.isPresent() && DisplayContextParameter
-            .hasDisplayContextParameterType(field.get().getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)) {
+        if (field.isPresent() && field.get().hasDisplayContextParameter(DATETIMEENTRY)) {
             newParams.put(fieldPath,
-                processValue(fieldPath, field.get().getDisplayContextParameter(), queryValue, field.get().getFieldType()));
+                processValue(fieldPath, field.get(), queryValue, field.get().getFieldType()));
         } else {
             newParams.put(fieldPath, queryValue);
         }
@@ -87,14 +89,14 @@ public class SearchInputProcessor {
         return splitPath.length > 1 && Ints.tryParse(splitPath[1]) == null;
     }
 
-    private String processValue(String id, String displayContextParameter, String value, FieldType fieldType) {
+    private String processValue(String id, CommonDCPModel dcpObject, String value, FieldType fieldType) {
         try {
             if (fieldType.getType().equals(FieldType.DATE)) {
-                return dateTimeFormatParser.convertDateToIso8601(format(displayContextParameter, fieldType), value);
+                return dateTimeFormatParser.convertDateToIso8601(format(dcpObject, fieldType), value);
             } else if (fieldType.getType().equals(FieldType.DATETIME)) {
-                return dateTimeFormatParser.convertDateTimeToIso8601(format(displayContextParameter, fieldType), value);
+                return dateTimeFormatParser.convertDateTimeToIso8601(format(dcpObject, fieldType), value);
             } else if (fieldType.getType().equals(FieldType.COLLECTION)) {
-                return processValue(id, displayContextParameter, value, fieldType.getCollectionFieldType());
+                return processValue(id, dcpObject, value, fieldType.getCollectionFieldType());
             } else {
                 return value;
             }
@@ -103,17 +105,16 @@ public class SearchInputProcessor {
                 String.format("Unable to process input %s with value %s. Expected format: %s",
                     id,
                     value,
-                    format(displayContextParameter, fieldType))
+                    format(dcpObject, fieldType))
             );
         }
     }
 
-    private String format(String displayContextParameter, FieldType fieldType) {
-        return DisplayContextParameter
-            .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
+    private String format(CommonDCPModel dcpObject, FieldType fieldType) {
+        return dcpObject.getDisplayContextParameter(DATETIMEENTRY)
             .map(DisplayContextParameter::getValue)
             .orElseGet(() -> fieldType.getType().equals(FieldType.DATE) ?
-                DateTimeFormatParser.DATE_FORMAT.toString() :
-                DateTimeFormatParser.DATE_TIME_FORMAT.toString());
+                DateTimeFormatParser.DATE_FORMAT :
+                DateTimeFormatParser.DATE_TIME_FORMAT);
     }
 }

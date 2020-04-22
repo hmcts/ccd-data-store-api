@@ -6,9 +6,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-
 public abstract class CaseViewFieldProcessor extends FieldProcessor {
 
     public CaseViewFieldProcessor(CaseViewFieldBuilder caseViewFieldBuilder) {
@@ -16,26 +13,22 @@ public abstract class CaseViewFieldProcessor extends FieldProcessor {
     }
 
     public CaseViewField execute(CaseViewField caseViewField) {
-        final BaseType fieldType = BaseType.get(caseViewField.getFieldType().getType());
-
-        if (BaseType.get(COMPLEX) == fieldType) {
+        if (caseViewField.isComplexFieldType()) {
             return executeComplex(caseViewField, caseViewField.getId(), caseViewField);
-        } else if (BaseType.get(COLLECTION) == fieldType) {
+        } else if (caseViewField.isCollectionFieldType()) {
             return executeCollection(caseViewField);
         } else {
-            return executeSimple(caseViewField, fieldType);
+            return executeSimple(caseViewField, BaseType.get(caseViewField.getFieldType().getType()));
         }
     }
 
     public CaseViewField execute(CaseViewField caseViewField, WizardPageField wizardPageField) {
-        final BaseType fieldType = BaseType.get(caseViewField.getFieldType().getType());
-
-        if (BaseType.get(COMPLEX) == fieldType) {
+        if (caseViewField.isComplexFieldType()) {
             return executeComplex(caseViewField, wizardPageField, caseViewField.getId(), caseViewField);
-        } else if (BaseType.get(COLLECTION) == fieldType) {
+        } else if (caseViewField.isCollectionFieldType()) {
             return executeCollection(caseViewField);
         } else {
-            return executeSimple(caseViewField, fieldType);
+            return executeSimple(caseViewField, BaseType.get(caseViewField.getFieldType().getType()));
         }
     }
 
@@ -46,7 +39,8 @@ public abstract class CaseViewFieldProcessor extends FieldProcessor {
     protected CaseViewField executeComplex(CaseViewField caseViewField, WizardPageField wizardPageField, String fieldPrefix, CaseViewField topLevelField) {
         caseViewField.setFormattedValue(
             caseViewField.getValue() instanceof ObjectNode ?
-                executeComplex((ObjectNode) caseViewField.getValue(), caseViewField.getFieldType().getComplexFields(), wizardPageField, fieldPrefix, topLevelField) :
+                executeComplex((ObjectNode) caseViewField.getValue(), caseViewField.getFieldType().getComplexFields(),
+                    wizardPageField, fieldPrefix, topLevelField) :
                 caseViewField.getValue()
         );
         return caseViewField;

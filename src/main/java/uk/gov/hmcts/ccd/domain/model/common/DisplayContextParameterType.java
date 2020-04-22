@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.processor;
+package uk.gov.hmcts.ccd.domain.model.common;
 
 import com.google.common.base.Strings;
 

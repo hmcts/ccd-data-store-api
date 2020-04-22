@@ -2,13 +2,14 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SearchResultField implements Serializable {
+public class SearchResultField implements Serializable, CommonDCPModel {
     @JsonProperty("case_type_id")
     private String caseTypeId;
     @JsonProperty("case_field_id")

@@ -9,12 +9,13 @@ import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
+import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
 import java.time.LocalDateTime;
@@ -22,9 +23,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 @Component
 public class SearchResultProcessor {
@@ -83,18 +81,16 @@ public class SearchResultProcessor {
 
         ObjectNode newNode = MAPPER.createObjectNode();
         complexCaseFields.stream().forEach(complexCaseField -> {
-            final String test = complexCaseField.getFieldType().getType();
-            final BaseType complexFieldType = BaseType.get(test);
             final String fieldId = complexCaseField.getId();
             final JsonNode caseFieldNode = originalNode.get(fieldId);
             final String fieldPath = fieldPrefix + FIELD_SEPARATOR + fieldId;
 
             if (FieldProcessor.isNullOrEmpty(caseFieldNode)) {
                 newNode.set(fieldId, caseFieldNode);
-            } else if (complexFieldType == BaseType.get(COLLECTION)) {
+            } else if (complexCaseField.isCollectionFieldType()) {
                 newNode.set(fieldId,
                     createArrayNodeFrom((ArrayNode) caseFieldNode, viewColumn, fieldPath));
-            } else if (complexFieldType == BaseType.get(COMPLEX)) {
+            } else if (complexCaseField.isComplexFieldType()) {
                 Optional.ofNullable(
                     createObjectNodeFrom((ObjectNode) caseFieldNode, viewColumn, complexCaseField.getFieldType().getComplexFields(), fieldPath))
                     .ifPresent(result -> newNode.set(fieldId, result));
@@ -114,11 +110,9 @@ public class SearchResultProcessor {
         }
 
         final Optional<CommonField> nestedField = viewColumn.getCaseFieldType().getNestedField(fieldPath, true);
-        final String displayContextParameter = nestedField
-            .map(CommonField::getDisplayContextParameter)
-            .orElse(viewColumn.getDisplayContextParameter());
+        final CommonDCPModel dcpObject = nestedField.map(CommonDCPModel.class::cast).orElse(viewColumn);
 
-        return DisplayContextParameter.getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEDISPLAY)
+        return dcpObject.getDisplayContextParameter(DisplayContextParameterType.DATETIMEDISPLAY)
             .map(dcp -> {
                 final String fieldType = nestedField
                     .map(CommonField::getFieldType)
