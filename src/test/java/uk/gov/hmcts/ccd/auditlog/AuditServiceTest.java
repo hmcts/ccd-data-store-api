@@ -18,7 +18,6 @@ import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -71,7 +70,7 @@ class AuditServiceTest {
     void shouldSaveToAuditRepository() {
         AuditContext auditContext = AuditContext.auditContextWith()
             .caseId(CASE_ID)
-            .operationType(OperationType.CREATE_CASE)
+            .auditOperationType(AuditOperationType.CREATE_CASE)
             .jurisdiction(JURISDICTION)
             .caseType(CASE_TYPE)
             .eventName(EVENT_NAME)
@@ -95,7 +94,7 @@ class AuditServiceTest {
         assertThat(captor.getValue().getInvokingService(), is(equalTo((SERVICE_NAME))));
         assertThat(captor.getValue().getRequestId(), is(equalTo((REQUEST_ID_VALUE))));
 
-        assertThat(captor.getValue().getOperationType(), is(equalTo(OperationType.CREATE_CASE.getLabel())));
+        assertThat(captor.getValue().getOperationType(), is(equalTo(AuditOperationType.CREATE_CASE.getLabel())));
         assertThat(captor.getValue().getJurisdiction(), is(equalTo(JURISDICTION)));
         assertThat(captor.getValue().getCaseId(), is(equalTo(CASE_ID)));
         assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
