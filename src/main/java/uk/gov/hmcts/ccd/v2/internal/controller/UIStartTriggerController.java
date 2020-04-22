@@ -16,8 +16,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
-import static uk.gov.hmcts.ccd.auditlog.OperationType.CREATE_CASE;
-import static uk.gov.hmcts.ccd.auditlog.OperationType.UPDATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CREATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.*;
 
 @RestController

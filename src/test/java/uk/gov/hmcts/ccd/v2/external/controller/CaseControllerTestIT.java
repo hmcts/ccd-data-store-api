@@ -18,8 +18,8 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
@@ -27,13 +27,11 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import javax.inject.Inject;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -99,7 +97,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(OperationType.VIEW_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
@@ -140,7 +138,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(OperationType.UPDATE_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
@@ -183,7 +181,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(OperationType.CREATE_CASE.getLabel()));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is("ccd-data"));

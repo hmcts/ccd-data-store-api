@@ -6,8 +6,8 @@ import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.aop.framework.AopProxy;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
 import org.springframework.stereotype.Controller;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,7 +69,7 @@ public class AuditAspectTest {
 
         public static final String JURISDICTION = "PROBATE";
 
-        @LogAudit(operationType = OperationType.VIEW_CASE, caseId = "#reference",caseType = "#result.caseTypeId",
+        @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#reference",caseType = "#result.caseTypeId",
             jurisdiction = "#result.jurisdiction", eventName = "#eventName")
         public CaseDetails getCase(String reference, String eventName) {
             CaseDetails caseDetails = new CaseDetails();
@@ -78,7 +78,7 @@ public class AuditAspectTest {
             return caseDetails;
         }
 
-        @LogAudit(operationType = OperationType.CREATE_CASE, caseType = "#caseType", targetIdamId = "#targetIdamId")
+        @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseType = "#caseType", targetIdamId = "#targetIdamId")
         public CaseDetails createCase(String caseType, String targetIdamId) {
             throw new RuntimeException("get case failed");
         }
