@@ -128,7 +128,7 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        MatcherAssert.assertThat(captor.getValue().getOperationType(), is(OperationType.UPDATE_CASE_ACCESS.getLabel()));
+        MatcherAssert.assertThat(captor.getValue().getOperationType(), is(OperationType.GRANT_CASE_ACCESS.getLabel()));
         MatcherAssert.assertThat(captor.getValue().getCaseId(), is(CASE_ID));
         MatcherAssert.assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         MatcherAssert.assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
@@ -161,7 +161,7 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
         verify(auditRepository, times(2)).save(captor.capture());
         List<AuditEntry> auditEntry = captor.getAllValues();
 
-        MatcherAssert.assertThat(auditEntry.get(1).getOperationType(), is(OperationType.UPDATE_CASE_ACCESS.getLabel()));
+        MatcherAssert.assertThat(auditEntry.get(1).getOperationType(), is(OperationType.REVOKE_CASE_ACCESS.getLabel()));
         MatcherAssert.assertThat(auditEntry.get(1).getCaseId(), is(CASE_ID));
         MatcherAssert.assertThat(auditEntry.get(1).getIdamId(), is("Cloud.Strife@test.com"));
         MatcherAssert.assertThat(auditEntry.get(1).getInvokingService(), is("ccd-data"));

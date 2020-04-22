@@ -5,7 +5,9 @@ public enum OperationType {
     UPDATE_CASE("Update case"),
     VIEW_CASE("View case"),
     SEARCH_CASE("Search case"),
-    UPDATE_CASE_ACCESS("Update case access");
+    UPDATE_CASE_ACCESS("Update case access"),
+    GRANT_CASE_ACCESS("Grant case access"),
+    REVOKE_CASE_ACCESS("Revoke case access");
 
     private final String label;
 
