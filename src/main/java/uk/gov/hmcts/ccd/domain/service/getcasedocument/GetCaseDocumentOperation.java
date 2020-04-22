@@ -112,7 +112,7 @@ public class GetCaseDocumentOperation {
             .orElseThrow((() -> new CaseDocumentNotFoundException("User does not has read permissions on any document field")));
 
 
-        if (isDocumentPresent(documentId, documentFieldsWithReadPermission)) {
+        if (Boolean.TRUE.equals(isDocumentPresent(documentId, documentFieldsWithReadPermission))) {
             //build caseDocument and set permissions
             return DocumentPermissions.builder()
                 .id(documentId)
@@ -128,10 +128,9 @@ public class GetCaseDocumentOperation {
     private Boolean isDocumentPresent(String documentId, JsonNode documentFieldsWithReadPermission) {
         for (JsonNode jsonNode : documentFieldsWithReadPermission) {
             if (jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null
-                && jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE).asText().contains(documentId)) {
-                return true;
-            } else if (jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null
-                       && jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText().contains(documentId)) {
+                && jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE).asText().contains(documentId)
+                || (jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null
+                && jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText().contains(documentId))) {
                 return true;
             }
         }
