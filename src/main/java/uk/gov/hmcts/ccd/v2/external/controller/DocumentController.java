@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
@@ -68,7 +66,6 @@ public class DocumentController {
             message = V2.Error.PRINTABLE_DOCUMENTS_ENDPOINT_DOWN
         )
     })
-    @LogAudit(operationType = AuditOperationType.VIEW_CASE, caseId = "#caseId")
     public ResponseEntity<DocumentsResource> getDocuments(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);

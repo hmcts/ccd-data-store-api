@@ -1,11 +1,8 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -22,9 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
@@ -34,17 +29,11 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -162,16 +151,6 @@ public class DocumentControllerITest extends WireMockBaseTest {
                                                                hasProperty("description", is("Document identifying address")),
                                                                hasProperty("type", is("Address")),
                                                                hasProperty("url", is(PRINTABLE_URL))))));
-
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        Assert.assertThat(captor.getValue().getOperationType(), CoreMatchers.is(AuditOperationType.VIEW_CASE.getLabel()));
-        Assert.assertThat(captor.getValue().getCaseId(), CoreMatchers.is(CASE_ID));
-        Assert.assertThat(captor.getValue().getIdamId(), CoreMatchers.is("Cloud.Strife@test.com"));
-        Assert.assertThat(captor.getValue().getInvokingService(), CoreMatchers.is("ccd-data"));
-        Assert.assertThat(captor.getValue().getHttpStatus(), CoreMatchers.is(200));
-        Assert.assertThat(captor.getValue().getRequestId(), CoreMatchers.is(REQUEST_ID_VALUE));
     }
 
 }
