@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -36,12 +37,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
@@ -481,6 +484,28 @@ public class CaseDocumentAttacherTest {
                                                 ArgumentMatchers.any(HttpMethod.class),
                                                 ArgumentMatchers.any(),
                                                 ArgumentMatchers.<Class<String>>any());
+    }
+
+    @Test
+    @DisplayName("Should throw Forbidden exception when user passes an invalid hashToken")
+    void shouldThrowForbiddenExceptionForinvalidHashToken() {
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("documentId123", HttpStatus.FORBIDDEN);
+        doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "documentId123")).when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        caseDocumentAttacher.caseDocumentsMetadata =
+            CaseDocumentsMetadata
+                .builder()
+                .documentHashToken(Collections.singletonList(DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                                     .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())
+                                  ).build();
+
+        Assertions.assertThrows(DocumentTokenException.class,
+                                () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
+
     }
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
