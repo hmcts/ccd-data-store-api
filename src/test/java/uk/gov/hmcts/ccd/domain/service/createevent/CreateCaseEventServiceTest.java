@@ -8,6 +8,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -111,6 +112,8 @@ class CreateCaseEventServiceTest {
     private RestTemplate restTemplate;
     @Mock
     SecurityUtils securityUtils;
+
+
 
 
     private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
@@ -250,8 +253,10 @@ class CreateCaseEventServiceTest {
     @Test
     @DisplayName("should update a case for V2.1 endpoint")
     void shouldUpdateV2Event() throws IOException {
+        final HttpHeaders headers = new HttpHeaders();
         ResponseEntity<List> responseEntity = new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         doReturn(V2.MediaType.CREATE_EVENT_2_1).when(request).getContentType();
+        doReturn(headers).when(securityUtils).authorizationHeaders();
         doReturn(responseEntity).when(restTemplate).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
