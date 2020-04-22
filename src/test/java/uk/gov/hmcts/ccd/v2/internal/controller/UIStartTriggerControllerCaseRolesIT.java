@@ -18,8 +18,8 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
-import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -28,9 +28,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 import javax.inject.Inject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
@@ -38,10 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_CREATE;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_DELETE;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_READ;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_UPDATE;
+import static uk.gov.hmcts.ccd.MockUtils.*;
 
 public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase" +
