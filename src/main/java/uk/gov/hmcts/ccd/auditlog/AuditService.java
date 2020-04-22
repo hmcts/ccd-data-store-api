@@ -8,7 +8,6 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
@@ -31,29 +30,28 @@ public class AuditService {
         this.auditRepository = auditRepository;
     }
 
-    public void audit(HttpServletRequest request, int httpResponseStatus, AuditContext auditContext) {
+    public void audit(AuditContext auditContext) {
         AuditEntry entry = new AuditEntry();
 
         String formattedDate = LocalDateTime.now(clock).format(ISO_LOCAL_DATE_TIME);
-
         entry.setDateTime(formattedDate);
-        entry.setHttpStatus(httpResponseStatus);
-        entry.setHttpMethod(request.getMethod());
-        entry.setPath(request.getRequestURI());
+
+        entry.setHttpStatus(auditContext.getHttpStatus());
+        entry.setHttpMethod(auditContext.getHttpMethod());
+        entry.setPath(auditContext.getRequestPath());
+        entry.setRequestId(auditContext.getRequestId());
+
         entry.setIdamId(userRepository.getUser().getEmail());
         entry.setInvokingService(securityUtils.getServiceName());
 
-        if (auditContext != null) {
-            entry.setOperationType(auditContext.getOperationType().getLabel());
-            entry.setJurisdiction(auditContext.getJurisdiction());
-            entry.setCaseId(auditContext.getCaseId());
-            entry.setCaseType(auditContext.getCaseType());
-            entry.setEventSelected(auditContext.getEventName());
-            entry.setTargetIdamId(auditContext.getTargetIdamId());
-            entry.setTargetCaseRoles(auditContext.getTargetCaseRoles());
-        }
-
-        entry.setRequestId(request.getHeader("request-id"));
+        entry.setOperationType(auditContext.getOperationType().getLabel());
+        entry.setJurisdiction(auditContext.getJurisdiction());
+        entry.setCaseId(auditContext.getCaseId());
+        entry.setCaseType(auditContext.getCaseType());
+        entry.setListOfCaseTypes(auditContext.getCaseTypeIds());
+        entry.setEventSelected(auditContext.getEventName());
+        entry.setTargetIdamId(auditContext.getTargetIdamId());
+        entry.setTargetCaseRoles(auditContext.getTargetCaseRoles());
 
         auditRepository.save(entry);
     }
