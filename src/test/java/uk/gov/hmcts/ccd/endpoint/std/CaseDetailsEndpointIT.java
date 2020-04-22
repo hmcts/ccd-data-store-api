@@ -40,6 +40,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsIn.isIn;
@@ -1018,6 +1019,31 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findCaseDetailsForCaseworkerShouldLogAudit() throws Exception {
+        final MvcResult result = mockMvc
+            .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353529")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+
+        assertEquals(1504259907353529L, caseDetails.getReference().longValue());
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
+        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getHttpStatus(), is(200));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+    }
+
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_private_cases.sql"})
     public void shouldReturn404WhenGetCaseClassificationTooHighForCaseworker() throws Exception {
 
@@ -1104,6 +1130,33 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Country").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Postcode").asText());
         }
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findCaseDetailsForCitizenShouldLogAudit() throws Exception {
+
+        final MvcResult result = mockMvc
+            .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353529")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+
+        assertEquals(1504259907353529L, caseDetails.getReference().longValue());
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
+        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getHttpStatus(), is(200));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+
     }
 
     @Test
@@ -1939,6 +1992,18 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertNotNull(savedCaseDetails);
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
         assertNotNull(savedCaseDetails.getDataClassification());
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is(CASE_REFERENCE));
+        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getHttpStatus(), is(201));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getEventSelected(), is(PRE_STATES_EVENT_ID));
     }
 
     @Test
@@ -1977,6 +2042,18 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertNotNull(savedCaseDetails);
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
         assertNotNull(savedCaseDetails.getDataClassification());
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is(CASE_REFERENCE));
+        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getHttpStatus(), is(201));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getEventSelected(), is(PRE_STATES_EVENT_ID));
     }
 
     @Test

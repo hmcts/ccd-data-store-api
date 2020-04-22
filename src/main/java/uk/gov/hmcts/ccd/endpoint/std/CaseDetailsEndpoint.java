@@ -102,6 +102,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID"),
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
+    @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#caseId", jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId")
     public CaseDetails findCaseDetailsForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -128,6 +130,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID"),
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
+    @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#caseId", jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId")
     public CaseDetails findCaseDetailsForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -329,6 +333,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 409, message = "Case altered outside of transaction"),
         @ApiResponse(code = 422, message = "Event submission failed")
     })
+    @LogAudit(operationType = AuditOperationType.UPDATE_CASE, caseId = "#caseId", jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails createCaseEventForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -355,6 +361,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 409, message = "Case altered outside of transaction"),
         @ApiResponse(code = 422, message = "Event submission failed")
     })
+    @LogAudit(operationType = AuditOperationType.UPDATE_CASE, caseId = "#caseId", jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails createCaseEventForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
