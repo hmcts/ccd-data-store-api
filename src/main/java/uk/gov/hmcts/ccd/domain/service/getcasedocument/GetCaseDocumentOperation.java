@@ -1,22 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -30,9 +19,19 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.v2.external.domain.DocumentPermissions;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentPermissions;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 public class GetCaseDocumentOperation {
@@ -85,7 +84,7 @@ public class GetCaseDocumentOperation {
 
         return CaseDocumentMetadata.builder()
             .caseId(caseDetails.getReferenceAsString())
-            .document(getCaseDocument(caseDetails, documentId))
+            .documentPermissions(getCaseDocument(caseDetails, documentId))
             .build();
 
     }
@@ -99,9 +98,9 @@ public class GetCaseDocumentOperation {
         List<CaseField> documentCaseFields = new ArrayList<>();
         List<CaseField> documentAndComplexFields = caseType.getCaseFields()
             .stream()
-            .filter(caseField -> (DOCUMENT.equalsIgnoreCase(caseField.getFieldType().getType())) ||
-                                 (COMPLEX.equalsIgnoreCase(caseField.getFieldType().getType())) ||
-                                 (COLLECTION.equalsIgnoreCase(caseField.getFieldType().getType())))
+            .filter(caseField -> (DOCUMENT.equalsIgnoreCase(caseField.getFieldType().getType()))
+                    || (COMPLEX.equalsIgnoreCase(caseField.getFieldType().getType()))
+                    || (COLLECTION.equalsIgnoreCase(caseField.getFieldType().getType())))
             .collect(Collectors.toList());
 
         if (documentAndComplexFields.isEmpty()) {

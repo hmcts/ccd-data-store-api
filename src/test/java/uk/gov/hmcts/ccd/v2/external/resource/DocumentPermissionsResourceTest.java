@@ -27,13 +27,8 @@ class DocumentPermissionsResourceTest {
     private final String linkSelfForCaseDocument = String.format("/cases/%s/documents/%s", CASE_REFERENCE, CASE_DOCUMENT_ID);
     private final CaseDocumentMetadata caseDocumentMetadata = CaseDocumentMetadata.builder()
         .caseId(CASE_REFERENCE)
-            .caseTypeId(CASE_TYPE_ID)
-            .jurisdictionId(JURISDICTION_ID)
-            .document(DocumentPermissions.builder()
+            .documentPermissions(DocumentPermissions.builder()
                 .id(CASE_DOCUMENT_ID)
-                .url(DOCUMENT_URL)
-                .name(DOCUMENT_NAME)
-                .type(DOCUMENT_TYPE)
                 .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
         .build())
         .build();

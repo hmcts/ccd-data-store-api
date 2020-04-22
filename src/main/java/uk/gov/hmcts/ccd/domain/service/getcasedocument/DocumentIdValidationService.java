@@ -10,7 +10,7 @@ public class DocumentIdValidationService {
 
 
     /**
-     * Validate a UUID string using
+     * Validate a UUID string using.
      *
      * @param documentId case document Id
      * @return boolean result for validation

@@ -49,7 +49,7 @@ class CaseDocumentControllerTest {
 
         CaseDocumentMetadata caseDocumentMetadata = CaseDocumentMetadata.builder()
             .caseId(CASE_REFERENCE)
-            .document(DocumentPermissions.builder()
+            .documentPermissions(DocumentPermissions.builder()
                 .id(CASE_DOCUMENT_ID)
                 .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
                 .build())
@@ -66,10 +66,10 @@ class CaseDocumentControllerTest {
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
             () -> assertThat(response.getBody().getDocumentMetadata().getCaseId(), is(CASE_REFERENCE)),
-            () -> assertThat(response.getBody().getDocumentMetadata().getDocument(),
+            () -> assertThat(response.getBody().getDocumentMetadata().getDocumentPermissions(),
                 allOf(hasProperty("id", is(CASE_DOCUMENT_ID)))),
-            () -> assertThat(response.getBody().getDocumentMetadata().getDocument().getPermissions(), hasSize(2)),
-            () -> assertThat(response.getBody().getDocumentMetadata().getDocument().getPermissions(),
+            () -> assertThat(response.getBody().getDocumentMetadata().getDocumentPermissions().getPermissions(), hasSize(2)),
+            () -> assertThat(response.getBody().getDocumentMetadata().getDocumentPermissions().getPermissions(),
                 hasItems(Permission.READ, Permission.UPDATE))
         );
     }
