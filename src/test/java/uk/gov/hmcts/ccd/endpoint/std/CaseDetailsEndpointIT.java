@@ -715,6 +715,94 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void saveCaseDetailsForCaseWorkerShouldLogAudit() throws Exception {
+        final String DESCRIPTION = "A very long comment.......";
+        final String SUMMARY = "Short comment";
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(TEST_EVENT_ID);
+        triggeringEvent.setDescription(DESCRIPTION);
+        triggeringEvent.setSummary(SUMMARY);
+        caseDetailsToSave.setEvent(triggeringEvent);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.get(0);
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(captor.getValue().getCaseId()));
+        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getHttpStatus(), is(201));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
+    }
+
+    @Test
+    public void saveCaseDetailsForCitizenShouldLogAudit() throws Exception {
+        final String DESCRIPTION = "A very long comment.......";
+        final String SUMMARY = "Short comment";
+
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(TEST_EVENT_ID);
+        triggeringEvent.setDescription(DESCRIPTION);
+        triggeringEvent.setSummary(SUMMARY);
+        caseDetailsToSave.setEvent(triggeringEvent);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.get(0);
+        assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
+        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
+        assertEquals("state3", savedCaseDetails.getState());
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(captor.getValue().getCaseId()));
+        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getHttpStatus(), is(201));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
+    }
+
+    @Test
     public void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseTypeForCaseworker() throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseType("caseworkers");
     }

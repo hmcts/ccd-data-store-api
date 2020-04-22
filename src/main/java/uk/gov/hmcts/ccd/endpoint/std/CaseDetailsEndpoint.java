@@ -251,6 +251,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 422, message = "Case submission failed"),
         @ApiResponse(code = 409, message = "Case reference not unique")
     })
+    @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseId = "#result.reference",
+        jurisdiction = "#result.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails saveCaseDetailsForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -276,6 +278,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 422, message = "Case submission failed"),
         @ApiResponse(code = 409, message = "Case reference not unique")
     })
+    @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseId = "#result.reference",
+        jurisdiction = "#result.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails saveCaseDetailsForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
