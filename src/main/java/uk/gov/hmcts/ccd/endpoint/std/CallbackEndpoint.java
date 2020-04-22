@@ -4,8 +4,6 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.stdapi.PrintableDocumentListOperation;
@@ -32,8 +30,6 @@ public class CallbackEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Printable documents list retrieved")
     })
-    @LogAudit(operationType = OperationType.VIEW_CASE, caseId = "#caseDetails.reference", caseType = "#caseTypeId",
-        jurisdiction = "#jurisdictionId")
     public List<Document> getPrintableDocuments(
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,

@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.endpoint.std;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -16,9 +15,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.auditlog.OperationType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder;
@@ -28,13 +25,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -88,17 +83,6 @@ public class CallbackEndpointIT extends WireMockBaseTest {
         assertThat(documents, hasItem(hasProperty("name", equalTo("CCD Print"))));
         assertThat(documents, hasItem(hasProperty("type", equalTo("CCD Print Type"))));
         assertThat(documents, hasItem(hasProperty("description", equalTo("Printing for CCD"))));
-
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        assertThat(captor.getValue().getOperationType(), is(OperationType.VIEW_CASE.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is("1535450291607660"));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
-        assertThat(captor.getValue().getHttpStatus(), is(200));
-        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
-        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
     }
 
 }
