@@ -119,8 +119,10 @@ public class CaseDocumentAttacher {
                 if (restClientException.getStatusCode() != HttpStatus.FORBIDDEN) {
                     if (restClientException.getStatusCode() == HttpStatus.BAD_REQUEST) {
                         throw new BadSearchRequest(restClientException.getMessage());
-                    } else {
+                    } else if (restClientException.getStatusCode() == HttpStatus.NOT_FOUND) {
                         throw new ResourceNotFoundException(restClientException.getMessage());
+                    } else if (restClientException.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+                        throw new ServiceException("The downstream application has failed");
                     }
                 }
                 String badDocument = restClientException.getResponseBodyAsString();
@@ -198,23 +200,22 @@ public class CaseDocumentAttacher {
                                                                    .filter(documentsBeforeCallback::containsKey)
                                                                    .collect(Collectors.toList());
 
-            //find Hash token of documents belong to  before call back which are in After callback Map
-            Map<String, String> commonDocumentIdsWithHashToken = documentsBeforeCallback.entrySet()
-                                                                                        .stream()
-                                                                                        .filter(documentBeforeCallback -> commonDocumentIds
-                                                                                            .contains(documentBeforeCallback.getKey()))
-                                                                                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-
-            // Check temper hashToken by call back service
+            // Check tempered hashToken by call back service
             List<String> temperHashTokenDocumentIds =
                 commonDocumentIds.stream()
+                                 //documentsAfterCallback is a Map and service should not introduce their own hashtoken for a document.
                                  .filter(documentId -> StringUtils.isNotEmpty(documentsAfterCallback.get(documentId)))
                                  .collect(Collectors.toList());
 
             if (!temperHashTokenDocumentIds.isEmpty()) {
                 throw new ServiceException("call back attempted to change the hashToken of the following documents:" + temperHashTokenDocumentIds);
             }
+
+            //find Hash token of documents which belong to before call back and present in After callback Map
+            Map<String, String> commonDocumentIdsWithHashToken = documentsBeforeCallback.entrySet()
+                                                                                        .stream()
+                                                                                        .filter(documentBeforeCallback -> commonDocumentIds.contains(documentBeforeCallback.getKey()))
+                                                                                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
             //putting back documentIds with hashToken in after call back map  which belong to before callback Map
             documentsAfterCallback.putAll(commonDocumentIdsWithHashToken);
@@ -230,12 +231,8 @@ public class CaseDocumentAttacher {
         }
         //Filter DocumentHashToken based on consolidatedDocumentsWithHashToken
         consolidatedDocumentsWithHashToken.forEach((key, value) ->
-                                                       caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken
-                                                                                                            .builder()
-                                                                                                            .id(key)
-                                                                                                            .hashToken(value)
-                                                                                                            .build())
-                                                  );
+                                                       caseDocumentsMetadata.getDocumentHashToken()
+                                                                            .add(DocumentHashToken.builder().id(key).hashToken(value).build()));
     }
 
     public Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore, final Map<String, JsonNode> caseData) {
@@ -267,13 +264,11 @@ public class CaseDocumentAttacher {
                     }
 
                 } else {
-
                     Iterator<String> fieldNames = caseBeforeNode[0].fieldNames();
                     while (fieldNames.hasNext()) {
                         String fieldName = fieldNames.next();
                         JsonNode before = caseBeforeNode[0].get(fieldName);
                         recursiveMapForCaseDetailsBefore.put(fieldName, before);
-
                     }
 
                     value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
