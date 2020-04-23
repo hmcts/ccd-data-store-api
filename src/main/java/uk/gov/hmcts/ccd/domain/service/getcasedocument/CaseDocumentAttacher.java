@@ -97,7 +97,7 @@ public class CaseDocumentAttacher {
 
         if (callBackWasCalled) {
             // to remove hashcode before compute delta
-            extractDocumentsAfterCallback(caseDocumentsMetadata, caseDetails.getData(), documentsAfterCallback);
+            extractDocumentsAfterCallback(caseDetails.getData(), documentsAfterCallback);
         }
 
     }
@@ -150,7 +150,7 @@ public class CaseDocumentAttacher {
         });
     }
 
-    public void extractDocumentsAfterCallback(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, JsonNode> data, Map<String, String> documentMap) {
+    public void extractDocumentsAfterCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
@@ -161,9 +161,8 @@ public class CaseDocumentAttacher {
                 }
                 ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
-                jsonNode.fields().forEachRemaining(node -> extractDocumentsAfterCallback(caseDocumentsMetadata,
-                                                                                         Collections.singletonMap(node.getKey(), node.getValue()),
-                                                                                         documentMap));
+                jsonNode.fields().forEachRemaining(node -> extractDocumentsAfterCallback(
+                    Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
             }
         });
 
