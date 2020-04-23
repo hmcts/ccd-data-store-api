@@ -6,8 +6,8 @@ public enum AuditOperationType {
     CASE_ACCESSED("Case Accessed"),
     SEARCH_CASE("Search case"),
     UPDATE_CASE_ACCESS("Update case access permissions"),
-    GRANT_CASE_ACCESS("Grant case access"),
-    REVOKE_CASE_ACCESS("Revoke case access"),
+    GRANT_CASE_ACCESS("Grant case access permissions"),
+    REVOKE_CASE_ACCESS("Revoke case access permissions"),
     VIEW_CASE_HISTORY("View case history");
 
     private final String label;
