@@ -17,7 +17,7 @@ public class AuditRepositoryTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        repository = new AuditRepository(logFormatter);
+        repository = new LoggerAuditRepository(logFormatter);
     }
 
     @Test
