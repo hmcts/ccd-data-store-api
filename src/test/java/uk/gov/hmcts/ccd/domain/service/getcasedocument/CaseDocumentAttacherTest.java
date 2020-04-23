@@ -11,6 +11,8 @@ import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -552,9 +554,9 @@ public class CaseDocumentAttacherTest {
     }
 
     @Test
-    @DisplayName("Should throw Service exception when a document hashToke is altered by a Service")
+    @DisplayName("Should throw Service exception when a document hashToken is altered by a Service")
     void shouldThrowServiceExceptionWhenHashtokenIsAlteredByService() {
-        doThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "The resource 388a1ce0-f132-4680-90e9-5e782721cabb was not found"))
+        doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "The resource", "388a1ce0-f132-4680-90e9-5e782721cabb".getBytes(), StandardCharsets.UTF_8))
             .when(restTemplate).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
@@ -572,7 +574,8 @@ public class CaseDocumentAttacherTest {
                                   ).build();
         caseDocumentAttacher.documentAfterCallbackOriginalCopy
             .put("388a1ce0-f132-4680-90e9-5e782721cabb","57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a");
-        Assertions.assertThrows(ResourceNotFoundException.class,
+
+        Assertions.assertThrows(ServiceException.class,
                                 () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
     }
 
