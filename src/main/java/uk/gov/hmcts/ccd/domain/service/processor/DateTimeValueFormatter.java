@@ -80,9 +80,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
         final DisplayContext displayContext = displayContext(topLevelField, override);
 
-        if ((hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), ENUM_MAP.get(displayContext))
-            && isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES))
-            || BaseType.get(COMPLEX) == collectionFieldType) {
+        if (shouldExecuteCollection(collectionNode, caseViewField, ENUM_MAP.get(displayContext), collectionFieldType, SUPPORTED_TYPES)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
@@ -133,4 +131,6 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
                 DateTimeFormatParser.DATE_FORMAT.toString()
             );
     }
+
+
 }

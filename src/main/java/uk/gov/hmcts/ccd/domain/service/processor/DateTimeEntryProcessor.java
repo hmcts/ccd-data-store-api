@@ -47,9 +47,8 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
     protected JsonNode executeCollection(JsonNode collectionNode, CommonField caseViewField, String fieldPath, WizardPageComplexFieldOverride override, CommonField topLevelField) {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
 
-        if ((hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
-            && isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES))
-            || BaseType.get(COMPLEX) == collectionFieldType) {
+        if (shouldExecuteCollection(collectionNode, caseViewField,
+            DisplayContextParameterType.DATETIMEENTRY, collectionFieldType, SUPPORTED_TYPES)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
