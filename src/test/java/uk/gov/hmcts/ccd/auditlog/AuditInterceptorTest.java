@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.auditlog;
 
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -7,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContextHolder;
 
@@ -30,17 +32,21 @@ class AuditInterceptorTest {
     @Mock
     private AuditService auditService;
     @Mock
+    private ApplicationParams applicationParams;
+    @Mock
     private HandlerMethod handler;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        interceptor = new AuditInterceptor(auditService);
+        interceptor = new AuditInterceptor(auditService, applicationParams);
 
         request = new MockHttpServletRequest(METHOD, REQUEST_URI);
         request.addHeader(AuditInterceptor.REQUEST_ID, REQUEST_ID);
         response = new MockHttpServletResponse();
         response.setStatus(STATUS);
+
+        given(applicationParams.getAuditLogIgnoreStatuses()).willReturn(Lists.newArrayList(404));
     }
 
     @Test

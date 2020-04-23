@@ -125,6 +125,9 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
+    @Value("#{'${audit.log.ignore.statues}'.split(',')}")
+    private List<Integer> auditLogIgnoreStatuses;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -343,5 +346,9 @@ public class ApplicationParams {
 
     public Integer getElasticSearchRequestTimeout() {
         return elasticSearchRequestTimeout;
+    }
+
+    public List<Integer> getAuditLogIgnoreStatuses() {
+        return auditLogIgnoreStatuses;
     }
 }

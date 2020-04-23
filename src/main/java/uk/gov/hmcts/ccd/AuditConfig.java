@@ -13,6 +13,8 @@ public class AuditConfig implements WebMvcConfigurer {
 
     @Autowired
     private AuditService auditService;
+    @Autowired
+    private ApplicationParams applicationParams;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -21,7 +23,7 @@ public class AuditConfig implements WebMvcConfigurer {
 
     @Bean
     public AuditInterceptor auditInterceptor() {
-        return new AuditInterceptor(auditService);
+        return new AuditInterceptor(auditService, applicationParams);
     }
 
 }
