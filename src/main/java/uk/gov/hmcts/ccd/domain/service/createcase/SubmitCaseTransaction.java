@@ -96,7 +96,6 @@ class SubmitCaseTransaction {
                                   CaseDetails newCaseDetails, Boolean ignoreWarning) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-        CaseDocumentAttacher caseDocumentAttacher = null;
 
         newCaseDetails.setCreatedDate(now);
         newCaseDetails.setLastStateModifiedDate(now);
@@ -105,6 +104,7 @@ class SubmitCaseTransaction {
         boolean isApiVersion21 = request.getContentType() != null
             && request.getContentType().equals(V2.MediaType.CREATE_CASE_2_1);
 
+        CaseDocumentAttacher caseDocumentAttacher = null;
         if (isApiVersion21) {
             caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
             caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(newCaseDetails.getData());
