@@ -3,7 +3,7 @@
   "productName": "CCD Data Store",
   "operationName": "Upload a case document",
   "method": "POST",
-  "uri": "[[$CASE_DOCUMENT_AM_URL]]/cases/documents",
+  "uri": "{{CASE_DOCUMENT_AM_URL}}/cases/documents",
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.2.solicitor.2@gmail.com",
@@ -12,8 +12,8 @@
   },
   "request": {
     "headers": {
-      "Authorization": "[[DYNAMIC]]",
-      "ServiceAuthorization": "[[DYNAMIC]]",
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
       "Content-Type": "multipart/form-data"
     }
   },

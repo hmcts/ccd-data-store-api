@@ -1,20 +1,20 @@
 {
   "_guid_": "Common_Response_Header_Base",
 
-    "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Allow-Headers": "undefined",
-    "Access-Control-Allow-Methods": "GET,POST,OPTIONS,PUT,DELETE",
-    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-    "connection": "close",
-    "date": "[[ANYTHING_PRESENT]]",
-    "Expires": "0",
-    "Pragma": "no-cache",
-    "request-context": "[[ANYTHING_PRESENT]]",
-    "Strict-Transport-Security": "[[ANYTHING_PRESENT]]",
-    "Surrogate-Control": "no-store",
-    "transfer-encoding": "chunked",
-    "x-content-type-options": "nosniff",
-    "x-frame-options": "DENY",
-    "x-xss-protection": "1; mode=block"
+  "Access-Control-Allow-Credentials": "true",
+  "Access-Control-Allow-Headers": "undefined",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS,PUT,DELETE",
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  "connection": "close",
+  "date": "[[ANYTHING_PRESENT]]",
+  "Expires": "0",
+  "Pragma": "no-cache",
+  "request-context": "[[ANYTHING_PRESENT]]",
+  "Strict-Transport-Security": "[[ANYTHING_PRESENT]]",
+  "Surrogate-Control": "no-store",
+  "transfer-encoding": "chunked",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+  "x-xss-protection": "1; mode=block"
 
 }

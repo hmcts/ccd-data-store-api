@@ -8,15 +8,11 @@
   "createdOn": "[[ANYTHING_PRESENT]]",
   "lastModifiedBy": "[[ANYTHING_PRESENT]]",
   "classification": "PUBLIC",
-  "roles": [
-    "caseworker"
-  ],
   "metadata": {
     "caseTypeId": "BEFTA_CASETYPE_2_2",
-    "jurisdictionId": "BEFTA_JURISDICTION_2",
-    "caseId" : "1111222233334444"
+    "jurisdictionId": "BEFTA_JURISDICTION_2"
   },
-  "hashcode": "[[ANYTHING_PRESENT]]",
+  "hashToken": "[[ANYTHING_PRESENT]]",
   "ttl": "[[ANYTHING_PRESENT]]",
   "_links": {
     "self": {
