@@ -5,7 +5,7 @@ public enum AuditOperationType {
     UPDATE_CASE("Update case"),
     CASE_ACCESSED("Case Accessed"),
     SEARCH_CASE("Search case"),
-    UPDATE_CASE_ACCESS("Update case access"),
+    UPDATE_CASE_ACCESS("Update case access permissions"),
     VIEW_CASE_HISTORY("View case history");
 
     private final String label;
