@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -176,14 +177,21 @@ public class CaseDocumentAttacher {
     }
 
     public String extractDocumentId(JsonNode jsonNode) {
-        //Document Binary URL is preferred.
-        JsonNode documentField = jsonNode.get(DOCUMENT_BINARY_URL) != null ?
-                                 jsonNode.get(DOCUMENT_BINARY_URL) :
-                                 jsonNode.get(DOCUMENT_URL);
-        if (documentField.asText().contains(BINARY)) {
-            return documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
-        } else {
-            return documentField.asText().substring(documentField.asText().length() - 36);
+        try {
+            String documentId;
+            //Document Binary URL is preferred.
+            JsonNode documentField = jsonNode.get(DOCUMENT_BINARY_URL) != null ?
+                                     jsonNode.get(DOCUMENT_BINARY_URL) :
+                                     jsonNode.get(DOCUMENT_URL);
+            if (documentField.asText().contains(BINARY)) {
+                documentId = documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
+            } else {
+                documentId = documentField.asText().substring(documentField.asText().length() - 36);
+            }
+            UUID.fromString(documentId);
+            return documentId;
+        } catch (RuntimeException e) {
+            throw new BadRequestException("The input Document ID is invalid");
         }
     }
 

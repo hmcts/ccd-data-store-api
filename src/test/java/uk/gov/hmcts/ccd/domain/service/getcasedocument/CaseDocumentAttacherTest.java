@@ -405,6 +405,17 @@ public class CaseDocumentAttacherTest {
     @DisplayName("should throw exception while getting documents without hashToken from Case Data")
     void shouldThrowExceptionWhileExtractingDocumentsFromCaseData() throws IOException {
 
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadHashTokenUpload.json");
+        Map<String, String> documentMap = new HashMap<>();
+
+        Assertions.assertThrows(BadRequestException.class,
+                                () -> caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(dataMap, documentMap));
+    }
+
+    @Test
+    @DisplayName("should throw Bad Request exception while getting documents without appropriate documentId")
+    void shouldThrowExceptionWhileParingDocumentId() throws IOException {
+
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadDocumentUpload.json");
         Map<String, String> documentMap = new HashMap<>();
 
