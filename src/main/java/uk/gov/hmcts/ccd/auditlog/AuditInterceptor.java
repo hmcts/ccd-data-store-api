@@ -21,7 +21,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuditAspect.class);
 
-    private static final String REQUEST_ID = "request-id";
+    public static final String REQUEST_ID = "request-id";
 
     private final AuditService auditService;
 

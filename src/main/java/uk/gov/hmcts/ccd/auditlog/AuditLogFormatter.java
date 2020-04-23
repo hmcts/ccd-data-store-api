@@ -10,15 +10,16 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Component
 public class AuditLogFormatter {
 
-    private static final String TAG = "CLA-CCD";
+    public static final String TAG = "CLA-CCD";
+
     private static final String COMMA = ",";
     private static final String COLON = ":";
 
     public String format(AuditEntry entry) {
         return new StringBuilder(TAG)
             .append(" ")
-            .append(entry.getDateTime())
-            .append(" operationType:" + entry.getOperationType())
+            .append(getPair("dateTime", entry.getDateTime()))
+            .append(getPair("operationType", entry.getOperationType()))
             .append(getPair("caseId", entry.getCaseId()))
             .append(getPair("idamId", entry.getIdamId()))
             .append(getPair("invokingService", entry.getInvokingService()))
