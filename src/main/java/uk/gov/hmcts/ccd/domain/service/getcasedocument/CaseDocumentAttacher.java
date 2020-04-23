@@ -55,6 +55,7 @@ public class CaseDocumentAttacher {
     private final SecurityUtils securityUtils;
     public static final String BINARY = "/binary";
     public static final String EVENT_UPDATE = "UPDATE";
+    JsonNode caseBeforeNode;
 
     public CaseDocumentAttacher(RestTemplate restTemplate,
                                 ApplicationParams applicationParams,
@@ -262,11 +263,11 @@ public class CaseDocumentAttacher {
 
     private void checkDocumentFieldsDifference(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> caseData,
                                                Map<String, JsonNode> documentsDifference) {
-        final JsonNode[] caseBeforeNode = {null};
+         caseBeforeNode = null;
         caseData.forEach((key, value) -> {
 
             if (caseDataBefore.containsKey(key)) {
-                caseBeforeNode[0] = caseDataBefore.get(key);
+                caseBeforeNode = caseDataBefore.get(key);
                 if (value != null && isDocumentField(value)) {
                     if (!value.equals(caseDataBefore.get(key))) {
                         documentsDifference.put(key, value);
@@ -274,10 +275,10 @@ public class CaseDocumentAttacher {
 
                 } else {
 
-                    Iterator<String> fieldNames = caseBeforeNode[0].fieldNames();
+                    Iterator<String> fieldNames = caseBeforeNode.fieldNames();
                     while (fieldNames.hasNext()) {
                         String fieldName = fieldNames.next();
-                        JsonNode before = caseBeforeNode[0].get(fieldName);
+                        JsonNode before = caseBeforeNode.get(fieldName);
                         recursiveMapForCaseDetailsBefore.put(fieldName, before);
 
                     }
