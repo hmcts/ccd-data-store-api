@@ -515,6 +515,7 @@ jacocoTestReport {
         classDirectories = files(classDirectories.files.collect {
             fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**',
                                         '**/service/doclink/**',
+                                        'io/zonky/test/db/postgres/embedded/**',
                                         '**/domain/model/definition/CaseEventFieldComplex**',
                                         '**/domain/model/definition/DisplayContext**'])
         })
