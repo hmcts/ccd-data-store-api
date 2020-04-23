@@ -12,6 +12,7 @@ public final class V2 {
         // External API
         public static final String CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8";
         public static final String CASE_DOCUMENTS = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-documents.v2+json;charset=UTF-8";
+        public static final String CASE_DOCUMENT = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-document+json;charset=UTF-8;version=1.0";
         public static final String CREATE_EVENT = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8";
         public static final String CREATE_EVENT_2_1 = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event+json;charset=UTF-8;version=2.1";
         public static final String CREATE_CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8";
@@ -72,5 +73,7 @@ public final class V2 {
         public static final String ROLES_FOR_CASE_ID_NOT_FOUND = "Cannot find user roles or case roles for the case ID";
         public static final String CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID = "Cannot find case type definition for case ID";
         public static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+        public static final String CASE_DOCUMENT_NOT_FOUND = "Case document not found";
+        public static final String CASE_DOCUMENT_ID_INVALID = "Case document Id is not valid";
     }
 }
