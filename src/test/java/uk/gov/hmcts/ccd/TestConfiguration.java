@@ -18,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.ContextCleanupListener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
@@ -27,6 +26,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
