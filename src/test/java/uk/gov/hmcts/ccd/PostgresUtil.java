@@ -1,17 +1,19 @@
 package uk.gov.hmcts.ccd;
 
-import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 
 @Component
 public class PostgresUtil {
