@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -573,7 +572,7 @@ public class CaseDocumentAttacherTest {
                                                                  .build())
                                   ).build();
         caseDocumentAttacher.documentAfterCallbackOriginalCopy
-            .put("388a1ce0-f132-4680-90e9-5e782721cabb","57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a");
+            .put("388a1ce0-f132-4680-90e9-5e782721cabb", "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a");
 
         Assertions.assertThrows(ServiceException.class,
                                 () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
