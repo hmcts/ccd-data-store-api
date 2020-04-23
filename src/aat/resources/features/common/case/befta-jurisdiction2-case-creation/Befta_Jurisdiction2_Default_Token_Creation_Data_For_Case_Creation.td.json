@@ -1,6 +1,5 @@
 {
   "_guid_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation",
-  "_extends_": "Befta_Case_Transfer_Encoding_Header",
   "productName": "CCD Data Store",
   "operationName": "Start event creation as Case worker",
   "method": "GET",

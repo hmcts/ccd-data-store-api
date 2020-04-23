@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,17 +45,19 @@ public class CaseDocumentAttacher {
     Map<String, String> documentAfterCallbackOriginalCopy = new HashMap<>();
     Map<String, JsonNode> recursiveMapForCaseDetailsBefore = new HashMap<>();
     CaseDocumentsMetadata caseDocumentsMetadata = null;
+
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
     public static final String DOCUMENT = "Document";
     public static final String DOCUMENT_URL = "document_url";
     public static final String DOCUMENT_BINARY_URL = "document_binary_url";
     public static final String HASH_TOKEN_STRING = "hashToken";
+    public static final String BINARY = "/binary";
+    public static final String EVENT_UPDATE = "UPDATE";
+
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-    public static final String BINARY = "/binary";
-    public static final String EVENT_UPDATE = "UPDATE";
 
     public CaseDocumentAttacher(RestTemplate restTemplate,
                                 ApplicationParams applicationParams,
@@ -95,19 +98,18 @@ public class CaseDocumentAttacher {
 
         if (callBackWasCalled) {
             // to remove hashcode before compute delta
-            extractDocumentsAfterCallback(caseDocumentsMetadata, caseDetails.getData(), documentsAfterCallback);
+            extractDocumentsAfterCallback(caseDetails.getData(), documentsAfterCallback);
         }
 
     }
 
     public void restCallToAttachCaseDocuments() {
-
-        HttpHeaders headers = securityUtils.authorizationHeaders();
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        HttpEntity<CaseDocumentsMetadata> requestEntity = new HttpEntity<>(caseDocumentsMetadata,headers);
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-
         if (!caseDocumentsMetadata.getDocumentHashToken().isEmpty()) {
+            HttpHeaders headers = securityUtils.authorizationHeaders();
+            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            HttpEntity<CaseDocumentsMetadata> requestEntity = new HttpEntity<>(caseDocumentsMetadata,headers);
+            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+
             try {
                 restTemplate.exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
                                       HttpMethod.PATCH, requestEntity, Void.class);
@@ -118,8 +120,10 @@ public class CaseDocumentAttacher {
                 if (restClientException.getStatusCode() != HttpStatus.FORBIDDEN) {
                     if (restClientException.getStatusCode() == HttpStatus.BAD_REQUEST) {
                         throw new BadSearchRequest(restClientException.getMessage());
-                    } else {
+                    } else if (restClientException.getStatusCode() == HttpStatus.NOT_FOUND) {
                         throw new ResourceNotFoundException(restClientException.getMessage());
+                    } else if (restClientException.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+                        throw new ServiceException("The downstream application has failed");
                     }
                 }
                 String badDocument = restClientException.getResponseBodyAsString();
@@ -141,10 +145,7 @@ public class CaseDocumentAttacher {
                     throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
                 }
                 documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
-                if (jsonNode instanceof ObjectNode) {
-                    ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
-                }
-
+                ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
                 jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallback(
                     Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
@@ -152,7 +153,7 @@ public class CaseDocumentAttacher {
         });
     }
 
-    public void extractDocumentsAfterCallback(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, JsonNode> data, Map<String, String> documentMap) {
+    public void extractDocumentsAfterCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
@@ -161,14 +162,10 @@ public class CaseDocumentAttacher {
                 } else {
                     documentMap.put(documentId, null);
                 }
-                if (jsonNode instanceof ObjectNode) {
-                    ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
-                }
-
+                ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
-                jsonNode.fields().forEachRemaining(node -> extractDocumentsAfterCallback(caseDocumentsMetadata,
-                                                                                         Collections.singletonMap(node.getKey(), node.getValue()),
-                                                                                         documentMap));
+                jsonNode.fields().forEachRemaining(node -> extractDocumentsAfterCallback(
+                    Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
             }
         });
 
@@ -180,14 +177,21 @@ public class CaseDocumentAttacher {
     }
 
     public String extractDocumentId(JsonNode jsonNode) {
-        //Document Binary URL is preferred.
-        JsonNode documentField = jsonNode.get(DOCUMENT_BINARY_URL) != null ?
-                                 jsonNode.get(DOCUMENT_BINARY_URL) :
-                                 jsonNode.get(DOCUMENT_URL);
-        if (documentField.asText().contains(BINARY)) {
-            return documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
-        } else {
-            return documentField.asText().substring(documentField.asText().length() - 36);
+        try {
+            String documentId;
+            //Document Binary URL is preferred.
+            JsonNode documentField = jsonNode.get(DOCUMENT_BINARY_URL) != null ?
+                                     jsonNode.get(DOCUMENT_BINARY_URL) :
+                                     jsonNode.get(DOCUMENT_URL);
+            if (documentField.asText().contains(BINARY)) {
+                documentId = documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
+            } else {
+                documentId = documentField.asText().substring(documentField.asText().length() - 36);
+            }
+            UUID.fromString(documentId);
+            return documentId;
+        } catch (RuntimeException e) {
+            throw new BadRequestException("The input Document ID is invalid");
         }
     }
 
@@ -204,23 +208,22 @@ public class CaseDocumentAttacher {
                                                                    .filter(documentsBeforeCallback::containsKey)
                                                                    .collect(Collectors.toList());
 
-            //find Hash token of documents belong to  before call back which are in After callback Map
-            Map<String, String> commonDocumentIdsWithHashToken = documentsBeforeCallback.entrySet()
-                                                                                        .stream()
-                                                                                        .filter(documentBeforeCallback -> commonDocumentIds
-                                                                                            .contains(documentBeforeCallback.getKey()))
-                                                                                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-
-            // Check temper hashToken by call back service
+            // Check tempered hashToken by call back service
             List<String> temperHashTokenDocumentIds =
                 commonDocumentIds.stream()
+                                 //documentsAfterCallback is a Map and service should not introduce their own hashtoken for a document.
                                  .filter(documentId -> StringUtils.isNotEmpty(documentsAfterCallback.get(documentId)))
                                  .collect(Collectors.toList());
 
             if (!temperHashTokenDocumentIds.isEmpty()) {
                 throw new ServiceException("call back attempted to change the hashToken of the following documents:" + temperHashTokenDocumentIds);
             }
+
+            //find Hash token of documents which belong to before call back and present in After callback Map
+            Map<String, String> commonDocumentIdsWithHashToken = documentsBeforeCallback.entrySet()
+                                                                                        .stream()
+                                                                                        .filter(documentBeforeCallback -> commonDocumentIds.contains(documentBeforeCallback.getKey()))
+                                                                                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
             //putting back documentIds with hashToken in after call back map  which belong to before callback Map
             documentsAfterCallback.putAll(commonDocumentIdsWithHashToken);
@@ -236,12 +239,8 @@ public class CaseDocumentAttacher {
         }
         //Filter DocumentHashToken based on consolidatedDocumentsWithHashToken
         consolidatedDocumentsWithHashToken.forEach((key, value) ->
-                                                       caseDocumentsMetadata.getDocumentHashToken().add(DocumentHashToken
-                                                                                                            .builder()
-                                                                                                            .id(key)
-                                                                                                            .hashToken(value)
-                                                                                                            .build())
-                                                  );
+                                                       caseDocumentsMetadata.getDocumentHashToken()
+                                                                            .add(DocumentHashToken.builder().id(key).hashToken(value).build()));
     }
 
     public Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore, final Map<String, JsonNode> caseData) {
@@ -273,13 +272,11 @@ public class CaseDocumentAttacher {
                     }
 
                 } else {
-
                     Iterator<String> fieldNames = caseBeforeNode[0].fieldNames();
                     while (fieldNames.hasNext()) {
                         String fieldName = fieldNames.next();
                         JsonNode before = caseBeforeNode[0].get(fieldName);
                         recursiveMapForCaseDetailsBefore.put(fieldName, before);
-
                     }
 
                     value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,

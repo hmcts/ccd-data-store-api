@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,7 +45,9 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
@@ -402,6 +405,17 @@ public class CaseDocumentAttacherTest {
     @DisplayName("should throw exception while getting documents without hashToken from Case Data")
     void shouldThrowExceptionWhileExtractingDocumentsFromCaseData() throws IOException {
 
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadHashTokenUpload.json");
+        Map<String, String> documentMap = new HashMap<>();
+
+        Assertions.assertThrows(BadRequestException.class,
+                                () -> caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(dataMap, documentMap));
+    }
+
+    @Test
+    @DisplayName("should throw Bad Request exception while getting documents without appropriate documentId")
+    void shouldThrowExceptionWhileParingDocumentId() throws IOException {
+
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionBadDocumentUpload.json");
         Map<String, String> documentMap = new HashMap<>();
 
@@ -489,7 +503,6 @@ public class CaseDocumentAttacherTest {
     @Test
     @DisplayName("Should throw Forbidden exception when user passes an invalid hashToken")
     void shouldThrowForbiddenExceptionForinvalidHashToken() {
-        ResponseEntity<String> responseEntity = new ResponseEntity<>("documentId123", HttpStatus.FORBIDDEN);
         doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "documentId123")).when(restTemplate).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
@@ -505,15 +518,97 @@ public class CaseDocumentAttacherTest {
 
         Assertions.assertThrows(DocumentTokenException.class,
                                 () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
+    }
 
+    @Test
+    @DisplayName("Should throw Bad request exception when input params have validation issues.")
+    void shouldThrowBadRequestExceptionWhenDocumentIdIsInvalid() {
+        doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "The input parameter does not comply with the required pattern"))
+            .when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        caseDocumentAttacher.caseDocumentsMetadata =
+            CaseDocumentsMetadata
+                .builder()
+                .documentHashToken(Collections.singletonList(DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                                                                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())).build();
+
+        Assertions.assertThrows(BadSearchRequest.class,
+                                () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
+    }
+
+    @Test
+    @DisplayName("Should throw Resource Not found exception when a document does not exists in document store")
+    void shouldThrowResourceNotFoundExceptionWhenDocumentIsMissing() {
+        doThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "The resource 388a1ce0-f132-4680-90e9-5e782721cabb was not found"))
+            .when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        caseDocumentAttacher.caseDocumentsMetadata =
+            CaseDocumentsMetadata
+                .builder()
+                .documentHashToken(Collections.singletonList(DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                                                                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())).build();
+
+        Assertions.assertThrows(ResourceNotFoundException.class,
+                                () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
+    }
+
+    @Test
+    @DisplayName("Should throw Resource Not found exception when a document does not exists in document store")
+    void shouldThroServiceExceptionWhenDownstreapApplicationFails() {
+        doThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR))
+            .when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        caseDocumentAttacher.caseDocumentsMetadata =
+            CaseDocumentsMetadata
+                .builder()
+                .documentHashToken(Collections.singletonList(DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                                                                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())).build();
+
+        Assertions.assertThrows(ServiceException.class,
+                                () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
+    }
+
+    @Test
+    @DisplayName("Should throw Service exception when a document hashToken is altered by a Service")
+    void shouldThrowServiceExceptionWhenHashtokenIsAlteredByService() {
+        doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "The resource", "388a1ce0-f132-4680-90e9-5e782721cabb".getBytes(), StandardCharsets.UTF_8))
+            .when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        caseDocumentAttacher.caseDocumentsMetadata =
+            CaseDocumentsMetadata
+                .builder()
+                .documentHashToken(Collections.singletonList(DocumentHashToken
+                                                                 .builder()
+                                                                 .id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                                                                 .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a")
+                                                                 .build())).build();
+        caseDocumentAttacher.documentAfterCallbackOriginalCopy
+            .put("388a1ce0-f132-4680-90e9-5e782721cabb", "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a");
+
+        Assertions.assertThrows(ServiceException.class,
+                                () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
     }
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
         InputStream inputStream =
             CaseDocumentAttacherTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
-        return
-            new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {
-            });
+        return new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {});
     }
 
     private void prepareInputs() {
@@ -527,7 +622,6 @@ public class CaseDocumentAttacherTest {
                                                      .jurisdictionId("BEFTA_JURISDICTION_2")
                                                      .documentHashToken(new ArrayList<>())
                                                      .build();
-
     }
 }
 
