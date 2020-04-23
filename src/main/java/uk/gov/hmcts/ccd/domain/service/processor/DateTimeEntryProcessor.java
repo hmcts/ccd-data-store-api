@@ -52,12 +52,9 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
-                final JsonNode valueNode = item.get(CollectionValidator.VALUE);
-                final String valueToConvert = valueNode.isNull() ? null : valueNode.asText();
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                    isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES) ?
-                        createNode(caseViewField.getDisplayContextParameter(), valueToConvert, collectionFieldType, fieldPath) :
-                        executeComplex(valueNode, caseViewField.getFieldType().getChildren(), null, fieldPath, topLevelField));
+                    createCollectionValueNode(item.get(CollectionValidator.VALUE),
+                        collectionFieldType, caseViewField, fieldPath, topLevelField));
                 newNode.add(newItem);
             });
 
@@ -65,6 +62,15 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
         }
 
         return collectionNode;
+    }
+
+    private JsonNode createCollectionValueNode(JsonNode valueNode, BaseType collectionFieldType, CommonField caseViewField, String fieldPath, CommonField topLevelField) {
+        if (valueNode.isNull()) {
+            return valueNode;
+        }
+        return isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES) ?
+            createNode(caseViewField.getDisplayContextParameter(), valueNode.asText(), collectionFieldType, fieldPath) :
+            executeComplex(valueNode, caseViewField.getFieldType().getChildren(), null, fieldPath, topLevelField);
     }
 
     private TextNode createNode(String displayContextParameter, String valueToConvert, BaseType baseType, String fieldPath) {
