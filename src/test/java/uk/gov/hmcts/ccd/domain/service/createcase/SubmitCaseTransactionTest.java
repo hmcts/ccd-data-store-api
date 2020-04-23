@@ -35,6 +35,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -163,7 +164,7 @@ class SubmitCaseTransactionTest {
         final AboutToSubmitCallbackResponse response = buildResponse();
         doReturn("http://localhost:4455").when(applicationParams).getCaseDocumentAmApiHost();
         doReturn("/cases/documents/attachToCase").when(applicationParams).getAttachDocumentPath();
-
+        doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(STATE_ID).when(savedCaseDetails).getState();
 
         doReturn(state).when(caseTypeService).findState(caseType, STATE_ID);
