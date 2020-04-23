@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.integrations;
 
+import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -9,15 +10,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.ContextCleanupListener;
+import uk.gov.hmcts.ccd.PostgresUtil;
 
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
-
 import java.io.IOException;
 import java.sql.SQLException;
-
-import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
-import uk.gov.hmcts.ccd.PostgresUtil;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

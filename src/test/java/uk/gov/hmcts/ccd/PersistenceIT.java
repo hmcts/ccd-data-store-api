@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd;
 
+import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -9,14 +10,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-
-import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 
 /**
  * Lightweight test bootstrap to test integration of the persistence layer.
