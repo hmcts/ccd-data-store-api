@@ -24,17 +24,13 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 403,
-    "responseMessage": "Forbidden",
+    "_extends_": "Common_403_Response",
     "headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json",
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
       "timestamp": "[[ANYTHING_PRESENT]]",
-      "status": 403,
-      "error": "Forbidden",
       "message": "Access Denied",
       "path": "/caseworkers/Some_wrong_uid/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata"
     }
