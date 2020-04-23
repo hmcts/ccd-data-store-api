@@ -21,7 +21,6 @@
       "Date" : "[[ANYTHING_PRESENT]]",
       "Expires" : "0",
       "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Type": "application/json",
       "Content-Encoding" : "gzip"
     },
     "body": {
