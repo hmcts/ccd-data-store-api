@@ -347,7 +347,7 @@ public class CaseController {
 
     )
     @ApiOperation(
-        value = "Submit event creation",
+        value = "Submit event creation V2.1",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({

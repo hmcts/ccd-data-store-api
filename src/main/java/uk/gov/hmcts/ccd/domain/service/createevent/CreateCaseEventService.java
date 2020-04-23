@@ -76,11 +76,9 @@ public class CreateCaseEventService {
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
     private final Clock clock;
-    public static final String CONTENT_TYPE = "content-type";
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-   // private final CaseDocumentAttachOperation  caseDocumentAttachOperation;
 
     @Inject
     public CreateCaseEventService(HttpServletRequest request,
@@ -150,13 +148,11 @@ public class CreateCaseEventService {
             caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(content.getData());
         }
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
-
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
             caseDetailsBefore,
             caseDetails,
             caseType,
             content.getIgnoreWarning());
-
 
         final Optional<String>
             newState = aboutToSubmitCallbackResponse.getState();
@@ -165,12 +161,8 @@ public class CreateCaseEventService {
         LocalDateTime timeNow = now();
 
         if (isApiVersion21) {
-
-            caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, caseDetailsBefore,content.getEvent().getEventId(),newState.isPresent());
-
+            caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, caseDetailsBefore, content.getEvent().getEventId(), newState.isPresent());
         }
-
-
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, eventTrigger, newState, timeNow);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType, timeNow);
 
@@ -236,11 +228,8 @@ public class CreateCaseEventService {
                                                  final CaseDetails caseDetails,
                                                  final CaseEvent caseEvent,
                                                  final CaseType caseType) {
-
         if (null != data) {
-
             final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseType, data);
-
             for (Map.Entry<String, JsonNode> field : sanitisedData.entrySet()) {
                 caseDetails.getData().put(field.getKey(), field.getValue());
             }
