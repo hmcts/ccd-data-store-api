@@ -44,17 +44,19 @@ public class CaseDocumentAttacher {
     Map<String, String> documentAfterCallbackOriginalCopy = new HashMap<>();
     Map<String, JsonNode> recursiveMapForCaseDetailsBefore = new HashMap<>();
     CaseDocumentsMetadata caseDocumentsMetadata = null;
+
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
     public static final String DOCUMENT = "Document";
     public static final String DOCUMENT_URL = "document_url";
     public static final String DOCUMENT_BINARY_URL = "document_binary_url";
     public static final String HASH_TOKEN_STRING = "hashToken";
+    public static final String BINARY = "/binary";
+    public static final String EVENT_UPDATE = "UPDATE";
+
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-    public static final String BINARY = "/binary";
-    public static final String EVENT_UPDATE = "UPDATE";
 
     public CaseDocumentAttacher(RestTemplate restTemplate,
                                 ApplicationParams applicationParams,
@@ -101,13 +103,12 @@ public class CaseDocumentAttacher {
     }
 
     public void restCallToAttachCaseDocuments() {
-
-        HttpHeaders headers = securityUtils.authorizationHeaders();
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        HttpEntity<CaseDocumentsMetadata> requestEntity = new HttpEntity<>(caseDocumentsMetadata,headers);
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-
         if (!caseDocumentsMetadata.getDocumentHashToken().isEmpty()) {
+            HttpHeaders headers = securityUtils.authorizationHeaders();
+            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            HttpEntity<CaseDocumentsMetadata> requestEntity = new HttpEntity<>(caseDocumentsMetadata,headers);
+            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+
             try {
                 restTemplate.exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
                                       HttpMethod.PATCH, requestEntity, Void.class);
@@ -141,10 +142,7 @@ public class CaseDocumentAttacher {
                     throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
                 }
                 documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
-                if (jsonNode instanceof ObjectNode) {
-                    ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
-                }
-
+                ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
                 jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallback(
                     Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
@@ -161,10 +159,7 @@ public class CaseDocumentAttacher {
                 } else {
                     documentMap.put(documentId, null);
                 }
-                if (jsonNode instanceof ObjectNode) {
-                    ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
-                }
-
+                ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
                 jsonNode.fields().forEachRemaining(node -> extractDocumentsAfterCallback(caseDocumentsMetadata,
                                                                                          Collections.singletonMap(node.getKey(), node.getValue()),

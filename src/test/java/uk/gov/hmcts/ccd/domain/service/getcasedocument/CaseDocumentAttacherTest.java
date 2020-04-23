@@ -507,7 +507,6 @@ public class CaseDocumentAttacherTest {
 
         Assertions.assertThrows(DocumentTokenException.class,
                                 () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
-
     }
 
     @Test
@@ -524,8 +523,7 @@ public class CaseDocumentAttacherTest {
             CaseDocumentsMetadata
                 .builder()
                 .documentHashToken(Collections.singletonList(DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
-                                                                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())
-                                  ).build();
+                                                                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())).build();
 
         Assertions.assertThrows(BadSearchRequest.class,
                                 () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
@@ -545,8 +543,7 @@ public class CaseDocumentAttacherTest {
             CaseDocumentsMetadata
                 .builder()
                 .documentHashToken(Collections.singletonList(DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
-                                                                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())
-                                  ).build();
+                                                                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())).build();
 
         Assertions.assertThrows(ResourceNotFoundException.class,
                                 () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
@@ -569,8 +566,7 @@ public class CaseDocumentAttacherTest {
                                                                  .builder()
                                                                  .id("388a1ce0-f132-4680-90e9-5e782721cabb")
                                                                  .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a")
-                                                                 .build())
-                                  ).build();
+                                                                 .build())).build();
         caseDocumentAttacher.documentAfterCallbackOriginalCopy
             .put("388a1ce0-f132-4680-90e9-5e782721cabb", "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a");
 
@@ -581,9 +577,7 @@ public class CaseDocumentAttacherTest {
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
         InputStream inputStream =
             CaseDocumentAttacherTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
-        return
-            new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {
-            });
+        return new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {});
     }
 
     private void prepareInputs() {
