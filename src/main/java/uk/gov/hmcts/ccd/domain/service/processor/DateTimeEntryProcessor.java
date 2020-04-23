@@ -52,10 +52,12 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
+                final JsonNode valueNode = item.get(CollectionValidator.VALUE);
+                final String valueToConvert = valueNode.isNull() ? null : valueNode.asText();
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
                     isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES) ?
-                        createNode(caseViewField.getDisplayContextParameter(), item.get(CollectionValidator.VALUE).asText(), collectionFieldType, fieldPath) :
-                        executeComplex(item.get(CollectionValidator.VALUE), caseViewField.getFieldType().getChildren(), null, fieldPath, topLevelField));
+                        createNode(caseViewField.getDisplayContextParameter(), valueToConvert, collectionFieldType, fieldPath) :
+                        executeComplex(valueNode, caseViewField.getFieldType().getChildren(), null, fieldPath, topLevelField));
                 newNode.add(newItem);
             });
 
