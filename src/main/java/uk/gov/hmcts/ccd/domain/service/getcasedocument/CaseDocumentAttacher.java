@@ -80,7 +80,7 @@ public class CaseDocumentAttacher {
 
     public void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> contentData) {
 
-        LOG.debug("Updating  case using Version 2.1 of case create API");
+        LOG.debug("Updating case using Version 2.1 of case create API");
         documentsBeforeCallback = new HashMap<>();
         extractDocumentsWithHashTokenBeforeCallback(contentData, documentsBeforeCallback);
 
@@ -292,9 +292,6 @@ public class CaseDocumentAttacher {
     private void findDocumentsId(Map<String, JsonNode> sanitisedDataToAttachDoc, Set<String> filterDocumentSet) {
 
         sanitisedDataToAttachDoc.forEach((field, jsonNode) -> {
-            //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
-            //This quick check will reduce the processing time as most of filtering will be done at top level.
-            //****** Every document should have hashcode, else throw error
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
                 filterDocumentSet.add(documentId);
