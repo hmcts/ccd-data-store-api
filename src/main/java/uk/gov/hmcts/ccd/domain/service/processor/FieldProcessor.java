@@ -54,13 +54,15 @@ public abstract class FieldProcessor {
         }
         ObjectNode newNode = MAPPER.createObjectNode();
         complexNode.fieldNames().forEachRemaining(fieldId -> {
+            final JsonNode caseFieldNode = complexNode.get(fieldId);
             Optional<CaseField> complexCaseFieldOpt = complexCaseFields.stream().filter(f -> f.getId().equals(fieldId)).findFirst();
             if (!complexCaseFieldOpt.isPresent()) {
+                newNode.set(fieldId, caseFieldNode);
                 return;
             }
             final CaseField complexCaseField = complexCaseFieldOpt.get();
             final BaseType complexFieldType = BaseType.get(complexCaseField.getFieldType().getType());
-            final JsonNode caseFieldNode = complexNode.get(fieldId);
+
             final String fieldPath = fieldPrefix + FIELD_SEPARATOR + fieldId;
 
             if (complexFieldType == BaseType.get(COLLECTION)) {
