@@ -58,7 +58,7 @@ public class CaseDocumentAttacher {
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-
+    JsonNode caseBeforeNode;
     public CaseDocumentAttacher(RestTemplate restTemplate,
                                 ApplicationParams applicationParams,
                                 SecurityUtils securityUtils) {
@@ -261,21 +261,22 @@ public class CaseDocumentAttacher {
 
     private void checkDocumentFieldsDifference(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> caseData,
                                                Map<String, JsonNode> documentsDifference) {
-        final JsonNode[] caseBeforeNode = {null};
+         caseBeforeNode = null;
         caseData.forEach((key, value) -> {
 
             if (caseDataBefore.containsKey(key)) {
-                caseBeforeNode[0] = caseDataBefore.get(key);
+                caseBeforeNode = caseDataBefore.get(key);
                 if (value != null && isDocumentField(value)) {
                     if (!value.equals(caseDataBefore.get(key))) {
                         documentsDifference.put(key, value);
                     }
 
                 } else {
-                    Iterator<String> fieldNames = caseBeforeNode[0].fieldNames();
+
+                    Iterator<String> fieldNames = caseBeforeNode.fieldNames();
                     while (fieldNames.hasNext()) {
                         String fieldName = fieldNames.next();
-                        JsonNode before = caseBeforeNode[0].get(fieldName);
+                        JsonNode before = caseBeforeNode.get(fieldName);
                         recursiveMapForCaseDetailsBefore.put(fieldName, before);
                     }
 
