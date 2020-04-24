@@ -89,6 +89,7 @@ public class CaseController {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
+
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
                                                              .orElseThrow(() -> new CaseNotFoundException(caseId));
 
@@ -258,6 +259,7 @@ public class CaseController {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.ERROR_CASE_ID_INVALID);
         }
+
         final List<AuditEvent> auditEvents = getEventsOperation.getEvents(caseId);
 
         return ResponseEntity.ok(new CaseEventsResource(caseId, auditEvents));
