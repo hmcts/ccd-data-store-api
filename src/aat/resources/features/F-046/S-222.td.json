@@ -10,6 +10,7 @@
   "expectedResponse": {
     "_extends_": "Common_204_Response",
     "headers": {
+      "Content-Type": "[[ANY_STRING_NULLABLE]]",
       "Vary" : "[[ANYTHING_PRESENT]]"
     }
   }
