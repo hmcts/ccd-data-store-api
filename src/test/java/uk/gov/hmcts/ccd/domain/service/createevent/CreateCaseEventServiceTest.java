@@ -113,9 +113,6 @@ class CreateCaseEventServiceTest {
     @Mock
     SecurityUtils securityUtils;
 
-
-
-
     private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
 
     @InjectMocks
@@ -188,11 +185,7 @@ class CreateCaseEventServiceTest {
         doReturn(postState).when(caseTypeService).findState(caseType, POST_STATE);
         doReturn(user).when(userRepository).getUser();
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
-        given(callbackInvoker.invokeAboutToSubmitCallback(any(),
-                                                          any(),
-                                                          any(),
-                                                          any(),
-                                                          any())).willReturn(aboutToSubmitCallbackResponse);
+        given(callbackInvoker.invokeAboutToSubmitCallback(any(), any(), any(), any(), any())).willReturn(aboutToSubmitCallbackResponse);
     }
 
     @Test
@@ -241,11 +234,7 @@ class CreateCaseEventServiceTest {
     void shouldInvokeAboutToSubmitCallback() {
         createCaseEvent();
 
-        verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
-                                                            caseDetailsBefore,
-                                                            caseDetails,
-                                                            caseType,
-                                                            IGNORE_WARNING);
+        verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger, caseDetailsBefore, caseDetails, caseType, IGNORE_WARNING);
     }
 
 

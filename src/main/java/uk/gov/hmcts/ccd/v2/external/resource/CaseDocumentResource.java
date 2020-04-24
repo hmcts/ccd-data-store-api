@@ -25,5 +25,4 @@ public class CaseDocumentResource extends RepresentationModel {
         this.documentMetadata = documentMetadata;
         add(linkTo(methodOn(CaseDocumentController.class).getCaseDocumentMetadata(caseId, documentId)).withSelfRel());
     }
-
 }

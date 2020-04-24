@@ -83,8 +83,7 @@ public class CreateCaseEventService {
     private final SecurityUtils securityUtils;
 
     @Inject
-    public CreateCaseEventService(HttpServletRequest request,
-                                  @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+    public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
@@ -102,7 +101,8 @@ public class CreateCaseEventService {
                                   @Qualifier("utcClock") final Clock clock,
                                   @Qualifier("restTemplate") final RestTemplate restTemplate,
                                   ApplicationParams applicationParams,
-                                  SecurityUtils securityUtils
+                                  SecurityUtils securityUtils,
+                                  HttpServletRequest request
                                   ) {
         this.request = request;
         this.userRepository = userRepository;

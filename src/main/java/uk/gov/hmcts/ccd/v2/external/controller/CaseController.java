@@ -345,7 +345,6 @@ public class CaseController {
         consumes  = {
         V2.MediaType.CREATE_EVENT_2_1
         }
-
     )
     @ApiOperation(
         value = "Submit event creation V2.1",
@@ -380,9 +379,7 @@ public class CaseController {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
 
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId,
-                                                                             content);
-
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId, content);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
     }
 
@@ -390,8 +387,8 @@ public class CaseController {
                                                                        @RequestBody CaseDataContent content,
                                                                        @RequestParam(value = "ignore-warning",
                                                                                      required = false) Boolean ignoreWarning) {
-        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
 
+        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
     }
 }
