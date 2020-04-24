@@ -18,7 +18,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_JURISDICTION_2",
       "ctid": "BEFTA_CASETYPE_2_1",
       "etid": "CREATE"

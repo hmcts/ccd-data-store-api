@@ -1,0 +1,108 @@
+{
+  "_guid_": "S-1031",
+  "_extends_": "F-1003_Test_Base_data",
+  "title": "must successfully create a case with multiple documents uploded",
+  "specs": [
+    "is to attach the document uploaded above to a new case",
+    "contains necessary details about the document attached to the case"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "DocumentField1": {
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][_embedded][documents][0][hashToken]}"
+        },
+        "DocumentField2": {
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_01][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data_01][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_01][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data_01][testData][actualResponse][body][_embedded][documents][0][hashToken]}"
+        },
+        "DocumentField3": {
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_02][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data_02][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_02][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data_02][testData][actualResponse][body][_embedded][documents][0][hashToken]}"
+        },
+        "DocumentField4": {
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_03][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data_03][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_03][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data_03][testData][actualResponse][body][_embedded][documents][0][hashToken]}"
+        },
+        "DocumentField5": {
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_04][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data_04][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_04][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data_04][testData][actualResponse][body][_embedded][documents][0][hashToken]}"
+        },
+        "DocumentField6": {
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_05][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data_05][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_05][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data_05][testData][actualResponse][body][_embedded][documents][0][hashToken]}"
+        },
+        "DocumentField7": {
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_06][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data_06][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_06][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data_06][testData][actualResponse][body][_embedded][documents][0][hashToken]}"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "F-1003_Test_Base_Response_Body",
+    "body": {
+      "data" : {
+        "DocumentField1" : {
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField2" : {
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_01][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_01][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_01][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField3" : {
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_02][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_02][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_02][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField4" : {
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_03][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_03][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_03][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField5" : {
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_04][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_04][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_04][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField6" : {
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_05][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_05][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_05][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField7" : {
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_06][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_06][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data_06][customValues][documentIdInTheResponse]}/binary"
+        }
+      },
+      "data_classification" : {
+        "DocumentField1" : "PUBLIC",
+        "DocumentField2" : "PUBLIC",
+        "DocumentField3" : "PUBLIC",
+        "DocumentField4" : "PUBLIC",
+        "DocumentField5" : "PUBLIC",
+        "DocumentField6" : "PUBLIC",
+        "DocumentField7" : "PUBLIC"
+      }
+    }
+  }
+}
