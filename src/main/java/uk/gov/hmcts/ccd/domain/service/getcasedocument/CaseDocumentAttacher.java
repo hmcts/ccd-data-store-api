@@ -87,7 +87,7 @@ public class CaseDocumentAttacher {
 
     }
 
-    void extractDocumentsAfterCallBack(CaseDetails caseDetails, boolean callBackWasCalled) {
+    public void extractDocumentsAfterCallBack(CaseDetails caseDetails, boolean callBackWasCalled) {
 
         documentsAfterCallback = new HashMap<>();
         caseDocumentsMetadata = CaseDocumentsMetadata.builder()
