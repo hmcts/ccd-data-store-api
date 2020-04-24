@@ -74,7 +74,7 @@ class SubmitCaseTransaction {
     public CaseDetails submitCase(Event event,
                                   CaseTypeDefinition caseTypeDefinition,
                                   IdamUser idamUser,
-                                  CaseEventDefinition eventTrigger,
+                                  CaseEventDefinition caseEventDefinition,
                                   CaseDetails newCaseDetails, Boolean ignoreWarning) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -90,10 +90,10 @@ class SubmitCaseTransaction {
             been assigned and the UID generation has to be part of a retryable transaction in order to recover from collisions.
          */
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
-            callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseTypeDefinition, ignoreWarning);
+            callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, null, newCaseDetails, caseTypeDefinition, ignoreWarning);
 
         final CaseDetails savedCaseDetails =
-            saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseTypeDefinition, idamUser, eventTrigger, newCaseDetails);
+            saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails);
 
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()),
@@ -108,13 +108,13 @@ class SubmitCaseTransaction {
                                                      Event event,
                                                      CaseTypeDefinition caseTypeDefinition,
                                                      IdamUser idamUser,
-                                                     CaseEventDefinition eventTrigger,
+                                                     CaseEventDefinition caseEventDefinition,
                                                      CaseDetails newCaseDetails) {
 
         final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
-        auditEvent.setEventName(eventTrigger.getName());
+        auditEvent.setEventName(caseEventDefinition.getName());
         auditEvent.setSummary(event.getSummary());
         auditEvent.setDescription(event.getDescription());
         auditEvent.setCaseDataId(savedCaseDetails.getId());
@@ -128,7 +128,7 @@ class SubmitCaseTransaction {
         auditEvent.setUserLastName(idamUser.getSurname());
         auditEvent.setUserFirstName(idamUser.getForename());
         auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
-        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition, eventTrigger));
+        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition));
         auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
         auditEvent.setSignificantItem(response.getSignificantItem());
 

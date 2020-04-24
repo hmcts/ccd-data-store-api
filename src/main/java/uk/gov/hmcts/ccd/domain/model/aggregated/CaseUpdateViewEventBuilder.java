@@ -39,10 +39,10 @@ public class CaseUpdateViewEventBuilder {
         }
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
-        final CaseEventDefinition eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
-        final CaseUpdateViewEvent caseUpdateViewEvent = buildCaseEventTrigger(eventTrigger);
+        final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
+        final CaseUpdateViewEvent caseUpdateViewEvent = buildCaseUpdateEvent(caseEventDefinition);
         caseUpdateViewEvent.setCaseId(caseReference);
-        caseUpdateViewEvent.setCaseFields(mergeEventFields(startEventResult.getCaseDetails(), caseTypeDefinition, eventTrigger));
+        caseUpdateViewEvent.setCaseFields(mergeEventFields(startEventResult.getCaseDetails(), caseTypeDefinition, caseEventDefinition));
         caseUpdateViewEvent.setEventToken(startEventResult.getToken());
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
                                                                                                      eventId);
@@ -59,30 +59,30 @@ public class CaseUpdateViewEventBuilder {
         return caseTypeDefinition;
     }
 
-    private CaseEventDefinition getEventTrigger(String eventId, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEventDefinition eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
+    private CaseEventDefinition getCaseEventDefinition(String eventId, CaseTypeDefinition caseTypeDefinition) {
+        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
 
-        if (null == eventTrigger) {
+        if (null == caseEventDefinition) {
             throw new ResourceNotFoundException(eventId + " is not a known event ID for the specified case type: " + caseTypeDefinition.getId());
         }
-        return eventTrigger;
+        return caseEventDefinition;
     }
 
-    private CaseUpdateViewEvent buildCaseEventTrigger(final CaseEventDefinition eventTrigger) {
-        final CaseUpdateViewEvent caseTrigger = new CaseUpdateViewEvent();
+    private CaseUpdateViewEvent buildCaseUpdateEvent(final CaseEventDefinition eventTrigger) {
+        final CaseUpdateViewEvent caseUpdateViewEvent = new CaseUpdateViewEvent();
 
-        caseTrigger.setId(eventTrigger.getId());
-        caseTrigger.setName(eventTrigger.getName());
-        caseTrigger.setDescription(eventTrigger.getDescription());
-        caseTrigger.setShowSummary(eventTrigger.getShowSummary());
-        caseTrigger.setShowEventNotes(eventTrigger.getShowEventNotes());
-        caseTrigger.setEndButtonLabel(eventTrigger.getEndButtonLabel());
-        caseTrigger.setCanSaveDraft(eventTrigger.getCanSaveDraft());
-        return caseTrigger;
+        caseUpdateViewEvent.setId(eventTrigger.getId());
+        caseUpdateViewEvent.setName(eventTrigger.getName());
+        caseUpdateViewEvent.setDescription(eventTrigger.getDescription());
+        caseUpdateViewEvent.setShowSummary(eventTrigger.getShowSummary());
+        caseUpdateViewEvent.setShowEventNotes(eventTrigger.getShowEventNotes());
+        caseUpdateViewEvent.setEndButtonLabel(eventTrigger.getEndButtonLabel());
+        caseUpdateViewEvent.setCanSaveDraft(eventTrigger.getCanSaveDraft());
+        return caseUpdateViewEvent;
     }
 
-    private List<CaseViewField> mergeEventFields(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, CaseEventDefinition eventTrigger) {
-        final List<CaseEventFieldDefinition> eventFields = eventTrigger.getCaseFields();
+    private List<CaseViewField> mergeEventFields(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, CaseEventDefinition caseEventDefinition) {
+        final List<CaseEventFieldDefinition> eventFields = caseEventDefinition.getCaseFields();
         final List<CaseFieldDefinition> caseFieldDefinitions = caseTypeDefinition.getCaseFieldDefinitions();
 
         return caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails != null ? caseDetails.getCaseDataAndMetadata() : null);

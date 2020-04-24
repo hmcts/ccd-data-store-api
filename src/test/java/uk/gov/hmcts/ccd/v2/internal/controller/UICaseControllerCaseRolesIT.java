@@ -83,7 +83,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         assertNotNull("Content Should not be null", content);
         CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
-        assertEquals("Should not contain events with case role access", 1, savedCaseResource.getEvents().length);
+        assertEquals("Should not contain events with case role access", 1, savedCaseResource.getCaseViewEvents().length);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         assertNotNull("Content Should not be null", content);
         CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
-        assertEquals("Should contain events with case role access", 2, savedCaseResource.getEvents().length);
+        assertEquals("Should contain events with case role access", 2, savedCaseResource.getCaseViewEvents().length);
 
     }
 

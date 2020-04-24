@@ -91,17 +91,17 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
 
-        final CaseEventDefinition eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
-        if (eventTrigger == null) {
+        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
+        if (caseEventDefinition == null) {
             throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeId);
         }
 
-        if (!eventTriggerService.isPreStateValid(null, eventTrigger)) {
-            throw new ValidationException("Cannot create case because of " + eventTrigger.getId() + " has pre-states defined");
+        if (!eventTriggerService.isPreStateValid(null, caseEventDefinition)) {
+            throw new ValidationException("Cannot create case because of " + caseEventDefinition.getId() + " has pre-states defined");
         }
 
         String token = caseDataContent.getToken();
-        eventTokenService.validateToken(token, userRepository.getUserId(), eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
+        eventTokenService.validateToken(token, userRepository.getUserId(), caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
 
         Map<String, JsonNode> data = caseDataContent.getData();
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
@@ -110,7 +110,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
         newCaseDetails.setCaseTypeId(caseTypeId);
         newCaseDetails.setJurisdiction(caseTypeDefinition.getJurisdictionId());
-        newCaseDetails.setState(eventTrigger.getPostState());
+        newCaseDetails.setState(caseEventDefinition.getPostState());
         newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
         newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, data));
         newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, newCaseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
@@ -119,11 +119,11 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
                                                                               idamUser,
-                                                                              eventTrigger,
+                                                                              caseEventDefinition,
                                                                               newCaseDetails,
                                                                               ignoreWarning);
 
-        submittedCallback(eventTrigger, savedCaseDetails);
+        submittedCallback(caseEventDefinition, savedCaseDetails);
 
         deleteDraft(caseDataContent, savedCaseDetails);
 
@@ -141,11 +141,11 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         }
     }
 
-    private void submittedCallback(CaseEventDefinition eventTrigger, CaseDetails savedCaseDetails) {
-        if (!isBlank(eventTrigger.getCallBackURLSubmittedEvent())) {
+    private void submittedCallback(CaseEventDefinition caseEventDefinition, CaseDetails savedCaseDetails) {
+        if (!isBlank(caseEventDefinition.getCallBackURLSubmittedEvent())) {
             try { // make a call back
                 final ResponseEntity<AfterSubmitCallbackResponse> callBackResponse =
-                    callbackInvoker.invokeSubmittedCallback(eventTrigger,
+                    callbackInvoker.invokeSubmittedCallback(caseEventDefinition,
                                                             null,
                                                             savedCaseDetails);
                 savedCaseDetails.setAfterSubmitCallbackResponseEntity(callBackResponse);

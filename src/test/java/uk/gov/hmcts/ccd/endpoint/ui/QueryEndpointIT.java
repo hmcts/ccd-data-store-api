@@ -741,19 +741,19 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Event State Name", "Draft", events[1].getStateName());
         assertEquals("Event State ID", "Draft", events[1].getStateId());
 
-        final CaseViewActionableEvent[] triggers = caseView.getActionableEvents();
-        assertNotNull("Triggers are null", triggers);
-        assertEquals("Should only get resume and delete triggers", 2, triggers.length);
+        final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
+        assertNotNull("Triggers are null", actionableEvents);
+        assertEquals("Should only get resume and delete triggers", 2, actionableEvents.length);
 
-        assertEquals("Trigger ID", "createCase", triggers[0].getId());
-        assertEquals("Trigger Name", "Resume", triggers[0].getName());
-        assertEquals("Trigger Description", "This event will create a new case", triggers[0].getDescription());
-        assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
+        assertEquals("Trigger ID", "createCase", actionableEvents[0].getId());
+        assertEquals("Trigger Name", "Resume", actionableEvents[0].getName());
+        assertEquals("Trigger Description", "This event will create a new case", actionableEvents[0].getDescription());
+        assertEquals("Trigger Order", Integer.valueOf(1), actionableEvents[0].getOrder());
 
-        assertEquals("Trigger ID", "DELETE", triggers[1].getId());
-        assertEquals("Trigger Name", "Delete", triggers[1].getName());
-        assertEquals("Trigger Description", "Delete draft", triggers[1].getDescription());
-        assertEquals("Trigger Order", Integer.valueOf(2), triggers[1].getOrder());
+        assertEquals("Trigger ID", "DELETE", actionableEvents[1].getId());
+        assertEquals("Trigger Name", "Delete", actionableEvents[1].getName());
+        assertEquals("Trigger Description", "Delete draft", actionableEvents[1].getDescription());
+        assertEquals("Trigger Order", Integer.valueOf(2), actionableEvents[1].getOrder());
     }
 
     @Test
@@ -916,15 +916,15 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Comment", "Some comment", event2.getComment());
         assertEquals("Timestamp", "2017-05-09T14:31:43", event2.getTimestamp().format(DateTimeFormatter.ISO_DATE_TIME));
 
-        final CaseViewActionableEvent[] triggers = caseView.getActionableEvents();
-        assertNotNull("Triggers are null", triggers);
-        assertEquals("Should only get valid triggers", 1, triggers.length);
+        final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
+        assertNotNull("Triggers are null", actionableEvents);
+        assertEquals("Should only get valid triggers", 1, actionableEvents.length);
 
         // checks Trigger 1 content
-        assertEquals("Trigger ID", "HAS_PRE_STATES_EVENT", triggers[0].getId());
-        assertEquals("Trigger Name", "HAS PRE STATES EVENT", triggers[0].getName());
-        assertEquals("Trigger Description", "Test event for non null pre-states", triggers[0].getDescription());
-        assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
+        assertEquals("Trigger ID", "HAS_PRE_STATES_EVENT", actionableEvents[0].getId());
+        assertEquals("Trigger Name", "HAS PRE STATES EVENT", actionableEvents[0].getName());
+        assertEquals("Trigger Description", "Test event for non null pre-states", actionableEvents[0].getDescription());
+        assertEquals("Trigger Order", Integer.valueOf(1), actionableEvents[0].getOrder());
     }
 
     @Test
@@ -948,8 +948,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull("Case View is null", caseView);
         assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
 
-        final CaseViewActionableEvent[] triggers = caseView.getActionableEvents();
-        assertEquals("Should only no valid triggers", 0, triggers.length);
+        final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
+        assertEquals("Should only no valid triggers", 0, actionableEvents.length);
     }
 
     @Test
@@ -1171,18 +1171,18 @@ public class QueryEndpointIT extends WireMockBaseTest {
                                         .andExpect(status().is(200))
                                         .andReturn();
 
-        final CaseUpdateViewEvent eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(result.getResponse().getContentAsString(),
                                                                CaseUpdateViewEvent.class);
-        assertNotNull("Event Trigger is null", eventTrigger);
+        assertNotNull("Event Trigger is null", caseUpdateViewEvent);
 
-        assertThat("Unexpected Case ID", eventTrigger.getCaseId(), is(nullValue()));
-        assertEquals("Unexpected Event ID", "NO_PRE_STATES_EVENT", eventTrigger.getId());
-        assertEquals("Unexpected Event Name", "NO PRE STATES EVENT", eventTrigger.getName());
-        assertEquals("Unexpected Event Show Event Notes", true, eventTrigger.getShowEventNotes());
-        assertEquals("Unexpected Event Description", "Test event for null pre-states", eventTrigger.getDescription());
-        assertEquals("Unexpected Case Fields", 2, eventTrigger.getCaseFields().size());
+        assertThat("Unexpected Case ID", caseUpdateViewEvent.getCaseId(), is(nullValue()));
+        assertEquals("Unexpected Event ID", "NO_PRE_STATES_EVENT", caseUpdateViewEvent.getId());
+        assertEquals("Unexpected Event Name", "NO PRE STATES EVENT", caseUpdateViewEvent.getName());
+        assertEquals("Unexpected Event Show Event Notes", true, caseUpdateViewEvent.getShowEventNotes());
+        assertEquals("Unexpected Event Description", "Test event for null pre-states", caseUpdateViewEvent.getDescription());
+        assertEquals("Unexpected Case Fields", 2, caseUpdateViewEvent.getCaseFields().size());
 
-        final CaseViewField field1 = eventTrigger.getCaseFields().get(0);
+        final CaseViewField field1 = caseUpdateViewEvent.getCaseFields().get(0);
         assertThat(field1.getLabel(), equalTo("First name"));
         assertThat(field1.getOrder(), is(nullValue()));
         assertThat(field1.getFieldType().getId(), equalTo("Text"));
@@ -1190,7 +1190,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field1.getId(), equalTo("PersonFirstName"));
         assertThat(field1.getDisplayContext(), equalTo(READONLY));
 
-        final CaseViewField field2 = eventTrigger.getCaseFields().get(1);
+        final CaseViewField field2 = caseUpdateViewEvent.getCaseFields().get(1);
         assertThat(field2.getLabel(), equalTo("Last name"));
         assertThat(field2.getOrder(), is(nullValue()));
         assertThat(field2.getFieldType().getId(), equalTo("Text"));
@@ -1234,19 +1234,19 @@ public class QueryEndpointIT extends WireMockBaseTest {
                                         .andExpect(status().is(200))
                                         .andReturn();
 
-        final CaseUpdateViewEvent eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(result.getResponse().getContentAsString(),
                                                                CaseUpdateViewEvent.class);
-        assertNotNull("Event Trigger is null", eventTrigger);
+        assertNotNull("Event Trigger is null", caseUpdateViewEvent);
 
-        assertEquals("Unexpected Case Reference", "1504259907353545", eventTrigger.getCaseId());
-        assertEquals("Unexpected Event ID", "HAS_PRE_STATES_EVENT", eventTrigger.getId());
-        assertEquals("Unexpected Event Name", "HAS PRE STATES EVENT", eventTrigger.getName());
-        assertEquals("Unexpected Show Event Notes", false, eventTrigger.getShowEventNotes());
-        assertEquals("Unexpected Event Description", "Test event for non null pre-states", eventTrigger
+        assertEquals("Unexpected Case Reference", "1504259907353545", caseUpdateViewEvent.getCaseId());
+        assertEquals("Unexpected Event ID", "HAS_PRE_STATES_EVENT", caseUpdateViewEvent.getId());
+        assertEquals("Unexpected Event Name", "HAS PRE STATES EVENT", caseUpdateViewEvent.getName());
+        assertEquals("Unexpected Show Event Notes", false, caseUpdateViewEvent.getShowEventNotes());
+        assertEquals("Unexpected Event Description", "Test event for non null pre-states", caseUpdateViewEvent
             .getDescription());
-        assertEquals("Unexpected Case Fields", 2, eventTrigger.getCaseFields().size());
+        assertEquals("Unexpected Case Fields", 2, caseUpdateViewEvent.getCaseFields().size());
 
-        final CaseViewField field1 = eventTrigger.getCaseFields().get(0);
+        final CaseViewField field1 = caseUpdateViewEvent.getCaseFields().get(0);
         assertThat(field1.getValue(), equalTo("George"));
         assertThat(field1.getLabel(), equalTo("First name"));
         assertThat(field1.getOrder(), is(nullValue()));
@@ -1256,7 +1256,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field1.getDisplayContext(), equalTo(READONLY));
         assertThat(field1.getShowSummaryContentOption(), equalTo(2));
 
-        final CaseViewField field2 = eventTrigger.getCaseFields().get(1);
+        final CaseViewField field2 = caseUpdateViewEvent.getCaseFields().get(1);
         assertThat(field2.getValue(), equalTo("Roof"));
         assertThat(field2.getLabel(), equalTo("Last name"));
         assertThat(field2.getOrder(), is(nullValue()));

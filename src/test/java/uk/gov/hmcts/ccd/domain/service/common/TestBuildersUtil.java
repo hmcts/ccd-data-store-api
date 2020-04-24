@@ -582,7 +582,7 @@ public class TestBuildersUtil {
             return new CaseViewBuilder();
         }
 
-        public CaseViewBuilder withCaseViewTrigger(CaseViewActionableEvent caseViewActionableEvent) {
+        public CaseViewBuilder withCaseViewActionableEvent(CaseViewActionableEvent caseViewActionableEvent) {
             this.caseViewActionableEvents.add(caseViewActionableEvent);
             return this;
         }
@@ -851,18 +851,18 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class CaseViewTriggerBuilder {
+    public static class CaseViewActionableEventBuilder {
         private final CaseViewActionableEvent caseViewActionableEvent;
 
-        private CaseViewTriggerBuilder() {
+        private CaseViewActionableEventBuilder() {
             this.caseViewActionableEvent = new CaseViewActionableEvent();
         }
 
-        public static CaseViewTriggerBuilder aViewTrigger() {
-            return new CaseViewTriggerBuilder();
+        public static CaseViewActionableEventBuilder aViewTrigger() {
+            return new CaseViewActionableEventBuilder();
         }
 
-        public CaseViewTriggerBuilder withId(String id) {
+        public CaseViewActionableEventBuilder withId(String id) {
             caseViewActionableEvent.setId(id);
             return this;
         }
@@ -872,70 +872,70 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class CaseEventTriggerBuilder {
+    public static class CaseUpdateViewEventBuilder {
         private final CaseUpdateViewEvent caseUpdateViewEvent;
         private final List<CaseViewField> caseFields = Lists.newArrayList();
         private final List<WizardPage> wizardPages = Lists.newArrayList();
 
-        private CaseEventTriggerBuilder() {
+        private CaseUpdateViewEventBuilder() {
             this.caseUpdateViewEvent = new CaseUpdateViewEvent();
         }
 
-        public static CaseEventTriggerBuilder newCaseEventTrigger() {
-            return new CaseEventTriggerBuilder();
+        public static CaseUpdateViewEventBuilder newCaseUpdateViewEvent() {
+            return new CaseUpdateViewEventBuilder();
         }
 
-        public CaseEventTriggerBuilder withId(String id) {
+        public CaseUpdateViewEventBuilder withId(String id) {
             caseUpdateViewEvent.setId(id);
             return this;
         }
 
-        public CaseEventTriggerBuilder withWizardPage(WizardPage wizardPage) {
+        public CaseUpdateViewEventBuilder withWizardPage(WizardPage wizardPage) {
             this.wizardPages.add(wizardPage);
             return this;
         }
 
-        public CaseEventTriggerBuilder withCaseId(String caseId) {
+        public CaseUpdateViewEventBuilder withCaseId(String caseId) {
             this.caseUpdateViewEvent.setCaseId(caseId);
             return this;
         }
 
-        public CaseEventTriggerBuilder withField(CaseViewField caseField) {
+        public CaseUpdateViewEventBuilder withField(CaseViewField caseField) {
             caseFields.add(caseField);
             return this;
         }
 
-        public CaseEventTriggerBuilder withName(String name) {
+        public CaseUpdateViewEventBuilder withName(String name) {
             this.caseUpdateViewEvent.setName(name);
             return this;
         }
 
-        public CaseEventTriggerBuilder withDescription(String description) {
+        public CaseUpdateViewEventBuilder withDescription(String description) {
             this.caseUpdateViewEvent.setDescription(description);
             return this;
         }
 
-        public CaseEventTriggerBuilder withEventToken(String token) {
+        public CaseUpdateViewEventBuilder withEventToken(String token) {
             this.caseUpdateViewEvent.setEventToken(token);
             return this;
         }
 
-        public CaseEventTriggerBuilder withShowSummary(Boolean isShowSummary) {
+        public CaseUpdateViewEventBuilder withShowSummary(Boolean isShowSummary) {
             this.caseUpdateViewEvent.setShowSummary(isShowSummary);
             return this;
         }
 
-        public CaseEventTriggerBuilder withShowEventNotes(Boolean isShowEventNotes) {
+        public CaseUpdateViewEventBuilder withShowEventNotes(Boolean isShowEventNotes) {
             this.caseUpdateViewEvent.setShowEventNotes(isShowEventNotes);
             return this;
         }
 
-        public CaseEventTriggerBuilder withEndButtonLabel(String endButtonLabel) {
+        public CaseUpdateViewEventBuilder withEndButtonLabel(String endButtonLabel) {
             this.caseUpdateViewEvent.setEndButtonLabel(endButtonLabel);
             return this;
         }
 
-        public CaseEventTriggerBuilder withCanSaveDraft(boolean isSaveDraft) {
+        public CaseUpdateViewEventBuilder withCanSaveDraft(boolean isSaveDraft) {
             this.caseUpdateViewEvent.setCanSaveDraft(isSaveDraft);
             return this;
         }
@@ -988,23 +988,23 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class StartEventTriggerBuilder {
+    public static class StartEventResultBuilder {
         private final StartEventResult startEventResult;
 
-        private StartEventTriggerBuilder() {
+        private StartEventResultBuilder() {
             this.startEventResult = new StartEventResult();
         }
 
-        public static StartEventTriggerBuilder newStartEventTrigger() {
-            return new StartEventTriggerBuilder();
+        public static StartEventResultBuilder newStartEventTrigger() {
+            return new StartEventResultBuilder();
         }
 
-        public StartEventTriggerBuilder withCaseDetails(CaseDetails caseDetails) {
+        public StartEventResultBuilder withCaseDetails(CaseDetails caseDetails) {
             this.startEventResult.setCaseDetails(caseDetails);
             return this;
         }
 
-        public StartEventTriggerBuilder withEventToken(String token) {
+        public StartEventResultBuilder withEventToken(String token) {
             this.startEventResult.setToken(token);
             return this;
         }

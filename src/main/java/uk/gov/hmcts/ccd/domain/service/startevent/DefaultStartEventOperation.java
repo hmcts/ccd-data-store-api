@@ -93,13 +93,13 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
 
-        final CaseEventDefinition eventTrigger = getCaseEventDefinition(eventId, caseTypeDefinition);
+        final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
+        validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition));
 
-        final String eventToken = eventTokenService.generateToken(uid, caseDetails, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
+        final String eventToken = eventTokenService.generateToken(uid, caseDetails, caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
 
-        callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseTypeDefinition, caseDetails, ignoreWarning);
+        callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
 
@@ -127,16 +127,16 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                     final String eventId,
                                                     final Boolean ignoreWarning,
                                                     final Supplier<CaseDetails> caseDetailsSupplier) {
-        final CaseEventDefinition eventTrigger = getCaseEventDefinition(eventId, caseTypeDefinition);
+        final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
         final CaseDetails caseDetails = caseDetailsSupplier.get();
 
-        validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(eventTrigger));
+        validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(caseEventDefinition));
 
         // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the relevant draft payload
-        final String eventToken = eventTokenService.generateToken(uid, eventTrigger, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
+        final String eventToken = eventTokenService.generateToken(uid, caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
 
-        callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseTypeDefinition, caseDetails, ignoreWarning);
+        callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
     }
@@ -159,11 +159,11 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     private CaseEventDefinition getCaseEventDefinition(String eventId, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEventDefinition eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
-        if (eventTrigger == null) {
+        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
+        if (caseEventDefinition == null) {
             throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());
         }
-        return eventTrigger;
+        return caseEventDefinition;
     }
 
     private CaseTypeDefinition getCaseType(String caseTypeId) {

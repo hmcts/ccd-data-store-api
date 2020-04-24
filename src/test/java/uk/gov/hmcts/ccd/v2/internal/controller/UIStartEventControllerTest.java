@@ -25,7 +25,7 @@ import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseUpdateViewEventBuilder.newCaseUpdateViewEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
@@ -58,7 +58,7 @@ class UIStartEventControllerTest {
     @InjectMocks
     private UIStartTriggerController uiStartTriggerController;
 
-    private CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+    private CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
         .withId(EVENT_ID)
         .withName(NAME)
         .withDescription(DESCRIPTION)

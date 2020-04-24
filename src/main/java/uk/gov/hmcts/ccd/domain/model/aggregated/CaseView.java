@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 public class CaseView extends AbstractCaseView {
     private ProfileCaseState state;
     private String[] channels;
-    private CaseViewActionableEvent[] triggers;
-    private CaseViewEvent[] events;
+    private CaseViewActionableEvent[] actionableEvents;
+    private CaseViewEvent[] caseViewEvents;
 
     public ProfileCaseState getState() {
         return state;
@@ -23,18 +23,18 @@ public class CaseView extends AbstractCaseView {
     }
 
     public CaseViewActionableEvent[] getActionableEvents() {
-        return triggers;
+        return actionableEvents;
     }
 
     public void setActionableEvents(CaseViewActionableEvent[] actionableEvents) {
-        this.triggers = actionableEvents;
+        this.actionableEvents = actionableEvents;
     }
 
     public CaseViewEvent[] getEvents() {
-        return events;
+        return caseViewEvents;
     }
 
     public void setEvents(CaseViewEvent[] events) {
-        this.events = events;
+        this.caseViewEvents = events;
     }
 }

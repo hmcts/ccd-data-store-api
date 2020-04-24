@@ -65,18 +65,18 @@ public class CaseRolesIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final CaseUpdateViewEvent eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(result.getResponse().getContentAsString(),
             CaseUpdateViewEvent.class);
-        assertNotNull("Event Trigger is null", eventTrigger);
+        assertNotNull("Event Trigger is null", caseUpdateViewEvent);
 
-        assertThat("Unexpected Case ID", eventTrigger.getCaseId(), is(nullValue()));
-        assertEquals("Unexpected Event ID", "CREATE-CASE", eventTrigger.getId());
-        assertEquals("Unexpected Event Name", "CREATE-CASE", eventTrigger.getName());
-        assertEquals("Unexpected Event Show Event Notes", true, eventTrigger.getShowEventNotes());
-        assertEquals("Unexpected Event Description", "Creation event", eventTrigger.getDescription());
-        assertEquals("Unexpected Case Fields", 1, eventTrigger.getCaseFields().size());
+        assertThat("Unexpected Case ID", caseUpdateViewEvent.getCaseId(), is(nullValue()));
+        assertEquals("Unexpected Event ID", "CREATE-CASE", caseUpdateViewEvent.getId());
+        assertEquals("Unexpected Event Name", "CREATE-CASE", caseUpdateViewEvent.getName());
+        assertEquals("Unexpected Event Show Event Notes", true, caseUpdateViewEvent.getShowEventNotes());
+        assertEquals("Unexpected Event Description", "Creation event", caseUpdateViewEvent.getDescription());
+        assertEquals("Unexpected Case Fields", 1, caseUpdateViewEvent.getCaseFields().size());
 
-        final CaseViewField field1 = eventTrigger.getCaseFields().get(0);
+        final CaseViewField field1 = caseUpdateViewEvent.getCaseFields().get(0);
         assertThat(field1.getId(), equalTo("PersonFirstName"));
 
         assertThat(field1.getAccessControlLists().get(0).getRole(), equalTo("caseworker-probate-public"));

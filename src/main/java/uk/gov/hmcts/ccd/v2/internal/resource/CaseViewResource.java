@@ -35,10 +35,10 @@ public class CaseViewResource extends RepresentationModel {
     private ProfileCaseState state;
 
     @JsonProperty("triggers")
-    private CaseViewActionableEvent[] triggers;
+    private CaseViewActionableEvent[] caseViewActionableEvents;
 
     @JsonProperty("events")
-    private CaseViewEvent[] events;
+    private CaseViewEvent[] caseViewEvents;
 
     public CaseViewResource(@NonNull CaseView caseView) {
         copyProperties(caseView);
@@ -52,7 +52,7 @@ public class CaseViewResource extends RepresentationModel {
         this.tabs = caseView.getTabs();
         this.metadataFields = caseView.getMetadataFields();
         this.state = caseView.getState();
-        this.triggers = caseView.getActionableEvents();
-        this.events = caseView.getEvents();
+        this.caseViewActionableEvents = caseView.getActionableEvents();
+        this.caseViewEvents = caseView.getEvents();
     }
 }

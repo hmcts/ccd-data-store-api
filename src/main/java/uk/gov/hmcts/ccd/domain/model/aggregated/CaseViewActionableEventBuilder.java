@@ -31,7 +31,7 @@ public class CaseViewActionableEventBuilder {
         return caseViewActionableEvent;
     }
 
-    public static CaseViewActionableEventBuilder anCaseViewTrigger() {
+    public static CaseViewActionableEventBuilder anCaseViewActionableEvent() {
         return new CaseViewActionableEventBuilder();
     }
 

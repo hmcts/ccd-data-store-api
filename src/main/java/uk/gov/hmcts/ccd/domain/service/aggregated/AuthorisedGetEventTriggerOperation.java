@@ -86,9 +86,9 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                               Boolean ignoreWarning) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-        final CaseEventDefinition eventTrigger = getEventTrigger(eventId, caseTypeDefinition);
+        final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
+        validateEventDefinition(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition));
 
         Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), caseAccessService.getCaseRoles(caseDetails.getId()));
 
@@ -186,15 +186,15 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             CAN_UPDATE);
     }
 
-    private CaseEventDefinition getEventTrigger(String eventId, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEventDefinition eventTrigger = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
-        if (eventTrigger == null) {
+    private CaseEventDefinition getCaseEventDefinition(String eventId, CaseTypeDefinition caseTypeDefinition) {
+        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
+        if (caseEventDefinition == null) {
             throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());
         }
-        return eventTrigger;
+        return caseEventDefinition;
     }
 
-    private void validateEventTrigger(Supplier<Boolean> validationOperation) {
+    private void validateEventDefinition(Supplier<Boolean> validationOperation) {
         if (validationOperation.get()) {
             throw new ValidationException("The case status did not qualify for the event");
         }

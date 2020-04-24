@@ -14,9 +14,9 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseUpdateViewEventBuilder.newCaseUpdateViewEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventTriggerBuilder.newStartEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventResultBuilder.newStartEventTrigger;
 
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +59,7 @@ class DefaultGetEventTriggerOperationTest {
     private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
     private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
     private final StartEventResult startEventResult = newStartEventTrigger().withEventToken(TOKEN).withCaseDetails(caseDetails).build();
-    private final CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger().build();
+    private final CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent().build();
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;

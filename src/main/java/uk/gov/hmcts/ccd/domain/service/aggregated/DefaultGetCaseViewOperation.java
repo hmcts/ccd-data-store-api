@@ -82,19 +82,19 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTypeTabsDefinition));
         caseView.setMetadataFields(getMetadataFields(caseTypeDefinition, caseDetails));
 
-        final CaseViewActionableEvent[] triggers = caseTypeDefinition.getEvents()
+        final CaseViewActionableEvent[] actionableEvents = caseTypeDefinition.getEvents()
             .stream()
             .filter(event -> eventTriggerService.isPreStateValid(caseStateDefinition.getId(), event))
             .map(event -> {
-                final CaseViewActionableEvent trigger = new CaseViewActionableEvent();
-                trigger.setId(event.getId());
-                trigger.setName(event.getName());
-                trigger.setDescription(event.getDescription());
-                trigger.setOrder(event.getDisplayOrder());
-                return trigger;
+                final CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
+                caseViewActionableEvent.setId(event.getId());
+                caseViewActionableEvent.setName(event.getName());
+                caseViewActionableEvent.setDescription(event.getDescription());
+                caseViewActionableEvent.setOrder(event.getDisplayOrder());
+                return caseViewActionableEvent;
             })
             .toArray(CaseViewActionableEvent[]::new);
-        caseView.setActionableEvents(triggers);
+        caseView.setActionableEvents(actionableEvents);
 
         caseView.setEvents(caseViewEvents);
 

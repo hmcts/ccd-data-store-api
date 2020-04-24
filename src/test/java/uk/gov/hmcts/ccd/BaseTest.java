@@ -263,10 +263,10 @@ public abstract class BaseTest {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEventDefinition eventTrigger = new CaseEventDefinition();
-        eventTrigger.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdictionDefinition, caseTypeDefinition);
+        return eventTokenService.generateToken(userId, getCase(template, caseReference), caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
     }
 
     protected String generateEventTokenNewCase(String userId, String jurisdictionId, String caseTypeId, String eventId) {
@@ -276,10 +276,10 @@ public abstract class BaseTest {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEventDefinition eventTrigger = new CaseEventDefinition();
-        eventTrigger.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, eventTrigger, jurisdictionDefinition, caseTypeDefinition);
+        return eventTokenService.generateToken(userId, caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
     }
 
     protected CaseDetails getCase(JdbcTemplate template, String caseReference) {

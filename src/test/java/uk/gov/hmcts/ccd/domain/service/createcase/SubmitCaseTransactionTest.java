@@ -95,7 +95,7 @@ class SubmitCaseTransactionTest {
     private Event event;
     private CaseTypeDefinition caseTypeDefinition;
     private IdamUser idamUser;
-    private CaseEventDefinition eventTrigger;
+    private CaseEventDefinition caseEventDefinition;
     private CaseStateDefinition state;
 
     @BeforeEach
@@ -114,7 +114,7 @@ class SubmitCaseTransactionTest {
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
         idamUser = buildIdamUser();
-        eventTrigger = buildEventTrigger();
+        caseEventDefinition = buildEventTrigger();
         state = buildState();
         final AboutToSubmitCallbackResponse response = buildResponse();
         doReturn(STATE_ID).when(savedCaseDetails).getState();
@@ -127,7 +127,7 @@ class SubmitCaseTransactionTest {
 
         doReturn(CASE_ID).when(savedCaseDetails).getId();
 
-        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
                                                                              null,
                                                                              this.caseDetails, caseTypeDefinition, IGNORE_WARNING
         );
@@ -157,7 +157,7 @@ class SubmitCaseTransactionTest {
         final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
                                                                                idamUser,
-                                                                               eventTrigger,
+            caseEventDefinition,
                                                                                this.caseDetails,
                                                                                IGNORE_WARNING);
 
@@ -180,7 +180,7 @@ class SubmitCaseTransactionTest {
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
                                          idamUser,
-                                         eventTrigger,
+            caseEventDefinition,
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
@@ -198,7 +198,7 @@ class SubmitCaseTransactionTest {
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
                                          idamUser,
-                                         eventTrigger,
+            caseEventDefinition,
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
@@ -216,7 +216,7 @@ class SubmitCaseTransactionTest {
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
                                          idamUser,
-                                         eventTrigger,
+            caseEventDefinition,
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
@@ -231,7 +231,7 @@ class SubmitCaseTransactionTest {
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
                                          idamUser,
-                                         eventTrigger,
+            caseEventDefinition,
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
@@ -244,11 +244,11 @@ class SubmitCaseTransactionTest {
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
                                          idamUser,
-                                         eventTrigger,
+            caseEventDefinition,
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger, null, caseDetails, caseTypeDefinition, IGNORE_WARNING);
+        verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition, IGNORE_WARNING);
     }
 
     private void assertAuditEvent(final AuditEvent auditEvent) {

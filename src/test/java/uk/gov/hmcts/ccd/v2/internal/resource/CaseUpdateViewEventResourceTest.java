@@ -38,13 +38,13 @@ class CaseUpdateViewEventResourceTest {
 
     @BeforeEach
     void setUp() {
-        caseUpdateViewEvent = newCaseEventTrigger();
+        caseUpdateViewEvent = newCaseUpdateViewEvent();
         ignoreWarning = true;
     }
 
 
-    private CaseUpdateViewEvent newCaseEventTrigger() {
-        return TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger()
+    private CaseUpdateViewEvent newCaseUpdateViewEvent() {
+        return TestBuildersUtil.CaseUpdateViewEventBuilder.newCaseUpdateViewEvent()
             .withId(ID)
             .withName(NAME)
             .withDescription(DESCRIPTION)

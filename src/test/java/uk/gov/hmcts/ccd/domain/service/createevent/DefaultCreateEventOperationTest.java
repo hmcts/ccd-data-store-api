@@ -59,7 +59,7 @@ class DefaultCreateEventOperationTest {
 
     private Map<String, JsonNode> data;
     private CaseTypeDefinition caseTypeDefinition;
-    private CaseEventDefinition eventTrigger;
+    private CaseEventDefinition caseEventDefinition;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
     private CaseStateDefinition postState;
@@ -89,8 +89,8 @@ class DefaultCreateEventOperationTest {
         caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         caseTypeDefinition.setVersion(version);
 
-        eventTrigger = new CaseEventDefinition();
-        eventTrigger.setPostState(POST_STATE);
+        caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setPostState(POST_STATE);
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
@@ -103,7 +103,7 @@ class DefaultCreateEventOperationTest {
         CreateCaseEventResult caseEventResult =  CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
             .savedCaseDetails(caseDetails)
-            .eventTrigger(eventTrigger)
+            .eventTrigger(caseEventDefinition)
             .build();
 
         given(createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent)).willReturn(caseEventResult);
@@ -113,19 +113,19 @@ class DefaultCreateEventOperationTest {
     @Test
     @DisplayName("should invoke after submit callback")
     void shouldInvokeAfterSubmitCallback() {
-        eventTrigger.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
         AfterSubmitCallbackResponse response = new AfterSubmitCallbackResponse();
         response.setConfirmationHeader("Header");
         response.setConfirmationBody("Body");
         doReturn(ResponseEntity.ok(response)).when(callbackInvoker)
-            .invokeSubmittedCallback(eventTrigger,
+            .invokeSubmittedCallback(caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertAll(
-            () -> verify(callbackInvoker).invokeSubmittedCallback(eventTrigger, caseDetailsBefore, this.caseDetails),
+            () -> verify(callbackInvoker).invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore, this.caseDetails),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
@@ -136,9 +136,9 @@ class DefaultCreateEventOperationTest {
     @Test
     @DisplayName("should return incomplete response status if remote endpoint is down")
     void shouldReturnIncomplete() {
-        eventTrigger.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
         doThrow(new CallbackException("Testing failure")).when(callbackInvoker)
-            .invokeSubmittedCallback(eventTrigger,
+            .invokeSubmittedCallback(caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails);
 

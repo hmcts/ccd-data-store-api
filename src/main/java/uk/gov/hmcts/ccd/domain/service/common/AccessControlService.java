@@ -498,9 +498,9 @@ public class AccessControlService {
                                                                           final List<CaseEventDefinition> caseEventDefinitionDefinitions,
                                                                           final Set<String> userRoles) {
         return stream(caseViewActionableEvents)
-            .filter(caseViewTrigger -> hasAccessControlList(userRoles,
+            .filter(caseViewEvent -> hasAccessControlList(userRoles,
                 CAN_CREATE,
-                getCaseEventById(caseEventDefinitionDefinitions, caseViewTrigger)
+                getCaseEventById(caseEventDefinitionDefinitions, caseViewEvent)
                     .map(CaseEventDefinition::getAccessControlLists)
                     .orElse(newArrayList()))
             )

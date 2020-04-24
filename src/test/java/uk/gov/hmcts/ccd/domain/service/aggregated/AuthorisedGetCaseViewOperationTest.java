@@ -51,7 +51,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBu
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTabBuilder.newCaseViewTab;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewActionableEventBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class AuthorisedGetCaseViewOperationTest {
@@ -112,8 +112,8 @@ class AuthorisedGetCaseViewOperationTest {
         .withCaseId(CASE_REFERENCE)
         .withState(caseState)
         .withCaseViewType(TEST_CASE_VIEW_TYPE)
-        .withCaseViewTrigger(CASE_VIEW_TRIGGER)
-        .withCaseViewTrigger(CASE_VIEW_TRIGGER_2)
+        .withCaseViewActionableEvent(CASE_VIEW_TRIGGER)
+        .withCaseViewActionableEvent(CASE_VIEW_TRIGGER_2)
         .addCaseViewTab(CASE_VIEW_TAB_WITH_MIXED_FIELDS)
         .addCaseViewTab(CASE_VIEW_TAB_WITH_UNALLOWED_FIELD)
         .addCaseViewTab(CASE_VIEW_TAB_WITH_ROLE_ALLOWED)

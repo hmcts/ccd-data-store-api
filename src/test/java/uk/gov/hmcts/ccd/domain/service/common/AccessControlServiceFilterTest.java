@@ -41,11 +41,11 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ge
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getPersonFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseUpdateViewEventBuilder.newCaseUpdateViewEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewActionableEventBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
@@ -96,9 +96,9 @@ class AccessControlServiceFilterTest {
                     .build()).build();
             final List<CaseEventDefinition> caseEventDefinitionDefinitions = Arrays.asList(event1, event2, event3);
 
-            final CaseViewActionableEvent[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(
+            final CaseViewActionableEvent[] filteredEvents = accessControlService.filterCaseViewTriggersByCreateAccess(
                 caseViewActionableEvents, caseEventDefinitionDefinitions, USER_ROLES);
-            assertArrayEquals(caseViewActionableEvents, filteredTriggers);
+            assertArrayEquals(caseViewActionableEvents, filteredEvents);
         }
 
         @Test
@@ -124,10 +124,10 @@ class AccessControlServiceFilterTest {
                     .build()).build();
             final List<CaseEventDefinition> caseEventDefinitionDefinitions = Arrays.asList(event1, event2, event3);
 
-            final CaseViewActionableEvent[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(caseViewActionableEvents, caseEventDefinitionDefinitions, USER_ROLES);
+            final CaseViewActionableEvent[] filteredEvents = accessControlService.filterCaseViewTriggersByCreateAccess(caseViewActionableEvents, caseEventDefinitionDefinitions, USER_ROLES);
             assertAll(
-                () -> assertThat(filteredTriggers.length, is(1)),
-                () -> assertThat(filteredTriggers[0], is(CASE_VIEW_TRIGGER_3))
+                () -> assertThat(filteredEvents.length, is(1)),
+                () -> assertThat(filteredEvents[0], is(CASE_VIEW_TRIGGER_3))
             );
         }
     }
@@ -163,7 +163,7 @@ class AccessControlServiceFilterTest {
                 .withId("Surname")
                 .build();
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withWizardPage(newWizardPage()
@@ -174,15 +174,15 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), hasSize(1)),
-                () -> assertThat(eventTrigger.getCaseFields(), hasItem(caseViewField2))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2))
             );
         }
 
@@ -214,7 +214,7 @@ class AccessControlServiceFilterTest {
                 .withId("Surname")
                 .build();
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withWizardPage(newWizardPage()
@@ -226,13 +226,13 @@ class AccessControlServiceFilterTest {
                 .build();
 
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
 
-            assertThat(eventTrigger.getCaseFields(), hasSize(0));
+            assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(0));
         }
 
         @Test
@@ -255,7 +255,7 @@ class AccessControlServiceFilterTest {
                 .withId("Surname")
                 .build();
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withWizardPage(newWizardPage()
@@ -266,15 +266,15 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), hasSize(1)),
-                () -> assertThat(eventTrigger.getCaseFields(), hasItem(caseViewField2))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2))
             );
         }
     }
@@ -350,7 +350,7 @@ class AccessControlServiceFilterTest {
                 .withFieldType(getAddressFieldType())
                 .build();
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -363,21 +363,21 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), hasSize(2)),
-                () -> assertThat(eventTrigger.getCaseFields(), hasItem(caseViewField2)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getId(), is("BornAddress")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("Address")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("PostCode"))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getId(), is("BornAddress")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("Address")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("PostCode"))
             );
         }
 
@@ -469,7 +469,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -482,24 +482,24 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), hasSize(2)),
-                () -> assertThat(eventTrigger.getCaseFields(), not(hasItem(caseViewField1))),
-                () -> assertThat(eventTrigger.getCaseFields(), hasItem(caseViewField2)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getId(), is("People")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getId(), is("Address")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("Line2"))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), not(hasItem(caseViewField1))),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getId(), is("People")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getId(), is("Address")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("Line2"))
             );
         }
 
@@ -591,7 +591,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -604,20 +604,20 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), hasSize(2)),
-                () -> assertThat(eventTrigger.getCaseFields(), not(hasItem(caseViewField1))),
-                () -> assertThat(eventTrigger.getCaseFields(), hasItem(caseViewField2)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getId(), is("People")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(0))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), not(hasItem(caseViewField1))),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getId(), is("People")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(0))
             );
         }
 
@@ -759,7 +759,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -790,40 +790,40 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), hasSize(2)),
-                () -> assertThat(eventTrigger.getCaseFields(), not(hasItem(caseViewField1))),
-                () -> assertThat(eventTrigger.getCaseFields(), hasItem(caseViewField2)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getId(), is("People")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(3).getId(), is("Notes")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getId(), is("BornCity")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getId(), is("BornAddress")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("Country")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getId(), is("Address")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("Line2")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getId(), is("Tags")),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Tag")),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields(), hasSize(2)),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides(), hasSize(3)),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(0).getComplexFieldElementId(), is("People.LastName")),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(1).getComplexFieldElementId(), is("People.BirthInfo.BornCity")),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(2).getComplexFieldElementId(), is("People.BirthInfo.BornAddress.Address"))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), not(hasItem(caseViewField1))),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getId(), is("People")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(3).getId(), is("Notes")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getId(), is("BornCity")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getId(), is("BornAddress")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("Country")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getId(), is("Address")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("Line2")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getId(), is("Tags")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Tag")),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields(), hasSize(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides(), hasSize(3)),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(0).getComplexFieldElementId(), is("People.LastName")),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(1).getComplexFieldElementId(), is("People.BirthInfo.BornCity")),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(2).getComplexFieldElementId(), is("People.BirthInfo.BornAddress.Address"))
             );
         }
 
@@ -965,7 +965,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -978,15 +978,15 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), hasSize(0)),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields(), hasSize(0))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(0)),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields(), hasSize(0))
             );
         }
 
@@ -1046,7 +1046,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setComplexFields(getPredefinedAddressFields());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -1059,15 +1059,15 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), hasSize(2)),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields(), hasSize(2))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields(), hasSize(2))
             );
         }
 
@@ -1127,7 +1127,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField3.getFieldType().setComplexFields(getPredefinedAddressFields());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withField(caseViewField2)
                 .withField(caseViewField3)
@@ -1140,16 +1140,16 @@ class AccessControlServiceFilterTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.filterCaseViewFieldsByAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_CREATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), hasSize(1)),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields(), hasSize(1)),
-                () -> assertThat(eventTrigger.getCaseFields(), hasItem(caseViewField2))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields(), hasSize(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2))
             );
         }
     }
@@ -1186,7 +1186,7 @@ class AccessControlServiceFilterTest {
                 .withUpdate(false)
                 .build()));
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withWizardPage(newWizardPage()
                         .withId("Page One")
@@ -1195,13 +1195,13 @@ class AccessControlServiceFilterTest {
                                )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.updateCollectionDisplayContextParameterByAccess(
                 caseUpdateViewEvent,
                 USER_ROLES);
 
-            assertThat("There should be only one caseField", eventTrigger.getCaseFields(), hasSize(1));
+            assertThat("There should be only one caseField", caseUpdateViewEventReturned.getCaseFields(), hasSize(1));
 
-            CaseViewField people = eventTrigger.getCaseFields().stream()
+            CaseViewField people = caseUpdateViewEventReturned.getCaseFields().stream()
                 .filter(e -> e.getId().equals("People")).findFirst().get();
 
             assertAll(
@@ -1242,7 +1242,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withWizardPage(newWizardPage()
                         .withId("Page One")
@@ -1251,11 +1251,11 @@ class AccessControlServiceFilterTest {
                                )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.updateCollectionDisplayContextParameterByAccess(
                 caseUpdateViewEvent,
                 USER_ROLES);
 
-            CaseViewField people = eventTrigger.getCaseFields().stream()
+            CaseViewField people = caseUpdateViewEventReturned.getCaseFields().stream()
                 .filter(e -> e.getId().equals("People")).findFirst().get();
 
             assertAll(
@@ -1285,7 +1285,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withWizardPage(newWizardPage()
                         .withId("Page One")
@@ -1294,11 +1294,11 @@ class AccessControlServiceFilterTest {
                                )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.updateCollectionDisplayContextParameterByAccess(
                 caseUpdateViewEvent,
                 USER_ROLES);
 
-            CaseViewField people = eventTrigger.getCaseFields().stream()
+            CaseViewField people = caseUpdateViewEventReturned.getCaseFields().stream()
                 .filter(e -> e.getId().equals("People")).findFirst().get();
 
             assertAll(

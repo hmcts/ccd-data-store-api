@@ -286,10 +286,10 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return classification relevant for event")
         void shouldGetClassificationForEvent() {
-            CaseEventDefinition eventTrigger = new CaseEventDefinition();
-            eventTrigger.setId("createEvent");
+            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+            caseEventDefinition.setId("createEvent");
             SecurityClassification result = securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-                                                                                                    eventTrigger);
+                                                                                                    caseEventDefinition);
 
             assertThat(result, is(equalTo(RESTRICTED)));
         }
@@ -297,11 +297,11 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should fail to return fields when event not found")
         void shouldThrowRuntimeExceptionIfEventNotFound() {
-            CaseEventDefinition eventTrigger = new CaseEventDefinition();
-            eventTrigger.setId("unknown");
+            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+            caseEventDefinition.setId("unknown");
 
             assertThrows(RuntimeException.class, () ->
-                securityClassificationService.getClassificationForEvent(caseTypeDefinition, eventTrigger));
+                securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition));
         }
     }
 

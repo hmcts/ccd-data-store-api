@@ -96,7 +96,7 @@ class CreateCaseEventDefinitionServiceTest {
 
     private Map<String, JsonNode> data;
     private CaseTypeDefinition caseTypeDefinition;
-    private CaseEventDefinition eventTrigger;
+    private CaseEventDefinition caseEventDefinition;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
     private CaseStateDefinition postState;
@@ -125,8 +125,8 @@ class CreateCaseEventDefinitionServiceTest {
         caseTypeDefinition.setId(CASE_TYPE_ID);
         caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         caseTypeDefinition.setVersion(version);
-        eventTrigger = new CaseEventDefinition();
-        eventTrigger.setPostState(POST_STATE);
+        caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setPostState(POST_STATE);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("http://www.yahoo.com");
         significantItem.setDescription("description");
@@ -151,10 +151,10 @@ class CreateCaseEventDefinitionServiceTest {
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseTypeDefinition);
-        doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
+        doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
-        doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, eventTrigger);
+        doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
         doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(user).when(userRepository).getUser();
@@ -191,14 +191,14 @@ class CreateCaseEventDefinitionServiceTest {
     void shouldNotUpdateLastStateModifiedWhenStateTransitionNotOccurred() {
         caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore.setState(PRE_STATE_ID);
-        eventTrigger = new CaseEventDefinition();
-        eventTrigger.setPostState(PRE_STATE_ID);
+        caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setPostState(PRE_STATE_ID);
 
         CaseStateDefinition state = new CaseStateDefinition();
         state.setId(PRE_STATE_ID);
 
-        doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
-        doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, eventTrigger);
+        doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
+        doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, PRE_STATE_ID);
 
         CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
@@ -212,7 +212,7 @@ class CreateCaseEventDefinitionServiceTest {
     void shouldInvokeAboutToSubmitCallback() {
         createCaseEvent();
 
-        verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+        verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
             caseDetailsBefore,
             caseDetails,
             caseTypeDefinition,

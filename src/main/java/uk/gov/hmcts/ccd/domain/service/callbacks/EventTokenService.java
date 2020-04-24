@@ -64,7 +64,7 @@ public class EventTokenService {
             .setIssuedAt(new Date())
             .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode(tokenSecret))
             .claim(EventTokenProperties.CASE_ID, caseDetails.getId())
-            .claim(EventTokenProperties.TRIGGER_EVENT_ID, event.getId())
+            .claim(EventTokenProperties.EVENT_ID, event.getId())
             .claim(EventTokenProperties.CASE_TYPE_ID, caseTypeDefinition.getId())
             .claim(EventTokenProperties.JURISDICTION_ID, jurisdictionDefinition.getId())
             .claim(EventTokenProperties.CASE_STATE, caseDetails.getState())
@@ -83,7 +83,7 @@ public class EventTokenService {
                 claims.getSubject(),
                 toString(claims.get(EventTokenProperties.CASE_ID)),
                 toString(claims.get(EventTokenProperties.JURISDICTION_ID)),
-                toString(claims.get(EventTokenProperties.TRIGGER_EVENT_ID)),
+                toString(claims.get(EventTokenProperties.EVENT_ID)),
                 toString(claims.get(EventTokenProperties.CASE_TYPE_ID)),
                 toString(claims.get(EventTokenProperties.CASE_VERSION)),
                 toString(claims.get(EventTokenProperties.CASE_STATE)),

@@ -31,8 +31,8 @@ class CaseViewResourceTest {
     private ProfileCaseState state;
 
     private CaseViewTab[] tabs;
-    private CaseViewActionableEvent[] triggers;
-    private CaseViewEvent[] events;
+    private CaseViewActionableEvent[] caseViewActionableEvents;
+    private CaseViewEvent[] caseViewEvents;
 
     private CaseView caseView;
 
@@ -56,8 +56,8 @@ class CaseViewResourceTest {
             () -> assertThat(resource.getTabs(), sameInstance(tabs)),
             () -> assertThat(resource.getMetadataFields(), sameInstance(metadataFields)),
             () -> assertThat(resource.getState(), sameInstance(state)),
-            () -> assertThat(resource.getTriggers(), sameInstance(triggers)),
-            () -> assertThat(resource.getEvents(), sameInstance(events))
+            () -> assertThat(resource.getCaseViewActionableEvents(), sameInstance(caseViewActionableEvents)),
+            () -> assertThat(resource.getCaseViewEvents(), sameInstance(caseViewEvents))
         );
     }
 
@@ -72,8 +72,8 @@ class CaseViewResourceTest {
 
     private void mockArrays() {
         tabs = new CaseViewTab[]{};
-        triggers = new CaseViewActionableEvent[]{};
-        events = new CaseViewEvent[]{};
+        caseViewActionableEvents = new CaseViewActionableEvent[]{};
+        caseViewEvents = new CaseViewEvent[]{};
     }
 
     private CaseView newCaseView() {
@@ -84,8 +84,8 @@ class CaseViewResourceTest {
         caseView.setTabs(tabs);
         caseView.setMetadataFields(metadataFields);
         caseView.setState(state);
-        caseView.setActionableEvents(triggers);
-        caseView.setEvents(events);
+        caseView.setActionableEvents(caseViewActionableEvents);
+        caseView.setEvents(caseViewEvents);
 
         return caseView;
     }

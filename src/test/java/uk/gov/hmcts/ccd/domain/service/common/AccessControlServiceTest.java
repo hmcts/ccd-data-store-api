@@ -27,7 +27,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseUpdateViewEventBuilder.newCaseUpdateViewEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
@@ -2291,7 +2291,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())
@@ -2299,13 +2299,13 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
+            assertThat(caseUpdateViewEventReturned.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
         }
 
         @Test
@@ -2358,7 +2358,7 @@ public class AccessControlServiceTest {
                 .build();
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType()
@@ -2386,16 +2386,16 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"), hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"), hasProperty("displayContext", is(READONLY)))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(caseUpdateViewEventReturned.getCaseFields().get(0), "Line1"), hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(caseUpdateViewEventReturned.getCaseFields().get(0), "Line2"), hasProperty("displayContext", is(READONLY)))
             );
         }
 
@@ -2448,7 +2448,7 @@ public class AccessControlServiceTest {
                 .build();
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType()
@@ -2476,16 +2476,16 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1"), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2"), not(hasProperty("displayContext", is(READONLY))))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0).getComplexFieldNestedField("Line1"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0).getComplexFieldNestedField("Line2"), not(hasProperty("displayContext", is(READONLY))))
             );
         }
 
@@ -2562,7 +2562,7 @@ public class AccessControlServiceTest {
                     .build())
                 .withId("Addresses")
                 .build();
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withWizardPage(newWizardPage()
                     .withId("Page One")
@@ -2579,18 +2579,18 @@ public class AccessControlServiceTest {
                 )
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").orElseThrow(() -> new RuntimeException("Line 2 is not there")), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").orElseThrow(() -> new RuntimeException("Line 2 is not there")), hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(0).getDisplayContext(), is(OPTIONAL)),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1).getDisplayContext(), is(READONLY))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0).getComplexFieldNestedField("Line1").orElseThrow(() -> new RuntimeException("Line 2 is not there")), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0).getComplexFieldNestedField("Line2").orElseThrow(() -> new RuntimeException("Line 2 is not there")), hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(0).getDisplayContext(), is(OPTIONAL)),
+                () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1).getDisplayContext(), is(READONLY))
             );
         }
 
@@ -2649,7 +2649,7 @@ public class AccessControlServiceTest {
                 .build();
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(aViewField()
                     .withId("AddressCollection")
                     .withFieldType(aFieldType()
@@ -2679,17 +2679,17 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses"), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"), hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"), hasProperty("displayContext", is(READONLY)))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(caseUpdateViewEventReturned.getCaseFields().get(0), "Addresses"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(caseUpdateViewEventReturned.getCaseFields().get(0), "Addresses.Line1"), hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(caseUpdateViewEventReturned.getCaseFields().get(0), "Addresses.Line2"), hasProperty("displayContext", is(READONLY)))
             );
         }
 
@@ -2748,7 +2748,7 @@ public class AccessControlServiceTest {
                 .build();
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(aViewField()
                     .withId("AddressCollection")
                     .withFieldType(aFieldType()
@@ -2778,17 +2778,17 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses"), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line1"), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line2"), not(hasProperty("displayContext", is(READONLY))))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0).getComplexFieldNestedField("Addresses"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line1"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line2"), not(hasProperty("displayContext", is(READONLY))))
             );
         }
 
@@ -2804,7 +2804,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())
@@ -2812,13 +2812,13 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
+            assertThat(caseUpdateViewEventReturned.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
         }
 
         @Test
@@ -2833,20 +2833,20 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withId("DifferentAddresses")
                         .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
+            assertThat(caseUpdateViewEventReturned.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
         }
 
         @Test
@@ -2862,7 +2862,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())
@@ -2870,13 +2870,13 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext", is(READONLY)))));
+            assertThat(caseUpdateViewEventReturned.getCaseFields(), everyItem(not(hasProperty("displayContext", is(READONLY)))));
         }
 
         @Test
@@ -2900,7 +2900,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())
@@ -2908,12 +2908,12 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseUpdateViewEvent,
+            CaseUpdateViewEvent caseUpdateViewEventReturned = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseUpdateViewEvent,
                 caseTypeDefinition.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext", is(READONLY)))));
+            assertThat(caseUpdateViewEventReturned.getCaseFields(), everyItem(not(hasProperty("displayContext", is(READONLY)))));
 
         }
 
@@ -2956,7 +2956,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            CaseUpdateViewEvent caseUpdateViewEvent = newCaseEventTrigger()
+            CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())

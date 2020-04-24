@@ -91,13 +91,13 @@ public class SecurityClassificationService {
         return classifiedEvents;
     }
 
-    public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition, CaseEventDefinition eventTrigger) {
+    public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition, CaseEventDefinition caseEventDefinition) {
         return caseTypeDefinition
             .getEvents()
             .stream()
-            .filter(e -> e.getId().equals(eventTrigger.getId()))
+            .filter(e -> e.getId().equals(caseEventDefinition.getId()))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("EventId %s not found", eventTrigger.getId())))
+            .orElseThrow(() -> new RuntimeException(String.format("EventId %s not found", caseEventDefinition.getId())))
             .getSecurityClassification();
     }
 

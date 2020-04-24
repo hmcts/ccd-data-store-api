@@ -70,19 +70,19 @@ public class CallbackInvoker {
             response));
     }
 
-    public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEventDefinition eventTrigger,
+    public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEventDefinition caseEventDefinition,
                                                                      final CaseDetails caseDetailsBefore,
                                                                      final CaseDetails caseDetails,
                                                                      final CaseTypeDefinition caseTypeDefinition,
                                                                      final Boolean ignoreWarning) {
         final Optional<CallbackResponse> callbackResponse;
-        if (isRetriesDisabled(eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent())) {
-            callbackResponse = callbackService.sendSingleRequest(eventTrigger.getCallBackURLAboutToSubmitEvent(),
-                eventTrigger, caseDetailsBefore, caseDetails, ignoreWarning);
+        if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
+            callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
+                caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         } else {
             callbackResponse = callbackService.send(
-                eventTrigger.getCallBackURLAboutToSubmitEvent(),
-                eventTrigger, caseDetailsBefore, caseDetails, ignoreWarning);
+                caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
+                caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         }
 
         if (callbackResponse.isPresent()) {
@@ -95,19 +95,19 @@ public class CallbackInvoker {
         return new AboutToSubmitCallbackResponse();
     }
 
-    public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEventDefinition eventTrigger,
+    public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEventDefinition caseEventDefinition,
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
         ResponseEntity<AfterSubmitCallbackResponse> afterSubmitCallbackResponseEntity;
-        if (isRetriesDisabled(eventTrigger.getRetriesTimeoutURLSubmittedEvent())) {
-            afterSubmitCallbackResponseEntity = callbackService.sendSingleRequest(eventTrigger.getCallBackURLSubmittedEvent(),
-                eventTrigger,
+        if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLSubmittedEvent())) {
+            afterSubmitCallbackResponseEntity = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLSubmittedEvent(),
+                caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
                 AfterSubmitCallbackResponse.class);
         } else {
-            afterSubmitCallbackResponseEntity = callbackService.send(eventTrigger.getCallBackURLSubmittedEvent(),
-                eventTrigger,
+            afterSubmitCallbackResponseEntity = callbackService.send(caseEventDefinition.getCallBackURLSubmittedEvent(),
+                caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
                 AfterSubmitCallbackResponse.class);

@@ -65,7 +65,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     }
 
     private CaseView filterUpsertAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseView caseView) {
-        CaseViewActionableEvent[] authorisedTriggers;
+        CaseViewActionableEvent[] authorisedActionableEvents;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseTypeDefinition,
                                                                      userRoles,
                                                                      CAN_UPDATE)
@@ -73,14 +73,14 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
             caseTypeDefinition,
                                                                       userRoles,
                                                                       CAN_UPDATE)) {
-            authorisedTriggers = new CaseViewActionableEvent[]{};
+            authorisedActionableEvents = new CaseViewActionableEvent[]{};
         } else {
-            authorisedTriggers = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getActionableEvents(),
+            authorisedActionableEvents = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getActionableEvents(),
                                                                                                 caseTypeDefinition.getEvents(),
                                                                                                 userRoles);
         }
 
-        caseView.setActionableEvents(authorisedTriggers);
+        caseView.setActionableEvents(authorisedActionableEvents);
 
         return caseView;
     }

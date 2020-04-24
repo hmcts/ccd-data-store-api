@@ -262,19 +262,19 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Event State Name", "Draft", events[1].getStateName());
         assertEquals("Event State ID", "Draft", events[1].getStateId());
 
-        final CaseViewActionableEvent[] triggers = caseView.getActionableEvents();
-        assertNotNull("Triggers are null", triggers);
-        assertEquals("Should only get resume and delete triggers", 2, triggers.length);
+        final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
+        assertNotNull("Triggers are null", actionableEvents);
+        assertEquals("Should only get resume and delete triggers", 2, actionableEvents.length);
 
-        assertEquals("Trigger ID", "createCase", triggers[0].getId());
-        assertEquals("Trigger Name", "Resume", triggers[0].getName());
-        assertEquals("Trigger Description", "This event will create a new case", triggers[0].getDescription());
-        assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
+        assertEquals("Trigger ID", "createCase", actionableEvents[0].getId());
+        assertEquals("Trigger Name", "Resume", actionableEvents[0].getName());
+        assertEquals("Trigger Description", "This event will create a new case", actionableEvents[0].getDescription());
+        assertEquals("Trigger Order", Integer.valueOf(1), actionableEvents[0].getOrder());
 
-        assertEquals("Trigger ID", "DELETE", triggers[1].getId());
-        assertEquals("Trigger Name", "Delete", triggers[1].getName());
-        assertEquals("Trigger Description", "Delete draft", triggers[1].getDescription());
-        assertEquals("Trigger Order", Integer.valueOf(2), triggers[1].getOrder());
+        assertEquals("Trigger ID", "DELETE", actionableEvents[1].getId());
+        assertEquals("Trigger Name", "Delete", actionableEvents[1].getName());
+        assertEquals("Trigger Description", "Delete draft", actionableEvents[1].getDescription());
+        assertEquals("Trigger Order", Integer.valueOf(2), actionableEvents[1].getOrder());
     }
 
     @Test
