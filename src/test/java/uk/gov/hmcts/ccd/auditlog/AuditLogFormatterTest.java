@@ -31,19 +31,19 @@ class AuditLogFormatterTest {
 
         String result = logFormatter.format(auditEntry);
 
-        assertEquals("CLA-CCD dateTime:2020-12-05 10:30:45," +
-            "operationType:VIEW_CASE," +
-            "caseId:test_caseId," +
-            "idamId:test_idamId," +
-            "invokingService:test_invokingService," +
-            "endpointCalled:GET test_path," +
-            "operationOutcome:200," +
-            "caseType:test_caseType," +
-            "jurisdiction:test_jurisdiction," +
-            "eventSelected:test_eventSelected," +
-            "idamIdOfTarget:test_idamIdOfTarget," +
-            "targetCaseRoles:test_targetCaseRoles," +
-            "X-Request-ID:test_X-Request-ID", result);
+        assertEquals("CLA-CCD dateTime:2020-12-05 10:30:45,"
+            + "operationType:VIEW_CASE,"
+            + "caseId:test_caseId,"
+            + "idamId:test_idamId,"
+            + "invokingService:test_invokingService,"
+            + "endpointCalled:GET test_path,"
+            + "operationOutcome:200,"
+            + "caseType:test_caseType,"
+            + "jurisdiction:test_jurisdiction,"
+            + "eventSelected:test_eventSelected,"
+            + "idamIdOfTarget:test_idamIdOfTarget,"
+            + "targetCaseRoles:test_targetCaseRoles,"
+            + "X-Request-ID:test_X-Request-ID", result);
     }
 
     @Test
