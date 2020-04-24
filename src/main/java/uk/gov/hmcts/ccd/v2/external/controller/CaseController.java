@@ -89,6 +89,7 @@ public class CaseController {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
+
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
                                                              .orElseThrow(() -> new CaseNotFoundException(caseId));
 
