@@ -18,7 +18,7 @@ public class AuditLogFormatter {
     public String format(AuditEntry entry) {
         return new StringBuilder(TAG)
             .append(" ")
-            .append(getPair("dateTime", entry.getDateTime()))
+            .append(getFirstPair("dateTime", entry.getDateTime()))
             .append(getPair("operationType", entry.getOperationType()))
             .append(getPair("caseId", entry.getCaseId()))
             .append(getPair("idamId", entry.getIdamId()))
@@ -38,8 +38,11 @@ public class AuditLogFormatter {
         return isNotBlank(value) ? COMMA + label + COLON + value : "";
     }
 
-    private String commaSeparatedList(List<String> list) {
-        return list.stream().map(String::toString).collect(Collectors.joining(COMMA));
+    private String getFirstPair(String label, String value) {
+        return isNotBlank(value) ? label + COLON + value : "";
     }
 
+    private String commaSeparatedList(List<String> list) {
+        return list == null ? null : list.stream().map(String::toString).collect(Collectors.joining(COMMA));
+    }
 }
