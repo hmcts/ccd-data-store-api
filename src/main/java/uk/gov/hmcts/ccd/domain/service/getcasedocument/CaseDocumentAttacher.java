@@ -264,7 +264,7 @@ public class CaseDocumentAttacher {
 
     private void checkDocumentFieldsDifference(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> caseData,
                                                Map<String, JsonNode> documentsDifference) {
-         caseBeforeNode = null;
+        caseBeforeNode = null;
         caseData.forEach((key, value) -> {
 
             if (caseDataBefore.containsKey(key)) {
