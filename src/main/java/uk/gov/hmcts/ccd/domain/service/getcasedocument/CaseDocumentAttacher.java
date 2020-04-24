@@ -99,7 +99,7 @@ public class CaseDocumentAttacher {
 
         if (callBackWasCalled) {
             // to remove hashcode before compute delta
-            extractDocumentsAfterCallback(caseDetails.getData(), documentsAfterCallback);
+            extractDocumentIdsAfterCallback(caseDetails.getData(), documentsAfterCallback);
         }
 
     }
@@ -116,16 +116,8 @@ public class CaseDocumentAttacher {
                                       HttpMethod.PATCH, requestEntity, Void.class);
 
             } catch (HttpClientErrorException restClientException) {
-                //handle 400's
-                //Revisit this piece of code again.
                 if (restClientException.getStatusCode() != HttpStatus.FORBIDDEN) {
-                    if (restClientException.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                        throw new BadSearchRequest(restClientException.getMessage());
-                    } else if (restClientException.getStatusCode() == HttpStatus.NOT_FOUND) {
-                        throw new ResourceNotFoundException(restClientException.getMessage());
-                    } else if (restClientException.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
-                        throw new ServiceException("The downstream application has failed");
-                    }
+                    exceptionScenarios(restClientException);
                 }
                 String badDocument = restClientException.getResponseBodyAsString();
 
@@ -135,6 +127,16 @@ public class CaseDocumentAttacher {
                     throw new DocumentTokenException(String.format("The user has provided an invalid hashToken for document %s", badDocument));
                 }
             }
+        }
+    }
+
+    private void exceptionScenarios(HttpClientErrorException restClientException) {
+        if (restClientException.getStatusCode() == HttpStatus.BAD_REQUEST) {
+            throw new BadSearchRequest(restClientException.getMessage());
+        } else if (restClientException.getStatusCode() == HttpStatus.NOT_FOUND) {
+            throw new ResourceNotFoundException(restClientException.getMessage());
+        } else if (restClientException.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+            throw new ServiceException("The downstream application has failed");
         }
     }
 
@@ -154,7 +156,7 @@ public class CaseDocumentAttacher {
         });
     }
 
-    public void extractDocumentsAfterCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
+    public void extractDocumentIdsAfterCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
@@ -165,7 +167,7 @@ public class CaseDocumentAttacher {
                 }
                 ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
-                jsonNode.fields().forEachRemaining(node -> extractDocumentsAfterCallback(
+                jsonNode.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
                     Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
             }
         });
@@ -266,29 +268,34 @@ public class CaseDocumentAttacher {
         caseData.forEach((key, value) -> {
 
             if (caseDataBefore.containsKey(key)) {
-                caseBeforeNode = caseDataBefore.get(key);
-                if (value != null && isDocumentField(value)) {
-                    if (!value.equals(caseDataBefore.get(key))) {
-                        documentsDifference.put(key, value);
-                    }
-
-                } else {
-
-                    Iterator<String> fieldNames = caseBeforeNode.fieldNames();
-                    while (fieldNames.hasNext()) {
-                        String fieldName = fieldNames.next();
-                        JsonNode before = caseBeforeNode.get(fieldName);
-                        recursiveMapForCaseDetailsBefore.put(fieldName, before);
-                    }
-
-                    value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
-                                                               Collections.singletonMap(node.getKey(), node.getValue()), documentsDifference));
-                }
+                extractDocumentFieldsWithDelta(caseDataBefore, documentsDifference, key, value);
 
             } else if (isDocumentFieldAtAnyLevel(value)) {
                 documentsDifference.put(key, value);
             }
         });
+    }
+
+    private void extractDocumentFieldsWithDelta(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> documentsDifference, String key, JsonNode value) {
+        caseBeforeNode = caseDataBefore.get(key);
+        if (value != null && isDocumentField(value)) {
+            if (!value.equals(caseDataBefore.get(key))) {
+                documentsDifference.put(key, value);
+            }
+
+        } else {
+            Iterator<String> fieldNames = caseBeforeNode.fieldNames();
+            while (fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                JsonNode before = caseBeforeNode.get(fieldName);
+                recursiveMapForCaseDetailsBefore.put(fieldName, before);
+            }
+            if (value != null) {
+                value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
+                                                                                      Collections.singletonMap(node.getKey(), node.getValue()),
+                                                                                      documentsDifference));
+            }
+        }
     }
 
     private void findDocumentsId(Map<String, JsonNode> sanitisedDataToAttachDoc, Set<String> filterDocumentSet) {
