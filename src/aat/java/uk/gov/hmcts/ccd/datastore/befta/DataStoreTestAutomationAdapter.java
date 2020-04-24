@@ -16,6 +16,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         loader.addCcdRoles();
         loader.importDefinitions();
     }
+
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
         String docAmUrl = EnvironmentVariableUtils.getRequiredVariable("CASE_DOCUMENT_AM_URL");
