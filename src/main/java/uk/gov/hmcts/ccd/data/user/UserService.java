@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
@@ -32,7 +32,7 @@ public class UserService {
     public UserService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
                        JurisdictionMapper jurisdictionMapper,
-                       @Qualifier(IDAMJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
+                       @Qualifier(IdamJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.jurisdictionMapper = jurisdictionMapper;
@@ -41,7 +41,7 @@ public class UserService {
 
     public UserProfile getUserProfile() {
 
-        IDAMProperties idamProperties = userRepository.getUserDetails();
+        IdamProperties idamProperties = userRepository.getUserDetails();
         String userId = idamProperties.getEmail();
         List<String> jurisdictionIds = jurisdictionsResolver.getJurisdictions();
 
@@ -58,7 +58,7 @@ public class UserService {
         return createUserProfile(idamProperties, userId, jurisdictionDefinitions);
     }
 
-    private UserProfile createUserProfile(IDAMProperties idamProperties, String userId, List<JurisdictionDefinition> jurisdictionsDefinition) {
+    private UserProfile createUserProfile(IdamProperties idamProperties, String userId, List<JurisdictionDefinition> jurisdictionsDefinition) {
 
         JurisdictionDisplayProperties[] resultJurisdictions = toResponse(jurisdictionsDefinition);
 

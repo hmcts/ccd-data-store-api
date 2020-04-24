@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-public class IDAMProperties extends IdamUser {
+public class IdamProperties extends IdamUser {
 
     private static final long serialVersionUID = -8859850331834643245L;
     private String[] roles;

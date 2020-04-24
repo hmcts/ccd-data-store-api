@@ -10,16 +10,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Qualifier(IDAMJurisdictionsResolver.QUALIFIER)
+@Qualifier(IdamJurisdictionsResolver.QUALIFIER)
 @RequestScope
-public class IDAMJurisdictionsResolver implements JurisdictionsResolver {
+public class IdamJurisdictionsResolver implements JurisdictionsResolver {
 
     public static final String QUALIFIER = "default";
 
     private UserRepository userRepository;
 
     @Inject
-    public IDAMJurisdictionsResolver(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+    public IdamJurisdictionsResolver(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

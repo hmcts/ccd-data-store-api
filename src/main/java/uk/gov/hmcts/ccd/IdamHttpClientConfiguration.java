@@ -23,11 +23,11 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Configuration
-class IDAMHttpClientConfiguration {
+class IdamHttpClientConfiguration {
 
     private HttpClient idamHttpClient;
 
-    public IDAMHttpClientConfiguration(@Value("${auth.log.unsuccessful.auth.details:true}") boolean logUnsuccessfulAuthDetails) {
+    public IdamHttpClientConfiguration(@Value("${auth.log.unsuccessful.auth.details:true}") boolean logUnsuccessfulAuthDetails) {
         this.idamHttpClient = new LoggingHTTPClient(logUnsuccessfulAuthDetails);
     }
 

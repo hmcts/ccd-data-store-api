@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.data.JsonDataConverter;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 
 import javax.persistence.CascadeType;
@@ -90,10 +91,10 @@ public class CaseAuditEventEntity {
     @Column(name = "security_classification", nullable = false)
     private SecurityClassification securityClassification;
     @Column(name = "data", nullable = false)
-    @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
+    @Convert(converter = JsonDataConverter.class)
     private JsonNode data;
     @Column(name = "data_classification", nullable = false)
-    @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
+    @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
 
     @OneToOne(mappedBy = "caseEvent", cascade = CascadeType.PERSIST, orphanRemoval = true)
