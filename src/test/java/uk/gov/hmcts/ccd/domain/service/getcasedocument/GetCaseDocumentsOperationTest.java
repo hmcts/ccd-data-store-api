@@ -47,8 +47,6 @@ import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentPermissions;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
 
-
-
 public class GetCaseDocumentsOperationTest {
 
     @Mock
