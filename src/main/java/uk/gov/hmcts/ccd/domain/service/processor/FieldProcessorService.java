@@ -42,7 +42,7 @@ public class FieldProcessorService {
     public CaseViewField processCaseViewField(final CaseViewField field) {
         CaseViewField result = field;
         for (CaseViewFieldProcessor processor : caseViewFieldProcessors) {
-            result = processor.execute(result);
+            result = processor.execute(result, null);
         }
         return result;
     }

@@ -19,6 +19,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
+import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 
@@ -104,6 +105,32 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
                 is("2020-02-19")),
             () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX, STANDARD_DATE_TIME)).asText(),
                 is("2007-07-17T07:07:00.000"))
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_case_dcp.sql" })
+    public void shouldFail() throws Exception {
+        assertCaseDataResultSetSize();
+
+        final MvcResult result = mockMvc.perform(post(VALIDATE)
+            .content(invalidValidateContent())
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(AUTHORIZATION, "Bearer user1")
+            .header(V2.EXPERIMENTAL_HEADER, "true"))
+            .andExpect(status().is(422))
+            .andReturn();
+
+        assertEquals(result.getResponse().getContentAsString(), 422, result.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = result.getResponse().getContentAsString();
+        DataProcessingException exception = mapper.readValue(content, DataProcessingException.class);
+
+        assertAll(
+            () -> assertThat(exception.getMessage(), is("Processing of data failed")),
+            () -> assertThat(exception.getDetails(),
+                is("Unable to process field CollectionComplexDateTime.NestedComplex.DateField with value 2000. "
+                   + "Expected format to be either MM-yyyy or yyyy-MM-dd"))
         );
     }
 

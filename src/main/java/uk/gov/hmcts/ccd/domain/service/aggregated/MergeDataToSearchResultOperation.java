@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import javax.inject.Named;
@@ -38,12 +38,12 @@ public class MergeDataToSearchResultOperation {
     private static final String NESTED_ELEMENT_NOT_FOUND_FOR_PATH = "Nested element not found for path %s";
 
     private final UserRepository userRepository;
-    private final SearchResultProcessor searchResultProcessor;
+    private final DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
 
     public MergeDataToSearchResultOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                            final SearchResultProcessor searchResultProcessor) {
+                                            final DateTimeSearchResultProcessor dateTimeSearchResultProcessor) {
         this.userRepository = userRepository;
-        this.searchResultProcessor = searchResultProcessor;
+        this.dateTimeSearchResultProcessor = dateTimeSearchResultProcessor;
     }
 
     public SearchResultView execute(final CaseType caseType,
@@ -57,7 +57,7 @@ public class MergeDataToSearchResultOperation {
             .map(caseData -> buildSearchResultViewItem(caseData, caseType, searchResult))
             .collect(Collectors.toList());
 
-        return searchResultProcessor.execute(viewColumns, viewItems, resultError);
+        return dateTimeSearchResultProcessor.execute(viewColumns, viewItems, resultError);
     }
 
     private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseType caseType,

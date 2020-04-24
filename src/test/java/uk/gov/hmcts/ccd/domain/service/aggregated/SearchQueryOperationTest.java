@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 
 public class SearchQueryOperationTest {
@@ -73,7 +73,7 @@ public class SearchQueryOperationTest {
     private UserRepository userRepository;
 
     @Mock
-    private SearchInputProcessor searchInputProcessor;
+    private DateTimeSearchInputProcessor dateTimeSearchInputProcessor;
 
     private SearchQueryOperation searchQueryOperation;
     private MetaData metadata;
@@ -103,13 +103,13 @@ public class SearchQueryOperationTest {
                                                         mergeDataToSearchResultOperation,
                                                         getCaseTypeOperation,
                                                         getDraftsOperation, uiDefinitionRepository, userRepository,
-                                                        searchInputProcessor);
+            dateTimeSearchInputProcessor);
         SearchResult searchResult = aSearchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, ""))
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
         doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
-        doAnswer(i -> i.getArgument(2)).when(searchInputProcessor).execute(Mockito.any(), Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(2)).when(dateTimeSearchInputProcessor).execute(Mockito.any(), Mockito.any(), Mockito.any());
 
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();

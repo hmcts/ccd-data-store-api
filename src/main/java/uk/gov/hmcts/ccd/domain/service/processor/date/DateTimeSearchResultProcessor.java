@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.processor;
+package uk.gov.hmcts.ccd.domain.service.processor.date;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,13 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
-import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessor;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,8 +23,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEDISPLAY;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DATETIME;
+import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_TIME_FORMAT;
+import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
+
 @Component
-public class SearchResultProcessor {
+public class DateTimeSearchResultProcessor {
 
     protected static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String FIELD_SEPARATOR = ".";
@@ -33,7 +37,7 @@ public class SearchResultProcessor {
     private final DateTimeFormatParser dateTimeFormatParser;
 
     @Autowired
-    public SearchResultProcessor(final DateTimeFormatParser dateTimeFormatParser) {
+    public DateTimeSearchResultProcessor(final DateTimeFormatParser dateTimeFormatParser) {
         this.dateTimeFormatParser = dateTimeFormatParser;
     }
 
@@ -65,7 +69,7 @@ public class SearchResultProcessor {
             return createObjectNodeFrom((ObjectNode) object, viewColumn, viewColumn.getCaseFieldType().getComplexFields(), viewColumn.getCaseFieldId());
         } else if (object instanceof LocalDateTime) {
             return createTextNodeFrom(new TextNode(((LocalDateTime) object)
-                .format(DateTimeFormatter.ofPattern(DateTimeFormatParser.DATE_TIME_FORMAT))), viewColumn, viewColumn.getCaseFieldId());
+                .format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT))), viewColumn, viewColumn.getCaseFieldId());
         }
 
         return object;
@@ -112,7 +116,7 @@ public class SearchResultProcessor {
         final Optional<CommonField> nestedField = viewColumn.getCaseFieldType().getNestedField(fieldPath, true);
         final CommonDCPModel dcpObject = nestedField.map(CommonDCPModel.class::cast).orElse(viewColumn);
 
-        return dcpObject.getDisplayContextParameter(DisplayContextParameterType.DATETIMEDISPLAY)
+        return dcpObject.getDisplayContextParameter(DATETIMEDISPLAY)
             .map(dcp -> {
                 final String fieldType = nestedField
                     .map(CommonField::getFieldType)
@@ -121,7 +125,7 @@ public class SearchResultProcessor {
                         FieldType collectionFieldType = viewColumn.getCaseFieldType().getCollectionFieldType();
                         return collectionFieldType == null ? viewColumn.getCaseFieldType().getType() : collectionFieldType.getType();
                     });
-                if (fieldType.equals(FieldType.DATETIME) || viewColumn.isMetadata()) {
+                if (fieldType.equals(DATETIME) || viewColumn.isMetadata()) {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDateTime(dcp.getValue(), originalNode.asText()));
                 } else {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDate(dcp.getValue(), originalNode.asText()));
@@ -135,10 +139,10 @@ public class SearchResultProcessor {
         ArrayNode newNode = MAPPER.createArrayNode();
         originalNode.forEach(item -> {
             JsonNode newItem = item.deepCopy();
-            ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                item.get(CollectionValidator.VALUE) instanceof TextNode ?
-                    createTextNodeFrom((TextNode) item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix) :
-                    createObjectNodeFrom((ObjectNode) item.get(CollectionValidator.VALUE), viewColumn, viewColumn.getCaseFieldType().getChildren(), fieldPrefix));
+            ((ObjectNode)newItem).replace(VALUE,
+                item.get(VALUE) instanceof TextNode ?
+                    createTextNodeFrom((TextNode) item.get(VALUE), viewColumn, fieldPrefix) :
+                    createObjectNodeFrom((ObjectNode) item.get(VALUE), viewColumn, viewColumn.getCaseFieldType().getChildren(), fieldPrefix));
             newNode.add(newItem);
         });
 

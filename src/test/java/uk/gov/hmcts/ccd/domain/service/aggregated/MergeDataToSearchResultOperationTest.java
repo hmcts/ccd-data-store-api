@@ -21,7 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.io.IOException;
@@ -92,10 +92,10 @@ class MergeDataToSearchResultOperationTest {
 
     @Mock
     private UserRepository userRepository;
-    
+
     @Mock
-    private SearchResultProcessor searchResultProcessor;
-    
+    private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
+
     private MergeDataToSearchResultOperation classUnderTest;
 
     private List<CaseDetails> caseDetailsList;
@@ -158,9 +158,9 @@ class MergeDataToSearchResultOperationTest {
             .build();
         doReturn(Collections.emptySet()).when(userRepository).getUserRoles();
         doAnswer(i -> new SearchResultView(i.getArgument(0), i.getArgument(1), i.getArgument(2)))
-            .when(searchResultProcessor).execute(Mockito.any(), Mockito.any(), Mockito.any());
+            .when(dateTimeSearchResultProcessor).execute(Mockito.any(), Mockito.any(), Mockito.any());
 
-        classUnderTest = new MergeDataToSearchResultOperation(userRepository, searchResultProcessor);
+        classUnderTest = new MergeDataToSearchResultOperation(userRepository, dateTimeSearchResultProcessor);
     }
 
     @Test

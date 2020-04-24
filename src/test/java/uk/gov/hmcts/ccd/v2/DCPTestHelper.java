@@ -62,6 +62,29 @@ public class DCPTestHelper {
                + "}";
     }
 
+    public static String invalidValidateContent() {
+        return "{\n"
+               + "    \"data\": {\n"
+               + "      \"TextField\": \"Case 1 Text\",\n"
+               + "      \"CollectionComplexDateTime\": [\n"
+               + "        {\n"
+               + "          \"id\": \"ID\",\n"
+               + "          \"value\": {\n"
+               + "            \"NestedComplex\": {\n"
+               + "              \"DateField\": \"2000\"\n"
+               + "            }\n"
+               + "          }\n"
+               + "        }\n"
+               + "      ]\n"
+               + "    },\n"
+               + "    \"event\": {\n"
+               + "      \"id\": \"UPDATE\",\n"
+               + "      \"summary\": \"\",\n"
+               + "      \"description\": \"\"\n"
+               + "    }\n"
+               + "}";
+    }
+
     public static String createCaseRequestContent(String eventToken) {
         return String.format(
           "{\n"

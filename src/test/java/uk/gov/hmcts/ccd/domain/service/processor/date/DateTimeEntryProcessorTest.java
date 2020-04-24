@@ -1,12 +1,12 @@
-package uk.gov.hmcts.ccd.domain.service.processor;
+package uk.gov.hmcts.ccd.domain.service.processor.date;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -14,18 +14,17 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
-import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import java.io.IOException;
-import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DATETIME;
 
 class DateTimeEntryProcessorTest {
 
@@ -62,8 +61,9 @@ class DateTimeEntryProcessorTest {
         String json = "{\"DateTimeField\":\"13/03/2020\"}";
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
         CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
-        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
-        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "13/03/2020")).thenReturn("2020-03-13T00:00:00.000");
+        when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
+        when(dateTimeFormatParser.valueToTextNode(eq("13/03/2020"), eq(BaseType.get(DATETIME)), any(), eq("dd/MM/yyyy"), eq(true)))
+            .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
 
@@ -79,8 +79,9 @@ class DateTimeEntryProcessorTest {
         String json = "{\"DateTimeField\":\"2020-03-13T00:00:00.000\"}";
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
         CaseViewField caseViewField = caseViewField(ID, null, fieldType());
-        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
-        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601(null, "2020-03-13T00:00:00.000")).thenReturn("2020-03-13T00:00:00.000");
+        when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
+        when(dateTimeFormatParser.valueToTextNode(eq("2020-03-13T00:00:00.000"), eq(BaseType.get(DATETIME)), any(), eq(null), eq(false)))
+            .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
 
@@ -96,8 +97,9 @@ class DateTimeEntryProcessorTest {
         String json = "{\"DateTimeField\":\"2020-03-13T00:00:00.000\"}";
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
         CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
-        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
-        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "2020-03-13T00:00:00.000")).thenReturn("2020-03-13T00:00:00.000");
+        when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
+        when(dateTimeFormatParser.valueToTextNode(eq("2020-03-13T00:00:00.000"), eq(BaseType.get(DATETIME)), any(), eq("dd/MM/yyyy"), eq(true)))
+            .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
 
@@ -117,9 +119,11 @@ class DateTimeEntryProcessorTest {
                 "DateTime", "DateTime", Collections.EMPTY_LIST, null
             ))
         );
-        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
-        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "13/03/2020")).thenReturn("2020-03-13T00:00:00.000");
-        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "25/12/1995")).thenReturn("1995-12-25T00:00:00.000");
+        when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
+        when(dateTimeFormatParser.valueToTextNode(eq("13/03/2020"), eq(BaseType.get(DATETIME)), any(), eq("dd/MM/yyyy"), eq(true)))
+            .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
+        when(dateTimeFormatParser.valueToTextNode(eq("25/12/1995"), eq(BaseType.get(DATETIME)), any(), eq("dd/MM/yyyy"), eq(true)))
+            .thenReturn(new TextNode("1995-12-25T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
 
@@ -130,44 +134,6 @@ class DateTimeEntryProcessorTest {
             () -> assertThat(result.get(0).get("id").asText(), is("id1")),
             () -> assertThat(result.get(1).get(CollectionValidator.VALUE).asText(), is("1995-12-25T00:00:00.000")),
             () -> assertThat(result.get(1).get("id").asText(), is("id2"))
-        );
-    }
-
-    @Test
-    void shouldThrowErrorDetailingExpectedDateTimeFormat() throws IOException {
-        setUpBaseType("DateTime");
-        String json = "{\"DateTimeField\":\"abc\"}";
-        JsonNode node = MAPPER.readTree(json).get("DateTimeField");
-        CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
-        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
-        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "abc")).thenThrow(DateTimeParseException.class);
-
-        DataProcessingException exception = assertThrows(DataProcessingException.class, () -> {
-            dateTimeEntryProcessor.execute(node, caseField("FieldId"), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
-        });
-
-        assertAll(
-            () -> assertThat(exception.getDetails(),
-                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd'T'HH:mm:ss.SSS"))
-        );
-    }
-
-    @Test
-    void shouldThrowErrorDetailingExpectedDateFormat() throws IOException {
-        setUpBaseType("Date");
-        String json = "{\"DateField\":\"abc\"}";
-        JsonNode node = MAPPER.readTree(json).get("DateField");
-        CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType("Date", "Date", Collections.emptyList(), null));
-        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
-        Mockito.when(dateTimeFormatParser.convertDateToIso8601("dd/MM/yyyy", "abc")).thenThrow(DateTimeParseException.class);
-
-        DataProcessingException exception = assertThrows(DataProcessingException.class, () -> {
-            dateTimeEntryProcessor.execute(node, caseField("FieldId"), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
-        });
-
-        assertAll(
-            () -> assertThat(exception.getDetails(),
-                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd"))
         );
     }
 

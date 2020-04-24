@@ -23,7 +23,7 @@ public abstract class FieldProcessor {
         this.caseViewFieldBuilder = caseViewFieldBuilder;
     }
 
-    protected JsonNode execute(JsonNode node, CaseField caseField, CaseEventField caseEventField, WizardPageField wizardPageField) {
+    public JsonNode execute(JsonNode node, CaseField caseField, CaseEventField caseEventField, WizardPageField wizardPageField) {
         CaseViewField caseViewField = caseViewFieldBuilder.build(caseField, caseEventField);
 
         if (caseViewField.isComplexFieldType()) {

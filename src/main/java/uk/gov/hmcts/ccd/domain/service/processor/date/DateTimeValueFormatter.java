@@ -1,10 +1,9 @@
-package uk.gov.hmcts.ccd.domain.service.processor;
+package uk.gov.hmcts.ccd.domain.service.processor.date;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -14,13 +13,17 @@ import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameter;
 import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.ccd.domain.service.processor.CaseViewFieldProcessor;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
-import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
-import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import java.util.*;
 
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEDISPLAY;
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEENTRY;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
+import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_FORMAT;
+import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_TIME_FORMAT;
+import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 
 @Component
 public class DateTimeValueFormatter extends CaseViewFieldProcessor {
@@ -31,14 +34,14 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
     private final DateTimeFormatParser dateTimeFormatParser;
 
     static {
-        ENUM_MAP.put(DisplayContext.MANDATORY, DisplayContextParameterType.DATETIMEENTRY);
-        ENUM_MAP.put(DisplayContext.OPTIONAL, DisplayContextParameterType.DATETIMEENTRY);
-        ENUM_MAP.put(DisplayContext.READONLY, DisplayContextParameterType.DATETIMEDISPLAY);
+        ENUM_MAP.put(DisplayContext.MANDATORY, DATETIMEENTRY);
+        ENUM_MAP.put(DisplayContext.OPTIONAL, DATETIMEENTRY);
+        ENUM_MAP.put(DisplayContext.READONLY, DATETIMEDISPLAY);
     }
 
     @Autowired
-    public DateTimeValueFormatter(DateTimeFormatParser dateTimeFormatParser,
-                                  CaseViewFieldBuilder caseViewFieldBuilder) {
+    public DateTimeValueFormatter(CaseViewFieldBuilder caseViewFieldBuilder,
+                                  DateTimeFormatParser dateTimeFormatParser) {
         super(caseViewFieldBuilder);
         this.dateTimeFormatParser = dateTimeFormatParser;
     }
@@ -86,10 +89,10 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
-                ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
+                ((ObjectNode)newItem).replace(VALUE,
                     isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES) ?
-                        createNode(field, item.get(CollectionValidator.VALUE).asText(), collectionFieldType, fieldPath, displayContext) :
-                        executeComplex(item.get(CollectionValidator.VALUE), field.getFieldType().getChildren(), null, fieldPath, topLevelField));
+                        createNode(field, item.get(VALUE).asText(), collectionFieldType, fieldPath, displayContext) :
+                        executeComplex(item.get(VALUE), field.getFieldType().getChildren(), null, fieldPath, topLevelField));
                 newNode.add(newItem);
             });
 
@@ -100,26 +103,9 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
     }
 
     private TextNode createNode(CommonField field, String valueToConvert, BaseType baseType, String fieldPath, DisplayContext displayContext) {
-        if (Strings.isNullOrEmpty(valueToConvert)) {
-            return new TextNode(valueToConvert);
-        }
         if (ENUM_MAP.containsKey(displayContext)) {
             String format = format(field, displayContext, baseType);
-            try {
-                if (baseType == BaseType.get(DATETIME)) {
-                    return new TextNode(dateTimeFormatParser.convertIso8601ToDateTime(format, valueToConvert));
-                } else {
-                    return new TextNode(dateTimeFormatParser.convertIso8601ToDate(format, valueToConvert));
-                }
-            } catch (Exception e) {
-                throw new DataProcessingException().withDetails(
-                    String.format("Unable to process field %s with value %s. Expected format to be either %s or %s",
-                        fieldPath,
-                        valueToConvert,
-                        format,
-                        baseType == BaseType.get(DATETIME) ? DateTimeFormatParser.DATE_TIME_FORMAT : DateTimeFormatParser.DATE_FORMAT)
-                );
-            }
+            return dateTimeFormatParser.valueToTextNode(valueToConvert, baseType, fieldPath, format, false);
         }
 
         return new TextNode(valueToConvert);
@@ -128,9 +114,6 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
     private String format(CommonField field, DisplayContext displayContext, BaseType baseType) {
         return field.getDisplayContextParameter(ENUM_MAP.get(displayContext))
             .map(DisplayContextParameter::getValue)
-            .orElseGet(() -> baseType == BaseType.get(DATETIME) ?
-                DateTimeFormatParser.DATE_TIME_FORMAT :
-                DateTimeFormatParser.DATE_FORMAT
-            );
+            .orElseGet(() -> baseType == BaseType.get(DATETIME) ? DATE_TIME_FORMAT : DATE_FORMAT);
     }
 }
