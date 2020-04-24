@@ -95,9 +95,9 @@ public class GetCaseDocumentsOperationTest {
     public void setUp() throws IOException {
 
         MockitoAnnotations.initMocks(this);
-        documentCaseField =buildCaseField("document-type-case-field.json");
-        complexCaseField =buildCaseField("complex-type-case-field.json");
-        collectionCaseField =buildCaseField("collection-type-case-field.json");
+        documentCaseField = buildCaseField("document-type-case-field.json");
+        complexCaseField = buildCaseField("complex-type-case-field.json");
+        collectionCaseField = buildCaseField("collection-type-case-field.json");
         caseDetailsData = buildCaseDetailData("case-details-data.json");
         caseFields = Arrays.asList(documentCaseField,complexCaseField,collectionCaseField);
         caseDetailsOptional = Optional.of(new CaseDetails());
@@ -139,7 +139,7 @@ public class GetCaseDocumentsOperationTest {
     @Test
     @DisplayName("should return CaseDocumentMetadata")
     void shouldCallGetCaseDocumentMetadata() throws IOException {
-        JsonNode expectedNode =buildJsonNode("document-field-node.json");
+
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
@@ -148,7 +148,7 @@ public class GetCaseDocumentsOperationTest {
         caseDetails.setState("state1");
         caseDetails.setData(caseDetailsData);
         caseType.setCaseFields(caseFields);
-
+        JsonNode expectedNode = buildJsonNode("document-field-node.json");
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
@@ -167,10 +167,11 @@ public class GetCaseDocumentsOperationTest {
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
         );
     }
+
     @Test
     @DisplayName("should throw CaseDocumentMetadataException  in case of documentId is not in caseDetails")
     void  shouldThrowCaseDocumentNotFoundExceptionWhenDocumentIdInvalid() throws IOException {
-        JsonNode expectedNode =buildJsonNode("document-field-node.json");
+        JsonNode expectedNode = buildJsonNode("document-field-node.json");
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
@@ -191,7 +192,8 @@ public class GetCaseDocumentsOperationTest {
             eq(AccessControlService.CAN_READ),
             anyBoolean());
 
-        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS ));
+        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
+            CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS));
     }
 
 
@@ -260,6 +262,7 @@ public class GetCaseDocumentsOperationTest {
             new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {
             });
     }
+
     static JsonNode buildJsonNode(String fileName) throws IOException {
         InputStream inputStream =
             GetCaseDocumentsOperationTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
