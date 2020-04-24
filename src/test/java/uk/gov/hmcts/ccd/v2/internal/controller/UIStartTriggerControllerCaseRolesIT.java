@@ -2,10 +2,8 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,9 +15,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
-import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -28,20 +23,14 @@ import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 import javax.inject.Inject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_CREATE;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_DELETE;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_READ;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_UPDATE;
+import static uk.gov.hmcts.ccd.MockUtils.*;
 
 public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase" +
@@ -58,9 +47,6 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
 
     @Mock
     private SecurityContext securityContext;
-
-    @SpyBean
-    private AuditRepository auditRepository;
 
     private MockMvc mockMvc;
 
@@ -114,13 +100,6 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertThat(field1.getAccessControlLists().get(1).isRead(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isUpdate(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isDelete(), is(false));
-
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
-        assertThat(captor.getValue().getCaseType(), is("CaseRolesCase"));
-        assertThat(captor.getValue().getEventSelected(), is("CREATE-CASE"));
     }
 
     @Test
@@ -268,12 +247,5 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
 
         assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseId(), is("1504259907353529"));
-
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
-        assertThat(captor.getValue().getEventSelected(), is("HAS_PRE_STATES_EVENT"));
     }
 }

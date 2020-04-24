@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
@@ -16,8 +15,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
-import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CREATE_CASE;
-import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.*;
 
 @RestController
@@ -65,7 +62,6 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    @LogAudit(operationType = CREATE_CASE, eventName = "#triggerId", caseType = "#caseTypeId")
     public ResponseEntity<UIStartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
                                                                       @PathVariable("triggerId") String triggerId,
                                                                       @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
@@ -109,7 +105,6 @@ public class UIStartTriggerController {
             message = "Trigger not found"
         )
     })
-    @LogAudit(operationType = UPDATE_CASE,  caseId = "#caseId", eventName = "#triggerId")
     public ResponseEntity<UIStartTriggerResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
                                                                        @PathVariable("triggerId") String triggerId,
                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
