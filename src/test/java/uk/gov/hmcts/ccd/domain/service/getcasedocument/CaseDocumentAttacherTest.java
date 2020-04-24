@@ -657,7 +657,7 @@ public class CaseDocumentAttacherTest {
 
     @Test
     @DisplayName("should call caseDocumentAttachOperation and filter the documents for UPDATE case scenario with callback")
-    void shouldFilterCaseDocumentMetaDataUpdateScenarioWithoutCallback() throws IOException{
+    void shouldFilterCaseDocumentMetaDataUpdateScenarioWithoutCallback() throws IOException {
         caseDetailsBefore = buildCaseData("case-detail-before-update.json");
         caseDataContent = buildCaseData("case-detail-after-update.json");
         CaseDetails existingCaseDetails = new CaseDetails();

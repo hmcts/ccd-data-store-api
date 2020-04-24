@@ -59,6 +59,7 @@ public class CaseDocumentAttacher {
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
     JsonNode caseBeforeNode;
+
     public CaseDocumentAttacher(RestTemplate restTemplate,
                                 ApplicationParams applicationParams,
                                 SecurityUtils securityUtils) {
