@@ -56,6 +56,14 @@ To build project please execute the following:
 ./gradlew clean build
 ```
 
+If integration tests fail due to failure of embedded postgres db initialisation process 
+on Mac OS, the shmmni configuration value for kernel should be set to at least 64 for 
+remediation. This can be achieved by having the below line in the file `/etc/sysctl.conf`:
+```
+kern.sysv.shmmni=64
+```
+
+
 ### Running
 
 If you want your code to become available to other Docker projects (e.g. for local environment testing), you need to build the image:
