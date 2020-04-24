@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
@@ -32,7 +32,7 @@ public class UserServiceTest {
     @Mock
     private JurisdictionMapper jurisdictionMapperMock;
     @Mock
-    private IDAMProperties mockIDAMProps;
+    private IdamProperties mockIDAMProps;
     @Mock
     private JurisdictionDisplayProperties jdp1;
     @Mock

@@ -11,18 +11,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-public class JSONBConverterTest {
+public class JsonDataConverterTest {
     private static ObjectMapper mapper = new ObjectMapper();
 
     static {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
-    private JSONBConverter jsonbConverter;
+    private JsonDataConverter jsonbConverter;
 
     @Before
     public void setup() {
-        jsonbConverter = new JSONBConverter();
+        jsonbConverter = new JsonDataConverter();
     }
 
     @Test

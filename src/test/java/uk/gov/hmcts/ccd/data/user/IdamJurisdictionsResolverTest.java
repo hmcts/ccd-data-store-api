@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -16,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-public class IDAMJurisdictionsResolverTest {
+public class IdamJurisdictionsResolverTest {
 
     @Mock
     private UserRepository userRepoMock;
 
     @InjectMocks
-    private IDAMJurisdictionsResolver jurisdictionsResolver;
+    private IdamJurisdictionsResolver jurisdictionsResolver;
 
     @BeforeEach
     void setUp() {
@@ -140,7 +140,7 @@ public class IDAMJurisdictionsResolverTest {
     }
 
     private void mockIDAMProperties(String[] roles) {
-        IDAMProperties idamProperties = mock(IDAMProperties.class);
+        IdamProperties idamProperties = mock(IdamProperties.class);
         doReturn(roles).when(idamProperties).getRoles();
         doReturn(idamProperties).when(userRepoMock).getUserDetails();
     }
