@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEDISPLAY;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DATETIME;
+import static uk.gov.hmcts.ccd.domain.service.processor.FieldProcessor.isNullOrEmpty;
 import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 
@@ -61,11 +62,11 @@ public class DateTimeSearchResultProcessor {
 
     private Object processObject(final Object object,
                                  final SearchResultViewColumn viewColumn) {
-        if (object instanceof TextNode && !FieldProcessor.isNullOrEmpty((TextNode) object)) {
+        if (object instanceof TextNode && !isNullOrEmpty((TextNode) object)) {
             return createTextNodeFrom((TextNode) object, viewColumn, viewColumn.getCaseFieldId());
-        } else if (object instanceof ArrayNode && !FieldProcessor.isNullOrEmpty((ArrayNode) object)) {
+        } else if (object instanceof ArrayNode && !isNullOrEmpty((ArrayNode) object)) {
             return createArrayNodeFrom((ArrayNode) object, viewColumn, viewColumn.getCaseFieldId());
-        } else if (object instanceof ObjectNode && !FieldProcessor.isNullOrEmpty((ObjectNode) object)) {
+        } else if (object instanceof ObjectNode && !isNullOrEmpty((ObjectNode) object)) {
             return createObjectNodeFrom((ObjectNode) object, viewColumn, viewColumn.getCaseFieldType().getComplexFields(), viewColumn.getCaseFieldId());
         } else if (object instanceof LocalDateTime) {
             return createTextNodeFrom(new TextNode(((LocalDateTime) object)
@@ -79,17 +80,17 @@ public class DateTimeSearchResultProcessor {
                                           final SearchResultViewColumn viewColumn,
                                           final List<CaseField> complexCaseFields,
                                           final String fieldPrefix) {
-        if (FieldProcessor.isNullOrEmpty(originalNode)) {
+        if (isNullOrEmpty(originalNode)) {
             return originalNode;
         }
 
         ObjectNode newNode = MAPPER.createObjectNode();
-        complexCaseFields.stream().forEach(complexCaseField -> {
+        complexCaseFields.forEach(complexCaseField -> {
             final String fieldId = complexCaseField.getId();
             final JsonNode caseFieldNode = originalNode.get(fieldId);
             final String fieldPath = fieldPrefix + FIELD_SEPARATOR + fieldId;
 
-            if (FieldProcessor.isNullOrEmpty(caseFieldNode)) {
+            if (isNullOrEmpty(caseFieldNode)) {
                 newNode.set(fieldId, caseFieldNode);
             } else if (complexCaseField.isCollectionFieldType()) {
                 newNode.set(fieldId,

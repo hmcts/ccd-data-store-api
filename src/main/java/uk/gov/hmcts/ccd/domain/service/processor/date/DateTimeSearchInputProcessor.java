@@ -44,17 +44,17 @@ public class DateTimeSearchInputProcessor {
         final List<? extends CriteriaInput> criteriaInputs = getCriteriaInputs(view, metadata);
 
         Map<String, String> newParams = new HashMap<>();
-        queryParameters.entrySet().forEach(entry -> {
-            final Optional<? extends CriteriaInput> input = findCriteriaInputField(criteriaInputs, entry.getKey().split("\\.")[0]);
+        queryParameters.forEach((fieldId, value) -> {
+            final Optional<? extends CriteriaInput> input = findCriteriaInputField(criteriaInputs, fieldId.split("\\.")[0]);
 
             if (input.isPresent()) {
-                if (isComplexPath(entry.getKey()) && input.get().getDisplayContextParameters().isEmpty()) {
-                    handleNested(entry.getKey(), entry.getValue(), input.get(), newParams);
+                if (isComplexPath(fieldId) && input.get().getDisplayContextParameters().isEmpty()) {
+                    handleNested(fieldId, value, input.get(), newParams);
                 } else {
-                    handleTopLevel(entry.getKey(), entry.getValue(), input.get(), newParams);
+                    handleTopLevel(fieldId, value, input.get(), newParams);
                 }
             } else {
-                newParams.put(entry.getKey(), entry.getValue());
+                newParams.put(fieldId, value);
             }
         });
 
@@ -103,7 +103,7 @@ public class DateTimeSearchInputProcessor {
                 return dateTimeFormatParser.convertDateToIso8601(format(dcpObject, fieldType), value);
             } else if (fieldType.getType().equals(DATETIME)) {
                 return dateTimeFormatParser.convertDateTimeToIso8601(format(dcpObject, fieldType), value);
-            } else if (fieldType.getType().equals(COLLECTION)) {
+            } else if (fieldType.isCollectionFieldType()) {
                 return processValue(id, dcpObject, value, fieldType.getCollectionFieldType());
             } else {
                 return value;

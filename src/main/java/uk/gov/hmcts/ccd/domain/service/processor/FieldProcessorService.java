@@ -58,18 +58,17 @@ public class FieldProcessorService {
 
         Map<String, JsonNode> processedData = new HashMap<>();
 
-        data.entrySet().stream().forEach(entry -> {
-            final Optional<CaseField> caseField = caseType.getCaseField(entry.getKey());
-            final Optional<CaseEventField> caseEventField = event.getCaseEventField(entry.getKey());
+        data.forEach((fieldId, node) -> {
+            final Optional<CaseField> caseField = caseType.getCaseField(fieldId);
+            final Optional<CaseEventField> caseEventField = event.getCaseEventField(fieldId);
 
-            JsonNode result = entry.getValue();
-            if (!isNullOrEmpty(result) && caseField.isPresent() && caseEventField.isPresent()) {
+            if (!isNullOrEmpty(node) && caseField.isPresent() && caseEventField.isPresent()) {
                 for (CaseDataFieldProcessor processor : caseDataFieldProcessors) {
-                    result = processor.execute(result, caseField.get(), caseEventField.get(), wizardPageField(wizardPageFields, caseField.get().getId()));
+                    node = processor.execute(node, caseField.get(), caseEventField.get(), wizardPageField(wizardPageFields, caseField.get().getId()));
                 }
             }
 
-            processedData.put(entry.getKey(), result);
+            processedData.put(fieldId, node);
         });
 
         return processedData;

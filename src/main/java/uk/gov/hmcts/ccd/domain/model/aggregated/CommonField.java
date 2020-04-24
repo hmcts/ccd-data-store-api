@@ -10,8 +10,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-
 public interface CommonField extends CommonDCPModel {
 
     FieldType getFieldType();
@@ -32,12 +30,12 @@ public interface CommonField extends CommonDCPModel {
 
     @JsonIgnore
     default boolean isCollectionFieldType() {
-        return FieldType.COLLECTION.equalsIgnoreCase(getFieldType().getType());
+        return getFieldType().isCollectionFieldType();
     }
 
     @JsonIgnore
     default boolean isComplexFieldType() {
-        return COMPLEX.equalsIgnoreCase(getFieldType().getType());
+        return getFieldType().isComplexFieldType();
     }
 
     @JsonIgnore
