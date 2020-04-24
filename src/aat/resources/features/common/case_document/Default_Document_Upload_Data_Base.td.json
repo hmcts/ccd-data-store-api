@@ -1,0 +1,37 @@
+{
+  "_guid_": "Default_Document_Upload_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Upload a case document",
+  "method": "POST",
+  "uri": "{{CASE_DOCUMENT_AM_URL}}/cases/documents",
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "request": {
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "Content-Type": "multipart/form-data"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Header_Base",
+      "content-type": "application/vnd.uk.gov.hmcts.dm.document-collection.v1+hal+json;charset=UTF-8"
+    },
+    "body": {
+      "_embedded": {
+        "documents": [
+          {
+            "_extends_": "Common_Response_Body_Document_Base"
+          }
+        ]
+      }
+    }
+  }
+}
