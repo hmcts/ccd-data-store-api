@@ -80,6 +80,7 @@ public class GetCaseDocumentsOperationTest {
     private CaseField documentCaseField;
     private CaseField complexCaseField;
     private CaseField collectionCaseField;
+    private CaseField documentInComplexCaseField;
     private List<CaseField> caseFields;
     private CaseDetails caseDetails;
     private Optional<CaseDetails> caseDetailsOptional;
@@ -97,7 +98,9 @@ public class GetCaseDocumentsOperationTest {
         complexCaseField = buildCaseField("complex-type-case-field.json");
         collectionCaseField = buildCaseField("collection-type-case-field.json");
         caseDetailsData = buildCaseDetailData("case-details-data.json");
-        caseFields = Arrays.asList(documentCaseField,complexCaseField,collectionCaseField);
+        documentInComplexCaseField = buildCaseField("complex-type-with-document-case-field.json");
+
+        caseFields = Arrays.asList(documentCaseField,complexCaseField,collectionCaseField,documentInComplexCaseField);
         caseDetailsOptional = Optional.of(new CaseDetails());
         doReturn(userRoles).when(userRepository).getUserRoles();
         doReturn(USER_ID).when(userRepository).getUserId();
@@ -267,9 +270,8 @@ public class GetCaseDocumentsOperationTest {
     @Test
     @DisplayName("should Extract the document fields from CaseDefinition")
     void shouldExtractDocumentFieldsFromCaseDefinition() throws IOException {
-
         List<CaseField>  inputCaseField = new ArrayList<>();
-        List<CaseField>  expectedCaseField = Arrays.asList(documentCaseField);
+        List<CaseField>  expectedCaseField = Arrays.asList(documentCaseField,documentInComplexCaseField.getFieldType().getComplexFields().get(3));
 
         caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
         assertAll(
@@ -277,6 +279,53 @@ public class GetCaseDocumentsOperationTest {
 
         );
     }
+
+    @Test
+    @DisplayName("should Extract the document fields from Collection Case Field")
+    void shouldExtractDocumentFieldsFromCollectionTypeCaseField() throws IOException {
+       List<CaseField> caseFields = Arrays.asList(buildCaseField("collection-type-with-document-case-field.json"));
+        List<CaseField>  inputCaseField = new ArrayList<>();
+        List<CaseField>  expectedCaseField = Arrays.asList(caseFields.get(0).getFieldType().getComplexFields().get(0));
+
+        caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
+        assertAll(
+            () -> assertEquals(inputCaseField,expectedCaseField)
+
+        );
+    }
+
+    @Test
+    @DisplayName("should return CaseDocumentMetadata")
+    void shouldReturnCaseDocumentMetadataWhenDocumentFieldInsideComplexField() throws IOException {
+
+        caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
+        caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setId(CASE_REFERENCE);
+        caseDetails.setReference(new Long(CASE_REFERENCE));
+        caseDetails.setState("state1");
+        caseDetails.setData(caseDetailsData);
+        caseType.setCaseFields(caseFields);
+        JsonNode expectedNode = buildJsonNode("document-field-node.json");
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
+            ArgumentMatchers.any(JsonNode.class),
+            ArgumentMatchers.any(List.class),
+            ArgumentMatchers.any(Set.class),
+            eq(AccessControlService.CAN_READ),
+            anyBoolean());
+
+        CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
+        assertAll(
+            () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions(), is(documentPermissions)),
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getId(), is(documentPermissions.getId())),
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
+        );
+    }
+
 
 
 
