@@ -79,7 +79,7 @@ public class CaseDocumentAttacher {
         }
     }
 
-    public void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> contentData) {
+     public void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> contentData) {
 
         LOG.debug("Updating case using Version 2.1 of case create API");
         documentsBeforeCallback = new HashMap<>();
@@ -87,7 +87,7 @@ public class CaseDocumentAttacher {
 
     }
 
-    public void extractDocumentsAfterCallBack(CaseDetails caseDetails, boolean callBackWasCalled) {
+    void extractDocumentsAfterCallBack(CaseDetails caseDetails, boolean callBackWasCalled) {
 
         documentsAfterCallback = new HashMap<>();
         caseDocumentsMetadata = CaseDocumentsMetadata.builder()
@@ -140,7 +140,7 @@ public class CaseDocumentAttacher {
         }
     }
 
-    public void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
+    void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
@@ -156,7 +156,7 @@ public class CaseDocumentAttacher {
         });
     }
 
-    public void extractDocumentIdsAfterCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
+    private void extractDocumentIdsAfterCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
@@ -179,7 +179,7 @@ public class CaseDocumentAttacher {
         return jsonNode.get(DOCUMENT_BINARY_URL) != null || jsonNode.get(DOCUMENT_URL) != null;
     }
 
-    public String extractDocumentId(JsonNode jsonNode) {
+    private String extractDocumentId(JsonNode jsonNode) {
         try {
             String documentId;
             //Document Binary URL is preferred.
@@ -199,7 +199,7 @@ public class CaseDocumentAttacher {
     }
 
 
-    public void consolidateDocumentsWithHashTokenAfterCallBack(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, String> documentsBeforeCallback,
+    void consolidateDocumentsWithHashTokenAfterCallBack(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, String> documentsBeforeCallback,
                                                                Map<String, String> documentsAfterCallback) {
 
         Map<String, String> consolidatedDocumentsWithHashToken;
@@ -246,7 +246,7 @@ public class CaseDocumentAttacher {
                                                                             .add(DocumentHashToken.builder().id(key).hashToken(value).build()));
     }
 
-    public Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore, final Map<String, JsonNode> caseData) {
+    Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore, final Map<String, JsonNode> caseData) {
 
         final Map<String, JsonNode> documentsDifference = new HashMap<>();
 
@@ -314,7 +314,7 @@ public class CaseDocumentAttacher {
 
     }
 
-    public void filterDocumentMetaData(Set<String> filterDocumentSet) {
+    void filterDocumentMetaData(Set<String> filterDocumentSet) {
 
         List<DocumentHashToken> caseDocumentList = caseDocumentsMetadata.getDocumentHashToken().stream()
                                                                         .filter(document -> filterDocumentSet.contains(document.getId()))
