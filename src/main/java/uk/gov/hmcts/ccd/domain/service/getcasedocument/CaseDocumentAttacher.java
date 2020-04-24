@@ -58,6 +58,7 @@ public class CaseDocumentAttacher {
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
+    JsonNode caseBeforeNode;
 
     public CaseDocumentAttacher(RestTemplate restTemplate,
                                 ApplicationParams applicationParams,
@@ -78,9 +79,9 @@ public class CaseDocumentAttacher {
         }
     }
 
-    public void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> contentData) {
+     public void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> contentData) {
 
-        LOG.debug("Updating  case using Version 2.1 of case create API");
+        LOG.debug("Updating case using Version 2.1 of case create API");
         documentsBeforeCallback = new HashMap<>();
         extractDocumentsWithHashTokenBeforeCallback(contentData, documentsBeforeCallback);
 
@@ -98,7 +99,7 @@ public class CaseDocumentAttacher {
 
         if (callBackWasCalled) {
             // to remove hashcode before compute delta
-            extractDocumentsAndRemoveHashcodeAfterCallback(caseDetails.getData(), documentsAfterCallback);
+            extractDocumentIdsAfterCallback(caseDetails.getData(), documentsAfterCallback);
         }
 
     }
@@ -115,16 +116,8 @@ public class CaseDocumentAttacher {
                                       HttpMethod.PATCH, requestEntity, Void.class);
 
             } catch (HttpClientErrorException restClientException) {
-                //handle 400's
-                //Revisit this piece of code again.
                 if (restClientException.getStatusCode() != HttpStatus.FORBIDDEN) {
-                    if (restClientException.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                        throw new BadSearchRequest(restClientException.getMessage());
-                    } else if (restClientException.getStatusCode() == HttpStatus.NOT_FOUND) {
-                        throw new ResourceNotFoundException(restClientException.getMessage());
-                    } else if (restClientException.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
-                        throw new ServiceException("The downstream application has failed");
-                    }
+                    exceptionScenarios(restClientException);
                 }
                 String badDocument = restClientException.getResponseBodyAsString();
 
@@ -137,7 +130,17 @@ public class CaseDocumentAttacher {
         }
     }
 
-    public void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
+    private void exceptionScenarios(HttpClientErrorException restClientException) {
+        if (restClientException.getStatusCode() == HttpStatus.BAD_REQUEST) {
+            throw new BadSearchRequest(restClientException.getMessage());
+        } else if (restClientException.getStatusCode() == HttpStatus.NOT_FOUND) {
+            throw new ResourceNotFoundException(restClientException.getMessage());
+        } else if (restClientException.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+            throw new ServiceException("The downstream application has failed");
+        }
+    }
+
+    void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
@@ -153,7 +156,7 @@ public class CaseDocumentAttacher {
         });
     }
 
-    public void extractDocumentsAndRemoveHashcodeAfterCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
+    private void extractDocumentIdsAfterCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
@@ -164,7 +167,7 @@ public class CaseDocumentAttacher {
                 }
                 ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
-                jsonNode.fields().forEachRemaining(node -> extractDocumentsAndRemoveHashcodeAfterCallback(
+                jsonNode.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
                     Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
             }
         });
@@ -176,7 +179,7 @@ public class CaseDocumentAttacher {
         return jsonNode.get(DOCUMENT_BINARY_URL) != null || jsonNode.get(DOCUMENT_URL) != null;
     }
 
-    public String extractDocumentId(JsonNode jsonNode) {
+    private String extractDocumentId(JsonNode jsonNode) {
         try {
             String documentId;
             //Document Binary URL is preferred.
@@ -196,7 +199,7 @@ public class CaseDocumentAttacher {
     }
 
 
-    public void consolidateDocumentsWithHashTokenAfterCallBack(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, String> documentsBeforeCallback,
+    void consolidateDocumentsWithHashTokenAfterCallBack(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, String> documentsBeforeCallback,
                                                                Map<String, String> documentsAfterCallback) {
 
         Map<String, String> consolidatedDocumentsWithHashToken;
@@ -243,7 +246,7 @@ public class CaseDocumentAttacher {
                                                                             .add(DocumentHashToken.builder().id(key).hashToken(value).build()));
     }
 
-    public Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore, final Map<String, JsonNode> caseData) {
+    Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore, final Map<String, JsonNode> caseData) {
 
         final Map<String, JsonNode> documentsDifference = new HashMap<>();
 
@@ -261,27 +264,11 @@ public class CaseDocumentAttacher {
 
     private void checkDocumentFieldsDifference(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> caseData,
                                                Map<String, JsonNode> documentsDifference) {
-        final JsonNode[] caseBeforeNode = {null};
+        caseBeforeNode = null;
         caseData.forEach((key, value) -> {
 
             if (caseDataBefore.containsKey(key)) {
-                caseBeforeNode[0] = caseDataBefore.get(key);
-                if (value != null && isDocumentField(value)) {
-                    if (!value.equals(caseDataBefore.get(key))) {
-                        documentsDifference.put(key, value);
-                    }
-
-                } else {
-                    Iterator<String> fieldNames = caseBeforeNode[0].fieldNames();
-                    while (fieldNames.hasNext()) {
-                        String fieldName = fieldNames.next();
-                        JsonNode before = caseBeforeNode[0].get(fieldName);
-                        recursiveMapForCaseDetailsBefore.put(fieldName, before);
-                    }
-
-                    value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
-                                                               Collections.singletonMap(node.getKey(), node.getValue()), documentsDifference));
-                }
+                extractDocumentFieldsWithDelta(caseDataBefore, documentsDifference, key, value);
 
             } else if (isDocumentFieldAtAnyLevel(value)) {
                 documentsDifference.put(key, value);
@@ -289,12 +276,31 @@ public class CaseDocumentAttacher {
         });
     }
 
+    private void extractDocumentFieldsWithDelta(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> documentsDifference, String key, JsonNode value) {
+        caseBeforeNode = caseDataBefore.get(key);
+        if (value != null && isDocumentField(value)) {
+            if (!value.equals(caseDataBefore.get(key))) {
+                documentsDifference.put(key, value);
+            }
+
+        } else {
+            Iterator<String> fieldNames = caseBeforeNode.fieldNames();
+            while (fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                JsonNode before = caseBeforeNode.get(fieldName);
+                recursiveMapForCaseDetailsBefore.put(fieldName, before);
+            }
+            if (value != null) {
+                value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
+                                                                                      Collections.singletonMap(node.getKey(), node.getValue()),
+                                                                                      documentsDifference));
+            }
+        }
+    }
+
     private void findDocumentsId(Map<String, JsonNode> sanitisedDataToAttachDoc, Set<String> filterDocumentSet) {
 
         sanitisedDataToAttachDoc.forEach((field, jsonNode) -> {
-            //Check if the field consists of Document at any level, e.g. Complex fields can also have documents.
-            //This quick check will reduce the processing time as most of filtering will be done at top level.
-            //****** Every document should have hashcode, else throw error
             if (jsonNode != null && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
                 filterDocumentSet.add(documentId);
@@ -308,7 +314,7 @@ public class CaseDocumentAttacher {
 
     }
 
-    public void filterDocumentMetaData(Set<String> filterDocumentSet) {
+    void filterDocumentMetaData(Set<String> filterDocumentSet) {
 
         List<DocumentHashToken> caseDocumentList = caseDocumentsMetadata.getDocumentHashToken().stream()
                                                                         .filter(document -> filterDocumentSet.contains(document.getId()))

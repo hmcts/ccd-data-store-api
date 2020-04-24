@@ -127,8 +127,8 @@ public class GetCaseDocumentOperation {
 
     private Boolean isDocumentPresent(String documentId, JsonNode documentFieldsWithReadPermission) {
         for (JsonNode jsonNode : documentFieldsWithReadPermission) {
-            if (jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null
-                && jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE).asText().contains(documentId)
+            if ((jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE) != null
+                && jsonNode.get(DOCUMENT_CASE_FIELD_BINARY_ATTRIBUTE).asText().contains(documentId))
                 || (jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE) != null
                 && jsonNode.get(DOCUMENT_CASE_FIELD_URL_ATTRIBUTE).asText().contains(documentId))) {
                 return true;
@@ -137,31 +137,35 @@ public class GetCaseDocumentOperation {
         return false;
     }
 
-    private void extractDocumentFieldsFromCaseDefinition(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {
+     void extractDocumentFieldsFromCaseDefinition(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {
         if (complexCaseFieldList != null && !complexCaseFieldList.isEmpty()) {
             for (CaseField caseField : complexCaseFieldList) {
-                switch (caseField.getFieldType().getType()) {
-                    case DOCUMENT:
-                        documentCaseFields.add(caseField);
-                        break;
-                    case COMPLEX:
-                    case COLLECTION:
-                        if (caseField.getFieldType().getCollectionFieldType() != null) {
-                            if (caseField.getFieldType().getCollectionFieldType().getComplexFields() != null) {
-                                extractDocumentFieldsFromCaseDefinition(
-                                    caseField.getFieldType().getCollectionFieldType().getComplexFields(), documentCaseFields);
-                            }
-                            if (caseField.getFieldType().getCollectionFieldType().getCollectionFieldType() != null) {
-                                extractDocumentFieldsFromCaseDefinition(
-                                    caseField.getFieldType().getCollectionFieldType().getCollectionFieldType().getComplexFields(), documentCaseFields);
-                            }
-                        }
-                        extractDocumentFieldsFromCaseDefinition(caseField.getFieldType().getComplexFields(), documentCaseFields);
-                        break;
-                    default:
-                        break;
-                }
+                getDocumentFields(documentCaseFields, caseField);
             }
+        }
+    }
+
+    private void getDocumentFields(List<CaseField> documentCaseFields, CaseField caseField) {
+        switch (caseField.getFieldType().getType()) {
+            case DOCUMENT:
+                documentCaseFields.add(caseField);
+                break;
+            case COMPLEX:
+            case COLLECTION:
+                if (caseField.getFieldType().getCollectionFieldType() != null) {
+                    if (caseField.getFieldType().getCollectionFieldType().getComplexFields() != null) {
+                        extractDocumentFieldsFromCaseDefinition(
+                            caseField.getFieldType().getCollectionFieldType().getComplexFields(), documentCaseFields);
+                    }
+                    if (caseField.getFieldType().getCollectionFieldType().getCollectionFieldType() != null) {
+                        extractDocumentFieldsFromCaseDefinition(
+                            caseField.getFieldType().getCollectionFieldType().getCollectionFieldType().getComplexFields(), documentCaseFields);
+                    }
+                }
+                extractDocumentFieldsFromCaseDefinition(caseField.getFieldType().getComplexFields(), documentCaseFields);
+                break;
+            default:
+                break;
         }
     }
 

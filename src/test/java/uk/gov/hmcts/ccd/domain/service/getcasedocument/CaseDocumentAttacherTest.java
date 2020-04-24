@@ -227,7 +227,7 @@ public class CaseDocumentAttacherTest {
     }
 
     @Test
-    @DisplayName("should  filter the Case Document Meta Data while  2 documents with hashcode from request and  no response from callback ")
+    @DisplayName("should filter the Case Document Meta Data while  2 documents with hashcode from request and  no response from callback ")
     void shouldFilterCaseDocumentMetaData_With_Scenario_5() {
         prepareInputs();
         Map<String, String> afterCallBack = new HashMap<>();
@@ -243,9 +243,7 @@ public class CaseDocumentAttacherTest {
         List<DocumentHashToken> actual = caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
-            () -> assertEquals(actual, expected)
-
-                 );
+            () -> assertEquals(actual, expected));
     }
 
     @Test
@@ -314,7 +312,6 @@ public class CaseDocumentAttacherTest {
         assertAll(
             () -> assertEquals(output, expectedOutput));
     }
-
 
     @Test
     @DisplayName("should return empty document set in case of CaseDataContent is empty")
@@ -603,6 +600,90 @@ public class CaseDocumentAttacherTest {
 
         Assertions.assertThrows(ServiceException.class,
                                 () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
+    }
+
+    @Test
+    @DisplayName("should call caseDocumentAttachOperation and filter the documents for create case scenario without callback")
+    void shouldFilterCaseDocumentMetaDataCreateScenarioWithoutCallback() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setReference(1111122222333334L);
+        caseDetails.setCaseTypeId("BEFTA_CASETYPE_2");
+        caseDetails.setData(caseDetailsBefore);
+        prepareInputs();
+        List<DocumentHashToken> expected = Arrays.asList(
+            DocumentHashToken.builder().id("b6ee2bff-8244-431f-94ec-9d8ecace8dd6")
+                             .hashToken("4d49edc151423fb7b2e1f22d89a2d041b43").build(),
+            DocumentHashToken.builder().id("e16f2ae0-d6ce-4bd0-a652-47b3c4d86292")
+                             .hashToken("4d49edc151423fb7b2e1f22d87b2d041b34").build()
+                                                        );
+
+        caseDocumentAttacher.documentsBeforeCallback = Stream.of(new String[][] {
+            {"b6ee2bff-8244-431f-94ec-9d8ecace8dd6", "4d49edc151423fb7b2e1f22d89a2d041b43"},
+            {"e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", "4d49edc151423fb7b2e1f22d87b2d041b34"}
+        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
+        caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, null, "CREATE", false);
+        List<DocumentHashToken> actual = caseDocumentAttacher.caseDocumentsMetadata.getDocumentHashToken();
+
+        assertAll(
+            () -> assertEquals(expected, actual));
+    }
+
+    @Test
+    @DisplayName("should call caseDocumentAttachOperation and filter the documents for create case scenario with callback")
+    void shouldFilterCaseDocumentMetaDataCreateScenarioWithCallback() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setReference(1111122222333334L);
+        caseDetails.setCaseTypeId("BEFTA_CASETYPE_2");
+        caseDetails.setData(caseDetailsBefore);
+        prepareInputs();
+        List<DocumentHashToken> expected = Collections.singletonList(
+            DocumentHashToken.builder().id("e16f2ae0-d6ce-4bd0-a652-47b3c4d86292")
+                             .hashToken("4d49edc151423fb7b2e1f22d87b2d041b34").build()
+                                                        );
+
+        caseDocumentAttacher.documentsBeforeCallback = Stream.of(new String[][] {
+            {"b6ee2bff-8244-431f-94ec-9d8ecace8dd6", "4d49edc151423fb7b2e1f22d89a2d041b43"},
+            {"e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", "4d49edc151423fb7b2e1f22d87b2d041b34"}
+        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
+        caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, null, "CREATE", true);
+        List<DocumentHashToken> actual = caseDocumentAttacher.caseDocumentsMetadata.getDocumentHashToken();
+
+        assertAll(
+            () -> assertEquals(expected, actual));
+    }
+
+    @Test
+    @DisplayName("should call caseDocumentAttachOperation and filter the documents for UPDATE case scenario with callback")
+    void shouldFilterCaseDocumentMetaDataUpdateScenarioWithoutCallback() throws IOException {
+        caseDetailsBefore = buildCaseData("case-detail-before-update.json");
+        caseDataContent = buildCaseData("case-detail-after-update.json");
+        CaseDetails existingCaseDetails = new CaseDetails();
+        existingCaseDetails.setReference(1111122222333334L);
+        existingCaseDetails.setCaseTypeId("BEFTA_CASETYPE_2");
+        existingCaseDetails.setData(caseDetailsBefore);
+
+        CaseDetails caseUpdatePayload = new CaseDetails();
+        caseUpdatePayload.setReference(1111122222333334L);
+        caseUpdatePayload.setCaseTypeId("BEFTA_CASETYPE_2");
+        caseUpdatePayload.setData(caseDataContent);
+        prepareInputs();
+        List<DocumentHashToken> expected = Collections.singletonList(
+            DocumentHashToken.builder().id("8da17150-c001-47d7-bfeb-3dabed9e0976")
+                             .hashToken("41134reqrfadfed49edc151423fb7b2e1f22d87b2d041b34").build()
+                                                                    );
+
+        caseDocumentAttacher.documentsBeforeCallback = Stream.of(new String[][] {
+            {"b6ee2bff-8244-431f-94ec-9d8ecace8dd6", "4d49edc151423fb7b2e1f22d89a2d041b43"},
+            {"e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", "4d49edc151423fb7b2e1f22d87b2d041b34"}
+        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
+        caseDocumentAttacher.caseDocumentAttachOperation(caseUpdatePayload, existingCaseDetails, "UPDATE", true);
+        List<DocumentHashToken> actual = caseDocumentAttacher.caseDocumentsMetadata.getDocumentHashToken();
+
+        assertAll(
+            () -> assertEquals(expected, actual));
     }
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
