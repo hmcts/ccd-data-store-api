@@ -24,6 +24,8 @@ public interface CommonField extends CommonDCPModel {
 
     void setDisplayContext(String displayContext);
 
+    void setDisplayContextParameter(String displayContextParameter);
+
     Object getFormattedValue();
 
     void setFormattedValue(Object formattedValue);
