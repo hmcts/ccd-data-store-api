@@ -72,7 +72,8 @@ class CaseUpdateViewEventResourceTest {
         @Test
         @DisplayName("should copy case event trigger")
         void shouldCopyCaseDetails() {
-            final CaseUpdateViewEventResource caseUpdateViewEventResource = CaseUpdateViewEventResource.forCaseType(caseUpdateViewEvent, CASE_TYPE_ID, ignoreWarning);
+            final CaseUpdateViewEventResource caseUpdateViewEventResource =
+                CaseUpdateViewEventResource.forCaseType(caseUpdateViewEvent, CASE_TYPE_ID, ignoreWarning);
 
             assertAll(
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getId(), equalTo(ID)),
@@ -93,7 +94,8 @@ class CaseUpdateViewEventResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final CaseUpdateViewEventResource caseUpdateViewEventResource = CaseUpdateViewEventResource.forCaseType(caseUpdateViewEvent, CASE_TYPE_ID, ignoreWarning);
+            final CaseUpdateViewEventResource caseUpdateViewEventResource =
+                CaseUpdateViewEventResource.forCaseType(caseUpdateViewEvent, CASE_TYPE_ID, ignoreWarning);
 
             Optional<Link> self = caseUpdateViewEventResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelfForCase));
@@ -110,7 +112,8 @@ class CaseUpdateViewEventResourceTest {
         @Test
         @DisplayName("should copy case event trigger")
         void shouldCopyCaseDetails() {
-            final CaseUpdateViewEventResource caseUpdateViewEventResource = CaseUpdateViewEventResource.forCase(caseUpdateViewEvent, caseReference.toString(), ignoreWarning);
+            final CaseUpdateViewEventResource caseUpdateViewEventResource =
+                CaseUpdateViewEventResource.forCase(caseUpdateViewEvent, caseReference.toString(), ignoreWarning);
 
             assertAll(
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getId(), equalTo(ID)),
@@ -131,7 +134,8 @@ class CaseUpdateViewEventResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final CaseUpdateViewEventResource caseUpdateViewEventResource = CaseUpdateViewEventResource.forCase(caseUpdateViewEvent, caseReference.toString(), ignoreWarning);
+            final CaseUpdateViewEventResource caseUpdateViewEventResource =
+                CaseUpdateViewEventResource.forCase(caseUpdateViewEvent, caseReference.toString(), ignoreWarning);
 
             Optional<Link> self = caseUpdateViewEventResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelfForEvent));
@@ -148,7 +152,8 @@ class CaseUpdateViewEventResourceTest {
         @Test
         @DisplayName("should copy case event trigger")
         void shouldCopyCaseDetails() {
-            final CaseUpdateViewEventResource caseUpdateViewEventResource = CaseUpdateViewEventResource.forDraft(caseUpdateViewEvent, draftReference, ignoreWarning);
+            final CaseUpdateViewEventResource caseUpdateViewEventResource =
+                CaseUpdateViewEventResource.forDraft(caseUpdateViewEvent, draftReference, ignoreWarning);
 
             assertAll(
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getId(), equalTo(ID)),
@@ -169,7 +174,8 @@ class CaseUpdateViewEventResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final CaseUpdateViewEventResource caseUpdateViewEventResource = CaseUpdateViewEventResource.forDraft(caseUpdateViewEvent, draftReference, ignoreWarning);
+            final CaseUpdateViewEventResource caseUpdateViewEventResource =
+                CaseUpdateViewEventResource.forDraft(caseUpdateViewEvent, draftReference, ignoreWarning);
 
             Optional<Link> self = caseUpdateViewEventResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelfForEvent));
