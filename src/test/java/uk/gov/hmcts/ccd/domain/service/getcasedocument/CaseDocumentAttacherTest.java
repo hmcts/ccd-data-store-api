@@ -313,7 +313,6 @@ public class CaseDocumentAttacherTest {
             () -> assertEquals(output, expectedOutput));
     }
 
-
     @Test
     @DisplayName("should return empty document set in case of CaseDataContent is empty")
     void shouldReturnEmptyDocumentSet() {
