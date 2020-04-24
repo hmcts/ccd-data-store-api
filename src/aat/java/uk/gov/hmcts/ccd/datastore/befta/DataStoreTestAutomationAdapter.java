@@ -13,8 +13,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public void doLoadTestData() {
-//        loader.addCcdRoles();
-//        loader.importDefinitions();
+        loader.addCcdRoles();
+        loader.importDefinitions();
     }
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
