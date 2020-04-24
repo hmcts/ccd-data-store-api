@@ -34,20 +34,31 @@ public class SwaggerGeneratorTest {
         this.mvc = webAppContextSetup(webAppContext).build();
     }
 
-    @DisplayName("Generate swagger documentation")
+    @DisplayName("Generate swagger documentation for v1 APIs")
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-    void generateDocs() throws Exception {
-        ResultActions perform = mvc.perform(get("/v2/api-docs"));
+    void generateV1SpecsDocument() throws Exception {
+        generateSpecsFor("v1");
+    }
+
+    @DisplayName("Generate swagger documentation for v2 APIs")
+    @Test
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+    void generateV2SpecsDocument() throws Exception {
+        generateSpecsFor("v2");
+    }
+
+    private void generateSpecsFor(String groupName) throws Exception {
+        ResultActions perform = mvc.perform(get("/v2/api-docs?group=" + groupName));
         byte[] specs = perform
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
             .getContentAsByteArray();
 
-        try (OutputStream outputStream = Files.newOutputStream(Paths.get("/tmp/swagger-specs.json"))) {
+        try (OutputStream outputStream = Files
+                .newOutputStream(Paths.get("/tmp/ccd-data-store-api." + groupName + ".json"))) {
             outputStream.write(specs);
         }
-
     }
 }
