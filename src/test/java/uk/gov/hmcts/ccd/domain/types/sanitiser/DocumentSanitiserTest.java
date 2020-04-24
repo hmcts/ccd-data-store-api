@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
@@ -39,7 +39,7 @@ class DocumentSanitiserTest {
     private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
 
     private static final String TYPE_DOCUMENT = "Document";
-    private static final FieldType DOCUMENT_FIELD_TYPE = new FieldType();
+    private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = new FieldTypeDefinition();
     private static final String DOCUMENT_FIELD_ID = "D8Document";
     private static final CaseFieldDefinition DOCUMENT_FIELD = new CaseFieldDefinition();
     private static final ObjectNode DOCUMENT_VALUE_INITIAL = JSON_FACTORY.objectNode();
@@ -52,7 +52,7 @@ class DocumentSanitiserTest {
         DOCUMENT_FIELD_TYPE.setId(TYPE_DOCUMENT);
         DOCUMENT_FIELD_TYPE.setType(TYPE_DOCUMENT);
         DOCUMENT_FIELD.setId(DOCUMENT_FIELD_ID);
-        DOCUMENT_FIELD.setFieldType(DOCUMENT_FIELD_TYPE);
+        DOCUMENT_FIELD.setFieldTypeDefinition(DOCUMENT_FIELD_TYPE);
 
         CASE_TYPE.setCaseFieldDefinitions(Collections.singletonList(DOCUMENT_FIELD));
     }
@@ -97,7 +97,7 @@ class DocumentSanitiserTest {
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValue);
 
         assertAll(
-            () -> verify(documentManagementRestClient, never()).getDocument(any(FieldType.class), anyString()),
+            () -> verify(documentManagementRestClient, never()).getDocument(any(FieldTypeDefinition.class), anyString()),
             () -> assertThat(sanitisedDocument, is(documentValue))
         );
     }

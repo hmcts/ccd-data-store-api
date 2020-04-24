@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
@@ -33,7 +33,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     private final Map<String, List<CaseTypeDefinition>> caseTypesForJurisdictions = newHashMap();
     private final Map<String, CaseTypeDefinitionVersion> versions = newHashMap();
     private final Map<String, UserRole> userRoleClassifications = newHashMap();
-    private final Map<String, List<FieldType>> baseTypes = newHashMap();
+    private final Map<String, List<FieldTypeDefinition>> baseTypes = newHashMap();
 
     @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository) {
@@ -92,7 +92,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public List<FieldType> getBaseTypes() {
+    public List<FieldTypeDefinition> getBaseTypes() {
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }
 

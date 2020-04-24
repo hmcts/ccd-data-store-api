@@ -4,18 +4,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public interface CommonField {
 
-    FieldType getFieldType();
+    FieldTypeDefinition getFieldTypeDefinition();
 
     String getId();
 
@@ -31,12 +31,12 @@ public interface CommonField {
 
     @JsonIgnore
     default boolean isCollectionFieldType() {
-        return FieldType.COLLECTION.equalsIgnoreCase(getFieldType().getType());
+        return FieldTypeDefinition.COLLECTION.equalsIgnoreCase(getFieldTypeDefinition().getType());
     }
 
     @JsonIgnore
     default boolean isComplexFieldType() {
-        return COMPLEX.equalsIgnoreCase(getFieldType().getType());
+        return COMPLEX.equalsIgnoreCase(getFieldTypeDefinition().getType());
     }
 
     @JsonIgnore
@@ -55,12 +55,12 @@ public interface CommonField {
         if (StringUtils.isBlank(path)) {
             return Optional.of(this);
         }
-        if (this.getFieldType().getChildren().isEmpty()) {
+        if (this.getFieldTypeDefinition().getChildren().isEmpty()) {
             return Optional.empty();
         }
         List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(toList());
 
-        return reduce(this.getFieldType().getChildren(), pathElements);
+        return reduce(this.getFieldTypeDefinition().getChildren(), pathElements);
     }
 
     @JsonIgnore
@@ -74,7 +74,7 @@ public interface CommonField {
             if (pathElements.size() == 1) {
                 return Optional.of(caseField);
             } else {
-                List<CaseFieldDefinition> newCaseFieldDefinitions = caseField.getFieldType().getChildren();
+                List<CaseFieldDefinition> newCaseFieldDefinitions = caseField.getFieldTypeDefinition().getChildren();
                 List<String> tail = pathElements.subList(1, pathElements.size());
 
                 return reduce(newCaseFieldDefinitions, tail);

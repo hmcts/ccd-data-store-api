@@ -88,7 +88,7 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
 
         final Field field = new Field();
         field.setId(in.getCaseFieldId());
-        field.setType(caseFieldDefinitionByPath.getFieldType());
+        field.setType(caseFieldDefinitionByPath.getFieldTypeDefinition());
         field.setElementPath(in.getCaseFieldPath());
         field.setMetadata(caseFieldDefinitionByPath.isMetadata());
         field.setShowCondition(in.getShowCondition());

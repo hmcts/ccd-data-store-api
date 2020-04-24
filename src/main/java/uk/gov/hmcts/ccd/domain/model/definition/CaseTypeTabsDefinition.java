@@ -41,7 +41,7 @@ public class CaseTypeTabsDefinition implements Serializable {
         return this.tabs.stream()
                         .flatMap(tab -> tab.getTabFields().stream())
                         .anyMatch(field -> field.getCaseFieldDefinition()
-                                                .getFieldType()
+                                                .getFieldTypeDefinition()
                                                 .getType()
                                                 .equals(tabFieldType));
     }

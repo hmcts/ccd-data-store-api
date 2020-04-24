@@ -40,7 +40,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -200,9 +200,9 @@ class AuthorisedCaseSearchOperationTest {
         @DisplayName("should transform alias field for a collection field in source filter ")
         void shouldTransformAliasFieldForCollection() {
             CaseFieldDefinition collectionField = new CaseFieldDefinition();
-            FieldType fieldType = new FieldType();
-            fieldType.setType(FieldType.COLLECTION);
-            collectionField.setFieldType(fieldType);
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setType(FieldTypeDefinition.COLLECTION);
+            collectionField.setFieldTypeDefinition(fieldTypeDefinition);
             collectionField.setId("collectionField");
             caseTypeDefinition.getCaseFieldDefinitions().add(collectionField);
 

@@ -9,8 +9,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -32,7 +32,7 @@ class DateValidatorTest {
     private static final String FIELD_ID = "TEST_FIELD_ID";
 
     @Mock
-    private FieldType dateFieldType;
+    private FieldTypeDefinition dateFieldTypeDefinition;
 
     @Mock
     private CaseDefinitionRepository definitionRepository;
@@ -48,9 +48,9 @@ class DateValidatorTest {
         BaseType.setCaseDefinitionRepository(definitionRepository);
         BaseType.initialise();
 
-        when(dateFieldType.getType()).thenReturn(DateValidator.TYPE_ID);
-        when(dateFieldType.getRegularExpression()).thenReturn(DATE_REGEX);
-        BaseType.register(new BaseType(dateFieldType));
+        when(dateFieldTypeDefinition.getType()).thenReturn(DateValidator.TYPE_ID);
+        when(dateFieldTypeDefinition.getRegularExpression()).thenReturn(DATE_REGEX);
+        BaseType.register(new BaseType(dateFieldTypeDefinition));
 
         validator = new DateValidator();
 
@@ -262,8 +262,8 @@ class DateValidatorTest {
 
     @Test
     void invalidBaseTypeRegEx() {
-        when(dateFieldType.getRegularExpression()).thenReturn("InvalidRegEx");
-        BaseType.register(new BaseType(dateFieldType));
+        when(dateFieldTypeDefinition.getRegularExpression()).thenReturn("InvalidRegEx");
+        BaseType.register(new BaseType(dateFieldTypeDefinition));
 
         final CaseFieldDefinition caseFieldDefinition = caseField().build();
         final List<ValidationResult> result = validator.validate(FIELD_ID,
@@ -294,7 +294,7 @@ class DateValidatorTest {
         }
     }
 
-    private CaseFieldBuilder caseField() {
-        return new CaseFieldBuilder(FIELD_ID).withType(DateValidator.TYPE_ID);
+    private CaseFieldDefinitionBuilder caseField() {
+        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(DateValidator.TYPE_ID);
     }
 }

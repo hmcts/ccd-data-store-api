@@ -31,13 +31,13 @@ public class CompoundFieldOrderService {
 
     public void sortNestedFieldsFromCaseEventComplexFields(final CaseFieldDefinition caseFieldDefinition, final List<CaseEventFieldComplexDefinition> caseEventComplexFields, final String listElementCode) {
         if (CollectionUtils.isNotEmpty(caseEventComplexFields) && caseFieldDefinition.isCompoundFieldType()) {
-            List<CaseFieldDefinition> children = caseFieldDefinition.getFieldType().getChildren();
+            List<CaseFieldDefinition> children = caseFieldDefinition.getFieldTypeDefinition().getChildren();
             children.forEach(childField -> {
                 String newListElementCode = isBlank(listElementCode) ? childField.getId() : listElementCode + "." + childField.getId();
                 sortNestedFieldsFromCaseEventComplexFields(childField, getNestedComplexFields(caseEventComplexFields, newListElementCode), newListElementCode);
             });
             List<CaseFieldDefinition> sortedFields = getSortedCompoundTypeFields(caseEventComplexFields, children, listElementCode);
-            caseFieldDefinition.getFieldType().setChildren(sortedFields);
+            caseFieldDefinition.getFieldTypeDefinition().setChildren(sortedFields);
         }
     }
 

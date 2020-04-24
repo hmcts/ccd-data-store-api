@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -108,10 +108,10 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     @Test(expected = ResourceNotFoundException.class)
     public void shouldReturnFieldTypeListWhenGetBaseTypesIsCalled() {
-        FieldType[] fieldTypeArr = {new FieldType(), new FieldType()};
-        doReturn(fieldTypeArr).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
-        List<FieldType> fieldTypes = caseDefinitionRepository.getBaseTypes();
-        assertEquals(2, fieldTypes.size());
+        FieldTypeDefinition[] fieldTypeDefinitionArr = {new FieldTypeDefinition(), new FieldTypeDefinition()};
+        doReturn(fieldTypeDefinitionArr).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
+        List<FieldTypeDefinition> fieldTypeDefinitions = caseDefinitionRepository.getBaseTypes();
+        assertEquals(2, fieldTypeDefinitions.size());
     }
 
     @Test

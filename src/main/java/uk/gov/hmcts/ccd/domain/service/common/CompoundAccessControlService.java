@@ -66,7 +66,7 @@ public class CompoundAccessControlService {
     private boolean isCreateDeniedForAnyChildNode(final CaseFieldDefinition caseFieldDefinition, final Set<String> userRoles, final JsonNode node) {
         boolean createDeniedForAnyChild = false;
         if (caseFieldDefinition.isCollectionFieldType()) {
-            for (CaseFieldDefinition field : caseFieldDefinition.getFieldType().getCollectionFieldType().getComplexFields()) {
+            for (CaseFieldDefinition field : caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields()) {
                 if (field.isCompoundFieldType() && node.get(VALUE) != null && node.get(VALUE).get(field.getId()) != null
                     && isCreateDenied(node.get(VALUE).get(field.getId()), field, userRoles)) {
                     LOG.info("Child {} of {} has new data and no create access", field.getId(), caseFieldDefinition.getId());
@@ -75,7 +75,7 @@ public class CompoundAccessControlService {
                 }
             }
         } else { //caseField is Complex
-            for (CaseFieldDefinition field : caseFieldDefinition.getFieldType().getComplexFields()) {
+            for (CaseFieldDefinition field : caseFieldDefinition.getFieldTypeDefinition().getComplexFields()) {
                 if (field.isCompoundFieldType() && node.get(field.getId()) != null && isCreateDenied(node.get(field.getId()), field, userRoles)) {
                     LOG.info("Child {} has new data and no create access", field.getId());
                     createDeniedForAnyChild = true;
@@ -116,7 +116,7 @@ public class CompoundAccessControlService {
     private boolean isAnyChildOfComplexNodeDeletedWithoutAccess(final JsonNode existingData, final JsonNode newData, final CaseFieldDefinition caseFieldDefinition, final Set<String> userRoles) {
         boolean deleteDeniedForAnyChildNode = false;
         if (existingData.isObject() && existingData.size() > 0 && newData != null && newData.isObject() && newData.size() > 0) {
-            for (CaseFieldDefinition field : caseFieldDefinition.getFieldType().getComplexFields()) {
+            for (CaseFieldDefinition field : caseFieldDefinition.getFieldTypeDefinition().getComplexFields()) {
                 if (field.isCompoundFieldType() && existingData.get(field.getId()) != null && newData.get(field.getId()) != null
                     && isDeleteDeniedForChildren(existingData.get(field.getId()), newData.get(field.getId()), field, userRoles)) {
                     deleteDeniedForAnyChildNode = true;
@@ -133,7 +133,7 @@ public class CompoundAccessControlService {
         Optional<JsonNode> correspondingNewNode = findCorrespondingNode(newData, existingNode.get("id"));
         if (correspondingNewNode.isPresent()) {
             JsonNode newNode = correspondingNewNode.get();
-            for (CaseFieldDefinition field : caseFieldDefinition.getFieldType().getCollectionFieldType().getComplexFields()) {
+            for (CaseFieldDefinition field : caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields()) {
                 if (field.isCompoundFieldType() && existingNode.get(VALUE) != null && existingNode.get(VALUE).get(field.getId()) != null
                     && isDeleteDeniedForChildren(existingNode.get(VALUE).get(field.getId()), newNode.get(VALUE).get(field.getId()), field, userRoles)) {
                     currentNodeOrAnyChildNodeDeletedWithoutAccess = true;
@@ -203,7 +203,7 @@ public class CompoundAccessControlService {
 
     private boolean checkCollectionNodesForUpdate(final CaseFieldDefinition caseFieldDefinition, final JsonNode oldNode, final JsonNode newNode, Set<String> userRoles) {
         boolean udateDenied = false;
-        for (CaseFieldDefinition field : caseFieldDefinition.getFieldType().getCollectionFieldType().getComplexFields()) {
+        for (CaseFieldDefinition field : caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields()) {
             if (!field.isCompoundFieldType() && oldNode.get(VALUE).get(field.getId()) != null
                 && !oldNode.get(VALUE).get(field.getId()).equals(newNode.get(VALUE).get(field.getId()))
                 && !hasAccessControlList(userRoles, CAN_UPDATE, field.getAccessControlLists())) {
@@ -223,7 +223,7 @@ public class CompoundAccessControlService {
 
     private boolean checkComplexNodesForUpdate(final CaseFieldDefinition caseFieldDefinition, final JsonNode oldNode, final JsonNode newNode, Set<String> userRoles) {
         boolean updateDenied = false;
-        for (CaseFieldDefinition field : caseFieldDefinition.getFieldType().getComplexFields()) {
+        for (CaseFieldDefinition field : caseFieldDefinition.getFieldTypeDefinition().getComplexFields()) {
             if (!field.isCompoundFieldType()
                 && isSimpleFieldValueReallyUpdated(oldNode, newNode, field)
                 && !hasAccessControlList(userRoles, CAN_UPDATE, field.getAccessControlLists())) {

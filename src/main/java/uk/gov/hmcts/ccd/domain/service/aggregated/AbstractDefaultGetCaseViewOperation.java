@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
 public abstract class AbstractDefaultGetCaseViewOperation {
 
@@ -103,7 +103,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
 
     protected void hydrateHistoryField(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, List<CaseViewEvent> events) {
         for (CaseFieldDefinition caseFieldDefinition : caseTypeDefinition.getCaseFieldDefinitions()) {
-            if (caseFieldDefinition.getFieldType().getType().equals(CASE_HISTORY_VIEWER)) {
+            if (caseFieldDefinition.getFieldTypeDefinition().getType().equals(CASE_HISTORY_VIEWER)) {
                 JsonNode eventsNode = objectMapperService.convertObjectToJsonNode(events);
                 caseDetails.getData().put(caseFieldDefinition.getId(), eventsNode);
                 return;

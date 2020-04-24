@@ -8,20 +8,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class JurisdictionConfigViewResource extends RepresentationModel {
 
-    private List<JurisdictionUiConfig> configs;
+    private List<JurisdictionUiConfigDefinition> configs;
 
-    public JurisdictionConfigViewResource(@NonNull List<JurisdictionUiConfig> listOfConfigs) {
+    public JurisdictionConfigViewResource(@NonNull List<JurisdictionUiConfigDefinition> listOfConfigs) {
         copyProperties(listOfConfigs);
     }
 
-    private void copyProperties(List<JurisdictionUiConfig> listOfConfigs) {
+    private void copyProperties(List<JurisdictionUiConfigDefinition> listOfConfigs) {
         this.configs = listOfConfigs;
     }
 }

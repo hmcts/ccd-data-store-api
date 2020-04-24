@@ -11,11 +11,11 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "")
 public class JurisdictionUiConfigResult implements Serializable {
 
-	private List<JurisdictionUiConfig> configs;
+	private List<JurisdictionUiConfigDefinition> configs;
 
 	public JurisdictionUiConfigResult() { }
 
-	public JurisdictionUiConfigResult(List<JurisdictionUiConfig> configs) {
+	public JurisdictionUiConfigResult(List<JurisdictionUiConfigDefinition> configs) {
 		this.configs = configs;
 	}
 
@@ -23,11 +23,11 @@ public class JurisdictionUiConfigResult implements Serializable {
 	 **/
 	@ApiModelProperty(value = "")
 	@JsonProperty("configs")
-	public List<JurisdictionUiConfig> getConfigs() {
+	public List<JurisdictionUiConfigDefinition> getConfigs() {
 		return configs;
 	}
 
-	public void setConfigs(List<JurisdictionUiConfig> configs) {
+	public void setConfigs(List<JurisdictionUiConfigDefinition> configs) {
 		this.configs = configs;
 	}
 

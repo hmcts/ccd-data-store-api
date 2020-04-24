@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 
 @DisplayName("UIJurisdictionConfigResource")
 class JurisdictionConfigViewResourceTest {
@@ -34,7 +34,7 @@ class JurisdictionConfigViewResourceTest {
     @Test
     @DisplayName("should copy empty jurisdiction UI configs")
     void shouldCopyEmptyJurisdictionUIConfigList() {
-        List<JurisdictionUiConfig> emptyList = Lists.emptyList();
+        List<JurisdictionUiConfigDefinition> emptyList = Lists.emptyList();
         final JurisdictionConfigViewResource resource = new JurisdictionConfigViewResource(emptyList);
         assertAll(
             () -> assertThat(resource.getConfigs(), sameInstance(emptyList))
@@ -44,7 +44,7 @@ class JurisdictionConfigViewResourceTest {
     @Test
     @DisplayName("should copy jurisdiction UI config list")
     void shouldCopyJurisdictionUIConfigList() {
-        List<JurisdictionUiConfig> newArrayList = Lists.newArrayList(new JurisdictionUiConfig(), new JurisdictionUiConfig());
+        List<JurisdictionUiConfigDefinition> newArrayList = Lists.newArrayList(new JurisdictionUiConfigDefinition(), new JurisdictionUiConfigDefinition());
         final JurisdictionConfigViewResource resource = new JurisdictionConfigViewResource(newArrayList);
         assertAll(
             () -> assertThat(resource.getConfigs(), sameInstance(newArrayList))

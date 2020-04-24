@@ -11,7 +11,7 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 
-public class FieldType implements Serializable {
+public class FieldTypeDefinition implements Serializable {
 
     public static final String COLLECTION = "Collection";
     public static final String COMPLEX = "Complex";
@@ -34,11 +34,11 @@ public class FieldType implements Serializable {
     @JsonProperty("regular_expression")
     private String regularExpression = null;
     @JsonProperty("fixed_list_items")
-    private List<FixedListItem> fixedListItems = new ArrayList<>();
+    private List<FixedListItemDefinition> fixedListItemDefinitions = new ArrayList<>();
     @JsonProperty("complex_fields")
     private List<CaseFieldDefinition> complexFields = new ArrayList<>();
     @JsonProperty("collection_field_type")
-    private FieldType collectionFieldType = null;
+    private FieldTypeDefinition collectionFieldTypeDefinition = null;
 
     public String getType() {
         return type;
@@ -72,12 +72,12 @@ public class FieldType implements Serializable {
         this.regularExpression = regularExpression;
     }
 
-    public List<FixedListItem> getFixedListItems() {
-        return fixedListItems;
+    public List<FixedListItemDefinition> getFixedListItemDefinitions() {
+        return fixedListItemDefinitions;
     }
 
-    public void setFixedListItems(List<FixedListItem> fixedListItems) {
-        this.fixedListItems = fixedListItems;
+    public void setFixedListItemDefinitions(List<FixedListItemDefinition> fixedListItemDefinitions) {
+        this.fixedListItemDefinitions = fixedListItemDefinitions;
     }
 
     public List<CaseFieldDefinition> getComplexFields() {
@@ -93,10 +93,10 @@ public class FieldType implements Serializable {
         if (type.equalsIgnoreCase(COMPLEX)) {
             return complexFields;
         } else if (type.equalsIgnoreCase(COLLECTION)) {
-            if (collectionFieldType == null) {
+            if (collectionFieldTypeDefinition == null) {
                 return emptyList();
             }
-            return collectionFieldType.complexFields;
+            return collectionFieldTypeDefinition.complexFields;
         } else {
             return emptyList();
         }
@@ -106,8 +106,8 @@ public class FieldType implements Serializable {
     public void setChildren(List<CaseFieldDefinition> caseFieldDefinitions) {
         if (type.equalsIgnoreCase(COMPLEX)) {
             complexFields = caseFieldDefinitions;
-        } else if (type.equalsIgnoreCase(COLLECTION) && collectionFieldType != null) {
-            collectionFieldType.complexFields = caseFieldDefinitions;
+        } else if (type.equalsIgnoreCase(COLLECTION) && collectionFieldTypeDefinition != null) {
+            collectionFieldTypeDefinition.complexFields = caseFieldDefinitions;
         }
     }
 
@@ -119,12 +119,12 @@ public class FieldType implements Serializable {
         this.id = id;
     }
 
-    public FieldType getCollectionFieldType() {
-        return collectionFieldType;
+    public FieldTypeDefinition getCollectionFieldTypeDefinition() {
+        return collectionFieldTypeDefinition;
     }
 
-    public void setCollectionFieldType(FieldType collectionFieldType) {
-        this.collectionFieldType = collectionFieldType;
+    public void setCollectionFieldTypeDefinition(FieldTypeDefinition collectionFieldTypeDefinition) {
+        this.collectionFieldTypeDefinition = collectionFieldTypeDefinition;
     }
 
     @Override

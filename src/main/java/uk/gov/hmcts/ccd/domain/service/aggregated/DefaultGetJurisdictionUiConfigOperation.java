@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 
 @Service
@@ -23,7 +23,7 @@ public class DefaultGetJurisdictionUiConfigOperation implements GetJurisdictionU
     }
 
     @Override
-    public List<JurisdictionUiConfig> execute(List<String> jurisdictionReferences) {
+    public List<JurisdictionUiConfigDefinition> execute(List<String> jurisdictionReferences) {
     	JurisdictionUiConfigResult jurisdictionUiConfigResult = repository.getJurisdictionUiConfigs(jurisdictionReferences);
         return jurisdictionUiConfigResult.getConfigs();
     }

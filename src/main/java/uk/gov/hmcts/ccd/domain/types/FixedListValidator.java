@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,7 +30,7 @@ public class FixedListValidator implements BaseTypeValidator {
         }
 
         final String value = dataValue.textValue();
-        final List<FixedListItem> validValues = caseFieldDefinition.getFieldType().getFixedListItems();
+        final List<FixedListItemDefinition> validValues = caseFieldDefinition.getFieldTypeDefinition().getFixedListItemDefinitions();
 
         if (!checkRegex(getType().getRegularExpression(), value)) {
             return Collections.singletonList(new ValidationResult("'" + value + "' failed FixedList Type Regex check: "
@@ -45,7 +45,7 @@ public class FixedListValidator implements BaseTypeValidator {
     private List<ValidationResult> typeChecks(final String dataFieldId,
                                               final String value,
                                               final CaseFieldDefinition caseFieldDefinition) {
-        if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), value)) {
+        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
         return Collections.emptyList();

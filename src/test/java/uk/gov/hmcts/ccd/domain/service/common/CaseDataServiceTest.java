@@ -12,7 +12,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 class CaseDataServiceTest {
     private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
@@ -45,7 +45,7 @@ class CaseDataServiceTest {
     }
 
     private void setCaseTypeDefinition(SecurityClassification securityClassification) {
-        final FieldType textFieldType = aFieldType().withType("Text")
+        final FieldTypeDefinition textFieldTypeDefinition = aFieldType().withType("Text")
                                            .build();
 
         CaseFieldDefinition postalAddress = newCaseField()
@@ -55,27 +55,27 @@ class CaseDataServiceTest {
                                .withType("Complex")
                                .withComplexField(newCaseField()
                                                      .withId("AddressLine1")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(securityClassification.name())
                                                      .build())
                                .withComplexField(newCaseField()
                                                      .withId("AddressLine2")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(securityClassification.name())
                                                      .build())
                                .withComplexField(newCaseField()
                                                      .withId("AddressLine3")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(securityClassification.name())
                                                      .build())
                                .withComplexField(newCaseField()
                                                      .withId("Country")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(PRIVATE.name())
                                                      .build())
                                .withComplexField(newCaseField()
                                                      .withId("PostCode")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(RESTRICTED.name())
                                                      .build())
                                .withComplexField(newCaseField()
@@ -86,7 +86,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "Title")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                      textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   PUBLIC.name())
                                                                                               .build())
@@ -94,7 +94,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "FirstName")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                      textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   PUBLIC.name())
                                                                                               .build())
@@ -102,7 +102,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "MiddleName")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                      textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   PRIVATE.name())
                                                                                               .build())
@@ -110,7 +110,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "LastName")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                      textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   PRIVATE.name())
                                                                                               .build())
@@ -129,7 +129,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "NationalInsuranceNumber")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                      textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   RESTRICTED.name())
                                                                                               .build())
@@ -172,7 +172,7 @@ class CaseDataServiceTest {
                                    .withType("Complex")
                                    .withComplexField(newCaseField()
                                                          .withId("Name")
-                                                         .withFieldType(textFieldType)
+                                                         .withFieldType(textFieldTypeDefinition)
                                                          .withSC(PRIVATE.name())
                                                          .build())
                                    .withComplexField(postalAddress)
@@ -182,13 +182,13 @@ class CaseDataServiceTest {
             )
             .withField(newCaseField()
                            .withId("OtherInfo")
-                           .withFieldType(textFieldType)
+                           .withFieldType(textFieldTypeDefinition)
                            .withSC(PRIVATE.name())
                            .build())
             .withField(newCaseField().withId("simple_collection")
                                    .withSC("PUBLIC")
                                    .withFieldType(aFieldType().withType(COLLECTION)
-                                                              .withCollectionFieldType(textFieldType)
+                                                              .withCollectionFieldType(textFieldTypeDefinition)
                                                               .build()
                                    )
                                    .build()

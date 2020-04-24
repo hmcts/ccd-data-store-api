@@ -124,10 +124,10 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
         assertEquals("Unexpected Case Fields", 2, caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().size());
 
         final CaseViewField children = caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().get(1);
-        assertThat(children.getFieldType().getType(), equalTo("Collection"));
+        assertThat(children.getFieldTypeDefinition().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
 
-        final CaseFieldDefinition hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        final CaseFieldDefinition hobby = children.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
     }
@@ -153,10 +153,10 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
         assertEquals("Unexpected Case Fields", 2, caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().size());
 
         final CaseViewField children = caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().get(1);
-        assertThat(children.getFieldType().getType(), equalTo("Collection"));
+        assertThat(children.getFieldTypeDefinition().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
 
-        final CaseFieldDefinition hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        final CaseFieldDefinition hobby = children.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
 
@@ -189,10 +189,10 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
         assertEquals("Unexpected Case Fields", 2, caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().size());
 
         final CaseViewField children = caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().get(1);
-        assertThat(children.getFieldType().getType(), equalTo("Collection"));
+        assertThat(children.getFieldTypeDefinition().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
 
-        final CaseFieldDefinition hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        final CaseFieldDefinition hobby = children.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
     }
@@ -218,10 +218,10 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
         assertEquals("Unexpected Case Fields", 2, caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().size());
 
         final CaseViewField children = caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().get(1);
-        assertThat(children.getFieldType().getType(), equalTo("Collection"));
+        assertThat(children.getFieldTypeDefinition().getType(), equalTo("Collection"));
         assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
 
-        final CaseFieldDefinition hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        final CaseFieldDefinition hobby = children.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
     }

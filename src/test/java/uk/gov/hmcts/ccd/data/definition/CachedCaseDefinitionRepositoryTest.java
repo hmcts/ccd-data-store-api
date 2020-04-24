@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 class CachedCaseDefinitionRepositoryTest {
@@ -91,10 +91,10 @@ class CachedCaseDefinitionRepositoryTest {
         @Test
         @DisplayName("should initially retrieve base types from decorated repository")
         void shouldRetrieveBaseTypesFromDecorated() {
-            final List<FieldType> expectedBaseTypes = newArrayList(new FieldType(), new FieldType());
+            final List<FieldTypeDefinition> expectedBaseTypes = newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition());
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getBaseTypes();
 
-            final List<FieldType> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();
+            final List<FieldTypeDefinition> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();
 
             assertAll(
                 () -> assertThat(baseTypes, is(expectedBaseTypes)),
@@ -105,16 +105,16 @@ class CachedCaseDefinitionRepositoryTest {
         @Test
         @DisplayName("should cache base types for subsequent calls")
         void shouldCacheBaseTypesForSubsequentCalls() {
-            final List<FieldType> expectedBaseTypes = newArrayList(new FieldType(), new FieldType());
+            final List<FieldTypeDefinition> expectedBaseTypes = newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition());
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getBaseTypes();
 
             cachedCaseDefinitionRepository.getBaseTypes();
 
             verify(caseDefinitionRepository, times(1)).getBaseTypes();
 
-            doReturn(newArrayList(new FieldType(), new FieldType())).when(caseDefinitionRepository).getBaseTypes();
+            doReturn(newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition())).when(caseDefinitionRepository).getBaseTypes();
 
-            final List<FieldType> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();
+            final List<FieldTypeDefinition> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();
 
             assertAll(
                 () -> assertThat(baseTypes, is(expectedBaseTypes)),

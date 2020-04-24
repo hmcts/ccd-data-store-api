@@ -19,8 +19,8 @@ import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinitionTest.findNestedField;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -44,7 +44,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.io.IOException;
@@ -3360,14 +3360,14 @@ public class AccessControlServiceTest {
                     .withCreate(true)
                     .build())
                 .build();
-            addressField.getFieldType().setCollectionFieldType(getSimpleAddressFieldType());
+            addressField.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getSimpleAddressFieldType());
 
             caseTypeDefinition = newCaseType()
                 .withField(addressField)
                 .build();
         }
 
-        private FieldType getSimpleAddressFieldType() {
+        private FieldTypeDefinition getSimpleAddressFieldType() {
             return aFieldType()
                 .withId("Address")
                 .withType(COMPLEX)
@@ -3600,11 +3600,11 @@ public class AccessControlServiceTest {
                 .withType(COLLECTION)
                 .build())
             .build();
-        caseFieldDefinition.getFieldType().setCollectionFieldType(getPersonFieldType());
+        caseFieldDefinition.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
         return caseFieldDefinition;
     }
 
-    static FieldType getPersonFieldType() {
+    static FieldTypeDefinition getPersonFieldType() {
         return aFieldType()
             .withId("Person")
             .withType(COMPLEX)
@@ -3636,7 +3636,7 @@ public class AccessControlServiceTest {
                 .withType(COLLECTION)
                 .build())
             .build();
-        caseFieldDefinition.getFieldType().setCollectionFieldType(getAddressFieldType());
+        caseFieldDefinition.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getAddressFieldType());
         return caseFieldDefinition;
     }
 
@@ -3668,7 +3668,7 @@ public class AccessControlServiceTest {
             .build();
     }
 
-    static FieldType getAddressFieldType() {
+    static FieldTypeDefinition getAddressFieldType() {
         return aFieldType()
             .withId("AddressComplexType")
             .withType(COMPLEX)
@@ -3686,7 +3686,7 @@ public class AccessControlServiceTest {
             .build();
     }
 
-    static FieldType getAddressDetailFieldType() {
+    static FieldTypeDefinition getAddressDetailFieldType() {
         return aFieldType()
             .withId("AddressDetailComplexType")
             .withType(COMPLEX)
@@ -3729,7 +3729,7 @@ public class AccessControlServiceTest {
                 .withType(COLLECTION)
                 .build())
             .build();
-        notes.getFieldType().setCollectionFieldType(aFieldType()
+        notes.getFieldTypeDefinition().setCollectionFieldTypeDefinition(aFieldType()
             .withId("Note")
             .withType(COMPLEX)
             .withComplexField(newCaseField()
@@ -3752,7 +3752,7 @@ public class AccessControlServiceTest {
                 .withType(COLLECTION)
                 .build())
             .build();
-        tagsField.getFieldType().setCollectionFieldType(aFieldType()
+        tagsField.getFieldTypeDefinition().setCollectionFieldTypeDefinition(aFieldType()
             .withId("TagComplex")
             .withType(COMPLEX)
             .withComplexField(newCaseField()

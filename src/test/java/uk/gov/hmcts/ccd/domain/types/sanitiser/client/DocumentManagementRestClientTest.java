@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document._links;
@@ -45,7 +45,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     private static final String FILENAME = "Seagulls_Sqaure.jpg";
     private static final String TYPE_DOCUMENT = "Document";
     private static final String DOCUMENT_FIELD_ID = "D8Document";
-    private static final FieldType DOCUMENT_FIELD_TYPE = new FieldType();
+    private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = new FieldTypeDefinition();
     private static final CaseFieldDefinition DOCUMENT_FIELD = new CaseFieldDefinition();
     private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
     private static final ObjectNode DOCUMENT_VALUE_INITIAL = JSON_FACTORY.objectNode();
@@ -66,7 +66,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         DOCUMENT_FIELD_TYPE.setId(TYPE_DOCUMENT);
         DOCUMENT_FIELD_TYPE.setType(TYPE_DOCUMENT);
         DOCUMENT_FIELD.setId(DOCUMENT_FIELD_ID);
-        DOCUMENT_FIELD.setFieldType(DOCUMENT_FIELD_TYPE);
+        DOCUMENT_FIELD.setFieldTypeDefinition(DOCUMENT_FIELD_TYPE);
 
         CASE_TYPE.setCaseFieldDefinitions(Collections.singletonList(DOCUMENT_FIELD));
         DOCUMENT_VALUE_INITIAL.put("document_url", DOCUMENT_URL);

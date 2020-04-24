@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 @Service
 public class CaseDataService {
@@ -53,7 +53,7 @@ public class CaseDataService {
             while (!found && cFIterator.hasNext()) {
                 CaseFieldDefinition caseFieldDefinition = cFIterator.next();
                 if (caseFieldDefinition.getId().equalsIgnoreCase(fieldName)) {
-                    final String caseFieldType = caseFieldDefinition.getFieldType().getType();
+                    final String caseFieldType = caseFieldDefinition.getFieldTypeDefinition().getType();
                     if (caseFieldType.equalsIgnoreCase(COMPLEX)) {
                         found = true;
                         deduceClassificationForComplexType(dataNode,
@@ -111,19 +111,19 @@ public class CaseDataService {
         final JsonNode fieldNode = dataNode.get(fieldName);
         if (null != fieldNode && fieldNode.isArray()) {
             ArrayNode arrayNode = (ArrayNode) fieldNode;
-            final FieldType collectionFieldType = caseFieldDefinition.getFieldType().getCollectionFieldType();
+            final FieldTypeDefinition collectionFieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition();
             for (JsonNode field : arrayNode) {
 
                 final JsonNode itemClassification = getExistingDataClassificationFromArrayOrEmpty(
                     existingDataClassificationNode,
                     field);
 
-                if (COMPLEX.equalsIgnoreCase(collectionFieldType.getType())) {
+                if (COMPLEX.equalsIgnoreCase(collectionFieldTypeDefinition.getType())) {
                     deduceDefaultClassifications(
                         field.get(VALUE),
                         // get value of the field with given ID
                         itemClassification,
-                        caseFieldDefinition.getFieldType().getCollectionFieldType().getComplexFields(),
+                        caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields(),
                         fieldIdPrefix + fieldName + FIELD_SEPARATOR);
                 } else {
                     final ObjectNode simpleCollectionItemNode = (ObjectNode) field;
@@ -149,7 +149,7 @@ public class CaseDataService {
         deduceDefaultClassifications(
             dataNode.get(fieldName),
             getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, VALUE),
-            caseFieldDefinition.getFieldType().getComplexFields(),
+            caseFieldDefinition.getFieldTypeDefinition().getComplexFields(),
             fieldIdPrefix + fieldName + FIELD_SEPARATOR);
         ObjectNode valueNode = JSON_NODE_FACTORY.objectNode();
         deduceClassificationForSimpleType(valueNode,

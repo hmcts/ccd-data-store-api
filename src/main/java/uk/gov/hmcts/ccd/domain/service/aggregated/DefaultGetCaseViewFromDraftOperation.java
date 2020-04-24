@@ -26,7 +26,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import java.util.ArrayList;
 
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEventBuilder.anCaseViewActionableEvent;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
 @Service
 @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER)

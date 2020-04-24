@@ -5,7 +5,7 @@ import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class CaseViewField implements CommonField {
     @JsonProperty("hint_text")
     private String hintText;
     @JsonProperty("field_type")
-    private FieldType fieldType;
+    private FieldTypeDefinition fieldTypeDefinition;
     private Boolean hidden;
     @JsonProperty("validation_expr")
     private String validationExpression;
@@ -69,12 +69,12 @@ public class CaseViewField implements CommonField {
         this.hintText = hintText;
     }
 
-    public FieldType getFieldType() {
-        return fieldType;
+    public FieldTypeDefinition getFieldTypeDefinition() {
+        return fieldTypeDefinition;
     }
 
-    public void setFieldType(FieldType fieldType) {
-        this.fieldType = fieldType;
+    public void setFieldTypeDefinition(FieldTypeDefinition fieldTypeDefinition) {
+        this.fieldTypeDefinition = fieldTypeDefinition;
     }
 
     public Boolean isHidden() {
@@ -185,11 +185,11 @@ public class CaseViewField implements CommonField {
         CaseViewField caseViewField = new CaseViewField();
         caseViewField.setId(caseFieldDefinition.getId());
         caseViewField.setLabel(caseFieldDefinition.getLabel());
-        caseViewField.setFieldType(caseFieldDefinition.getFieldType());
+        caseViewField.setFieldTypeDefinition(caseFieldDefinition.getFieldTypeDefinition());
         caseViewField.setHidden(caseFieldDefinition.getHidden());
         caseViewField.setHintText(caseFieldDefinition.getHintText());
         caseViewField.setSecurityLabel(caseFieldDefinition.getSecurityLabel());
-        caseViewField.setValidationExpression(caseFieldDefinition.getFieldType().getRegularExpression());
+        caseViewField.setValidationExpression(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression());
         caseViewField.setAccessControlLists(caseFieldDefinition.getAccessControlLists());
         caseViewField.setValue(data.get(caseFieldDefinition.getId()));
         caseViewField.setMetadata(caseFieldDefinition.isMetadata());

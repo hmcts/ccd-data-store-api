@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
+import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -154,7 +154,7 @@ class PhoneUKValidatorTest {
         assertEquals(0, validMinMaxResults.size(), validMinMaxResults.toString());
     }
 
-    private CaseFieldBuilder caseField() {
-        return new CaseFieldBuilder(FIELD_ID).withType(PhoneUKValidator.TYPE_ID);
+    private CaseFieldDefinitionBuilder caseField() {
+        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(PhoneUKValidator.TYPE_ID);
     }
 }

@@ -8,7 +8,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
@@ -59,24 +59,24 @@ public class DefaultGetCriteriaOperationTest {
 
     private CaseFieldDefinition name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private CaseFieldDefinition surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private FieldType personFieldType = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).build();
-    private CaseFieldDefinition person = newCaseField().withId(PERSON).withFieldType(personFieldType).build();
+    private FieldTypeDefinition personFieldTypeDefinition = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).build();
+    private CaseFieldDefinition person = newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
 
-    private FieldType debtorFieldType = aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
-    private CaseFieldDefinition debtorDetails = newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldType).build();
+    private FieldTypeDefinition debtorFieldTypeDefinition = aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
+    private CaseFieldDefinition debtorDetails = newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldTypeDefinition).build();
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
-        FieldType fieldType = new FieldType();
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
         caseFieldDefinition1.setId("field1");
-        caseFieldDefinition1.setFieldType(fieldType);
+        caseFieldDefinition1.setFieldTypeDefinition(fieldTypeDefinition);
         caseFieldDefinition2.setId("field2");
-        caseFieldDefinition2.setFieldType(fieldType);
+        caseFieldDefinition2.setFieldTypeDefinition(fieldTypeDefinition);
         caseFieldDefinition3.setId("field3");
-        caseFieldDefinition3.setFieldType(fieldType);
+        caseFieldDefinition3.setFieldTypeDefinition(fieldTypeDefinition);
         caseFieldDefinition4.setId("field4");
-        caseFieldDefinition4.setFieldType(fieldType);
+        caseFieldDefinition4.setFieldTypeDefinition(fieldTypeDefinition);
         caseFieldDefinition4.setMetadata(true);
         caseTypeDefinition.setId("Test case type");
         caseTypeDefinition.setCaseFieldDefinitions(asList(caseFieldDefinition1,
@@ -135,8 +135,8 @@ public class DefaultGetCriteriaOperationTest {
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(5)),
             () -> assertThat(workbasketInputs.get(4).getField().getId(), is(DEBTOR_DETAILS)),
-            () -> assertThat(workbasketInputs.get(4).getField().getType().getType(), is(name.getFieldType().getType())),
-            () -> assertThat(workbasketInputs.get(4).getField().getType().getId(), is(name.getFieldType().getId())),
+            () -> assertThat(workbasketInputs.get(4).getField().getType().getType(), is(name.getFieldTypeDefinition().getType())),
+            () -> assertThat(workbasketInputs.get(4).getField().getType().getId(), is(name.getFieldTypeDefinition().getId())),
             () -> assertThat(workbasketInputs.get(4).getField().getType().getChildren().size(), is(0))
         );
     }
@@ -161,8 +161,8 @@ public class DefaultGetCriteriaOperationTest {
         assertAll(
             () -> assertThat(searchInputs.size(), is(5)),
             () -> assertThat(searchInputs.get(4).getField().getId(), is(DEBTOR_DETAILS)),
-            () -> assertThat(searchInputs.get(4).getField().getType().getType(), is(name.getFieldType().getType())),
-            () -> assertThat(searchInputs.get(4).getField().getType().getId(), is(name.getFieldType().getId())),
+            () -> assertThat(searchInputs.get(4).getField().getType().getType(), is(name.getFieldTypeDefinition().getType())),
+            () -> assertThat(searchInputs.get(4).getField().getType().getId(), is(name.getFieldTypeDefinition().getId())),
             () -> assertThat(searchInputs.get(4).getField().getType().getChildren().size(), is(0)));
     }
 

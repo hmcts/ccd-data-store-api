@@ -46,18 +46,18 @@ public class DateTimeValidator implements BaseTypeValidator {
             return Collections.singletonList(new ValidationResult(dataValue + " is not a valid ISO 8601 date time", dataFieldId));
         }
 
-        if (!checkMax(caseFieldDefinition.getFieldType().getMax(), dateTimeValue)) {
+        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), dateTimeValue)) {
             return Collections.singletonList(new ValidationResult("The date time should be earlier than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldType().getMax())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMax())), dataFieldId));
         }
 
-        if (!checkMin(caseFieldDefinition.getFieldType().getMin(), dateTimeValue)) {
+        if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), dateTimeValue)) {
             return Collections.singletonList(new ValidationResult("The date time should be later than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldType().getMin())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMin())), dataFieldId));
         }
 
-        if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), dataValue.asText())) {
-            return Collections.singletonList(new ValidationResult(dataValue.asText() + " Field Type Regex Failed:" + caseFieldDefinition.getFieldType().getRegularExpression(), dataFieldId));
+        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataValue.asText())) {
+            return Collections.singletonList(new ValidationResult(dataValue.asText() + " Field Type Regex Failed:" + caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataFieldId));
         }
 
         if (!checkRegex(getType().getRegularExpression(), dataValue.asText())) {

@@ -9,8 +9,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -38,7 +38,7 @@ class DateTimeValidatorTest {
         + "([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$";
 
     @Mock
-    private FieldType dateTimeFieldType;
+    private FieldTypeDefinition dateTimeFieldTypeDefinition;
 
     @Mock
     private CaseDefinitionRepository definitionRepository;
@@ -54,9 +54,9 @@ class DateTimeValidatorTest {
         BaseType.setCaseDefinitionRepository(definitionRepository);
         BaseType.initialise();
 
-        when(dateTimeFieldType.getType()).thenReturn(DateTimeValidator.TYPE_ID);
-        when(dateTimeFieldType.getRegularExpression()).thenReturn(DATE_TIME_REGEX);
-        BaseType.register(new BaseType(dateTimeFieldType));
+        when(dateTimeFieldTypeDefinition.getType()).thenReturn(DateTimeValidator.TYPE_ID);
+        when(dateTimeFieldTypeDefinition.getRegularExpression()).thenReturn(DATE_TIME_REGEX);
+        BaseType.register(new BaseType(dateTimeFieldTypeDefinition));
 
         validator = new DateTimeValidator();
 
@@ -276,8 +276,8 @@ class DateTimeValidatorTest {
 
     @Test
     void invalidBaseTypeRegEx() {
-        when(dateTimeFieldType.getRegularExpression()).thenReturn("InvalidRegEx");
-        BaseType.register(new BaseType(dateTimeFieldType));
+        when(dateTimeFieldTypeDefinition.getRegularExpression()).thenReturn("InvalidRegEx");
+        BaseType.register(new BaseType(dateTimeFieldTypeDefinition));
         final List<ValidationResult> result = validator.validate(FIELD_ID,
                                                                  NODE_FACTORY.textNode("2001-12-10T00:00:00"),
                 caseFieldDefinition);
@@ -342,8 +342,8 @@ class DateTimeValidatorTest {
         assertThat(result.get(0).getErrorMessage(), is("true is not a valid ISO 8601 date time"));
     }
 
-    private CaseFieldBuilder caseField() {
-        return new CaseFieldBuilder(FIELD_ID).withType(DateTimeValidator.TYPE_ID);
+    private CaseFieldDefinitionBuilder caseField() {
+        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(DateTimeValidator.TYPE_ID);
     }
 
     private BigDecimal datetime(final String datetimeString) {

@@ -46,17 +46,17 @@ public class DateValidator implements BaseTypeValidator {
             return Collections.singletonList(new ValidationResult(dataValue + " is not a valid ISO 8601 date", dataFieldId));
         }
 
-        if (!checkMax(caseFieldDefinition.getFieldType().getMax(), dateValue)) {
+        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), dateValue)) {
             return Collections.singletonList(new ValidationResult("The date should be earlier than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldType().getMax())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMax())), dataFieldId));
         }
 
-        if (!checkMin(caseFieldDefinition.getFieldType().getMin(), dateValue)) {
+        if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), dateValue)) {
             return Collections.singletonList(new ValidationResult("The date should be later than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldType().getMin())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMin())), dataFieldId));
         }
 
-        if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), dataValue.asText())) {
+        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataValue.asText())) {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
 

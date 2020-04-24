@@ -158,8 +158,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("PersonAddress", searchResultViewColumns.get(2).getCaseFieldId());
         assertEquals("Address", searchResultViewColumns.get(2).getLabel());
         assertEquals(1, searchResultViewColumns.get(2).getOrder().intValue());
-        assertEquals("Address", searchResultViewColumns.get(2).getCaseFieldType().getId());
-        assertEquals("Complex", searchResultViewColumns.get(2).getCaseFieldType().getType());
+        assertEquals("Address", searchResultViewColumns.get(2).getCaseFieldTypeDefinition().getId());
+        assertEquals("Complex", searchResultViewColumns.get(2).getCaseFieldTypeDefinition().getType());
 
         assertEquals("Incorrect view items count", 3, searchResultViewItems.size());
 
@@ -694,7 +694,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "First Name", firstNameField.getLabel());
         assertEquals("Unexpected Field order", 1, firstNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Jones\"", firstNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "John", firstNameField.getValue());
 
         final CaseViewField lastNameField = nameFields[1];
@@ -703,7 +703,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Last Name", lastNameField.getLabel());
         assertEquals("Unexpected Field order", 2, lastNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonFirstName=\"Tom\"", lastNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "Smith", lastNameField.getValue());
 
         final CaseViewTab addressTab = caseViewTabs[1];
@@ -817,7 +817,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "First Name", firstNameField.getLabel());
         assertEquals("Unexpected Field order", 1, firstNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Jones\"", firstNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "Janet", firstNameField.getValue());
 
         final CaseViewField lastNameField = nameFields[1];
@@ -826,7 +826,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Last Name", lastNameField.getLabel());
         assertEquals("Unexpected Field order", 2, lastNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonFirstName=\"Tom\"", lastNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "Parker", lastNameField.getValue());
 
         final CaseViewTab addressTab = caseViewTabs[1];
@@ -846,7 +846,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Address", addressField.getLabel());
         assertEquals("Unexpected Field order", 1, addressField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Smart\"", addressField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Address", addressField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Address", addressField.getFieldTypeDefinition().getType());
 
         final Map addressNode = (Map) addressField.getValue();
         assertNotNull("Null address value", addressNode);
@@ -873,7 +873,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Document", documentField.getLabel());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Dumb\"", documentField.getShowCondition());
         assertEquals("Unexpected Field order", 1, documentField.getOrder().intValue());
-        assertEquals("Unexpected Field field type", "Document", documentField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Document", documentField.getFieldTypeDefinition().getType());
 
         final Map documentNode = (Map) documentField.getValue();
         assertNotNull("Null address value", documentNode);
@@ -1066,28 +1066,28 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field id", "Company", companyField.getId());
         assertEquals("Unexpected Field label", "Company", companyField.getLabel());
         assertEquals("Unexpected Field order", 1, companyField.getOrder().intValue());
-        assertEquals("Unexpected Field field type", "Company", companyField.getFieldType().getId());
-        assertEquals("Unexpected Field field type", "Complex", companyField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Company", companyField.getFieldTypeDefinition().getId());
+        assertEquals("Unexpected Field field type", "Complex", companyField.getFieldTypeDefinition().getType());
 
         // Check complex fields are mapped correctly
-        final List<CaseFieldDefinition> companyComplexFields = companyField.getFieldType().getComplexFields();
+        final List<CaseFieldDefinition> companyComplexFields = companyField.getFieldTypeDefinition().getComplexFields();
         assertEquals("Unexpected number of Complex Fields", 2, companyComplexFields.size());
 
         // Get the Address complex field from the Company
         final CaseFieldDefinition addressField = companyComplexFields.get(1);
         assertEquals("Unexpected Field id", "PostalAddress", addressField.getId());
         assertEquals("Unexpected Field label", "Postal Address", addressField.getLabel());
-        assertEquals("Unexpected Field type", "Address", addressField.getFieldType().getId());
-        assertEquals("Unexpected Field type", "Complex", addressField.getFieldType().getType());
-        assertEquals("Unexpected number of complex fields", 6, addressField.getFieldType().getComplexFields().size());
+        assertEquals("Unexpected Field type", "Address", addressField.getFieldTypeDefinition().getId());
+        assertEquals("Unexpected Field type", "Complex", addressField.getFieldTypeDefinition().getType());
+        assertEquals("Unexpected number of complex fields", 6, addressField.getFieldTypeDefinition().getComplexFields().size());
 
         // Get the Occupant complex field from the Address
-        final CaseFieldDefinition occupantField = addressField.getFieldType().getComplexFields().get(5);
+        final CaseFieldDefinition occupantField = addressField.getFieldTypeDefinition().getComplexFields().get(5);
         assertEquals("Unexpected Field id", "Occupant", occupantField.getId());
         assertEquals("Unexpected Field label", "Occupant", occupantField.getLabel());
-        assertEquals("Unexpected Field type", "Person", occupantField.getFieldType().getId());
-        assertEquals("Unexpected Field type", "Complex", occupantField.getFieldType().getType());
-        assertEquals("Unexpected number of complex fields", 7, occupantField.getFieldType().getComplexFields().size());
+        assertEquals("Unexpected Field type", "Person", occupantField.getFieldTypeDefinition().getId());
+        assertEquals("Unexpected Field type", "Complex", occupantField.getFieldTypeDefinition().getType());
+        assertEquals("Unexpected number of complex fields", 7, occupantField.getFieldTypeDefinition().getComplexFields().size());
 
         // Check all field values are mapped correctly
         Map companyNode = (Map) companyField.getValue();
@@ -1122,7 +1122,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field id", "OtherInfo", otherInfoField.getId());
         assertEquals("Unexpected Field label", "Other Info", otherInfoField.getLabel());
         assertEquals("Unexpected Field order", 1, otherInfoField.getOrder().intValue());
-        assertEquals("Unexpected Field field type", "Text", otherInfoField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", otherInfoField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "Extra Info", otherInfoField.getValue());
     }
 
@@ -1185,16 +1185,16 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final CaseViewField field1 = caseUpdateViewEvent.getCaseFields().get(0);
         assertThat(field1.getLabel(), equalTo("First name"));
         assertThat(field1.getOrder(), is(nullValue()));
-        assertThat(field1.getFieldType().getId(), equalTo("Text"));
-        assertThat(field1.getFieldType().getType(), equalTo("Text"));
+        assertThat(field1.getFieldTypeDefinition().getId(), equalTo("Text"));
+        assertThat(field1.getFieldTypeDefinition().getType(), equalTo("Text"));
         assertThat(field1.getId(), equalTo("PersonFirstName"));
         assertThat(field1.getDisplayContext(), equalTo(READONLY));
 
         final CaseViewField field2 = caseUpdateViewEvent.getCaseFields().get(1);
         assertThat(field2.getLabel(), equalTo("Last name"));
         assertThat(field2.getOrder(), is(nullValue()));
-        assertThat(field2.getFieldType().getId(), equalTo("Text"));
-        assertThat(field2.getFieldType().getType(), equalTo("Text"));
+        assertThat(field2.getFieldTypeDefinition().getId(), equalTo("Text"));
+        assertThat(field2.getFieldTypeDefinition().getType(), equalTo("Text"));
         assertThat(field2.getId(), equalTo("PersonLastName"));
         assertThat(field2.getDisplayContext(), equalTo("OPTIONAL"));
     }
@@ -1250,8 +1250,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field1.getValue(), equalTo("George"));
         assertThat(field1.getLabel(), equalTo("First name"));
         assertThat(field1.getOrder(), is(nullValue()));
-        assertThat(field1.getFieldType().getId(), equalTo("Text"));
-        assertThat(field1.getFieldType().getType(), equalTo("Text"));
+        assertThat(field1.getFieldTypeDefinition().getId(), equalTo("Text"));
+        assertThat(field1.getFieldTypeDefinition().getType(), equalTo("Text"));
         assertThat(field1.getId(), equalTo("PersonFirstName"));
         assertThat(field1.getDisplayContext(), equalTo(READONLY));
         assertThat(field1.getShowSummaryContentOption(), equalTo(2));
@@ -1260,8 +1260,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field2.getValue(), equalTo("Roof"));
         assertThat(field2.getLabel(), equalTo("Last name"));
         assertThat(field2.getOrder(), is(nullValue()));
-        assertThat(field2.getFieldType().getId(), equalTo("Text"));
-        assertThat(field2.getFieldType().getType(), equalTo("Text"));
+        assertThat(field2.getFieldTypeDefinition().getId(), equalTo("Text"));
+        assertThat(field2.getFieldTypeDefinition().getType(), equalTo("Text"));
         assertThat(field2.getId(), equalTo("PersonLastName"));
         assertThat(field2.getDisplayContext(), equalTo("OPTIONAL"));
         assertThat(field2.getShowSummaryContentOption(), equalTo(1));
@@ -1462,7 +1462,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "First Name", firstNameField.getLabel());
         assertEquals("Unexpected Field order", 1, firstNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Jones\"", firstNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "Janet", firstNameField.getValue());
 
         final CaseViewField lastNameField = nameFields[1];
@@ -1471,7 +1471,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Last Name", lastNameField.getLabel());
         assertEquals("Unexpected Field order", 2, lastNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonFirstName=\"Tom\"", lastNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "Parker", lastNameField.getValue());
 
         final CaseViewTab addressTab = caseViewTabs[1];
@@ -1491,7 +1491,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Address", addressField.getLabel());
         assertEquals("Unexpected Field order", 1, addressField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Smart\"", addressField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Address", addressField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Address", addressField.getFieldTypeDefinition().getType());
 
         final Map addressNode = (Map) addressField.getValue();
         assertNotNull("Null address value", addressNode);
@@ -1518,7 +1518,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Document", documentField.getLabel());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Dumb\"", documentField.getShowCondition());
         assertEquals("Unexpected Field order", 1, documentField.getOrder().intValue());
-        assertEquals("Unexpected Field field type", "Document", documentField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Document", documentField.getFieldTypeDefinition().getType());
 
         final Map documentNode = (Map) documentField.getValue();
         final int dmApiPort = 10000;

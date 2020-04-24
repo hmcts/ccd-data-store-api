@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ public class CaseSanitiserTest {
     private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
 
     private static final String TYPE_SIMPLE = "Simple";
-    private static final FieldType SIMPLE_FIELD_TYPE = new FieldType();
+    private static final FieldTypeDefinition SIMPLE_FIELD_TYPE = new FieldTypeDefinition();
     private static final String SIMPLE_FIELD_ID = "FirstName";
     private static final CaseFieldDefinition SIMPLE_FIELD = new CaseFieldDefinition();
     private static final JsonNode SIMPLE_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value");
@@ -34,7 +34,7 @@ public class CaseSanitiserTest {
         SIMPLE_FIELD_TYPE.setId(TYPE_SIMPLE);
         SIMPLE_FIELD_TYPE.setType(TYPE_SIMPLE);
         SIMPLE_FIELD.setId(SIMPLE_FIELD_ID);
-        SIMPLE_FIELD.setFieldType(SIMPLE_FIELD_TYPE);
+        SIMPLE_FIELD.setFieldTypeDefinition(SIMPLE_FIELD_TYPE);
 
         CASE_TYPE.setCaseFieldDefinitions(Collections.singletonList(SIMPLE_FIELD));
     }

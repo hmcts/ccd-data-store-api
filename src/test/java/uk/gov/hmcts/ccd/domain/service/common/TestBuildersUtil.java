@@ -43,10 +43,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
@@ -66,7 +66,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -539,10 +539,10 @@ public class TestBuildersUtil {
 
     public static class JurisdictionUiConfigBuilder {
 
-        private final JurisdictionUiConfig jurisdictionUiConfig;
+        private final JurisdictionUiConfigDefinition jurisdictionUiConfigDefinition;
 
         private JurisdictionUiConfigBuilder() {
-            this.jurisdictionUiConfig = new JurisdictionUiConfig();
+            this.jurisdictionUiConfigDefinition = new JurisdictionUiConfigDefinition();
         }
 
         public static JurisdictionUiConfigBuilder newJurisdictionUiConfig() {
@@ -550,22 +550,22 @@ public class TestBuildersUtil {
         }
 
         public JurisdictionUiConfigBuilder withShutteredEnabled(Boolean shuttered) {
-            this.jurisdictionUiConfig.setShuttered(shuttered);
+            this.jurisdictionUiConfigDefinition.setShuttered(shuttered);
             return this;
         }
 
         public JurisdictionUiConfigBuilder withId(String id) {
-            this.jurisdictionUiConfig.setId(id);
+            this.jurisdictionUiConfigDefinition.setId(id);
             return this;
         }
 
         public JurisdictionUiConfigBuilder withName(String name) {
-            this.jurisdictionUiConfig.setName(name);
+            this.jurisdictionUiConfigDefinition.setName(name);
             return this;
         }
 
-        public JurisdictionUiConfig build() {
-            return jurisdictionUiConfig;
+        public JurisdictionUiConfigDefinition build() {
+            return jurisdictionUiConfigDefinition;
         }
     }
 
@@ -1061,7 +1061,7 @@ public class TestBuildersUtil {
         private final CaseFieldDefinition caseFieldDefinition;
         private final List<AccessControlList> accessControlLists = newArrayList();
         private final List<ComplexACL> complexACLs = newArrayList();
-        private FieldType caseFieldType;
+        private FieldTypeDefinition caseFieldTypeDefinition;
 
         private CaseFieldBuilder() {
             this.caseFieldDefinition = new CaseFieldDefinition();
@@ -1081,8 +1081,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseFieldBuilder withFieldType(FieldType fieldType) {
-            caseFieldType = fieldType;
+        public CaseFieldBuilder withFieldType(FieldTypeDefinition fieldTypeDefinition) {
+            caseFieldTypeDefinition = fieldTypeDefinition;
             return this;
         }
 
@@ -1114,16 +1114,16 @@ public class TestBuildersUtil {
         public CaseFieldDefinition build() {
             caseFieldDefinition.setAccessControlLists(accessControlLists);
             caseFieldDefinition.setComplexACLs(complexACLs);
-            caseFieldDefinition.setFieldType(caseFieldType);
+            caseFieldDefinition.setFieldTypeDefinition(caseFieldTypeDefinition);
             return caseFieldDefinition;
         }
     }
 
     public static class FixedListItemBuilder {
-        private final FixedListItem fixedListItem;
+        private final FixedListItemDefinition fixedListItemDefinition;
 
         public FixedListItemBuilder() {
-            this.fixedListItem = new FixedListItem();
+            this.fixedListItemDefinition = new FixedListItemDefinition();
         }
 
         public static FixedListItemBuilder aFixedListItem() {
@@ -1131,26 +1131,26 @@ public class TestBuildersUtil {
         }
 
         public FixedListItemBuilder withCode(String code) {
-            this.fixedListItem.setCode(code);
+            this.fixedListItemDefinition.setCode(code);
             return this;
         }
 
         public FixedListItemBuilder withOrder(String order) {
-            this.fixedListItem.setOrder(order);
+            this.fixedListItemDefinition.setOrder(order);
             return this;
         }
 
-        public FixedListItem build() {
-            return fixedListItem;
+        public FixedListItemDefinition build() {
+            return fixedListItemDefinition;
         }
     }
 
     public static class FieldTypeBuilder {
-        private final FieldType fieldType;
+        private final FieldTypeDefinition fieldTypeDefinition;
         private final List<CaseFieldDefinition> complexFields;
 
         private FieldTypeBuilder() {
-            this.fieldType = new FieldType();
+            this.fieldTypeDefinition = new FieldTypeDefinition();
             this.complexFields = Lists.newArrayList();
         }
 
@@ -1159,12 +1159,12 @@ public class TestBuildersUtil {
         }
 
         public FieldTypeBuilder withId(String id) {
-            fieldType.setId(id);
+            fieldTypeDefinition.setId(id);
             return this;
         }
 
         public FieldTypeBuilder withType(String type) {
-            fieldType.setType(type);
+            fieldTypeDefinition.setType(type);
             return this;
         }
 
@@ -1173,39 +1173,39 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public FieldTypeBuilder withCollectionFieldType(FieldType collectionFieldType) {
-            fieldType.setCollectionFieldType(collectionFieldType);
+        public FieldTypeBuilder withCollectionFieldType(FieldTypeDefinition collectionFieldTypeDefinition) {
+            fieldTypeDefinition.setCollectionFieldTypeDefinition(collectionFieldTypeDefinition);
             return this;
         }
 
         public FieldTypeBuilder withCollectionField(CaseFieldDefinition complexField) {
-            fieldType.setCollectionFieldType(aFieldType()
+            fieldTypeDefinition.setCollectionFieldTypeDefinition(aFieldType()
                 .withComplexField(complexField)
                 .withType(COMPLEX)
                 .build());
             return this;
         }
 
-        public FieldTypeBuilder withFixedListItems(final FixedListItem... fixedListItems) {
-            fieldType.setFixedListItems(Lists.newArrayList(fixedListItems));
+        public FieldTypeBuilder withFixedListItems(final FixedListItemDefinition... fixedListItemDefinitions) {
+            fieldTypeDefinition.setFixedListItemDefinitions(Lists.newArrayList(fixedListItemDefinitions));
             return this;
         }
 
-        public FieldTypeBuilder withFixedListItems(final List<FixedListItem> fixedListItems) {
-            fieldType.setFixedListItems(fixedListItems);
+        public FieldTypeBuilder withFixedListItems(final List<FixedListItemDefinition> fixedListItemDefinitions) {
+            fieldTypeDefinition.setFixedListItemDefinitions(fixedListItemDefinitions);
             return this;
         }
 
-        public FieldType build() {
-            fieldType.setComplexFields(complexFields);
-            return fieldType;
+        public FieldTypeDefinition build() {
+            fieldTypeDefinition.setComplexFields(complexFields);
+            return fieldTypeDefinition;
         }
     }
 
     public static class CaseViewFieldBuilder {
         private final CaseViewField caseViewField;
         private final List<AccessControlList> acls = newArrayList();
-        private FieldType caseFieldType;
+        private FieldTypeDefinition caseFieldTypeDefinition;
 
         private CaseViewFieldBuilder() {
             this.caseViewField = new CaseViewField();
@@ -1220,8 +1220,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseViewFieldBuilder withFieldType(FieldType fieldType) {
-            this.caseFieldType = fieldType;
+        public CaseViewFieldBuilder withFieldType(FieldTypeDefinition fieldTypeDefinition) {
+            this.caseFieldTypeDefinition = fieldTypeDefinition;
             return this;
         }
 
@@ -1232,7 +1232,7 @@ public class TestBuildersUtil {
 
         public CaseViewField build() {
             this.caseViewField.setAccessControlLists(acls);
-            this.caseViewField.setFieldType(this.caseFieldType);
+            this.caseViewField.setFieldTypeDefinition(this.caseFieldTypeDefinition);
             return this.caseViewField;
         }
     }
@@ -1497,9 +1497,9 @@ public class TestBuildersUtil {
             asList(caseFieldIds).forEach(caseFieldId -> {
                 CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
                 caseFieldDefinition.setId(caseFieldId);
-                FieldType fieldType = new FieldType();
-                fieldType.setType("YesOrNo");
-                caseFieldDefinition.setFieldType(fieldType);
+                FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+                fieldTypeDefinition.setType("YesOrNo");
+                caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
                 CaseTypeTabField tabField = new CaseTypeTabField();
                 tabField.setCaseFieldDefinition(caseFieldDefinition);
                 tabField.setShowCondition(caseFieldId + "-fieldShowCondition");

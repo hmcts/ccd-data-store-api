@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.STRING_JSON_MAP;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.USER_ROLES;

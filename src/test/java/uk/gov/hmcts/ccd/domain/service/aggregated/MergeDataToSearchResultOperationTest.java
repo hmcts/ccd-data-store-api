@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
@@ -35,8 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
@@ -120,11 +120,11 @@ class MergeDataToSearchResultOperationTest {
 
         final CaseFieldDefinition addressLine1 = newCaseField().withId(ADDRESS_LINE_1).withFieldType(textFieldType()).build();
         final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE).withFieldType(textFieldType()).build();
-        final FieldType addressFieldType = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
+        final FieldTypeDefinition addressFieldTypeDefinition = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
             .withComplexField(addressLine1).withComplexField(postCode).build();
-        final CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldType).build();
+        final CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition).build();
 
-        final FieldType familyDetailsFieldType =
+        final FieldTypeDefinition familyDetailsFieldTypeDefinition =
             aFieldType().withId(FAMILY).withType(COMPLEX)
                 .withComplexField(fatherName)
                 .withComplexField(motherName)
@@ -138,7 +138,7 @@ class MergeDataToSearchResultOperationTest {
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build())
             .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).build())
             .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
-            .withField(newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldType).build())
+            .withField(newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition).build())
             .build();
 
         final CaseFieldDefinition labelField = buildLabelCaseField(LABEL_ID, LABEL_TEXT);
@@ -460,7 +460,7 @@ class MergeDataToSearchResultOperationTest {
             Matchers.is("Nested element not found for path InvalidElementPath"));
     }
 
-    private FieldType textFieldType() {
+    private FieldTypeDefinition textFieldType() {
         return aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build();
     }
 

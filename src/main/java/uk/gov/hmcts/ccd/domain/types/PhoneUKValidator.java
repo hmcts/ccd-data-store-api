@@ -30,17 +30,17 @@ public class PhoneUKValidator implements BaseTypeValidator {
         }
 
         final String value = dataValue.textValue();
-        if (!checkMax(caseFieldDefinition.getFieldType().getMax(), value)) {
+        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
             return Collections.singletonList(new ValidationResult("Phone no '" + value
-                + "' exceeds maximum length " + caseFieldDefinition.getFieldType().getMax(), dataFieldId));
+                + "' exceeds maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId));
         }
 
-        if (!checkMin(caseFieldDefinition.getFieldType().getMin(), value)) {
+        if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
             return Collections.singletonList(new ValidationResult("Phone no '" + value
-                + "' requires minimum length " + caseFieldDefinition.getFieldType().getMin(), dataFieldId));
+                + "' requires minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId));
         }
 
-        final String userRegex = caseFieldDefinition.getFieldType().getRegularExpression();
+        final String userRegex = caseFieldDefinition.getFieldTypeDefinition().getRegularExpression();
         if (userRegex != null && userRegex.length() > 0) {
             return (value.matches(userRegex)) ?
                 Collections.emptyList() :

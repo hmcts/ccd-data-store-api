@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetBannerOperation;
@@ -69,12 +69,12 @@ class UIDefinitionControllerTest {
                                         .withBannerUrlText("Click here to see it.>>>")
                                         .withBannerUrl("http://localhost:3451/test").build();
 
-    private JurisdictionUiConfig jurisdictionUiConfig1 = newJurisdictionUiConfig()
+    private JurisdictionUiConfigDefinition jurisdictionUiConfigDefinition1 = newJurisdictionUiConfig()
                                                                     .withId("Reference 1")
                                                                     .withName("Name 1")
                                                                     .withShutteredEnabled(true)
                                                                     .build();
-    private JurisdictionUiConfig jurisdictionUiConfig2 = newJurisdictionUiConfig()
+    private JurisdictionUiConfigDefinition jurisdictionUiConfigDefinition2 = newJurisdictionUiConfig()
                                                                     .withId("Reference 2")
                                                                     .withName("Name 2")
                                                                     .withShutteredEnabled(false)
@@ -83,7 +83,7 @@ class UIDefinitionControllerTest {
     private final List<WorkbasketInput> workbasketInputs = Lists.newArrayList(workbasketInput1, workbasketInput2);
     private final List<SearchInput> searchInputs = Lists.newArrayList(searchInput1, searchInput2);
     private final List<Banner> banners = Lists.newArrayList(banner1, banner2);
-    private final List<JurisdictionUiConfig> jurisdictionUiConfigs = Lists.newArrayList(jurisdictionUiConfig1, jurisdictionUiConfig2);
+    private final List<JurisdictionUiConfigDefinition> jurisdictionUiConfigDefinitions = Lists.newArrayList(jurisdictionUiConfigDefinition1, jurisdictionUiConfigDefinition2);
     private final List<String> jurisdictionReferenes = Lists.newArrayList("TEST", "FAMILY LAW");
 
     @Mock
@@ -108,7 +108,7 @@ class UIDefinitionControllerTest {
         doReturn(workbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ID, CAN_READ, WORKBASKET);
         doReturn(searchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ID, CAN_READ, SEARCH);
         doReturn(banners).when(getBannerOperation).execute(jurisdictionReferenes);
-        doReturn(jurisdictionUiConfigs).when(getJurisdictionUiConfigOperation).execute(jurisdictionReferenes);
+        doReturn(jurisdictionUiConfigDefinitions).when(getJurisdictionUiConfigOperation).execute(jurisdictionReferenes);
     }
 
     @Nested
@@ -279,7 +279,7 @@ class UIDefinitionControllerTest {
 
     @Nested
     @DisplayName("GET /internal/jurisdiction-ui-configs")
-    class GetJurisdictionUiConfigs {
+    class GetJurisdictionUiConfigsDefinition {
 
         @Test
         @DisplayName("should return 200 when jurisdiction UI configs found")

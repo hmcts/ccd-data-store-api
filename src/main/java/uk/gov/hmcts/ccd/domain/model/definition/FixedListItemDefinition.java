@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "")
-public class FixedListItem implements Serializable {
+public class FixedListItemDefinition implements Serializable {
 
     private static final long serialVersionUID = 6196146295016140921L;
     private String code = null;

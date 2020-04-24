@@ -8,8 +8,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
@@ -55,24 +55,24 @@ public class CaseFieldDefinitionTest {
     private CaseFieldDefinition addressLine3 = newCaseField().withId(ADDRES_LINE_3).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private CaseFieldDefinition postcode = newCaseField().withId(POSTCODE).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private CaseFieldDefinition country = newCaseField().withId(COUNTRY).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private FieldType addressFieldType = aFieldType().withId(ADDRESS).withType(COMPLEX).withComplexField(addressLine1).withComplexField(addressLine2)
+    private FieldTypeDefinition addressFieldTypeDefinition = aFieldType().withId(ADDRESS).withType(COMPLEX).withComplexField(addressLine1).withComplexField(addressLine2)
         .withComplexField(addressLine3).withComplexField(postcode).withComplexField(country).build();
-    private CaseFieldDefinition address = newCaseField().withId(ADDRESS).withFieldType(addressFieldType).build();
+    private CaseFieldDefinition address = newCaseField().withId(ADDRESS).withFieldType(addressFieldTypeDefinition).build();
 
     private CaseFieldDefinition name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private CaseFieldDefinition surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private FieldType personFieldType = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).withComplexField(address).build();
-    private CaseFieldDefinition person = newCaseField().withId(PERSON).withFieldType(personFieldType).build();
+    private FieldTypeDefinition personFieldTypeDefinition = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).withComplexField(address).build();
+    private CaseFieldDefinition person = newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
 
-    private FieldType debtorFieldType = aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
-    private CaseFieldDefinition debtorDetails = newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldType).build();
+    private FieldTypeDefinition debtorFieldTypeDefinition = aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
+    private CaseFieldDefinition debtorDetails = newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldTypeDefinition).build();
 
-    private FieldType membersFieldType = aFieldType().withId(MEMBERS + "-some-uid-value").withType(COLLECTION).withCollectionField(person).build();
-    private CaseFieldDefinition members = newCaseField().withId(MEMBERS).withFieldType(membersFieldType).build();
+    private FieldTypeDefinition membersFieldTypeDefinition = aFieldType().withId(MEMBERS + "-some-uid-value").withType(COLLECTION).withCollectionField(person).build();
+    private CaseFieldDefinition members = newCaseField().withId(MEMBERS).withFieldType(membersFieldTypeDefinition).build();
 
     private CaseFieldDefinition familyName = newCaseField().withId(FAMILY_NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private FieldType familyNamesFieldType = aFieldType().withId(FAMILY_NAMES).withType(COLLECTION).withCollectionField(familyName).build();
-    private CaseFieldDefinition familyNames = newCaseField().withId(FAMILY_NAMES).withFieldType(familyNamesFieldType).build();
+    private FieldTypeDefinition familyNamesFieldTypeDefinition = aFieldType().withId(FAMILY_NAMES).withType(COLLECTION).withCollectionField(familyName).build();
+    private CaseFieldDefinition familyNames = newCaseField().withId(FAMILY_NAMES).withFieldType(familyNamesFieldTypeDefinition).build();
 
 
     private CaseFieldDefinition addressLine21 = newCaseField().withId(ADDRES_LINE_1).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
@@ -80,13 +80,13 @@ public class CaseFieldDefinitionTest {
     private CaseFieldDefinition addressLine23 = newCaseField().withId(ADDRES_LINE_3).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private CaseFieldDefinition postcode2 = newCaseField().withId(POSTCODE).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private CaseFieldDefinition country2 = newCaseField().withId(COUNTRY).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private FieldType addressFieldType2 = aFieldType().withId(ADDRESS).withType(COMPLEX).withComplexField(addressLine21).withComplexField(addressLine22)
+    private FieldTypeDefinition addressFieldTypeDefinition2 = aFieldType().withId(ADDRESS).withType(COMPLEX).withComplexField(addressLine21).withComplexField(addressLine22)
         .withComplexField(addressLine23).withComplexField(postcode2).withComplexField(country2).build();
-    private CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldType2).build();
-    private FieldType familyInfoType = aFieldType().withId(FAMILY_INFO).withType(COMPLEX).withComplexField(familyNames).withComplexField(familyAddress).build();
+    private CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition2).build();
+    private FieldTypeDefinition familyInfoType = aFieldType().withId(FAMILY_INFO).withType(COMPLEX).withComplexField(familyNames).withComplexField(familyAddress).build();
     private CaseFieldDefinition familyInfo = newCaseField().withId(FAMILY_INFO).withFieldType(familyInfoType).build();
 
-    private FieldType familyFieldType =
+    private FieldTypeDefinition familyFieldTypeDefinition =
         aFieldType().withId(FAMILY).withType(COMPLEX).withComplexField(familyInfo).withComplexField(members).build();
     private AccessControlList acl1 = anAcl().withRole(ROLE1).withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
     private AccessControlList acl2 = anAcl().withRole(ROLE2).withCreate(true).withRead(true).withUpdate(false).withDelete(true).build();
@@ -100,7 +100,7 @@ public class CaseFieldDefinitionTest {
 
     @BeforeEach
     void setup() {
-        family = newCaseField().withId(FAMILY).withFieldType(familyFieldType)
+        family = newCaseField().withId(FAMILY).withFieldType(familyFieldTypeDefinition)
             .withComplexACL(complexACL1)
             .withComplexACL(complexACL4)
             .withComplexACL(complexACL5)
@@ -116,14 +116,14 @@ public class CaseFieldDefinitionTest {
 
             family.propagateACLsToNestedFields();
 
-            CaseFieldDefinition members = family.getFieldType().getChildren().stream()
+            CaseFieldDefinition members = family.getFieldTypeDefinition().getChildren().stream()
                 .filter(e -> e.getId().equals(MEMBERS)).findFirst().get();
-            CaseFieldDefinition person = members.getFieldType().getChildren().stream()
+            CaseFieldDefinition person = members.getFieldTypeDefinition().getChildren().stream()
                 .filter(e -> e.getId().equals(PERSON)).findFirst().get();
 
-            CaseFieldDefinition name = person.getFieldType().getChildren().stream()
+            CaseFieldDefinition name = person.getFieldTypeDefinition().getChildren().stream()
                 .filter(e -> e.getId().equals(NAME)).findFirst().get();
-            CaseFieldDefinition surname = person.getFieldType().getChildren().stream()
+            CaseFieldDefinition surname = person.getFieldTypeDefinition().getChildren().stream()
                 .filter(e -> e.getId().equals(SURNAME)).findFirst().get();
 
             validateACL(findNestedField(family, MEMBERS).getAccessControlLists(), complexACL1);
@@ -181,9 +181,9 @@ public class CaseFieldDefinitionTest {
 
             assertAll(
                 () -> assertThat(nestedElementByPath.getId(), is(name.getId())),
-                () -> assertThat(nestedElementByPath.getFieldType().getType(), is(name.getFieldType().getType())),
-                () -> assertThat(nestedElementByPath.getFieldType().getId(), is(name.getFieldType().getId())),
-                () -> assertThat(nestedElementByPath.getFieldType().getChildren().size(), is(0)));
+                () -> assertThat(nestedElementByPath.getFieldTypeDefinition().getType(), is(name.getFieldTypeDefinition().getType())),
+                () -> assertThat(nestedElementByPath.getFieldTypeDefinition().getId(), is(name.getFieldTypeDefinition().getId())),
+                () -> assertThat(nestedElementByPath.getFieldTypeDefinition().getChildren().size(), is(0)));
         }
 
         @Test

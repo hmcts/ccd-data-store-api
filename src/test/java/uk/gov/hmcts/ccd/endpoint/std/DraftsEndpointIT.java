@@ -215,7 +215,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "First Name", firstNameField.getLabel());
         assertEquals("Unexpected Field order", 1, firstNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Jones\"", firstNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "John", firstNameField.getValue());
 
         final CaseViewField lastNameField = nameFields[1];
@@ -224,7 +224,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Last Name", lastNameField.getLabel());
         assertEquals("Unexpected Field order", 2, lastNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonFirstName=\"Tom\"", lastNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "Smith", lastNameField.getValue());
 
         final CaseViewTab addressTab = caseViewTabs[1];

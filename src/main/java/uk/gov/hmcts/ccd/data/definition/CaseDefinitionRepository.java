@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.data.definition;
 import java.util.List;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
@@ -14,7 +14,7 @@ public interface CaseDefinitionRepository {
 
     CaseTypeDefinition getCaseType(int version, String caseTypeId);
 
-    List<FieldType> getBaseTypes();
+    List<FieldTypeDefinition> getBaseTypes();
 
     UserRole getUserRoleClassifications(String userRole);
 

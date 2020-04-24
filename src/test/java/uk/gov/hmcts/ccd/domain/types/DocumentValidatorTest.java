@@ -24,7 +24,7 @@ import java.util.List;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 public class DocumentValidatorTest implements IVallidatorTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -47,10 +47,10 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
     @BeforeClass
     public static void setUpClass() {
-        final FieldType documentFieldType = mock(FieldType.class);
-        when(documentFieldType.getType()).thenReturn("Document");
+        final FieldTypeDefinition documentFieldTypeDefinition = mock(FieldTypeDefinition.class);
+        when(documentFieldTypeDefinition.getType()).thenReturn("Document");
         final CaseDefinitionRepository definitionRepository = mock(CaseDefinitionRepository.class);
-        doReturn(Collections.singletonList(documentFieldType)).when(definitionRepository).getBaseTypes();
+        doReturn(Collections.singletonList(documentFieldTypeDefinition)).when(definitionRepository).getBaseTypes();
 
         BaseType.setCaseDefinitionRepository(definitionRepository);
     }

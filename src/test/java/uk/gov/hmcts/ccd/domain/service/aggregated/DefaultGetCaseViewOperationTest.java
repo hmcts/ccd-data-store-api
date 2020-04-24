@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeTabBuilder.newCaseTab;
@@ -136,7 +136,7 @@ class DefaultGetCaseViewOperationTest {
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setId(MetaData.CaseField.CASE_TYPE.getReference());
         caseFieldDefinition.setMetadata(true);
-        caseFieldDefinition.setFieldType(new FieldType());
+        caseFieldDefinition.setFieldTypeDefinition(new FieldTypeDefinition());
         caseTypeDefinition.setCaseFieldDefinitions(singletonList(caseFieldDefinition));
 
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
@@ -149,7 +149,7 @@ class DefaultGetCaseViewOperationTest {
 
     @Nested
     @DisplayName("field of CaseHistoryViewer field type")
-    class CaseHistoryViewer_FieldType {
+    class CaseHistoryViewer_FieldTypeDefinition {
         @Test
         @DisplayName("should hydrate case history viewer if CaseHistoryViewer field type present in tabs")
         void shouldHydrateCaseHistoryViewerIfFieldPresentInTabs() {

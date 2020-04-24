@@ -26,8 +26,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_UK;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_UK;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -373,11 +373,11 @@ class AccessControlServiceFilterTest {
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasSize(2)),
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2)),
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getId(), is("BornAddress")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("Address")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("PostCode"))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(0).getId(), is("Address")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().get(0).getId(), is("Line1")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().get(1).getId(), is("PostCode"))
             );
         }
 
@@ -467,7 +467,7 @@ class AccessControlServiceFilterTest {
                     .withType(COLLECTION)
                     .build())
                 .build();
-            caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
+            caseViewField3.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -493,13 +493,13 @@ class AccessControlServiceFilterTest {
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), not(hasItem(caseViewField1))),
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2)),
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getId(), is("People")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getId(), is("Address")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("Line2"))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().size(), is(4)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(0).getId(), is("LastName")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getId(), is("Address")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().get(0).getId(), is("Line1")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().get(1).getId(), is("Line2"))
             );
         }
 
@@ -589,7 +589,7 @@ class AccessControlServiceFilterTest {
                     .withType(COLLECTION)
                     .build())
                 .build();
-            caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
+            caseViewField3.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -615,9 +615,9 @@ class AccessControlServiceFilterTest {
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), not(hasItem(caseViewField1))),
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2)),
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getId(), is("People")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(0))
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().size(), is(4)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(0).getId(), is("LastName")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().size(), is(0))
             );
         }
 
@@ -757,7 +757,7 @@ class AccessControlServiceFilterTest {
                     .withType(COLLECTION)
                     .build())
                 .build();
-            caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
+            caseViewField3.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -801,24 +801,24 @@ class AccessControlServiceFilterTest {
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), not(hasItem(caseViewField1))),
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields(), hasItem(caseViewField2)),
                 () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getId(), is("People")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(3).getId(), is("Notes")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getId(), is("BornCity")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getId(), is("BornAddress")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(1).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("Country")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getId(), is("Address")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(2)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Line1")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().get(1).getId(), is("Line2")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getId(), is("Tags")),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Tag")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().size(), is(4)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(0).getId(), is("LastName")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(3).getId(), is("Notes")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(0).getId(), is("BornCity")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(1).getId(), is("BornAddress")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().get(0).getId(), is("Line1")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().get(1).getId(), is("Country")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getId(), is("Address")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().size(), is(2)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().get(0).getId(), is("Line1")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().get(1).getId(), is("Line2")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(3).getFieldTypeDefinition().getChildren().get(0).getId(), is("Tags")),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(3).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().size(), is(1)),
+                () -> assertThat(caseUpdateViewEventReturned.getCaseFields().get(1).getFieldTypeDefinition().getChildren().get(3).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().get(0).getId(), is("Tag")),
                 () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields(), hasSize(2)),
                 () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides(), hasSize(3)),
                 () -> assertThat(caseUpdateViewEventReturned.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(0).getComplexFieldElementId(), is("People.LastName")),
@@ -963,7 +963,7 @@ class AccessControlServiceFilterTest {
                     .withType(COLLECTION)
                     .build())
                 .build();
-            caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
+            caseViewField3.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -1028,7 +1028,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseTypeDefinition.getCaseFieldDefinitions().get(2).getFieldType().setComplexFields(getPredefinedAddressFields());
+            caseTypeDefinition.getCaseFieldDefinitions().get(2).getFieldTypeDefinition().setComplexFields(getPredefinedAddressFields());
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
@@ -1044,7 +1044,7 @@ class AccessControlServiceFilterTest {
                     .withType("Complex")
                     .build())
                 .build();
-            caseViewField3.getFieldType().setComplexFields(getPredefinedAddressFields());
+            caseViewField3.getFieldTypeDefinition().setComplexFields(getPredefinedAddressFields());
 
             CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -1109,7 +1109,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseTypeDefinition.getCaseFieldDefinitions().get(2).getFieldType().setComplexFields(getPredefinedAddressFields());
+            caseTypeDefinition.getCaseFieldDefinitions().get(2).getFieldTypeDefinition().setComplexFields(getPredefinedAddressFields());
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
@@ -1125,7 +1125,7 @@ class AccessControlServiceFilterTest {
                     .withType("Complex")
                     .build())
                 .build();
-            caseViewField3.getFieldType().setComplexFields(getPredefinedAddressFields());
+            caseViewField3.getFieldTypeDefinition().setComplexFields(getPredefinedAddressFields());
 
             CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -1176,8 +1176,8 @@ class AccessControlServiceFilterTest {
                     .withUpdate(false)
                     .build())
                 .build();
-            caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
-            caseViewField1.getFieldType().getChildren().stream()
+            caseViewField1.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
+            caseViewField1.getFieldTypeDefinition().getChildren().stream()
                 .filter(e -> e.getId().equals("Addresses")).findFirst()
                 .get().setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -1211,7 +1211,7 @@ class AccessControlServiceFilterTest {
                 () -> assertTrue(people.getDisplayContextParameter().contains("allowDelete"))
                      );
 
-            CaseFieldDefinition addresses = people.getFieldType().getChildren().stream()
+            CaseFieldDefinition addresses = people.getFieldTypeDefinition().getChildren().stream()
                 .filter(e -> e.getId().equals("Addresses")).findFirst()
                 .get();
 
@@ -1240,7 +1240,7 @@ class AccessControlServiceFilterTest {
                     .withUpdate(true)
                     .build())
                 .build();
-            caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
+            caseViewField1.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -1283,7 +1283,7 @@ class AccessControlServiceFilterTest {
                     .withUpdate(false)
                     .build())
                 .build();
-            caseViewField1.getFieldType().setCollectionFieldType(getPersonFieldType());
+            caseViewField1.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
 
             CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
@@ -1459,10 +1459,10 @@ class AccessControlServiceFilterTest {
 
             assertAll(
                 () -> assertThat(filteredCaseFieldDefinitions, hasSize(1)),
-                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldType().getChildren(), hasSize(3)),
-                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldType().getChildren().get(2).getId(), is("Addresses")),
-                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(1))
+                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldTypeDefinition().getChildren(), hasSize(3)),
+                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldTypeDefinition().getChildren().get(2).getId(), is("Addresses")),
+                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().size(), is(1)),
+                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().size(), is(1))
             );
         }
 
@@ -1512,10 +1512,10 @@ class AccessControlServiceFilterTest {
 
             assertAll(
                 () -> assertThat(filteredCaseFieldDefinitions, hasSize(1)),
-                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldType().getChildren(), hasSize(3)),
-                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldType().getChildren().get(2).getId(), is("Addresses")),
-                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(1)),
-                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldType().getChildren().get(2).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(1))
+                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldTypeDefinition().getChildren(), hasSize(3)),
+                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldTypeDefinition().getChildren().get(2).getId(), is("Addresses")),
+                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().size(), is(1)),
+                () -> assertThat(filteredCaseFieldDefinitions.get(0).getFieldTypeDefinition().getChildren().get(2).getFieldTypeDefinition().getChildren().get(0).getFieldTypeDefinition().getChildren().size(), is(1))
             );
         }
     }

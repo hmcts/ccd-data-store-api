@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCriteriaOperation;
@@ -184,7 +184,7 @@ public class UIDefinitionController {
         )
     })
     public ResponseEntity<JurisdictionConfigViewResource> getJurisdictionUiConfigs(@RequestParam("ids") Optional<List<String>> idsOptional) {
-        List<JurisdictionUiConfig> listOfConfigs = idsOptional.isPresent()
+        List<JurisdictionUiConfigDefinition> listOfConfigs = idsOptional.isPresent()
                                         ? getJurisdictionUiConfigOperation.execute(idsOptional.get())
                                         : Lists.newArrayList();
         return ResponseEntity.ok(new JurisdictionConfigViewResource(listOfConfigs));

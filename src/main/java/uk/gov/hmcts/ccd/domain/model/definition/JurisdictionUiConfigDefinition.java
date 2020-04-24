@@ -5,12 +5,12 @@ import java.io.Serializable;
 import lombok.ToString;
 
 @ToString
-public class JurisdictionUiConfig implements Serializable {
+public class JurisdictionUiConfigDefinition implements Serializable {
 
     private String id = null;
     private String name  = null;
     private Boolean shuttered = null;
-    
+
     public String getId() {
         return id;
     }

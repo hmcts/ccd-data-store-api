@@ -32,7 +32,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     @JsonProperty("hint_text")
     private String hintText = null;
     @JsonProperty("field_type")
-    private FieldType fieldType = null;
+    private FieldTypeDefinition fieldTypeDefinition = null;
     private Boolean hidden = null;
     @JsonProperty("security_classification")
     private String securityLabel = null;
@@ -85,12 +85,12 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         this.hintText = hintText;
     }
 
-    public FieldType getFieldType() {
-        return fieldType;
+    public FieldTypeDefinition getFieldTypeDefinition() {
+        return fieldTypeDefinition;
     }
 
-    public void setFieldType(FieldType fieldType) {
-        this.fieldType = fieldType;
+    public void setFieldTypeDefinition(FieldTypeDefinition fieldTypeDefinition) {
+        this.fieldTypeDefinition = fieldTypeDefinition;
     }
 
     public Boolean getHidden() {
@@ -202,7 +202,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     private void clearACLsForMissingComplexACLs() {
         if (this.isCompoundFieldType()) {
-            final List<String> allPaths = buildAllDottedComplexFieldPossibilities(this.getFieldType().getChildren());
+            final List<String> allPaths = buildAllDottedComplexFieldPossibilities(this.getFieldTypeDefinition().getChildren());
             this.complexACLs.forEach(complexACL -> {
                 Optional<String> parentPath = getParentPath(complexACL.getListElementCode());
                 List<String> siblings;
@@ -266,7 +266,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     private static void propagateACLsToNestedFields(CommonField caseField, List<AccessControlList> acls) {
         if (caseField.isCompoundFieldType()) {
-            caseField.getFieldType().getChildren().forEach(nestedField -> {
+            caseField.getFieldTypeDefinition().getChildren().forEach(nestedField -> {
                 final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
                 nestedField.setAccessControlLists(cloneACLs);
                 propagateACLsToNestedFields(nestedField, acls);
@@ -292,12 +292,12 @@ public class CaseFieldDefinition implements Serializable, CommonField {
             allSubTypePossibilities.add(startingString + concatenationCharacter + caseField.getId());
 
             List<CaseFieldDefinition> complexFields;
-            if (caseField.getFieldType() == null) {
+            if (caseField.getFieldTypeDefinition() == null) {
                 complexFields = Collections.emptyList();
             } else if (isCollection(caseField)) {
-                complexFields = caseField.getFieldType().getCollectionFieldType().getComplexFields();
+                complexFields = caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields();
             } else {
-                complexFields = caseField.getFieldType().getComplexFields();
+                complexFields = caseField.getFieldTypeDefinition().getComplexFields();
             }
 
             prepare(allSubTypePossibilities,
@@ -307,8 +307,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     }
 
     private boolean isCollection(CommonField caseField) {
-        return caseField.getFieldType().getCollectionFieldType() != null
-            && caseField.getFieldType().getCollectionFieldType().getComplexFields() != null
-            && !caseField.getFieldType().getCollectionFieldType().getComplexFields().isEmpty();
+        return caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition() != null
+            && caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields() != null
+            && !caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().isEmpty();
     }
 }

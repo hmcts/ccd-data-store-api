@@ -99,9 +99,9 @@ class CaseDetailsTest {
     private CaseTypeTabField createCaseTypeTabField(String id, String type) {
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setId(id);
-        FieldType labelFieldType = new FieldType();
-        labelFieldType.setType(type);
-        caseFieldDefinition.setFieldType(labelFieldType);
+        FieldTypeDefinition labelFieldTypeDefinition = new FieldTypeDefinition();
+        labelFieldTypeDefinition.setType(type);
+        caseFieldDefinition.setFieldTypeDefinition(labelFieldTypeDefinition);
         CaseTypeTabField tabField = new CaseTypeTabField();
         tabField.setCaseFieldDefinition(caseFieldDefinition);
         return tabField;

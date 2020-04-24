@@ -10,13 +10,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 public class CollectionValidatorTest {
 
@@ -31,18 +31,18 @@ public class CollectionValidatorTest {
     public void setUp() throws Exception {
         validator = new CollectionValidator();
 
-        final FieldType collectionFieldType = new FieldType();
-        collectionFieldType.setId(TYPE_TEXT);
-        collectionFieldType.setType(TYPE_TEXT);
+        final FieldTypeDefinition collectionFieldTypeDefinition = new FieldTypeDefinition();
+        collectionFieldTypeDefinition.setId(TYPE_TEXT);
+        collectionFieldTypeDefinition.setType(TYPE_TEXT);
 
-        final FieldType fieldType = new FieldType();
-        fieldType.setId(TYPE_TEXT);
-        fieldType.setType(COLLECTION);
-        fieldType.setCollectionFieldType(collectionFieldType);
+        final FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setId(TYPE_TEXT);
+        fieldTypeDefinition.setType(COLLECTION);
+        fieldTypeDefinition.setCollectionFieldTypeDefinition(collectionFieldTypeDefinition);
 
         caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setId(CASE_FIELD_ID);
-        caseFieldDefinition.setFieldType(fieldType);
+        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_invalidMin() throws IOException {
-        caseFieldDefinition.getFieldType().setMin(new BigDecimal(2));
+        caseFieldDefinition.getFieldTypeDefinition().setMin(new BigDecimal(2));
 
         final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"} ]"), caseFieldDefinition);
 
@@ -64,7 +64,7 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_invalidMax() throws IOException {
-        caseFieldDefinition.getFieldType().setMax(ONE);
+        caseFieldDefinition.getFieldTypeDefinition().setMax(ONE);
 
         final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"}, { \"value\": \"V2\"} ]"), caseFieldDefinition);
 
@@ -74,8 +74,8 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_validMinMax() throws IOException {
-        caseFieldDefinition.getFieldType().setMin(ONE);
-        caseFieldDefinition.getFieldType().setMax(ONE);
+        caseFieldDefinition.getFieldTypeDefinition().setMin(ONE);
+        caseFieldDefinition.getFieldTypeDefinition().setMax(ONE);
 
         final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"} ]"), caseFieldDefinition);
 

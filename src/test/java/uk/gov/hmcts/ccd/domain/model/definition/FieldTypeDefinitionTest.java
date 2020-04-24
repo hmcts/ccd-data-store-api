@@ -12,18 +12,18 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class FieldTypeTest {
+public class FieldTypeDefinitionTest {
 
     @Nested
     @DisplayName("getChildren test")
-    class FieldTypeGetChildrenTest {
+    class FieldTypeDefinitionGetChildrenTest {
 
         @Test
         public void getChildrenOfTextType() {
-            FieldType fieldType = new FieldType();
-            fieldType.setType("Text");
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setType("Text");
 
-            List<CaseFieldDefinition> children = fieldType.getChildren();
+            List<CaseFieldDefinition> children = fieldTypeDefinition.getChildren();
 
             assertThat(children, is(emptyList()));
         }
@@ -35,13 +35,13 @@ public class FieldTypeTest {
             CaseFieldDefinition caseFieldDefinition2 = new CaseFieldDefinition();
             caseFieldDefinition2.setId("caseField2");
 
-            FieldType collectionFieldType = new FieldType();
-            collectionFieldType.setComplexFields(asList(caseFieldDefinition1, caseFieldDefinition2));
-            FieldType fieldType = new FieldType();
-            fieldType.setType("Collection");
-            fieldType.setCollectionFieldType(collectionFieldType);
+            FieldTypeDefinition collectionFieldTypeDefinition = new FieldTypeDefinition();
+            collectionFieldTypeDefinition.setComplexFields(asList(caseFieldDefinition1, caseFieldDefinition2));
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setType("Collection");
+            fieldTypeDefinition.setCollectionFieldTypeDefinition(collectionFieldTypeDefinition);
 
-            List<CaseFieldDefinition> children = fieldType.getChildren();
+            List<CaseFieldDefinition> children = fieldTypeDefinition.getChildren();
 
             assertThat(children.size(), is(2));
             assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseFieldDefinition1.getId())));
@@ -50,10 +50,10 @@ public class FieldTypeTest {
 
         @Test
         public void getChildrenOfInvalidCollectionType() {
-            FieldType fieldType = new FieldType();
-            fieldType.setType("Collection");
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setType("Collection");
 
-            List<CaseFieldDefinition> children = fieldType.getChildren();
+            List<CaseFieldDefinition> children = fieldTypeDefinition.getChildren();
 
             assertThat(children, is(emptyList()));
         }
@@ -64,11 +64,11 @@ public class FieldTypeTest {
             caseFieldDefinition1.setId("caseField1");
             CaseFieldDefinition caseFieldDefinition2 = new CaseFieldDefinition();
             caseFieldDefinition2.setId("caseField2");
-            FieldType fieldType = new FieldType();
-            fieldType.setType("Complex");
-            fieldType.setComplexFields(asList(caseFieldDefinition1, caseFieldDefinition2));
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setType("Complex");
+            fieldTypeDefinition.setComplexFields(asList(caseFieldDefinition1, caseFieldDefinition2));
 
-            List<CaseFieldDefinition> children = fieldType.getChildren();
+            List<CaseFieldDefinition> children = fieldTypeDefinition.getChildren();
 
             assertThat(children.size(), is(2));
             assertTrue(children.stream().anyMatch(e -> e.getId().equals(caseFieldDefinition1.getId())));

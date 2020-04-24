@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 import static java.lang.String.format;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
 @Named
 @Singleton
@@ -93,10 +93,10 @@ public class MergeDataToSearchResultOperation {
         }
     }
 
-    private FieldType buildCaseFieldType(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {
+    private FieldTypeDefinition buildCaseFieldType(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {
         CommonField resultField = caseFieldDefinition.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
             .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseFieldDefinition.getId(), searchResultField.getCaseFieldPath())));
-        return resultField.getFieldType();
+        return resultField.getFieldTypeDefinition();
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
@@ -158,7 +158,7 @@ public class MergeDataToSearchResultOperation {
     private Map<String, TextNode> getLabelsFromCaseFields(CaseTypeDefinition caseTypeDefinition) {
         return caseTypeDefinition.getCaseFieldDefinitions()
             .stream()
-            .filter(caseField -> LABEL.equals(caseField.getFieldType().getType()))
+            .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
             .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField -> instance.textNode(caseField.getLabel())));
     }
 
