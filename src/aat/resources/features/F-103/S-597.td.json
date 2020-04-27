@@ -18,7 +18,9 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8"
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8",
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
     },
     "body": {
       "auditEvents": [
