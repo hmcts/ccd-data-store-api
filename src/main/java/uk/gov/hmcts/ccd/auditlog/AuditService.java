@@ -43,7 +43,8 @@ public class AuditService {
         entry.setIdamId(userRepository.getUser().getEmail());
         entry.setInvokingService(securityUtils.getServiceName());
 
-        entry.setOperationType(auditContext.getAuditOperationType().getLabel());
+        entry.setOperationType(auditContext.getAuditOperationType() != null
+            ? auditContext.getAuditOperationType().getLabel() : null);
         entry.setJurisdiction(auditContext.getJurisdiction());
         entry.setCaseId(auditContext.getCaseId());
         entry.setCaseType(auditContext.getCaseType());

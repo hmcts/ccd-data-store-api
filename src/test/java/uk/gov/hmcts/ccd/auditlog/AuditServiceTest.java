@@ -105,4 +105,19 @@ class AuditServiceTest {
         assertTrue(captor.getValue().getTargetCaseRoles().contains("CaseRole2"));
     }
 
+    @Test
+    @DisplayName("should save to audit repository")
+    void shouldSaveToAuditRepositoryWithNullOperationType() {
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .auditOperationType(null)
+            .httpStatus(403)
+            .build();
+
+        auditService.audit(auditContext);
+
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getHttpStatus(), is(equalTo(403)));
+        assertThat(captor.getValue().getOperationType(), is(equalTo(null)));
+    }
 }

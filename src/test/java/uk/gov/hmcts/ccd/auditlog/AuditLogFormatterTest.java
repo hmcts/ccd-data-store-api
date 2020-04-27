@@ -4,6 +4,7 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 class AuditLogFormatterTest {
@@ -30,21 +31,19 @@ class AuditLogFormatterTest {
 
         String result = logFormatter.format(auditEntry);
 
-        assertThat(result).containsOnlyOnce(AuditLogFormatter.TAG);
-
-        assertThat(result).containsOnlyOnce("dateTime:2020-12-05 10:30:45");
-        assertThat(result).containsOnlyOnce("operationType:VIEW_CASE");
-        assertThat(result).containsOnlyOnce("caseId:test_caseId");
-        assertThat(result).containsOnlyOnce("idamId:test_idamId");
-        assertThat(result).containsOnlyOnce("invokingService:test_invokingService");
-        assertThat(result).containsOnlyOnce("endpointCalled:GET test_path");
-        assertThat(result).containsOnlyOnce("operationOutcome:200");
-        assertThat(result).containsOnlyOnce("caseType:test_caseType");
-        assertThat(result).containsOnlyOnce("jurisdiction:test_jurisdiction");
-        assertThat(result).containsOnlyOnce("eventSelected:test_eventSelected");
-        assertThat(result).containsOnlyOnce("idamIdOfTarget:test_idamIdOfTarget");
-        assertThat(result).containsOnlyOnce("targetCaseRoles:test_targetCaseRoles");
-        assertThat(result).containsOnlyOnce("X-Request-ID:test_X-Request-ID");
+        assertEquals("CLA-CCD dateTime:2020-12-05 10:30:45,"
+            + "operationType:VIEW_CASE,"
+            + "caseId:test_caseId,"
+            + "idamId:test_idamId,"
+            + "invokingService:test_invokingService,"
+            + "endpointCalled:GET test_path,"
+            + "operationOutcome:200,"
+            + "caseType:test_caseType,"
+            + "jurisdiction:test_jurisdiction,"
+            + "eventSelected:test_eventSelected,"
+            + "idamIdOfTarget:test_idamIdOfTarget,"
+            + "targetCaseRoles:test_targetCaseRoles,"
+            + "X-Request-ID:test_X-Request-ID", result);
     }
 
     @Test
@@ -66,5 +65,15 @@ class AuditLogFormatterTest {
         String result = logFormatter.format(auditEntry);
 
         assertThat(result).containsOnlyOnce("targetCaseRoles:role1,role2");
+    }
+
+    @Test
+    void shouldHandleNullTargetCaseRoles() {
+        AuditEntry auditEntry = new AuditEntry();
+        auditEntry.setTargetCaseRoles(null);
+
+        String result = logFormatter.format(auditEntry);
+
+        assertThat(result).doesNotContain("targetCaseRoles:role1,role2");
     }
 }
