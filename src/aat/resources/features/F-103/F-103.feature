@@ -21,7 +21,7 @@ Feature: F-103: Retrieve audit events by case ID (V2)
         Given a user with [an active profile in CCD], 
         When a request is prepared with appropriate values, 
         And the request [contains an malformed case ID],
-         And it is submitted to call the [Retrieve audit events by case ID (V2)] operation of [CCD data store], 
+         And it is submitted to call the [Retrieve audit events by case ID] operation of [CCD Data Store], 
         Then a negative response is received,
         And the response has all other details as expected.
 
@@ -30,6 +30,6 @@ Feature: F-103: Retrieve audit events by case ID (V2)
         Given a user with [an active profile in CCD],
         When a request is prepared with appropriate values,
         And the request [contains a non-existent Case ID],
-        And it is submitted to call the [Retrieve audit events by case ID (V2)] operation of [CCD data store],
+        And it is submitted to call the [Retrieve audit events by case ID] operation of [CCD Data Store],
         Then a negative response is received,
         And the response has all other details as expected.
