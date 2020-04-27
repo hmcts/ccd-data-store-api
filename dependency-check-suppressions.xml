@@ -173,14 +173,4 @@
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
         <cve>CVE-2020-11113</cve>
      </suppress>
-    <suppress>
-      <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-      <packageUrl regex="true">^pkg:maven/com.fasterxml.jackson.core/jackson-databind@.*$</packageUrl>
-      <cve>CVE-2020-11619</cve>
-    </suppress>
-    <suppress>
-      <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-      <packageUrl regex="true">^pkg:maven/com.fasterxml.jackson.core/jackson-databind@.*$</packageUrl>
-      <cve>CVE-2020-11620</cve>
-    </suppress>
 </suppressions>

@@ -1,7 +1,7 @@
 {
   "DateField": null,
   "TextField": "A text fields",
-  "EmailField": "a@b.com",
+  "EmailField": null,
   "NumberField": "11111",
   "ComplexField": {
     "ComplexTextField": "aefaefa",

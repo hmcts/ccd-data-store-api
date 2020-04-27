@@ -74,7 +74,6 @@ public class CaseDocumentAttacherTest {
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
     public static final String DOCUMENT_URL = "document_url";
-    public static final String DOCUMENT_BINARY_URL = "document_binary_url";
     public static final String HASH_TOKEN_STRING = "hashToken";
 
     @BeforeEach
@@ -105,9 +104,7 @@ public class CaseDocumentAttacherTest {
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetailsBefore,caseDataContent);
 
         assertAll(
-            () -> assertEquals(output, expectedOutput)
-
-        );
+            () -> assertEquals(output, expectedOutput));
     }
 
     @Test
@@ -134,9 +131,7 @@ public class CaseDocumentAttacherTest {
         List<DocumentHashToken> actual = caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
-            () -> assertEquals(actual, expected)
-
-                 );
+            () -> assertEquals(actual, expected));
     }
 
     @Test
@@ -166,9 +161,7 @@ public class CaseDocumentAttacherTest {
         List<DocumentHashToken> actual = caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
-            () -> assertEquals(actual, expected)
-
-                 );
+            () -> assertEquals(actual, expected));
     }
 
     @Test
@@ -184,18 +177,14 @@ public class CaseDocumentAttacherTest {
 
         List<DocumentHashToken> expected = Collections.singletonList(
             DocumentHashToken.builder().id("b6ee2bff-8244-431f-94ec-9d8ecace8dd6")
-                             .hashToken("4d49edc151423fb7b2e1f22d89a2d041b43").build()
-
-                                                        );
+                             .hashToken("4d49edc151423fb7b2e1f22d89a2d041b43").build());
 
         caseDocumentAttacher.consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata, beforeCallBack, afterCallBack);
 
         List<DocumentHashToken> actual = caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
-            () -> assertEquals(actual, expected)
-
-                 );
+            () -> assertEquals(actual, expected));
     }
 
     @Test
@@ -221,9 +210,7 @@ public class CaseDocumentAttacherTest {
         List<DocumentHashToken> actual = caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
-            () -> assertEquals(actual, expected)
-
-                 );
+            () -> assertEquals(actual, expected));
     }
 
     @Test
@@ -256,11 +243,9 @@ public class CaseDocumentAttacherTest {
         afterCallBack.put("b6ee2bff-8244-431f-94ec-9d8ecace8dd6", "4d49edc151423fb7b2e1f22d89a2d056234");
         afterCallBack.put("e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", "4d49edc151423fb7b2e1f2230975328jk89");
 
-
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                                                              () -> caseDocumentAttacher
-                                                                 .consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata, beforeCallBack,
-                                                                                                                 afterCallBack));
+                                                                 .consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata, beforeCallBack, afterCallBack));
         Assertions.assertTrue(exception.getMessage().contains(
             "call back attempted to change the hashToken of the following documents:[b6ee2bff-8244-431f-94ec-9d8ecace8dd6, " +
             "e16f2ae0-d6ce-4bd0-a652-47b3c4d86292]"));
@@ -279,8 +264,7 @@ public class CaseDocumentAttacherTest {
 
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                                                              () -> caseDocumentAttacher
-                                                                 .consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata, beforeCallBack,
-                                                                                                                 afterCallBack));
+                                                                 .consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata, beforeCallBack, afterCallBack));
         Assertions.assertTrue(
             exception.getMessage().contains("call back attempted to change the hashToken of the following documents:[b6ee2bff-8244-431f-94ec-9d8ecace8dd6]"));
     }
@@ -295,9 +279,7 @@ public class CaseDocumentAttacherTest {
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
-            () -> assertEquals(output, expectedOutput)
-
-                 );
+            () -> assertEquals(output, expectedOutput));
     }
 
     @Test
@@ -321,9 +303,7 @@ public class CaseDocumentAttacherTest {
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
-            () -> assertEquals(output, expectedOutput)
-
-                 );
+            () -> assertEquals(output, expectedOutput));
     }
 
     @Test
@@ -357,9 +337,7 @@ public class CaseDocumentAttacherTest {
         List<DocumentHashToken> actual = caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
-            () -> assertEquals(actual, expected)
-
-                 );
+            () -> assertEquals(actual, expected));
     }
 
     @Test
@@ -448,25 +426,9 @@ public class CaseDocumentAttacherTest {
             () -> assertEquals(caseDocumentAttacher.documentsAfterCallback, expectedMap));
     }
 
-  /*  @Test
-    @DisplayName("should throw exception while getting documents without hashcode from Case Data after callback response")
-    void shouldThrowExceptionWhileExtractingDocumentsFromCaseDataAfterCallback() throws IOException {
-
-
-        Map<String, JsonNode> dataMap = buildCaseData("case-detail-plain-fields-update.json");
-        Map<String, String> documentMap = new HashMap<>();
-        caseDetails = new CaseDetails();
-        caseDetails.setData(dataMap);
-        caseDetails.setReference(1111122222333334L);
-        caseDetails.setCaseTypeId("BEFTA_CASETYPE_2");
-
-        Assertions.assertThrows(BadRequestException.class,
-                                () -> caseDocumentAttacher.extractDocumentsAfterCallBack(caseDetails, true));
-    }*/
-
     @Test
     @DisplayName("Should call the Case Document AM API to attach document to a case")
-    void shouldCallRestclientToAttachDocumentToCase() {
+    void shouldCallRestClientToAttachDocumentToCase() {
         caseDocumentAttacher.caseDocumentsMetadata =
             CaseDocumentsMetadata.builder()
                                  .documentHashToken(Collections.singletonList(
@@ -554,6 +516,26 @@ public class CaseDocumentAttacherTest {
                                                                               .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())).build();
 
         Assertions.assertThrows(ResourceNotFoundException.class,
+                                () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
+    }
+
+    @Test
+    @DisplayName("Should throw a Service exception when the downstream application fails")
+    void shouldThrowServiceExceptionWhenDownstreamApplicationFails() {
+        doThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR))
+            .when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        caseDocumentAttacher.caseDocumentsMetadata =
+            CaseDocumentsMetadata
+                .builder()
+                .documentHashToken(Collections.singletonList(DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                                                                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())).build();
+
+        Assertions.assertThrows(ServiceException.class,
                                 () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
     }
 
