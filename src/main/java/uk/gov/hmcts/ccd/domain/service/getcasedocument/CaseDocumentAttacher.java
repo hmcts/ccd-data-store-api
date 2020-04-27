@@ -135,8 +135,8 @@ public class CaseDocumentAttacher {
             throw new BadSearchRequest(restClientException.getMessage());
         } else if (restClientException.getStatusCode() == HttpStatus.NOT_FOUND) {
             throw new ResourceNotFoundException(restClientException.getMessage());
-        } else if (restClientException.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
-            throw new ServiceException("The downstream application has failed");
+        } else {
+            throw new ServiceException("The downstream CCD AM application has failed");
         }
     }
 
