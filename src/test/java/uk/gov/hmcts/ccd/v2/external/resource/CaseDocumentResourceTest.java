@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.v2.external.resource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentPermissions;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 import uk.gov.hmcts.ccd.v2.external.domain.Permission;
@@ -37,6 +38,25 @@ class CaseDocumentResourceTest {
             () -> assertThat(result.getDocumentMetadata(), equalTo(caseDocumentMetadata))
         );
     }
+
+    @Test
+    @DisplayName("should throw Null Pointer Exception  when case id is null")
+    void shouldThrowNullPointerExceptionWhenCaseIdNull() {
+        assertThrows(NullPointerException .class, () -> new CaseDocumentResource(null, CASE_DOCUMENT_ID, caseDocumentMetadata));
+
+
+    }
+
+    @Test
+    @DisplayName("should throw Null Pointer Exception  when document id is null")
+    void shouldThrowNullPointerExceptionWhenDocumentIdNull() {
+        assertThrows(NullPointerException .class, () -> new CaseDocumentResource(CASE_REFERENCE, null, caseDocumentMetadata));
+
+
+    }
+
+
+
 
     @Test
     @DisplayName("should link to itself")
