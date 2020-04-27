@@ -80,16 +80,16 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
         final DisplayContext displayContext = displayContext(topLevelField, override);
 
-        if ((hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), ENUM_MAP.get(displayContext))
-            && isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES))
-            || BaseType.get(COMPLEX) == collectionFieldType) {
+        if (shouldExecuteCollection(collectionNode, caseViewField, ENUM_MAP.get(displayContext), collectionFieldType, SUPPORTED_TYPES)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
+                final JsonNode valueNode = item.get(CollectionValidator.VALUE);
+                final String valueToConvert = valueNode.isNull() ? null : valueNode.asText();
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
                     isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES) ?
-                        createNode(caseViewField.getDisplayContextParameter(), item.get(CollectionValidator.VALUE).asText(), collectionFieldType, fieldPath, displayContext) :
-                        executeComplex(item.get(CollectionValidator.VALUE), caseViewField.getFieldType().getChildren(), null, fieldPath, topLevelField));
+                        createNode(caseViewField.getDisplayContextParameter(), valueToConvert, collectionFieldType, fieldPath, displayContext) :
+                        executeComplex(valueNode, caseViewField.getFieldType().getChildren(), null, fieldPath, topLevelField));
                 newNode.add(newItem);
             });
 
@@ -133,4 +133,6 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
                 DateTimeFormatParser.DATE_FORMAT.toString()
             );
     }
+
+
 }

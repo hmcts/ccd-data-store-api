@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
+import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.hasDisplayContextParameterType;
 
 public abstract class FieldProcessor {
 
@@ -52,16 +53,22 @@ public abstract class FieldProcessor {
             return null;
         }
         ObjectNode newNode = MAPPER.createObjectNode();
-        complexCaseFields.stream().forEach(complexCaseField -> {
-            final BaseType complexFieldType = BaseType.get(complexCaseField.getFieldType().getType());
-            final String fieldId = complexCaseField.getId();
+        complexNode.fieldNames().forEachRemaining(fieldId -> {
             final JsonNode caseFieldNode = complexNode.get(fieldId);
+            Optional<CaseField> complexCaseFieldOpt = complexCaseFields.stream().filter(f -> f.getId().equals(fieldId)).findFirst();
+            if (!complexCaseFieldOpt.isPresent()) {
+                newNode.set(fieldId, caseFieldNode);
+                return;
+            }
+            final CaseField complexCaseField = complexCaseFieldOpt.get();
+            final BaseType complexFieldType = BaseType.get(complexCaseField.getFieldType().getType());
+
             final String fieldPath = fieldPrefix + FIELD_SEPARATOR + fieldId;
 
             if (complexFieldType == BaseType.get(COLLECTION)) {
                 newNode.set(fieldId,
                     executeCollection(caseFieldNode, complexCaseField, fieldPath, wizardPageComplexFieldOverride(wizardPageField, fieldPath).orElse(null), topLevelField
-                ));
+                    ));
             } else if (complexFieldType == BaseType.get(COMPLEX)) {
                 Optional.ofNullable(
                     executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), wizardPageField, fieldPath, topLevelField))
@@ -95,6 +102,17 @@ public abstract class FieldProcessor {
         return Optional.ofNullable(override)
             .map(WizardPageComplexFieldOverride::displayContextType)
             .orElse(Optional.ofNullable(field.displayContextType()).orElse(DisplayContext.READONLY));
+    }
+
+    protected boolean shouldExecuteCollection(JsonNode collectionNode,
+                                              CommonField field,
+                                              DisplayContextParameterType supportedDCP,
+                                              BaseType collectionFieldType,
+                                              List<String> supportedTypes) {
+        return !isNullOrEmpty(collectionNode)
+               && ((hasDisplayContextParameterType(field.getDisplayContextParameter(), supportedDCP)
+                    && isSupportedBaseType(collectionFieldType, supportedTypes))
+                   || BaseType.get(COMPLEX) == collectionFieldType);
     }
 
     private Optional<WizardPageComplexFieldOverride> wizardPageComplexFieldOverride(WizardPageField wizardPageField, String fieldPath) {
