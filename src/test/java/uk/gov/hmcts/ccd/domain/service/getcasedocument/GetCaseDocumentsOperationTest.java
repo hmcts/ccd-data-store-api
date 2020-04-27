@@ -411,6 +411,42 @@ public class GetCaseDocumentsOperationTest {
     }
 
     @Test
+    @DisplayName("should return CaseDocumentMetaData  if Collection Case Field is missing")
+    void shouldReturnCaseDocumentMetaDataWithoutCollectionField() throws IOException {
+
+        caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
+        caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setId(CASE_REFERENCE);
+        caseDetails.setReference(new Long(CASE_REFERENCE));
+        caseDetails.setState("state1");
+        caseDetails.setData(caseDetailsData);
+        caseFields = Arrays.asList(documentCaseField,complexCaseField);
+        caseType.setCaseFields(caseFields);
+        JsonNode expectedNode = buildJsonNode("document-field-node.json");
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
+        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
+            ArgumentMatchers.any(JsonNode.class),
+            ArgumentMatchers.any(List.class),
+            ArgumentMatchers.any(Set.class),
+            eq(AccessControlService.CAN_READ),
+            anyBoolean());
+
+        CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
+        assertAll(
+            () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions(), is(documentPermissions)),
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getId(), is(documentPermissions.getId())),
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
+        );
+
+
+    }
+
+    @Test
     @DisplayName("collection don't have complex field")
     void shouldNotExtractDocumentFieldWhileCollectionNotHaveComplexField() throws IOException {
         List<CaseField> caseFields = Arrays.asList(buildCaseField("collection-type-without-complexfield.json"));
