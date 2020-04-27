@@ -78,9 +78,9 @@ class SubmitCaseTransaction {
         this.securityClassificationService = securityClassificationService;
         this.caseUserRepository = caseUserRepository;
         this.userAuthorisation = userAuthorisation;
-       this.restTemplate = restTemplate;
-       this.applicationParams = applicationParams;
-       this.securityUtils = securityUtils;
+        this.restTemplate = restTemplate;
+        this.applicationParams = applicationParams;
+        this.securityUtils = securityUtils;
    }
 
     @Transactional(REQUIRES_NEW)
