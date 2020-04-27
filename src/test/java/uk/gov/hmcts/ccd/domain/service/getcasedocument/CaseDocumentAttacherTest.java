@@ -438,7 +438,6 @@ public class CaseDocumentAttacherTest {
                                                                  )).build();
 
         caseDocumentAttacher.restCallToAttachCaseDocuments();
-
         verify(restTemplate, times(1)).exchange(ArgumentMatchers.anyString(),
                                                 ArgumentMatchers.any(HttpMethod.class),
                                                 ArgumentMatchers.any(),
