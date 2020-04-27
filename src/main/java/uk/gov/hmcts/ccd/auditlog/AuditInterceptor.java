@@ -30,21 +30,21 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
                            @Nullable Exception ex) {
-        if (hasLogAudit(handler) &&
-            !applicationParams.getAuditLogIgnoreStatuses().contains(response.getStatus())) {
-            AuditContext auditContext = AuditContextHolder.getAuditContext();
-            auditContext = populateHttpSemantics(auditContext, request, response);
-            try {
-                auditService.audit(auditContext);
-            } catch (Exception e) {  // Ignoring audit failures
-                LOG.error("Error while auditing the request data:{}", e.getMessage());
-            } finally {
-                AuditContextHolder.remove();
+        if (applicationParams.isAuditLogEnabled() && hasAuditAnnotation(handler)) {
+            if (!applicationParams.getAuditLogIgnoreStatuses().contains(response.getStatus())) {
+                AuditContext auditContext = AuditContextHolder.getAuditContext();
+                auditContext = populateHttpSemantics(auditContext, request, response);
+                try {
+                    auditService.audit(auditContext);
+                } catch (Exception e) {  // Ignoring audit failures
+                    LOG.error("Error while auditing the request data:{}", e.getMessage());
+                }
             }
+            AuditContextHolder.remove();
         }
     }
 
-    private boolean hasLogAudit(Object handler) {
+    private boolean hasAuditAnnotation(Object handler) {
         return handler instanceof HandlerMethod && ((HandlerMethod) handler).hasMethodAnnotation(LogAudit.class);
     }
 
