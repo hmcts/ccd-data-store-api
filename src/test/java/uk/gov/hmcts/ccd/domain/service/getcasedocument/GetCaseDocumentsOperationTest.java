@@ -71,6 +71,8 @@ public class GetCaseDocumentsOperationTest {
     private static final String CASE_DOCUMENT_ID_INVALID = "a780ee98-3136-4be9-bf56-a46f8da1bc9@";
     private static final String USER_ID = "test_user_id";
     private static final String CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS = "a780ee98-3136-4be9-bf56-a46f8da1bc85";
+    private static final String CASE_DOCUMENT_FIELD_2_ID = "e16f2ae0-d6ce-4bd0-a652-47b3c4d86292";
+
 
 
 
@@ -295,6 +297,21 @@ public class GetCaseDocumentsOperationTest {
     }
 
     @Test
+    @DisplayName("should not extract any document field in case of empty list")
+    void shouldNotExtractAnyFieldsInCaseOfListEmpty() throws IOException {
+        List<CaseField> caseFields = Collections.EMPTY_LIST;
+        List<CaseField>  inputCaseField = new ArrayList<>();
+        List<CaseField>  expectedCaseField = Collections.EMPTY_LIST;
+
+        caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
+        assertAll(
+            () -> assertEquals(inputCaseField,expectedCaseField)
+
+        );
+    }
+
+
+    @Test
     @DisplayName("should return CaseDocumentMetadata")
     void shouldReturnCaseDocumentMetadataWhenDocumentFieldInsideComplexField() throws IOException {
 
@@ -325,6 +342,52 @@ public class GetCaseDocumentsOperationTest {
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
         );
     }
+
+    @Test
+    @DisplayName("should throw CaseDocumentNotFoundException  if url is  missing")
+    void shouldThrowExceptionIfDocumentFieldUrlIsMissing() throws IOException {
+
+        caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
+        caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setId(CASE_REFERENCE);
+        caseDetails.setReference(new Long(CASE_REFERENCE));
+        caseDetails.setState("state1");
+        caseDetails.setData(caseDetailsData);
+        caseType.setCaseFields(caseFields);
+        JsonNode expectedNode = buildJsonNode("document-fields-without-url.json");
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_FIELD_2_ID);
+        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
+            ArgumentMatchers.any(JsonNode.class),
+            ArgumentMatchers.any(List.class),
+            ArgumentMatchers.any(Set.class),
+            eq(AccessControlService.CAN_READ),
+            anyBoolean());
+
+        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
+            CASE_DOCUMENT_FIELD_2_ID));
+
+
+    }
+
+    @Test
+    @DisplayName("collection don't have complex field")
+    void shouldNotExtractDocumentFieldWhileCollectionNotHaveComplexField() throws IOException {
+        List<CaseField> caseFields = Arrays.asList(buildCaseField("collection-type-without-complexfield.json"));
+        List<CaseField>  inputCaseField = new ArrayList<>();
+       // List<CaseField>  expectedCaseField = Arrays.asList(caseFields.get(0).getFieldType().getComplexFields().get(0));
+         List<CaseField>  expectedCaseField = Arrays.asList();
+
+        caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
+        assertAll(
+            () -> assertEquals(inputCaseField,expectedCaseField)
+
+        );
+    }
+
 
 
 
