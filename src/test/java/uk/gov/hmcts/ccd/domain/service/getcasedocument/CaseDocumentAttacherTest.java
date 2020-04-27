@@ -74,7 +74,6 @@ public class CaseDocumentAttacherTest {
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
     public static final String DOCUMENT_URL = "document_url";
-    public static final String DOCUMENT_BINARY_URL = "document_binary_url";
     public static final String HASH_TOKEN_STRING = "hashToken";
 
     @BeforeEach
