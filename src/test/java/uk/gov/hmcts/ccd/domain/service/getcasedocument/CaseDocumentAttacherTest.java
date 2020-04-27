@@ -521,6 +521,26 @@ public class CaseDocumentAttacherTest {
     }
 
     @Test
+    @DisplayName("Should throw a Service exception when the downstream application fails")
+    void shouldThrowServiceExceptionWhenDownstreamApplicationFails() {
+        doThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR))
+            .when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        caseDocumentAttacher.caseDocumentsMetadata =
+            CaseDocumentsMetadata
+                .builder()
+                .documentHashToken(Collections.singletonList(DocumentHashToken.builder().id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                                                                              .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a").build())).build();
+
+        Assertions.assertThrows(ServiceException.class,
+                                () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
+    }
+
+    @Test
     @DisplayName("Should throw Resource Not found exception when a document does not exists in document store")
     void shouldThroServiceExceptionWhenDownstreapApplicationFails() {
         doThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR))
