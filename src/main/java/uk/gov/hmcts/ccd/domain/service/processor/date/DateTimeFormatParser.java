@@ -8,10 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -84,10 +81,10 @@ public class DateTimeFormatParser {
     }
 
     private String convert(List<String> permittedInputFormats, String outputFormat, String value) {
-        List<DateTimeFormatter> inputFormatters = permittedInputFormats.stream()
+        Set<DateTimeFormatter> inputFormatters = permittedInputFormats.stream()
             .filter(Objects::nonNull)
             .map(this::getFormatter)
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
         DateTimeFormatter outputFormatter = getFormatter(outputFormat);
         TemporalAccessor parsed = null;
 
@@ -98,7 +95,7 @@ public class DateTimeFormatParser {
             ParsePosition parsePosition = new ParsePosition(0);
             parsed = inputFormatter.parseUnresolved(value, parsePosition);
 
-            if (parsed != null && isValidParseResult(value, parsePosition)) {
+            if (isValidParseResult(value, parsePosition)) {
                 break;
             } else if (!iterator.hasNext()) {
                 throw new DateTimeParseException(
@@ -124,6 +121,6 @@ public class DateTimeFormatParser {
     }
 
     private boolean isValidParseResult(String value, ParsePosition parsePosition) {
-        return parsePosition.getIndex() == value.length();
+        return parsePosition.getErrorIndex() != 1 && parsePosition.getIndex() == value.length();
     }
 }
