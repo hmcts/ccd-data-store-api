@@ -15,7 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessor;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
