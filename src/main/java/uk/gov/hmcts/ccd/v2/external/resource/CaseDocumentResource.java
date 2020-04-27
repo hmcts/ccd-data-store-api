@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class CaseDocumentResource extends RepresentationModel {
+public class CaseDocumentResource extends RepresentationModel<CaseDocumentResource> {
 
     @JsonProperty("documentMetadata")
     private CaseDocumentMetadata documentMetadata;
