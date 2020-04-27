@@ -275,11 +275,12 @@ public class CaseDocumentAttacherTest {
     void shouldReturnDeltaWhenDocumentFieldsUpdate() {
         Set<String> expectedOutput = new HashSet<>();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
+        expectedOutput.add("320233b8-fb61-4b58-8731-23c83638c9c6");
 
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
-            () -> assertEquals(output, expectedOutput));
+            () -> assertEquals(expectedOutput, output));
     }
 
     @Test
