@@ -12,7 +12,6 @@
     "DocumentField8": {
       "document_url": "http://dm-store:8080/documents/f0550adc-eaea-4232-b52f-1c4ac0534d60",
       "document_filename": "Test.png",
-      "document_binary_url": "http://dm-store:8080/documents/f0550adc-eaea-4232-b52f-1c4ac0534d60/binary",
       "hashToken": "UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q"
     },
     "ComplexFixedListField": "VALUE2"
