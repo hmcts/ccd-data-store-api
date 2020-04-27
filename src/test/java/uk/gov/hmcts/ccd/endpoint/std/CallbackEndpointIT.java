@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
