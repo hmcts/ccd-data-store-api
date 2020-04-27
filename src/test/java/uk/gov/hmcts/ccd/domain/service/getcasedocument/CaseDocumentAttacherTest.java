@@ -428,7 +428,7 @@ public class CaseDocumentAttacherTest {
 
     @Test
     @DisplayName("Should call the Case Document AM API to attach document to a case")
-    void shouldCallRestclientToAttachDocumentToCase() {
+    void shouldCallRestClientToAttachDocumentToCase() {
         caseDocumentAttacher.caseDocumentsMetadata =
             CaseDocumentsMetadata.builder()
                                  .documentHashToken(Collections.singletonList(
