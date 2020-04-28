@@ -163,7 +163,13 @@ public class CaseDocumentAttacher {
 
 
     private boolean isDocumentField(JsonNode jsonNode) {
-        return jsonNode.get(DOCUMENT_BINARY_URL) != null || jsonNode.get(DOCUMENT_URL) != null;
+        //temporary change to identofy the conditional flow.
+        if (jsonNode.get(DOCUMENT_BINARY_URL) != null) {
+            return true;
+        } else if (jsonNode.get(DOCUMENT_URL) != null) {
+            return true;
+        }
+        return false;
     }
 
     private String extractDocumentId(JsonNode jsonNode) {
