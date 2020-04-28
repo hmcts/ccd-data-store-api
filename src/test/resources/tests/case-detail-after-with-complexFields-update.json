@@ -60,6 +60,7 @@
   "MultiSelectListField" : [ ],
   "YesOrNoField" : "yes",
   "EmailField" : null,
+  "MyField" : "Test",
   "TextField" : "hi Dharm",
   "DateField" : null,
   "TextAreaField" : null,

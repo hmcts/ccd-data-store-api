@@ -161,10 +161,6 @@ public class CaseDocumentAttacher {
         }
     }
 
-    private boolean isDocumentField(JsonNode jsonNode) {
-        return jsonNode.has(DOCUMENT_BINARY_URL) || jsonNode.has(DOCUMENT_URL);
-    }
-
     private String extractDocumentId(JsonNode jsonNode) {
         try {
             String documentId;
@@ -239,22 +235,9 @@ public class CaseDocumentAttacher {
         }
         //Comparing two jsonNode entities at nested child level
         checkDocumentFieldsDifference(caseDataBefore, caseData, documentsDifference);
-        //Find documentId based on filter Map. So that I can filter the DocumentMetaData Object before calling the case document am Api.
+        //Find documentId based on filter Map. So that we can filter the DocumentMetaData Object before calling the case document am Api.
         findDocumentsId(documentsDifference, filterDocumentSet);
         return filterDocumentSet;
-    }
-
-    private void checkDocumentFieldsDifference(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> caseData,
-                                               Map<String, JsonNode> documentsDifference) {
-        caseBeforeNode = null;
-        caseData.forEach((key, value) -> {
-            if (caseDataBefore.containsKey(key)) {
-                extractDocumentFieldsWithDelta(caseDataBefore, documentsDifference, key, value);
-
-            } else if (isDocumentFieldAtAnyLevel(value)) {
-                documentsDifference.put(key, value);
-            }
-        });
     }
 
     private void extractDocumentFieldsWithDelta(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> documentsDifference, String key, JsonNode value) {
@@ -277,6 +260,20 @@ public class CaseDocumentAttacher {
                                                                                       documentsDifference));
             }
         }
+    }
+
+
+    private void checkDocumentFieldsDifference(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> caseData,
+                                               Map<String, JsonNode> documentsDifference) {
+        caseBeforeNode = null;
+        caseData.forEach((key, value) -> {
+            if (caseDataBefore.containsKey(key)) {
+                extractDocumentFieldsWithDelta(caseDataBefore, documentsDifference, key, value);
+
+            } else if (isDocumentFieldAtAnyLevel(value)) {
+                documentsDifference.put(key, value);
+            }
+        });
     }
 
     public void caseDocumentAttachOperation(CaseDetails caseDetails, CaseDetails caseDetailsBefore, String eventType, boolean callBackWasCalled) {
@@ -314,6 +311,14 @@ public class CaseDocumentAttacher {
     }
 
     private boolean isDocumentFieldAtAnyLevel(JsonNode jsonNode) {
-        return jsonNode != null && (jsonNode.findValue(DOCUMENT_BINARY_URL) != null || jsonNode.findValue(DOCUMENT_URL) != null);
+        return jsonNode != null
+               &&
+               (jsonNode.findValue(DOCUMENT_BINARY_URL) != null
+                ||
+                jsonNode.findValue(DOCUMENT_URL) != null);
+    }
+
+    private boolean isDocumentField(JsonNode jsonNode) {
+        return jsonNode.has(DOCUMENT_BINARY_URL) || jsonNode.has(DOCUMENT_URL);
     }
 }
