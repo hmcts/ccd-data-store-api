@@ -259,7 +259,7 @@ public class CaseDocumentAttacher {
 
     private void extractDocumentFieldsWithDelta(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> documentsDifference, String key, JsonNode value) {
         caseBeforeNode = caseDataBefore.get(key);
-        if (value != null && isDocumentField(value)) {
+        if (!value.isNull() && isDocumentField(value)) {
             if (!value.equals(caseDataBefore.get(key))) {
                 documentsDifference.put(key, value);
             }
@@ -271,7 +271,7 @@ public class CaseDocumentAttacher {
                 JsonNode before = caseBeforeNode.get(fieldName);
                 recursiveMapForCaseDetailsBefore.put(fieldName, before);
             }
-            if (value != null) {
+            if (!value.isNull()) {
                 value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
                                                                                       Collections.singletonMap(node.getKey(), node.getValue()),
                                                                                       documentsDifference));
