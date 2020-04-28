@@ -3,7 +3,7 @@
   "productName": "CCD Data Store",
   "operationName": "Retrieve audit events by case ID",
   "method": "GET",
-  "uri": "/cases/{caseId}/events",
+  "uri": "/cases/{cid}/events",
   "user": {
     "_extends_": "Common_User_For_Request"
   },
