@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v3.V3;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -101,11 +101,11 @@ class SubmitCaseTransaction {
         newCaseDetails.setLastStateModifiedDate(now);
         newCaseDetails.setReference(Long.valueOf(uidService.generateUID()));
 
-        boolean isApiVersion21 = request.getContentType() != null
-            && request.getContentType().equals(V2.MediaType.CREATE_CASE_2_1);
+        boolean isApiVersion3 = request.getContentType() != null
+            && request.getContentType().equals(V3.MediaType.CREATE_CASE);
 
         CaseDocumentAttacher caseDocumentAttacher = null;
-        if (isApiVersion21) {
+        if (isApiVersion3) {
             caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
             caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(newCaseDetails.getData());
         }
@@ -128,7 +128,7 @@ class SubmitCaseTransaction {
                                            CREATOR.getRole());
         }
 
-        if (isApiVersion21) {
+        if (isApiVersion3) {
             caseDocumentAttacher.caseDocumentAttachOperation(newCaseDetails, null, event.getEventId(), aboutToSubmitCallbackResponse.getState().isPresent());
             caseDocumentAttacher.restCallToAttachCaseDocuments();
         }

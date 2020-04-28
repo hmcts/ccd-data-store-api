@@ -41,7 +41,7 @@ public class ApplicationParams {
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
 
-    @Value("${ccd.case-document-am-api.host}")
+    @Value("${ccd.case-document-am-api.base_url}")
     private String caseDocumentAmApiHost;
 
     @Value("${ccd.case-document-am-api.attachDocumentPath}")

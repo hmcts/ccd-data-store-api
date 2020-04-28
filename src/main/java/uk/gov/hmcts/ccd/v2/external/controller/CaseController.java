@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
+import uk.gov.hmcts.ccd.v3.V3;
 
 import static org.springframework.http.ResponseEntity.status;
 
@@ -213,18 +214,18 @@ public class CaseController {
     @PostMapping(
         path = "/case-types/{caseTypeId}/cases",
         headers = {
-            V2.EXPERIMENTAL_HEADER
+            V3.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.CREATE_CASE
+            V3.MediaType.CREATE_CASE
         },
         consumes = {
-            V2.MediaType.CREATE_CASE_2_1
+            V3.MediaType.CREATE_CASE
         }
     )
     @ApiOperation(
-        value = "Submit case creation V2.1",
-        notes = V2.EXPERIMENTAL_WARNING
+        value = "Submit case creation V3",
+        notes = V3.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
           @ApiResponse(
@@ -234,54 +235,54 @@ public class CaseController {
           ),
           @ApiResponse(
               code = 400,
-              message = V2.Error.MISSING_EVENT_TOKEN
+              message = V3.Error.MISSING_EVENT_TOKEN
           ),
           @ApiResponse(
               code = 404,
-              message = V2.Error.EVENT_TRIGGER_NOT_FOUND
+              message = V3.Error.EVENT_TRIGGER_NOT_FOUND
           ),
           @ApiResponse(
               code = 404,
-              message = V2.Error.NO_MATCHING_EVENT_TRIGGER
+              message = V3.Error.NO_MATCHING_EVENT_TRIGGER
           ),
           @ApiResponse(
               code = 409,
-              message = V2.Error.CASE_ALTERED
+              message = V3.Error.CASE_ALTERED
           ),
           @ApiResponse(
               code = 422,
-              message = V2.Error.CASE_DATA_NOT_FOUND
+              message = V3.Error.CASE_DATA_NOT_FOUND
           ),
           @ApiResponse(
               code = 422,
-              message = V2.Error.CASE_TYPE_NOT_FOUND
+              message = V3.Error.CASE_TYPE_NOT_FOUND
           ),
           @ApiResponse(
               code = 422,
-              message = V2.Error.USER_ROLE_NOT_FOUND
+              message = V3.Error.USER_ROLE_NOT_FOUND
           ),
           @ApiResponse(
               code = 422,
-              message = V2.Error.EVENT_TRIGGER_NOT_SPECIFIED
+              message = V3.Error.EVENT_TRIGGER_NOT_SPECIFIED
           ),
           @ApiResponse(
               code = 422,
-              message = V2.Error.EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE
+              message = V3.Error.EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE
           ),
           @ApiResponse(
               code = 422,
-              message = V2.Error.EVENT_TRIGGER_HAS_PRE_STATE
+              message = V3.Error.EVENT_TRIGGER_HAS_PRE_STATE
           ),
           @ApiResponse(
               code = 422,
-              message = V2.Error.CASE_FIELD_INVALID
+              message = V3.Error.CASE_FIELD_INVALID
           ),
           @ApiResponse(
               code = 504,
-              message = V2.Error.CALLBACK_EXCEPTION
+              message = V3.Error.CALLBACK_EXCEPTION
           )
     })
-    public ResponseEntity<CaseResource> createCaseV21(@PathVariable("caseTypeId") String caseTypeId,
+    public ResponseEntity<CaseResource> createCaseV3(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
         return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
@@ -337,18 +338,18 @@ public class CaseController {
     @PostMapping(
         path = "/cases/{caseId}/events",
         headers = {
-            V2.EXPERIMENTAL_HEADER
+            V3.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.CREATE_EVENT
+            V3.MediaType.CREATE_EVENT
         },
         consumes  = {
-        V2.MediaType.CREATE_EVENT_2_1
+            V3.MediaType.CREATE_EVENT
         }
     )
     @ApiOperation(
-        value = "Submit event creation V2.1",
-        notes = V2.EXPERIMENTAL_WARNING
+        value = "Submit event creation V3",
+        notes = V3.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
         @ApiResponse(
@@ -358,18 +359,18 @@ public class CaseController {
         ),
         @ApiResponse(
             code = 400,
-            message = V2.Error.CASE_ID_INVALID
+            message = V3.Error.CASE_ID_INVALID
         ),
         @ApiResponse(
             code = 404,
-            message = V2.Error.EVENT_TRIGGER_NOT_FOUND
+            message = V3.Error.EVENT_TRIGGER_NOT_FOUND
         ),
         @ApiResponse(
             code = 409,
-            message = V2.Error.CASE_ALTERED
+            message = V3.Error.CASE_ALTERED
         )
     })
-    public ResponseEntity<CaseResource> createEventV21(@PathVariable("caseId") String caseId,
+    public ResponseEntity<CaseResource> createEventV3(@PathVariable("caseId") String caseId,
                                                     @RequestBody final CaseDataContent content) {
         return createCaseEvent(caseId, content);
     }

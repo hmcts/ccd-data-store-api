@@ -54,7 +54,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v3.V3;
 
 @Service
 public class CreateCaseEventService {
@@ -141,11 +141,11 @@ public class CreateCaseEventService {
         validatePreState(caseDetails, eventTrigger);
 
         // Logic start from here to attach document with case ID
-        boolean isApiVersion21 = request.getContentType() != null
-            && request.getContentType().equals(V2.MediaType.CREATE_EVENT_2_1);
+        boolean isApiVersion3 = request.getContentType() != null
+            && request.getContentType().equals(V3.MediaType.CREATE_EVENT);
 
         CaseDocumentAttacher caseDocumentAttacher = null;
-        if (isApiVersion21) {
+        if (isApiVersion3) {
             caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
             caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(content.getData());
         }
@@ -162,14 +162,14 @@ public class CreateCaseEventService {
         validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
         LocalDateTime timeNow = now();
 
-        if (isApiVersion21) {
+        if (isApiVersion3) {
             caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, caseDetailsBefore, content.getEvent().getEventId(), newState.isPresent());
         }
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, eventTrigger, newState, timeNow);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType, timeNow);
 
 
-        if (isApiVersion21) {
+        if (isApiVersion3) {
             //rest api call
             caseDocumentAttacher.restCallToAttachCaseDocuments();
         }

@@ -63,7 +63,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v3.V3;
 
 class SubmitCaseTransactionTest {
 
@@ -239,9 +239,9 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("should create a case for V2.1 endpoint")
+    @DisplayName("should create a case for V3 endpoint")
     void shouldPersistCreateCaseEventV2() throws IOException {
-        doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
+        doReturn(V3.MediaType.CREATE_CASE).when(request).getContentType();
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
         AboutToSubmitCallbackResponse response = buildResponse();
@@ -278,9 +278,9 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("should create a case for V2.1 endpoint")
+    @DisplayName("should create a case for V3 endpoint")
     void shouldPersistCreateCaseEventV2NoCallback() throws IOException {
-        doReturn(V2.MediaType.CREATE_CASE_2_1).when(request).getContentType();
+        doReturn(V3.MediaType.CREATE_CASE).when(request).getContentType();
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
         AboutToSubmitCallbackResponse response = buildResponse();
@@ -315,7 +315,7 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("should not invoke any methods corresponding to create case v2.1")
+    @DisplayName("should not invoke any methods corresponding to create case v3")
     void shouldNotInvokeAttachDocumentToCase() throws IOException {
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
