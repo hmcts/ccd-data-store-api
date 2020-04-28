@@ -161,14 +161,8 @@ public class CaseDocumentAttacher {
         }
     }
 
-
     private boolean isDocumentField(JsonNode jsonNode) {
-        if (jsonNode.get(DOCUMENT_BINARY_URL) != null) {
-            return true;
-        } else if (jsonNode.get(DOCUMENT_URL) != null) {
-            return true;
-        }
-        return false;
+        return jsonNode.get(DOCUMENT_BINARY_URL) != null || jsonNode.get(DOCUMENT_URL) != null;
     }
 
     private String extractDocumentId(JsonNode jsonNode) {
@@ -299,7 +293,7 @@ public class CaseDocumentAttacher {
     private void findDocumentsId(Map<String, JsonNode> sanitisedDataToAttachDoc, Set<String> filterDocumentSet) {
 
         sanitisedDataToAttachDoc.forEach((field, jsonNode) -> {
-            if (jsonNode != null && isDocumentField(jsonNode)) {
+            if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
                 filterDocumentSet.add(documentId);
 
