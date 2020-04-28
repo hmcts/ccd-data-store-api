@@ -445,6 +445,7 @@ public class CaseDocumentAttacherTest {
                                                 ArgumentMatchers.<Class<String>>any());
     }
 
+
     @Test
     @DisplayName("Should Not call the Case Document AM API to attach document to a case for empty payload")
     void shouldNotCallRestClientToAttachDocumentToCaseForNoEligibleDocuments() {
@@ -581,6 +582,31 @@ public class CaseDocumentAttacherTest {
             .put("388a1ce0-f132-4680-90e9-5e782721cabb", "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a");
 
         Assertions.assertThrows(ServiceException.class,
+                                () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
+    }
+
+    @Test
+    @DisplayName("Should throw Document Token Exception when user has provided an invalid document token.")
+    void shouldThrowDocumentTokenExceptionWhenUserHasProvidedInvalidDocument() {
+        doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "The resource", "388a1ce0-f132-4680-90e9-5e782721cabb".getBytes(), StandardCharsets.UTF_8))
+            .when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        caseDocumentAttacher.caseDocumentsMetadata =
+            CaseDocumentsMetadata
+                .builder()
+                .documentHashToken(Collections.singletonList(DocumentHashToken
+                                                                 .builder()
+                                                                 .id("388a1ce0-f132-4680-90e9-5e782721cabb")
+                                                                 .hashToken("57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a")
+                                                                 .build())).build();
+        caseDocumentAttacher.documentAfterCallbackOriginalCopy
+            .put("TestDocument", "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a");
+
+        Assertions.assertThrows(DocumentTokenException.class,
                                 () -> caseDocumentAttacher.restCallToAttachCaseDocuments());
     }
 
