@@ -162,7 +162,7 @@ public class CaseDocumentAttacher {
     }
 
     private boolean isDocumentField(JsonNode jsonNode) {
-        return jsonNode.get(DOCUMENT_BINARY_URL) != null || jsonNode.get(DOCUMENT_URL) != null;
+        return jsonNode.has(DOCUMENT_BINARY_URL) || jsonNode.has(DOCUMENT_URL);
     }
 
     private String extractDocumentId(JsonNode jsonNode) {
