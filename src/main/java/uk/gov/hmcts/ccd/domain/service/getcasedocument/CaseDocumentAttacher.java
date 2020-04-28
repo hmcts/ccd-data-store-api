@@ -165,7 +165,7 @@ public class CaseDocumentAttacher {
     private boolean isDocumentField(JsonNode jsonNode) {
         if (jsonNode.get(DOCUMENT_BINARY_URL) != null) {
             return true;
-        } else if (jsonNode.get(DOCUMENT_BINARY_URL) != null) {
+        } else if (jsonNode.get(DOCUMENT_URL) != null) {
             return true;
         }
         return false;
