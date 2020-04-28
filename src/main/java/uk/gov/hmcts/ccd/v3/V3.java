@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.v3;
 
 public final class V3 {
+    private V3() {
+    }
 
     public static final String EXPERIMENTAL_HEADER = "experimental";
     public static final String EXPERIMENTAL_WARNING = "Experimental! Subject to change or removal, do not use in production!";
