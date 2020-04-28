@@ -289,11 +289,12 @@ public class CaseDocumentAttacherTest {
         HashMap<String, JsonNode> caseDataContent = buildCaseData("case-detail-after-with-complexFields-update.json");
         Set<String> expectedOutput = new HashSet<>();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
+        expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0222");
 
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
-            () -> assertEquals(output, expectedOutput));
+            () -> assertEquals(expectedOutput, output));
     }
 
     @Test
@@ -304,7 +305,7 @@ public class CaseDocumentAttacherTest {
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
         assertAll(
-            () -> assertEquals(output, expectedOutput));
+            () -> assertEquals(expectedOutput, output));
     }
 
     @Test
