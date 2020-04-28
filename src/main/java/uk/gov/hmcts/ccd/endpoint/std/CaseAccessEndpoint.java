@@ -60,7 +60,8 @@ public class CaseAccessEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID")
     })
     @ResponseStatus(value = HttpStatus.CREATED)
-    @LogAudit(operationType = AuditOperationType.GRANT_CASE_ACCESS, caseId = "#caseId", targetIdamId = "#userId.id")
+    @LogAudit(operationType = AuditOperationType.GRANT_CASE_ACCESS, jurisdiction = "#jurisdictionId",
+        caseId = "#caseId", targetIdamId = "#userId.id")
     public void grantAccessToCase(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -87,7 +88,8 @@ public class CaseAccessEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID")
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @LogAudit(operationType = AuditOperationType.REVOKE_CASE_ACCESS, caseId = "#caseId", targetIdamId = "#idToDelete")
+    @LogAudit(operationType = AuditOperationType.REVOKE_CASE_ACCESS, jurisdiction = "#jurisdictionId",
+        caseId = "#caseId", targetIdamId = "#idToDelete")
     public void revokeAccessToCase(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
