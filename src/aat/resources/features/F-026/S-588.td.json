@@ -34,8 +34,8 @@
           "metadata" : true,
           "case_field_id" : "[LAST_STATE_MODIFIED_DATE]",
           "case_field_type" : {
-            "id" : "Date",
-            "type" : "Date",
+            "id" : "DateTime",
+            "type" : "DateTime",
             "min" : null,
             "max" : null,
             "regular_expression" : null,
