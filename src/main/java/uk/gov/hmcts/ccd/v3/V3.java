@@ -5,13 +5,18 @@ public final class V3 {
     public static final String EXPERIMENTAL_HEADER = "experimental";
     public static final String EXPERIMENTAL_WARNING = "Experimental! Subject to change or removal, do not use in production!";
 
-    public final class MediaType {
+    public static final class MediaType {
+        private MediaType() {
+        }
+
         // External API
         public static final String CREATE_EVENT = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v3+json;charset=UTF-8";
         public static final String CREATE_CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v3+json;charset=UTF-8";
     }
 
-    public final class Error {
+    public static final class Error {
+        private Error() {
+        }
 
         public static final String NO_MATCHING_EVENT_TRIGGER = "Cannot find matching event trigger";
         public static final String MISSING_EVENT_TOKEN = "Missing event token";
