@@ -103,12 +103,12 @@ ext {
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0-SNAPSHOT'
     limits = [
-            'instruction': 80,
-            'branch'     : 75,
-            'line'       : 80,
-            'complexity' : 78,
-            'method'     : 80,
-            'class'      : 88
+            'instruction': 90,
+            'branch'     : 85,
+            'line'       : 90,
+            'complexity' : 88,
+            'method'     : 90,
+            'class'      : 98
     ]
     appInsights = '2.0.1'
     springCloudVersion = 'Hoxton.RELEASE'
