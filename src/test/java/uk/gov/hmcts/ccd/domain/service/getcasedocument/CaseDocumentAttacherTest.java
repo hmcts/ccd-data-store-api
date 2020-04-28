@@ -290,6 +290,7 @@ public class CaseDocumentAttacherTest {
         Set<String> expectedOutput = new HashSet<>();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0222");
+        expectedOutput.add("335a9a09-7a51-40e9-8196-6b9e26fce6ff");
 
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
