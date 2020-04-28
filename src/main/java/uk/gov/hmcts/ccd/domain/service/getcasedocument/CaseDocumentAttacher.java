@@ -78,7 +78,7 @@ public class CaseDocumentAttacher {
 
     void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
-            if (jsonNode != null && isDocumentField(jsonNode)) {
+            if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
                 if (jsonNode.get(HASH_TOKEN_STRING) == null) {
                     throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
@@ -110,7 +110,7 @@ public class CaseDocumentAttacher {
 
     private void extractDocumentIdsAfterCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
         data.forEach((field, jsonNode) -> {
-            if (jsonNode != null && isDocumentField(jsonNode)) {
+            if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
                 if (jsonNode.get(HASH_TOKEN_STRING) != null) {
                     documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
