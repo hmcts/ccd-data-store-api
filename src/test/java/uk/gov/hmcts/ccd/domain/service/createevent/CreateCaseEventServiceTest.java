@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v3.V3;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -240,11 +240,11 @@ class CreateCaseEventServiceTest {
 
 
     @Test
-    @DisplayName("should update a case for V2.1 endpoint")
+    @DisplayName("should update a case for V3 endpoint")
     void shouldUpdateV2Event() throws IOException {
         final HttpHeaders headers = new HttpHeaders();
         ResponseEntity<List> responseEntity = new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        doReturn(V2.MediaType.CREATE_EVENT_2_1).when(request).getContentType();
+        doReturn(V3.MediaType.CREATE_EVENT).when(request).getContentType();
         doReturn(headers).when(securityUtils).authorizationHeaders();
         doReturn(responseEntity).when(restTemplate).exchange(
             ArgumentMatchers.anyString(),
@@ -266,7 +266,7 @@ class CreateCaseEventServiceTest {
     }
 
     @Test
-    @DisplayName("should not invoke any methods corresponding to create event v2.1")
+    @DisplayName("should not invoke any methods corresponding to create event v3")
     void shouldNotInvokeAttachDocumentToCase() throws IOException {
         caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore.setState(PRE_STATE_ID);

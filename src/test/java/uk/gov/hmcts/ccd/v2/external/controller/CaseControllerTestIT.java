@@ -113,16 +113,15 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         final Map<String, String> parameterMap = new HashMap<>(4);
-        parameterMap.put("version", "2.1");
         parameterMap.put("charset", "UTF-8");
-        MediaType JSON_CONTENT_V2_CREATE_CASE = new MediaType(
+        MediaType JSON_CONTENT_V3_CREATE_CASE = new MediaType(
             "application",
-            "vnd.uk.gov.hmcts.ccd-data-store-api.create-case+json",
+            "vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v3+json",
             parameterMap);
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
                                                         .header(EXPERIMENTAL_HEADER, "experimental")
-                                                        .contentType(JSON_CONTENT_V2_CREATE_CASE)
+                                                        .contentType(JSON_CONTENT_V3_CREATE_CASE)
                                                         .content(mapper.writeValueAsString(caseDetailsToSave))
                                                    ).andReturn();
 

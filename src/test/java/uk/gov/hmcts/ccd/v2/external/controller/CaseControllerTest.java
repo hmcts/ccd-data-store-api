@@ -135,9 +135,9 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should call V2.1 endpoint and return 201 when case event created")
+        @DisplayName("should call V3 endpoint and return 201 when case event created")
         void caseEventCreatedV21() {
-            final ResponseEntity<CaseResource> response = caseController.createEventV21(CASE_REFERENCE, CASE_DATA_CONTENT);
+            final ResponseEntity<CaseResource> response = caseController.createEventV3(CASE_REFERENCE, CASE_DATA_CONTENT);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
@@ -185,12 +185,12 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should call V2.1 endpoint and return 201 when case is created")
+        @DisplayName("should call V3 endpoint and return 201 when case is created")
         void caseEventCreatedV21() {
             LocalDateTime stateModified = LocalDateTime.now();
             when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
 
-            final ResponseEntity<CaseResource> response = caseController.createCaseV21(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
+            final ResponseEntity<CaseResource> response = caseController.createCaseV3(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),

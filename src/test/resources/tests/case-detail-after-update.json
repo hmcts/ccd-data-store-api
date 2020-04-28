@@ -7,7 +7,7 @@
     "MoneyGBPField" : "750000",
     "DocumentField3" : {
       "document_url" : "http://dm-store:8080/documents/320233b8-fb61-4b58-8731-23c83638c9c6",
-      "document_filename" : "Screenshot 2020-02-26 at 10.07.51.png",
+      "document_filename" : "Screenshot 2020-02-26 at 10.07.51.pngextension",
       "document_binary_url" : "http://dm-store:8080/documents/320233b8-fb61-4b58-8731-23c83638c9c6/binary"
     },
     "FixedListField" : null,
@@ -53,15 +53,14 @@
     "PhoneUKField" : null,
     "DocumentField7" : {
       "document_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976",
-      "document_filename": "Screenshot 2020-02-24 at 13.32.03.png",
-      "document_binary_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976/binary",
+      "document_filename": "Screenshot 2020-02-24 at 13.32.03.Jpeg",
       "hashToken": "41134reqrfadfed49edc151423fb7b2e1f22d87b2d041b34"
     },
     "NumberField" : null,
     "MultiSelectListField" : [ ],
     "YesOrNoField" : "yes",
     "EmailField" : null,
-    "TextField" : "hi Dharm",
+    "TextField" : "hi",
     "DateField" : null,
     "TextAreaField" : null,
     "CollectionField" : [ ]
