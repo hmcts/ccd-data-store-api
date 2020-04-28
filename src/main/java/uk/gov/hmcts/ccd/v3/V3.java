@@ -24,10 +24,8 @@ public final class V3 {
         public static final String NO_MATCHING_EVENT_TRIGGER = "Cannot find matching event trigger";
         public static final String MISSING_EVENT_TOKEN = "Missing event token";
         public static final String CASE_TYPE_NOT_FOUND = "Case type not found";
-        public static final String CASE_NOT_FOUND = "Case not found";
         public static final String USER_ROLE_NOT_FOUND = "User role not found";
         public static final String CASE_DATA_NOT_FOUND = "Case data not found";
-        public static final String PRINTABLE_DOCUMENTS_ENDPOINT_DOWN = "Print documents endpoint is down";
         public static final String EVENT_TRIGGER_NOT_FOUND = "Event trigger not found";
         public static final String EVENT_TRIGGER_NOT_SPECIFIED = "Event trigger not specified";
         public static final String EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE = "Event trigger is not known for given case type";
