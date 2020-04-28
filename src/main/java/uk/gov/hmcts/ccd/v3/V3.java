@@ -12,7 +12,6 @@ public final class V3 {
         }
 
         // External API
-        public static final String CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8";
         public static final String CREATE_EVENT = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v3+json;charset=UTF-8";
         public static final String CREATE_CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v3+json;charset=UTF-8";
     }
