@@ -314,6 +314,6 @@ public class CaseDocumentAttacher {
     }
 
     private boolean isDocumentFieldAtAnyLevel(JsonNode jsonNode) {
-        return jsonNode.findValue(DOCUMENT_BINARY_URL) != null || jsonNode.findValue(DOCUMENT_URL) != null;
+        return jsonNode != null && (jsonNode.findValue(DOCUMENT_BINARY_URL) != null || jsonNode.findValue(DOCUMENT_URL) != null);
     }
 }
