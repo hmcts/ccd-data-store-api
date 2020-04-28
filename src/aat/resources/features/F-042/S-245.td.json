@@ -16,7 +16,6 @@
     "_extends_": "Common_403_Response",
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Type": "application/json",
       "Content-Encoding" : "gzip"
     },
     "body": {

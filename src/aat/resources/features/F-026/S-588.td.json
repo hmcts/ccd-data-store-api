@@ -16,7 +16,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_JURISDICTION_3",
       "ctid": "BEFTA_CASETYPE_3_4",
       "date": "${[scenarioContext][customValues][today]}"
@@ -34,8 +34,8 @@
           "metadata" : true,
           "case_field_id" : "[LAST_STATE_MODIFIED_DATE]",
           "case_field_type" : {
-            "id" : "Date",
-            "type" : "Date",
+            "id" : "DateTime",
+            "type" : "DateTime",
             "min" : null,
             "max" : null,
             "regular_expression" : null,
