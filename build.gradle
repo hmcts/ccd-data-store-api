@@ -108,7 +108,7 @@ ext {
             'line'       : 90,
             'complexity' : 88,
             'method'     : 90,
-            'class'      : 98
+            'class'      : 97
     ]
     appInsights = '2.0.1'
     springCloudVersion = 'Hoxton.RELEASE'
