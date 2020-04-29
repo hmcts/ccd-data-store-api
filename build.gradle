@@ -108,7 +108,7 @@ ext {
             'line'       : 90,
             'complexity' : 88,
             'method'     : 90,
-            'class'      : 97
+            'class'      : 98
     ]
     appInsights = '2.0.1'
     springCloudVersion = 'Hoxton.RELEASE'
@@ -514,6 +514,7 @@ jacocoTestReport {
             fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**',
                                         '**/service/doclink/**',
                                         '**/domain/model/definition/CaseEventFieldComplex**',
+                                        '**/v3.V3.java',
                                         '**/domain/model/definition/DisplayContext**'])
         })
     }
