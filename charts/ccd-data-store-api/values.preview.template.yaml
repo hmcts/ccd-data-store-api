@@ -22,5 +22,8 @@ java:
     ENABLE_DB_MIGRATE: true
     ELASTIC_SEARCH_ENABLED: false
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
+
+    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-606.service.core-compute-preview.internal
+    USER_PROFILE_HOST: http://ccd-user-profile-api-pr-279.service.core-compute-preview.internal
   postgresql:
     enabled: true
