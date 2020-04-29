@@ -25,7 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,16 +69,11 @@ public class GetCaseDocumentsOperationTest {
     private static final String JURISDICTION_ID = "BEFTA_JURISDICTION_2";
     private static final String CASE_DOCUMENT_ID = "a780ee98-3136-4be9-bf56-a46f8da1bc97";
     private static final String CASE_DOCUMENT_ID_INVALID = "a780ee98-3136-4be9-bf56-a46f8da1bc9@";
-    private static final String USER_ID = "test_user_id";
     private static final String CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS = "a780ee98-3136-4be9-bf56-a46f8da1bc85";
     private static final String CASE_DOCUMENT_FIELD_2_ID = "e16f2ae0-d6ce-4bd0-a652-47b3c4d86292";
 
-
-
-
     private final CaseType caseType = new CaseType();
-    private final Set<String> userRoles = Sets.newHashSet("role1", "role2");
-    private final List<String> caseRoles = Collections.emptyList();
+    List<CaseField>  inputCaseField = new ArrayList<>();
     private CaseField documentCaseField;
     private CaseField complexCaseField;
     private CaseField collectionCaseField;
@@ -96,22 +91,15 @@ public class GetCaseDocumentsOperationTest {
     public void setUp() throws IOException {
 
         MockitoAnnotations.initMocks(this);
-        documentCaseField = buildCaseField("document-type-case-field.json");
-        complexCaseField = buildCaseField("complex-type-case-field.json");
-        collectionCaseField = buildCaseField("collection-type-case-field.json");
-        caseDetailsData = buildCaseDetailData("case-details-data.json");
-        documentInComplexCaseField = buildCaseField("complex-type-with-document-case-field.json");
-
-        caseFields = Arrays.asList(documentCaseField,complexCaseField,collectionCaseField,documentInComplexCaseField);
-        caseDetailsOptional = Optional.of(new CaseDetails());
-        doReturn(userRoles).when(userRepository).getUserRoles();
-        doReturn(USER_ID).when(userRepository).getUserId();
-        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
         caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation, caseTypeService, userRepository, caseUserRepository,
             documentIdValidationService, accessControlService);
-    }
 
+        prepareCaseField();
+        prepareCaseDetails();
+        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
+        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS);
+    }
 
 
     @Test
@@ -142,35 +130,14 @@ public class GetCaseDocumentsOperationTest {
     @Test
     @DisplayName("should throw CaseNotFoundException when case reference  is null ")
     void shouldThrowCaseNotFoundWhenCaseReferenceIsNull() {
-        caseDetails = new CaseDetails();
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        assertThrows(CaseNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
+        doReturn(caseDetailsOptional).when(getCaseOperation).execute(null);
+        assertThrows(CaseNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(null, CASE_DOCUMENT_ID));
 
     }
 
     @Test
     @DisplayName("should return CaseDocumentMetadata")
-    void shouldCallGetCaseDocumentMetadata() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-        caseDetails.setData(caseDetailsData);
-        caseType.setCaseFields(caseFields);
-        JsonNode expectedNode = buildJsonNode("document-field-node.json");
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
-            ArgumentMatchers.any(JsonNode.class),
-            ArgumentMatchers.any(List.class),
-            ArgumentMatchers.any(Set.class),
-            eq(AccessControlService.CAN_READ),
-            anyBoolean());
-
+    void shouldReturnGetCaseDocumentMetadata() throws IOException {
         CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
         assertAll(
             () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
@@ -181,102 +148,32 @@ public class GetCaseDocumentsOperationTest {
     }
 
     @Test
-    @DisplayName("should throw CaseDocumentMetadataException  in case of documentId is not in caseDetails")
-    void  shouldThrowCaseDocumentNotFoundExceptionWhenDocumentIdInvalid() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-        caseDetails.setData(caseDetailsData);
-        caseType.setCaseFields(caseFields);
-
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        JsonNode expectedNode = buildJsonNode("document-field-node.json");
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS);
-        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
-            ArgumentMatchers.any(JsonNode.class),
-            ArgumentMatchers.any(List.class),
-            ArgumentMatchers.any(Set.class),
-            eq(AccessControlService.CAN_READ),
-            anyBoolean());
-
+    @DisplayName("should throw CaseDocumentMetadataException when given document id not have read permission")
+    void  shouldThrowExceptionWhenDocumentHaveNoReadPermission() throws IOException {
         assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
             CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS));
     }
 
     @Test
-    @DisplayName("should throw CaseDocumentMetadataException  in case of collection case field only")
-    void  shouldThrowCaseDocumentNotFoundExceptionWhenCollectionTypeField() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-        caseDetails.setData(caseDetailsData);
+    @DisplayName("should throw CaseDocumentMetadataException when passing collection case type field only")
+    void  shouldThrowExceptionWhenCollectionTypeField() throws IOException {
         caseType.setCaseFields(Arrays.asList(collectionCaseField));
-
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        JsonNode expectedNode = buildJsonNode("document-field-node.json");
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS);
-        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
-            ArgumentMatchers.any(JsonNode.class),
-            ArgumentMatchers.any(List.class),
-            ArgumentMatchers.any(Set.class),
-            eq(AccessControlService.CAN_READ),
-            anyBoolean());
-
         assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
             CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS));
     }
 
 
     @Test
-    @DisplayName("should throw CaseDocumentNotFoundException for no qualifying document fields")
+    @DisplayName("should throw CaseDocumentNotFoundException when case type have empty case fields")
     void shouldThrowCaseDocumentNotFoundException() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
         caseType.setCaseFields(Collections.emptyList());
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-
         assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
     }
 
     @Test
-    @DisplayName("should throw CaseNotFoundException if case is not found")
-    void shouldThrowCaseNotFoundException() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-
-        caseDetails.setState("state1");
-
-        assertThrows(CaseNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
-    }
-
-    @Test
-    @DisplayName("should Extract the document fields from CaseDefinition")
-    void shouldExtractDocumentFieldsFromCaseDefinition() throws IOException {
-        List<CaseField>  inputCaseField = new ArrayList<>();
+    @DisplayName("should extract the document fields once passing the document type case fields")
+    void shouldExtractDocumentFieldsFromCaseType() throws IOException {
         List<CaseField>  expectedCaseField = Arrays.asList(documentCaseField,documentInComplexCaseField.getFieldType().getComplexFields().get(3));
-
         caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
         assertAll(
             () -> assertEquals(inputCaseField,expectedCaseField)
@@ -285,12 +182,10 @@ public class GetCaseDocumentsOperationTest {
     }
 
     @Test
-    @DisplayName("should Extract the document fields from Collection Case Field")
+    @DisplayName("should extract the document fields from Collection case type field")
     void shouldExtractDocumentFieldsFromCollectionTypeCaseField() throws IOException {
         List<CaseField> caseFields = Arrays.asList(buildCaseField("collection-type-with-document-case-field.json"));
-        List<CaseField>  inputCaseField = new ArrayList<>();
         List<CaseField>  expectedCaseField = Arrays.asList(caseFields.get(0).getFieldType().getComplexFields().get(0));
-
         caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
         assertAll(
             () -> assertEquals(inputCaseField,expectedCaseField)
@@ -299,10 +194,9 @@ public class GetCaseDocumentsOperationTest {
     }
 
     @Test
-    @DisplayName("should not extract any document field in case of empty list")
+    @DisplayName("should not extract any document fields when list of Case Field is  empty ")
     void shouldNotExtractAnyFieldsInCaseOfListEmpty() throws IOException {
         List<CaseField> caseFields = Collections.EMPTY_LIST;
-        List<CaseField>  inputCaseField = new ArrayList<>();
         List<CaseField>  expectedCaseField = Collections.EMPTY_LIST;
 
         caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
@@ -315,27 +209,7 @@ public class GetCaseDocumentsOperationTest {
 
     @Test
     @DisplayName("should return CaseDocumentMetadata")
-    void shouldReturnCaseDocumentMetadataWhenDocumentFieldInsideComplexField() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-        caseDetails.setData(caseDetailsData);
-        caseType.setCaseFields(caseFields);
-        JsonNode expectedNode = buildJsonNode("document-field-node.json");
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
-            ArgumentMatchers.any(JsonNode.class),
-            ArgumentMatchers.any(List.class),
-            ArgumentMatchers.any(Set.class),
-            eq(AccessControlService.CAN_READ),
-            anyBoolean());
-
+    void shouldReturnCaseDocumentMetadata() throws IOException {
         CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
         assertAll(
             () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
@@ -346,21 +220,9 @@ public class GetCaseDocumentsOperationTest {
     }
 
     @Test
-    @DisplayName("should throw CaseDocumentNotFoundException  if url is  missing")
-    void shouldThrowExceptionIfDocumentFieldUrlIsMissing() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-        caseDetails.setData(caseDetailsData);
-        caseType.setCaseFields(caseFields);
+    @DisplayName("should throw CaseDocumentNotFoundException when  binary and document url is missing for given document id")
+    void shouldThrowExceptionIfUrlIsMissing() throws IOException {
         JsonNode expectedNode = buildJsonNode("document-fields-without-url.json");
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
         doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_FIELD_2_ID);
         doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
             ArgumentMatchers.any(JsonNode.class),
@@ -371,27 +233,12 @@ public class GetCaseDocumentsOperationTest {
 
         assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
             CASE_DOCUMENT_FIELD_2_ID));
-
-
     }
 
     @Test
-    @DisplayName("should return CaseDocumentMetaData  if Binary url is  missing")
+    @DisplayName("should return CaseDocumentMetaData when Binary url is  missing for given document id and  having read permission")
     void shouldReturnCaseDocumentMetaData() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-        caseDetails.setData(caseDetailsData);
-        caseType.setCaseFields(caseFields);
         JsonNode expectedNode = buildJsonNode("document-fields-without-url.json");
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
         doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
             ArgumentMatchers.any(JsonNode.class),
             ArgumentMatchers.any(List.class),
@@ -411,30 +258,11 @@ public class GetCaseDocumentsOperationTest {
     }
 
     @Test
-    @DisplayName("should return CaseDocumentMetaData  if Collection Case Field is missing")
+    @DisplayName("should return CaseDocumentMetaData when passing document and complex type case fields")
     void shouldReturnCaseDocumentMetaDataWithoutCollectionField() throws IOException {
 
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-        caseDetails.setData(caseDetailsData);
         caseFields = Arrays.asList(documentCaseField,complexCaseField);
         caseType.setCaseFields(caseFields);
-        JsonNode expectedNode = buildJsonNode("document-field-node.json");
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
-        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
-            ArgumentMatchers.any(JsonNode.class),
-            ArgumentMatchers.any(List.class),
-            ArgumentMatchers.any(Set.class),
-            eq(AccessControlService.CAN_READ),
-            anyBoolean());
-
         CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
         assertAll(
             () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
@@ -448,30 +276,10 @@ public class GetCaseDocumentsOperationTest {
 
 
     @Test
-    @DisplayName("should return CaseDocumentMetaData  if Complex Case Field is missing")
+    @DisplayName("should return CaseDocumentMetaData  when passing document and collection type case fields")
     void shouldReturnCaseDocumentMetaDataWithoutComplexField() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-        caseDetails.setData(caseDetailsData);
         caseFields = Arrays.asList(documentCaseField,collectionCaseField);
         caseType.setCaseFields(caseFields);
-        JsonNode expectedNode = buildJsonNode("document-field-node.json");
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
-        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
-            ArgumentMatchers.any(JsonNode.class),
-            ArgumentMatchers.any(List.class),
-            ArgumentMatchers.any(Set.class),
-            eq(AccessControlService.CAN_READ),
-            anyBoolean());
-
         CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
         assertAll(
             () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
@@ -480,47 +288,25 @@ public class GetCaseDocumentsOperationTest {
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
         );
 
-
     }
 
     @Test
-    @DisplayName("should throw exception if Complex Case Field is missing")
+    @DisplayName("should throw exception when there is no document type case field")
     void shouldThrowExceptionWithoutDocumentField() throws IOException {
 
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setState("state1");
-        caseDetails.setData(caseDetailsData);
         caseFields = Arrays.asList(complexCaseField,collectionCaseField);
         caseType.setCaseFields(caseFields);
-        JsonNode expectedNode = buildJsonNode("document-field-node.json");
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS);
-        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
-            ArgumentMatchers.any(JsonNode.class),
-            ArgumentMatchers.any(List.class),
-            ArgumentMatchers.any(Set.class),
-            eq(AccessControlService.CAN_READ),
-            anyBoolean());
 
         assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
             CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS));
-
 
     }
 
     @Test
     @DisplayName("collection don't have complex field")
-    void shouldNotExtractDocumentFieldWhileCollectionNotHaveComplexField() throws IOException {
+    void shouldNotExtractDocumentFieldWhenComplexFieldNullInCollection() throws IOException {
         List<CaseField> caseFields = Arrays.asList(buildCaseField("collection-type-without-complexfield.json"));
-        List<CaseField>  inputCaseField = new ArrayList<>();
         List<CaseField>  expectedCaseField = Arrays.asList();
-
         caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
         assertAll(
             () -> assertEquals(inputCaseField,expectedCaseField)
@@ -531,26 +317,10 @@ public class GetCaseDocumentsOperationTest {
     @Test
     @DisplayName("should throw CaseDocumentMetadataException  in case of  text field")
     void  shouldThrowCaseDocumentNotFoundExceptionWhenTextField() throws IOException {
-
-        caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setId(CASE_REFERENCE);
-        caseDetails.setReference(new Long(CASE_REFERENCE));
-        caseDetails.setData(caseDetailsData);
         caseType.setCaseFields(Arrays.asList(buildCaseField("text-type-case-field.json")));
-
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
-
-
         assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
             CASE_DOCUMENT_ID));
     }
-
-
-
 
 
     static CaseField buildCaseField(String fileName) throws IOException {
@@ -560,7 +330,6 @@ public class GetCaseDocumentsOperationTest {
             new ObjectMapper().readValue(inputStream, new TypeReference<CaseField>() {
             });
     }
-
 
 
     static HashMap<String, JsonNode> buildCaseDetailData(String fileName) throws IOException {
@@ -577,6 +346,34 @@ public class GetCaseDocumentsOperationTest {
         return
             new ObjectMapper().readValue(inputStream, new TypeReference<JsonNode>() {
             });
+    }
+
+    private void prepareCaseField() throws IOException {
+        documentCaseField = buildCaseField("document-type-case-field.json");
+        complexCaseField = buildCaseField("complex-type-case-field.json");
+        collectionCaseField = buildCaseField("collection-type-case-field.json");
+        caseDetailsData = buildCaseDetailData("case-details-data.json");
+        documentInComplexCaseField = buildCaseField("complex-type-with-document-case-field.json");
+        caseFields = Arrays.asList(documentCaseField,complexCaseField,collectionCaseField,documentInComplexCaseField);
+        JsonNode expectedNode = buildJsonNode("document-field-node.json");
+        doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
+            ArgumentMatchers.any(JsonNode.class),
+            ArgumentMatchers.any(List.class),
+            ArgumentMatchers.any(Set.class),
+            eq(AccessControlService.CAN_READ),
+            anyBoolean());
+    }
+    
+    private void prepareCaseDetails() {
+        caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
+        caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setId(CASE_REFERENCE);
+        caseDetails.setReference(new Long(CASE_REFERENCE));
+        caseDetails.setData(caseDetailsData);
+        caseType.setCaseFields(caseFields);
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        caseDetailsOptional = Optional.of(new CaseDetails());
     }
 }
 
