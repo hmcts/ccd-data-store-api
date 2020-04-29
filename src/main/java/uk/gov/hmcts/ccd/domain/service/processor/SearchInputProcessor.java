@@ -35,10 +35,8 @@ public class SearchInputProcessor {
         this.getCriteriaOperation = getCriteriaOperation;
     }
 
-    public Map<String, String> execute(String view, MetaData metadata, Map<String, String> queryParameters) {
-        final List<? extends CriteriaInput> criteriaInputs =
-            getCriteriaOperation.execute(metadata.getCaseTypeId(), null,
-                view == null ? CriteriaType.SEARCH : CriteriaType.valueOf(view));
+    public Map<String, String> executeQueryParams(String view, MetaData metadata, Map<String, String> queryParameters) {
+        final List<? extends CriteriaInput> criteriaInputs = getCriteriaInputs(view, metadata);
 
         Map<String, String> newParams = new HashMap<>();
         queryParameters.entrySet().stream().forEach(entry -> {
@@ -58,6 +56,37 @@ public class SearchInputProcessor {
         });
 
         return newParams;
+    }
+
+    public MetaData executeMetadata(String view, MetaData metadata) {
+        getCriteriaInputs(view, metadata).stream()
+            .filter(i -> i.getField().isMetadata() && !Strings.isNullOrEmpty(i.getDisplayContextParameter()))
+            .forEach(input -> {
+                final String id = input.getField().getId();
+                MetaData.CaseField field;
+                try {
+                    field = MetaData.CaseField.valueOfReference(id);
+                } catch (IllegalArgumentException ex) {
+                    throw new DataProcessingException().withDetails(
+                        String.format("Unable to process unknown metadata field %s.", id)
+                    );
+                }
+                if (DisplayContextParameter
+                        .hasDisplayContextParameterType(input.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
+                    && MetaData.DATE_FIELDS.contains(field)
+                    && metadata.getOptionalMetadata(field).isPresent()) {
+                    metadata.setOptionalMetadata(field,
+                        processValue(id, input.getDisplayContextParameter(),
+                            metadata.getOptionalMetadata(field).get(), input.getField().getType()));
+                }
+        });
+
+        return metadata;
+    }
+
+    private List<? extends CriteriaInput> getCriteriaInputs(String view, MetaData metadata) {
+        return getCriteriaOperation.execute(metadata.getCaseTypeId(), null,
+            view == null ? CriteriaType.SEARCH : CriteriaType.valueOf(view));
     }
 
     private void handleTopLevel(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
@@ -113,7 +142,7 @@ public class SearchInputProcessor {
             .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
             .map(DisplayContextParameter::getValue)
             .orElseGet(() -> fieldType.getType().equals(FieldType.DATE) ?
-                DateTimeFormatParser.DATE_FORMAT.toString() :
-                DateTimeFormatParser.DATE_TIME_FORMAT.toString());
+                DateTimeFormatParser.DATE_FORMAT :
+                DateTimeFormatParser.DATE_TIME_FORMAT);
     }
 }
