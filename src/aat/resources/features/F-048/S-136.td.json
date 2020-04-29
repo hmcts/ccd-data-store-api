@@ -15,17 +15,14 @@
 	],
 	"request": {
 		"pathVariables": {
-			"uid": "[[DYNAMIC]]",
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
 			"jid": "AUTOTEST1",
 			"ctid": "AAT"
 		}
 	},
 	"expectedResponse": {
-		"responseCode": 200,
-		"responseMessage": "OK",
 		"headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {

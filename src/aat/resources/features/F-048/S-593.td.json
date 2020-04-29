@@ -20,18 +20,16 @@
   },
 	"request": {
 		"pathVariables": {
-			"uid": "[[DYNAMIC]]",
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_JURISDICTION_3",
       "ctid": "BEFTA_CASETYPE_3_4",
       "date":"1970-01-01"
 		}
 	},
 	"expectedResponse": {
-		"responseCode": 200,
-		"responseMessage": "OK",
+    "_extends_": "Common_200_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {

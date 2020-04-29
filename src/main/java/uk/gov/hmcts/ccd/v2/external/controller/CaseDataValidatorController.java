@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 @RequestMapping(path = "/case-types")
 public class CaseDataValidatorController {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final MidEventCallback midEventCallback;
