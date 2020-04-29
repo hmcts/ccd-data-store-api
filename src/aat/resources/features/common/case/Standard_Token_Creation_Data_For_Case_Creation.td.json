@@ -22,7 +22,7 @@
 			"_extends_": "Common_Request_Headers"
 		},
 		"pathVariables": {
-			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"uid": "[[DYNAMIC]]",
 			"jid": "AUTOTEST1",
 			"ctid": "AAT_AUTH_15",
 			"etid": "CREATE"

@@ -5,7 +5,7 @@
   "operationName": "Fetch a case for display for Case Worker",
   "request": {
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
       "ctid": "AAT"
     }

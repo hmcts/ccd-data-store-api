@@ -13,7 +13,7 @@
   },
   "request": {
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "uid": "[[DYNAMIC]]",
       "jid": "BEFTA_JURISDICTION_3",
       "ctid": "BEFTA_CASETYPE_3_4",
       "cid": "${[scenarioContext][childContexts][S-027.01_Case][testData][actualResponse][body][id]}"
