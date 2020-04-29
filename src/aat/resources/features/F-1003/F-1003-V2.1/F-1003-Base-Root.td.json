@@ -10,7 +10,7 @@
     "headers": {
       "Authorization": "[[DEFAULT_AUTO_VALUE]]",
       "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case+json;charset=UTF-8;version=2.1",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v3+json;charset=UTF-8",
       "experimental": true
     },
     "pathVariables": {

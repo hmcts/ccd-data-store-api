@@ -1,0 +1,23 @@
+{
+  "_guid_": "S-1032",
+  "_extends_": "F-1003_Test_Base_data",
+  "title": "must get an error response for a malformed case type ID",
+  "specs": [
+    "contains a malformed case type ID"
+  ],
+  "request": {
+    "pathVariables": {
+      "CaseTypeID": "BEFTA_&^%$£CASETYPE_2_1"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message": "Case ID is not valid",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

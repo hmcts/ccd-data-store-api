@@ -1,0 +1,23 @@
+{
+  "_guid_": "S-1033",
+  "_extends_": "F-1003_Test_Base_data",
+  "title": "must get an error response for a non-existing case type ID",
+  "specs": [
+    "contains a non-existing case type ID"
+  ],
+  "request": {
+    "pathVariables": {
+      "CaseTypeID": "Non-Existing-Case-type-ID"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "Resource not found when getting case type version for 'Non-Existing-Case-type-ID'.",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

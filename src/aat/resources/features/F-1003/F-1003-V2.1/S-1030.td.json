@@ -2,10 +2,6 @@
   "_guid_": "S-1030",
   "_extends_": "F-1003_Test_Base_data",
   "title": "must successfully create a case with new document uploded",
-  "specs": [
-    "is to attach the document uploaded above to a new case",
-    "contains necessary details about the document attached to the case"
-  ],
   "expectedResponse": {
     "_extends_": "F-1003_Test_Base_Response_Body"
   }

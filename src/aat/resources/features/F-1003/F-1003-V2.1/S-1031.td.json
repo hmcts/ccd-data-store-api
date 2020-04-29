@@ -2,10 +2,6 @@
   "_guid_": "S-1031",
   "_extends_": "F-1003_Test_Base_data",
   "title": "must successfully create a case with multiple documents uploded",
-  "specs": [
-    "is to attach the document uploaded above to a new case",
-    "contains necessary details about the document attached to the case"
-  ],
   "request": {
     "body": {
       "data": {
@@ -59,7 +55,7 @@
     "body": {
       "data" : {
         "DocumentField1" : {
-          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][][customValues][documentIdInTheResponse]}",
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
           "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
           "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
         },
