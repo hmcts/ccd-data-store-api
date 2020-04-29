@@ -19,6 +19,8 @@ public class CaseTypeTab implements Serializable {
     @JsonProperty("show_condition")
     private String showCondition;
     private String role;
+    @JsonProperty("display_context_parameter")
+    private String displayContextParameter = null;
 
     public String getId() {
         return id;
@@ -66,5 +68,13 @@ public class CaseTypeTab implements Serializable {
 
     public void setRole(final String role) {
         this.role = role;
+    }
+
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
+    }
+
+    public void setDisplayContextParameter(String displayContextParameter) {
+        this.displayContextParameter = displayContextParameter;
     }
 }

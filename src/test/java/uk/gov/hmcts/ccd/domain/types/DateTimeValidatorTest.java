@@ -24,7 +24,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -115,7 +114,7 @@ class DateTimeValidatorTest {
             assertAll(
                 () -> assertThat(results, hasSize(1)),
                 () -> assertThat(results.get(0).getErrorMessage(),
-                                 equalTo("\"3321M1 1AA\" is not a valid ISO 8601 date time"))
+                                 equalTo("Date or Time entered is not valid"))
             );
         }
 
@@ -128,7 +127,7 @@ class DateTimeValidatorTest {
             assertAll(
                 () -> assertThat(results, hasSize(1)),
                 () -> assertThat(results.get(0).getErrorMessage(),
-                                 equalTo("\"1800-14-14T00:00:00\" is not a valid ISO 8601 date time"))
+                                 equalTo("Date or Time entered is not valid"))
             );
         }
 
@@ -141,7 +140,7 @@ class DateTimeValidatorTest {
             assertAll(
                 () -> assertThat(results, hasSize(1)),
                 () -> assertThat(results.get(0).getErrorMessage(),
-                                 equalTo("\"2001-11-31T00:00:00\" is not a valid ISO 8601 date time"))
+                                 equalTo("Date or Time entered is not valid"))
             );
         }
 
@@ -154,7 +153,7 @@ class DateTimeValidatorTest {
             assertAll(
                 () -> assertThat(results, hasSize(1)),
                 () -> assertThat(results.get(0).getErrorMessage(),
-                                 equalTo("\"2001-01-01\" is not a valid ISO 8601 date time"))
+                                 equalTo("Date or Time entered is not valid"))
             );
         }
 
@@ -167,7 +166,7 @@ class DateTimeValidatorTest {
             assertAll(
                 () -> assertThat(results, hasSize(1)),
                 () -> assertThat(results.get(0).getErrorMessage(),
-                                 equalTo("\"2100-02-29T00:00:00Z\" is not a valid ISO 8601 date time"))
+                                 equalTo("Date or Time entered is not valid"))
             );
         }
     }
@@ -305,7 +304,7 @@ class DateTimeValidatorTest {
             result =
             validator.validate(FIELD_ID, NODE_FACTORY.booleanNode(true), caseField);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("true is not a valid ISO 8601 date time"));
+        assertThat(result.get(0).getErrorMessage(), is("Date or Time entered is not valid"));
     }
 
     @Test
@@ -314,7 +313,7 @@ class DateTimeValidatorTest {
             result =
             validator.validate(FIELD_ID, NODE_FACTORY.binaryNode("Ngitb".getBytes()), caseField);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), endsWith(" is not a valid ISO 8601 date time"));
+        assertThat(result.get(0).getErrorMessage(), is("Date or Time entered is not valid"));
     }
 
     @Test
@@ -323,7 +322,7 @@ class DateTimeValidatorTest {
             result =
             validator.validate(FIELD_ID, NODE_FACTORY.arrayNode(), caseField);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("[] is not a valid ISO 8601 date time"));
+        assertThat(result.get(0).getErrorMessage(), is("Date or Time entered is not valid"));
     }
 
     @Test
@@ -339,7 +338,7 @@ class DateTimeValidatorTest {
             result =
             validator.validate(FIELD_ID, NODE_FACTORY.pojoNode(true), caseField);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("true is not a valid ISO 8601 date time"));
+        assertThat(result.get(0).getErrorMessage(), is("Date or Time entered is not valid"));
     }
 
     private CaseFieldBuilder caseField() {
