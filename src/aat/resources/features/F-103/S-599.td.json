@@ -1,0 +1,24 @@
+{
+  "title": "must return an error response for a non-existing Case ID",
+  "_guid_": "S-599",
+  "_extends_": "F-103_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a non-existent Case ID"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "1573751648840703"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "[[ANYTHING_PRESENT]]",
+      "message": "No case found",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
