@@ -16,6 +16,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 //        loader.addCcdRoles();
 //        loader.importDefinitions();
     }
+
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
         String docAmUrl = EnvironmentVariableUtils.getRequiredVariable("CASE_DOCUMENT_AM_URL");
@@ -23,7 +24,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             try {
                 String href = (String) ReflectionUtils
                     .deepGetFieldInObject(scenarioContext,
-                        "testData.actualResponse.body._embedded.documents[0]._links.self.href");
+                                          "testData.actualResponse.body._embedded.documents[0]._links.self.href");
                 return href.substring(href.length() - 36);
             } catch (Exception exception) {
 //                logger.error("Exception while getting the Document ID from the response :{}", exception.getMessage());
@@ -32,7 +33,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         } else if (key.toString().equalsIgnoreCase("validSelfLink")) {
             try {
                 String self = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                    "testData.actualResponse.body._embedded.documents[0]._links.self.href");
+                                                                            "testData.actualResponse.body._embedded.documents[0]._links.self.href");
                 scenarioContext.getScenario().write("Self: " + self);
                 if (self != null && self.startsWith(docAmUrl + "/cases/documents/")) {
                     return self;
@@ -45,7 +46,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         } else if (key.toString().equalsIgnoreCase("validBinaryLink")) {
             try {
                 String binary = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                    "testData.actualResponse.body._embedded.documents[0]._links.binary.href");
+                                                                              "testData.actualResponse.body._embedded.documents[0]._links.binary.href");
                 scenarioContext.getScenario().write("Binary: " + binary);
                 if (binary != null && binary.startsWith(docAmUrl + "/cases/documents/") && binary.endsWith("/binary")) {
                     return binary;
