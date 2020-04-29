@@ -9,7 +9,7 @@
 	],
 	"request": {
     "pathVariables": {
-      "cid": "[[DEFAULT_AUTO_VALUE]]"
+      "cid": "[[DYNAMIC]]"
     }
 	},
 	"expectedResponse": {

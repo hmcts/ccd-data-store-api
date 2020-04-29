@@ -12,10 +12,10 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
       "ctid": "AAT",
-      "cid": "[[DEFAULT_AUTO_VALUE]]",
+      "cid": "[[DYNAMIC]]",
       "idToDelete": "${[scenarioContext][theInvokingUser][id]}"
     }
   }

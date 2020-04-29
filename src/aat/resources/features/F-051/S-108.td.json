@@ -19,7 +19,7 @@
 			"Authorization": "TEST"
 		},
 		"pathVariables": {
-			"uid": "[[DEFAULT_AUTO_VALUE]]"
+			"uid": "[[DYNAMIC]]"
 		}
 	},
 	"expectedResponse": {
