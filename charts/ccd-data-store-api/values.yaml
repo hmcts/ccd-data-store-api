@@ -52,7 +52,7 @@ java:
     IDAM_USER_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     CCD_DRAFT_STORE_URL: http://draft-store-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CCD_DEFAULTPRINTURL: https://return-case-doc-ccd.nonprod.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid
-    CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-pr-203.service.core-compute-preview.internal
+    CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-pr-190.service.core-compute-preview.internal
 
     HTTP_CLIENT_CONNECTION_TIMEOUT: '10000'
     HTTP_CLIENT_READ_TIMEOUT: '60000'
