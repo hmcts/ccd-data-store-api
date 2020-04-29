@@ -13,6 +13,10 @@
   },
   "expectedResponse": {
     "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
+    },
     "body": {
       "exception": "[[ANYTHING_PRESENT]]",
       "message": "No case found",
