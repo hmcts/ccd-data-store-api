@@ -528,6 +528,27 @@ public class GetCaseDocumentsOperationTest {
         );
     }
 
+    @Test
+    @DisplayName("should throw CaseDocumentMetadataException  in case of  text field")
+    void  shouldThrowCaseDocumentNotFoundExceptionWhenTextField() throws IOException {
+
+        caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
+        caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setId(CASE_REFERENCE);
+        caseDetails.setReference(new Long(CASE_REFERENCE));
+        caseDetails.setData(caseDetailsData);
+        caseType.setCaseFields(Arrays.asList(buildCaseField("text-type-case-field.json")));
+
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
+
+
+        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
+            CASE_DOCUMENT_ID));
+    }
+
 
 
 
