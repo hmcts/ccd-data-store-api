@@ -79,7 +79,7 @@ public class SearchInputProcessor {
                         processValue(id, input.getDisplayContextParameter(),
                             metadata.getOptionalMetadata(field).get(), input.getField().getType()));
                 }
-        });
+            });
 
         return metadata;
     }
