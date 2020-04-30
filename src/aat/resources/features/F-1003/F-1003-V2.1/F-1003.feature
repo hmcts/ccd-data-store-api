@@ -60,18 +60,6 @@ Feature: F-1003: Submit Case Creation (V3)
     Then  a negative response is received
     And   the response has all the details as expected
 
-  @S-1034 @Ignore # Defect AM-708
-  Scenario: must get an error response for a non-existing Hashtoken
-    Given a user with [an active caseworker profile in CCD with full permissions on a document field],
-    And   a successful call [to upload a document with mandatory metadata] as in [Default_Document_Upload_Data],
-    And   a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation],
-    When  a request is prepared with appropriate values,
-    And   the request [is to attach the document uploaded above to a new case],
-    And   the request [contains a non-existing Hashtoken]
-    And   it is submitted to call the [Submit Case Creation (V3)] operation of [CCD Data Store]
-    Then  a negative response is received
-    And   the response has all the details as expected
-
   @S-1035 @Ignore # Defect AM-708
   Scenario: must get an error response for a malformed Hashtoken
     Given a user with [an active caseworker profile in CCD with full permissions on a document field],
