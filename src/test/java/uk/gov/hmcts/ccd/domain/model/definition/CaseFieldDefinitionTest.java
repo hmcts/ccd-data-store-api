@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,6 +16,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
+import org.hamcrest.MatcherAssert;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
@@ -217,6 +219,47 @@ public class CaseFieldDefinitionTest {
             Exception exception = assertThrows(BadRequestException.class, () ->
                 findNestedField(debtorDetails,"Field2.Field3"));
             assertEquals("CaseViewField " + DEBTOR_DETAILS + " has no nested elements with code Field2.Field3.", exception.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("displayContextType test")
+    class CaseFieldDisplayContextTypeTest {
+
+        @Test
+        void shouldReturnCorrectDisplayContextEnumForReadOnlyContext() {
+            name.setDisplayContext("READONLY");
+
+            DisplayContext result = name.displayContextType();
+
+            MatcherAssert.assertThat(result, is(DisplayContext.READONLY));
+        }
+
+        @Test
+        void shouldReturnCorrectDisplayContextEnumForMandatoryContext() {
+            name.setDisplayContext("MANDATORY");
+
+            DisplayContext result = name.displayContextType();
+
+            MatcherAssert.assertThat(result, is(DisplayContext.MANDATORY));
+        }
+
+        @Test
+        void shouldReturnCorrectDisplayContextEnumForOptionalContext() {
+            name.setDisplayContext("OPTIONAL");
+
+            DisplayContext result = name.displayContextType();
+
+            MatcherAssert.assertThat(result, is(DisplayContext.OPTIONAL));
+        }
+
+        @Test
+        void shouldReturnNullForHiddenContext() {
+            name.setDisplayContext("HIDDEN");
+
+            DisplayContext result = name.displayContextType();
+
+            assertNull(result);
         }
     }
 

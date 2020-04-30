@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 
+import com.google.common.base.Strings;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
@@ -85,6 +86,12 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
 
         CaseFieldDefinition caseFieldDefinitionByPath = (CaseFieldDefinition) caseFieldDefinition.getComplexFieldNestedField(in.getCaseFieldPath())
             .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, caseFieldDefinition.getId(), in.getCaseFieldPath())));
+
+        result.setDisplayContextParameter(
+            Strings.isNullOrEmpty(in.getCaseFieldPath()) ?
+                in.getDisplayContextParameter() :
+                caseFieldByPath.getDisplayContextParameter()
+        );
 
         final Field field = new Field();
         field.setId(in.getCaseFieldId());

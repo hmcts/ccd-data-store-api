@@ -33,7 +33,7 @@ public class CaseViewFieldBuilder {
         field.setLabel(ofNullable(eventFieldDefinition.getLabel()).orElse(caseFieldDefinition.getLabel()));
         field.setSecurityLabel(caseFieldDefinition.getSecurityLabel());
         field.setDisplayContext(eventFieldDefinition.getDisplayContext());
-        field.setDisplayContextParameter(eventFieldDefinition.getDisplayContextParamter());
+        field.setDisplayContextParameter(eventFieldDefinition.getDisplayContextParameter());
         field.setShowCondition(eventFieldDefinition.getShowCondition());
         field.setShowSummaryChangeOption(eventFieldDefinition.getShowSummaryChangeOption());
         field.setShowSummaryContentOption(eventFieldDefinition.getShowSummaryContentOption());

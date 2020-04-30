@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 
 import java.util.List;
 
@@ -46,8 +47,9 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                                        EventTriggerService eventTriggerService,
                                        UIDService uidService,
                                        ObjectMapperService objectMapperService,
-                                       CompoundFieldOrderService compoundFieldOrderService) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, compoundFieldOrderService);
+                                       CompoundFieldOrderService compoundFieldOrderService,
+                                       FieldProcessorService fieldProcessorService) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, compoundFieldOrderService, fieldProcessorService);
         this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;

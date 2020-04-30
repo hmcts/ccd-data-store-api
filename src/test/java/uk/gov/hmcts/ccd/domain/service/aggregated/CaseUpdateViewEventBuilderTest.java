@@ -34,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 class CaseUpdateViewEventBuilderTest {
@@ -77,6 +78,8 @@ class CaseUpdateViewEventBuilderTest {
     private CaseViewFieldBuilder caseViewFieldBuilder;
 
     private CaseUpdateViewEventBuilder caseUpdateViewEventBuilder;
+    @Mock
+    private FieldProcessorService fieldProcessorService;
 
     @BeforeEach
     void setUp() {

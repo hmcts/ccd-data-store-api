@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.List;
@@ -36,19 +37,22 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     private final UIDService uidService;
     private final ObjectMapperService objectMapperService;
     private final CompoundFieldOrderService compoundFieldOrderService;
+    private final FieldProcessorService fieldProcessorService;
 
     AbstractDefaultGetCaseViewOperation(GetCaseOperation getCaseOperation,
                                         UIDefinitionRepository uiDefinitionRepository,
                                         CaseTypeService caseTypeService,
                                         UIDService uidService,
                                         ObjectMapperService objectMapperService,
-                                        CompoundFieldOrderService compoundFieldOrderService) {
+                                        CompoundFieldOrderService compoundFieldOrderService,
+                                        FieldProcessorService fieldProcessorService) {
         this.getCaseOperation = getCaseOperation;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseTypeService = caseTypeService;
         this.uidService = uidService;
         this.objectMapperService = objectMapperService;
         this.compoundFieldOrderService = compoundFieldOrderService;
+        this.fieldProcessorService = fieldProcessorService;
     }
 
     void validateCaseReference(String caseReference) {
@@ -79,6 +83,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
             CommonField[] caseViewFields = tab.getTabFields().stream()
                 .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
                 .map(caseTypeTabField -> CaseViewField.createFrom(caseTypeTabField, data))
+                .map(fieldProcessorService::processCaseViewField)
                 .toArray(CaseViewField[]::new);
             return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), (CaseViewField[])caseViewFields,
                                    tab.getShowCondition(), tab.getRole());

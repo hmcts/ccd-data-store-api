@@ -26,7 +26,8 @@
     "_extends_": "Common_201_Response",
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Vary": "Accept-Encoding"
+      "Vary": "Accept-Encoding",
+      "Content-Type": "[[ANY_STRING_NULLABLE]]"
     }
   }
 }

@@ -1,7 +1,28 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
@@ -15,34 +36,16 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
-import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 @DisplayName("DefaultGetCriteriaOperationTest")
 public class DefaultGetCriteriaOperationTest {
     private static final String TEXT_TYPE = "Text";
+    private static final String DATE_TYPE = "Date";
     private static final String PERSON = "Person";
     private static final String DEBTOR_DETAILS = "Debtor details";
     private static final String NAME = "Name";
     private static final String SURNAME = "Surname";
+    private static final String DOB = "DoB";
+    private static final String DISPLAY_CONTEXT_PARAMETER = "#KEY(Value)";
     private static final String SHOW_CONDITION = "some show condition";
 
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
@@ -61,6 +64,10 @@ public class DefaultGetCriteriaOperationTest {
     private CaseFieldDefinition surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private FieldTypeDefinition personFieldTypeDefinition = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).build();
     private CaseFieldDefinition person = newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
+    private CaseFieldDefinition dob = newCaseField().withId(DOB).withFieldType(aFieldType().withId(DATE_TYPE).withType(DATE_TYPE).build())
+        .withDisplayContextParameter(DISPLAY_CONTEXT_PARAMETER).build();
+    private FieldTypeDefinition personFieldType = aFieldType().withId(PERSON).withType(COMPLEX)
+        .withComplexField(name).withComplexField(surname).withComplexField(dob).build();
 
     private FieldTypeDefinition debtorFieldTypeDefinition = aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
     private CaseFieldDefinition debtorDetails = newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldTypeDefinition).build();

@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
@@ -36,9 +37,10 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
         UIDService uidService,
         DefaultObjectMapperService defaultObjectMapperService,
-        CompoundFieldOrderService compoundFieldOrderService) {
+        CompoundFieldOrderService compoundFieldOrderService,
+        FieldProcessorService fieldProcessorService) {
 
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService, compoundFieldOrderService);
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService, compoundFieldOrderService, fieldProcessorService);
         this.getEventsOperation = getEventsOperation;
     }
 

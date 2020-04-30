@@ -499,7 +499,7 @@ public class CaseDetailsEndpoint {
         metadata.setState(param(queryParameters, STATE.getParameterName()));
         metadata.setCaseReference(param(queryParameters, CASE_REFERENCE.getParameterName()));
         metadata.setCreatedDate(param(queryParameters, CREATED_DATE.getParameterName()));
-        metadata.setLastModified(param(queryParameters, LAST_MODIFIED_DATE.getParameterName()));
+        metadata.setLastModifiedDate(param(queryParameters, LAST_MODIFIED_DATE.getParameterName()));
         metadata.setLastStateModifiedDate(param(queryParameters, LAST_STATE_MODIFIED_DATE.getParameterName()));
         metadata.setSecurityClassification(param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()));
         metadata.setPage(param(queryParameters, PAGE_PARAM));

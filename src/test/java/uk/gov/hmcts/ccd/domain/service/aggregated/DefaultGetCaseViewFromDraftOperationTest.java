@@ -12,18 +12,19 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,6 +36,8 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
@@ -85,6 +88,9 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     @Mock
     private CompoundFieldOrderService compoundFieldOrderService;
+
+    @Mock
+    private FieldProcessorService fieldProcessorService;
 
     private GetCaseViewOperation getDraftViewOperation;
 
@@ -144,14 +150,17 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
         doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
 
+        doAnswer(invocation -> invocation.getArgument(0)).when(fieldProcessorService).processCaseViewField(any());
+
         getDraftViewOperation = new DefaultGetCaseViewFromDraftOperation(getCaseOperation,
-                                                                         uiDefinitionRepository,
-                                                                         caseTypeService,
-                                                                         uidService,
-                                                                         draftGateway,
-                                                                         draftResponseToCaseDetailsBuilder,
-                                                                         objectMapperService,
-                                                                         compoundFieldOrderService);
+            uiDefinitionRepository,
+            caseTypeService,
+            uidService,
+            draftGateway,
+            draftResponseToCaseDetailsBuilder,
+            objectMapperService,
+            compoundFieldOrderService,
+            fieldProcessorService);
     }
 
     @Test

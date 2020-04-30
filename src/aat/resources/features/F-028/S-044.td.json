@@ -16,8 +16,7 @@
     "_extends_": "Common_200_Response",
     "headers": {
       "Transfer-Encoding": "chunked",
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/json"
+      "Content-Encoding": "gzip"
     },
     "body": {
       "id": "UPDATE",
@@ -49,6 +48,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": "Some Text",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -91,6 +91,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": "164528",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -133,6 +134,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": "Yes",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -175,6 +177,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": "07123456789",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -217,6 +220,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": "ccd@hmcts.net",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -259,6 +263,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": "4200",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -301,6 +306,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": "2017-02-13",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -343,6 +349,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": "1988-07-07T22:20:00",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -385,6 +392,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": "Line1\nLine2",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -443,6 +451,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value" : "VALUE3",
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -514,6 +523,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": [ "OPTION2", "OPTION4" ],
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -574,6 +584,13 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": [ {
+            "id" : "CollectionField1",
+            "value" : "Alias 1"
+          }, {
+            "id" : "CollectionField2",
+            "value" : "Alias 2"
+          } ],
           "display_context": "OPTIONAL",
           "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
           "show_condition": null,
@@ -656,7 +673,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "ComplexFixedListField",
@@ -716,7 +734,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "ComplexNestedField",
@@ -774,7 +793,8 @@
                       ],
                       "complexACLs": [],
                       "display_context": null,
-                      "display_context_parameter": null
+                      "display_context_parameter": null,
+                      "formatted_value": null
                     },
                     {
                       "id": "[[ANYTHING_PRESENT]]",
@@ -825,7 +845,8 @@
                       ],
                       "complexACLs": [],
                       "display_context": null,
-                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)"
+                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
+                      "formatted_value": null
                     }
                   ],
                   "collection_field_type": null
@@ -854,7 +875,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -862,6 +884,10 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": {
+            "ComplexTextField" : "Nested text",
+            "ComplexFixedListField" : "VALUE2"
+          },
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -947,7 +973,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "AddressLine2",
@@ -989,7 +1016,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "AddressLine3",
@@ -1031,7 +1059,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "PostTown",
@@ -1073,7 +1102,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "County",
@@ -1115,7 +1145,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "PostCode",
@@ -1157,7 +1188,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "Country",
@@ -1199,7 +1231,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -1207,6 +1240,15 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": {
+            "AddressLine1" : "102 Petty France",
+            "AddressLine2" : "CCD",
+            "AddressLine3" : "c/o HMCTS Reform",
+            "PostTown" : "Westminster",
+            "County" : "Greater London",
+            "PostCode" : "SW1H 9AJ",
+            "Country" : "UK"
+          },
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -1249,6 +1291,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,

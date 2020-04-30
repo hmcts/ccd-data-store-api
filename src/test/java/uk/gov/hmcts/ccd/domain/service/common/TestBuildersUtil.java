@@ -1332,6 +1332,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public WorkbasketInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.workbasketInput.setDisplayContextParameter(displayContextParameter);
+            return this;
+        }
+
         public WorkbasketInput build() {
             return this.workbasketInput;
         }
@@ -1364,6 +1369,11 @@ public class TestBuildersUtil {
         public SearchInputBuilder withShowCondition(String showCondition) {
             field.setShowCondition(showCondition);
             this.searchInput.setField(field);
+            return this;
+        }
+
+        public SearchInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.searchInput.setDisplayContextParameter(displayContextParameter);
             return this;
         }
 
@@ -1448,6 +1458,11 @@ public class TestBuildersUtil {
 
         public static CaseTypeTabFieldBuilder newCaseTabField() {
             return new CaseTypeTabFieldBuilder();
+        }
+
+        public CaseTypeTabFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
+            caseTypeTabField.setDisplayContextParameter(displayContextParameter);
+            return this;
         }
 
     }
