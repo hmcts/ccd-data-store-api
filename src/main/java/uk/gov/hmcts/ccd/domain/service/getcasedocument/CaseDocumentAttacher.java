@@ -71,7 +71,7 @@ public class CaseDocumentAttacher {
     }
 
 
-  public  void extractDocumentsWithHashTokenBeforeCallbackForCreateCase(Map<String, JsonNode> data) {
+    public  void extractDocumentsWithHashTokenBeforeCallbackForCreateCase(Map<String, JsonNode> data) {
         data.forEach((field, jsonNode) -> {
             if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
@@ -87,34 +87,34 @@ public class CaseDocumentAttacher {
         });
     }
 
-   public void extractDocumentsWithHashTokenBeforeCallbackForUpdate(Map<String, JsonNode> data,CaseDetails caseDetailsBefore) {
+    public void extractDocumentsWithHashTokenBeforeCallbackForUpdate(Map<String, JsonNode> data,CaseDetails caseDetailsBefore) {
         data.forEach((field, jsonNode) -> {
             if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
                 if (jsonNode.get(HASH_TOKEN_STRING) != null) {
                     documentsBeforeCallback.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
-                } else if (caseDetailsBefore!=null){
+                } else if (caseDetailsBefore != null) {
                     existingDocument(caseDetailsBefore.getData(),documentId);
-                        if(documentsId.size() == 0) {
-                            throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
-                        }else{
-                            documentsId.clear();
-                        }
+                    if (documentsId.size() == 0) {
+                        throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
+                    } else {
+                        documentsId.clear();
+                    }
                 }
 
 
             } else {
-                if(jsonNode instanceof ArrayNode){
-                 Iterator<JsonNode>  arrayNode = ((ArrayNode) jsonNode).elements();
-                 while(arrayNode.hasNext()){
-                   JsonNode arrayNodeElement  = arrayNode.next();
-                     arrayNodeElement.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
-                         Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
+                if (jsonNode instanceof ArrayNode) {
+                    Iterator<JsonNode>  arrayNode = ((ArrayNode) jsonNode).elements();
+                    while (arrayNode.hasNext()) {
+                        JsonNode arrayNodeElement  = arrayNode.next();
+                        arrayNodeElement.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
+                            Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
 
-                 }
+                    }
 
-                }else {
+                } else {
                     jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
                         Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
                 }
@@ -195,8 +195,8 @@ public class CaseDocumentAttacher {
         try {
             String documentId;
             //Document Binary URL is preferred.
-            JsonNode documentField = jsonNode.get(DOCUMENT_BINARY_URL) != null ?
-                                     jsonNode.get(DOCUMENT_BINARY_URL) :
+            JsonNode documentField = jsonNode.get(DOCUMENT_BINARY_URL) != null
+                                     ? jsonNode.get(DOCUMENT_BINARY_URL) :
                                      jsonNode.get(DOCUMENT_URL);
             if (documentField.asText().contains(BINARY)) {
                 documentId = documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
@@ -236,7 +236,7 @@ public class CaseDocumentAttacher {
             //find Hash token of documents which belong to before call back and present in After callback Map
             Map<String, String> commonDocumentIdsWithHashToken = documentsBeforeCallback.entrySet()
                                                                                         .stream()
-                                                                                        .filter(documentBeforeCallback -> commonDocumentIds.contains(documentBeforeCallback.getKey()))
+                                                 .filter(documentBeforeCallback -> commonDocumentIds.contains(documentBeforeCallback.getKey()))
                                                                                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
             //putting back documentIds with hashToken in after call back map  which belong to before callback Map
