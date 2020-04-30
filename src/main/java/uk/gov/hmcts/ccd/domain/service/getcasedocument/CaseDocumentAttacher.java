@@ -40,11 +40,12 @@ public class CaseDocumentAttacher {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseDocumentAttacher.class);
 
-    Map<String, String> documentsBeforeCallback = null;
+    Map<String, String> documentsBeforeCallback = new HashMap<>();
     Map<String, String> documentsAfterCallback = null;
     Map<String, String> documentAfterCallbackOriginalCopy = new HashMap<>();
     Map<String, JsonNode> recursiveMapForCaseDetailsBefore = new HashMap<>();
     CaseDocumentsMetadata caseDocumentsMetadata = null;
+    Set<String> documentsId = new HashSet();
 
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
@@ -68,26 +69,43 @@ public class CaseDocumentAttacher {
         this.securityUtils = securityUtils;
     }
 
-     public void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> contentData) {
 
-        LOG.debug("Updating case using Version 2.1 of case create API");
-        documentsBeforeCallback = new HashMap<>();
-        extractDocumentsWithHashTokenBeforeCallback(contentData, documentsBeforeCallback);
-
-    }
-
-    void extractDocumentsWithHashTokenBeforeCallback(Map<String, JsonNode> data, Map<String, String> documentMap) {
+  public  void extractDocumentsWithHashTokenBeforeCallbackForCreateCase(Map<String, JsonNode> data) {
         data.forEach((field, jsonNode) -> {
             if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
                 if (jsonNode.get(HASH_TOKEN_STRING) == null) {
                     throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
                 }
-                documentMap.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
+                documentsBeforeCallback.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                 ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
-                jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallback(
-                    Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+                jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForCreateCase(
+                    Collections.singletonMap(node.getKey(), node.getValue())));
+            }
+        });
+    }
+
+   public void extractDocumentsWithHashTokenBeforeCallbackForUpdate(Map<String, JsonNode> data,CaseDetails caseDetailsBefore) {
+        data.forEach((field, jsonNode) -> {
+            if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
+                String documentId = extractDocumentId(jsonNode);
+                if (jsonNode.get(HASH_TOKEN_STRING) != null) {
+                    documentsBeforeCallback.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
+                    ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
+                } else if (caseDetailsBefore!=null){
+                    existingDocument(caseDetailsBefore.getData(),documentId);
+                        if(documentsId.size() == 0) {
+                            throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
+                        }else{
+                            documentsId.clear();
+                        }
+                }
+
+
+            } else {
+                jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
+                    Collections.singletonMap(node.getKey(), node.getValue()),caseDetailsBefore));
             }
         });
     }
@@ -317,4 +335,22 @@ public class CaseDocumentAttacher {
     private boolean isDocumentField(JsonNode jsonNode) {
         return jsonNode.has(DOCUMENT_BINARY_URL) || jsonNode.has(DOCUMENT_URL);
     }
+
+    private void existingDocument(Map<String, JsonNode> caseDetailBefore, String newDocumentId) {
+
+        caseDetailBefore.forEach((field, jsonNode) -> {
+            if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
+                String existingDocumentId = extractDocumentId(jsonNode);
+                if (newDocumentId.equalsIgnoreCase(existingDocumentId)) {
+                    documentsId.add(newDocumentId);
+                }
+
+            } else {
+                jsonNode.fields().forEachRemaining(node -> existingDocument(
+                    Collections.singletonMap(node.getKey(), node.getValue()), newDocumentId));
+            }
+        });
+
+    }
+
 }

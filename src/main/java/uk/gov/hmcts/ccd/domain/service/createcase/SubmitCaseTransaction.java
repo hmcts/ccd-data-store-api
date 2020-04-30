@@ -107,7 +107,7 @@ class SubmitCaseTransaction {
         CaseDocumentAttacher caseDocumentAttacher = null;
         if (isApiVersion3) {
             caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
-            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(newCaseDetails.getData());
+            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForCreateCase(newCaseDetails.getData());
         }
 
         /*

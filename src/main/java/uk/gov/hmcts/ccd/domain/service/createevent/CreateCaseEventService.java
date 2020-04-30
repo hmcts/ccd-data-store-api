@@ -147,7 +147,7 @@ public class CreateCaseEventService {
         CaseDocumentAttacher caseDocumentAttacher = null;
         if (isApiVersion3) {
             caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
-            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallback(content.getData());
+            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForUpdate(content.getData(),caseDetailsBefore);
         }
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,

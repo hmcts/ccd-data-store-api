@@ -274,7 +274,7 @@ class CreateCaseEventServiceTest {
 
         createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
-        verify(caseDocumentAttacher, times(0)).extractDocumentsWithHashTokenBeforeCallback(caseDataContent.getData());
+        //verify(caseDocumentAttacher, times(0)).extractDocumentsWithHashTokenBeforeCallbackForUpdate(caseDataContent.getData());
         verify(caseDocumentAttacher, times(0)).extractDocumentsAfterCallBack(caseDetails,false);
         verify(caseDocumentAttacher, times(0)).restCallToAttachCaseDocuments();
 
