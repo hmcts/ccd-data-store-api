@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CaseView extends AbstractCaseView {
     private ProfileCaseState state;
     private String[] channels;
@@ -22,6 +24,7 @@ public class CaseView extends AbstractCaseView {
         this.channels = channels;
     }
 
+    @JsonProperty("triggers")
     public CaseViewActionableEvent[] getActionableEvents() {
         return actionableEvents;
     }
@@ -30,6 +33,7 @@ public class CaseView extends AbstractCaseView {
         this.actionableEvents = actionableEvents;
     }
 
+    @JsonProperty("events")
     public CaseViewEvent[] getEvents() {
         return caseViewEvents;
     }

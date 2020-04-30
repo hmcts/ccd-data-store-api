@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -35,6 +36,7 @@ public class JurisdictionDisplayProperties {
         this.description = description;
     }
 
+    @JsonProperty("caseTypes")
     public List<CaseTypeDefinition> getCaseTypeDefinitions() {
         return caseTypeDefinitions;
     }
