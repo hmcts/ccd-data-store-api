@@ -16,7 +16,7 @@ public class BaseType {
     private final String type;
     private final String regularExpression;
 
-    BaseType(final FieldTypeDefinition fieldTypeDefinition) {
+    public BaseType(final FieldTypeDefinition fieldTypeDefinition) {
         type = fieldTypeDefinition.getType();
         regularExpression = fieldTypeDefinition.getRegularExpression();
     }

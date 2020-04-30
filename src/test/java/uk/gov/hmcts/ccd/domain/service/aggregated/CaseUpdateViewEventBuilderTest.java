@@ -1,6 +1,29 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.List;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEventBuilder;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
@@ -16,26 +39,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventResultBuilder.newStartEventTrigger;
-
-import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEventBuilder;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 class CaseUpdateViewEventBuilderTest {
 
@@ -93,7 +96,7 @@ class CaseUpdateViewEventBuilderTest {
         caseUpdateViewEventBuilder = new CaseUpdateViewEventBuilder(caseDefinitionRepository,
                                                               uiDefinitionRepository,
                                                               eventTriggerService,
-                                                              caseViewFieldBuilder);
+                                                              caseViewFieldBuilder, fieldProcessorService);
     }
 
     @Test

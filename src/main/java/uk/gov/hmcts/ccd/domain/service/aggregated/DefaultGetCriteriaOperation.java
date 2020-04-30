@@ -1,11 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
-import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
-
 import com.google.common.base.Strings;
+import java.util.List;
+import java.util.function.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
@@ -22,13 +23,10 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import java.util.List;
-import java.util.function.Predicate;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 
 @Service
 @Qualifier(DefaultGetCriteriaOperation.QUALIFIER)
@@ -90,7 +88,7 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         result.setDisplayContextParameter(
             Strings.isNullOrEmpty(in.getCaseFieldPath()) ?
                 in.getDisplayContextParameter() :
-                caseFieldByPath.getDisplayContextParameter()
+                caseFieldDefinitionByPath.getDisplayContextParameter()
         );
 
         final Field field = new Field();

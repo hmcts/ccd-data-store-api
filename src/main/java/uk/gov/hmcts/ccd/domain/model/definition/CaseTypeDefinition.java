@@ -17,6 +17,7 @@ public class CaseTypeDefinition implements Serializable {
     private String description;
     private Version version;
     private String name;
+    @JsonProperty("jurisdiction")
     private JurisdictionDefinition jurisdictionDefinition;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;

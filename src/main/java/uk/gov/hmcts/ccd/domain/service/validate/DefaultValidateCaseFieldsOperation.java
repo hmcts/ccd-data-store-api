@@ -36,10 +36,10 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         }
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseTypeDefinition == null) {
-            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
+            throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
         if (!hasEventId(caseTypeDefinition, content.getEventId())) {
-            throw new ValidationException("Cannot validate case field because of event" + content.getEventId() + " is not found in case type definition");
+            throw new ValidationException("Cannot validate case field because of event " + content.getEventId() + " is not found in case type definition");
         }
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, content.getEventId()));
         caseTypeService.validateData(content.getData(), caseTypeDefinition);

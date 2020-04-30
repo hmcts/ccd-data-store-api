@@ -6,25 +6,24 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.Strings;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 @Component
 public class SearchResultProcessor {
@@ -64,7 +63,7 @@ public class SearchResultProcessor {
         } else if (object instanceof ArrayNode && !FieldProcessor.isNullOrEmpty((ArrayNode) object)) {
             return createArrayNodeFrom((ArrayNode) object, viewColumn, viewColumn.getCaseFieldId());
         } else if (object instanceof ObjectNode && !FieldProcessor.isNullOrEmpty((ObjectNode) object)) {
-            return createObjectNodeFrom((ObjectNode) object, viewColumn, viewColumn.getCaseFieldType().getComplexFields(), viewColumn.getCaseFieldId());
+            return createObjectNodeFrom((ObjectNode) object, viewColumn, viewColumn.getCaseFieldTypeDefinition().getComplexFields(), viewColumn.getCaseFieldId());
         } else if (object instanceof LocalDateTime) {
             return createTextNodeFrom(new TextNode(((LocalDateTime) object)
                 .format(DateTimeFormatter.ofPattern(DateTimeFormatParser.DATE_TIME_FORMAT))), viewColumn, viewColumn.getCaseFieldId());
@@ -75,7 +74,7 @@ public class SearchResultProcessor {
 
     private JsonNode createObjectNodeFrom(final ObjectNode originalNode,
                                           final SearchResultViewColumn viewColumn,
-                                          final List<CaseField> complexCaseFields,
+                                          final List<CaseFieldDefinition> complexCaseFields,
                                           final String fieldPrefix) {
         if (FieldProcessor.isNullOrEmpty(originalNode)) {
             return originalNode;
@@ -83,7 +82,7 @@ public class SearchResultProcessor {
 
         ObjectNode newNode = MAPPER.createObjectNode();
         complexCaseFields.stream().forEach(complexCaseField -> {
-            final String test = complexCaseField.getFieldType().getType();
+            final String test = complexCaseField.getFieldTypeDefinition().getType();
             final BaseType complexFieldType = BaseType.get(test);
             final String fieldId = complexCaseField.getId();
             final JsonNode caseFieldNode = originalNode.get(fieldId);
@@ -96,7 +95,7 @@ public class SearchResultProcessor {
                     createArrayNodeFrom((ArrayNode) caseFieldNode, viewColumn, fieldPath));
             } else if (complexFieldType == BaseType.get(COMPLEX)) {
                 Optional.ofNullable(
-                    createObjectNodeFrom((ObjectNode) caseFieldNode, viewColumn, complexCaseField.getFieldType().getComplexFields(), fieldPath))
+                    createObjectNodeFrom((ObjectNode) caseFieldNode, viewColumn, complexCaseField.getFieldTypeDefinition().getComplexFields(), fieldPath))
                     .ifPresent(result -> newNode.set(fieldId, result));
             } else {
                 newNode.set(fieldId, createTextNodeFrom((TextNode) caseFieldNode, viewColumn, fieldPath));
@@ -113,7 +112,7 @@ public class SearchResultProcessor {
             return new TextNode(originalNode.asText());
         }
 
-        final Optional<CommonField> nestedField = viewColumn.getCaseFieldType().getNestedField(fieldPath, true);
+        final Optional<CommonField> nestedField = viewColumn.getCaseFieldTypeDefinition().getNestedField(fieldPath, true);
         final String displayContextParameter = nestedField
             .map(CommonField::getDisplayContextParameter)
             .orElse(viewColumn.getDisplayContextParameter());
@@ -121,13 +120,13 @@ public class SearchResultProcessor {
         return DisplayContextParameter.getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEDISPLAY)
             .map(dcp -> {
                 final String fieldType = nestedField
-                    .map(CommonField::getFieldType)
-                    .map(FieldType::getType)
+                    .map(CommonField::getFieldTypeDefinition)
+                    .map(FieldTypeDefinition::getType)
                     .orElseGet(() -> {
-                        FieldType collectionFieldType = viewColumn.getCaseFieldType().getCollectionFieldType();
-                        return collectionFieldType == null ? viewColumn.getCaseFieldType().getType() : collectionFieldType.getType();
+                        FieldTypeDefinition collectionFieldType = viewColumn.getCaseFieldTypeDefinition().getCollectionFieldTypeDefinition();
+                        return collectionFieldType == null ? viewColumn.getCaseFieldTypeDefinition().getType() : collectionFieldType.getType();
                     });
-                if (fieldType.equals(FieldType.DATETIME) || viewColumn.isMetadata()) {
+                if (fieldType.equals(FieldTypeDefinition.DATETIME) || viewColumn.isMetadata()) {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDateTime(dcp.getValue(), originalNode.asText()));
                 } else {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDate(dcp.getValue(), originalNode.asText()));
@@ -144,7 +143,7 @@ public class SearchResultProcessor {
             ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
                 item.get(CollectionValidator.VALUE) instanceof TextNode ?
                     createTextNodeFrom((TextNode) item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix) :
-                    createObjectNodeFrom((ObjectNode) item.get(CollectionValidator.VALUE), viewColumn, viewColumn.getCaseFieldType().getChildren(), fieldPrefix));
+                    createObjectNodeFrom((ObjectNode) item.get(CollectionValidator.VALUE), viewColumn, viewColumn.getCaseFieldTypeDefinition().getChildren(), fieldPrefix));
             newNode.add(newItem);
         });
 

@@ -1,5 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
+import java.time.DateTimeException;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -7,23 +16,23 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
-import java.time.DateTimeException;
-import java.time.format.DateTimeParseException;
-import java.util.*;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
@@ -112,7 +121,7 @@ class SearchInputProcessorTest {
     @Test
     void shouldConvertWorkbasketComplexQueryParamUsingDisplayContextParameter() {
         CriteriaInput criteriaInput = new CriteriaInput();
-        FieldType complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldType.COMPLEX).withComplexField(
+        FieldTypeDefinition complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX).withComplexField(
             newCaseField().withId(NESTED_FIELD).withFieldType(fieldType("Date")).withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build()
         ).build();
         criteriaInput.setField(field(COMPLEX_FIELD, complexFieldType));
@@ -133,7 +142,7 @@ class SearchInputProcessorTest {
     @Test
     void shouldConvertSearchComplexQueryParamUsingDisplayContextParameter() {
         CriteriaInput criteriaInput = new CriteriaInput();
-        FieldType complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldType.COMPLEX).withComplexField(
+        FieldTypeDefinition complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX).withComplexField(
             newCaseField().withId(NESTED_FIELD).withFieldType(fieldType("Date")).withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build()
         ).build();
         criteriaInput.setField(field(COMPLEX_FIELD, complexFieldType));
@@ -193,7 +202,7 @@ class SearchInputProcessorTest {
     void shouldConvertWorkbasketCollectionQueryParamUsingDisplayContextParameter() {
         CriteriaInput criteriaInput = new CriteriaInput();
         criteriaInput.setField(field(COLLECTION_FIELD,
-            aFieldType().withId(FieldType.COLLECTION).withType(FieldType.COLLECTION).withCollectionFieldType(fieldType("Date")).build())
+            aFieldType().withId(FieldTypeDefinition.COLLECTION).withType(FieldTypeDefinition.COLLECTION).withCollectionFieldType(fieldType("Date")).build())
         );
         criteriaInput.setDisplayContextParameter("#DATETIMEENTRY(yyyy)");
         criteriaInputs.add(criteriaInput);
@@ -250,12 +259,12 @@ class SearchInputProcessorTest {
         criteriaInput3.setField(field(TEXT_FIELD, fieldType("Text")));
         CriteriaInput criteriaInput4 = new CriteriaInput();
         criteriaInput4.setField(field(COLLECTION_FIELD,
-            aFieldType().withId(FieldType.COLLECTION).withType(FieldType.COLLECTION).withCollectionFieldType(fieldType("Date")).build())
+            aFieldType().withId(FieldTypeDefinition.COLLECTION).withType(FieldTypeDefinition.COLLECTION).withCollectionFieldType(fieldType("Date")).build())
         );
         CriteriaInput criteriaInput5 = new CriteriaInput();
         criteriaInput5.setField(field(COMPLEX_FIELD, NESTED_FIELD, fieldType("DateTime")));
         CriteriaInput criteriaInput6 = new CriteriaInput();
-        criteriaInput6.setField(field(COMPLEX_FIELD, aFieldType().withId(COMPLEX_FIELD).withType(FieldType.COMPLEX).withComplexField(
+        criteriaInput6.setField(field(COMPLEX_FIELD, aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX).withComplexField(
             newCaseField().withId("OtherNestedField").withFieldType(fieldType("Date")).build()
         ).build()));
         criteriaInputs = Arrays.asList(criteriaInput1, criteriaInput2, criteriaInput3, criteriaInput4, criteriaInput5, criteriaInput6);
@@ -455,29 +464,29 @@ class SearchInputProcessorTest {
         );
     }
 
-    private Field field(String id, FieldType fieldType) {
+    private Field field(String id, FieldTypeDefinition fieldType) {
         Field field = new Field();
         field.setId(id);
         field.setType(fieldType);
         return field;
     }
 
-    private Field field(String id, String elementPath, FieldType fieldType) {
+    private Field field(String id, String elementPath, FieldTypeDefinition fieldType) {
         Field field = field(id, fieldType);
         field.setElementPath(elementPath);
         return field;
     }
 
-    private FieldType fieldType(String id, String type, List<CaseField> complexFields, FieldType collectionFieldType) {
-        FieldType fieldType = new FieldType();
+    private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields, FieldTypeDefinition collectionFieldType) {
+        FieldTypeDefinition fieldType = new FieldTypeDefinition();
         fieldType.setId(id);
         fieldType.setType(type);
         fieldType.setComplexFields(complexFields);
-        fieldType.setCollectionFieldType(collectionFieldType);
+        fieldType.setCollectionFieldTypeDefinition(collectionFieldType);
         return fieldType;
     }
 
-    private FieldType fieldType(String fieldType) {
+    private FieldTypeDefinition fieldType(String fieldType) {
         return fieldType(fieldType, fieldType, Collections.emptyList(), null);
     }
 }

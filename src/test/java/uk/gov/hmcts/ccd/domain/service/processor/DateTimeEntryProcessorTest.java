@@ -2,6 +2,10 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.time.format.DateTimeParseException;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -11,15 +15,14 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
-
-import java.io.IOException;
-import java.time.format.DateTimeParseException;
-import java.util.Collections;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -42,7 +45,7 @@ class DateTimeEntryProcessorTest {
     private CaseViewFieldBuilder caseViewFieldBuilder;
 
     @Mock
-    private FieldType fieldType;
+    private FieldTypeDefinition fieldType;
 
     @Mock
     private CaseDefinitionRepository definitionRepository;
@@ -65,7 +68,7 @@ class DateTimeEntryProcessorTest {
         Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "13/03/2020")).thenReturn("2020-03-13T00:00:00.000");
 
-        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseFieldDefinition(), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -82,7 +85,7 @@ class DateTimeEntryProcessorTest {
         Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601(null, "2020-03-13T00:00:00.000")).thenReturn("2020-03-13T00:00:00.000");
 
-        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseFieldDefinition(), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -99,7 +102,7 @@ class DateTimeEntryProcessorTest {
         Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "2020-03-13T00:00:00.000")).thenReturn("2020-03-13T00:00:00.000");
 
-        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseFieldDefinition(), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -121,7 +124,7 @@ class DateTimeEntryProcessorTest {
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "13/03/2020")).thenReturn("2020-03-13T00:00:00.000");
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "25/12/1995")).thenReturn("1995-12-25T00:00:00.000");
 
-        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseField(), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseFieldDefinition(), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isArray(), is(true)),
@@ -143,7 +146,7 @@ class DateTimeEntryProcessorTest {
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "abc")).thenThrow(DateTimeParseException.class);
 
         DataProcessingException exception = assertThrows(DataProcessingException.class, () -> {
-            dateTimeEntryProcessor.execute(node, caseField("FieldId"), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+            dateTimeEntryProcessor.execute(node, caseField("FieldId"), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
         });
 
         assertAll(
@@ -162,7 +165,7 @@ class DateTimeEntryProcessorTest {
         Mockito.when(dateTimeFormatParser.convertDateToIso8601("dd/MM/yyyy", "abc")).thenThrow(DateTimeParseException.class);
 
         DataProcessingException exception = assertThrows(DataProcessingException.class, () -> {
-            dateTimeEntryProcessor.execute(node, caseField("FieldId"), new CaseEventField(), wizardPageField(ID, Collections.EMPTY_LIST));
+            dateTimeEntryProcessor.execute(node, caseField("FieldId"), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
         });
 
         assertAll(
@@ -171,8 +174,8 @@ class DateTimeEntryProcessorTest {
         );
     }
 
-    private CaseField caseField(String id) {
-        CaseField caseField = new CaseField();
+    private CaseFieldDefinition caseField(String id) {
+        CaseFieldDefinition caseField = new CaseFieldDefinition();
         caseField.setId(id);
         return caseField;
     }
@@ -184,24 +187,24 @@ class DateTimeEntryProcessorTest {
         return wizardPageField;
     }
 
-    private CaseViewField caseViewField(String id, String displayContextParameter, FieldType fieldType) {
+    private CaseViewField caseViewField(String id, String displayContextParameter, FieldTypeDefinition fieldType) {
         CaseViewField caseViewField = new CaseViewField();
         caseViewField.setId(id);
         caseViewField.setDisplayContextParameter(displayContextParameter);
-        caseViewField.setFieldType(fieldType);
+        caseViewField.setFieldTypeDefinition(fieldType);
         return caseViewField;
     }
 
-    private FieldType fieldType(String id, String type, List<CaseField> complexFields, FieldType collectionFieldType) {
-        FieldType fieldType = new FieldType();
+    private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields, FieldTypeDefinition collectionFieldType) {
+        FieldTypeDefinition fieldType = new FieldTypeDefinition();
         fieldType.setId(id);
         fieldType.setType(type);
         fieldType.setComplexFields(complexFields);
-        fieldType.setCollectionFieldType(collectionFieldType);
+        fieldType.setCollectionFieldTypeDefinition(collectionFieldType);
         return fieldType;
     }
 
-    private FieldType fieldType() {
+    private FieldTypeDefinition fieldType() {
         return fieldType("DateTime", "DateTime", Collections.emptyList(), null);
     }
 
