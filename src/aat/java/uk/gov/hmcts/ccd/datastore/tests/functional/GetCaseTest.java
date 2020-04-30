@@ -28,66 +28,6 @@ class GetCaseTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("should retrieve case when the case reference exists")
-    void shouldRetrieveWhenExists() {
-        // Prepare new case in known state
-        final Long caseReference = Event.create()
-                                        .as(asAutoTestCaseworker())
-                                        .withData(FullCase.build())
-                                        .submitAndGetReference();
-
-        asAutoTestCaseworker()
-            .get()
-
-            .given()
-            .pathParam("jurisdiction", JURISDICTION)
-            .pathParam("caseType", CASE_TYPE)
-            .pathParam("caseReference", caseReference)
-            .contentType(ContentType.JSON)
-
-            .when()
-            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
-
-            .then()
-            .log().ifError()
-            .statusCode(200)
-            .assertThat()
-
-            // Metadata
-            .body("jurisdiction", equalTo(JURISDICTION))
-            .body("case_type_id", equalTo(CASE_TYPE))
-            .body("id", equalTo(caseReference))
-            .body("state", equalTo(AATCaseType.State.TODO))
-            .body("security_classification", equalTo("PUBLIC"))
-
-            // Flexible data
-            .rootPath("case_data")
-            .body("TextField", equalTo(AATCaseBuilder.TEXT))
-            .body("NumberField", equalTo(AATCaseBuilder.NUMBER))
-            .body("YesOrNoField", equalTo(AATCaseBuilder.YES_OR_NO))
-            .body("PhoneUKField", equalTo(AATCaseBuilder.PHONE_UK))
-            .body("EmailField", equalTo(AATCaseBuilder.EMAIL))
-            .body("MoneyGBPField", equalTo(AATCaseBuilder.MONEY_GBP))
-            .body("DateField", equalTo(AATCaseBuilder.DATE))
-            .body("DateTimeField", equalTo(AATCaseBuilder.DATE_TIME))
-            .body("TextAreaField", equalTo(AATCaseBuilder.TEXT_AREA))
-            .body("FixedListField", equalTo(AATCaseBuilder.FIXED_LIST))
-            .body("MultiSelectListField[0]", equalTo(AATCaseBuilder.MULTI_SELECT_LIST[0]))
-            .body("MultiSelectListField[1]", equalTo(AATCaseBuilder.MULTI_SELECT_LIST[1]))
-            .body("CollectionField[0].value", equalTo(AATCaseBuilder.COLLECTION_VALUE_1))
-            .body("CollectionField[1].value", equalTo(AATCaseBuilder.COLLECTION_VALUE_2))
-            .body("ComplexField.ComplexTextField", equalTo(AATCaseBuilder.COMPLEX_TEXT))
-            .body("ComplexField.ComplexFixedListField", equalTo(AATCaseBuilder.COMPLEX_FIXED_LIST))
-            .body("AddressUKField.AddressLine1", equalTo(AATCaseBuilder.ADDRESS_LINE_1))
-            .body("AddressUKField.AddressLine2", equalTo(AATCaseBuilder.ADDRESS_LINE_2))
-            .body("AddressUKField.AddressLine3", equalTo(AATCaseBuilder.ADDRESS_LINE_3))
-            .body("AddressUKField.PostTown", equalTo(AATCaseBuilder.ADDRESS_POST_TOWN))
-            .body("AddressUKField.County", equalTo(AATCaseBuilder.ADDRESS_COUNTY))
-            .body("AddressUKField.PostCode", equalTo(AATCaseBuilder.ADDRESS_POSTCODE))
-            .body("AddressUKField.Country", equalTo(AATCaseBuilder.ADDRESS_COUNTRY));
-    }
-
-    @Test
     @DisplayName("should get 404 when case reference does NOT exist")
     void should404WhenNotExists() {
         asAutoTestCaseworker()
