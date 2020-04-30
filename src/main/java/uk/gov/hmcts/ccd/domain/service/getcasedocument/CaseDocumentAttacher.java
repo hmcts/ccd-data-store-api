@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import liquibase.util.StringUtils;
 import org.slf4j.Logger;
@@ -104,8 +105,19 @@ public class CaseDocumentAttacher {
 
 
             } else {
-                jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
-                    Collections.singletonMap(node.getKey(), node.getValue()),caseDetailsBefore));
+                if(jsonNode instanceof ArrayNode){
+                 Iterator<JsonNode>  arrayNode = ((ArrayNode) jsonNode).elements();
+                 while(arrayNode.hasNext()){
+                   JsonNode arrayNodeElement  = arrayNode.next();
+                     arrayNodeElement.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
+                         Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
+
+                 }
+
+                }else {
+                    jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
+                        Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
+                }
             }
         });
     }
