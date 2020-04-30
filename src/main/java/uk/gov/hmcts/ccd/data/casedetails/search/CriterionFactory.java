@@ -50,7 +50,7 @@ public class CriterionFactory {
         ifPresentAndNotBlank(metadata.getCreatedDate(), cd ->
                 result.add(new MetaDataCriterion("date(" + CaseDetailsEntity.CREATED_DATE_FIELD_COL + ")", cd)));
 
-        ifPresentAndNotBlank(metadata.getLastModified(), lm ->
+        ifPresentAndNotBlank(metadata.getLastModifiedDate(), lm ->
                 result.add(new MetaDataCriterion("date(" + CaseDetailsEntity.LAST_MODIFIED_FIELD_COL + ")", lm)));
 
         ifPresentAndNotBlank(metadata.getLastStateModifiedDate(), lsm ->
