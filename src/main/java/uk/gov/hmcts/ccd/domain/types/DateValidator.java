@@ -18,7 +18,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
 /**
- * Max and Min is expressed as EPOCH
+ * Max and Min is expressed as EPOCH.
  */
 @Named
 @Singleton

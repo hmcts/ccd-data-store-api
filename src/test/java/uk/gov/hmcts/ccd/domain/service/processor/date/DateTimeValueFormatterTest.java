@@ -14,11 +14,11 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser;
-import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeValueFormatter;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
+import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -135,7 +136,8 @@ class DateTimeValueFormatterTest {
             CaseField complexNestedField = caseField("ComplexNestedField", fieldType(COMPLEX_FIELD_TYPE), null);
             CaseField nestedDateField = caseField("NestedDateField", fieldType(DATE_FIELD_TYPE), "#DATETIMEENTRY(yyyy),#DATETIMEDISPLAY(MM yyyy)");
             CaseField nestedCollectionDateField =
-                caseField("NestedCollectionDateField", fieldType(COLLECTION_FIELD_TYPE, fieldType(DATE_FIELD_TYPE)), "#DATETIMEDISPLAY(dd/MM/yyyy),#DATETIMEENTRY(yyyy)");
+                caseField("NestedCollectionDateField", fieldType(COLLECTION_FIELD_TYPE, fieldType(DATE_FIELD_TYPE)),
+                    "#DATETIMEDISPLAY(dd/MM/yyyy),#DATETIMEENTRY(yyyy)");
             complexNestedField.getFieldType().setComplexFields(Arrays.asList(nestedDateField, nestedCollectionDateField));
             caseViewField.getFieldType().setComplexFields(Arrays.asList(complexDateField, complexNestedField));
             when(dateTimeFormatParser.valueToTextNode(eq(TEST_DATE), eq(BaseType.get(DATE)), anyString(), eq("MM yyyy"), eq(false)))
@@ -197,7 +199,8 @@ class DateTimeValueFormatterTest {
         void shouldReturnExistingCollectionValueWhenNoDCP() throws IOException {
             setUpBaseType(COLLECTION_FIELD_TYPE);
             ArrayNode value = collectionValue();
-            CaseViewField caseViewField = caseViewField(ID, null, fieldType(COLLECTION_FIELD_TYPE, fieldType(DATE_FIELD_TYPE)), value, DisplayContext.READONLY.name());
+            CaseViewField caseViewField =
+                caseViewField(ID, null, fieldType(COLLECTION_FIELD_TYPE, fieldType(DATE_FIELD_TYPE)), value, DisplayContext.READONLY.name());
 
             CaseViewField result = dateTimeValueFormatter.execute(caseViewField, null);
 
@@ -246,6 +249,31 @@ class DateTimeValueFormatterTest {
                 () -> assertThat(((TextNode) result.getFormattedValue()).asText(), is("TextField"))
             );
         }
+
+        @Test
+        void shouldThrowExceptionWhenDateTimeCannotBeConverted() {
+            setUpBaseType(DATETIME_FIELD_TYPE);
+            TextNode value = new TextNode("INVALID");
+            CaseViewField caseViewField =
+                caseViewField(ID, "#DATETIMEDISPLAY(dd/MM/yyyy)", fieldType(DATETIME_FIELD_TYPE), value, DisplayContext.READONLY.name());
+            when(dateTimeFormatParser.valueToTextNode("INVALID", BaseType.get(DATETIME), ID, "dd/MM/yyyy", false)).thenThrow(DataProcessingException.class);
+
+            assertThrows(DataProcessingException.class,
+                () -> dateTimeValueFormatter.execute(caseViewField, null)
+            );
+        }
+
+        @Test
+        void shouldThrowExceptionWhenDateCannotBeConverted() {
+            setUpBaseType(DATE_FIELD_TYPE);
+            TextNode value = new TextNode("INVALID");
+            CaseViewField caseViewField = caseViewField(ID, "#DATETIMEDISPLAY(dd/MM/yyyy)", fieldType(DATE_FIELD_TYPE), value, DisplayContext.READONLY.name());
+            when(dateTimeFormatParser.valueToTextNode("INVALID", BaseType.get(DATE), ID, "dd/MM/yyyy", false)).thenThrow(DataProcessingException.class);
+
+            assertThrows(DataProcessingException.class,
+                () -> dateTimeValueFormatter.execute(caseViewField, null)
+            );
+        }
     }
 
     @Nested
@@ -290,7 +318,8 @@ class DateTimeValueFormatterTest {
         void shouldFormatCollectionOfDateFieldsUsingDisplayDCP() throws IOException {
             setUpBaseType(COLLECTION_FIELD_TYPE);
             ArrayNode value = collectionValue();
-            CaseViewField caseViewField = caseViewField(ID, "#DATETIMEDISPLAY(dd/MM/yyyy)", fieldType(COLLECTION_FIELD_TYPE, fieldType(DATE_FIELD_TYPE)), value, DisplayContext.READONLY.name());
+            CaseViewField caseViewField = caseViewField(ID, "#DATETIMEDISPLAY(dd/MM/yyyy)",
+                fieldType(COLLECTION_FIELD_TYPE, fieldType(DATE_FIELD_TYPE)), value, DisplayContext.READONLY.name());
             WizardPageField wizardPageField = wizardPageField(ID, Collections.emptyList());
             when(dateTimeFormatParser.valueToTextNode(eq(TEST_DATE), eq(BaseType.get(DATE)), anyString(), eq(TEST_FORMAT), eq(false)))
                 .thenReturn(new TextNode("13/03/2020"));
@@ -358,8 +387,8 @@ class DateTimeValueFormatterTest {
             CaseField complexDateField = caseField("ComplexDateField", fieldType(DATE_FIELD_TYPE), "#DATETIMEENTRY(d)");
             CaseField complexNestedField = caseField("ComplexNestedField", fieldType(COMPLEX_FIELD_TYPE), null);
             CaseField nestedDateField = caseField("NestedDateField", fieldType(DATE_FIELD_TYPE), "#DATETIMEENTRY(yyyy),#DATETIMEDISPLAY(MM yyyy)");
-            CaseField nestedCollectionDateField =
-                caseField("NestedCollectionDateField", fieldType(COLLECTION_FIELD_TYPE, fieldType(DATE_FIELD_TYPE)), "#DATETIMEDISPLAY(dd/MM/yyyy),#DATETIMEENTRY(MM)");
+            CaseField nestedCollectionDateField = caseField("NestedCollectionDateField", fieldType(COLLECTION_FIELD_TYPE, fieldType(DATE_FIELD_TYPE)),
+                    "#DATETIMEDISPLAY(dd/MM/yyyy),#DATETIMEENTRY(MM)");
             complexNestedField.getFieldType().setComplexFields(Arrays.asList(nestedDateField, nestedCollectionDateField));
             caseViewField.getFieldType().setComplexFields(Arrays.asList(complexDateField, complexNestedField));
             WizardPageComplexFieldOverride nestedDateFieldOverride =

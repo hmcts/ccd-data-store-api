@@ -70,9 +70,18 @@ public abstract class FieldProcessor {
         return newNode;
     }
 
-    protected abstract JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath, WizardPageComplexFieldOverride override, CommonField topLevelField);
+    protected abstract JsonNode executeSimple(JsonNode node,
+                                              CommonField field,
+                                              BaseType baseType,
+                                              String fieldPath,
+                                              WizardPageComplexFieldOverride override,
+                                              CommonField topLevelField);
 
-    protected abstract JsonNode executeCollection(JsonNode collectionNode, CommonField field, String fieldPath, WizardPageComplexFieldOverride override, CommonField topLevelField);
+    protected abstract JsonNode executeCollection(JsonNode collectionNode,
+                                                  CommonField field,
+                                                  String fieldPath,
+                                                  WizardPageComplexFieldOverride override,
+                                                  CommonField topLevelField);
 
     public static boolean isNullOrEmpty(final JsonNode node) {
         return node == null
@@ -92,8 +101,8 @@ public abstract class FieldProcessor {
     }
 
     private Optional<WizardPageComplexFieldOverride> wizardPageComplexFieldOverride(WizardPageField wizardPageField, String fieldPath) {
-        return wizardPageField != null ?
-            wizardPageField.getComplexFieldOverride(fieldPath) :
-            Optional.empty();
+        return wizardPageField != null
+            ? wizardPageField.getComplexFieldOverride(fieldPath)
+            : Optional.empty();
     }
 }

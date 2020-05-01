@@ -132,6 +132,8 @@ public class EventTokenService {
     }
 
     /**
+     * Convert to string.
+     *
      * @param object Object to convert to string
      * @return <code>object.toString()</code> when object is not null; <code>null</code> otherwise
      */

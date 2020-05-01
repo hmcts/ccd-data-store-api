@@ -46,7 +46,7 @@ class CachedCaseDefinitionRepositoryTest {
 
     @Nested
     @DisplayName("getCaseTypesForJurisdiction()")
-    class getCaseTypesForJurisdiction {
+    class GetCaseTypesForJurisdiction {
 
         @Test
         @DisplayName("should initially retrieve case types from decorated repository")
@@ -85,7 +85,7 @@ class CachedCaseDefinitionRepositoryTest {
 
     @Nested
     @DisplayName("getBaseTypes()")
-    class getBaseTypes {
+    class GetBaseTypes {
 
         @Test
         @DisplayName("should initially retrieve base types from decorated repository")

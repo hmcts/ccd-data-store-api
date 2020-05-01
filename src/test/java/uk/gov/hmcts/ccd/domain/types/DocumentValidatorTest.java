@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class DocumentValidatorTest implements IVallidatorTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String CASE_FIELD_STRING =

@@ -140,9 +140,12 @@ public class DateTimeSearchResultProcessor {
         originalNode.forEach(item -> {
             JsonNode newItem = item.deepCopy();
             ((ObjectNode)newItem).replace(VALUE,
-                item.get(VALUE) instanceof TextNode ?
-                    createTextNodeFrom((TextNode) item.get(VALUE), viewColumn, fieldPrefix) :
-                    createObjectNodeFrom((ObjectNode) item.get(VALUE), viewColumn, viewColumn.getCaseFieldType().getChildren(), fieldPrefix));
+                item.get(VALUE) instanceof TextNode
+                    ? createTextNodeFrom((TextNode) item.get(VALUE), viewColumn, fieldPrefix)
+                    : createObjectNodeFrom((ObjectNode) item.get(VALUE),
+                                           viewColumn,
+                                           viewColumn.getCaseFieldType().getChildren(),
+                                           fieldPrefix));
             newNode.add(newItem);
         });
 

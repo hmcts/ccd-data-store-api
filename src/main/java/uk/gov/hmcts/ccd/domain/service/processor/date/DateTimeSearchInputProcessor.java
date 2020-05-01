@@ -40,7 +40,7 @@ public class DateTimeSearchInputProcessor {
         this.getCriteriaOperation = getCriteriaOperation;
     }
 
-    public Map<String, String> execute(String view, MetaData metadata, Map<String, String> queryParameters) {
+    public Map<String, String> executeQueryParams(String view, MetaData metadata, Map<String, String> queryParameters) {
         final List<? extends CriteriaInput> criteriaInputs = getCriteriaInputs(view, metadata);
 
         Map<String, String> newParams = new HashMap<>();
@@ -59,6 +59,31 @@ public class DateTimeSearchInputProcessor {
         });
 
         return newParams;
+    }
+
+    public MetaData executeMetadata(String view, MetaData metadata) {
+        getCriteriaInputs(view, metadata).stream()
+            .filter(i -> i.getField().isMetadata() && !i.getDisplayContextParameters().isEmpty())
+            .forEach(input -> {
+                final String id = input.getField().getId();
+                MetaData.CaseField field;
+                try {
+                    field = MetaData.CaseField.valueOfReference(id);
+                } catch (IllegalArgumentException ex) {
+                    throw new DataProcessingException().withDetails(
+                        String.format("Unable to process unknown metadata field %s.", id)
+                    );
+                }
+                if (input.hasDisplayContextParameter(DATETIMEENTRY)
+                    && MetaData.DATE_FIELDS.contains(field)
+                    && metadata.getOptionalMetadata(field).isPresent()) {
+                    metadata.setOptionalMetadata(field,
+                        processValue(id, input,
+                            metadata.getOptionalMetadata(field).get(), input.getField().getType()));
+                }
+            });
+
+        return metadata;
     }
 
     private Optional<? extends CriteriaInput> findCriteriaInputField(List<? extends CriteriaInput> criteriaInputs, String fieldId) {

@@ -28,9 +28,11 @@ public class StartTriggerResource extends RepresentationModel {
         copyProperties(startEventTrigger);
 
         if (withCase) {
-            add(linkTo(methodOn(StartTriggerController.class).getStartEventTrigger(startEventTrigger.getCaseReference(), eventId, ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(StartTriggerController.class).getStartEventTrigger(startEventTrigger.getCaseReference(), eventId, ignoreWarning))
+                .withSelfRel());
         } else {
-            add(linkTo(methodOn(StartTriggerController.class).getStartCaseTrigger(startEventTrigger.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(StartTriggerController.class).getStartCaseTrigger(startEventTrigger.getCaseTypeId(), eventId, ignoreWarning))
+                .withSelfRel());
         }
     }
 

@@ -154,7 +154,8 @@ public class CaseDetailsEndpoint {
 
     @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
-    @ApiOperation(value = "Start event creation as Case worker", notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
+    @ApiOperation(value = "Start event creation as Case worker",
+                  notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Event creation process started"),
         @ApiResponse(code = 404, message = "No case found for the given ID"),
@@ -499,7 +500,7 @@ public class CaseDetailsEndpoint {
         metadata.setState(param(queryParameters, STATE.getParameterName()));
         metadata.setCaseReference(param(queryParameters, CASE_REFERENCE.getParameterName()));
         metadata.setCreatedDate(param(queryParameters, CREATED_DATE.getParameterName()));
-        metadata.setLastModified(param(queryParameters, LAST_MODIFIED_DATE.getParameterName()));
+        metadata.setLastModifiedDate(param(queryParameters, LAST_MODIFIED_DATE.getParameterName()));
         metadata.setLastStateModifiedDate(param(queryParameters, LAST_STATE_MODIFIED_DATE.getParameterName()));
         metadata.setSecurityClassification(param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()));
         metadata.setPage(param(queryParameters, PAGE_PARAM));

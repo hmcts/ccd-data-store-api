@@ -17,12 +17,12 @@ public class HttpUIDefinitionGatewayServiceExceptionTest extends BaseTest {
 
     @Test(expected = ServiceException.class)
     public void shouldGetServiceExceptionWhenGettingWorkbasketInputDefinitions() {
-            httpUIDefinitionGateway.getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
+        httpUIDefinitionGateway.getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
     }
 
     @Test(expected = ServiceException.class)
     public void shouldGetServiceExceptionWhenGettingWorkbasketResults() {
-            httpUIDefinitionGateway.getWorkBasketResult(VERSION, "TestAddressBookCase");
+        httpUIDefinitionGateway.getWorkBasketResult(VERSION, "TestAddressBookCase");
     }
 
     @Test(expected = ServiceException.class)

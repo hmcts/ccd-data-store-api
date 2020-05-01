@@ -21,8 +21,6 @@ public class Jurisdiction implements Serializable {
 
     private List<CaseType> caseTypes = new ArrayList<>();
 
-    /**
-     **/
     @ApiModelProperty(required = true, value = "")
     @JsonProperty("id")
     public String getId() {
@@ -33,8 +31,6 @@ public class Jurisdiction implements Serializable {
         this.id = id;
     }
 
-    /**
-     **/
     @ApiModelProperty(required = true, value = "")
     @JsonProperty("name")
     public String getName() {
@@ -45,8 +41,6 @@ public class Jurisdiction implements Serializable {
         this.name = name;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("description")
     public String getDescription() {
@@ -57,8 +51,6 @@ public class Jurisdiction implements Serializable {
         this.description = description;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("live_from")
     public Date getLiveFrom() {
@@ -69,8 +61,6 @@ public class Jurisdiction implements Serializable {
         this.liveFrom = liveFrom;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("live_until")
     public Date getLiveUntil() {
@@ -81,8 +71,6 @@ public class Jurisdiction implements Serializable {
         this.liveUntil = liveUntil;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("case_types")
     public List<CaseType> getCaseTypes() {

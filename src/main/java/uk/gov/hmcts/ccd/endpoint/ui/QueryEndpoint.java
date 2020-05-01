@@ -155,12 +155,12 @@ public class QueryEndpoint {
     public SearchResultView searchNew(@PathVariable("jid") final String jurisdictionId,
                                       @PathVariable("ctid") final String caseTypeId,
                                       @RequestParam java.util.Map<String, String> params) {
-        String view = params.get("view");
+        final String view = params.get("view");
         MetaData metadata = new MetaData(caseTypeId, jurisdictionId);
         metadata.setState(param(params, STATE.getParameterName()));
         metadata.setCaseReference(param(params, CASE_REFERENCE.getParameterName()));
         metadata.setCreatedDate(param(params, CREATED_DATE.getParameterName()));
-        metadata.setLastModified(param(params, LAST_MODIFIED_DATE.getParameterName()));
+        metadata.setLastModifiedDate(param(params, LAST_MODIFIED_DATE.getParameterName()));
         metadata.setLastStateModifiedDate(param(params, LAST_STATE_MODIFIED_DATE.getParameterName()));
         metadata.setSecurityClassification(param(params, SECURITY_CLASSIFICATION.getParameterName()));
         metadata.setPage(param(params, PAGE_PARAM));

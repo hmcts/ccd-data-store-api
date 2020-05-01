@@ -68,8 +68,10 @@ public class SearchQueryOperation {
 
         addSortOrderFields(metadata, searchResult);
 
-        final Map<String, String> criteria = dateTimeSearchInputProcessor.execute(view, metadata, queryParameters);
-        final List<CaseDetails> cases = searchOperation.execute(metadata, criteria);
+        final List<CaseDetails> cases = searchOperation.execute(
+            dateTimeSearchInputProcessor.executeMetadata(view, metadata),
+            dateTimeSearchInputProcessor.executeQueryParams(view, metadata, queryParameters)
+        );
 
         String draftResultError = NO_ERROR;
         List<CaseDetails> draftsAndCases = Lists.newArrayList();

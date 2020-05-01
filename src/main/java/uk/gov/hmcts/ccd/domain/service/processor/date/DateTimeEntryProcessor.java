@@ -43,9 +43,9 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
                                      CommonField topLevelField) {
         return !isNullOrEmpty(node)
             && field.hasDisplayContextParameter(DATETIMEENTRY)
-            && isSupportedBaseType(baseType, SUPPORTED_TYPES) ?
-            createNode(field, node.asText(), baseType, fieldPath) :
-            node;
+            && isSupportedBaseType(baseType, SUPPORTED_TYPES)
+            ? createNode(field, node.asText(), baseType, fieldPath)
+            : node;
     }
 
     @Override
@@ -63,9 +63,9 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
                 ((ObjectNode)newItem).replace(VALUE,
-                    isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES) ?
-                        createNode(field, item.get(VALUE).asText(), collectionFieldType, fieldPath) :
-                        executeComplex(item.get(VALUE), field.getFieldType().getChildren(), null, fieldPath, topLevelField));
+                    isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
+                        ? createNode(field, item.get(VALUE).asText(), collectionFieldType, fieldPath)
+                        : executeComplex(item.get(VALUE), field.getFieldType().getChildren(), null, fieldPath, topLevelField));
                 newNode.add(newItem);
             });
 

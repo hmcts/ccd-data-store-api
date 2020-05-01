@@ -21,17 +21,21 @@ class StartTriggerResourceTest {
     private static final String EVENT_ID = "createCase";
     private static final CaseDetails CASE_DETAILS = new CaseDetails();
 
+    private static final String LINK_SELF_FOR_CASE = String.format("/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, EVENT_ID);
+    private static final Long CASE_REFERENCE = 1111222233334444L;
+    private static final String LINK_SELF_FOR_EVENT = String.format("/cases/%s/event-triggers/%s?ignore-warning=true", CASE_REFERENCE, EVENT_ID);
+
     private StartEventTrigger startEventTrigger;
     private boolean ignoreWarning;
 
     @BeforeEach
     void setUp() {
         CASE_DETAILS.setCaseTypeId(CASE_TYPE_ID);
-        startEventTrigger = aStartEventTrigger();
+        startEventTrigger = newStartEventTrigger();
         ignoreWarning = true;
     }
 
-    private StartEventTrigger aStartEventTrigger() {
+    private StartEventTrigger newStartEventTrigger() {
         final StartEventTrigger startEventTrigger = new StartEventTrigger();
 
         startEventTrigger.setCaseDetails(CASE_DETAILS);
@@ -44,7 +48,6 @@ class StartTriggerResourceTest {
     @Nested
     @DisplayName("Start case trigger")
     class StartTriggerForCase {
-        private final String LINK_SELF_FOR_CASE = String.format("/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, EVENT_ID);
 
         @Test
         @DisplayName("should copy case details")
@@ -71,15 +74,13 @@ class StartTriggerResourceTest {
     @Nested
     @DisplayName("Start event trigger")
     class StartTriggerForEvent {
-        private final Long CASE_REFERENCE = 1111222233334444L;
-        private final String LINK_SELF_FOR_EVENT = String.format("/cases/%s/event-triggers/%s?ignore-warning=true", CASE_REFERENCE, EVENT_ID);
 
         @BeforeEach
         void setUp() {
             CASE_DETAILS.setReference(CASE_REFERENCE);
             startEventTrigger.setCaseDetails(CASE_DETAILS);
             CASE_DETAILS.setCaseTypeId(CASE_TYPE_ID);
-            startEventTrigger = aStartEventTrigger();
+            startEventTrigger = newStartEventTrigger();
             ignoreWarning = true;
         }
 

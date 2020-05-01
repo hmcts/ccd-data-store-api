@@ -65,7 +65,8 @@ public class CaseFieldTest {
 
     private CaseField name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private CaseField surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private FieldType personFieldType = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).withComplexField(address).build();
+    private FieldType personFieldType
+        = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).withComplexField(address).build();
     private CaseField person = newCaseField().withId(PERSON).withFieldType(personFieldType).build();
 
     private FieldType debtorFieldType = aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
@@ -95,11 +96,19 @@ public class CaseFieldTest {
     private AccessControlList acl1 = anAcl().withRole(ROLE1).withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
     private AccessControlList acl2 = anAcl().withRole(ROLE2).withCreate(true).withRead(true).withUpdate(false).withDelete(true).build();
     private AccessControlList acl3 = anAcl().withRole(ROLE3).withCreate(false).withRead(false).withUpdate(true).withDelete(false).build();
-    private ComplexACL complexACL1 = aComplexACL().withListElementCode(MEMBERS).withRole(ROLE1).withCreate(false).withRead(true).withUpdate(true).withDelete(false).build();
-    private ComplexACL complexACL2 = aComplexACL().withListElementCode(MEMBERS + "." + PERSON).withRole(ROLE1).withCreate(false).withRead(true).withUpdate(false).withDelete(false).build();
-    private ComplexACL complexACL3 = aComplexACL().withListElementCode(MEMBERS + "." + PERSON + "." + NAME).withRole(ROLE1).withCreate(false).withRead(true).withUpdate(false).withDelete(false).build();
-    private ComplexACL complexACL4 = aComplexACL().withListElementCode(FAMILY_INFO).withRole(ROLE1).withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
-    private ComplexACL complexACL5 = aComplexACL().withListElementCode(FAMILY_INFO + "." + FAMILY_ADDRESS).withRole(ROLE1).withCreate(true).withRead(true).withUpdate(false).withDelete(false).build();
+    private ComplexACL complexACL1
+        = aComplexACL().withListElementCode(MEMBERS).withRole(ROLE1).withCreate(false).withRead(true).withUpdate(true).withDelete(false).build();
+    private ComplexACL complexACL2
+        = aComplexACL().withListElementCode(MEMBERS + "." + PERSON).withRole(ROLE1).withCreate(false).withRead(true).withUpdate(false).withDelete(false)
+            .build();
+    private ComplexACL complexACL3
+        = aComplexACL().withListElementCode(MEMBERS + "." + PERSON + "." + NAME).withRole(ROLE1).withCreate(false).withRead(true).withUpdate(false)
+            .withDelete(false).build();
+    private ComplexACL complexACL4
+        = aComplexACL().withListElementCode(FAMILY_INFO).withRole(ROLE1).withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
+    private ComplexACL complexACL5
+        = aComplexACL().withListElementCode(FAMILY_INFO + "." + FAMILY_ADDRESS).withRole(ROLE1).withCreate(true).withRead(true).withUpdate(false)
+            .withDelete(false).build();
     private CaseField family;
 
     @BeforeEach
@@ -120,14 +129,14 @@ public class CaseFieldTest {
 
             family.propagateACLsToNestedFields();
 
-            CaseField members = family.getFieldType().getChildren().stream()
+            final CaseField members = family.getFieldType().getChildren().stream()
                 .filter(e -> e.getId().equals(MEMBERS)).findFirst().get();
-            CaseField person = members.getFieldType().getChildren().stream()
+            final CaseField person = members.getFieldType().getChildren().stream()
                 .filter(e -> e.getId().equals(PERSON)).findFirst().get();
 
-            CaseField name = person.getFieldType().getChildren().stream()
+            final CaseField name = person.getFieldType().getChildren().stream()
                 .filter(e -> e.getId().equals(NAME)).findFirst().get();
-            CaseField surname = person.getFieldType().getChildren().stream()
+            final CaseField surname = person.getFieldType().getChildren().stream()
                 .filter(e -> e.getId().equals(SURNAME)).findFirst().get();
 
             validateACL(findNestedField(family, MEMBERS).getAccessControlLists(), complexACL1);

@@ -32,6 +32,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 class CaseDataServiceTest {
     private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
@@ -490,7 +491,7 @@ class CaseDataServiceTest {
             "   },\n" +
             "   \"PersonFirstName\":\"\"\n" +
             "}";
-           assertEquals(expectedNewResult, newClassificationsResult.toString(), false);
+        assertEquals(expectedNewResult, newClassificationsResult.toString(), false);
     }
 
     @Test

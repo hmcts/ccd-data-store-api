@@ -15,8 +15,6 @@ public class CriteriaField implements Serializable, CommonDCPModel {
     private String displayContextParameter = null;
     private String showCondition;
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("case_field_id")
     public String getCaseFieldId() {
@@ -27,8 +25,6 @@ public class CriteriaField implements Serializable, CommonDCPModel {
         this.caseFieldId = caseFieldId;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("case_field_element_path")
     public String getCaseFieldPath() {
@@ -39,8 +35,6 @@ public class CriteriaField implements Serializable, CommonDCPModel {
         this.caseFieldPath = caseFieldPath;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("label")
     public String getLabel() {
@@ -51,8 +45,6 @@ public class CriteriaField implements Serializable, CommonDCPModel {
         this.label = label;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("order")
     public Integer getDisplayOrder() {
@@ -82,7 +74,7 @@ public class CriteriaField implements Serializable, CommonDCPModel {
     public void setDisplayContextParameter(String displayContextParameter) {
         this.displayContextParameter = displayContextParameter;
     }
-    
+
     @JsonProperty("show_condition")
     public String getShowCondition() {
         return showCondition;

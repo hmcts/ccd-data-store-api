@@ -9,6 +9,7 @@ import javax.persistence.Converter;
 import java.io.IOException;
 
 @Converter(autoApply = true)
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName") // class naming predates checkstyle implementation in module
 public class JSONBConverter implements AttributeConverter<JsonNode, String> {
     private static ObjectMapper mapper = new ObjectMapper();
 

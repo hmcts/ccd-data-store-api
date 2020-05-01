@@ -62,6 +62,7 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public abstract class BaseTest {
     protected static final ObjectMapper mapper = new ObjectMapper();
     protected static final TypeReference<HashMap<String, JsonNode>> STRING_NODE_TYPE = new TypeReference<HashMap<String, JsonNode>>() {};
@@ -151,9 +152,7 @@ public abstract class BaseTest {
             "AND tablename NOT IN ('databasechangeloglock','databasechangelog')"
         ).stream()
             .map(resultRow -> resultRow.get("truncate_statement"))
-            .forEach(truncateStatement ->
-                            jdbcTemplate.execute(truncateStatement.toString())
-            );
+            .forEach(truncateStatement -> jdbcTemplate.execute(truncateStatement.toString()));
 
     }
 

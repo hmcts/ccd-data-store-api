@@ -343,7 +343,7 @@ class AuthorisedGetCaseTypesOperationTest {
         }
     }
 
-        @Nested
+    @Nested
     @DisplayName("events tests")
     class ReturnsCaseTypesWithEventsThatMatchAccessCriteria {
 
@@ -447,7 +447,10 @@ class AuthorisedGetCaseTypesOperationTest {
             List<CaseType> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
 
             assertThat(caseTypes.get(0).getCaseFields(), hasSize(2));
-            assertThat(caseTypes.get(0).getCaseFields(), hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_3_1)), hasProperty("id", equalTo(CASE_FIELD_ID_3_2))));
+            assertThat(
+                caseTypes.get(0).getCaseFields(),
+                hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_3_1)), hasProperty("id", equalTo(CASE_FIELD_ID_3_2)))
+            );
         }
 
         @Test

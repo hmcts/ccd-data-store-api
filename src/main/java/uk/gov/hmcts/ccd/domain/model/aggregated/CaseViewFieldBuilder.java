@@ -46,11 +46,6 @@ public class CaseViewFieldBuilder {
         return field;
     }
 
-    private void buildFieldType(final CaseField caseField, final CaseEventField eventField, final CaseViewField field) {
-        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseField, eventField.getCaseEventFieldComplex(), ROOT);
-        field.setFieldType(caseField.getFieldType());
-    }
-
     public CaseViewField build(CaseField caseField, CaseEventField eventField, Object value) {
         final CaseViewField field = build(caseField, eventField);
         field.setValue(value);
@@ -66,5 +61,10 @@ public class CaseViewFieldBuilder {
             .filter(eventField -> caseFieldMap.containsKey(eventField.getCaseFieldId()))
             .map(eventField -> build(caseFieldMap.get(eventField.getCaseFieldId()), eventField, data != null ? data.get(eventField.getCaseFieldId()) : null))
             .collect(Collectors.toList());
+    }
+
+    private void buildFieldType(final CaseField caseField, final CaseEventField eventField, final CaseViewField field) {
+        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseField, eventField.getCaseEventFieldComplex(), ROOT);
+        field.setFieldType(caseField.getFieldType());
     }
 }

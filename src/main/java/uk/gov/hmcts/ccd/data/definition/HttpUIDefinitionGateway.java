@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 /**
- * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway
+ * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway.
  */
 @Named
 @Qualifier("Http")
@@ -214,7 +214,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                 e.getMessage()));
         }
     }
-    
+
     public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionIds) {
         try {
             final Instant start = Instant.now();

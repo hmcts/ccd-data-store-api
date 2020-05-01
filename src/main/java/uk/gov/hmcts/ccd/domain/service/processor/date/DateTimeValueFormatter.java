@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameter;
 import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
@@ -49,37 +50,46 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
     @Override
     protected CaseViewField executeSimple(CaseViewField caseViewField, BaseType baseType) {
         caseViewField.setFormattedValue(
-            caseViewField.getValue() instanceof TextNode ?
-                executeSimple((TextNode) caseViewField.getValue(), caseViewField, baseType, caseViewField.getId(), null, caseViewField) :
-                caseViewField.getValue()
+            caseViewField.getValue() instanceof TextNode
+                ? executeSimple((TextNode) caseViewField.getValue(), caseViewField, baseType, caseViewField.getId(), null, caseViewField)
+                : caseViewField.getValue()
         );
 
         return caseViewField;
+    }
+
+    @Override
+    protected JsonNode executeSimple(JsonNode node,
+                                     CommonField field,
+                                     BaseType baseType,
+                                     String fieldPath,
+                                     WizardPageComplexFieldOverride override,
+                                     CommonField topLevelField) {
+        final DisplayContext displayContext = displayContext(topLevelField, override);
+        return !isNullOrEmpty(node)
+            && field.hasDisplayContextParameter(ENUM_MAP.get(displayContext))
+            && isSupportedBaseType(baseType, SUPPORTED_TYPES)
+                ? createNode(field, node.asText(), baseType, fieldPath, displayContext)
+                : node;
     }
 
     @Override
     protected CaseViewField executeCollection(CaseViewField caseViewField) {
         caseViewField.setFormattedValue(
-            caseViewField.getValue() instanceof ArrayNode ?
-                executeCollection((ArrayNode) caseViewField.getValue(), caseViewField, caseViewField.getId(), null, caseViewField) :
-                caseViewField.getValue()
+            caseViewField.getValue() instanceof ArrayNode
+                ? executeCollection((ArrayNode) caseViewField.getValue(), caseViewField, caseViewField.getId(), null, caseViewField)
+                : caseViewField.getValue()
         );
 
         return caseViewField;
     }
 
     @Override
-    protected JsonNode executeSimple(JsonNode node, CommonField field, BaseType baseType, String fieldPath, WizardPageComplexFieldOverride override, CommonField topLevelField) {
-        final DisplayContext displayContext = displayContext(topLevelField, override);
-        return !isNullOrEmpty(node)
-            && field.hasDisplayContextParameter(ENUM_MAP.get(displayContext))
-            && isSupportedBaseType(baseType, SUPPORTED_TYPES) ?
-            createNode(field, node.asText(), baseType, fieldPath, displayContext) :
-            node;
-    }
-
-    @Override
-    protected JsonNode executeCollection(JsonNode collectionNode, CommonField field, String fieldPath, WizardPageComplexFieldOverride override, CommonField topLevelField) {
+    protected JsonNode executeCollection(JsonNode collectionNode,
+                                         CommonField field,
+                                         String fieldPath,
+                                         WizardPageComplexFieldOverride override,
+                                         CommonField topLevelField) {
         final BaseType collectionFieldType = BaseType.get(field.getFieldType().getCollectionFieldType().getType());
         final DisplayContext displayContext = displayContext(topLevelField, override);
 
@@ -90,9 +100,19 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
                 ((ObjectNode)newItem).replace(VALUE,
-                    isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES) ?
-                        createNode(field, item.get(VALUE).asText(), collectionFieldType, fieldPath, displayContext) :
-                        executeComplex(item.get(VALUE), field.getFieldType().getChildren(), null, fieldPath, topLevelField));
+                    isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
+                        ? createNode(
+                            field,
+                            item.get(VALUE).asText(),
+                            collectionFieldType,
+                            fieldPath,
+                            displayContext)
+                        : executeComplex(
+                            item.get(VALUE),
+                            field.getFieldType().getChildren(),
+                            null,
+                            fieldPath,
+                            topLevelField));
                 newNode.add(newItem);
             });
 
@@ -102,7 +122,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         return collectionNode;
     }
 
-    private TextNode createNode(CommonField field, String valueToConvert, BaseType baseType, String fieldPath, DisplayContext displayContext) {
+    private TextNode createNode(CommonDCPModel field, String valueToConvert, BaseType baseType, String fieldPath, DisplayContext displayContext) {
         if (ENUM_MAP.containsKey(displayContext)) {
             String format = format(field, displayContext, baseType);
             return dateTimeFormatParser.valueToTextNode(valueToConvert, baseType, fieldPath, format, false);
@@ -111,7 +131,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         return new TextNode(valueToConvert);
     }
 
-    private String format(CommonField field, DisplayContext displayContext, BaseType baseType) {
+    private String format(CommonDCPModel field, DisplayContext displayContext, BaseType baseType) {
         return field.getDisplayContextParameter(ENUM_MAP.get(displayContext))
             .map(DisplayContextParameter::getValue)
             .orElseGet(() -> baseType == BaseType.get(DATETIME) ? DATE_TIME_FORMAT : DATE_FORMAT);

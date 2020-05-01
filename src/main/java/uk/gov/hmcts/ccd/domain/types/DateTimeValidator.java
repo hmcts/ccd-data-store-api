@@ -18,7 +18,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
 /**
- * Max and Min is expressed as EPOCH
+ * Max and Min is expressed as EPOCH.
  */
 @Named
 @Singleton
@@ -57,11 +57,15 @@ public class DateTimeValidator implements BaseTypeValidator {
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), dataValue.asText())) {
-            return Collections.singletonList(new ValidationResult(dataValue.asText() + " Field Type Regex Failed:" + caseFieldDefinition.getFieldType().getRegularExpression(), dataFieldId));
+            return Collections.singletonList(
+                new ValidationResult(dataValue.asText() + " Field Type Regex Failed:" + caseFieldDefinition.getFieldType().getRegularExpression(), dataFieldId)
+            );
         }
 
         if (!checkRegex(getType().getRegularExpression(), dataValue.asText())) {
-            return Collections.singletonList(new ValidationResult(dataValue.asText() + " Date Time Type Regex Failed:" + getType().getRegularExpression(), dataFieldId));
+            return Collections.singletonList(
+                new ValidationResult(dataValue.asText() + " Date Time Type Regex Failed:" + getType().getRegularExpression(), dataFieldId)
+            );
         }
 
         return Collections.emptyList();

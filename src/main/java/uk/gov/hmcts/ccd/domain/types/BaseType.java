@@ -21,7 +21,8 @@ public class BaseType {
         regularExpression = fieldType.getRegularExpression();
     }
 
-    public static void setCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
+    public static void setCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
+                                                   final CaseDefinitionRepository caseDefinitionRepository) {
         BaseType.caseDefinitionRepository = caseDefinitionRepository;
     }
 

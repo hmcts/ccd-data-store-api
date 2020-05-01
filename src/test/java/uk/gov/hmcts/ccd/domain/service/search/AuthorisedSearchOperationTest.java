@@ -272,7 +272,8 @@ class AuthorisedSearchOperationTest {
         assertAll(
             () -> assertThat(output, is(notNullValue())),
             () -> assertThat(output, hasSize(0)),
-            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
+            () -> verify(accessControlService, never())
+                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
         );
     }
 }

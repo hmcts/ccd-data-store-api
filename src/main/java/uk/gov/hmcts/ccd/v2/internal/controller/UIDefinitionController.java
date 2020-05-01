@@ -52,7 +52,7 @@ public class UIDefinitionController {
     private final GetCriteriaOperation getCriteriaOperation;
 
     private final GetBannerOperation getBannerOperation;
-    
+
     private final GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation;
 
     private final GetUserProfileOperation getUserProfileOperation;
@@ -63,7 +63,8 @@ public class UIDefinitionController {
     public UIDefinitionController(@Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER) GetCriteriaOperation getCriteriaOperation,
                                   @Qualifier(DefaultGetBannerOperation.QUALIFIER) GetBannerOperation getBannerOperation,
                                   @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation,
-                                  @Qualifier(DefaultGetJurisdictionUiConfigOperation.QUALIFIER) GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation) {
+                                  @Qualifier(DefaultGetJurisdictionUiConfigOperation.QUALIFIER)
+                                          GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation) {
         this.getCriteriaOperation = getCriteriaOperation;
         this.getBannerOperation = getBannerOperation;
         this.getJurisdictionUiConfigOperation = getJurisdictionUiConfigOperation;
@@ -162,8 +163,7 @@ public class UIDefinitionController {
         return ResponseEntity.ok(new UIBannerResource(listOfBanners));
     }
 
-  
-   @GetMapping(
+    @GetMapping(
         path = "/jurisdiction-ui-configs",
         headers = {
             V2.EXPERIMENTAL_HEADER
@@ -189,8 +189,8 @@ public class UIDefinitionController {
                                         : Lists.newArrayList();
         return ResponseEntity.ok(new UIJurisdictionConfigResource(listOfConfigs));
     }
-  
-  @GetMapping(
+
+    @GetMapping(
         path = "/jurisdictions",
         headers = {
             V2.EXPERIMENTAL_HEADER

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Service
 @Qualifier(IDAMJurisdictionsResolver.QUALIFIER)
 @RequestScope
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName") // class naming predates checkstyle implementation in module
 public class IDAMJurisdictionsResolver implements JurisdictionsResolver {
 
     public static final String QUALIFIER = "default";

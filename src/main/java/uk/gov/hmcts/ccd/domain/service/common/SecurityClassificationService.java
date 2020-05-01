@@ -103,7 +103,8 @@ public class SecurityClassificationService {
 
     public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId, CaseType caseType, String fieldId) {
         final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
-        return userClassification.map(securityClassification -> securityClassification.higherOrEqualTo(caseType.getClassificationForField(fieldId))).orElse(false);
+        return userClassification.map(securityClassification ->
+            securityClassification.higherOrEqualTo(caseType.getClassificationForField(fieldId))).orElse(false);
     }
 
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification, SecurityClassification userClassification) {
@@ -137,7 +138,10 @@ public class SecurityClassificationService {
         return data;
     }
 
-    private void filterCollection(SecurityClassification userClassification, Iterator<Map.Entry<String, JsonNode>> dataIterator, JsonNode dataClassificationElement, JsonNode dataElementValue) {
+    private void filterCollection(SecurityClassification userClassification,
+                                  Iterator<Map.Entry<String, JsonNode>> dataIterator,
+                                  JsonNode dataClassificationElement,
+                                  JsonNode dataElementValue) {
         // Apply collection-level classification
         filterSimpleField(userClassification,
                           dataIterator,
@@ -181,7 +185,10 @@ public class SecurityClassificationService {
         }
     }
 
-    private void filterObject(SecurityClassification userClassification, Iterator<Map.Entry<String, JsonNode>> dataIterator, JsonNode dataClassificationParent, JsonNode dataElementValue) {
+    private void filterObject(SecurityClassification userClassification,
+                              Iterator<Map.Entry<String, JsonNode>> dataIterator,
+                              JsonNode dataClassificationParent,
+                              JsonNode dataElementValue) {
         filterNestedObject(dataElementValue,
                            dataClassificationParent.get(VALUE),
                            userClassification);

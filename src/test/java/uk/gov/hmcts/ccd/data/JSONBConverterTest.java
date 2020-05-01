@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName") // class naming predates checkstyle implementation in module
 public class JSONBConverterTest {
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -29,8 +30,8 @@ public class JSONBConverterTest {
     public void convertToDatabaseColumn() throws Exception {
         assertNull(jsonbConverter.convertToDatabaseColumn(null));
 
-        final String JSON_STRING = "{\"key\":\"value\"}";
-        assertEquals(JSON_STRING, jsonbConverter.convertToDatabaseColumn(mapper.readTree(JSON_STRING)));
+        final String jsonString = "{\"key\":\"value\"}";
+        assertEquals(jsonString, jsonbConverter.convertToDatabaseColumn(mapper.readTree(jsonString)));
     }
 
     @Test

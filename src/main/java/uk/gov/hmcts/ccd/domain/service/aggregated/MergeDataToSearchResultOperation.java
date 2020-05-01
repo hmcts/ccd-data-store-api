@@ -100,13 +100,14 @@ public class MergeDataToSearchResultOperation {
 
     private CommonField commonField(SearchResultField searchResultField, CaseField caseField) {
         return caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
-            .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseField.getId(), searchResultField.getCaseFieldPath())));
+            .orElseThrow(() ->
+                new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseField.getId(), searchResultField.getCaseFieldPath())));
     }
 
     private String displayContextParameter(SearchResultField searchResultField, CommonField commonField) {
-        return searchResultField.getDisplayContextParameter() == null ?
-            commonField.getDisplayContextParameter() :
-            searchResultField.getDisplayContextParameter();
+        return searchResultField.getDisplayContextParameter() == null
+            ? commonField.getDisplayContextParameter()
+            : searchResultField.getDisplayContextParameter();
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,

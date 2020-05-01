@@ -74,7 +74,8 @@ class DefaultValidateCaseFieldsOperationTest {
 
     @Test
     void shouldFailValidationIfNoContent() {
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, null));
+        ValidationException exception =
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, null));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(any());
@@ -85,7 +86,8 @@ class DefaultValidateCaseFieldsOperationTest {
     void shouldFailValidationIfNoEventInContent() {
         doReturn(null).when(caseDataContent).getEvent();
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+        ValidationException exception =
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(any());
@@ -96,7 +98,8 @@ class DefaultValidateCaseFieldsOperationTest {
     void shouldFailValidationIfNoEventIdInContent() {
         doReturn(null).when(caseDataContent).getEventId();
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+        ValidationException exception =
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(any());
@@ -107,7 +110,8 @@ class DefaultValidateCaseFieldsOperationTest {
     void shouldFailValidationIfNoCaseType() {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+        ValidationException exception =
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
         assertThat(exception.getMessage(),
             startsWith("Cannot find case type definition for " + CASE_TYPE_ID));
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
@@ -118,7 +122,8 @@ class DefaultValidateCaseFieldsOperationTest {
     void shouldFailValidationIfEventIdNotFoundInCaseType() {
         doReturn("otherEvent").when(caseDataContent).getEventId();
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+        ValidationException exception =
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event otherEvent is not found in case type definition"));
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);

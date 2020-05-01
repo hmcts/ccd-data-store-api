@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName") // class naming predates checkstyle implementation in module
 public class IDAMProperties extends IdamUser {
 
     private static final long serialVersionUID = -8859850331834643245L;

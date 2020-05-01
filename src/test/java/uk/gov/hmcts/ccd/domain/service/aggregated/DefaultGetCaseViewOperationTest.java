@@ -155,7 +155,7 @@ class DefaultGetCaseViewOperationTest {
 
     @Nested
     @DisplayName("field of CaseHistoryViewer field type")
-    class CaseHistoryViewer_FieldType {
+    class CaseHistoryViewerFieldType {
         @Test
         @DisplayName("should hydrate case history viewer if CaseHistoryViewer field type present in tabs")
         void shouldHydrateCaseHistoryViewerIfFieldPresentInTabs() {
@@ -172,20 +172,20 @@ class DefaultGetCaseViewOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseType.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            caseType.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER)
+                .build()).build()));
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
 
-            assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
-                      () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
-                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
-                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(eventsNode))),
-                      () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
-                      () -> assertThat(caseView.getEvents(),
-                                       hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
-                      () -> assertThat(caseView.getEvents(),
-                                       hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
+            assertAll(
+                () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+                () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
+                () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
+                () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(eventsNode))),
+                () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+                () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
+                () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
             );
         }
 
@@ -215,13 +215,12 @@ class DefaultGetCaseViewOperationTest {
 
             final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
 
-            assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
-                      () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(0)),
-                      () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
-                      () -> assertThat(caseView.getEvents(),
-                                       hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
-                      () -> assertThat(caseView.getEvents(),
-                                       hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
+            assertAll(
+                () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+                () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(0)),
+                () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+                () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
+                () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
             );
         }
     }
@@ -245,25 +244,24 @@ class DefaultGetCaseViewOperationTest {
     void shouldRetrieveAllAuthorisedAuditEventsAndTabs() {
         final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
 
-        assertAll(() -> verify(getEventsOperation).getEvents(caseDetails),
-                  () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
-                  () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
-                  () -> assertThat(caseView.getTabs()[0].getFields(),
-                                   hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
-                                                        hasProperty("showCondition",
-                                                                    equalTo("dataTestField1-fieldShowCondition"))))),
-                  () -> assertThat(caseView.getTabs()[0].getFields(),
-                                   hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
-                                                        hasProperty("showCondition",
-                                                                    equalTo("dataTestField2-fieldShowCondition"))))),
-                  () -> assertThat(caseView.getMetadataFields().get(0).getValue(), equalTo(CASE_TYPE_ID)),
-                  () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
-                  () -> assertThat(caseView.getEvents(),
-                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
-                  () -> assertThat(caseView.getEvents(),
-                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2)))),
-                  () -> assertThat(caseView.getState().getId(), is(STATE)),
-                  () -> assertThat(caseView.getState().getTitleDisplay(), is(TITLE_DISPLAY))
+        assertAll(
+            () -> verify(getEventsOperation).getEvents(caseDetails),
+            () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+            () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
+            () -> assertThat(caseView.getTabs()[0].getFields(),
+                             hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
+                                                  hasProperty("showCondition",
+                                                              equalTo("dataTestField1-fieldShowCondition"))))),
+            () -> assertThat(caseView.getTabs()[0].getFields(),
+                             hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
+                                                  hasProperty("showCondition",
+                                                              equalTo("dataTestField2-fieldShowCondition"))))),
+            () -> assertThat(caseView.getMetadataFields().get(0).getValue(), equalTo(CASE_TYPE_ID)),
+            () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+            () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
+            () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2)))),
+            () -> assertThat(caseView.getState().getId(), is(STATE)),
+            () -> assertThat(caseView.getState().getTitleDisplay(), is(TITLE_DISPLAY))
         );
     }
 
@@ -275,15 +273,13 @@ class DefaultGetCaseViewOperationTest {
 
         final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
 
-        assertAll(() -> verify(getEventsOperation).getEvents(caseDetails),
-                  () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
-                  () -> assertThat(caseView.getTabs()[0].getFields(),
-                                   hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
-                  () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
-                  () -> assertThat(caseView.getEvents(),
-                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
-                  () -> assertThat(caseView.getEvents(),
-                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
+        assertAll(
+            () -> verify(getEventsOperation).getEvents(caseDetails),
+            () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
+            () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
+            () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+            () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
+            () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
         );
     }
 

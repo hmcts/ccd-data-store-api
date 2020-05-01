@@ -91,9 +91,9 @@ public class DefinitionsCachingIT {
 
     @Before
     public void setup() {
-        doReturn(aCaseTypeDefVersion(VERSION_1)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_1);
-        doReturn(aCaseTypeDefVersion(VERSION_2)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_2);
-        doReturn(aCaseTypeDefVersion(VERSION_3)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_3);
+        doReturn(newCaseTypeDefVersion(VERSION_1)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_1);
+        doReturn(newCaseTypeDefVersion(VERSION_2)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_2);
+        doReturn(newCaseTypeDefVersion(VERSION_3)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_3);
         doReturn(JURISDICTION_1).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J1");
         doReturn(JURISDICTION_2).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J2");
         doReturn(JURISDICTION_3).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J3");
@@ -272,7 +272,7 @@ public class DefinitionsCachingIT {
         verify(httpUIDefinitionGateway, times(1)).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
     }
 
-    protected CaseTypeDefinitionVersion aCaseTypeDefVersion(int version) {
+    protected CaseTypeDefinitionVersion newCaseTypeDefVersion(int version) {
         CaseTypeDefinitionVersion ctdv = new CaseTypeDefinitionVersion();
         ctdv.setVersion(version);
         return ctdv;

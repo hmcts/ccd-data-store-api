@@ -164,8 +164,14 @@ class DateTimeSearchResultProcessorTest {
         assertAll(
             () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
             () -> assertThat(itemResult.getCaseFields().size(), is(4)),
-            () -> assertThat(((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(), is("10-2020")),
-            () -> assertThat(((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(), is("12-1999")),
+            () -> assertThat(
+                ((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(),
+                is("10-2020")
+            ),
+            () -> assertThat(
+                ((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(),
+                is("12-1999")
+            ),
             () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(), is("2020-10-05")),
             () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(), is("1999-12-01"))
         );
@@ -194,10 +200,22 @@ class DateTimeSearchResultProcessorTest {
         assertAll(
             () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
             () -> assertThat(itemResult.getCaseFields().size(), is(4)),
-            () -> assertThat(((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(), is("10-2020")),
-            () -> assertThat(((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(), is("07-1992")),
-            () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(), is("2020-10-05")),
-            () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(), is("1992-07-30"))
+            () -> assertThat(
+                ((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                is("10-2020")
+            ),
+            () -> assertThat(
+                ((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                is("07-1992")
+            ),
+            () -> assertThat(
+                ((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                is("2020-10-05")
+            ),
+            () -> assertThat(
+                ((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                is("1992-07-30")
+            )
         );
     }
 
