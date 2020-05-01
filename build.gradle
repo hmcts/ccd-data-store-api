@@ -493,6 +493,12 @@ compileJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
 
+configurations {
+    all.exclude {
+        group: 'org.apache.logging.log4j' module: 'log4j-to-slf4j', version: '2.12.1'
+    }
+}
+
 compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
