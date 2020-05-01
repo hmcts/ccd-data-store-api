@@ -494,8 +494,8 @@ compileJava {
 }
 
 configurations {
-    all.exclude {
-        group: 'org.apache.logging.log4j' module: 'log4j-to-slf4j', version: '2.12.1'
+    all.collect { configuration ->
+        configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
     }
 }
 
