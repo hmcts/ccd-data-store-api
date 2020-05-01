@@ -52,6 +52,11 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
+    public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
+        return caseDefinitionRepository.getCaseType(version, caseTypeId);
+    }
+
+    @Override
     public UserRole getUserRoleClassifications(String userRole) {
         return userRoleClassifications.computeIfAbsent(userRole, caseDefinitionRepository::getUserRoleClassifications);
     }
@@ -84,11 +89,6 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
         LOGGER.debug("Will get jurisdiction '{}' from repository.", jurisdictionId);
         return caseDefinitionRepository.getJurisdiction(jurisdictionId);
-    }
-
-    @Override
-    public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
-        return caseDefinitionRepository.getCaseType(version, caseTypeId);
     }
 
     @Override

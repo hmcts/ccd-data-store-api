@@ -9,6 +9,10 @@ import static org.mockito.Mockito.when;
 
 public class MockUtils {
 
+    private MockUtils() {
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
+    }
+
     public static final String ROLE_CASEWORKER_PUBLIC = "caseworker-probate-public";
     public static final String ROLE_CASEWORKER_PRIVATE = "caseworker-probate-private";
     public static final String ROLE_TEST_PUBLIC = "caseworker-test-public";
@@ -17,9 +21,6 @@ public class MockUtils {
     public static final String CASE_ROLE_CAN_READ = "[CAN_READ]";
     public static final String CASE_ROLE_CAN_UPDATE = "[CAN_UPDATE]";
     public static final String CASE_ROLE_CAN_DELETE = "[CAN_DELETE]";
-
-    private MockUtils() {
-    }
 
     public static final void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
         String username = "123";

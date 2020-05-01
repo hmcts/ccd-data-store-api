@@ -33,7 +33,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Ignore("for now")
 public class DefaultCaseDefinitionRepositoryTest {
-    private final String JURISDICTION_ID = "Some Jurisdiction";
+    private static final String JURISDICTION_ID = "Some Jurisdiction";
 
     @Mock
     private ApplicationParams applicationParams;
@@ -67,7 +67,8 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID));
         assertThat(exception.getMessage(), startsWith("Resource not found when getting case types for Jurisdiction"));
     }
 
@@ -76,7 +77,8 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID));
         assertThat(exception.getMessage(), startsWith("Problem getting case types for the Jurisdiction"));
     }
 
@@ -129,7 +131,8 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
         assertThat(exception.getMessage(), startsWith("No classification found for user role nor_defined because of "));
     }
 
@@ -138,7 +141,8 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getLatestVersion("case_type_id"));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getLatestVersion("case_type_id"));
         assertThat(exception.getMessage(), startsWith("Resource not found when getting case type version for"));
     }
 
@@ -163,7 +167,8 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getJurisdiction("jurisdiction_id_1"));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getJurisdiction("jurisdiction_id_1"));
         assertThat(exception.getMessage(), startsWith("Resource not found when retrieving jurisdictions definition because of"));
     }
 

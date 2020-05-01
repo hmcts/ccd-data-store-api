@@ -65,8 +65,8 @@ class AuthorisedSearchOperationTest {
 
     private MetaData metaData;
     private HashMap<String, String> criteria;
-    private CaseTypeDefinition caseTypeDefinition;
-    private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
+    private CaseTypeDefinition caseType;
+    private final List<CaseFieldDefinition> caseFields = Lists.newArrayList();
 
     private JsonNode classifiedDataNode1;
     private JsonNode classifiedDataClassificationNode1;
@@ -86,15 +86,15 @@ class AuthorisedSearchOperationTest {
 
         metaData = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
-        caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+        caseType = new CaseTypeDefinition();
+        caseType.setCaseFieldDefinitions(caseFields);
 
-        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
+        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(userRepository.getUserRoles()).thenReturn(USER_ROLES);
 
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, USER_ROLES, CAN_READ);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ);
 
-        caseFieldDefinitions.addAll(getCaseFieldsWithIds("dataTestField11", "dataTestField12", "classificationTestField11", "classificationTestField12"));
+        caseFields.addAll(getCaseFieldsWithIds("dataTestField11", "dataTestField12", "classificationTestField11", "classificationTestField12"));
 
         classifiedDataNode1 = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) classifiedDataNode1).put("dataTestField11", "dataTestValue11");
@@ -112,7 +112,7 @@ class AuthorisedSearchOperationTest {
         classifiedCase1.setData(MAPPER.convertValue(classifiedDataNode1, STRING_JSON_MAP));
         classifiedCase1.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode1, STRING_JSON_MAP));
 
-        caseFieldDefinitions.addAll(getCaseFieldsWithIds("dataTestField21", "dataTestField22", "classificationTestField21", "classificationTestField22"));
+        caseFields.addAll(getCaseFieldsWithIds("dataTestField21", "dataTestField22", "classificationTestField21", "classificationTestField22"));
 
         classifiedDataNode2 = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) classifiedDataNode2).put("dataTestField21", "dataTestValue21");
@@ -131,31 +131,31 @@ class AuthorisedSearchOperationTest {
         classifiedCase2.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode2, STRING_JSON_MAP));
 
         doReturn(Arrays.asList(classifiedCase1, classifiedCase2)).when(nextOperationInChain).execute(metaData, criteria);
-        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase1.getState()), eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_READ));
-        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase2.getState()), eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_READ));
+        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase1.getState()), eq(caseType), eq(USER_ROLES), eq(CAN_READ));
+        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase2.getState()), eq(caseType), eq(USER_ROLES), eq(CAN_READ));
 
         doReturn(authorisedDataNode1).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataNode1),
-            eq(caseFieldDefinitions),
+            eq(caseFields),
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean());
         doReturn(authorisedDataClassificationNode1).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataClassificationNode1),
-            eq(caseFieldDefinitions),
+            eq(caseFields),
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean());
 
         doReturn(authorisedDataNode2).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataNode2),
-            eq(caseFieldDefinitions),
+            eq(caseFields),
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean());
         doReturn(authorisedDataClassificationNode2).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataClassificationNode2),
-            eq(caseFieldDefinitions),
+            eq(caseFields),
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean());
@@ -167,9 +167,9 @@ class AuthorisedSearchOperationTest {
     private List<CaseFieldDefinition> getCaseFieldsWithIds(String... dataTestFields) {
         return Stream.of(dataTestFields)
             .map(field -> {
-                CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-                caseFieldDefinition.setId(field);
-                return caseFieldDefinition;
+                CaseFieldDefinition caseField = new CaseFieldDefinition();
+                caseField.setId(field);
+                return caseField;
             })
             .collect(Collectors.toList());
     }
@@ -219,26 +219,26 @@ class AuthorisedSearchOperationTest {
             () -> inOrder.verify(nextOperationInChain).execute(metaData, criteria),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(userRepository).getUserRoles(),
-            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
                 eq(USER_ROLES),
                 eq(CAN_READ)),
             () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedDataNode1),
-                eq(caseFieldDefinitions),
+                eq(caseFields),
                 eq(USER_ROLES),
                 eq(CAN_READ),
                 anyBoolean()),
             () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedDataClassificationNode1),
-                eq(caseFieldDefinitions),
+                eq(caseFields),
                 eq(USER_ROLES),
                 eq(CAN_READ),
                 anyBoolean()),
             () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedDataNode2),
-                eq(caseFieldDefinitions),
+                eq(caseFields),
                 eq(USER_ROLES),
                 eq(CAN_READ),
                 anyBoolean()),
             () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedDataClassificationNode2),
-                eq(caseFieldDefinitions),
+                eq(caseFields),
                 eq(USER_ROLES),
                 eq(CAN_READ),
                 anyBoolean())
@@ -265,14 +265,15 @@ class AuthorisedSearchOperationTest {
     @Test
     @DisplayName("should return no results when no case type read access")
     void shouldReturnEmptyResultsIfNoCaseTypeReadAccess() {
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, USER_ROLES, CAN_READ);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ);
 
         final List<CaseDetails> output = authorisedSearchOperation.execute(metaData, criteria);
 
         assertAll(
             () -> assertThat(output, is(notNullValue())),
             () -> assertThat(output, hasSize(0)),
-            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
+            () -> verify(accessControlService, never())
+                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
         );
     }
 }

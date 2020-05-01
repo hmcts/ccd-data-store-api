@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Money GBP is represented in pence
+ * Money GBP is represented in pence.
  */
 @Named
 @Singleton
@@ -40,11 +40,17 @@ public class MoneyGBPValidator implements BaseTypeValidator {
             }
             numberValue = Long.valueOf(value);
             if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), numberValue)) {
-                return Collections.singletonList(new ValidationResult("Should be less than or equal to " + convertToSterlingString(caseFieldDefinition.getFieldTypeDefinition().getMax()), dataFieldId));
+                return Collections.singletonList(
+                    new ValidationResult("Should be less than or equal to "
+                        + convertToSterlingString(caseFieldDefinition.getFieldTypeDefinition().getMax()), dataFieldId)
+                );
             }
 
             if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), numberValue)) {
-                return Collections.singletonList(new ValidationResult("Should be more than or equal to " + convertToSterlingString(caseFieldDefinition.getFieldTypeDefinition().getMin()), dataFieldId));
+                return Collections.singletonList(
+                    new ValidationResult("Should be more than or equal to "
+                        + convertToSterlingString(caseFieldDefinition.getFieldTypeDefinition().getMin()), dataFieldId)
+                );
             }
         } catch (NumberFormatException e) {
             return Collections.singletonList(new ValidationResult(value + " is not a valid value.  Money GBP needs to be expressed in pence", dataFieldId));

@@ -2,15 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -26,6 +17,16 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 import static java.lang.String.format;
@@ -56,7 +57,7 @@ public class MergeDataToSearchResultOperation {
             .map(caseData -> buildSearchResultViewItem(caseData, caseTypeDefinition, searchResult))
             .collect(Collectors.toList());
 
-        return new SearchResultView(viewColumns, viewItems, resultError);
+        return searchResultProcessor.execute(viewColumns, viewItems, resultError);
     }
 
     private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseTypeDefinition caseTypeDefinition,
@@ -101,13 +102,15 @@ public class MergeDataToSearchResultOperation {
 
     private CommonField commonField(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {
         return caseFieldDefinition.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
-            .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseFieldDefinition.getId(), searchResultField.getCaseFieldPath())));
+            .orElseThrow(() ->
+                new BadRequestException(format("CaseField %s has no nested elements with code %s.",
+                    caseFieldDefinition.getId(), searchResultField.getCaseFieldPath())));
     }
 
     private String displayContextParameter(SearchResultField searchResultField, CommonField commonField) {
-        return searchResultField.getDisplayContextParameter() == null ?
-            commonField.getDisplayContextParameter() :
-            searchResultField.getDisplayContextParameter();
+        return searchResultField.getDisplayContextParameter() == null
+            ? commonField.getDisplayContextParameter()
+            : searchResultField.getDisplayContextParameter();
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,

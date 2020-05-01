@@ -172,10 +172,16 @@ class FieldProcessorServiceTest {
             when(event.getCaseEventField(eq(ID1))).thenReturn(Optional.of(caseEventField1));
             when(event.getCaseEventField(eq(ID2))).thenReturn(Optional.of(caseEventField2));
             when(caseDataFieldProcessor1
-                .execute(Mockito.any(JsonNode.class), Mockito.any(CaseFieldDefinition.class), Mockito.any(CaseEventFieldDefinition.class), Mockito.any(WizardPageField.class)))
+                .execute(Mockito.any(JsonNode.class),
+                    Mockito.any(CaseFieldDefinition.class),
+                    Mockito.any(CaseEventFieldDefinition.class),
+                    Mockito.any(WizardPageField.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
             when(caseDataFieldProcessor2
-                .execute(Mockito.any(JsonNode.class), Mockito.any(CaseFieldDefinition.class), Mockito.any(CaseEventFieldDefinition.class), Mockito.any(WizardPageField.class)))
+                .execute(Mockito.any(JsonNode.class),
+                    Mockito.any(CaseFieldDefinition.class),
+                    Mockito.any(CaseEventFieldDefinition.class),
+                    Mockito.any(WizardPageField.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             final Map<String, JsonNode> result = fieldProcessorService.processData(data(), caseType, event);

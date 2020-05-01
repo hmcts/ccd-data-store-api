@@ -68,13 +68,17 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         return merge(caseDetails, events, caseTypeDefinition, caseTypeTabsDefinition);
     }
 
-    private CaseView merge(CaseDetails caseDetails, List<AuditEvent> events, CaseTypeDefinition caseTypeDefinition, CaseTypeTabsDefinition caseTypeTabsDefinition) {
+    private CaseView merge(CaseDetails caseDetails, List<AuditEvent> events,
+                           CaseTypeDefinition caseTypeDefinition,
+                           CaseTypeTabsDefinition caseTypeTabsDefinition) {
         CaseView caseView = new CaseView();
         caseView.setCaseId(caseDetails.getReference().toString());
         caseView.setChannels(caseTypeTabsDefinition.getChannels().toArray(new String[0]));
 
         CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
-        caseView.setState(new ProfileCaseState(caseStateDefinition.getId(), caseStateDefinition.getName(), caseStateDefinition.getDescription(), caseStateDefinition.getTitleDisplay()));
+        caseView.setState(new ProfileCaseState(caseStateDefinition.getId(),
+            caseStateDefinition.getName(), caseStateDefinition.getDescription(),
+            caseStateDefinition.getTitleDisplay()));
 
         caseView.setCaseType(CaseViewType.createFrom(caseTypeDefinition));
         final CaseViewEvent[] caseViewEvents = convertToCaseViewEvent(events);

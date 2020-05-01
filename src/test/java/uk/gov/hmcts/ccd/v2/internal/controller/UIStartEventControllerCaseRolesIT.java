@@ -37,8 +37,7 @@ import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_READ;
 import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_UPDATE;
 
 public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase"
-        + "/event-triggers/CREATE-CASE";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
 
     @Inject
     private WebApplicationContext wac;
@@ -62,7 +61,7 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
     }
 
     @Test
-    public void internalGetStartCaseTrigger_200_shouldAddFieldsWith_CREATOR_CaseRole() throws Exception {
+    public void internalGetStartCaseTrigger_200_shouldAddFieldsWithCreatorCaseRole() throws Exception {
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 

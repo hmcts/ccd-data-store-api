@@ -20,7 +20,9 @@ import static org.mockito.Mockito.when;
 @DisplayName("PhoneUKValidator")
 class PhoneUKValidatorTest {
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
-    private static final String PHONE_REGEX = "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$";
+    private static final String PHONE_REGEX = "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})"
+        + "|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})"
+        + "|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$";
     private static final String FIELD_ID = "TEST_FIELD_ID";
 
     @Mock
@@ -122,9 +124,9 @@ class PhoneUKValidatorTest {
     @Test
     void testInvalidMin() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5).build();
+        final JsonNode invalidMin = NODE_FACTORY.textNode("Test");
 
-        final JsonNode INVALID_MIN = NODE_FACTORY.textNode("Test");
-        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, INVALID_MIN, caseFieldDefinition);
+        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMin, caseFieldDefinition);
         assertEquals(1, validationResults.size(), "Did not catch min");
         assertEquals("Phone no 'Test' requires minimum length 5", validationResults.get(0).getErrorMessage());
         assertEquals(FIELD_ID, validationResults.get(0).getFieldId());
@@ -133,9 +135,9 @@ class PhoneUKValidatorTest {
     @Test
     void testInvalidMax() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMax(6).build();
+        final JsonNode invalidMax = NODE_FACTORY.textNode("Test Test Test");
 
-        final JsonNode INVALID_MAX = NODE_FACTORY.textNode("Test Test Test");
-        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, INVALID_MAX, caseFieldDefinition);
+        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMax, caseFieldDefinition);
         assertEquals(1, validationResults.size(), "Did not catch max");
         assertEquals("Phone no 'Test Test Test' exceeds maximum length 6", validationResults.get(0).getErrorMessage());
         assertEquals(FIELD_ID, validationResults.get(0).getFieldId());

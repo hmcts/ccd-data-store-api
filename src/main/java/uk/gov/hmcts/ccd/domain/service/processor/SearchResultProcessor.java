@@ -6,11 +6,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.Strings;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
@@ -21,6 +16,12 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
@@ -63,7 +64,10 @@ public class SearchResultProcessor {
         } else if (object instanceof ArrayNode && !FieldProcessor.isNullOrEmpty((ArrayNode) object)) {
             return createArrayNodeFrom((ArrayNode) object, viewColumn, viewColumn.getCaseFieldId());
         } else if (object instanceof ObjectNode && !FieldProcessor.isNullOrEmpty((ObjectNode) object)) {
-            return createObjectNodeFrom((ObjectNode) object, viewColumn, viewColumn.getCaseFieldTypeDefinition().getComplexFields(), viewColumn.getCaseFieldId());
+            return createObjectNodeFrom((ObjectNode) object,
+                viewColumn,
+                viewColumn.getCaseFieldTypeDefinition().getComplexFields(),
+                viewColumn.getCaseFieldId());
         } else if (object instanceof LocalDateTime) {
             return createTextNodeFrom(new TextNode(((LocalDateTime) object)
                 .format(DateTimeFormatter.ofPattern(DateTimeFormatParser.DATE_TIME_FORMAT))), viewColumn, viewColumn.getCaseFieldId());
@@ -141,9 +145,12 @@ public class SearchResultProcessor {
         originalNode.forEach(item -> {
             JsonNode newItem = item.deepCopy();
             ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                item.get(CollectionValidator.VALUE) instanceof TextNode ?
-                    createTextNodeFrom((TextNode) item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix) :
-                    createObjectNodeFrom((ObjectNode) item.get(CollectionValidator.VALUE), viewColumn, viewColumn.getCaseFieldTypeDefinition().getChildren(), fieldPrefix));
+                item.get(CollectionValidator.VALUE) instanceof TextNode
+                    ? createTextNodeFrom((TextNode) item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix)
+                    : createObjectNodeFrom((ObjectNode) item.get(CollectionValidator.VALUE),
+                                           viewColumn,
+                                           viewColumn.getCaseFieldTypeDefinition().getChildren(),
+                                           fieldPrefix));
             newNode.add(newItem);
         });
 

@@ -46,19 +46,17 @@ public class CaseViewFieldBuilder {
         return field;
     }
 
-    private void buildFieldType(final CaseFieldDefinition caseFieldDefinition, final CaseEventFieldDefinition eventFieldDefinition, final CaseViewField caseViewField) {
-        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseFieldDefinition, eventFieldDefinition.getCaseEventFieldComplexDefinitions(), ROOT);
-        caseViewField.setFieldTypeDefinition(caseFieldDefinition.getFieldTypeDefinition());
-    }
-
-    public CaseViewField build(CaseFieldDefinition caseFieldDefinition, CaseEventFieldDefinition eventField, Object value) {
+    public CaseViewField build(CaseFieldDefinition caseFieldDefinition,
+                               CaseEventFieldDefinition eventField,
+                               Object value) {
         final CaseViewField field = build(caseFieldDefinition, eventField);
         field.setValue(value);
 
         return field;
     }
 
-    public List<CaseViewField> build(List<CaseFieldDefinition> caseFieldDefinitions, List<CaseEventFieldDefinition> eventFields, Map<String, ?> data) {
+    public List<CaseViewField> build(List<CaseFieldDefinition> caseFieldDefinitions,
+                                     List<CaseEventFieldDefinition> eventFields, Map<String, ?> data) {
         final Map<String, CaseFieldDefinition> caseFieldMap = caseFieldDefinitions.stream()
             .collect(Collectors.toMap(CaseFieldDefinition::getId, Function.identity()));
 
@@ -66,5 +64,13 @@ public class CaseViewFieldBuilder {
             .filter(eventField -> caseFieldMap.containsKey(eventField.getCaseFieldId()))
             .map(eventField -> build(caseFieldMap.get(eventField.getCaseFieldId()), eventField, data != null ? data.get(eventField.getCaseFieldId()) : null))
             .collect(Collectors.toList());
+    }
+
+    private void buildFieldType(final CaseFieldDefinition caseFieldDefinition,
+                                final CaseEventFieldDefinition eventFieldDefinition,
+                                final CaseViewField caseViewField) {
+        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseFieldDefinition,
+            eventFieldDefinition.getCaseEventFieldComplexDefinitions(), ROOT);
+        caseViewField.setFieldTypeDefinition(caseFieldDefinition.getFieldTypeDefinition());
     }
 }

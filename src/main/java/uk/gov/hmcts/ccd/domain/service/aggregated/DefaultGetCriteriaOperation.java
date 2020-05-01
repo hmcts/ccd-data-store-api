@@ -86,9 +86,9 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
             .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, caseFieldDefinition.getId(), in.getCaseFieldPath())));
 
         result.setDisplayContextParameter(
-            Strings.isNullOrEmpty(in.getCaseFieldPath()) ?
-                in.getDisplayContextParameter() :
-                caseFieldDefinitionByPath.getDisplayContextParameter()
+            Strings.isNullOrEmpty(in.getCaseFieldPath())
+                ? in.getDisplayContextParameter()
+                : caseFieldDefinitionByPath.getDisplayContextParameter()
         );
 
         final Field field = new Field();

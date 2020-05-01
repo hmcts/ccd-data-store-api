@@ -168,86 +168,88 @@ class DefaultGetCaseViewFromDraftOperationTest {
         CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 
         assertAll(() -> verify(draftGateway).get(DRAFT_ID),
-                  () -> assertThat(caseView.getCaseId(), is(String.format(DRAFT_ID_FORMAT, DRAFT_ID))),
-                  () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
-                  () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
-                  () -> assertThat(caseView.getTabs()[0].getFields(),
-                                   hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
-                                                        hasProperty("showCondition",
-                                                                    equalTo("dataTestField1-fieldShowCondition"))))),
-                  () -> assertThat(caseView.getTabs()[0].getFields(),
-                                   hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
-                                                        hasProperty("showCondition",
-                                                                    equalTo("dataTestField2-fieldShowCondition"))))),
-                  () -> assertThat(caseView.getActionableEvents(), arrayWithSize(2)),
-                  () -> assertThat(caseView.getActionableEvents()[0],
-                                   allOf(hasProperty("id", equalTo(EVENT_TRIGGER_ID)),
-                                         hasProperty("name", equalTo("Resume")),
-                                         hasProperty("description", equalTo(EVENT_DESCRIPTION)),
-                                         hasProperty("order", equalTo(1)))),
-                  () -> assertThat(caseView.getActionableEvents()[1],
-                                   allOf(hasProperty("id", is(DELETE)),
-                                         hasProperty("name", equalTo("Delete")),
-                                         hasProperty("description", equalTo("Delete draft")),
-                                         hasProperty("order", equalTo(2)))),
-                  () -> assertThat(caseView.getEvents(), is(arrayWithSize(2))),
-                  () -> assertThat(caseView.getEvents()[0],
-                                   allOf(hasProperty("eventId", equalTo("Draft updated")),
-                                         hasProperty("eventName", equalTo("Draft updated")),
-                                         hasProperty("stateId", equalTo("Draft")),
-                                         hasProperty("stateName", equalTo("Draft")))),
-                  () -> assertThat(caseView.getEvents()[1],
-                                   allOf(hasProperty("eventId", equalTo("Draft created")),
-                                         hasProperty("eventName", equalTo("Draft created")),
-                                         hasProperty("stateId", equalTo("Draft")),
-                                         hasProperty("stateName", equalTo("Draft"))))
+            () -> assertThat(caseView.getCaseId(), is(String.format(DRAFT_ID_FORMAT, DRAFT_ID))),
+            () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+            () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
+            () -> assertThat(caseView.getTabs()[0].getFields(),
+                hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
+                    hasProperty("showCondition",
+                        equalTo("dataTestField1-fieldShowCondition"))))),
+            () -> assertThat(caseView.getTabs()[0].getFields(),
+                hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
+                    hasProperty("showCondition",
+                        equalTo("dataTestField2-fieldShowCondition"))))),
+            () -> assertThat(caseView.getActionableEvents(), arrayWithSize(2)),
+            () -> assertThat(caseView.getActionableEvents()[0],
+                allOf(hasProperty("id", equalTo(EVENT_TRIGGER_ID)),
+                    hasProperty("name", equalTo("Resume")),
+                    hasProperty("description", equalTo(EVENT_DESCRIPTION)),
+                    hasProperty("order", equalTo(1)))),
+            () -> assertThat(caseView.getActionableEvents()[1],
+                allOf(hasProperty("id", is(DELETE)),
+                    hasProperty("name", equalTo("Delete")),
+                    hasProperty("description", equalTo("Delete draft")),
+                    hasProperty("order", equalTo(2)))),
+            () -> assertThat(caseView.getEvents(), is(arrayWithSize(2))),
+            () -> assertThat(caseView.getEvents()[0],
+                allOf(hasProperty("eventId", equalTo("Draft updated")),
+                    hasProperty("eventName", equalTo("Draft updated")),
+                    hasProperty("stateId", equalTo("Draft")),
+                    hasProperty("stateName", equalTo("Draft")))),
+            () -> assertThat(caseView.getEvents()[1],
+                allOf(hasProperty("eventId", equalTo("Draft created")),
+                    hasProperty("eventName", equalTo("Draft created")),
+                    hasProperty("stateId", equalTo("Draft")),
+                    hasProperty("stateName", equalTo("Draft"))))
         );
     }
 
     @Nested
     @DisplayName("field of CaseHistoryViewer field type")
-    class CaseHistoryViewer_FieldTypeDefinition {
+    class CaseHistoryViewerFieldType {
         @Test
         @DisplayName("should hydrate case history viewer if CaseHistoryViewer field type present in tabs")
         void shouldHydrateCaseHistoryViewerIfFieldPresentInTabs() {
             caseTypeTabsDefinition = newCaseTabCollection().withTab(newCaseTab()
-                                                                   .withTabField(newCaseTabField()
-                                                                                     .withCaseField(newCaseField()
-                                                                                                        .withId(CASE_HISTORY_VIEWER)
-                                                                                                        .withFieldType(aFieldType()
-                                                                                                                           .withType(
-                                                                                                                               CASE_HISTORY_VIEWER)
-                                                                                                                           .build())
-                                                                                                        .build())
-                                                                                     .build())
-                                                                   .build())
-                                                      .build();
+                .withTabField(newCaseTabField()
+                    .withCaseField(newCaseField()
+                        .withId(CASE_HISTORY_VIEWER)
+                        .withFieldType(aFieldType()
+                            .withType(
+                                CASE_HISTORY_VIEWER)
+                            .build())
+
+                        .build())
+                    .withDisplayContextParameter(null)
+                    .build())
+                .build())
+                .build();
             doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
             caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField()
-                                                     .withId(CASE_HISTORY_VIEWER)
-                                                     .withFieldType(aFieldType()
-                                                                        .withType(CASE_HISTORY_VIEWER)
-                                                                        .build())
-                                                     .build()));
+                .withId(CASE_HISTORY_VIEWER)
+                .withFieldType(aFieldType()
+                    .withType(CASE_HISTORY_VIEWER)
+                    .build())
+                .build()));
             doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 
             assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
-                      () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
-                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
-                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(eventsNode))),
-                      () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
-                      () -> assertThat(caseView.getEvents()[0],
-                                       allOf(hasProperty("eventId", equalTo("Draft updated")),
-                                             hasProperty("eventName", equalTo("Draft updated")),
-                                             hasProperty("stateId", equalTo("Draft")),
-                                             hasProperty("stateName", equalTo("Draft")))),
-                      () -> assertThat(caseView.getEvents()[1],
-                                       allOf(hasProperty("eventId", equalTo("Draft created")),
-                                             hasProperty("eventName", equalTo("Draft created")),
-                                             hasProperty("stateId", equalTo("Draft")),
-                                             hasProperty("stateName", equalTo("Draft"))))
+                () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
+                () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
+                () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(eventsNode))),
+                () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+                () -> assertThat(caseView.getEvents()[0],
+                    allOf(hasProperty("eventId", equalTo("Draft updated")),
+                        hasProperty("eventName", equalTo("Draft updated")),
+                        hasProperty("stateId", equalTo("Draft")),
+                        hasProperty("stateName", equalTo("Draft")))),
+                () -> assertThat(caseView.getEvents()[1],
+                    allOf(hasProperty("eventId", equalTo("Draft created")),
+                        hasProperty("eventName", equalTo("Draft created")),
+                        hasProperty("stateId", equalTo("Draft")),
+                        hasProperty("stateName", equalTo("Draft"))))
             );
         }
 
@@ -255,36 +257,43 @@ class DefaultGetCaseViewFromDraftOperationTest {
         @DisplayName("should not hydrate case history viewer if CaseHistoryViewer field type is not present in tabs")
         void shouldNotHydrateCaseHistoryViewerIfFieldIsNotPresentInTabs() {
             caseTypeTabsDefinition = newCaseTabCollection().withTab(newCaseTab()
-                                                                   .withTabField(newCaseTabField()
-                                                                                     .withCaseField(newCaseField()
-                                                                                                        .withId("NotACaseHistoryViewer")
-                                                                                                        .withFieldType(aFieldType()
-                                                                                                                           .withType(
-                                                                                                                               "NotACaseHistoryViewer")
-                                                                                                                           .build())
-                                                                                                        .build())
-                                                                                     .build())
-                                                                   .build())
-                                                      .build();
+                .withTabField(newCaseTabField()
+                    .withCaseField(newCaseField()
+                        .withId("NotACaseHistoryViewer")
+                        .withFieldType(aFieldType()
+                            .withType(
+                                "NotACaseHistoryViewer")
+                            .build())
+                        .withDisplayContextParameter(null)
+                        .build())
+                    .withDisplayContextParameter(null)
+                    .build())
+                .build())
+                .build();
             doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            caseTypeDefinition.setCaseFieldDefinitions(singletonList(newCaseField()
+                .withId(CASE_HISTORY_VIEWER)
+                .withFieldType(aFieldType()
+                    .withType(CASE_HISTORY_VIEWER)
+                    .build())
+                .build()));
             doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 
             assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
-                      () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(0)),
-                      () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
-                      () -> assertThat(caseView.getEvents()[0],
-                                       allOf(hasProperty("eventId", equalTo("Draft updated")),
-                                             hasProperty("eventName", equalTo("Draft updated")),
-                                             hasProperty("stateId", equalTo("Draft")),
-                                             hasProperty("stateName", equalTo("Draft")))),
-                      () -> assertThat(caseView.getEvents()[1],
-                                       allOf(hasProperty("eventId", equalTo("Draft created")),
-                                             hasProperty("eventName", equalTo("Draft created")),
-                                             hasProperty("stateId", equalTo("Draft")),
-                                             hasProperty("stateName", equalTo("Draft"))))
+                () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(0)),
+                () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+                () -> assertThat(caseView.getEvents()[0],
+                    allOf(hasProperty("eventId", equalTo("Draft updated")),
+                        hasProperty("eventName", equalTo("Draft updated")),
+                        hasProperty("stateId", equalTo("Draft")),
+                        hasProperty("stateName", equalTo("Draft")))),
+                () -> assertThat(caseView.getEvents()[1],
+                    allOf(hasProperty("eventId", equalTo("Draft created")),
+                        hasProperty("eventName", equalTo("Draft created")),
+                        hasProperty("stateId", equalTo("Draft")),
+                        hasProperty("stateName", equalTo("Draft"))))
             );
         }
     }

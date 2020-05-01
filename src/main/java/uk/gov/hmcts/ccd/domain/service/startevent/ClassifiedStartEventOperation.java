@@ -76,7 +76,9 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
                 throw new ValidationException("Cannot find case type definition for " + caseTypeId);
             }
             caseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
-            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, caseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
+            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
+                caseDetails.getData(),
+                EMPTY_DATA_CLASSIFICATION));
         }
     }
 

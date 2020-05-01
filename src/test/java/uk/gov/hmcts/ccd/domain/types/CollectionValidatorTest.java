@@ -66,7 +66,9 @@ public class CollectionValidatorTest {
     public void validate_invalidMax() throws IOException {
         caseFieldDefinition.getFieldTypeDefinition().setMax(ONE);
 
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"}, { \"value\": \"V2\"} ]"), caseFieldDefinition);
+        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree(
+            "[ { \"value\": \"V1\"}, { \"value\": \"V2\"} ]"),
+            caseFieldDefinition);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getErrorMessage(), equalTo("Cannot add more than 1 value"));
@@ -91,28 +93,36 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_shouldBeValidWhenIDsUnique() throws IOException {
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\", \"value\": \"V2\"} ]"), caseFieldDefinition);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree(
+                "[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\", \"value\": \"V2\"} ]"),
+                caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
 
     @Test
     public void validate_shouldBeInvalidWhenMultipleItemsHaveSameID() throws IOException {
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"1\", \"value\": \"V2\"} ]"), caseFieldDefinition);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree(
+                "[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"1\", \"value\": \"V2\"} ]"),
+                caseFieldDefinition);
 
         assertThat(results, hasSize(1));
     }
 
     @Test
     public void validate_shouldBeInvalidWhenInvalidIDType() throws IOException {
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": 1, \"value\": \"V1\"} ]"), caseFieldDefinition);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": 1, \"value\": \"V1\"} ]"), caseFieldDefinition);
 
         assertThat(results, hasSize(1));
     }
 
     @Test
     public void validate_shouldBeInvalidWhenAnItemIsMissingValue() throws IOException {
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\"} ]"), caseFieldDefinition);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\"} ]"), caseFieldDefinition);
 
         assertThat(results, hasSize(1));
     }

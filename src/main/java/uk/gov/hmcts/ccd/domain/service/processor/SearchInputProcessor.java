@@ -3,10 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -18,6 +14,11 @@ import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCriteriaOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class SearchInputProcessor {
@@ -78,7 +79,7 @@ public class SearchInputProcessor {
                         processValue(id, input.getDisplayContextParameter(),
                             metadata.getOptionalMetadata(field).get(), input.getField().getType()));
                 }
-        });
+            });
 
         return metadata;
     }
@@ -140,8 +141,8 @@ public class SearchInputProcessor {
         return DisplayContextParameter
             .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
             .map(DisplayContextParameter::getValue)
-            .orElseGet(() -> fieldType.getType().equals(FieldTypeDefinition.DATE) ?
-                DateTimeFormatParser.DATE_FORMAT :
-                DateTimeFormatParser.DATE_TIME_FORMAT);
+            .orElseGet(() -> fieldType.getType().equals(FieldTypeDefinition.DATE)
+                ? DateTimeFormatParser.DATE_FORMAT
+                : DateTimeFormatParser.DATE_TIME_FORMAT);
     }
 }

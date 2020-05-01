@@ -1,11 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
@@ -24,7 +22,7 @@ public class DefaultGetJurisdictionUiConfigOperation implements GetJurisdictionU
 
     @Override
     public List<JurisdictionUiConfigDefinition> execute(List<String> jurisdictionReferences) {
-    	JurisdictionUiConfigResult jurisdictionUiConfigResult = repository.getJurisdictionUiConfigs(jurisdictionReferences);
+        JurisdictionUiConfigResult jurisdictionUiConfigResult = repository.getJurisdictionUiConfigs(jurisdictionReferences);
         return jurisdictionUiConfigResult.getConfigs();
     }
 }

@@ -63,7 +63,8 @@ public class UIDefinitionController {
     public UIDefinitionController(@Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER) GetCriteriaOperation getCriteriaOperation,
                                   @Qualifier(DefaultGetBannerOperation.QUALIFIER) GetBannerOperation getBannerOperation,
                                   @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation,
-                                  @Qualifier(DefaultGetJurisdictionUiConfigOperation.QUALIFIER) GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation) {
+                                  @Qualifier(DefaultGetJurisdictionUiConfigOperation.QUALIFIER)
+                                          GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation) {
         this.getCriteriaOperation = getCriteriaOperation;
         this.getBannerOperation = getBannerOperation;
         this.getJurisdictionUiConfigOperation = getJurisdictionUiConfigOperation;
@@ -157,13 +158,13 @@ public class UIDefinitionController {
     })
     public ResponseEntity<BannerViewResource> getBanners(@RequestParam("ids") Optional<List<String>> idsOptional) {
         List<Banner> listOfBanners = idsOptional.isPresent()
-                                        ? getBannerOperation.execute(idsOptional.get())
-                                        : Lists.newArrayList();
+            ? getBannerOperation.execute(idsOptional.get())
+            : Lists.newArrayList();
         return ResponseEntity.ok(new BannerViewResource(listOfBanners));
     }
 
 
-   @GetMapping(
+    @GetMapping(
         path = "/jurisdiction-ui-configs",
         headers = {
             V2.EXPERIMENTAL_HEADER
@@ -185,12 +186,12 @@ public class UIDefinitionController {
     })
     public ResponseEntity<JurisdictionConfigViewResource> getJurisdictionUiConfigs(@RequestParam("ids") Optional<List<String>> idsOptional) {
         List<JurisdictionUiConfigDefinition> listOfConfigs = idsOptional.isPresent()
-                                        ? getJurisdictionUiConfigOperation.execute(idsOptional.get())
-                                        : Lists.newArrayList();
+            ? getJurisdictionUiConfigOperation.execute(idsOptional.get())
+            : Lists.newArrayList();
         return ResponseEntity.ok(new JurisdictionConfigViewResource(listOfConfigs));
     }
 
-  @GetMapping(
+    @GetMapping(
         path = "/jurisdictions",
         headers = {
             V2.EXPERIMENTAL_HEADER
@@ -222,7 +223,7 @@ public class UIDefinitionController {
         if (accessMap.get(access) == null) {
             throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
         }
-        JurisdictionDisplayProperties[] jurisdictions =  getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions();
+        JurisdictionDisplayProperties[] jurisdictions = getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions();
         if (jurisdictions == null || jurisdictions.length == 0) {
             throw new ResourceNotFoundException("No jurisdictions found");
         }

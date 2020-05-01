@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 /**
- * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway
+ * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway.
  */
 @Named
 @Qualifier("Http")

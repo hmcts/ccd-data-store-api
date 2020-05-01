@@ -15,8 +15,6 @@ public class WorkbasketInputFieldsDefinition implements Serializable {
     private List<WorkbasketInputField> fields = new ArrayList<>();
     private String displayContextParameter = null;
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("case_type_id")
     public String getCaseTypeId() {
@@ -27,8 +25,6 @@ public class WorkbasketInputFieldsDefinition implements Serializable {
         this.caseTypeId = caseTypeId;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("fields")
     public List<WorkbasketInputField> getFields() {
@@ -39,8 +35,6 @@ public class WorkbasketInputFieldsDefinition implements Serializable {
         this.fields = fields;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("display_context_parameter")
     public String getDisplayContextParameter() {

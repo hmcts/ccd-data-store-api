@@ -23,8 +23,7 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
     public void shouldFailToGetCaseTypesForJurisdiction() {
         final ServiceException
             exception =
-            assertThrows(ServiceException.class,
-                () -> caseDefinitionRepository.getCaseTypesForJurisdiction("nor_defined"));
+            assertThrows(ServiceException.class, () -> caseDefinitionRepository.getCaseTypesForJurisdiction("nor_defined"));
         assertThat(exception.getMessage(),
                    startsWith("Problem getting case types for the Jurisdiction:nor_defined because of "));
     }

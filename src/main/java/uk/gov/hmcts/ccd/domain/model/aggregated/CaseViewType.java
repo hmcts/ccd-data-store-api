@@ -53,9 +53,13 @@ public class CaseViewType {
         this.jurisdiction = jurisdiction;
     }
 
-    public boolean isPrintEnabled() { return isPrintEnabled; }
+    public boolean isPrintEnabled() {
+        return isPrintEnabled;
+    }
 
-    public void setPrintEnabled(boolean printEnabled) { this.isPrintEnabled = printEnabled; }
+    public void setPrintEnabled(boolean printEnabled) {
+        this.isPrintEnabled = printEnabled;
+    }
 
     public static CaseViewType createFrom(CaseTypeDefinition caseTypeDefinition) {
         return new CaseViewType(caseTypeDefinition.getId(),

@@ -226,7 +226,7 @@ class CaseAccessOperationTest {
                                               USER_ID)).thenReturn(Collections.singletonList(CASE_ROLE_GRANTED));
     }
 
-    private CaseUser caseUser(String... caseRoles) {
+    private CaseUser caseUser(String...caseRoles) {
         final CaseUser caseUser = new CaseUser();
         caseUser.setUserId(USER_ID);
         caseUser.getCaseRoles().addAll(Arrays.asList(caseRoles));

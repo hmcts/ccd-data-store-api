@@ -62,7 +62,12 @@ public class DefaultGetCriteriaOperationTest {
 
     private CaseFieldDefinition name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private CaseFieldDefinition surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private FieldTypeDefinition personFieldTypeDefinition = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).build();
+    private FieldTypeDefinition personFieldTypeDefinition = aFieldType()
+        .withId(PERSON)
+        .withType(COMPLEX)
+        .withComplexField(name)
+        .withComplexField(surname)
+        .build();
     private CaseFieldDefinition person = newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
     private CaseFieldDefinition dob = newCaseField().withId(DOB).withFieldType(aFieldType().withId(DATE_TYPE).withType(DATE_TYPE).build())
         .withDisplayContextParameter(DISPLAY_CONTEXT_PARAMETER).build();

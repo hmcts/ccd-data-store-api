@@ -44,20 +44,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_EXTERNAL = "/case-types/CaseRolesCase/event-triggers" +
-        "/CREATE-CASE";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_EXTERNAL = "/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
 
-    private final JsonNode CALLBACK_DATA = mapper.readTree(
+    private static JsonNode CALLBACK_DATA = null;
+    private static final String CALLBACK_DATA_JSON_STRING =
         "{\n" +
-            "  \"PersonFirstName\": \"ccd-First Name\"\n" +
-            "}\n"
-                                                          );
-    private final JsonNode CALLBACK_DATA_CLASSIFICATION = mapper.readTree(
+        "  \"PersonFirstName\": \"ccd-First Name\"\n" +
+        "}\n";
+
+    private static JsonNode CALLBACK_DATA_CLASSIFICATION = null;
+    private static final String CALLBACK_DATA_CLASSIFICATION_JSON_STRING =
         "{\n" +
-            "    \"PersonFirstName\": \"PUBLIC\"\n" +
-            "  }"
-                                                                         );
+        "    \"PersonFirstName\": \"PUBLIC\"\n" +
+        "}";
+
     @Inject
     private WebApplicationContext wac;
 
@@ -73,7 +75,11 @@ public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
+
+        CALLBACK_DATA = mapper.readTree(CALLBACK_DATA_JSON_STRING);
+        CALLBACK_DATA_CLASSIFICATION = mapper.readTree(CALLBACK_DATA_CLASSIFICATION_JSON_STRING);
+
         MockitoAnnotations.initMocks(this);
 
         doReturn(authentication).when(securityContext).getAuthentication();
@@ -85,7 +91,7 @@ public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
     }
 
     @Test
-    public void externalGetStartCaseTrigger_200_shouldAddFieldsWithCREATORCaseRole() throws Exception {
+    public void externalGetStartCaseTrigger_200_shouldAddFieldsWithCreatorCaseRole() throws Exception {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         HttpHeaders headers = new HttpHeaders();

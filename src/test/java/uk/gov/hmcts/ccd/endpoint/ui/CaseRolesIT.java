@@ -57,7 +57,7 @@ public class CaseRolesIT extends WireMockBaseTest {
     }
 
     @Test
-    public void getEventTriggerForCaseType_200_shouldAddFieldsWith_CREATOR_CaseRole() throws Exception {
+    public void getEventTriggerForCaseType_200_shouldAddFieldsWith_CreatorCaseRole() throws Exception {
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE)
             .contentType(JSON_CONTENT_TYPE)

@@ -1,8 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import java.util.function.Supplier;
-
 import com.google.common.collect.Maps;
+import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -77,9 +76,9 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         return buildStartEventTrigger(uid,
             caseTypeDefinition,
-                                      eventId,
-                                      ignoreWarning,
-                                      () -> caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), Maps.newHashMap()));
+            eventId,
+            ignoreWarning,
+            (() -> caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), Maps.newHashMap())));
     }
 
     @Override
@@ -97,7 +96,11 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition));
 
-        final String eventToken = eventTokenService.generateToken(uid, caseDetails, caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
+        final String eventToken = eventTokenService.generateToken(uid,
+            caseDetails,
+            caseEventDefinition,
+            caseTypeDefinition.getJurisdictionDefinition(),
+            caseTypeDefinition);
 
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
@@ -119,7 +122,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
             caseTypeDefinition,
                                       draftResponse.getDocument().getEventId(),
                                       ignoreWarning,
-                                      () -> caseDetails);
+                                      (() -> caseDetails));
     }
 
     private StartEventResult buildStartEventTrigger(final String uid,

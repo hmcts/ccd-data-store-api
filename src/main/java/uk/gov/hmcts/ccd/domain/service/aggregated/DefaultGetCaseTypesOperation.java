@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 /**
+ * Default {@link GetCaseTypesOperation}.
  *
  * @deprecated current implementation has serious performance issues
  */

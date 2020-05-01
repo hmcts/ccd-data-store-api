@@ -50,10 +50,13 @@ public class CaseUpdateViewEventResource extends RepresentationModel {
 
         switch (origin) {
             case CASE_TYPE:
-                add(linkTo(methodOn(UIStartTriggerController.class).getCaseUpdateViewEventByCaseType(id, caseUpdateViewEvent.getId(), ignoreWarning)).withSelfRel());
+                add(linkTo(methodOn(UIStartTriggerController.class).getCaseUpdateViewEventByCaseType(id,
+                    caseUpdateViewEvent.getId(),
+                    ignoreWarning)).withSelfRel());
                 break;
             case CASE:
-                add(linkTo(methodOn(UIStartTriggerController.class).getCaseUpdateViewEvent(id, caseUpdateViewEvent.getId(), ignoreWarning)).withSelfRel());
+                add(linkTo(methodOn(UIStartTriggerController.class).getCaseUpdateViewEvent(id,
+                    caseUpdateViewEvent.getId(), ignoreWarning)).withSelfRel());
                 break;
             case DRAFT:
                 add(linkTo(methodOn(UIStartTriggerController.class).getStartDraftTrigger(id, ignoreWarning)).withSelfRel());

@@ -48,6 +48,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 class MergeDataToSearchResultOperationTest {
     private static final String CASE_TYPE_ID = "CASE_TYPE";
     private static final String CASE_FIELD_1 = "Case field 1";
@@ -188,7 +189,7 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()),
                 is(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted().get(STATE.getReference()))),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
-                 );
+        );
     }
 
     @Test
@@ -238,7 +239,7 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
-                 );
+        );
     }
 
     @Test
@@ -274,7 +275,7 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
-                 );
+        );
     }
 
     @Test
@@ -309,7 +310,7 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
-                 );
+        );
     }
 
     @Test
@@ -348,7 +349,7 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
             () -> assertThat(searchResultView.getResultError(), is(TIMEOUT_ERROR))
-                 );
+        );
     }
 
     @Test

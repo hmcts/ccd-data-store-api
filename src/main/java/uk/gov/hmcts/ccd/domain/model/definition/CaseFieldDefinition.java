@@ -1,11 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,11 +10,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @ToString
 @ApiModel(description = "")
@@ -198,10 +196,22 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         clearACLsForMissingComplexACLs();
     }
 
+    private static void propagateACLsToNestedFields(CommonField caseField, List<AccessControlList> acls) {
+        if (caseField.isCompoundFieldType()) {
+            caseField.getFieldTypeDefinition().getChildren().forEach(nestedField -> {
+                final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
+                nestedField.setAccessControlLists(cloneACLs);
+                propagateACLsToNestedFields(nestedField, acls);
+            });
+        }
+    }
+
     private void applyComplexACLs() {
         this.complexACLs.forEach(complexACL -> {
             final CaseFieldDefinition nestedField = (CaseFieldDefinition) this.getComplexFieldNestedField(complexACL.getListElementCode())
-                .orElseThrow(() -> new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), complexACL.getListElementCode())));
+                .orElseThrow(() -> new RuntimeException(
+                    format("CaseField %s has no nested elements with code %s.",
+                    this.getId(), complexACL.getListElementCode())));
             nestedField.getAccessControlListByRole(complexACL.getRole())
                 .ifPresent(accessControlList -> nestedField.accessControlLists.remove(accessControlList));
             nestedField.getAccessControlLists().add(complexACL);
@@ -274,19 +284,9 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         return this.accessControlLists.stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
     }
 
-    private static void propagateACLsToNestedFields(CommonField caseField, List<AccessControlList> acls) {
-        if (caseField.isCompoundFieldType()) {
-            caseField.getFieldTypeDefinition().getChildren().forEach(nestedField -> {
-                final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
-                nestedField.setAccessControlLists(cloneACLs);
-                propagateACLsToNestedFields(nestedField, acls);
-            });
-        }
-    }
-
-    private List<String> buildAllDottedComplexFieldPossibilities(List<CaseFieldDefinition> caseFieldDefinitions) {
+    private List<String> buildAllDottedComplexFieldPossibilities(List<CaseFieldDefinition> caseFieldEntities) {
         List<String> allSubTypePossibilities = new ArrayList<>();
-        List<CaseFieldDefinition> fieldEntities = caseFieldDefinitions.stream()
+        List<CaseFieldDefinition> fieldEntities = caseFieldEntities.stream()
             .filter(Objects::nonNull)
             .collect(Collectors.<CaseFieldDefinition>toList());
         prepare(allSubTypePossibilities, "", fieldEntities);

@@ -150,7 +150,7 @@ public class CallbackServiceWireMockTest {
     }
 
     @Test(expected = CallbackException.class)
-    public void notFoundFailurePath() throws Exception {
+    public void notFoundFailurePath() {
         final String testUrl = "http://localhost";
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
@@ -188,6 +188,7 @@ public class CallbackServiceWireMockTest {
         try {
             callbackService.send(testUrl, caseEventDefinition, null, caseDetails, false);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         final Duration between = Duration.between(start, Instant.now());
         assertThat((int) between.toMillis(), greaterThan(4000));
@@ -209,27 +210,27 @@ public class CallbackServiceWireMockTest {
     }
 
     @Test
-    public void validateCallbackErrorsAndWarningsHappyPath() throws Exception {
+    public void validateCallbackErrorsAndWarningsHappyPath() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
     }
 
     @Test(expected = ApiException.class)
-    public void validateCallbackErrorsAndWarningsWithWarnings() throws Exception {
-        final String TEST_WARNING_1 = "WARNING 1";
-        final String TEST_WARNING_2 = "WARNING 2";
+    public void validateCallbackErrorsAndWarningsWithWarnings() {
+        final String testWarning1 = "WARNING 1";
+        final String testWarning2 = "WARNING 2";
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         final List<String> warnings = new ArrayList<>();
-        warnings.add(TEST_WARNING_1);
-        warnings.add(TEST_WARNING_2);
+        warnings.add(testWarning1);
+        warnings.add(testWarning2);
 
         callbackResponse.setWarnings(warnings);
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
     }
 
     @Test(expected = ApiException.class)
-    public void validateCallbackErrorsAndWarningsWithErrorsAndIgnore() throws Exception {
+    public void validateCallbackErrorsAndWarningsWithErrorsAndIgnore() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("an error"));
         callbackResponse.setWarnings(Collections.singletonList("a warning"));
@@ -237,7 +238,7 @@ public class CallbackServiceWireMockTest {
     }
 
     @Test
-    public void validateCallbackErrorsAndWarningsWithWarningsAndIgnore() throws Exception {
+    public void validateCallbackErrorsAndWarningsWithWarningsAndIgnore() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
 
@@ -292,7 +293,7 @@ public class CallbackServiceWireMockTest {
     }
 
     @Test(expected = CallbackException.class)
-    public void shouldThrowCallbackException_whenSendInvalidUrlGetGenericBody() throws Exception {
+    public void shouldThrowCallbackException_whenSendInvalidUrlGetGenericBody() {
         final String testUrl = "http://localhost/invalid-test-callback";
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final ApplicationParams applicationParams = Mockito.mock(ApplicationParams.class);

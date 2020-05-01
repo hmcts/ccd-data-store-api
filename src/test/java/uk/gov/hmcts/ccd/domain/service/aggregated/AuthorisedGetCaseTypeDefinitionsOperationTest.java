@@ -171,10 +171,10 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
         .build();
 
 
-    private CaseTypeDefinition testCaseTypeDefinition1;
-    private CaseTypeDefinition testCaseTypeDefinition2;
-    private CaseTypeDefinition testCaseTypeDefinition3;
-    private List<CaseTypeDefinition> testCaseTypeDefinitions;
+    private CaseTypeDefinition testCaseType1;
+    private CaseTypeDefinition testCaseType2;
+    private CaseTypeDefinition testCaseType3;
+    private List<CaseTypeDefinition> testCaseTypes;
 
     @Mock
     private AccessControlService accessControlService;
@@ -190,7 +190,7 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseTypeDefinition1 = newCaseType()
+        testCaseType1 = newCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withRead(true)
@@ -210,7 +210,7 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
             .withField(CASE_FIELD_1_3)
             .build();
 
-        testCaseTypeDefinition2 = newCaseType()
+        testCaseType2 = newCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withCreate(true)
@@ -245,7 +245,7 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
             .withField(CASE_FIELD_2_3)
             .build();
 
-        testCaseTypeDefinition3 = newCaseType()
+        testCaseType3 = newCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withCreate(true)
@@ -262,19 +262,19 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
             .withField(CASE_FIELD_3_3)
             .build();
 
-        testCaseTypeDefinitions = Lists.newArrayList(testCaseTypeDefinition1, testCaseTypeDefinition2, testCaseTypeDefinition3);
+        testCaseTypes = Lists.newArrayList(testCaseType1, testCaseType2, testCaseType3);
 
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
 
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES, CAN_CREATE);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES, CAN_UPDATE);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES, CAN_READ);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2, USER_ROLES, CAN_CREATE);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2, USER_ROLES, CAN_UPDATE);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2, USER_ROLES, CAN_READ);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES, CAN_CREATE);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES, CAN_UPDATE);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES, CAN_READ);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType1, USER_ROLES, CAN_CREATE);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType1, USER_ROLES, CAN_UPDATE);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType1, USER_ROLES, CAN_READ);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType2, USER_ROLES, CAN_CREATE);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType2, USER_ROLES, CAN_UPDATE);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType2, USER_ROLES, CAN_READ);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType3, USER_ROLES, CAN_CREATE);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType3, USER_ROLES, CAN_UPDATE);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseType3, USER_ROLES, CAN_READ);
         authorisedGetCaseTypesOperation = new AuthorisedGetCaseTypesOperation(accessControlService,
                                                                               userRepository,
                                                                               getCaseTypesOperation);
@@ -282,128 +282,128 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
 
     @Nested
     @DisplayName("case type tests")
-    class ReturnsCaseTypeDefinitionsWithMatchingAccessCriteria {
+    class ReturnsCaseTypesWithMatchingAccessCriteria {
 
         @Test
         @DisplayName("Should return case types that have matching create access rights")
         void shouldReturnCreateAccessCaseTypesForJurisdiction() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_CREATE);
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_CREATE);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
 
-            assertThat(caseTypeDefinitions, hasItems(testCaseTypeDefinition2, testCaseTypeDefinition3));
+            assertThat(caseTypes, hasItems(testCaseType2, testCaseType3));
         }
 
         @Test
         @DisplayName("Should return case types that have matching read access rights")
         void shouldReturnReadAccessCaseTypesForJurisdiction() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
 
-            assertThat(caseTypeDefinitions, hasItems(testCaseTypeDefinition1, testCaseTypeDefinition3));
+            assertThat(caseTypes, hasItems(testCaseType1, testCaseType3));
         }
 
         @Test
         @DisplayName("Should return case types that have matching update access rights")
         void shouldReturnUpdateAccessCaseTypesForJurisdiction() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_UPDATE);
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_UPDATE);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
 
-            assertThat(caseTypeDefinitions, hasItems(testCaseTypeDefinition3));
+            assertThat(caseTypes, hasItems(testCaseType3));
         }
     }
 
     @Nested
     @DisplayName("case state tests")
-    class ReturnsCaseStateDefinitionsWithMatchingAccessCriteria {
+    class ReturnsCaseStatesWithMatchingAccessCriteria {
 
         @Test
         @DisplayName("Should return case states that have matching read access rights")
         void shouldReturnCorrectCaseStatesThatHaveReadAccess() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
-            doReturn(newArrayList(CASE_STATE_1_1)).when(accessControlService).filterCaseStatesByAccess(testCaseTypeDefinition1.getStates(),
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
+            doReturn(newArrayList(CASE_STATE_1_1)).when(accessControlService).filterCaseStatesByAccess(testCaseType1.getStates(),
                 USER_ROLES,
                 CAN_READ);
-            doReturn(newArrayList(CASE_STATE_3_1)).when(accessControlService).filterCaseStatesByAccess(testCaseTypeDefinition3.getStates(),
+            doReturn(newArrayList(CASE_STATE_3_1)).when(accessControlService).filterCaseStatesByAccess(testCaseType3.getStates(),
                 USER_ROLES,
                 CAN_READ);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
 
             assertAll(
-                () -> assertThat(caseTypeDefinitions.size(), is(2)),
-                () -> assertThat(caseTypeDefinitions, hasItems(testCaseTypeDefinition1, testCaseTypeDefinition3)),
-                () -> assertThat(caseTypeDefinitions.get(0).getStates(), hasItems(CASE_STATE_1_1)),
-                () -> assertThat(caseTypeDefinitions.get(0).getStates(), not(hasItems(CASE_STATE_1_2))),
-                () -> assertThat(caseTypeDefinitions.get(1).getStates(), hasItems(CASE_STATE_3_1)),
-                () -> assertThat(caseTypeDefinitions.get(1).getStates(), not(hasItems(CASE_STATE_3_2)))
+                () -> assertThat(caseTypes.size(), is(2)),
+                () -> assertThat(caseTypes, hasItems(testCaseType1, testCaseType3)),
+                () -> assertThat(caseTypes.get(0).getStates(), hasItems(CASE_STATE_1_1)),
+                () -> assertThat(caseTypes.get(0).getStates(), not(hasItems(CASE_STATE_1_2))),
+                () -> assertThat(caseTypes.get(1).getStates(), hasItems(CASE_STATE_3_1)),
+                () -> assertThat(caseTypes.get(1).getStates(), not(hasItems(CASE_STATE_3_2)))
             );
         }
     }
 
-        @Nested
+    @Nested
     @DisplayName("events tests")
-    class ReturnsCaseTypeDefinitionsWithEventsThatMatchAccessCriteria {
+    class ReturnsCaseTypesWithEventsThatMatchAccessCriteria {
 
         @Test
         @DisplayName("Should return case types with case events that have matching create access rights")
         void shouldReturnCaseTypesWithCreateAccessEventsForJurisdiction() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_CREATE);
-            doReturn(newArrayList(CASE_EVENT_2_3)).when(accessControlService).filterCaseEventsByAccess(testCaseTypeDefinition2.getEvents(),
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_CREATE);
+            doReturn(newArrayList(CASE_EVENT_2_3)).when(accessControlService).filterCaseEventsByAccess(testCaseType2.getEvents(),
                                                                                                        USER_ROLES,
                                                                                                        CAN_CREATE);
 
             doReturn(newArrayList(CASE_EVENT_3_1, CASE_EVENT_3_3)).when(accessControlService).filterCaseEventsByAccess(
-                testCaseTypeDefinition3.getEvents(),
+                testCaseType3.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
 
-            assertThat(caseTypeDefinitions.get(0).getEvents(), hasSize(1));
-            assertThat(caseTypeDefinitions.get(0).getEvents(), hasItems(hasProperty("id", equalTo(EVENT_ID_2_3))));
-            assertThat(caseTypeDefinitions.get(1).getEvents(), hasSize(2));
-            assertThat(caseTypeDefinitions.get(1).getEvents(),
+            assertThat(caseTypes.get(0).getEvents(), hasSize(1));
+            assertThat(caseTypes.get(0).getEvents(), hasItems(hasProperty("id", equalTo(EVENT_ID_2_3))));
+            assertThat(caseTypes.get(1).getEvents(), hasSize(2));
+            assertThat(caseTypes.get(1).getEvents(),
                        hasItems(hasProperty("id", equalTo(EVENT_ID_3_1)), hasProperty("id", equalTo(EVENT_ID_3_3))));
         }
 
         @Test
         @DisplayName("Should return case types with case events that have matching update access rights")
         void shouldReturnCaseTypesWithUpdateAccessEventsForJurisdiction() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_UPDATE);
-            doReturn(newArrayList(CASE_EVENT_3_2)).when(accessControlService).filterCaseEventsByAccess(testCaseTypeDefinition3.getEvents(),
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_UPDATE);
+            doReturn(newArrayList(CASE_EVENT_3_2)).when(accessControlService).filterCaseEventsByAccess(testCaseType3.getEvents(),
                                                                                                        USER_ROLES,
                                                                                                        CAN_UPDATE);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
 
-            assertThat(caseTypeDefinitions.get(0).getEvents(), hasSize(1));
-            assertThat(caseTypeDefinitions.get(0).getEvents(), hasItems(hasProperty("id", equalTo(EVENT_ID_3_2))));
+            assertThat(caseTypes.get(0).getEvents(), hasSize(1));
+            assertThat(caseTypes.get(0).getEvents(), hasItems(hasProperty("id", equalTo(EVENT_ID_3_2))));
         }
 
         @Test
         @DisplayName("Should return case types with case events that have matching read access rights")
         void shouldReturnCaseTypesWithReadAccessEventsForJurisdiction() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
             doReturn(newArrayList(CASE_EVENT_1_1, CASE_EVENT_1_2)).when(accessControlService).filterCaseEventsByAccess(
-                testCaseTypeDefinition1.getEvents(),
+                testCaseType1.getEvents(),
                 USER_ROLES,
                 CAN_READ);
             doReturn(newArrayList(CASE_EVENT_3_1,
                                   CASE_EVENT_3_2,
-                                  CASE_EVENT_3_3)).when(accessControlService).filterCaseEventsByAccess(testCaseTypeDefinition3.getEvents(),
+                                  CASE_EVENT_3_3)).when(accessControlService).filterCaseEventsByAccess(testCaseType3.getEvents(),
                                                                                                        USER_ROLES,
                                                                                                        CAN_READ);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
 
-            assertThat(caseTypeDefinitions.get(0).getEvents(), hasSize(2));
-            assertThat(caseTypeDefinitions.get(0).getEvents(),
+            assertThat(caseTypes.get(0).getEvents(), hasSize(2));
+            assertThat(caseTypes.get(0).getEvents(),
                        hasItems(hasProperty("id", equalTo(EVENT_ID_1_1)), hasProperty("id", equalTo(EVENT_ID_1_2))));
-            assertThat(caseTypeDefinitions.get(1).getEvents(), hasSize(3));
-            assertThat(caseTypeDefinitions.get(1).getEvents(),
+            assertThat(caseTypes.get(1).getEvents(), hasSize(3));
+            assertThat(caseTypes.get(1).getEvents(),
                        hasItems(hasProperty("id", equalTo(EVENT_ID_3_1)),
                                 hasProperty("id", equalTo(EVENT_ID_3_2)),
                                 hasProperty("id", equalTo(EVENT_ID_3_3))));
@@ -412,62 +412,65 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
 
     @Nested
     @DisplayName("fields tests")
-    class ReturnsCaseTypeDefinitionsWithFieldsThatMatchAccessCriteriaDefinition {
+    class ReturnsCaseTypesWithFieldsThatMatchAccessCriteria {
 
         @Test
         @DisplayName("Should return case types with case fields that have matching create access rights")
         void shouldReturnCaseTypesWithCreateAccessFieldsForJurisdiction() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_CREATE);
-            doReturn(newArrayList(CASE_FIELD_2_3)).when(accessControlService).filterCaseFieldsByAccess(testCaseTypeDefinition2.getCaseFieldDefinitions(),
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_CREATE);
+            doReturn(newArrayList(CASE_FIELD_2_3)).when(accessControlService).filterCaseFieldsByAccess(testCaseType2.getCaseFieldDefinitions(),
                                                                                                        USER_ROLES,
                                                                                                        CAN_CREATE);
-            doReturn(newArrayList(CASE_FIELD_3_2)).when(accessControlService).filterCaseFieldsByAccess(testCaseTypeDefinition3.getCaseFieldDefinitions(),
+            doReturn(newArrayList(CASE_FIELD_3_2)).when(accessControlService).filterCaseFieldsByAccess(testCaseType3.getCaseFieldDefinitions(),
                                                                                                        USER_ROLES,
                                                                                                        CAN_CREATE);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
 
-            assertThat(caseTypeDefinitions.get(0).getCaseFieldDefinitions(), hasSize(1));
-            assertThat(caseTypeDefinitions.get(0).getCaseFieldDefinitions(),
+            assertThat(caseTypes.get(0).getCaseFieldDefinitions(), hasSize(1));
+            assertThat(caseTypes.get(0).getCaseFieldDefinitions(),
                        hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_2_3))));
-            assertThat(caseTypeDefinitions.get(1).getCaseFieldDefinitions(), hasSize(1));
-            assertThat(caseTypeDefinitions.get(1).getCaseFieldDefinitions(),
+            assertThat(caseTypes.get(1).getCaseFieldDefinitions(), hasSize(1));
+            assertThat(caseTypes.get(1).getCaseFieldDefinitions(),
                        hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_3_2))));
         }
 
         @Test
         @DisplayName("Should return case types with case fields that have matching update access rights")
         void shouldReturnCaseTypesWithUpdateAccessFieldsForJurisdiction() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_UPDATE);
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_UPDATE);
             doReturn(newArrayList(CASE_FIELD_3_1, CASE_FIELD_3_2)).when(accessControlService).filterCaseFieldsByAccess(
-                testCaseTypeDefinition3.getCaseFieldDefinitions(),
+                testCaseType3.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
 
-            assertThat(caseTypeDefinitions.get(0).getCaseFieldDefinitions(), hasSize(2));
-            assertThat(caseTypeDefinitions.get(0).getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_3_1)), hasProperty("id", equalTo(CASE_FIELD_ID_3_2))));
+            assertThat(caseTypes.get(0).getCaseFieldDefinitions(), hasSize(2));
+            assertThat(
+                caseTypes.get(0).getCaseFieldDefinitions(),
+                hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_3_1)), hasProperty("id", equalTo(CASE_FIELD_ID_3_2)))
+            );
         }
 
         @Test
         @DisplayName("Should return case types with case fields that have matching read access rights")
         void shouldReturnCaseTypesWithReadAccessFieldsForJurisdiction() {
-            doReturn(testCaseTypeDefinitions).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
-            doReturn(newArrayList(CASE_FIELD_1_2)).when(accessControlService).filterCaseFieldsByAccess(testCaseTypeDefinition1.getCaseFieldDefinitions(),
+            doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
+            doReturn(newArrayList(CASE_FIELD_1_2)).when(accessControlService).filterCaseFieldsByAccess(testCaseType1.getCaseFieldDefinitions(),
                                                                                                        USER_ROLES,
                                                                                                        CAN_READ);
             doReturn(newArrayList(CASE_FIELD_3_1, CASE_FIELD_3_3)).when(accessControlService).filterCaseFieldsByAccess(
-                testCaseTypeDefinition3.getCaseFieldDefinitions(),
+                testCaseType3.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ);
 
-            List<CaseTypeDefinition> caseTypeDefinitions = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
+            List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
 
-            assertThat(caseTypeDefinitions.get(0).getCaseFieldDefinitions(), hasSize(1));
-            assertThat(caseTypeDefinitions.get(0).getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_1_2))));
-            assertThat(caseTypeDefinitions.get(1).getCaseFieldDefinitions(), hasSize(2));
-            assertThat(caseTypeDefinitions.get(1).getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_3_1)),
+            assertThat(caseTypes.get(0).getCaseFieldDefinitions(), hasSize(1));
+            assertThat(caseTypes.get(0).getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_1_2))));
+            assertThat(caseTypes.get(1).getCaseFieldDefinitions(), hasSize(2));
+            assertThat(caseTypes.get(1).getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo(CASE_FIELD_ID_3_1)),
                                                               hasProperty("id", equalTo(CASE_FIELD_ID_3_3))));
         }
     }

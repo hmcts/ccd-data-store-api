@@ -30,6 +30,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_PAYMENT_HISTORY_VIEWER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
+@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
@@ -70,32 +71,32 @@ public class CaseDetails implements Cloneable {
     private Map<String, JsonNode> dataClassification;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("after_submit_callback_response")
     private AfterSubmitCallbackResponse afterSubmitCallbackResponse;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("callback_response_status_code")
     private Integer callbackResponseStatusCode;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("delete_draft_response_status_code")
     private Integer deleteDraftResponseStatusCode;
 
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("delete_draft_response_status")
     private String deleteDraftResponseStatus;
@@ -229,17 +230,6 @@ public class CaseDetails implements Cloneable {
         return afterSubmitCallbackResponse;
     }
 
-    private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
-        this.afterSubmitCallbackResponse = response;
-        this.callbackResponseStatusCode = SC_OK;
-        this.callbackResponseStatus = "CALLBACK_COMPLETED";
-    }
-
-    private void setDeleteDraftResponseEntity() {
-        this.deleteDraftResponseStatusCode =  SC_OK;
-        this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
-    }
-
     public void setIncompleteCallbackResponse() {
         this.callbackResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
         this.callbackResponseStatus = "INCOMPLETE_CALLBACK";
@@ -283,6 +273,11 @@ public class CaseDetails implements Cloneable {
         }
     }
 
+    private void setDeleteDraftResponseEntity() {
+        this.deleteDraftResponseStatusCode =  SC_OK;
+        this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
+    }
+
     @JsonIgnore
     public void setAfterSubmitCallbackResponseEntity(final ResponseEntity<AfterSubmitCallbackResponse>
                                                          callBackResponse) {
@@ -296,6 +291,12 @@ public class CaseDetails implements Cloneable {
                      callBackResponse.getBody().toJson());
             setIncompleteCallbackResponse();
         }
+    }
+
+    private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
+        this.afterSubmitCallbackResponse = response;
+        this.callbackResponseStatusCode = SC_OK;
+        this.callbackResponseStatus = "CALLBACK_COMPLETED";
     }
 
     @JsonIgnore

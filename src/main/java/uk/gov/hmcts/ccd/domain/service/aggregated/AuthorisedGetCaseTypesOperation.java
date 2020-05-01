@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 /**
+ * Authorised {@link GetCaseTypesOperation}.
  *
  * @deprecated until {@link DefaultGetCaseTypesOperation} is deprecated
  */

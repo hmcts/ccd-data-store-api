@@ -83,7 +83,8 @@ class UIDefinitionControllerTest {
     private final List<WorkbasketInput> workbasketInputs = Lists.newArrayList(workbasketInput1, workbasketInput2);
     private final List<SearchInput> searchInputs = Lists.newArrayList(searchInput1, searchInput2);
     private final List<Banner> banners = Lists.newArrayList(banner1, banner2);
-    private final List<JurisdictionUiConfigDefinition> jurisdictionUiConfigDefinitions = Lists.newArrayList(jurisdictionUiConfigDefinition1, jurisdictionUiConfigDefinition2);
+    private final List<JurisdictionUiConfigDefinition> jurisdictionUiConfigDefinitions =
+        Lists.newArrayList(jurisdictionUiConfigDefinition1, jurisdictionUiConfigDefinition2);
     private final List<String> jurisdictionReferenes = Lists.newArrayList("TEST", "FAMILY LAW");
 
     @Mock

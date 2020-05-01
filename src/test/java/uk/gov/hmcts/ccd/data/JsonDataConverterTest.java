@@ -29,8 +29,8 @@ public class JsonDataConverterTest {
     public void convertToDatabaseColumn() throws Exception {
         assertNull(jsonbConverter.convertToDatabaseColumn(null));
 
-        final String JSON_STRING = "{\"key\":\"value\"}";
-        assertEquals(JSON_STRING, jsonbConverter.convertToDatabaseColumn(mapper.readTree(JSON_STRING)));
+        final String jsonString = "{\"key\":\"value\"}";
+        assertEquals(jsonString, jsonbConverter.convertToDatabaseColumn(mapper.readTree(jsonString)));
     }
 
     @Test

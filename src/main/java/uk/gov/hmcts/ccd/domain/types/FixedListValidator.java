@@ -37,9 +37,9 @@ public class FixedListValidator implements BaseTypeValidator {
                 + getType().getRegularExpression(), dataFieldId));
         }
 
-        return validValues.stream().anyMatch(fixedListItem -> fixedListItem.getCode().equals(value)) ?
-            typeChecks(dataFieldId, value, caseFieldDefinition) :
-            Collections.singletonList(new ValidationResult(value + " is not a valid value", dataFieldId));
+        return validValues.stream().anyMatch(fixedListItem -> fixedListItem.getCode().equals(value))
+            ? typeChecks(dataFieldId, value, caseFieldDefinition)
+            : Collections.singletonList(new ValidationResult(value + " is not a valid value", dataFieldId));
     }
 
     private List<ValidationResult> typeChecks(final String dataFieldId,

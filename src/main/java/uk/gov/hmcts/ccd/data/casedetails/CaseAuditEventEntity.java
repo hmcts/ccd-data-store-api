@@ -24,13 +24,13 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
 
 @NamedQueries({
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_CASE, query =
-        FIND_BY_CASE_DATA_ID_HQL +
-            " ORDER BY cae.createdDate DESC"
+        FIND_BY_CASE_DATA_ID_HQL
+            + " ORDER BY cae.createdDate DESC"
     ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_CREATE_EVENT, query =
-        FIND_BY_CASE_DATA_ID_HQL +
-            " AND createdDate = " +
-            "(select min(caeDate.createdDate) from CaseAuditEventEntity caeDate WHERE caeDate.caseDataId = :"
+        FIND_BY_CASE_DATA_ID_HQL
+            + " AND createdDate = "
+            + "(select min(caeDate.createdDate) from CaseAuditEventEntity caeDate WHERE caeDate.caseDataId = :"
             + CaseAuditEventEntity.CASE_DATA_ID + ")"
     ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_ID, query =

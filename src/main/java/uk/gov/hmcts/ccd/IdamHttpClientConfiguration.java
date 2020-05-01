@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Configuration
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName") // class naming predates checkstyle implementation in module
 class IdamHttpClientConfiguration {
 
     private HttpClient idamHttpClient;
@@ -141,7 +142,10 @@ class IdamHttpClientConfiguration {
         }
 
         @Override
-        public <T> T execute(HttpHost httpHost, HttpRequest httpRequest, ResponseHandler<? extends T> responseHandler, HttpContext httpContext) throws IOException {
+        public <T> T execute(HttpHost httpHost,
+                             HttpRequest httpRequest,
+                             ResponseHandler<? extends T> responseHandler,
+                             HttpContext httpContext) throws IOException {
             try {
                 return WRAPPED_CLIENT.execute(httpHost, httpRequest, loggingResponseHandler(responseHandler, httpRequest), httpContext);
             } catch (IOException e) {
@@ -173,8 +177,8 @@ class IdamHttpClientConfiguration {
                     .stream()
                     .map(header -> String.format("%s : %s\n", header.getName(), header.getValue()))
                     .collect(Collectors.joining()),
-                httpRequest instanceof HttpPost ?
-                    String.format(
+                httpRequest instanceof HttpPost
+                    ? String.format(
                         "Request Body \n-------\n%s-------\n ",
                         EntityUtils.toString(((HttpPost) httpRequest).getEntity())
                     ) : "",
@@ -193,8 +197,7 @@ class IdamHttpClientConfiguration {
             );
             try {
                 LOG.info(detailedLogMessage(message, httpRequest, response));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOG.info(String.format("%s. Exception occurred when creating detailed message", message), e);
             }
         }

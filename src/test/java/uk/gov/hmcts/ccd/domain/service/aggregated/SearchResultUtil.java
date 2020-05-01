@@ -10,10 +10,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import java.util.Map;
 
 class SearchResultUtil {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     private SearchResultUtil() {
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     }
+
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     public static class SearchResultBuilder {
         private final SearchResult searchResult;
@@ -22,6 +24,7 @@ class SearchResultUtil {
             this.searchResult = new SearchResult();
         }
 
+        @SuppressWarnings("checkstyle:MethodName") // method naming predates checkstyle implementation in module
         static SearchResultUtil.SearchResultBuilder searchResult() {
             return new SearchResultBuilder();
         }

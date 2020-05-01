@@ -48,10 +48,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewActionableEventBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTabBuilder.newCaseViewTab;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewActionableEventBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class AuthorisedGetCaseViewOperationTest {
@@ -77,13 +77,13 @@ class AuthorisedGetCaseViewOperationTest {
     private static final CaseViewActionableEvent CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
     private static final CaseViewActionableEvent[] AUTH_CASE_VIEW_TRIGGERS = new CaseViewActionableEvent[]{CASE_VIEW_TRIGGER};
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_ID).build();
-    private static final JurisdictionDefinition JURISDICTION_DEFINITION = newJurisdiction()
+    private static final JurisdictionDefinition jurisdiction = newJurisdiction()
         .withJurisdictionId(JURISDICTION_ID)
         .withName(JURISDICTION_ID)
         .build();
     private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType()
         .withId(CASE_TYPE_ID)
-        .withJurisdiction(JURISDICTION_DEFINITION)
+        .withJurisdiction(jurisdiction)
         .withEvent(CASE_EVENT)
         .withEvent(CASE_EVENT_2)
         .build();
@@ -252,8 +252,8 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
         doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
-        doReturn(AUTH_CASE_VIEW_TRIGGERS).when(accessControlService)
-            .filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
+        doReturn(AUTH_CASE_VIEW_TRIGGERS)
+            .when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
         assertThat(caseView.getActionableEvents(), arrayWithSize(1));
@@ -265,8 +265,8 @@ class AuthorisedGetCaseViewOperationTest {
     void shouldReturnEmptyCaseViewTriggersWhenNotAuthorisedByAccess() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
-        doReturn(EMPTY_TRIGGERS).when(accessControlService)
-            .filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
+        doReturn(EMPTY_TRIGGERS)
+            .when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
@@ -289,9 +289,9 @@ class AuthorisedGetCaseViewOperationTest {
     @Test
     @DisplayName("should return Case Type")
     void shouldReturnCaseType() {
-        CaseTypeDefinition caseTypeDefinition = authorisedGetCaseViewOperation.getCaseType(CASE_TYPE_ID);
+        CaseTypeDefinition caseType = authorisedGetCaseViewOperation.getCaseType(CASE_TYPE_ID);
 
-        assertThat(caseTypeDefinition, is(TEST_CASE_TYPE));
+        assertThat(caseType, is(TEST_CASE_TYPE));
     }
 
     @Test

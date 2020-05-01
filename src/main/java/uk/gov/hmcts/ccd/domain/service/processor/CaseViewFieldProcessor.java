@@ -43,11 +43,15 @@ public abstract class CaseViewFieldProcessor extends FieldProcessor {
         return executeComplex(caseViewField, null, fieldPrefix, topLevelField);
     }
 
-    protected CaseViewField executeComplex(CaseViewField caseViewField, WizardPageField wizardPageField, String fieldPrefix, CaseViewField topLevelField) {
+    protected CaseViewField executeComplex(CaseViewField caseViewField,     WizardPageField wizardPageField, String fieldPrefix, CaseViewField topLevelField) {
         caseViewField.setFormattedValue(
-            caseViewField.getValue() instanceof ObjectNode ?
-                executeComplex((ObjectNode) caseViewField.getValue(), caseViewField.getFieldTypeDefinition().getComplexFields(), wizardPageField, fieldPrefix, topLevelField) :
-                caseViewField.getValue()
+            caseViewField.getValue() instanceof ObjectNode
+                ? executeComplex((ObjectNode) caseViewField.getValue(),
+                    caseViewField.getFieldTypeDefinition().getComplexFields(),
+                    wizardPageField,
+                    fieldPrefix,
+                    topLevelField)
+                : caseViewField.getValue()
         );
         return caseViewField;
     }

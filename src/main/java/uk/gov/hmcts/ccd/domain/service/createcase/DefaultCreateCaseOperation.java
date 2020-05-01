@@ -100,9 +100,11 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         }
 
         String token = caseDataContent.getToken();
-        eventTokenService.validateToken(token, userRepository.getUserId(), caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
+        eventTokenService.validateToken(token, userRepository.getUserId(),
+            caseEventDefinition,
+            caseTypeDefinition.getJurisdictionDefinition(),
+            caseTypeDefinition);
 
-        Map<String, JsonNode> data = caseDataContent.getData();
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 
         final CaseDetails newCaseDetails = new CaseDetails();
@@ -111,12 +113,16 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setJurisdiction(caseTypeDefinition.getJurisdictionId());
         newCaseDetails.setState(caseEventDefinition.getPostState());
         newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
+        Map<String, JsonNode> data = caseDataContent.getData();
         newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, data));
-        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, newCaseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
+        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
+            caseTypeDefinition,
+            newCaseDetails.getData(),
+            EMPTY_DATA_CLASSIFICATION));
 
         final IdamUser idamUser = userRepository.getUser();
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
+                                                                              caseTypeDefinition,
                                                                               idamUser,
                                                                               caseEventDefinition,
                                                                               newCaseDetails,

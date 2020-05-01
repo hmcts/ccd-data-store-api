@@ -27,8 +27,9 @@ public class UserDefault {
     private String workBasketDefaultState;
 
     public void addJurisdiction(JurisdictionDefinition jurisdictionDefinition) {
-        if (jurisdictionDefinitions == null)
+        if (jurisdictionDefinitions == null) {
             jurisdictionDefinitions = new ArrayList<>();
+        }
         jurisdictionDefinitions.add(jurisdictionDefinition);
     }
 

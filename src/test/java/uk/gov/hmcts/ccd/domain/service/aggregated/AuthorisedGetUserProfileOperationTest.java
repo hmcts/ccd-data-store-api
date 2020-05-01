@@ -37,7 +37,10 @@ class AuthorisedGetUserProfileOperationTest {
 
     private Set<String> userRoles = Sets.newHashSet("role1", "role2", "role3");
     private List<CaseStateDefinition> caseStateDefinitions = Arrays.asList(new CaseStateDefinition(), new CaseStateDefinition(), new CaseStateDefinition());
-    private List<CaseEventDefinition> caseEventDefinitions = Arrays.asList(new CaseEventDefinition(), new CaseEventDefinition(), new CaseEventDefinition(), new CaseEventDefinition());
+    private List<CaseEventDefinition> caseEventDefinitions = Arrays.asList(new CaseEventDefinition(),
+        new CaseEventDefinition(),
+        new CaseEventDefinition(),
+        new CaseEventDefinition());
 
     private CaseTypeDefinition notAllowedCaseTypeDefinition = new CaseTypeDefinition();
 

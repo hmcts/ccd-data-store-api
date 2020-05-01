@@ -34,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 
 @Configuration
 @Profile("test")
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 class TestConfiguration extends ContextCleanupListener {
 
     private final ApplicationParams applicationParams;
@@ -43,6 +44,8 @@ class TestConfiguration extends ContextCleanupListener {
     private EmbeddedPostgres pg;
 
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long regex expressions
     private static final String baseTypes =
         "[\n" +
             "  {\n" +

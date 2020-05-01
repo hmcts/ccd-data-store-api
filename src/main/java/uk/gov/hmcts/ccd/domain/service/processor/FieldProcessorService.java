@@ -47,6 +47,15 @@ public class FieldProcessorService {
         return result;
     }
 
+    private CaseViewField processCaseViewField(final CaseViewField field,
+                                               final List<WizardPageField> wizardPageFields) {
+        CaseViewField result = field;
+        for (CaseViewFieldProcessor processor : caseViewFieldProcessors) {
+            result = processor.execute(result, wizardPageField(wizardPageFields, field.getId()));
+        }
+        return result;
+    }
+
     public Map<String, JsonNode> processData(final Map<String, JsonNode> data,
                                              final CaseTypeDefinition caseTypeDefinition,
                                              final CaseEventDefinition caseEventDefinition) {
@@ -79,15 +88,6 @@ public class FieldProcessorService {
                                              final CaseTypeDefinition caseTypeDefinition,
                                              final String eventId) {
         return processData(data, caseTypeDefinition, eventTriggerService.findCaseEvent(caseTypeDefinition, eventId));
-    }
-
-    private CaseViewField processCaseViewField(final CaseViewField field,
-                                               final List<WizardPageField> wizardPageFields) {
-        CaseViewField result = field;
-        for (CaseViewFieldProcessor processor : caseViewFieldProcessors) {
-            result = processor.execute(result, wizardPageField(wizardPageFields, field.getId()));
-        }
-        return result;
     }
 
     private List<WizardPageField> getWizardPageFields(String caseTypeId, String eventId) {

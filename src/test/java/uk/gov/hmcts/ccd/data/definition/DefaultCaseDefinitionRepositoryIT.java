@@ -1,5 +1,17 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import org.hamcrest.collection.IsCollectionWithSize;
+import org.junit.Test;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -11,21 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
-
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.Test;
-
-import javax.inject.Inject;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     @Inject
@@ -107,9 +104,9 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
                 .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
 
         assertAll(
-                () -> assertThat(allJurisdictionDefinitions, hasSize(3)),
-                () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
-                () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE"))))
+            () -> assertThat(allJurisdictionDefinitions, hasSize(3)),
+            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
+            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE"))))
         );
     }
 }

@@ -112,7 +112,9 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
             .build();
     }
 
-    private CaseView merge(CaseDetails caseDetails, CaseViewActionableEvent resumeCaseViewActionableEvent, CaseViewEvent[] events, CaseTypeDefinition caseTypeDefinition,
+    private CaseView merge(CaseDetails caseDetails,
+                           CaseViewActionableEvent resumeCaseViewActionableEvent,
+                           CaseViewEvent[] events, CaseTypeDefinition caseTypeDefinition,
                            CaseTypeTabsDefinition caseTypeTabsDefinition) {
         CaseView caseView = new CaseView();
         caseView.setCaseId(caseDetails.getId().toString());

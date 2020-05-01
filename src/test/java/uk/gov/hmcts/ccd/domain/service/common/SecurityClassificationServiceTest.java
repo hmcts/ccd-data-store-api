@@ -39,9 +39,14 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class SecurityClassificationServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    };
+
     private static final String JURISDICTION_ID = "PROBATE";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -69,17 +74,17 @@ public class SecurityClassificationServiceTest {
     @Nested
     @DisplayName("Check security classification for a field")
     class CheckSecurityClassificationForField {
-        private final String CASE_TYPE_ONE = "CaseTypeOne";
-        private final String SC_PUBLIC = "PUBLIC";
-        private final String SC_RESTRICTED = "RESTRICTED";
-        private final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
-        private final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
-        private final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
-        private final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
+        private static final String CASE_TYPE_ONE = "CaseTypeOne";
+        private static final String SC_PUBLIC = "PUBLIC";
+        private static final String SC_RESTRICTED = "RESTRICTED";
+        private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
+        private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
+        private final CaseFieldDefinition testCaseField11 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
+        private final CaseFieldDefinition testCaseField12 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
         private final CaseTypeDefinition testCaseTypeDefinition = newCaseType()
             .withId(CASE_TYPE_ONE)
-            .withField(CASE_FIELD_1_1)
-            .withField(CASE_FIELD_1_2)
+            .withField(testCaseField11)
+            .withField(testCaseField12)
             .build();
 
         @Test
@@ -103,7 +108,7 @@ public class SecurityClassificationServiceTest {
 
     @Nested
     @DisplayName("getUserClassification()")
-    class getUserClassification {
+    class GetUserClassification {
 
         @Test
         @DisplayName("should retrieve user classifications from user repository")
@@ -267,7 +272,7 @@ public class SecurityClassificationServiceTest {
 
     @Nested
     @DisplayName("getClassificationForEvent()")
-    class getSecurityClassificationForEvent {
+    class GetSecurityClassificationForEvent {
 
         private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
@@ -314,9 +319,7 @@ public class SecurityClassificationServiceTest {
         private static final String VALUE = "value";
         private static final String ID = "id";
         private CaseDetails caseDetails;
-        private final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-        };
-        private final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+
 
         @BeforeEach
         void setUp() throws IOException {

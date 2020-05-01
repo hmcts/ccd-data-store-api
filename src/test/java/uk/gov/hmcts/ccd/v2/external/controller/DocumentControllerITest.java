@@ -40,6 +40,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class DocumentControllerITest extends WireMockBaseTest {
 
     private static final String PRINTABLE_URL = "http://remote_host/print/cases/1565620330684549?jwt=test";

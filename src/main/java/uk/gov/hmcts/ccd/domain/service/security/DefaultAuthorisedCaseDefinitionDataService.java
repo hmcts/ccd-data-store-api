@@ -46,12 +46,6 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     }
 
     @Override
-    public List<String> getUserAuthorisedCaseStateIds(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
-        List<CaseStateDefinition> caseStateDefinitions = getUserAuthorisedCaseStates(jurisdiction, caseTypeId, access);
-        return collectCaseStateIds(caseStateDefinitions);
-    }
-
-    @Override
     public List<CaseStateDefinition> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction);
         return filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
@@ -64,12 +58,19 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
         return collectCaseStateIds(caseStateDefinitions);
     }
 
+    @Override
+    public List<String> getUserAuthorisedCaseStateIds(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
+        List<CaseStateDefinition> caseStateDefinitions = getUserAuthorisedCaseStates(jurisdiction, caseTypeId, access);
+        return collectCaseStateIds(caseStateDefinitions);
+    }
+
     private boolean verifyAclOnCaseType(CaseTypeDefinition caseTypeDefinition, Predicate<AccessControlList> access) {
         return accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, getUserRoles(), access);
     }
 
     private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
-        return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdictionDefinition().getId()).higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
+        return userRepository.getHighestUserClassification(
+            caseTypeDefinition.getJurisdictionDefinition().getId()).higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
     }
 
     private List<CaseStateDefinition> filterCaseStatesForUser(List<CaseStateDefinition> caseStateDefinitions, Predicate<AccessControlList> access) {

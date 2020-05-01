@@ -37,11 +37,15 @@ public class TextValidator implements BaseTypeValidator {
         final String value = dataValue.textValue();
 
         if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
-            return Collections.singletonList(new ValidationResult(value + " exceed maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId));
+            return Collections.singletonList(
+                new ValidationResult(value + " exceed maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
+            );
         }
 
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
-            return Collections.singletonList(new ValidationResult(value + " require minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId));
+            return Collections.singletonList(
+                new ValidationResult(value + " require minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId)
+            );
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {

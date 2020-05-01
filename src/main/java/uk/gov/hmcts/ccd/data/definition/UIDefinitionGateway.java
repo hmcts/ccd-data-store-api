@@ -25,5 +25,6 @@ public interface UIDefinitionGateway {
 
     BannersResult getBanners(final List<String> jurisdictionIds);
 
-	JurisdictionUiConfigResult getJurisdictionUiConfigs(List<String> jurisdictionIds);
+    JurisdictionUiConfigResult getJurisdictionUiConfigs(List<String> jurisdictionIds);
+
 }

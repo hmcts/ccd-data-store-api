@@ -68,7 +68,10 @@ class DateTimeEntryProcessorTest {
         Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "13/03/2020")).thenReturn("2020-03-13T00:00:00.000");
 
-        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseFieldDefinition(), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node,
+            new CaseFieldDefinition(),
+            new CaseEventFieldDefinition(),
+            wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -85,7 +88,10 @@ class DateTimeEntryProcessorTest {
         Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601(null, "2020-03-13T00:00:00.000")).thenReturn("2020-03-13T00:00:00.000");
 
-        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseFieldDefinition(), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node,
+            new CaseFieldDefinition(),
+            new CaseEventFieldDefinition(),
+            wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -102,7 +108,10 @@ class DateTimeEntryProcessorTest {
         Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "2020-03-13T00:00:00.000")).thenReturn("2020-03-13T00:00:00.000");
 
-        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseFieldDefinition(), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node,
+            new CaseFieldDefinition(),
+            new CaseEventFieldDefinition(),
+            wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isTextual(), is(true)),
@@ -124,7 +133,10 @@ class DateTimeEntryProcessorTest {
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "13/03/2020")).thenReturn("2020-03-13T00:00:00.000");
         Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "25/12/1995")).thenReturn("1995-12-25T00:00:00.000");
 
-        JsonNode result = dateTimeEntryProcessor.execute(node, new CaseFieldDefinition(), new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node,
+            new CaseFieldDefinition(),
+            new CaseEventFieldDefinition(),
+            wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isArray(), is(true)),

@@ -37,7 +37,7 @@ public class IdamJurisdictionsResolverTest {
         @DisplayName("It should retrieve one user jurisdiction from idam.")
         void shouldRetrieveOneUserJurisdictionIdam() {
 
-            mockIDAMProperties(new String[] { "caseworker", "caseworker-autotest1",
+            mockIdamProperties(new String[] { "caseworker", "caseworker-autotest1",
                 "caseworker-autotest1-solicitor", "caseworker-autotest1-private", "caseworker-autotest1-senior" });
 
             final List<String> result = jurisdictionsResolver.getJurisdictions();
@@ -52,7 +52,7 @@ public class IdamJurisdictionsResolverTest {
         @DisplayName("It should retrieve all user jurisdictions from idam.")
         void shouldRetrieveAllUserJurisdictionIdam() {
 
-            mockIDAMProperties(new String[] {
+            mockIdamProperties(new String[] {
                 "caseworker",
                 "caseworker-autotest1",
                 "caseworker-autotest1-solicitor",
@@ -77,7 +77,7 @@ public class IdamJurisdictionsResolverTest {
         @DisplayName("It should retrieve all user jurisdictions from idam with no visibilities settings.")
         void shouldRetrieveAllUserJurisdictionIdamWithNoVisibilities() {
 
-            mockIDAMProperties(new String[] {
+            mockIdamProperties(new String[] {
                 "caseworker",
                 "caseworker-autotest1",
                 "caseworker-autotest2",
@@ -98,7 +98,7 @@ public class IdamJurisdictionsResolverTest {
         @DisplayName("It should retrieve all user jurisdictions for a user with many roles.")
         void shouldRetrieveAllUserJurisdictionIdamUserWithManyRoles() {
 
-            mockIDAMProperties(new String[] {
+            mockIdamProperties(new String[] {
                 "caseworker",
                 "caseworker-autotest1",
                 "caseworker-autotest2",
@@ -118,9 +118,9 @@ public class IdamJurisdictionsResolverTest {
 
         @Test
         @DisplayName("It should retrieve all user jurisdictions for a user with citizen role.")
-        void shouldRetrieveAllUserJurisdictionIDAMUserWithCitizenRole() {
+        void shouldRetrieveAllUserJurisdictionIdamUserWithCitizenRole() {
 
-            mockIDAMProperties(new String[] {
+            mockIdamProperties(new String[] {
                 "caseworker",
                 "citizen",
                 "caseworker-autotest1",
@@ -139,7 +139,7 @@ public class IdamJurisdictionsResolverTest {
         }
     }
 
-    private void mockIDAMProperties(String[] roles) {
+    private void mockIdamProperties(String[] roles) {
         IdamProperties idamProperties = mock(IdamProperties.class);
         doReturn(roles).when(idamProperties).getRoles();
         doReturn(idamProperties).when(userRepoMock).getUserDetails();

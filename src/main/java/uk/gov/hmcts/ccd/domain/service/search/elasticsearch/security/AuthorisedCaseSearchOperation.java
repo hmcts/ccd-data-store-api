@@ -72,10 +72,10 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
-        List<CaseTypeDefinition> authorisedCaseTypeDefinitions = getAuthorisedCaseTypes(searchRequest);
-        CrossCaseTypeSearchRequest authorisedSearchRequest = createAuthorisedSearchRequest(authorisedCaseTypeDefinitions, searchRequest);
+        List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
+        CrossCaseTypeSearchRequest authorisedSearchRequest = createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
 
-        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypeDefinitions, authorisedSearchRequest);
+        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
     }
 
     private List<CaseTypeDefinition> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
@@ -86,8 +86,9 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             .collect(Collectors.toList());
     }
 
-    private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseTypeDefinition> authorisedCaseTypeDefinitions, CrossCaseTypeSearchRequest originalSearchRequest) {
-        List<String> authorisedCaseTypeIds = authorisedCaseTypeDefinitions.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList());
+    private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseTypeDefinition> authorisedCaseTypes,
+                                                                     CrossCaseTypeSearchRequest originalSearchRequest) {
+        List<String> authorisedCaseTypeIds = authorisedCaseTypes.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList());
 
         return new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(authorisedCaseTypeIds)
@@ -97,19 +98,22 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             .build();
     }
 
-    private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseTypeDefinition> authorisedCaseTypeDefinitions, CrossCaseTypeSearchRequest authorisedSearchRequest) {
-        if (authorisedCaseTypeDefinitions.isEmpty()) {
+    private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseTypeDefinition> authorisedCaseTypes,
+                                                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
+        if (authorisedCaseTypes.isEmpty()) {
             return CaseSearchResult.EMPTY;
         }
 
         CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
-        filterCaseDataByCaseType(authorisedCaseTypeDefinitions, result.getCases(), authorisedSearchRequest);
+        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest);
 
         return result;
     }
 
-    private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypeDefinitions, List<CaseDetails> cases, CrossCaseTypeSearchRequest authorisedSearchRequest) {
-        Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypeDefinitions
+    private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,
+                                          List<CaseDetails> cases,
+                                          CrossCaseTypeSearchRequest authorisedSearchRequest) {
+        Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypes
             .stream()
             .collect(Collectors.toMap(CaseTypeDefinition::getId, Function.identity()));
 
@@ -118,15 +122,16 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             .forEach(caseDetails -> filterCaseData(caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()), caseDetails, authorisedSearchRequest));
     }
 
-    private void filterCaseData(CaseTypeDefinition authorisedCaseTypeDefinition, CaseDetails caseDetails, CrossCaseTypeSearchRequest authorisedSearchRequest) {
-        filterCaseDataByAclAccess(authorisedCaseTypeDefinition, caseDetails);
+    private void filterCaseData(CaseTypeDefinition authorisedCaseType, CaseDetails caseDetails, CrossCaseTypeSearchRequest authorisedSearchRequest) {
+        filterCaseDataByAclAccess(authorisedCaseType, caseDetails);
         filterCaseDataBySecurityClassification(caseDetails);
-        filterCaseDataForMultiCaseTypeSearch(authorisedSearchRequest, authorisedCaseTypeDefinition, caseDetails);
+        filterCaseDataForMultiCaseTypeSearch(authorisedSearchRequest, authorisedCaseType, caseDetails);
     }
 
-    private void filterCaseDataByAclAccess(CaseTypeDefinition authorisedCaseTypeDefinition, CaseDetails caseDetails) {
+    private void filterCaseDataByAclAccess(CaseTypeDefinition authorisedCaseType, CaseDetails caseDetails) {
         JsonNode caseData = caseDataToJsonNode(caseDetails);
-        JsonNode accessFilteredData = accessControlService.filterCaseFieldsByAccess(caseData, authorisedCaseTypeDefinition.getCaseFieldDefinitions(), getUserRoles(), CAN_READ, false);
+        JsonNode accessFilteredData =
+            accessControlService.filterCaseFieldsByAccess(caseData, authorisedCaseType.getCaseFieldDefinitions(), getUserRoles(), CAN_READ, false);
         caseDetails.setData(jsonNodeToCaseData(accessFilteredData));
     }
 
@@ -154,16 +159,18 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
      * }
      * If no source filter was passed then this will remove case data and return only metadata.
      */
-    private void filterCaseDataForMultiCaseTypeSearch(CrossCaseTypeSearchRequest searchRequest, CaseTypeDefinition authorisedCaseTypeDefinition, CaseDetails caseDetails) {
+    private void filterCaseDataForMultiCaseTypeSearch(CrossCaseTypeSearchRequest searchRequest,
+                                                      CaseTypeDefinition authorisedCaseType,
+                                                      CaseDetails caseDetails) {
         if (searchRequest.isMultiCaseTypeSearch() && caseDetails.getData() != null) {
             JsonNode caseData = caseDataToJsonNode(caseDetails);
             String caseDataJson = caseData.toString();
             JsonNode filteredMultiCaseTypeSearchData = objectMapperService.createEmptyJsonNode();
 
-            authorisedCaseTypeDefinition.getSearchAliasFields()
+            authorisedCaseType.getSearchAliasFields()
                 .stream()
                 .filter(searchRequest::hasAliasField)
-                .forEach(searchAliasField -> findCaseFieldPathInCaseData(authorisedCaseTypeDefinition, caseDataJson, searchAliasField.getCaseFieldPath())
+                .forEach(searchAliasField -> findCaseFieldPathInCaseData(authorisedCaseType, caseDataJson, searchAliasField.getCaseFieldPath())
                     .filter(not(JsonNode::isMissingNode))
                     .ifPresent(jsonNode -> ((ObjectNode) filteredMultiCaseTypeSearchData).set(searchAliasField.getId(), jsonNode)));
 
@@ -171,9 +178,9 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private Optional<JsonNode> findCaseFieldPathInCaseData(CaseTypeDefinition caseTypeDefinition, String caseDataJson, String path) {
+    private Optional<JsonNode> findCaseFieldPathInCaseData(CaseTypeDefinition caseType, String caseDataJson, String path) {
         try {
-            String fieldPath = JSON_PATH_ROOT_ELEMENT_PREFIX + sanitiseCollectionFieldInPath(caseTypeDefinition, path);
+            String fieldPath = JSON_PATH_ROOT_ELEMENT_PREFIX + sanitiseCollectionFieldInPath(caseType, path);
             return of(ofNullable(JsonPath.parse(caseDataJson).read(fieldPath, JsonNode.class))
                           .orElse(NullNode.getInstance()));
         } catch (PathNotFoundException e) {
@@ -186,9 +193,9 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
      * Collection case field has a different syntax when looking up in the case data. The case field path is stored as `collectionField.value` and when looking
      * up this field, it needs to be looked up as collectionField[*].value
      */
-    private String sanitiseCollectionFieldInPath(CaseTypeDefinition caseTypeDefinition, String path) {
+    private String sanitiseCollectionFieldInPath(CaseTypeDefinition caseType, String path) {
         String caseFieldId = getCaseFieldFromPath(path);
-        if (path != null && caseTypeDefinition.isCaseFieldACollection(caseFieldId)) {
+        if (path != null && caseType.isCaseFieldACollection(caseFieldId)) {
             return path.replaceAll(caseFieldId, caseFieldId + JSON_PATH_COLLECTION_FIELD_INDICATOR);
         }
 

@@ -52,7 +52,8 @@ public class CaseUpdateViewEventBuilder {
         caseUpdateViewEvent.setCaseFields(
             fieldProcessorService.processCaseViewFields(
                 mergeEventFields(startEventResult.getCaseDetails(), caseTypeDefinition, caseEventDefinition), caseTypeDefinition, caseEventDefinition)
-        );        caseUpdateViewEvent.setEventToken(startEventResult.getToken());
+        );
+        caseUpdateViewEvent.setEventToken(startEventResult.getToken());
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
                                                                                                      eventId);
         caseUpdateViewEvent.setWizardPages(wizardPageCollection);

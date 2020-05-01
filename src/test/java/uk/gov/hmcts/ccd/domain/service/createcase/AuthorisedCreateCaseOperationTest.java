@@ -105,7 +105,8 @@ class AuthorisedCreateCaseOperationTest {
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(userRoles), eq(CAN_READ))).thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
-        when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
+        when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class),
+            eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions), eq(userRoles), eq(CAN_READ), anyBoolean()))
             .thenReturn(MAPPER.createObjectNode());
     }
@@ -136,7 +137,8 @@ class AuthorisedCreateCaseOperationTest {
         assertAll(
             () -> assertThat(output, is(nullValue())),
             () -> verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(userRoles), eq(CAN_READ)),
-            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions), eq(userRoles), eq(CAN_READ), anyBoolean())
+            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class),
+                eq(caseFieldDefinitions), eq(userRoles), eq(CAN_READ), anyBoolean())
         );
     }
 
@@ -155,7 +157,8 @@ class AuthorisedCreateCaseOperationTest {
             () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE)),
-            () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE)),
+            () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class),
+                eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(classifiedCreateCaseOperation).createCaseDetails(CASE_TYPE_ID, EVENT_DATA, IGNORE),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(userRoles), eq(CAN_READ)),
             () -> inOrder.verify(accessControlService, times(2))
@@ -251,7 +254,10 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if no create field access")
     void shouldFailIfNoCreateFieldAccess() {
 
-        when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE))).thenReturn(false);
+        when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class),
+            eq(caseFieldDefinitions),
+            eq(userRoles),
+            eq(CAN_CREATE))).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
                                                                                                             EVENT_DATA,

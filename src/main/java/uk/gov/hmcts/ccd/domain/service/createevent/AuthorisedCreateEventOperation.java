@@ -107,7 +107,10 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         return caseDetails;
     }
 
-    private void verifyUpsertAccess(Event event, Map<String, JsonNode> newData, CaseDetails existingCaseDetails, CaseTypeDefinition caseTypeDefinition, Set<String> userRoles) {
+    private void verifyUpsertAccess(Event event, Map<String, JsonNode> newData,
+                                    CaseDetails existingCaseDetails,
+                                    CaseTypeDefinition caseTypeDefinition,
+                                    Set<String> userRoles) {
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,userRoles,CAN_UPDATE)) {
             throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
         }

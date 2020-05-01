@@ -48,20 +48,22 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
-    private static final String GET_CASES_NO_READ_CASE_FIELD_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadFieldAccess/cases";
+    private static final String GET_CASES_NO_READ_CASE_FIELD_ACCESS =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadFieldAccess/cases";
     private static final String GET_CASES_NO_READ_CASE_TYPE_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase4/cases";
     private static final String GET_DRAFT = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/drafts/5";
     private static final String GET_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529";
-    private static final String GET_CASE_NO_EVENT_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadEventAccess/cases" +
-        "/1504259907353636";
+    private static final String GET_CASE_NO_EVENT_READ_ACCESS =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadEventAccess/cases/1504259907353636";
     private static final String GET_PRIVATE_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545";
-    private static final String GET_COMPLEX_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestComplexAddressBookCase/cases/1504259907353537";
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_VALID = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers" +
-        "/NO_PRE_STATES_EVENT";
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_VALID = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/event" +
-        "-triggers/HAS_PRE_STATES_EVENT";
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_PRIVATE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/event" +
-        "-triggers/HAS_PRE_STATES_EVENT";
+    private static final String GET_COMPLEX_CASE =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestComplexAddressBookCase/cases/1504259907353537";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_VALID =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers/NO_PRE_STATES_EVENT";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_VALID =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/event-triggers/HAS_PRE_STATES_EVENT";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_PRIVATE =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/event-triggers/HAS_PRE_STATES_EVENT";
     private static final String GET_CASE_TYPES_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types?access=read";
     private static final String GET_JURISDICTIONS_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions?access=read";
 
@@ -70,19 +72,22 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASE_TYPES_MISNAMED_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/PROBATE/invalid=read";
     private static final String GET_CASE_TYPES_INVALID_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types?access=INVALID";
     private static final String GET_NULL_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestComplexAddressBookCase/cases/9999999999999995";
-    private static final String GET_CASE_INVALID_STATE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestComplexAddressBookCase/cases/1504259907352539";
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INVALID_PRE_STATES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers" +
-        "/HAS_PRE_STATES_EVENT";
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INVALID_EVENT = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers/NOT_AN_EVENT";
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_STATE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353552/event" +
-        "-triggers/TEST_EVENT";
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/9999999999999995/event" +
-        "-triggers/HAS_PRE_STATES_EVENT";
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_EVENT = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353552/event" +
-        "-triggers/NOT_AN_EVENT";
-    private static final String GET_CASE_INVALID_REFERENCE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/invalidReference";
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE_REFERENCE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/xxx/event-triggers" +
-        "/HAS_PRE_STATES_EVENT";
+    private static final String GET_CASE_INVALID_STATE =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestComplexAddressBookCase/cases/1504259907352539";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INVALID_PRE_STATES =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers/HAS_PRE_STATES_EVENT";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INVALID_EVENT =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers/NOT_AN_EVENT";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_STATE =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353552/event-triggers/TEST_EVENT";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/9999999999999995/event-triggers/HAS_PRE_STATES_EVENT";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_EVENT =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353552/event-triggers/NOT_AN_EVENT";
+    private static final String GET_CASE_INVALID_REFERENCE =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/invalidReference";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE_REFERENCE =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/xxx/event-triggers/HAS_PRE_STATES_EVENT";
     private static final String GET_CASES_INVALID_JURISDICTION = "/aggregated/caseworkers/0/jurisdictions/XYZ/case-types/TestAddressBookCase/cases";
     private static final String GET_CASES_INVALID_CASE_TYPE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/XYZAddressBookCase/cases";
 
@@ -90,7 +95,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
     private static final String TEST_JURISDICTION = "PROBATE";
 
-    private static final String GET_CASE_HISTORY_FOR_EVENT = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events/%d/case-history";
+    private static final String GET_CASE_HISTORY_FOR_EVENT =
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events/%d/case-history";
     public static final int NUMBER_OF_CASES = 18;
 
 
@@ -127,14 +133,12 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
-        final String TEST_STATE = "CaseCreated";
-
         final MvcResult result = mockMvc.perform(get(GET_CASES)
                                                      .contentType(JSON_CONTENT_TYPE)
                                                      .param("view", WORKBASKET)
                                                      .param("case_type", TEST_CASE_TYPE)
                                                      .param("jurisdiction", TEST_JURISDICTION)
-                                                     .param("state", TEST_STATE)
+                                                     .param("state", "CaseCreated")
                                                      .param("page", "1")
                                                      .header(AUTHORIZATION, "Bearer user1"))
                                         .andExpect(status().is(200))

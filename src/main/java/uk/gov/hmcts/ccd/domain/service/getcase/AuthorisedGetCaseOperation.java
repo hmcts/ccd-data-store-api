@@ -77,21 +77,21 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
                 .collect(Collectors.toSet()));
     }
 
-    private Optional<CaseDetails> verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseDetails caseDetails) {
+    private Optional<CaseDetails> verifyReadAccess(CaseTypeDefinition caseType, Set<String> userRoles, CaseDetails caseDetails) {
 
-        if (caseTypeDefinition == null || caseDetails == null || CollectionUtils.isEmpty(userRoles)) {
+        if (caseType == null || caseDetails == null || CollectionUtils.isEmpty(userRoles)) {
             return Optional.empty();
         }
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ) ||
-            !accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseTypeDefinition, userRoles, CAN_READ)) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)
+            || !accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseType, userRoles, CAN_READ)) {
             return Optional.empty();
         }
 
         caseDetails.setData(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                caseTypeDefinition.getCaseFieldDefinitions(),
+                caseType.getCaseFieldDefinitions(),
                 userRoles,
                 CAN_READ,
                 false),
@@ -99,7 +99,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         caseDetails.setDataClassification(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                caseTypeDefinition.getCaseFieldDefinitions(),
+                caseType.getCaseFieldDefinitions(),
                 userRoles,
                 CAN_READ,
                 true),

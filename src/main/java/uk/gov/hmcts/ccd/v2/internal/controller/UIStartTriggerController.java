@@ -66,7 +66,8 @@ public class UIStartTriggerController {
     })
     public ResponseEntity<CaseUpdateViewEventResource> getCaseUpdateViewEventByCaseType(@PathVariable("caseTypeId") String caseTypeId,
                                                                                         @PathVariable("triggerId") String triggerId,
-                                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+                                                                                        @RequestParam(value = "ignore-warning", required = false)
+                                                                                            final Boolean ignoreWarning) {
 
         final CaseUpdateViewEvent caseUpdateViewEvent = this.getEventTriggerOperation.executeForCaseType(caseTypeId,
                                                                                                    triggerId,
@@ -109,7 +110,8 @@ public class UIStartTriggerController {
     })
     public ResponseEntity<CaseUpdateViewEventResource> getCaseUpdateViewEvent(@PathVariable("caseId") String caseId,
                                                                               @PathVariable("triggerId") String triggerId,
-                                                                              @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+                                                                              @RequestParam(value = "ignore-warning", required = false)
+                                                                                  final Boolean ignoreWarning) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
@@ -150,7 +152,8 @@ public class UIStartTriggerController {
         )
     })
     public ResponseEntity<CaseUpdateViewEventResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,
-                                                                            @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+                                                                            @RequestParam(value = "ignore-warning", required = false)
+                                                                            final Boolean ignoreWarning) {
 
         final CaseUpdateViewEvent caseUpdateViewEvent = getEventTriggerOperation.executeForDraft(draftId,
                                                                                            ignoreWarning);

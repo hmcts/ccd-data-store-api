@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -13,12 +9,15 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
 /**
- * Max and Min is expressed as EPOCH
+ * Max and Min is expressed as EPOCH.
  */
 @Named
 @Singleton
@@ -57,11 +56,16 @@ public class DateTimeValidator implements BaseTypeValidator {
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataValue.asText())) {
-            return Collections.singletonList(new ValidationResult(dataValue.asText() + " Field Type Regex Failed:" + caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataFieldId));
+            return Collections.singletonList(
+                new ValidationResult(dataValue.asText()
+                    + " Field Type Regex Failed:" + caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataFieldId)
+            );
         }
 
         if (!checkRegex(getType().getRegularExpression(), dataValue.asText())) {
-            return Collections.singletonList(new ValidationResult(dataValue.asText() + " Date Time Type Regex Failed:" + getType().getRegularExpression(), dataFieldId));
+            return Collections.singletonList(
+                new ValidationResult(dataValue.asText() + " Date Time Type Regex Failed:" + getType().getRegularExpression(), dataFieldId)
+            );
         }
 
         return Collections.emptyList();

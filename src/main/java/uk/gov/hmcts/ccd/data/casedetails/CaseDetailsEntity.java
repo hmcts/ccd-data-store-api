@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.JsonDataConverter;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @NamedQueries({
     @NamedQuery(name = CaseDetailsEntity.FIND_BY_METADATA, query =
         "SELECT cd FROM CaseDetailsEntity cd " +

@@ -208,7 +208,12 @@ class MidEventCallbackTest {
 
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
-            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseTypeDefinition, caseEventDefinition, null, caseDetails, IGNORE_WARNINGS),
+            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
+                caseTypeDefinition,
+                caseEventDefinition,
+                null,
+                caseDetails,
+                IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
             () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData));
     }
@@ -271,7 +276,8 @@ class MidEventCallbackTest {
 
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
-            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
+            () -> verify(callbackInvoker)
+                .invokeMidEventCallback(wizardPageWithCallback,
                                             caseTypeDefinition, caseEventDefinition, existingCaseDetails,
                                             combineCaseDetails, IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, combineData));

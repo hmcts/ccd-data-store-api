@@ -72,15 +72,15 @@ public class AccessControlService {
     }
 
 
-    public boolean canAccessCaseTypeWithCriteria(final CaseTypeDefinition caseTypeDefinition,
+    public boolean canAccessCaseTypeWithCriteria(final CaseTypeDefinition caseType,
                                                  final Set<String> userRoles,
                                                  final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = caseTypeDefinition != null
-            && hasAccessControlList(userRoles, criteria, caseTypeDefinition.getAccessControlLists());
+        boolean hasAccess = caseType != null
+            && hasAccessControlList(userRoles, criteria, caseType.getAccessControlLists());
 
         if (!hasAccess) {
             LOG.debug("No relevant case type access for caseTypeACLs={}, userRoles={}",
-                caseTypeDefinition != null ? caseTypeDefinition.getAccessControlLists() : newArrayList(),
+                caseType != null ? caseType.getAccessControlLists() : newArrayList(),
                 userRoles);
         }
 
@@ -88,10 +88,10 @@ public class AccessControlService {
     }
 
     public boolean canAccessCaseStateWithCriteria(final String caseState,
-                                                  final CaseTypeDefinition caseTypeDefinition,
+                                                  final CaseTypeDefinition caseType,
                                                   final Set<String> userRoles,
                                                   final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasAccessControlList(userRoles, criteria, caseTypeDefinition.getStates()
+        boolean hasAccess = hasAccessControlList(userRoles, criteria, caseType.getStates()
             .stream()
             .filter(cState -> cState.getId().equalsIgnoreCase(caseState))
             .map(CaseStateDefinition::getAccessControlLists)
@@ -101,21 +101,21 @@ public class AccessControlService {
         if (!hasAccess) {
             LOG.debug("No relevant case state access for caseState= {}, caseTypeACLs={}, userRoles={}",
                 caseState,
-                caseTypeDefinition.getAccessControlLists(),
+                caseType.getAccessControlLists(),
                 userRoles);
         }
         return hasAccess;
     }
 
     public boolean canAccessCaseEventWithCriteria(final String eventId,
-                                                  final List<CaseEventDefinition> caseEventDefinitionDefinitions,
+                                                  final List<CaseEventDefinition> caseEventDefinitions,
                                                   final Set<String> userRoles,
                                                   final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitionDefinitions, userRoles, criteria);
+        boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitions, userRoles, criteria);
         if (!hasAccess) {
             LOG.debug("No relevant event access for eventId={}, eventAcls={}, userRoles={}",
                 eventId,
-                getCaseEventAcls(caseEventDefinitionDefinitions, eventId),
+                getCaseEventAcls(caseEventDefinitions, eventId),
                 userRoles);
         }
         return hasAccess;
@@ -170,28 +170,55 @@ public class AccessControlService {
                     if (isEmpty(caseField.getComplexACLs())) {
                         filteredCaseFields.set(fieldName, caseFields.get(fieldName));
                     } else if (!isClassification) {
-                        filteredCaseFields.set(fieldName, filterChildren(caseField, caseFields.get(fieldName), userRoles, access, isClassification));
+                        filteredCaseFields.set(
+                            fieldName,
+                            filterChildrenUsingJsonNode(caseField, caseFields.get(fieldName), userRoles, access, isClassification)
+                        );
                     }
                 })
         );
         return filteredCaseFields;
     }
 
-    private Optional<CaseFieldDefinition> findCaseFieldAndVerifyHasAccess(final String fieldName, final List<CaseFieldDefinition> caseFieldDefinitions, final Set<String> userRoles, final Predicate<AccessControlList> access) {
-        return caseFieldDefinitions.stream().filter(caseField -> caseField.getId().equals(fieldName) && hasAccessControlList(userRoles, access, caseField.getAccessControlLists())).findFirst();
+    public List<CaseFieldDefinition> filterCaseFieldsByAccess(final List<CaseFieldDefinition> caseFieldDefinitions,
+                                                    final Set<String> userRoles,
+                                                    final Predicate<AccessControlList> access) {
+        List<CaseFieldDefinition> filteredCaseFields = newArrayList();
+        if (caseFieldDefinitions != null) {
+            filteredCaseFields = caseFieldDefinitions
+                .stream()
+                .filter(caseField -> caseField.isMetadata() || hasAccessControlList(userRoles,
+                    access,
+                    caseField.getAccessControlLists()))
+                .map(caseField -> checkIfChildFilteringRequired(caseField, userRoles, access))
+                .collect(toList());
+
+        }
+        return filteredCaseFields;
     }
 
-    private JsonNode filterChildren(final CaseFieldDefinition caseFieldDefinition, final JsonNode jsonNode, final Set<String> userRoles,
-                                    final Predicate<AccessControlList> access, boolean isClassification) {
-        if (caseFieldDefinition.isCompoundFieldType()) {
-            caseFieldDefinition.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
+    private Optional<CaseFieldDefinition> findCaseFieldAndVerifyHasAccess(final String fieldName,
+                                                                final List<CaseFieldDefinition> caseFieldDefinitions,
+                                                                final Set<String> userRoles,
+                                                                final Predicate<AccessControlList> access) {
+        return caseFieldDefinitions.stream().filter(caseField ->
+            caseField.getId().equals(fieldName) && hasAccessControlList(userRoles, access, caseField.getAccessControlLists())).findFirst();
+    }
+
+    private JsonNode filterChildrenUsingJsonNode(final CaseFieldDefinition caseField,
+                                                 final JsonNode jsonNode,
+                                                 final Set<String> userRoles,
+                                                 final Predicate<AccessControlList> access,
+                                                 boolean isClassification) {
+        if (caseField.isCompoundFieldType()) {
+            caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
-                    locateAndRemoveChildNode(caseFieldDefinition, jsonNode, childField);
+                    locateAndRemoveChildNode(caseField, jsonNode, childField);
                 } else {
                     if (childField.isCollectionFieldType()) {
-                        traverseAndFilterCollectionChildField(caseFieldDefinition, jsonNode, userRoles, access, isClassification, childField);
+                        traverseAndFilterCollectionChildField(caseField, jsonNode, userRoles, access, isClassification, childField);
                     } else if (childField.isComplexFieldType()) {
-                        traverseAndFilterComplexChildField(caseFieldDefinition, jsonNode, userRoles, access, isClassification, childField);
+                        traverseAndFilterComplexChildField(caseField, jsonNode, userRoles, access, isClassification, childField);
                     }
                 }
             });
@@ -199,43 +226,55 @@ public class AccessControlService {
         return jsonNode;
     }
 
-    private void traverseAndFilterComplexChildField(final CaseFieldDefinition caseFieldDefinition, final JsonNode jsonNode, final Set<String> userRoles, final Predicate<AccessControlList> access, final boolean isClassification, final CaseFieldDefinition childField) {
-        if (caseFieldDefinition.isCollectionFieldType() && jsonNode.isArray()) {
+    private void traverseAndFilterComplexChildField(final CaseFieldDefinition caseField,
+                                                    final JsonNode jsonNode,
+                                                    final Set<String> userRoles,
+                                                    final Predicate<AccessControlList> access,
+                                                    final boolean isClassification,
+                                                    final CaseFieldDefinition childField) {
+        if (caseField.isCollectionFieldType() && jsonNode.isArray()) {
             jsonNode.forEach(caseFieldValueJsonNode -> {
                 if (caseFieldValueJsonNode.get(VALUE).get(childField.getId()) != null) {
-                    filterChildren(childField, caseFieldValueJsonNode.get(VALUE).get(childField.getId()), userRoles, access, isClassification);
+                    filterChildrenUsingJsonNode(childField, caseFieldValueJsonNode.get(VALUE).get(childField.getId()), userRoles, access, isClassification);
                 }
             });
         } else {
-            filterChildren(childField, jsonNode.path(childField.getId()), userRoles, access, isClassification);
+            filterChildrenUsingJsonNode(childField, jsonNode.path(childField.getId()), userRoles, access, isClassification);
         }
     }
 
-    private void traverseAndFilterCollectionChildField(final CaseFieldDefinition caseFieldDefinition, final JsonNode jsonNode, final Set<String> userRoles, final Predicate<AccessControlList> access, final boolean isClassification, final CaseFieldDefinition childField) {
-        if (caseFieldDefinition.isCollectionFieldType() && jsonNode.isArray()) {
+    private void traverseAndFilterCollectionChildField(final CaseFieldDefinition caseField,
+                                                       final JsonNode jsonNode,
+                                                       final Set<String> userRoles,
+                                                       final Predicate<AccessControlList> access,
+                                                       final boolean isClassification,
+                                                       final CaseFieldDefinition childField) {
+        if (caseField.isCollectionFieldType() && jsonNode.isArray()) {
             jsonNode.forEach(caseFieldValueJsonNode -> {
                 if (caseFieldValueJsonNode.get(VALUE).get(childField.getId()) != null) {
-                    caseFieldValueJsonNode.get(VALUE).get(childField.getId()).forEach(childFieldValueJsonNode -> filterChildren(childField, childFieldValueJsonNode.get(VALUE), userRoles, access, isClassification));
+                    caseFieldValueJsonNode.get(VALUE).get(childField.getId()).forEach(childFieldValueJsonNode ->
+                        filterChildrenUsingJsonNode(childField, childFieldValueJsonNode.get(VALUE), userRoles, access, isClassification));
                 }
             });
         } else {
-            jsonNode.path(childField.getId()).forEach(childJsonNode -> filterChildren(childField, childJsonNode.get(VALUE), userRoles, access, isClassification));
+            jsonNode.path(childField.getId()).forEach(childJsonNode ->
+                filterChildrenUsingJsonNode(childField, childJsonNode.get(VALUE), userRoles, access, isClassification));
         }
     }
 
-    private void locateAndRemoveChildNode(final CaseFieldDefinition caseFieldDefinition, final JsonNode jsonNode, final CaseFieldDefinition childField) {
-        if (caseFieldDefinition.isCollectionFieldType() && jsonNode.isArray()) {
+    private void locateAndRemoveChildNode(final CaseFieldDefinition caseField, final JsonNode jsonNode, final CaseFieldDefinition childField) {
+        if (caseField.isCollectionFieldType() && jsonNode.isArray()) {
             jsonNode.forEach(jsonNode1 -> ((ObjectNode) jsonNode1.get(VALUE)).remove(childField.getId()));
         } else {
             ((ObjectNode) jsonNode).remove(childField.getId());
         }
     }
 
-    public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(final CaseUpdateViewEvent caseUpdateViewEvent,
-                                                                     final List<CaseFieldDefinition> caseFieldDefinitions,
-                                                                     final Set<String> userRoles,
-                                                                     final Predicate<AccessControlList> access) {
-        caseUpdateViewEvent.getCaseFields().stream()
+    public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(final CaseUpdateViewEvent caseEventTrigger,
+                                                                  final List<CaseFieldDefinition> caseFieldDefinitions,
+                                                                  final Set<String> userRoles,
+                                                                  final Predicate<AccessControlList> access) {
+        caseEventTrigger.getCaseFields().stream()
             .forEach(caseViewField -> {
                 Optional<CaseFieldDefinition> caseFieldOpt = findCaseField(caseFieldDefinitions, caseViewField.getId());
 
@@ -245,34 +284,32 @@ public class AccessControlService {
                         caseViewField.setDisplayContext(READONLY);
                     }
                     if (field.isCompoundFieldType()) {
-                        setChildrenAsReadOnlyIfNoAccess(caseUpdateViewEvent.getWizardPages(), field.getId(), field, access, userRoles, caseViewField);
+                        setChildrenAsReadOnlyIfNoAccess(caseEventTrigger.getWizardPages(), field.getId(), field, access, userRoles, caseViewField);
                     }
                 } else {
                     caseViewField.setDisplayContext(READONLY);
                 }
             });
-        return caseUpdateViewEvent;
+        return caseEventTrigger;
     }
 
-    public CaseUpdateViewEvent updateCollectionDisplayContextParameterByAccess(final CaseUpdateViewEvent caseUpdateViewEvent,
-                                                                               final Set<String> userRoles) {
-        caseUpdateViewEvent.getCaseFields().stream().filter(CommonField::isCollectionFieldType)
+    public CaseUpdateViewEvent updateCollectionDisplayContextParameterByAccess(final CaseUpdateViewEvent caseEventTrigger,
+                                                                            final Set<String> userRoles) {
+        caseEventTrigger.getCaseFields().stream().filter(CommonField::isCollectionFieldType)
             .forEach(caseViewField -> caseViewField.setDisplayContextParameter(generateDisplayContextParamer(userRoles, caseViewField)));
 
-        caseUpdateViewEvent.getCaseFields().forEach(caseViewField ->
+        caseEventTrigger.getCaseFields().forEach(caseViewField ->
             setChildrenCollectionDisplayContextParameter(caseViewField.getFieldTypeDefinition().getChildren(), userRoles));
 
-        return caseUpdateViewEvent;
+        return caseEventTrigger;
     }
 
-    private void setChildrenCollectionDisplayContextParameter(final List<CaseFieldDefinition> caseFieldDefinitions,
+    private void setChildrenCollectionDisplayContextParameter(final List<CaseFieldDefinition> caseFields,
                                                               final Set<String> userRoles) {
-        caseFieldDefinitions.stream().filter(CommonField::isCollectionFieldType)
+        caseFields.stream().filter(CommonField::isCollectionFieldType)
             .forEach(childField -> childField.setDisplayContextParameter(generateDisplayContextParamer(userRoles, childField)));
 
-        caseFieldDefinitions.forEach(childField -> {
-            setChildrenCollectionDisplayContextParameter(childField.getFieldTypeDefinition().getChildren(), userRoles);
-        });
+        caseFields.forEach(childField -> setChildrenCollectionDisplayContextParameter(childField.getFieldTypeDefinition().getChildren(), userRoles));
     }
 
     private String generateDisplayContextParamer(Set<String> userRoles, CommonField field) {
@@ -291,9 +328,14 @@ public class AccessControlService {
         return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(), collectionAccess);
     }
 
-    private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages, final String rootFieldId, final CaseFieldDefinition caseFieldDefinition, final Predicate<AccessControlList> access, final Set<String> userRoles, final CommonField caseViewField) {
-        if (caseFieldDefinition.isCompoundFieldType()) {
-            caseFieldDefinition.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
+    private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages,
+                                                 final String rootFieldId,
+                                                 final CaseFieldDefinition caseField,
+                                                 final Predicate<AccessControlList> access,
+                                                 final Set<String> userRoles,
+                                                 final CommonField caseViewField) {
+        if (caseField.isCompoundFieldType()) {
+            caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
                     findNestedField(caseViewField, childField.getId()).setDisplayContext(READONLY);
                     Optional<WizardPageField> optionalWizardPageField = getWizardPageField(wizardPages, rootFieldId);
@@ -302,7 +344,14 @@ public class AccessControlService {
                     }
                 }
                 if (childField.isCompoundFieldType()) {
-                    setChildrenAsReadOnlyIfNoAccess(wizardPages, rootFieldId, childField, access, userRoles, findNestedField(caseViewField, childField.getId()));
+                    setChildrenAsReadOnlyIfNoAccess(
+                        wizardPages,
+                        rootFieldId,
+                        childField,
+                        access,
+                        userRoles,
+                        findNestedField(caseViewField, childField.getId())
+                    );
                 }
             });
         }
@@ -318,7 +367,9 @@ public class AccessControlService {
         }
     }
 
-    private Optional<WizardPageComplexFieldOverride> getWizardPageComplexFieldOverride(final WizardPageField wizardPageField, final String rootFieldId, final CaseFieldDefinition field) {
+    private Optional<WizardPageComplexFieldOverride> getWizardPageComplexFieldOverride(final WizardPageField wizardPageField,
+                                                                                       final String rootFieldId,
+                                                                                       final CaseFieldDefinition field) {
         return wizardPageField.getComplexFieldOverrides()
                 .stream()
                 .filter(wpcfo -> wpcfo.getComplexFieldElementId().startsWith(rootFieldId)
@@ -328,17 +379,19 @@ public class AccessControlService {
 
     private Optional<WizardPageField> getWizardPageField(final List<WizardPage> wizardPages, final String rootFieldId) {
         return wizardPages.stream()
-            .filter(wizardPage -> wizardPage.getWizardPageFields().stream().anyMatch(wizardPageField -> wizardPageField.getCaseFieldId().equalsIgnoreCase(rootFieldId)))
-            .map(wizardPage -> wizardPage.getWizardPageFields().stream().filter(wizardPageField -> wizardPageField.getCaseFieldId().equalsIgnoreCase(rootFieldId)).findFirst().get())
+            .filter(wizardPage -> wizardPage.getWizardPageFields().stream().anyMatch(wizardPageField ->
+                wizardPageField.getCaseFieldId().equalsIgnoreCase(rootFieldId)))
+            .map(wizardPage -> wizardPage.getWizardPageFields().stream().filter(wizardPageField ->
+                wizardPageField.getCaseFieldId().equalsIgnoreCase(rootFieldId)).findFirst().get())
             .findFirst();
     }
 
-    public CaseUpdateViewEvent filterCaseViewFieldsByAccess(final CaseUpdateViewEvent caseUpdateViewEvent,
-                                                            final List<CaseFieldDefinition> caseFieldDefinitions,
-                                                            final Set<String> userRoles,
-                                                            final Predicate<AccessControlList> access) {
+    public CaseUpdateViewEvent filterCaseViewFieldsByAccess(final CaseUpdateViewEvent caseEventTrigger,
+                                                         final List<CaseFieldDefinition> caseFieldDefinitions,
+                                                         final Set<String> userRoles,
+                                                         final Predicate<AccessControlList> access) {
         List<String> filteredCaseFieldIds = new ArrayList<>();
-        caseUpdateViewEvent.setCaseFields(caseUpdateViewEvent.getCaseFields()
+        caseEventTrigger.setCaseFields(caseEventTrigger.getCaseFields()
             .stream()
             .filter(caseViewField -> {
                 Optional<CaseFieldDefinition> caseFieldOpt = findCaseField(caseFieldDefinitions, caseViewField.getId());
@@ -359,8 +412,8 @@ public class AccessControlService {
             })
             .collect(Collectors.toList())
         );
-        caseUpdateViewEvent.setWizardPages(filterWizardPageFields(caseUpdateViewEvent, filteredCaseFieldIds));
-        return caseUpdateViewEvent;
+        caseEventTrigger.setWizardPages(filterWizardPageFields(caseEventTrigger, filteredCaseFieldIds));
+        return caseEventTrigger;
     }
 
     private Optional<CaseFieldDefinition> findCaseField(final List<CaseFieldDefinition> caseFieldDefinitions, final String caseViewFieldId) {
@@ -375,27 +428,32 @@ public class AccessControlService {
             .findAny();
     }
 
-    private void filterChildren(final CaseFieldDefinition caseFieldDefinition, CommonField caseViewField,
+    private void filterChildren(final CaseFieldDefinition caseField, CommonField caseViewField,
                                 final Set<String> userRoles,
                                 final Predicate<AccessControlList> access) {
-        if (!hasAccessControlList(userRoles, access, caseFieldDefinition.getAccessControlLists())) {
-            locateAndRemoveCaseField(caseFieldDefinition, caseViewField);
-        } else if (caseFieldDefinition.isCompoundFieldType()) {
-            caseFieldDefinition.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
+        if (!hasAccessControlList(userRoles, access, caseField.getAccessControlLists())) {
+            locateAndRemoveCaseField(caseField, caseViewField);
+        } else if (caseField.isCompoundFieldType()) {
+            caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
-                    locateAndRemoveChildField(findNestedField(caseViewField, caseFieldDefinition.getId()), childField, caseFieldDefinition.isCollectionFieldType());
+                    locateAndRemoveChildField(findNestedField(caseViewField, caseField.getId()), childField, caseField.isCollectionFieldType());
                 } else if (childField.isCompoundFieldType()) {
-                    traverseAndFilterCompoundChildField(findNestedField(caseViewField, caseFieldDefinition.getId()), userRoles, access, childField);
+                    traverseAndFilterCompoundChildField(findNestedField(caseViewField, caseField.getId()), userRoles, access, childField);
                 }
             });
         }
     }
 
-    private void traverseAndFilterCompoundChildField(final CommonField caseViewField, final Set<String> userRoles, final Predicate<AccessControlList> access, final CaseFieldDefinition childField) {
+    private void traverseAndFilterCompoundChildField(final CommonField caseViewField,
+                                                     final Set<String> userRoles,
+                                                     final Predicate<AccessControlList> access,
+                                                     final CaseFieldDefinition childField) {
         if (childField.isCollectionFieldType()) {
-            childField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().forEach(subField -> filterChildren(subField, findNestedField(caseViewField, childField.getId()), userRoles, access));
+            childField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().forEach(subField ->
+                filterChildren(subField, findNestedField(caseViewField, childField.getId()), userRoles, access));
         } else if (childField.isComplexFieldType()) {
-            childField.getFieldTypeDefinition().getComplexFields().forEach(subField -> filterChildren(subField, findNestedField(caseViewField, childField.getId()), userRoles, access));
+            childField.getFieldTypeDefinition().getComplexFields().forEach(subField ->
+                filterChildren(subField, findNestedField(caseViewField, childField.getId()), userRoles, access));
         }
     }
 
@@ -406,22 +464,24 @@ public class AccessControlService {
 
     private void locateAndRemoveChildField(final CommonField caseViewField, final CaseFieldDefinition childField, final boolean isCollection) {
         if (isCollection) {
-            caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().remove(findNestedField(caseViewField, childField.getId()));
+            caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().remove(
+                findNestedField(caseViewField, childField.getId()));
         } else {
             caseViewField.getFieldTypeDefinition().getComplexFields().remove(findNestedField(caseViewField, childField.getId()));
         }
     }
 
-    private void locateAndRemoveCaseField(final CaseFieldDefinition caseFieldDefinition, final CommonField caseViewField) {
+    private void locateAndRemoveCaseField(final CaseFieldDefinition caseField, final CommonField caseViewField) {
         if (caseViewField.isCollectionFieldType()) {
-            caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().remove(findNestedField(caseViewField, caseFieldDefinition.getId()));
+            caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().remove(
+                findNestedField(caseViewField, caseField.getId()));
         } else {
-            caseViewField.getFieldTypeDefinition().getComplexFields().remove(findNestedField(caseViewField, caseFieldDefinition.getId()));
+            caseViewField.getFieldTypeDefinition().getComplexFields().remove(findNestedField(caseViewField, caseField.getId()));
         }
     }
 
-    private List<WizardPage> filterWizardPageFields(CaseUpdateViewEvent caseUpdateViewEvent, List<String> filteredCaseFieldIds) {
-        return caseUpdateViewEvent.getWizardPages()
+    private List<WizardPage> filterWizardPageFields(CaseUpdateViewEvent caseEventTrigger, List<String> filteredCaseFieldIds) {
+        return caseEventTrigger.getWizardPages()
             .stream()
             .map(wizardPage -> {
                 wizardPage.setWizardPageFields(wizardPage.getWizardPageFields()
@@ -435,7 +495,9 @@ public class AccessControlService {
                     })
                     .map(wizardPageField -> {
                         if (!wizardPageField.getComplexFieldOverrides().isEmpty()) {
-                            wizardPageField.setComplexFieldOverrides(filterMissingOverrides(wizardPageField.getComplexFieldOverrides(), wizardPageField.getCaseFieldId(), caseUpdateViewEvent));
+                            wizardPageField.setComplexFieldOverrides(
+                                filterMissingOverrides(wizardPageField.getComplexFieldOverrides(), wizardPageField.getCaseFieldId(), caseEventTrigger)
+                            );
                         }
                         return wizardPageField;
                     })
@@ -445,27 +507,30 @@ public class AccessControlService {
             .collect(toList());
     }
 
-    private List<WizardPageComplexFieldOverride> filterMissingOverrides(List<WizardPageComplexFieldOverride> overrides, String fieldId, final CaseUpdateViewEvent caseUpdateViewEvent) {
+    private List<WizardPageComplexFieldOverride> filterMissingOverrides(List<WizardPageComplexFieldOverride> overrides,
+                                                                        String fieldId,
+                                                                        final CaseUpdateViewEvent caseEventTrigger) {
         return overrides
             .stream()
             .filter(o -> {
-                Optional<CaseViewField> optionalCaseViewField = findCaseViewField(caseUpdateViewEvent.getCaseFields(), fieldId);
+                Optional<CaseViewField> optionalCaseViewField = findCaseViewField(caseEventTrigger.getCaseFields(), fieldId);
                 if (optionalCaseViewField.isPresent()) {
                     return optionalCaseViewField.get().getComplexFieldNestedField(o.getComplexFieldElementId().replace(fieldId + ".", "")).isPresent();
-                } else
+                } else {
                     return false;
+                }
             })
             .collect(toList());
     }
 
     public List<AuditEvent> filterCaseAuditEventsByReadAccess(final List<AuditEvent> auditEvents,
-                                                              final List<CaseEventDefinition> caseEventDefinitionDefinitions,
+                                                              final List<CaseEventDefinition> caseEventDefinitions,
                                                               final Set<String> userRoles) {
         List<AuditEvent> filteredAuditEvents = newArrayList();
         if (auditEvents != null) {
             filteredAuditEvents = auditEvents
                 .stream()
-                .filter(auditEvent -> hasCaseEventWithAccess(userRoles, auditEvent, caseEventDefinitionDefinitions))
+                .filter(auditEvent -> hasCaseEventWithAccess(userRoles, auditEvent, caseEventDefinitions))
                 .collect(toList());
 
         }
@@ -473,8 +538,8 @@ public class AccessControlService {
     }
 
     public List<CaseStateDefinition> filterCaseStatesByAccess(final List<CaseStateDefinition> caseStateDefinitions,
-                                                              final Set<String> userRoles,
-                                                              final Predicate<AccessControlList> access) {
+                                                    final Set<String> userRoles,
+                                                    final Predicate<AccessControlList> access) {
         return caseStateDefinitions
             .stream()
             .filter(caseState -> hasAccessControlList(userRoles,
@@ -483,10 +548,10 @@ public class AccessControlService {
             .collect(toList());
     }
 
-    public List<CaseEventDefinition> filterCaseEventsByAccess(final List<CaseEventDefinition> caseEventDefinitionDefinitions,
-                                                              final Set<String> userRoles,
-                                                              final Predicate<AccessControlList> access) {
-        return caseEventDefinitionDefinitions
+    public List<CaseEventDefinition> filterCaseEventsByAccess(final List<CaseEventDefinition> caseEventDefinitions,
+                                                    final Set<String> userRoles,
+                                                    final Predicate<AccessControlList> access) {
+        return caseEventDefinitions
             .stream()
             .filter(caseEvent -> hasAccessControlList(userRoles,
                 access,
@@ -494,51 +559,42 @@ public class AccessControlService {
             .collect(toList());
     }
 
-    public CaseViewActionableEvent[] filterCaseViewTriggersByCreateAccess(final CaseViewActionableEvent[] caseViewActionableEvents,
-                                                                          final List<CaseEventDefinition> caseEventDefinitionDefinitions,
-                                                                          final Set<String> userRoles) {
-        return stream(caseViewActionableEvents)
-            .filter(caseViewEvent -> hasAccessControlList(userRoles,
+    public CaseViewActionableEvent[] filterCaseViewTriggersByCreateAccess(final CaseViewActionableEvent[] caseViewTriggers,
+                                                                  final List<CaseEventDefinition> caseEventDefinitions,
+                                                                  final Set<String> userRoles) {
+        return stream(caseViewTriggers)
+            .filter(caseViewTrigger -> hasAccessControlList(userRoles,
                 CAN_CREATE,
-                getCaseEventById(caseEventDefinitionDefinitions, caseViewEvent)
+                getCaseEventById(caseEventDefinitions, caseViewTrigger)
                     .map(CaseEventDefinition::getAccessControlLists)
                     .orElse(newArrayList()))
             )
             .toArray(CaseViewActionableEvent[]::new);
     }
 
-    public List<CaseFieldDefinition> filterCaseFieldsByAccess(final List<CaseFieldDefinition> caseFieldDefinitions,
+    private CaseFieldDefinition checkIfChildFilteringRequired(final CaseFieldDefinition caseField,
                                                               final Set<String> userRoles,
                                                               final Predicate<AccessControlList> access) {
-        List<CaseFieldDefinition> filteredCaseFieldDefinitions = newArrayList();
-        if (caseFieldDefinitions != null) {
-            filteredCaseFieldDefinitions = caseFieldDefinitions
-                .stream()
-                .filter(caseField -> caseField.isMetadata() || hasAccessControlList(userRoles,
-                    access,
-                    caseField.getAccessControlLists()))
-                .map(caseField -> checkIfChildFilteringRequired(caseField, userRoles, access))
-                .collect(toList());
-
-        }
-        return filteredCaseFieldDefinitions;
+        return (caseField.isCompoundFieldType() && !caseField.getComplexACLs().isEmpty())
+            ? determineFieldTypeAndCheckChildAccess(caseField, userRoles, access)
+            : caseField;
     }
 
-    private CaseFieldDefinition checkIfChildFilteringRequired(final CaseFieldDefinition caseFieldDefinition, final Set<String> userRoles, final Predicate<AccessControlList> access) {
-        return (caseFieldDefinition.isCompoundFieldType() && !caseFieldDefinition.getComplexACLs().isEmpty()) ? determineFieldTypeAndCheckChildAccess(caseFieldDefinition, userRoles, access) : caseFieldDefinition;
-    }
-
-    private CaseFieldDefinition determineFieldTypeAndCheckChildAccess(final CaseFieldDefinition caseFieldDefinition, final Set<String> userRoles, final Predicate<AccessControlList> access) {
-        if (caseFieldDefinition.getFieldTypeDefinition().getType().equalsIgnoreCase(COMPLEX)) {
-            caseFieldDefinition.getFieldTypeDefinition().setComplexFields(checkSubFieldsAccess(caseFieldDefinition, userRoles, access));
+    private CaseFieldDefinition determineFieldTypeAndCheckChildAccess(final CaseFieldDefinition caseField,
+                                                            final Set<String> userRoles,
+                                                            final Predicate<AccessControlList> access) {
+        if (caseField.getFieldTypeDefinition().getType().equalsIgnoreCase(COMPLEX)) {
+            caseField.getFieldTypeDefinition().setComplexFields(checkSubFieldsAccess(caseField, userRoles, access));
         } else {
-            caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition().setComplexFields(checkSubFieldsAccess(caseFieldDefinition, userRoles, access));
+            caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().setComplexFields(checkSubFieldsAccess(caseField, userRoles, access));
         }
-        return caseFieldDefinition;
+        return caseField;
     }
 
-    private List<CaseFieldDefinition> checkSubFieldsAccess(CaseFieldDefinition caseFieldDefinition, final Set<String> userRoles, final Predicate<AccessControlList> access) {
-        return caseFieldDefinition.getFieldTypeDefinition()
+    private List<CaseFieldDefinition> checkSubFieldsAccess(CaseFieldDefinition caseField,
+                                                           final Set<String> userRoles,
+                                                           final Predicate<AccessControlList> access) {
+        return caseField.getFieldTypeDefinition()
             .getChildren()
             .stream()
             .filter(childField -> hasAccessControlList(userRoles, access, childField.getAccessControlLists()))
@@ -546,19 +602,19 @@ public class AccessControlService {
             .collect(toList());
     }
 
-    private Optional<CaseEventDefinition> getCaseEventById(List<CaseEventDefinition> caseEventDefinitionDefinitions, CaseViewActionableEvent caseViewActionableEvent) {
-        return caseEventDefinitionDefinitions
+    private Optional<CaseEventDefinition> getCaseEventById(List<CaseEventDefinition> caseEventDefinitions, CaseViewActionableEvent caseViewTrigger) {
+        return caseEventDefinitions
             .stream()
-            .filter(event -> hasEqualIds(caseViewActionableEvent, event))
+            .filter(event -> hasEqualIds(caseViewTrigger, event))
             .findAny();
     }
 
-    private boolean hasEqualIds(CaseViewActionableEvent caseViewActionableEvent, CaseEventDefinition event) {
-        return event.getId().equals(caseViewActionableEvent.getId());
+    private boolean hasEqualIds(CaseViewActionableEvent caseViewTrigger, CaseEventDefinition event) {
+        return event.getId().equals(caseViewTrigger.getId());
     }
 
-    private List<AccessControlList> getCaseEventAcls(List<CaseEventDefinition> caseEventDefinitionDefinitions, String eventId) {
-        return caseEventDefinitionDefinitions
+    private List<AccessControlList> getCaseEventAcls(List<CaseEventDefinition> caseEventDefinitions, String eventId) {
+        return caseEventDefinitions
             .stream()
             .filter(caseEventDef -> nonNull(caseEventDef.getAccessControlLists()) && caseEventDef.getId().equals(eventId))
             .map(CaseEventDefinition::getAccessControlLists)
@@ -566,9 +622,9 @@ public class AccessControlService {
     }
 
 
-    private boolean hasCaseEventWithAccess(Set<String> userRoles, AuditEvent auditEvent, List<CaseEventDefinition> caseEventDefinitionDefinitions) {
+    private boolean hasCaseEventWithAccess(Set<String> userRoles, AuditEvent auditEvent, List<CaseEventDefinition> caseEventDefinitions) {
 
-        return caseEventDefinitionDefinitions
+        return caseEventDefinitions
             .stream()
             .anyMatch(caseEventDefinition ->
                 auditEvent.getEventId().equals(caseEventDefinition.getId())
@@ -577,17 +633,21 @@ public class AccessControlService {
                     caseEventDefinition.getAccessControlLists()));
     }
 
-    private boolean valueDifferentAndHasUpdateAccess(JsonNode newData, JsonNode existingData, String newFieldName, final List<CaseFieldDefinition> caseFieldDefinitions, final Set<String> userRoles) {
+    private boolean valueDifferentAndHasUpdateAccess(JsonNode newData,
+                                                     JsonNode existingData,
+                                                     String newFieldName,
+                                                     final List<CaseFieldDefinition> caseFieldDefinitions,
+                                                     final Set<String> userRoles) {
         if (existingData.get(newFieldName).equals(newData.get(newFieldName))) {
             return true;
         }
         Optional<CaseFieldDefinition> fieldOptional = getCaseFieldType(caseFieldDefinitions, newFieldName);
         if (fieldOptional.isPresent()) {
-            CaseFieldDefinition caseFieldDefinition = fieldOptional.get();
-            if (!caseFieldDefinition.isCompoundFieldType()) {
+            CaseFieldDefinition caseField = fieldOptional.get();
+            if (!caseField.isCompoundFieldType()) {
                 return hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_UPDATE, newFieldName);
             } else {
-                return compoundAccessControlService.hasAccessForAction(newData, existingData, caseFieldDefinition, userRoles);
+                return compoundAccessControlService.hasAccessForAction(newData, existingData, caseField, userRoles);
             }
         } else {
             LOG.error("Data submitted for unknown field '{}'", newFieldName);
@@ -599,23 +659,29 @@ public class AccessControlService {
         return StreamSupport.stream(spliteratorUnknownSize(newData.fieldNames(), Spliterator.ORDERED), false);
     }
 
-    private boolean hasCaseEventAccess(String eventId, List<CaseEventDefinition> caseEventDefinitionDefinitions, Set<String> userRoles, Predicate<AccessControlList> criteria) {
-        for (CaseEventDefinition caseEventDefinition : caseEventDefinitionDefinitions) {
-            if (caseEventDefinition.getId().equals(eventId)
-                && hasAccessControlList(userRoles, criteria, caseEventDefinition.getAccessControlLists())) {
+    private boolean hasCaseEventAccess(String eventId,
+                                       List<CaseEventDefinition> caseEventDefinitions,
+                                       Set<String> userRoles,
+                                       Predicate<AccessControlList> criteria) {
+        for (CaseEventDefinition caseEvent : caseEventDefinitions) {
+            if (caseEvent.getId().equals(eventId)
+                && hasAccessControlList(userRoles, criteria, caseEvent.getAccessControlLists())) {
                 return true;
             }
         }
         return false;
     }
 
-    static boolean hasCaseFieldAccess(List<CaseFieldDefinition> caseFieldDefinitions, Set<String> userRoles, Predicate<AccessControlList> criteria, String fieldName) {
+    static boolean hasCaseFieldAccess(List<CaseFieldDefinition> caseFieldDefinitions,
+                                      Set<String> userRoles,
+                                      Predicate<AccessControlList> criteria,
+                                      String fieldName) {
         if (caseFieldDefinitions.isEmpty()) {
             return true;
         }
-        for (CaseFieldDefinition caseFieldDefinition : caseFieldDefinitions) {
-            if (caseFieldDefinition.getId().equals(fieldName)
-                && hasAccessControlList(userRoles, criteria, caseFieldDefinition.getAccessControlLists())) {
+        for (CaseFieldDefinition caseField : caseFieldDefinitions) {
+            if (caseField.getId().equals(fieldName)
+                && hasAccessControlList(userRoles, criteria, caseField.getAccessControlLists())) {
                 return true;
             }
         }

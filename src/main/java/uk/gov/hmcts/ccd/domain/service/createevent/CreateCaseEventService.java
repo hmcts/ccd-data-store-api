@@ -121,7 +121,12 @@ public class CreateCaseEventService {
         final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
         String uid = userAuthorisation.getUserId();
 
-        eventTokenService.validateToken(content.getToken(), uid, caseDetails, caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
+        eventTokenService.validateToken(content.getToken(),
+            uid,
+            caseDetails,
+            caseEventDefinition,
+            caseTypeDefinition.getJurisdictionDefinition(),
+            caseTypeDefinition);
 
         validatePreState(caseDetails, caseEventDefinition);
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
@@ -202,7 +207,10 @@ public class CreateCaseEventService {
             for (Map.Entry<String, JsonNode> field : sanitisedData.entrySet()) {
                 caseDetails.getData().put(field.getKey(), field.getValue());
             }
-            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, caseDetails.getData(), caseDetails.getDataClassification()));
+            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
+                caseTypeDefinition,
+                caseDetails.getData(),
+                caseDetails.getDataClassification()));
         }
         caseDetails.setLastModified(now());
         if (!StringUtils.equalsAnyIgnoreCase(CaseStateDefinition.ANY, caseEventDefinition.getPostState())) {

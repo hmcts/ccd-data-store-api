@@ -68,7 +68,8 @@ public class DocumentSanitiser implements Sanitiser {
             LOG.error(String.format(
                 "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary url missing",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
-            throw new ValidationException(String.format("Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary url missing",
+            throw new ValidationException(String.format(
+                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary url missing",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
 
         }
@@ -79,7 +80,8 @@ public class DocumentSanitiser implements Sanitiser {
             LOG.error(String.format(
                 "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document filename missing",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
-            throw new ValidationException(String.format("Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document filename missing",
+            throw new ValidationException(String.format(
+                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document filename missing",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
 
         }

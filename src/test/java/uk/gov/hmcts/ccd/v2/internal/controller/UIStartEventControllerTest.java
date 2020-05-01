@@ -152,7 +152,8 @@ class UIStartEventControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<CaseUpdateViewEventResource> response = uiStartTriggerController.getCaseUpdateViewEvent(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<CaseUpdateViewEventResource> response = uiStartTriggerController.getCaseUpdateViewEvent(
+                CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
