@@ -1,8 +1,0 @@
-{
-  "_guid_": "S-1055",
-  "_extends_": "F-1004_Test_Base_data",
-  "title": "must successfully create a case with new document uploded",
-  "expectedResponse": {
-    "_extends_": "F-1004_Test_Base_Response_Body"
-  }
-}
