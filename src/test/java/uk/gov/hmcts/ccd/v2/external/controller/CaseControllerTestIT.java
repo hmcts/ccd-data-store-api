@@ -98,7 +98,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     @Ignore("Enabled this once createCase endpoint is merged from  develop branch")
-    public void shouldReturn201WhenPostCreateCaseV21() throws Exception {
+    public void shouldReturn201WhenPostCreateCaseV3() throws Exception {
         final String URL =  "/case-types/" + CASE_TYPE + "/cases";
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
