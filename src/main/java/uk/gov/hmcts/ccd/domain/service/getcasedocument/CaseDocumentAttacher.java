@@ -46,7 +46,7 @@ public class CaseDocumentAttacher {
     Map<String, String> documentAfterCallbackOriginalCopy = new HashMap<>();
     Map<String, JsonNode> recursiveMapForCaseDetailsBefore = new HashMap<>();
     CaseDocumentsMetadata caseDocumentsMetadata = null;
-    Set<String> documentsId = new HashSet();
+    Set<String> existingDocumentsInCase = new HashSet();
 
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
@@ -81,8 +81,19 @@ public class CaseDocumentAttacher {
                 documentsBeforeCallback.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                 ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
-                jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForCreateCase(
-                    Collections.singletonMap(node.getKey(), node.getValue())));
+                if (jsonNode instanceof ArrayNode) {
+                    Iterator<JsonNode>  arrayNode = ((ArrayNode) jsonNode).elements();
+                    while (arrayNode.hasNext()) {
+                        JsonNode arrayNodeElement  = arrayNode.next();
+                        arrayNodeElement.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForCreateCase(
+                            Collections.singletonMap(node.getKey(), node.getValue())));
+
+                    }
+
+                } else {
+                    jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForCreateCase(
+                        Collections.singletonMap(node.getKey(), node.getValue())));
+                }
             }
         });
     }
@@ -96,10 +107,10 @@ public class CaseDocumentAttacher {
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
                 } else if (caseDetailsBefore != null) {
                     existingDocument(caseDetailsBefore.getData(),documentId);
-                    if (documentsId.size() == 0) {
+                    if (existingDocumentsInCase.size() == 0) {
                         throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
                     } else {
-                        documentsId.clear();
+                        existingDocumentsInCase.clear();
                     }
                 }
 
@@ -354,7 +365,7 @@ public class CaseDocumentAttacher {
             if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
                 String existingDocumentId = extractDocumentId(jsonNode);
                 if (newDocumentId.equalsIgnoreCase(existingDocumentId)) {
-                    documentsId.add(newDocumentId);
+                    existingDocumentsInCase.add(newDocumentId);
                 }
 
             } else {
