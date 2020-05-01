@@ -21,7 +21,7 @@ import java.util.*;
 
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEDISPLAY;
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEENTRY;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.*;
 import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_FORMAT;
 import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
@@ -84,13 +84,12 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         return caseViewField;
     }
 
-    @Override
     protected JsonNode executeCollection(JsonNode collectionNode,
                                          CommonField field,
                                          String fieldPath,
                                          WizardPageComplexFieldOverride override,
                                          CommonField topLevelField) {
-        final BaseType collectionFieldType = BaseType.get(field.getFieldType().getCollectionFieldType().getType());
+        final BaseType collectionFieldType = BaseType.get(field.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
         final DisplayContext displayContext = displayContext(topLevelField, override);
 
         if ((field.hasDisplayContextParameter(ENUM_MAP.get(displayContext))
@@ -109,7 +108,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
                             displayContext)
                         : executeComplex(
                             item.get(VALUE),
-                            field.getFieldType().getChildren(),
+                            field.getFieldTypeDefinition().getChildren(),
                             null,
                             fieldPath,
                             topLevelField));

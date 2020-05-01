@@ -9,19 +9,19 @@ import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 @ApiModel(description = "")
 public class CaseTypeTabField implements Serializable, CommonDCPModel {
-    private CaseField caseField = null;
+    private CaseFieldDefinition caseFieldDefinition = null;
     private Integer displayOrder = null;
     private String showCondition = null;
     private String displayContextParameter;
 
     @ApiModelProperty(value = "")
     @JsonProperty("case_field")
-    public CaseField getCaseField() {
-        return caseField;
+    public CaseFieldDefinition getCaseFieldDefinition() {
+        return caseFieldDefinition;
     }
 
-    public void setCaseField(final CaseField caseField) {
-        this.caseField = caseField;
+    public void setCaseFieldDefinition(final CaseFieldDefinition caseFieldDefinition) {
+        this.caseFieldDefinition = caseFieldDefinition;
     }
 
     @ApiModelProperty(value = "")

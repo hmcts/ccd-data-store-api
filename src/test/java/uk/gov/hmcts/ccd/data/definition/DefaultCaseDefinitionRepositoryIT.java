@@ -1,5 +1,17 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import org.hamcrest.collection.IsCollectionWithSize;
+import org.junit.Test;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -9,23 +21,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.Test;
-
-import javax.inject.Inject;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     @Inject
@@ -33,20 +30,20 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldGetCaseTypesForJurisdiction() {
-        final List<CaseType> caseTypes = caseDefinitionRepository.getCaseTypesForJurisdiction("probate");
-        assertEquals("HTTP call results failed", 2, caseTypes.size());
+        final List<CaseTypeDefinition> caseTypeDefinitions = caseDefinitionRepository.getCaseTypesForJurisdiction("probate");
+        assertEquals("HTTP call results failed", 2, caseTypeDefinitions.size());
 
     }
 
     @Test
     public void shouldGetCaseType() {
-        final CaseType caseType = caseDefinitionRepository.getCaseType("TestAddressBookCase");
-        assertEquals("Incorrect Case Type", "TestAddressBookCase", caseType.getId());
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType("TestAddressBookCase");
+        assertEquals("Incorrect Case Type", "TestAddressBookCase", caseTypeDefinition.getId());
     }
 
     @Test
     public void shouldGetBaseTypes() {
-        final List<FieldType> baseTypes = caseDefinitionRepository.getBaseTypes();
+        final List<FieldTypeDefinition> baseTypes = caseDefinitionRepository.getBaseTypes();
 
         assertAll(
             "Assert All of these",
@@ -103,13 +100,13 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldGetJurisdictionsDefinition() {
-        List<Jurisdiction> allJurisdictions = newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
+        List<JurisdictionDefinition> allJurisdictionDefinitions = newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
                 .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
 
         assertAll(
-            () -> assertThat(allJurisdictions, hasSize(3)),
-            () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("SSCS")))),
-            () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("PROBATE"))))
+            () -> assertThat(allJurisdictionDefinitions, hasSize(3)),
+            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
+            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE"))))
         );
     }
 }

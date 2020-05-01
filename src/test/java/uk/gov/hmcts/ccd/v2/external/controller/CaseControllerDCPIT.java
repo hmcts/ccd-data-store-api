@@ -21,7 +21,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 
 import javax.inject.Inject;
 
@@ -172,8 +172,8 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
             .andReturn();
 
         String startTriggerContent = startTriggerResult.getResponse().getContentAsString();
-        UIStartTriggerResource uiStartTriggerResource = mapper.readValue(startTriggerContent, UIStartTriggerResource.class);
-        return uiStartTriggerResource.getCaseEventTrigger().getEventToken();
+        CaseUpdateViewEventResource caseUpdateViewEventResource = mapper.readValue(startTriggerContent, CaseUpdateViewEventResource.class);
+        return caseUpdateViewEventResource.getCaseUpdateViewEvent().getEventToken();
     }
 
     private void assertCaseDataResultSetSize() {

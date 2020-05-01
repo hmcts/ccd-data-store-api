@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
@@ -66,7 +66,7 @@ public class UserProfileEndpointTest extends WireMockBaseTest {
 
         final UserProfile userProfile = mapper.readValue(result.getResponse().getContentAsString(), UserProfile.class);
 
-        final IDAMProperties idamProperties = userProfile.getUser().getIdamProperties();
+        final IdamProperties idamProperties = userProfile.getUser().getIdamProperties();
         assertEquals("123", idamProperties.getId());
         assertEquals("Cloud.Strife@test.com", idamProperties.getEmail());
         assertEquals("Cloud", idamProperties.getForename());

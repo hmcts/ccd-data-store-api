@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
@@ -145,11 +146,11 @@ public abstract class BaseTest {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         jdbcTemplate.queryForList(
-            "SELECT " +
-                "'TRUNCATE TABLE \"' || tablename || '\" CASCADE;' as truncate_statement " +
-            "FROM pg_tables " +
-            "WHERE schemaname = 'public' " +
-            "AND tablename NOT IN ('databasechangeloglock','databasechangelog')"
+            "SELECT "
+                + "'TRUNCATE TABLE \"' || tablename || '\" CASCADE;' as truncate_statement "
+                + "FROM pg_tables "
+                + "WHERE schemaname = 'public' "
+                + "AND tablename NOT IN ('databasechangeloglock','databasechangelog')"
         ).stream()
             .map(resultRow -> resultRow.get("truncate_statement"))
             .forEach(truncateStatement -> jdbcTemplate.execute(truncateStatement.toString()));
@@ -255,29 +256,29 @@ public abstract class BaseTest {
     }
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, Long caseReference, String eventId) {
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
 
-        final CaseType caseType = new CaseType();
-        caseType.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEvent eventTrigger = new CaseEvent();
-        eventTrigger.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdiction, caseType);
+        return eventTokenService.generateToken(userId, getCase(template, caseReference), caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
     }
 
     protected String generateEventTokenNewCase(String userId, String jurisdictionId, String caseTypeId, String eventId) {
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
 
-        final CaseType caseType = new CaseType();
-        caseType.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEvent eventTrigger = new CaseEvent();
-        eventTrigger.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, eventTrigger, jurisdiction, caseType);
+        return eventTokenService.generateToken(userId, caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
     }
 
     protected CaseDetails getCase(JdbcTemplate template, String caseReference) {
@@ -298,7 +299,7 @@ public abstract class BaseTest {
             .next();
     }
 
-    public static List<CaseField> getCaseFieldsFromJson(String json) throws IOException {
-        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+    public static List<CaseFieldDefinition> getCaseFieldsFromJson(String json) throws IOException {
+        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
     }
 }

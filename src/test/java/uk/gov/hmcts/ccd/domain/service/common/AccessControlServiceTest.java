@@ -18,33 +18,33 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldTest.findNestedField;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinitionTest.findNestedField;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseUpdateViewEventBuilder.newCaseUpdateViewEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
 
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.io.IOException;
@@ -232,13 +232,13 @@ public class AccessControlServiceTest {
     }
 
     @Nested
-    @DisplayName("ACL tests - CaseState")
+    @DisplayName("ACL tests - CaseStateDefinition")
     class CanAccessCaseStateWithCriteria_AclTests {
 
         @Test
         @DisplayName("Should not grant access to case state with relevant acl missing")
         void shouldNotGrantAccessToStateIfRelevantACLMissing() {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withState(newState()
                     .withId(STATE_ID1)
                     .withAcl(anAcl().withRole(ROLE_NOT_IN_USER_ROLES).withCreate(true).withRead(true).build())
@@ -258,7 +258,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case state with relevant acl not granting access")
         void shouldNotGrantAccessToStateIfRelevantAclNotGrantingAccess() {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withState(newState()
                     .withId(STATE_ID1)
                     .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES).build())
@@ -278,7 +278,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case state with acl matching")
         void shouldGrantAccessToStateWithAclMatching() {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withState(newState()
                     .withId(STATE_ID1)
                     .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).build())
@@ -298,7 +298,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Shouldn't grant access to state when state is not present in definition")
         void shouldNotGrantAccessToStateIfStateIsNotPresentInDefinition() throws IOException {
-            CaseType caseType = newCaseType().build();
+            CaseTypeDefinition caseType = newCaseType().build();
 
             assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES, CAN_CREATE), is(false));
         }
@@ -306,21 +306,21 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should filter states according to acls")
         void shouldFilterStatesAccordingToACLs() {
-            CaseState caseState1 = newState()
+            CaseStateDefinition caseState1 = newState()
                 .withId(STATE_ID1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withRead(true)
                     .build())
                 .build();
-            CaseState caseState2 = newState()
+            CaseStateDefinition caseState2 = newState()
                 .withId(STATE_ID2)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseState> caseStates = new ArrayList<>(asList(caseState1, caseState2));
-            final List<CaseState> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
+            List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2));
+            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(1)),
@@ -332,26 +332,26 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should filter states out when no matching ACLs")
         void shouldFilterOutStatesWhenNoMatchingACLSs() {
-            CaseState caseState1 = newState()
+            CaseStateDefinition caseState1 = newState()
                 .withId(STATE_ID1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            CaseState caseState2 = newState()
+            CaseStateDefinition caseState2 = newState()
                 .withId(STATE_ID2)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            CaseState caseState3 = newState()
+            CaseStateDefinition caseState3 = newState()
                 .withId("Some State")
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseState> caseStates = new ArrayList<>(asList(caseState1, caseState2, caseState3));
-            final List<CaseState> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
+            List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2, caseState3));
+            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(0)),
@@ -369,7 +369,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should fail to grant access to fields if acls are missing")
         void shouldFailToGrantCreateAccessForGivenFieldsIfOneFieldIsMissingAcls() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .build())
@@ -382,7 +382,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(false));
@@ -391,7 +391,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case fields with relevant acl missing")
         void shouldNotGrantAccessToFieldsIfRelevantAclMissing() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -409,7 +409,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(false));
@@ -418,7 +418,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case fields with relevant acl not granting access")
         void shouldNotGrantAccessToFieldsIfRelevantAclNotGrantingAccess() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -448,7 +448,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(false));
@@ -457,7 +457,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case fields if ACL false and null value")
         void shouldNotGrantAccessToNullValue() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -476,7 +476,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(false));
@@ -485,7 +485,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case fields with acl matching")
         void shouldGrantAccessToFieldsWithAclMatching() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -516,7 +516,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(true));
@@ -525,7 +525,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case fields when field is no present in definition")
         void shouldGrantAccessToFieldsIfFieldNotPresentInDefinition() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
@@ -535,7 +535,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(true));
@@ -549,7 +549,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case fields with text value")
         void shouldGrantAccessToTextValueType() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -566,7 +566,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(true));
@@ -575,7 +575,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case fields if ACL false and empty text")
         void shouldNotGrantAccessToEmptyTextType() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -591,7 +591,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(false));
@@ -605,7 +605,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case fields with collection")
         void shouldGrantAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -644,7 +644,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(true));
@@ -653,7 +653,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case fields if ACL false and empty collection")
         void shouldNotGrantCreateAccessToCollectionTypeIfEmpty() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -669,7 +669,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(false));
@@ -683,7 +683,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case fields with complex object")
         void shouldGrantAccessToComplexType() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -703,7 +703,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(true));
@@ -712,7 +712,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case fields if ACL false and empty object")
         void shouldNotGrantAccessToComplexTypeIfEmpty() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -728,7 +728,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES,
                     CAN_CREATE),
                 is(false));
@@ -742,7 +742,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to field if field acls are missing for update")
         void shouldNotGrantAccessToFieldsIfFieldIsMissingAclsForUpdate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType("Text").build())
@@ -757,7 +757,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to field if field acls are missing for create")
         void shouldNotGrantAccessToFieldsIfFieldIsMissingAclsForCreate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .build())
@@ -771,7 +771,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to field if field acls are missing relevant acl for update")
         void shouldNotGrantAccessToFieldsIfFieldIsMissingRelevantAclForUpdate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType("Text").build())
@@ -792,7 +792,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to field if field acls are missing relevant acl for create")
         void shouldNotGrantAccessToFieldsIfFieldIsMissingRelevantAclForCreate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -812,7 +812,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case field with relevant acl not granting access for update")
         void shouldNotGrantAccessToFieldIfRelevantAclNotGrantingAccessForUpdate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType("Text").build())
@@ -832,7 +832,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case field with relevant acl not granting access for create")
         void shouldNotGrantAccessToFieldIfRelevantAclNotGrantingAccessForCreate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -851,7 +851,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case field if ACL false and null value for update")
         void shouldNotGrantAccessToFieldWithNullValueForUpdate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType("Text").build())
@@ -869,7 +869,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case field if ACL false and null value for create")
         void shouldNotGrantAccessToFieldWithNullValueForCreate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -886,7 +886,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case field if ACL true and field name not matching for update")
         void shouldNotGrantAccessToFieldWithAclAccessGrantedAndFieldNameNotMatchingForUpdate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -906,7 +906,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case field if ACL true and field name not matching for create")
         void shouldNotGrantAccessToFieldWithAclAccessGrantedAndFieldNameNotMatchingForCreate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -926,7 +926,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case field with acl matching for update")
         void shouldGrantAccessToFieldWithAclMatchingForUpdate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType("Text").build())
@@ -945,7 +945,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case field with acl matching for create")
         void shouldGrantAccessToFieldWithAclMatchingForCreate() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -963,7 +963,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not need to grant access to case field if no value change")
         void shouldNotNeedToGrantAccessToFieldIfNoChangeInValue() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -980,7 +980,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case fields if all have access granted")
         void shouldGrantAccessToFieldsIfAllFieldsHaveAccessGranted() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType("Text").build())
@@ -1026,7 +1026,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case fields if a field does not have access granted")
         void shouldNotGrantAccessToFieldsIfOneFieldDoesNotHaveAccessGranted() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType("Text").build())
@@ -1072,7 +1072,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case fields if a field does not have acls")
         void shouldNotGrantAccessToFieldsIfOneFieldDoesNotHaveAcls() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType("Text").build())
@@ -1115,8 +1115,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to event if acls are missing")
         void shouldNotGrantAccessToEventIfEventIsMissingAcls() throws IOException {
-            final CaseType caseType = new CaseType();
-            CaseEvent eventDefinition = new CaseEvent();
+            final CaseTypeDefinition caseType = new CaseTypeDefinition();
+            CaseEventDefinition eventDefinition = new CaseEventDefinition();
             eventDefinition.setId(EVENT_ID);
             caseType.setEvents(Collections.singletonList(eventDefinition));
 
@@ -1132,8 +1132,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to event with relevant acl missing")
         void shouldNotGrantAccessToEventIfRelevantAclMissing() throws IOException {
-            final CaseType caseType = new CaseType();
-            CaseEvent eventDefinition = new CaseEvent();
+            final CaseTypeDefinition caseType = new CaseTypeDefinition();
+            CaseEventDefinition eventDefinition = new CaseEventDefinition();
             eventDefinition.setId(EVENT_ID);
             AccessControlList accessControlList = new AccessControlList();
             accessControlList.setRole(ROLE_NOT_IN_USER_ROLES);
@@ -1154,7 +1154,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to event with relevant acl not granting access")
         void shouldNotGrantAccessToEventIfRelevantAclNotGrantingAccess() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -1175,7 +1175,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to event if ACL false and null value")
         void shouldNotGrantAccessToNullValue() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -1196,7 +1196,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to event if ACL true and event name not matching")
         void shouldNotGrantAccessWithEventNameNotMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -1218,7 +1218,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to event with acl matching")
         void shouldGrantAccessToEventWithAclMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -1249,7 +1249,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case if acls are missing")
         void shouldNotGrantAccessToCaseIfMissingAcls() throws IOException {
-            final CaseType caseType = new CaseType();
+            final CaseTypeDefinition caseType = new CaseTypeDefinition();
 
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
@@ -1262,7 +1262,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case with relevant acl missing")
         void shouldNotGrantAccessToCaseIfRelevantAclMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -1283,7 +1283,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not grant access to case with relevant acl not granting access")
         void shouldNotGrantAccessToCaseIfRelevantAclNotGrantingAccess() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
@@ -1302,7 +1302,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to case with acl matching")
         void shouldGrantAccessToCaseWithAclMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES_3)
                     .build())
@@ -1328,7 +1328,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return data if field acls are missing")
         void shouldNotReturnDataIfCaseFieldIsMissingAcls() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .build())
@@ -1340,7 +1340,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1351,7 +1351,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return data if field with relevant acl missing")
         void shouldNotReturnFieldIfRelevantAclMissing() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1367,7 +1367,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1378,7 +1378,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return data if field with relevant acl not granting access")
         void shouldNotGrantAccessToFieldsIfRelevantAclNotGrantingAccess() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1393,7 +1393,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1404,7 +1404,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return data if field with acl false and null value")
         void shouldNotReturnDataWithAclFalseAndNullValue() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1422,7 +1422,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1433,7 +1433,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return data if field with acl true and field name not matching")
         void shouldNotReturnDataWithAclTrueAndFieldNameNotMatching() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1452,7 +1452,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1463,7 +1463,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return data if field with acl true and null value")
         void shouldReturnDataWithAclTrueAndNullValue() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1482,7 +1482,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1493,7 +1493,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return data if field with acl true and empty value")
         void shouldReturnDataWithAclTrueAndEmptyValue() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1512,7 +1512,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1523,7 +1523,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return data if field with acl matching")
         void shouldGrantAccessToFieldsWithAclMatching() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1542,7 +1542,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1558,7 +1558,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return data if field ACL false and empty text")
         void shouldNotGrantAccessToEmptyTextType() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1573,7 +1573,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1584,7 +1584,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return data with null and empty values on root level")
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1608,7 +1608,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1629,7 +1629,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return data if field with collection")
         void shouldGrantAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1668,7 +1668,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1679,7 +1679,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return data if field and children have ACLs")
         void shouldGrantAccessToCollectionTypeChildren() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
@@ -1707,14 +1707,14 @@ public class AccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseType = newCaseType().withField(people).build();
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleData();
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1735,7 +1735,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should filter data when child doesnot have ACLs")
         void shouldfilterDataWhenChildDoesnotHaveACL() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
@@ -1798,14 +1798,14 @@ public class AccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseType = newCaseType().withField(people).build();
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleData();
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1830,7 +1830,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return data with null and empty values on root level")
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1885,7 +1885,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1916,7 +1916,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return data if field ACL false and empty collection")
         void shouldNotGrantAccessToCollectionTypeIfEmpty() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1931,7 +1931,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1947,7 +1947,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return data if field with complex object")
         void shouldGrantAccessToComplexType() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -1966,7 +1966,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -1977,7 +1977,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return data with null and empty values on root level")
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -2004,7 +2004,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -2018,7 +2018,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return data if field ACL false and empty object")
         void shouldNotGrantAccessToComplexTypeIfEmpty() throws IOException {
-            CaseType caseType = newCaseType()
+            CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -2026,7 +2026,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            List<CaseField> caseFields = newArrayList();
+            List<CaseFieldDefinition> caseFields = newArrayList();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{} }\n"
             ), STRING_JSON_MAP);
@@ -2034,7 +2034,7 @@ public class AccessControlServiceTest {
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
@@ -2050,7 +2050,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return event if event is missing")
         void shouldNotReturnEventIfCaseEventIsMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .build())
@@ -2071,7 +2071,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return audit event if event is missing")
         void shouldNotReturnEventIfCaseEventIsMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .build())
@@ -2087,7 +2087,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return audit event if acls are missing")
         void shouldNotReturnEventIfCaseEventIsMissingAcls() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .build())
@@ -2105,7 +2105,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return audit event if relevant acl missing")
         void shouldNotReturnEventIfRelevantAclMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -2127,7 +2127,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return audit event if relevant acl not granting access")
         void shouldNotReturnEventIfRelevantAclNotGrantingAccess() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -2148,7 +2148,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return audit event if ACL true and event name not matching")
         void shouldNotReturnEventIfRelevantAclGrantingAccessAndEventNameNotMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -2170,7 +2170,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return audit event if acl matching")
         void shouldReturnEventWithAclMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -2193,7 +2193,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return single audit event if acl matching from a group")
         void shouldReturnEventWithAclMatchingFromGroup() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -2223,7 +2223,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return audit events if acls matching")
         void shouldReturnEventsWithAclsMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent().withId(EVENT_ID_WITH_ACCESS)
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
@@ -2285,7 +2285,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag if relevant acl missing")
         void shouldSetReadonlyFlagIfRelevantAclMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType().withType("Text").build())
                     .withId("Addresses")
@@ -2298,7 +2298,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())
@@ -2306,9 +2306,9 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2318,7 +2318,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag for complex children if relevant acl missing")
         void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType()
                         .withType(COMPLEX)
@@ -2363,9 +2363,9 @@ public class AccessControlServiceTest {
                             .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType()
@@ -2393,9 +2393,9 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2409,7 +2409,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not set readonly flag for complex children if relevant acl is there")
         void shouldNotSetReadonlyFlagForComplexChildrenIfRelevantAclIsThere() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType()
                         .withType(COMPLEX)
@@ -2453,9 +2453,9 @@ public class AccessControlServiceTest {
                             .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType()
@@ -2483,9 +2483,9 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2499,7 +2499,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag for complex children and complex field overrides if relevant acl is missing")
         void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclIsMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType()
                         .withType(COMPLEX)
@@ -2543,7 +2543,7 @@ public class AccessControlServiceTest {
                             .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             final CaseViewField caseViewField1 = aViewField()
                 .withFieldType(aFieldType()
@@ -2569,7 +2569,7 @@ public class AccessControlServiceTest {
                     .build())
                 .withId("Addresses")
                 .build();
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(caseViewField1)
                 .withWizardPage(newWizardPage()
                     .withId("Page One")
@@ -2586,9 +2586,9 @@ public class AccessControlServiceTest {
                 )
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2616,7 +2616,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag for collection children if relevant acl missing")
         void shouldSetReadonlyFlagForCollectionChildrenIfRelevantAclMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("AddressCollection")
                     .withFieldType(aFieldType()
@@ -2666,9 +2666,9 @@ public class AccessControlServiceTest {
                             .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(aViewField()
                     .withId("AddressCollection")
                     .withFieldType(aFieldType()
@@ -2698,9 +2698,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2715,7 +2715,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not set readonly flag for collection children if relevant acl is there")
         void shouldNotSetReadonlyFlagForCollectionChildrenIfRelevantAclIsThere() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("AddressCollection")
                     .withFieldType(aFieldType()
@@ -2765,9 +2765,9 @@ public class AccessControlServiceTest {
                             .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(aViewField()
                     .withId("AddressCollection")
                     .withFieldType(aFieldType()
@@ -2797,9 +2797,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2820,7 +2820,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag if relevant acl not granting access")
         void shouldSetReadonlyFlagIfRelevantAclNotGrantingAccess() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType().withType("Text").build())
                     .withId("Addresses")
@@ -2829,7 +2829,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())
@@ -2837,9 +2837,9 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2849,7 +2849,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag if ACL true and event name not matching")
         void shouldSetReadonlyFlagIfRelevantAclGrantingAccessAndEventNameNotMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
                     .withAcl(anAcl()
@@ -2858,16 +2858,16 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withId("DifferentAddresses")
                         .build())
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2877,7 +2877,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not set readonly flag if acl matching")
         void shouldNotSetReadonlyFlagIfAclMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType().withType("Text").build())
                     .withId("Addresses")
@@ -2887,7 +2887,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())
@@ -2895,9 +2895,9 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2907,7 +2907,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not set readonly flag if acl matching in acls group")
         void shouldNotSetReadonlyFlagIfAclMatchingInAclsGroup() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType().withType("Text").build())
                     .withId("Addresses")
@@ -2925,7 +2925,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())
@@ -2933,8 +2933,8 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                caseType.getCaseFields(),
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
@@ -2945,7 +2945,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not set readonly flags if acls matching in fields group")
         void shouldNotSetReadonlyFlagsIfAclsMatchingInCaseViewFieldsGroup() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType().withType("Text").build())
                     .withId("Addresses")
@@ -2981,7 +2981,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
                 .withField(
                     aViewField()
                         .withFieldType(aFieldType().withType("Text").build())
@@ -3004,8 +3004,8 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseEventTrigger actual = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                caseType.getCaseFields(),
+            CaseUpdateViewEvent actual = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
             assertAll(
@@ -3029,7 +3029,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return case event definition if relevant acl missing")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -3044,13 +3044,13 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE),
-                is(emptyCollectionOf(CaseEvent.class)));
+                is(emptyCollectionOf(CaseEventDefinition.class)));
         }
 
         @Test
         @DisplayName("Should not return case event definition if relevant acl not granting access")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclNotGrantingAccess() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -3065,13 +3065,13 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE),
-                is(emptyCollectionOf(CaseEvent.class)));
+                is(emptyCollectionOf(CaseEventDefinition.class)));
         }
 
         @Test
         @DisplayName("Should return case event definition if acl matching")
         void shouldReturnCaseEventDefinitionWithAclMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -3081,7 +3081,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -3094,7 +3094,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return single case event definition if acl matching from a group")
         void shouldReturnCaseEventDefinitionWithAclMatchingFromGroup() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -3112,7 +3112,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
             assertAll(
@@ -3124,7 +3124,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return case event definition if acls matching")
         void shouldReturnCaseEventDefinitionWithAclsMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID_WITH_ACCESS)
                     .withAcl(anAcl()
@@ -3156,7 +3156,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
             assertAll(
@@ -3174,7 +3174,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not return case event definition if relevant acl missing")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -3189,13 +3189,13 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE),
-                is(emptyCollectionOf(CaseEvent.class)));
+                is(emptyCollectionOf(CaseEventDefinition.class)));
         }
 
         @Test
         @DisplayName("Should not return case event definition if relevant acl not granting access")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclNotGrantingAccess() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -3210,13 +3210,13 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE),
-                is(emptyCollectionOf(CaseEvent.class)));
+                is(emptyCollectionOf(CaseEventDefinition.class)));
         }
 
         @Test
         @DisplayName("Should return case event definition if acl matching")
         void shouldReturnCaseEventDefinitionWithAclMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -3226,7 +3226,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
 
@@ -3239,7 +3239,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return single case event definition if acl matching from a group")
         void shouldReturnCaseEventDefinitionWithAclMatchingFromGroup() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID)
                     .withAcl(anAcl()
@@ -3257,7 +3257,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
             assertAll(
@@ -3269,7 +3269,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should return case event definition if acls matching")
         void shouldReturnCaseEventDefinitionWithAclsMatching() throws IOException {
-            final CaseType caseType = newCaseType()
+            final CaseTypeDefinition caseType = newCaseType()
                 .withEvent(newCaseEvent()
                     .withId(EVENT_ID_WITH_ACCESS)
                     .withAcl(anAcl()
@@ -3301,7 +3301,7 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
                 USER_ROLES,
                 CAN_CREATE);
             assertAll(
@@ -3370,8 +3370,8 @@ public class AccessControlServiceTest {
 
         private String collEnd = "      ]\n }\n";
 
-        private CaseField addressField;
-        private CaseType caseType;
+        private CaseFieldDefinition addressField;
+        private CaseTypeDefinition caseType;
 
         @BeforeEach
         void setUp() throws IOException {
@@ -3385,14 +3385,14 @@ public class AccessControlServiceTest {
                     .withCreate(true)
                     .build())
                 .build();
-            addressField.getFieldType().setCollectionFieldType(getSimpleAddressFieldType());
+            addressField.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getSimpleAddressFieldType());
 
             caseType = newCaseType()
                 .withField(addressField)
                 .build();
         }
 
-        private FieldType getSimpleAddressFieldType() {
+        private FieldTypeDefinition getSimpleAddressFieldType() {
             return aFieldType()
                 .withId("Address")
                 .withType(COMPLEX)
@@ -3407,7 +3407,7 @@ public class AccessControlServiceTest {
                 .build();
         }
 
-        private CaseField getNotesFieldDefinition() {
+        private CaseFieldDefinition getNotesFieldDefinition() {
             return newCaseField()
                 .withId("Notes")
                 .withFieldType(aFieldType()
@@ -3434,7 +3434,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should fail if the caseField not found")
         void shouldFailIfCaseFieldDoesNotExist() throws IOException {
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -3448,13 +3448,13 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow creation of new items on collection")
         void shouldGrantCreateAccessToCollectionType() throws IOException {
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(true));
         }
@@ -3462,13 +3462,13 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow creation of new items on collection even when no Id provided")
         void shouldGrantCreateAccessToCollectionTypeWOutId() throws IOException {
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChildWithNoIdTag + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(true));
         }
@@ -3477,13 +3477,13 @@ public class AccessControlServiceTest {
         @DisplayName("Should not allow creation of new items on collection")
         void shouldNotGrantCreateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(false).build()));
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(false));
         }
@@ -3493,13 +3493,13 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow update of items on collection")
         void shouldGrantUpdateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withUpdate(true).build()));
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(true));
         }
@@ -3508,14 +3508,14 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow update of items on collection along with creation")
         void shouldGrantUpdateAndCreateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).withUpdate(true).build()));
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1Updated + comma + child2 + comma + newChildWithNoIdTag
                         + comma + newChild + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(true));
         }
@@ -3524,13 +3524,13 @@ public class AccessControlServiceTest {
         @DisplayName("Should not allow update of items on collection")
         void shouldNotGrantUpdateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withUpdate(false).build()));
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(false));
         }
@@ -3539,13 +3539,13 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow deletion of items on collection")
         void shouldGrantDeleteAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withDelete(true).build()));
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1 + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(true));
         }
@@ -3554,13 +3554,13 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow deletion of items on collection along with creation")
         void shouldGrantDeleteAndCreateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).withDelete(true).build()));
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1 + comma + newChildWithNoIdTag + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(true));
         }
@@ -3569,13 +3569,13 @@ public class AccessControlServiceTest {
         @DisplayName("Should not allow deletion of items on collection")
         void shouldNotGrantDeleteAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withDelete(false).build()));
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1 + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(false));
         }
@@ -3585,14 +3585,14 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow creation, updating and deletion of items on collection")
         void shouldGrantUpdateDeleteAndCreateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).withUpdate(true).withDelete(true).build()));
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1Updated + comma + child2 + comma
                         + newChildWithNoIdTag + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    caseType.getCaseFieldDefinitions(),
                     USER_ROLES),
                 is(true));
         }
@@ -3603,12 +3603,12 @@ public class AccessControlServiceTest {
         return MAPPER.convertValue(newData, JsonNode.class);
     }
 
-    private void assertFieldsAccess(boolean hasFieldAccess, CaseType caseType, JsonNode newDataNode, JsonNode existingDataNode) {
+    private void assertFieldsAccess(boolean hasFieldAccess, CaseTypeDefinition caseType, JsonNode newDataNode, JsonNode existingDataNode) {
         assertThat(
             accessControlService.canAccessCaseFieldsForUpsert(
                 newDataNode,
                 existingDataNode,
-                caseType.getCaseFields(),
+                caseType.getCaseFieldDefinitions(),
                 USER_ROLES),
             is(hasFieldAccess));
     }
@@ -3617,19 +3617,19 @@ public class AccessControlServiceTest {
         return JSON_NODE_FACTORY.textNode(value);
     }
 
-    static CaseField getPeopleCollectionFieldDefinition() {
-        CaseField caseField = newCaseField()
+    static CaseFieldDefinition getPeopleCollectionFieldDefinition() {
+        CaseFieldDefinition caseField = newCaseField()
             .withId("People")
             .withFieldType(aFieldType()
                 .withId("G339483948")
                 .withType(COLLECTION)
                 .build())
             .build();
-        caseField.getFieldType().setCollectionFieldType(getPersonFieldType());
+        caseField.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
         return caseField;
     }
 
-    static FieldType getPersonFieldType() {
+    static FieldTypeDefinition getPersonFieldType() {
         return aFieldType()
             .withId("Person")
             .withType(COMPLEX)
@@ -3653,19 +3653,19 @@ public class AccessControlServiceTest {
             .build();
     }
 
-    static CaseField getAddressesCollectionFieldDefinition() {
-        CaseField caseField = newCaseField()
+    static CaseFieldDefinition getAddressesCollectionFieldDefinition() {
+        CaseFieldDefinition caseField = newCaseField()
             .withId("Addresses")
             .withFieldType(aFieldType()
                 .withId("Addresses-XYZT")
                 .withType(COLLECTION)
                 .build())
             .build();
-        caseField.getFieldType().setCollectionFieldType(getAddressFieldType());
+        caseField.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getAddressFieldType());
         return caseField;
     }
 
-    static CaseField getBirtInfoComplexField() {
+    static CaseFieldDefinition getBirtInfoComplexField() {
         return newCaseField()
             .withId("BirthInfo")
             .withFieldType(aFieldType()
@@ -3693,7 +3693,7 @@ public class AccessControlServiceTest {
             .build();
     }
 
-    static FieldType getAddressFieldType() {
+    static FieldTypeDefinition getAddressFieldType() {
         return aFieldType()
             .withId("AddressComplexType")
             .withType(COMPLEX)
@@ -3711,7 +3711,7 @@ public class AccessControlServiceTest {
             .build();
     }
 
-    static FieldType getAddressDetailFieldType() {
+    static FieldTypeDefinition getAddressDetailFieldType() {
         return aFieldType()
             .withId("AddressDetailComplexType")
             .withType(COMPLEX)
@@ -3746,15 +3746,15 @@ public class AccessControlServiceTest {
             .build();
     }
 
-    static CaseField getNotesCollectionFieldDefinition() {
-        CaseField notes = newCaseField()
+    static CaseFieldDefinition getNotesCollectionFieldDefinition() {
+        CaseFieldDefinition notes = newCaseField()
             .withId("Notes")
             .withFieldType(aFieldType()
                 .withId("Notes-EREJRKf")
                 .withType(COLLECTION)
                 .build())
             .build();
-        notes.getFieldType().setCollectionFieldType(aFieldType()
+        notes.getFieldTypeDefinition().setCollectionFieldTypeDefinition(aFieldType()
             .withId("Note")
             .withType(COMPLEX)
             .withComplexField(newCaseField()
@@ -3769,15 +3769,15 @@ public class AccessControlServiceTest {
         return notes;
     }
 
-    static CaseField getTagFieldDefinition() {
-        CaseField tagsField = newCaseField()
+    static CaseFieldDefinition getTagFieldDefinition() {
+        CaseFieldDefinition tagsField = newCaseField()
             .withId("Tags")
             .withFieldType(aFieldType()
                 .withId("Tag-EREJRKf")
                 .withType(COLLECTION)
                 .build())
             .build();
-        tagsField.getFieldType().setCollectionFieldType(aFieldType()
+        tagsField.getFieldTypeDefinition().setCollectionFieldTypeDefinition(aFieldType()
             .withId("TagComplex")
             .withType(COMPLEX)
             .withComplexField(newCaseField()

@@ -54,10 +54,10 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -788,7 +788,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
+        final StartEventResult startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
         assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
         assertTrue("No token", !startEventTrigger.getToken().isEmpty());
     }
@@ -876,7 +876,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
+        final StartEventResult startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
         assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
         assertTrue("No token", !startEventTrigger.getToken().isEmpty());
     }
@@ -937,7 +937,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
+        final StartEventResult startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
         assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
         assertTrue("No token", !startEventTrigger.getToken().isEmpty());
     }
@@ -960,7 +960,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final StartEventTrigger startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventTrigger.class);
+        final StartEventResult startEventTrigger = mapper.readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
         assertEquals("Incorrect Data content", mapper.convertValue(EXPECTED_MODIFIED_DATA, STRING_NODE_TYPE), startEventTrigger.getCaseDetails().getData());
         assertTrue("No token", !startEventTrigger.getToken().isEmpty());
     }
@@ -1186,9 +1186,9 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenPostCreateEventWithInvalidCallbackDataForCaseworker() throws Exception {
-        final CaseType caseType = new CaseType();
+        final CaseTypeDefinition caseType = new CaseTypeDefinition();
         caseType.setId(CASE_TYPE_ID);
-        final Jurisdiction jurisdiction = new Jurisdiction();
+        final JurisdictionDefinition jurisdiction = new JurisdictionDefinition();
         jurisdiction.setId(JURISDICTION_ID);
         final String URL =
             String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
@@ -1224,9 +1224,9 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenPostCreateEventWithInvalidCallbackDataForCitizen() throws Exception {
-        final CaseType caseType = new CaseType();
+        final CaseTypeDefinition caseType = new CaseTypeDefinition();
         caseType.setId(CASE_TYPE_ID);
-        final Jurisdiction jurisdiction = new Jurisdiction();
+        final JurisdictionDefinition jurisdiction = new JurisdictionDefinition();
         jurisdiction.setId(JURISDICTION_ID);
         final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 

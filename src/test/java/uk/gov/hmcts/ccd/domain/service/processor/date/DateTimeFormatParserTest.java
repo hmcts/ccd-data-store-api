@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
@@ -19,8 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DATE;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DATETIME;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class DateTimeFormatParserTest {
@@ -372,7 +371,7 @@ class DateTimeFormatParserTest {
     @Test
     void shouldThrowErrorForInvalidBaseType_ToIso() {
         DataProcessingException exception = assertThrows(DataProcessingException.class,
-            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(FieldType.COLLECTION), "FieldId", "dd/MM/yyyy", true)
+            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(COLLECTION), "FieldId", "dd/MM/yyyy", true)
         );
 
         assertAll(
@@ -408,7 +407,7 @@ class DateTimeFormatParserTest {
     @Test
     void shouldThrowErrorForInvalidBaseType_FromIso() {
         DataProcessingException exception = assertThrows(DataProcessingException.class,
-            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(FieldType.COLLECTION), "FieldId", "dd/MM/yyyy", false)
+            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(COLLECTION), "FieldId", "dd/MM/yyyy", false)
         );
 
         assertAll(
@@ -441,7 +440,7 @@ class DateTimeFormatParserTest {
         );
     }
 
-    private FieldType fieldType(String fieldType) {
+    private FieldTypeDefinition fieldType(String fieldType) {
         return aFieldType().withType(fieldType).build();
     }
 

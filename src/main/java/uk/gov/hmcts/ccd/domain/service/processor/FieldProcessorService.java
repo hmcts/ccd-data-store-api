@@ -32,8 +32,8 @@ public class FieldProcessorService {
     }
 
     public List<CaseViewField> processCaseViewFields(final List<CaseViewField> fields,
-                                                     final CaseType caseType,
-                                                     final CaseEvent event) {
+                                                     final CaseTypeDefinition caseType,
+                                                     final CaseEventDefinition event) {
         return fields.stream()
             .map(field -> processCaseViewField(field, getWizardPageFields(caseType.getId(), event.getId())))
             .collect(Collectors.toList());
@@ -57,19 +57,19 @@ public class FieldProcessorService {
     }
 
     public Map<String, JsonNode> processData(final Map<String, JsonNode> data,
-                                             final CaseType caseType,
-                                             final CaseEvent event) {
+                                             final CaseTypeDefinition caseTypeDefinition,
+                                             final CaseEventDefinition caseEventDefinition) {
         if (MapUtils.isEmpty(data)) {
             return data;
         }
 
-        final List<WizardPageField> wizardPageFields = getWizardPageFields(caseType.getId(), event.getId());
+        final List<WizardPageField> wizardPageFields = getWizardPageFields(caseTypeDefinition.getId(), caseEventDefinition.getId());
 
         Map<String, JsonNode> processedData = new HashMap<>();
 
         data.forEach((fieldId, node) -> {
-            final Optional<CaseField> caseField = caseType.getCaseField(fieldId);
-            final Optional<CaseEventField> caseEventField = event.getCaseEventField(fieldId);
+            final Optional<CaseFieldDefinition> caseField = caseTypeDefinition.getCaseField(fieldId);
+            final Optional<CaseEventFieldDefinition> caseEventField = caseEventDefinition.getCaseEventField(fieldId);
 
             if (!isNullOrEmpty(node) && caseField.isPresent() && caseEventField.isPresent()) {
                 for (CaseDataFieldProcessor processor : caseDataFieldProcessors) {
@@ -84,9 +84,9 @@ public class FieldProcessorService {
     }
 
     public Map<String, JsonNode> processData(final Map<String, JsonNode> data,
-                                             final CaseType caseType,
+                                             final CaseTypeDefinition caseTypeDefinition,
                                              final String eventId) {
-        return processData(data, caseType, eventTriggerService.findCaseEvent(caseType, eventId));
+        return processData(data, caseTypeDefinition, eventTriggerService.findCaseEvent(caseTypeDefinition, eventId));
     }
 
     private List<WizardPageField> getWizardPageFields(String caseTypeId, String eventId) {

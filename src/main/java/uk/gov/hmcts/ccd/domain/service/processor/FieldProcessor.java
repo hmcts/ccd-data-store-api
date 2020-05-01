@@ -3,14 +3,17 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import java.util.Optional;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
-
-import java.util.List;
-import java.util.Optional;
 
 public abstract class FieldProcessor {
 
@@ -23,21 +26,24 @@ public abstract class FieldProcessor {
         this.caseViewFieldBuilder = caseViewFieldBuilder;
     }
 
-    public JsonNode execute(JsonNode node, CaseField caseField, CaseEventField caseEventField, WizardPageField wizardPageField) {
+    public JsonNode execute(JsonNode node,
+                            CaseFieldDefinition caseField,
+                            CaseEventFieldDefinition caseEventField,
+                            WizardPageField wizardPageField) {
         CaseViewField caseViewField = caseViewFieldBuilder.build(caseField, caseEventField);
 
         if (caseViewField.isComplexFieldType()) {
-            return executeComplex(node, caseField.getFieldType().getComplexFields(), wizardPageField, caseField.getId(), caseViewField);
+            return executeComplex(node, caseField.getFieldTypeDefinition().getComplexFields(), wizardPageField, caseField.getId(), caseViewField);
         } else if (caseViewField.isCollectionFieldType()) {
             return executeCollection(node, caseViewField, caseField.getId(), null, caseViewField);
         } else {
-            return executeSimple(node, caseViewField, BaseType.get(caseViewField.getFieldType().getType()),
+            return executeSimple(node, caseViewField, BaseType.get(caseViewField.getFieldTypeDefinition().getType()),
                 caseField.getId(), null, caseViewField);
         }
     }
 
     protected JsonNode executeComplex(JsonNode complexNode,
-                                      List<CaseField> complexCaseFields,
+                                      List<CaseFieldDefinition> complexCaseFields,
                                       WizardPageField wizardPageField,
                                       String fieldPrefix,
                                       CommonField topLevelField) {
@@ -60,7 +66,7 @@ public abstract class FieldProcessor {
                 ));
             } else if (complexCaseField.isComplexFieldType()) {
                 JsonNode resultNode = executeComplex(caseFieldNode,
-                    complexCaseField.getFieldType().getComplexFields(),
+                    complexCaseField.getFieldTypeDefinition().getComplexFields(),
                     wizardPageField,
                     fieldPath,
                     topLevelField);
@@ -69,7 +75,7 @@ public abstract class FieldProcessor {
                 }
             } else {
                 newNode.set(fieldId, executeSimple(
-                    caseFieldNode, complexCaseField, BaseType.get(complexCaseField.getFieldType().getType()),
+                    caseFieldNode, complexCaseField, BaseType.get(complexCaseField.getFieldTypeDefinition().getType()),
                     fieldPath, wizardPageComplexFieldOverride(wizardPageField, fieldPath).orElse(null), topLevelField
                 ));
             }

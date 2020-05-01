@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -25,7 +25,7 @@ public class MoneyGBPValidator implements BaseTypeValidator {
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
-                                           final CaseField caseFieldDefinition) {
+                                           final CaseFieldDefinition caseFieldDefinition) {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
@@ -39,15 +39,17 @@ public class MoneyGBPValidator implements BaseTypeValidator {
                                                                       dataFieldId));
             }
             numberValue = Long.valueOf(value);
-            if (!checkMax(caseFieldDefinition.getFieldType().getMax(), numberValue)) {
+            if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), numberValue)) {
                 return Collections.singletonList(
-                    new ValidationResult("Should be less than or equal to " + convertToSterlingString(caseFieldDefinition.getFieldType().getMax()), dataFieldId)
+                    new ValidationResult("Should be less than or equal to "
+                        + convertToSterlingString(caseFieldDefinition.getFieldTypeDefinition().getMax()), dataFieldId)
                 );
             }
 
-            if (!checkMin(caseFieldDefinition.getFieldType().getMin(), numberValue)) {
+            if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), numberValue)) {
                 return Collections.singletonList(
-                    new ValidationResult("Should be more than or equal to " + convertToSterlingString(caseFieldDefinition.getFieldType().getMin()), dataFieldId)
+                    new ValidationResult("Should be more than or equal to "
+                        + convertToSterlingString(caseFieldDefinition.getFieldTypeDefinition().getMin()), dataFieldId)
                 );
             }
         } catch (NumberFormatException e) {

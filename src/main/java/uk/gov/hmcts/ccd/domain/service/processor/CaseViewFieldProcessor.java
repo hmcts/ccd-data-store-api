@@ -18,16 +18,15 @@ public abstract class CaseViewFieldProcessor extends FieldProcessor {
         } else if (caseViewField.isCollectionFieldType()) {
             return executeCollection(caseViewField);
         } else {
-            return executeSimple(caseViewField, BaseType.get(caseViewField.getFieldType().getType()));
+            return executeSimple(caseViewField, BaseType.get(caseViewField.getFieldTypeDefinition().getType()));
         }
     }
 
     protected CaseViewField executeComplex(CaseViewField caseViewField, WizardPageField wizardPageField, String fieldPrefix, CaseViewField topLevelField) {
         caseViewField.setFormattedValue(
             caseViewField.getValue() instanceof ObjectNode
-                ? executeComplex(
-                    (ObjectNode) caseViewField.getValue(),
-                    caseViewField.getFieldType().getComplexFields(),
+                ? executeComplex((ObjectNode) caseViewField.getValue(),
+                    caseViewField.getFieldTypeDefinition().getComplexFields(),
                     wizardPageField,
                     fieldPrefix,
                     topLevelField)

@@ -19,8 +19,8 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import static java.time.temporal.ChronoField.*;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DATE;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DATETIME;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
 
 @Component
 @Slf4j

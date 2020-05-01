@@ -25,7 +25,7 @@ class SearchResultUtil {
         }
 
         @SuppressWarnings("checkstyle:MethodName") // method naming predates checkstyle implementation in module
-        static SearchResultUtil.SearchResultBuilder aSearchResult() {
+        static SearchResultUtil.SearchResultBuilder searchResult() {
             return new SearchResultBuilder();
         }
 

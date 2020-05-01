@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -86,9 +86,9 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
 
         String content = result.getResponse().getContentAsString();
-        UIStartTriggerResource uiStartTriggerResource = mapper.readValue(content, UIStartTriggerResource.class);
+        CaseUpdateViewEventResource caseUpdateViewEventResource = mapper.readValue(content, CaseUpdateViewEventResource.class);
 
-        List<CaseViewField> caseFields = uiStartTriggerResource.getCaseEventTrigger().getCaseFields();
+        List<CaseViewField> caseFields = caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields();
 
         CaseViewField textField = caseFields.get(1);
         CaseViewField dateField = caseFields.get(2);
@@ -106,15 +106,15 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
                 new String[]{"2004-03-02T05:06:07.000", "2010-09-08T11:12:13.000"},
                 new String[]{"20040506", "20101112"}),
 
-            () -> assertThat(complexField.getFieldType().getChildren().get(0).getId(), is(COMPLEX_DATE_TIME_FIELD)),
-            () -> assertThat(complexField.getFieldType().getChildren().get(0).getDisplayContextParameter(), 
+            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(0).getId(), is(COMPLEX_DATE_TIME_FIELD)),
+            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(0).getDisplayContextParameter(),
                 is("#DATETIMEDISPLAY(yyyy),#DATETIMEENTRY(MM-yyyy)")),
             () -> assertThat(mapOf(complexField.getValue()).get(COMPLEX_DATE_TIME_FIELD), is("2005-03-28T07:45:30.000")),
             () -> assertThat(mapOf(complexField.getFormattedValue()).get(COMPLEX_DATE_TIME_FIELD), is("03-2005")),
 
-            () -> assertThat(complexField.getFieldType().getChildren().get(1).getFieldType().getChildren().get(0)
+            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(0)
                 .getId(), is(NESTED_NUMBER_FIELD)),
-            () -> assertThat(complexField.getFieldType().getChildren().get(1).getFieldType().getChildren().get(0)
+            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(0)
                 .getDisplayContextParameter(), is("#DATETIMEDISPLAY(dd MM yyyy),#DATETIMEENTRY(HHmm)")),
             () -> assertThat(mapOf(mapOf(complexField.getValue()).get(COMPLEX_NESTED_FIELD))
                 .get(NESTED_NUMBER_FIELD), is(nullValue())),
@@ -136,21 +136,21 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
 
     private void assertComplexCollectionDCP(CaseViewField caseViewField) {
         assertAll(
-            () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(0).getDisplayContextParameter(),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(0).getDisplayContextParameter(),
                 is("#DATETIMEENTRY(dd-MM-yyyy),#DATETIMEDISPLAY(dd-MM-yyyy)")),
-            () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(1).getDisplayContextParameter(),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(1).getDisplayContextParameter(),
                 is("#DATETIMEENTRY(yyyy-MM-dd'T'HH:mm),#DATETIMEDISPLAY(yyyy-MM-dd'T'HH:mm)")),
-            () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(2).getDisplayContextParameter(),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(2).getDisplayContextParameter(),
                 is((String) null)),
-            () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(3).getDisplayContextParameter(),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(3).getDisplayContextParameter(),
                 is((String) null)),
-            () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(4).getFieldType()
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(4).getFieldTypeDefinition()
                 .getChildren().get(0).getDisplayContextParameter(), is("#DATETIMEENTRY(MM-yyyy),#DATETIMEDISPLAY(MM-yyyy)")),
-            () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(4).getFieldType()
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(4).getFieldTypeDefinition()
                 .getChildren().get(1).getDisplayContextParameter(), is("#DATETIMEENTRY(yyyy-MM-dd),#DATETIMEDISPLAY(yyyy-MM-dd)")),
-            () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(4).getFieldType()
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(4).getFieldTypeDefinition()
                 .getChildren().get(2).getDisplayContextParameter(), is((String) null)),
-            () -> assertThat(caseViewField.getFieldType().getCollectionFieldType().getChildren().get(4).getFieldType()
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(4).getFieldTypeDefinition()
                 .getChildren().get(3).getDisplayContextParameter(), is((String) null))
         );
     }

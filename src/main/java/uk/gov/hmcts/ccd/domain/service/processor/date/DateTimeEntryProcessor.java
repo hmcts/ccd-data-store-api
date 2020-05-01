@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEENTRY;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.*;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 
 @Component
@@ -54,7 +54,7 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
                                          String fieldPath,
                                          WizardPageComplexFieldOverride override,
                                          CommonField topLevelField) {
-        final BaseType collectionFieldType = BaseType.get(field.getFieldType().getCollectionFieldType().getType());
+        final BaseType collectionFieldType = BaseType.get(field.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
 
         if ((field.hasDisplayContextParameter(DATETIMEENTRY)
             && isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES))
@@ -65,7 +65,7 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
                 ((ObjectNode)newItem).replace(VALUE,
                     isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
                         ? createNode(field, item.get(VALUE).asText(), collectionFieldType, fieldPath)
-                        : executeComplex(item.get(VALUE), field.getFieldType().getChildren(), null, fieldPath, topLevelField));
+                        : executeComplex(item.get(VALUE), field.getFieldTypeDefinition().getChildren(), null, fieldPath, topLevelField));
                 newNode.add(newItem);
             });
 

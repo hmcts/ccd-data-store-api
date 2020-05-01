@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEDISPLAY;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DATETIME;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
 import static uk.gov.hmcts.ccd.domain.service.processor.FieldProcessor.isNullOrEmpty;
 import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
@@ -66,7 +66,10 @@ public class DateTimeSearchResultProcessor {
         } else if (object instanceof ArrayNode && !isNullOrEmpty((ArrayNode) object)) {
             return createArrayNodeFrom((ArrayNode) object, viewColumn, viewColumn.getCaseFieldId());
         } else if (object instanceof ObjectNode && !isNullOrEmpty((ObjectNode) object)) {
-            return createObjectNodeFrom((ObjectNode) object, viewColumn, viewColumn.getCaseFieldType().getComplexFields(), viewColumn.getCaseFieldId());
+            return createObjectNodeFrom((ObjectNode) object,
+                viewColumn, 
+                viewColumn.getCaseFieldTypeDefinition().getComplexFields(),
+                viewColumn.getCaseFieldId());
         } else if (object instanceof LocalDateTime) {
             return createTextNodeFrom(new TextNode(((LocalDateTime) object)
                 .format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT))), viewColumn, viewColumn.getCaseFieldId());
@@ -77,7 +80,7 @@ public class DateTimeSearchResultProcessor {
 
     private JsonNode createObjectNodeFrom(final ObjectNode originalNode,
                                           final SearchResultViewColumn viewColumn,
-                                          final List<CaseField> complexCaseFields,
+                                          final List<CaseFieldDefinition> complexCaseFields,
                                           final String fieldPrefix) {
         if (isNullOrEmpty(originalNode)) {
             return originalNode;
@@ -96,7 +99,7 @@ public class DateTimeSearchResultProcessor {
                     createArrayNodeFrom((ArrayNode) caseFieldNode, viewColumn, fieldPath));
             } else if (complexCaseField.isComplexFieldType()) {
                 Optional.ofNullable(
-                    createObjectNodeFrom((ObjectNode) caseFieldNode, viewColumn, complexCaseField.getFieldType().getComplexFields(), fieldPath))
+                    createObjectNodeFrom((ObjectNode) caseFieldNode, viewColumn, complexCaseField.getFieldTypeDefinition().getComplexFields(), fieldPath))
                     .ifPresent(result -> newNode.set(fieldId, result));
             } else {
                 newNode.set(fieldId, createTextNodeFrom((TextNode) caseFieldNode, viewColumn, fieldPath));
@@ -113,17 +116,17 @@ public class DateTimeSearchResultProcessor {
             return new TextNode(originalNode.asText());
         }
 
-        final Optional<CommonField> nestedField = viewColumn.getCaseFieldType().getNestedField(fieldPath, true);
+        final Optional<CommonField> nestedField = viewColumn.getCaseFieldTypeDefinition().getNestedField(fieldPath, true);
         final CommonDCPModel dcpObject = nestedField.map(CommonDCPModel.class::cast).orElse(viewColumn);
 
         return dcpObject.getDisplayContextParameter(DATETIMEDISPLAY)
             .map(dcp -> {
                 final String fieldType = nestedField
-                    .map(CommonField::getFieldType)
-                    .map(FieldType::getType)
+                    .map(CommonField::getFieldTypeDefinition)
+                    .map(FieldTypeDefinition::getType)
                     .orElseGet(() -> {
-                        FieldType collectionFieldType = viewColumn.getCaseFieldType().getCollectionFieldType();
-                        return collectionFieldType == null ? viewColumn.getCaseFieldType().getType() : collectionFieldType.getType();
+                        FieldTypeDefinition collectionFieldType = viewColumn.getCaseFieldTypeDefinition().getCollectionFieldTypeDefinition();
+                        return collectionFieldType == null ? viewColumn.getCaseFieldTypeDefinition().getType() : collectionFieldType.getType();
                     });
                 if (fieldType.equals(DATETIME) || viewColumn.isMetadata()) {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDateTime(dcp.getValue(), originalNode.asText()));
@@ -144,7 +147,7 @@ public class DateTimeSearchResultProcessor {
                     ? createTextNodeFrom((TextNode) item.get(VALUE), viewColumn, fieldPrefix)
                     : createObjectNodeFrom((ObjectNode) item.get(VALUE),
                                            viewColumn,
-                                           viewColumn.getCaseFieldType().getChildren(),
+                                           viewColumn.getCaseFieldTypeDefinition().getChildren(),
                                            fieldPrefix));
             newNode.add(newItem);
         });

@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
@@ -45,7 +45,7 @@ public class CallbackService {
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public Optional<CallbackResponse> send(final String url,
-                                           final CaseEvent caseEvent,
+                                           final CaseEventDefinition caseEvent,
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails,
                                            final Boolean ignoreWarning) {
@@ -56,7 +56,7 @@ public class CallbackService {
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public <T> ResponseEntity<T> send(final String url,
-                                      final CaseEvent caseEvent,
+                                      final CaseEventDefinition caseEvent,
                                       final CaseDetails caseDetailsBefore,
                                       final CaseDetails caseDetails,
                                       final Class<T> clazz) {
@@ -64,7 +64,7 @@ public class CallbackService {
     }
 
     public Optional<CallbackResponse> sendSingleRequest(final String url,
-                                                        final CaseEvent caseEvent,
+                                                        final CaseEventDefinition caseEvent,
                                                         final CaseDetails caseDetailsBefore,
                                                         final CaseDetails caseDetails,
                                                         final Boolean ignoreWarning) {
@@ -80,7 +80,7 @@ public class CallbackService {
     }
 
     public <T> ResponseEntity<T> sendSingleRequest(final String url,
-                                                   final CaseEvent caseEvent,
+                                                   final CaseEventDefinition caseEvent,
                                                    final CaseDetails caseDetailsBefore,
                                                    final CaseDetails caseDetails,
                                                    final Class<T> clazz) {

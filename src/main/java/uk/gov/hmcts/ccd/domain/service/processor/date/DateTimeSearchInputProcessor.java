@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCriteriaOperation;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEENTRY;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.*;
 import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_FORMAT;
 import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_TIME_FORMAT;
 
@@ -111,7 +111,7 @@ public class DateTimeSearchInputProcessor {
 
         if (field.isPresent() && field.get().hasDisplayContextParameter(DATETIMEENTRY)) {
             newParams.put(fieldPath,
-                processValue(fieldPath, field.get(), queryValue, field.get().getFieldType()));
+                processValue(fieldPath, field.get(), queryValue, field.get().getFieldTypeDefinition()));
         } else {
             newParams.put(fieldPath, queryValue);
         }
@@ -122,14 +122,14 @@ public class DateTimeSearchInputProcessor {
         return splitPath.length > 1 && Ints.tryParse(splitPath[1]) == null;
     }
 
-    private String processValue(String id, CommonDCPModel dcpObject, String value, FieldType fieldType) {
+    private String processValue(String id, CommonDCPModel dcpObject, String value, FieldTypeDefinition fieldType) {
         try {
             if (fieldType.getType().equals(DATE)) {
                 return dateTimeFormatParser.convertDateToIso8601(format(dcpObject, fieldType), value);
             } else if (fieldType.getType().equals(DATETIME)) {
                 return dateTimeFormatParser.convertDateTimeToIso8601(format(dcpObject, fieldType), value);
             } else if (fieldType.isCollectionFieldType()) {
-                return processValue(id, dcpObject, value, fieldType.getCollectionFieldType());
+                return processValue(id, dcpObject, value, fieldType.getCollectionFieldTypeDefinition());
             } else {
                 return value;
             }
@@ -143,7 +143,7 @@ public class DateTimeSearchInputProcessor {
         }
     }
 
-    private String format(CommonDCPModel dcpObject, FieldType fieldType) {
+    private String format(CommonDCPModel dcpObject, FieldTypeDefinition fieldType) {
         return dcpObject.getDisplayContextParameterValue(DATETIMEENTRY)
             .orElseGet(() -> fieldType.getType().equals(DATE) ? DATE_FORMAT : DATE_TIME_FORMAT);
     }

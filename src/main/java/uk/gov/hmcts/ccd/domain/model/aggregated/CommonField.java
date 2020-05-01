@@ -1,18 +1,17 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
-import java.util.List;
-import java.util.Optional;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 public interface CommonField extends CommonDCPModel {
 
-    FieldType getFieldType();
+    FieldTypeDefinition getFieldTypeDefinition();
 
     String getId();
 
@@ -30,12 +29,12 @@ public interface CommonField extends CommonDCPModel {
 
     @JsonIgnore
     default boolean isCollectionFieldType() {
-        return getFieldType().isCollectionFieldType();
+        return getFieldTypeDefinition().isCollectionFieldType();
     }
 
     @JsonIgnore
     default boolean isComplexFieldType() {
-        return getFieldType().isComplexFieldType();
+        return getFieldTypeDefinition().isComplexFieldType();
     }
 
     @JsonIgnore
@@ -61,6 +60,7 @@ public interface CommonField extends CommonDCPModel {
         if (StringUtils.isBlank(path)) {
             return Optional.of(this);
         }
-        return this.getFieldType().getNestedField(path, false);
+        return this.getFieldTypeDefinition().getNestedField(path, false);
     }
+
 }

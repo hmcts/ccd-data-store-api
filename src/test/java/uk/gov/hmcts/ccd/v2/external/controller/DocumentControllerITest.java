@@ -49,50 +49,50 @@ public class DocumentControllerITest extends WireMockBaseTest {
     private WebApplicationContext wac;
     private MockMvc mockMvc;
     protected static final ObjectMapper mapper = new ObjectMapper();
-    private String caseTypeResponseString = "{\n" +
-        "      \"id\": \"TestAddressBookCase\",\n" +
-        "      \"version\": {\n" +
-        "        \"number\": 1,\n" +
-        "        \"live_from\": \"2017-01-01\"\n" +
-        "      },\n" +
-        "      \"name\": \"Test Address Book Case\",\n" +
-        "      \"description\": \"Test Address Book Case\",\n" +
-        "      \"printable_document_url\": \"http://localhost:%s/printables\",\n" +
-        "      \"jurisdiction\": {\n" +
-        "        \"id\": \"PROBATE\",\n" +
-        "        \"name\": \"Test\",\n" +
-        "        \"description\": \"Test Jurisdiction\"\n" +
-        "      },\n" +
-        "      \"security_classification\": \"PUBLIC\",\n" +
-        "      \"acls\": [\n" +
-        "        {\n" +
-        "          \"role\": \"caseworker-probate-public\",\n" +
-        "          \"create\": true,\n" +
-        "          \"read\": true,\n" +
-        "          \"update\": true,\n" +
-        "          \"delete\": false\n" +
-        "        },\n" +
-        "        {\n" +
-        "          \"role\": \"caseworker-probate-private\",\n" +
-        "          \"create\": true,\n" +
-        "          \"read\": true,\n" +
-        "          \"update\": true,\n" +
-        "          \"delete\": false\n" +
-        "        },\n" +
-        "        {\n" +
-        "          \"role\": \"citizen\",\n" +
-        "          \"create\": true,\n" +
-        "          \"read\": true,\n" +
-        "          \"update\": true,\n" +
-        "          \"delete\": false\n" +
-        "        }],\n" +
-        "      \"events\": [\n" +
-        "      ],\n" +
-        "      \"states\": [\n" +
-        "      ],\n" +
-        "      \"case_fields\": [\n" +
-        "      ]\n" +
-        "    }";
+    private String caseTypeResponseString = "{\n"
+        + "      \"id\": \"TestAddressBookCase\",\n"
+        + "      \"version\": {\n"
+        + "        \"number\": 1,\n"
+        + "        \"live_from\": \"2017-01-01\"\n"
+        + "      },\n"
+        + "      \"name\": \"Test Address Book Case\",\n"
+        + "      \"description\": \"Test Address Book Case\",\n"
+        + "      \"printable_document_url\": \"http://localhost:%s/printables\",\n"
+        + "      \"jurisdiction\": {\n"
+        + "        \"id\": \"PROBATE\",\n"
+        + "        \"name\": \"Test\",\n"
+        + "        \"description\": \"Test Jurisdiction\"\n"
+        + "      },\n"
+        + "      \"security_classification\": \"PUBLIC\",\n"
+        + "      \"acls\": [\n"
+        + "        {\n"
+        + "          \"role\": \"caseworker-probate-public\",\n"
+        + "          \"create\": true,\n"
+        + "          \"read\": true,\n"
+        + "          \"update\": true,\n"
+        + "          \"delete\": false\n"
+        + "        },\n"
+        + "        {\n"
+        + "          \"role\": \"caseworker-probate-private\",\n"
+        + "          \"create\": true,\n"
+        + "          \"read\": true,\n"
+        + "          \"update\": true,\n"
+        + "          \"delete\": false\n"
+        + "        },\n"
+        + "        {\n"
+        + "          \"role\": \"citizen\",\n"
+        + "          \"create\": true,\n"
+        + "          \"read\": true,\n"
+        + "          \"update\": true,\n"
+        + "          \"delete\": false\n"
+        + "        }],\n"
+        + "      \"events\": [\n"
+        + "      ],\n"
+        + "      \"states\": [\n"
+        + "      ],\n"
+        + "      \"case_fields\": [\n"
+        + "      ]\n"
+        + "    }";
 
     @Inject
     protected DataSource db;
