@@ -1,5 +1,5 @@
-@F-1003
-Feature: F-1003: Submit Case Creation (V3)
+@F-1003-V3
+Feature: F-1003-V3: Submit Case Creation (V3)
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source

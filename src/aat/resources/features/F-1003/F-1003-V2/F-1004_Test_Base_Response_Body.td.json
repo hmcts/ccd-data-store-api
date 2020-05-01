@@ -1,0 +1,93 @@
+{
+  "_guid_": "F-1004_Test_Base_Response_Body",
+  "_extends_": "Common_201_Response",
+  "body": {
+    "_links" : {
+      "self" : {
+        "href" : "{{TEST_URL}}/case-types/BEFTA_CASETYPE_2_1/cases{?ignore-warning}"
+      }
+    },
+    "id" : "[[ANYTHING_PRESENT]]",
+    "jurisdiction" : "BEFTA_JURISDICTION_2",
+    "case_type" : "BEFTA_CASETYPE_2_1",
+    "created_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+    "last_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+    "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+    "state" : "TODO",
+    "security_classification" : "PUBLIC",
+    "data" : {
+      "MoneyGBPField" : null,
+      "FixedListField" : "VALUE2",
+      "AddressUKField" : {
+        "County" : null,
+        "Country" : null,
+        "PostCode" : null,
+        "PostTown" : null,
+        "AddressLine1" : null,
+        "AddressLine2" : null,
+        "AddressLine3" : null
+      },
+      "DocumentField1" : {
+        "document_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+        "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][_embedded][documents][0][originalDocumentName]}",
+        "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
+      },
+      "ComplexField" : {
+        "ComplexTextField" : "aefaefa",
+        "ComplexNestedField" : {
+          "NestedNumberField" : null,
+          "NestedCollectionTextField" : [ ]
+        },
+        "ComplexFixedListField" : "VALUE2"
+      },
+      "FixedRadioListField" : "RADIOVALUE3",
+      "DateTimeField" : null,
+      "PhoneUKField" : "08888899999",
+      "NumberField" : "11111",
+      "MultiSelectListField" : [ "OPTION5", "OPTION4", "OPTION3" ],
+      "YesOrNoField" : "No",
+      "EmailField" : "a@b.com",
+      "TextField" : "A text fields",
+      "DateField" : null,
+      "TextAreaField" : "fqeadadfTSFGsfs`f`sfs`f",
+      "CollectionField" : [ ]
+    },
+    "data_classification" : {
+      "MoneyGBPField" : "PUBLIC",
+      "FixedListField" : "PUBLIC",
+      "AddressUKField" : {
+        "classification" : "PUBLIC",
+        "value" : {
+          "County" : "PUBLIC",
+          "Country" : "PUBLIC",
+          "PostCode" : "PUBLIC",
+          "PostTown" : "PUBLIC",
+          "AddressLine1" : "PUBLIC",
+          "AddressLine2" : "PUBLIC",
+          "AddressLine3" : "PUBLIC"
+        }
+      },
+      "DocumentField1" : "PUBLIC",
+      "FixedRadioListField" : "PUBLIC",
+      "DateTimeField" : "PUBLIC",
+      "PhoneUKField" : "PUBLIC",
+      "NumberField" : "PUBLIC",
+      "MultiSelectListField" : "PUBLIC",
+      "YesOrNoField" : "PUBLIC",
+      "EmailField" : "PUBLIC",
+      "TextField" : "PUBLIC",
+      "DateField" : "PUBLIC",
+      "TextAreaField" : "PUBLIC",
+      "CollectionField" : {
+        "classification" : "PUBLIC",
+        "value" : [ ]
+      }
+    },
+    "after_submit_callback_response" : null,
+    "callback_response_status_code" : null,
+    "callback_response_status" : null,
+    "delete_draft_response_status_code" : null,
+    "delete_draft_response_status" : null
+  }
+
+}
