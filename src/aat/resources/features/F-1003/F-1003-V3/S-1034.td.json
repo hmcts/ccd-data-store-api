@@ -1,6 +1,6 @@
 {
   "_guid_": "S-1034",
-  "_extends_": "F-1003_Test_Base_data",
+  "_extends_": "F-1003-V3_Test_Base_data",
   "title": "must get an error response for a non-existing Hashtoken",
   "specs": [
     "contains a non-existing Hashtoken"

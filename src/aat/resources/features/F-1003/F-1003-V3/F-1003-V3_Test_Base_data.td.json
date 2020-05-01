@@ -1,6 +1,6 @@
 {
-  "_guid_": "F-1003_Test_Base_data",
-  "_extends_": "F-1003-Base-Root",
+  "_guid_": "F-1003-V3_Test_Base_data",
+  "_extends_": "F-1003-V3-Base-Root",
   "productName": "CCD Data Store",
   "operationName": "Submit Case Creation (V3)",
   "specs": [

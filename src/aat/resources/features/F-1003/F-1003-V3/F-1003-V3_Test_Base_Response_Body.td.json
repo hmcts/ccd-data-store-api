@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1003_Test_Base_Response_Body",
+  "_guid_": "F-1003-V3_Test_Base_Response_Body",
   "_extends_": "Common_201_Response",
   "body": {
     "_links" : {
