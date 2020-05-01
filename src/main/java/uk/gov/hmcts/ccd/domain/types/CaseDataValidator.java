@@ -39,9 +39,9 @@ public class CaseDataValidator {
     public List<ValidationResult> validate(final Map<String, JsonNode> data,
                                            final List<CaseField> caseFieldDefinitions,
                                            final String fieldIdPrefix) {
-        return (data == null) ?
-            new ArrayList<>() :
-            data.entrySet().stream()
+        return (data == null)
+            ? new ArrayList<>()
+            : data.entrySet().stream()
                 .map(caseDataPair -> caseFieldDefinitions.stream()
                     .filter(caseField -> caseField.getId().equalsIgnoreCase(caseDataPair.getKey()))
                     .findAny()

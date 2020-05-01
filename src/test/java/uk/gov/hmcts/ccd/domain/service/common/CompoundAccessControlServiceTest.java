@@ -326,7 +326,10 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2, newPerson), dataNode, people, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2, newPerson), dataNode, people, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
@@ -415,7 +418,10 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
             String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + "," + newAddress1 + addressEnd + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
@@ -439,7 +445,10 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
             String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWIdWNewlyAddedTags + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
@@ -463,7 +472,10 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
             String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWIdWNewlyAddedTags + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES),
+                is(false)
+            );
         }
 
         @Test
@@ -487,7 +499,10 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
             String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + "," + newAddress1 + addressEnd + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES),
+                is(false)
+            );
         }
 
         @Test
@@ -515,7 +530,10 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2, newPerson), dataNode, people, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2, newPerson), dataNode, people, USER_ROLES),
+                is(false)
+            );
         }
     }
 
@@ -591,8 +609,8 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + addressesStart + existingAddress1 + addressEnd + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart + addressesStart +
-                existingAddress1Line1Updated + addressEnd + personEnd), dataNode, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart + addressesStart
+                + existingAddress1Line1Updated + addressEnd + personEnd), dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
@@ -613,7 +631,8 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1Line1Updated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1Line1Updated + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1Line1Updated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
@@ -641,7 +660,8 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1Line1Updated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1Line1Updated + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1Line1Updated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
         }
@@ -666,11 +686,11 @@ class CompoundAccessControlServiceTest {
             final CaseType caseType = newCaseType().withField(people).build();
             caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
-            String p = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + p2Notes + p2End;
-            JsonNode dataNode = generatePeopleDataWithPerson(p);
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + p2Notes + p2End;
+            JsonNode dataNode = generatePeopleDataWithPerson(p2);
 
-            String pUpdated = p2Start + p2Names + addressesStart + newAddress1 + "," + p2Address1 + "," + p2Address2 + addressEnd + "," + p2Notes + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(pUpdated), dataNode, people, USER_ROLES), is(true));
+            String p2Updated = p2Start + p2Names + addressesStart + newAddress1 + "," + p2Address1 + "," + p2Address2 + addressEnd + "," + p2Notes + p2End;
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(p2Updated), dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
@@ -708,7 +728,8 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
@@ -748,7 +769,8 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
@@ -798,7 +820,8 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
@@ -838,7 +861,8 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1NullLine1 + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
@@ -878,7 +902,8 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
         }
@@ -918,7 +943,8 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1NullLine1 + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
         }
@@ -995,7 +1021,8 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
         }
@@ -1127,7 +1154,10 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
             String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWIdDeletedTags + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
@@ -1151,7 +1181,10 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
             String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWIdDeletedTags + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES),
+                is(false)
+            );
         }
     }
 
@@ -1426,7 +1459,7 @@ class CompoundAccessControlServiceTest {
         private CaseField note;
 
         @BeforeEach
-        void Setup() {
+        void setup() {
             note = newCaseField()
                 .withId("Note")
                 .withFieldType(aFieldType()
@@ -1457,7 +1490,10 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWOutTags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
@@ -1472,7 +1508,10 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithMultipleNewTags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
@@ -1487,7 +1526,12 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsAndANewTag + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsAndANewTag + noteEnd), dataNode, note, USER_ROLES
+                ),
+                is(true)
+            );
         }
 
         @Test
@@ -1502,7 +1546,10 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWOutTags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES),
+                is(false)
+            );
 
         }
 
@@ -1518,7 +1565,12 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsAndANewTag + noteEnd), dataNode, note, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsAndANewTag + noteEnd), dataNode, note, USER_ROLES
+                ),
+                is(false)
+            );
         }
 
         @Test
@@ -1533,7 +1585,12 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsUpdated + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsUpdated + noteEnd), dataNode, note, USER_ROLES
+                ),
+                is(true)
+            );
         }
 
         @Test
@@ -1548,7 +1605,12 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsUpdated + noteEnd), dataNode, note, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsUpdated + noteEnd), dataNode, note, USER_ROLES
+                ),
+                is(false)
+            );
         }
 
         @Test
@@ -1563,7 +1625,12 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsOneDeleted + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsOneDeleted + noteEnd), dataNode, note, USER_ROLES
+                ),
+                is(true)
+            );
         }
 
         @Test
@@ -1578,7 +1645,12 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsOneDeleted + noteEnd), dataNode, note, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsOneDeleted + noteEnd), dataNode, note, USER_ROLES
+                ),
+                is(false)
+            );
         }
     }
 

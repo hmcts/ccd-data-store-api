@@ -41,11 +41,15 @@ public class NumberValidator implements BaseTypeValidator {
                 numberValue = new BigDecimal(value);
             }
             if (!checkMax(caseFieldDefinition.getFieldType().getMax(), numberValue)) {
-                return Collections.singletonList(new ValidationResult("Should be less than or equal to " + caseFieldDefinition.getFieldType().getMax(), dataFieldId));
+                return Collections.singletonList(
+                    new ValidationResult("Should be less than or equal to " + caseFieldDefinition.getFieldType().getMax(), dataFieldId)
+                );
             }
 
             if (!checkMin(caseFieldDefinition.getFieldType().getMin(), numberValue)) {
-                return Collections.singletonList(new ValidationResult("Should be more than or equal to " + caseFieldDefinition.getFieldType().getMin(), dataFieldId));
+                return Collections.singletonList(
+                    new ValidationResult("Should be more than or equal to " + caseFieldDefinition.getFieldType().getMin(), dataFieldId)
+                );
             }
 
             if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), value)) {

@@ -83,8 +83,8 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
             return Optional.empty();
         }
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ) ||
-            !accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseType, userRoles, CAN_READ)) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)
+            || !accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseType, userRoles, CAN_READ)) {
             return Optional.empty();
         }
 

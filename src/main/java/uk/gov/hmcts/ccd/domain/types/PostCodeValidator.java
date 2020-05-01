@@ -53,9 +53,9 @@ public class PostCodeValidator implements BaseTypeValidator {
 
         final String userRegex = caseFieldDefinition.getFieldType().getRegularExpression();
         if (userRegex != null && userRegex.length() > 0) {
-            return (value.matches(userRegex)) ?
-                Collections.emptyList() :
-                Collections.singletonList((new ValidationResult(REGEX_GUIDANCE, dataFieldId)));
+            return (value.matches(userRegex))
+                ? Collections.emptyList()
+                : Collections.singletonList((new ValidationResult(REGEX_GUIDANCE, dataFieldId)));
         }
 
         final String baseTypeRegex = getType().getRegularExpression();

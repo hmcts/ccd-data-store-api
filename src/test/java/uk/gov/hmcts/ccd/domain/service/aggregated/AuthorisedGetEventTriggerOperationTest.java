@@ -345,7 +345,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                                  eq(CAN_UPDATE)),
                 () -> inOrder.verify(accessControlService)
                     .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(userRoles))
-                     );
+            );
         }
 
         @Test

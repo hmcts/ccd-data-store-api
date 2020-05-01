@@ -84,8 +84,7 @@ class QueryEndpointTest {
 
     @Test
     void shouldFailIfAccessParamInvalid() {
-        assertThrows(ResourceNotFoundException.class,
-                     () -> queryEndpoint.getCaseTypes(JURISDICTION_ID, "INVALID"));
+        assertThrows(ResourceNotFoundException.class, () -> queryEndpoint.getCaseTypes(JURISDICTION_ID, "INVALID"));
     }
 
     @Test

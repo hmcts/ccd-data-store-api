@@ -58,13 +58,13 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     }
 
     @Override
-    public Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId) {
-        return auditEventRepository.findByEventId(eventId).map(Optional::of)
-            .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
+    public List<AuditEvent> getEvents(String caseReference) {
+        return getEvents(caseReference, () -> String.format(CASE_RESOURCE_NOT_FOUND, caseReference));
     }
 
     @Override
-    public List<AuditEvent> getEvents(String caseReference) {
-        return getEvents(caseReference, () -> String.format(CASE_RESOURCE_NOT_FOUND, caseReference));
+    public Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId) {
+        return auditEventRepository.findByEventId(eventId).map(Optional::of)
+            .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
 }

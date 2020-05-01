@@ -130,8 +130,10 @@ class PostCodeValidatorTest {
     @Test
     void testInvalidMin() {
         final CaseField caseField = caseField().withMin(5).build();
-        final JsonNode INVALID_MIN = NODE_FACTORY.textNode("Test");
-        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, INVALID_MIN, caseField);
+        final JsonNode invalidMin = NODE_FACTORY.textNode("Test");
+
+        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMin, caseField);
+
         assertEquals(1, validationResults.size(), "Did not catch min");
         assertEquals("Post code 'Test' requires minimum length 5", validationResults.get(0).getErrorMessage());
         assertEquals(FIELD_ID, validationResults.get(0).getFieldId());
@@ -140,8 +142,10 @@ class PostCodeValidatorTest {
     @Test
     void testInvalidMax() {
         final CaseField caseField = caseField().withMax(6).build();
-        final JsonNode INVALID_MAX = NODE_FACTORY.textNode("Test Test Test");
-        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, INVALID_MAX, caseField);
+        final JsonNode invalidMax = NODE_FACTORY.textNode("Test Test Test");
+
+        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMax, caseField);
+
         assertEquals(1, validationResults.size(), "Did not catch max");
         assertEquals("Post code 'Test Test Test' exceeds maximum length 6", validationResults.get(0).getErrorMessage());
         assertEquals(FIELD_ID, validationResults.get(0).getFieldId());

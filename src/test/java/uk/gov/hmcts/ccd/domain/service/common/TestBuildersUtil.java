@@ -68,6 +68,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
+@SuppressWarnings("checkstyle:MethodName") // method naming predates checkstyle implementation in module
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -312,8 +313,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CreateCaseDraftBuilder withTTLDays(Integer TTLDays) {
-            this.createCaseDraftRequest.setMaxTTLDays(TTLDays);
+        public CreateCaseDraftBuilder withTTLDays(Integer ttlDays) {
+            this.createCaseDraftRequest.setMaxTTLDays(ttlDays);
             return this;
         }
 
@@ -1319,15 +1320,15 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public WorkbasketInputBuilder withShowCondition(String showCondition) {
-            field.setShowCondition(showCondition);
+        public WorkbasketInputBuilder withFieldId(String fieldId, String elementPath) {
+            field.setId(fieldId);
+            field.setElementPath(elementPath);
             this.workbasketInput.setField(field);
             return this;
         }
 
-        public WorkbasketInputBuilder withFieldId(String fieldId, String elementPath) {
-            field.setId(fieldId);
-            field.setElementPath(elementPath);
+        public WorkbasketInputBuilder withShowCondition(String showCondition) {
+            field.setShowCondition(showCondition);
             this.workbasketInput.setField(field);
             return this;
         }
@@ -1371,6 +1372,13 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public SearchInputBuilder withFieldId(String fieldId, String elementPath) {
+            field.setId(fieldId);
+            field.setElementPath(elementPath);
+            this.searchInput.setField(field);
+            return this;
+        }
+
         public SearchInputBuilder withShowCondition(String showCondition) {
             field.setShowCondition(showCondition);
             this.searchInput.setField(field);
@@ -1379,13 +1387,6 @@ public class TestBuildersUtil {
 
         public SearchInputBuilder withDisplayContextParameter(String displayContextParameter) {
             this.searchInput.setDisplayContextParameter(displayContextParameter);
-            return this;
-        }
-
-        public SearchInputBuilder withFieldId(String fieldId, String elementPath) {
-            field.setId(fieldId);
-            field.setElementPath(elementPath);
-            this.searchInput.setField(field);
             return this;
         }
 

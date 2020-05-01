@@ -79,7 +79,7 @@ public class SearchInputProcessor {
                         processValue(id, input.getDisplayContextParameter(),
                             metadata.getOptionalMetadata(field).get(), input.getField().getType()));
                 }
-        });
+            });
 
         return metadata;
     }
@@ -141,8 +141,8 @@ public class SearchInputProcessor {
         return DisplayContextParameter
             .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
             .map(DisplayContextParameter::getValue)
-            .orElseGet(() -> fieldType.getType().equals(FieldType.DATE) ?
-                DateTimeFormatParser.DATE_FORMAT :
-                DateTimeFormatParser.DATE_TIME_FORMAT);
+            .orElseGet(() -> fieldType.getType().equals(FieldType.DATE)
+                ? DateTimeFormatParser.DATE_FORMAT
+                : DateTimeFormatParser.DATE_TIME_FORMAT);
     }
 }

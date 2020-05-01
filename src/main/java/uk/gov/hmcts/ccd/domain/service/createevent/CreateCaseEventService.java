@@ -202,7 +202,9 @@ public class CreateCaseEventService {
             for (Map.Entry<String, JsonNode> field : sanitisedData.entrySet()) {
                 caseDetails.getData().put(field.getKey(), field.getValue());
             }
-            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification()));
+            caseDetails.setDataClassification(
+                caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification())
+            );
         }
         caseDetails.setLastModified(now());
         if (!StringUtils.equalsAnyIgnoreCase(CaseState.ANY, caseEvent.getPostState())) {

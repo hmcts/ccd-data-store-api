@@ -52,16 +52,16 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     }
 
     @Override
-    public List<CaseState> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
-        CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction);
-        return filterCaseStatesForUser(caseType.getStates(), access);
-    }
-
-    @Override
     public List<String> getUserAuthorisedCaseStateIds(String caseTypeId, Predicate<AccessControlList> access) {
         CaseType caseType = caseTypeService.getCaseType(caseTypeId);
         List<CaseState> caseStates = filterCaseStatesForUser(caseType.getStates(), access);
         return collectCaseStateIds(caseStates);
+    }
+
+    @Override
+    public List<CaseState> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
+        CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction);
+        return filterCaseStatesForUser(caseType.getStates(), access);
     }
 
     private boolean verifyAclOnCaseType(CaseType caseType, Predicate<AccessControlList> access) {

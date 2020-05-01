@@ -83,8 +83,7 @@ class DocumentControllerTest {
     void caseReferenceNotValid() {
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
-        assertThrows(BadRequestException.class,
-                     () -> documentController.getDocuments(CASE_REFERENCE));
+        assertThrows(BadRequestException.class, () -> documentController.getDocuments(CASE_REFERENCE));
     }
 
     @Test
@@ -92,8 +91,7 @@ class DocumentControllerTest {
     void shouldPropagateExceptionWhenThrown() {
         when(documentController.getDocuments(CASE_REFERENCE)).thenThrow(RuntimeException.class);
 
-        assertThrows(RuntimeException.class,
-                     () -> documentController.getDocuments(CASE_REFERENCE));
+        assertThrows(RuntimeException.class, () -> documentController.getDocuments(CASE_REFERENCE));
     }
 
 }

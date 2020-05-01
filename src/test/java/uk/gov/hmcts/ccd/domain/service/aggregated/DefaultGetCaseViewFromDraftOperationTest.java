@@ -204,7 +204,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     @Nested
     @DisplayName("field of CaseHistoryViewer field type")
-    class CaseHistoryViewer_FieldType {
+    class CaseHistoryViewerFieldType {
         @Test
         @DisplayName("should hydrate case history viewer if CaseHistoryViewer field type present in tabs")
         void shouldHydrateCaseHistoryViewerIfFieldPresentInTabs() {
@@ -269,7 +269,8 @@ class DefaultGetCaseViewFromDraftOperationTest {
                 .build())
                 .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseType.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            caseType.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER)
+                .build()).build()));
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
