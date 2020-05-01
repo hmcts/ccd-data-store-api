@@ -1572,7 +1572,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .param("case.DateTimeField", "1999")
             .param("case.CollectionField.0.value", "02031994")
             .param("case.ComplexField.ComplexDateTimeField", "01-2004")
-//            .param("last_modified_date", "22-04-20") // Uncomment after RDM-8269
+            // .param("last_modified_date", "22-04-20") // Uncomment after RDM-8269
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();

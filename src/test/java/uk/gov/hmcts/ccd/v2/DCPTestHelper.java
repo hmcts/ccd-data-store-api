@@ -18,6 +18,10 @@ public class DCPTestHelper {
     public static final String STANDARD_DATE_TIME = "StandardDateTime";
     public static final String COMPLEX_FIELD = "ComplexField";
 
+    private DCPTestHelper() {
+        // Utility class
+    }
+
     public static String jsonPath(String... elements) {
         return "/" + String.join("/", elements);
     }

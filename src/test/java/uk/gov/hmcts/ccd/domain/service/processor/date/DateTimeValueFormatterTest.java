@@ -18,7 +18,6 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import java.io.IOException;
-import java.time.DateTimeException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

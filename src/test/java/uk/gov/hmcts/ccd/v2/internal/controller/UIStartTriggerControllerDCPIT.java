@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
     private static final String GET_START_TRIGGER = "/internal/cases/1587051668000989/event-triggers/UPDATE";
     private static final int NUMBER_OF_CASES = 2;
@@ -106,7 +107,8 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
                 new String[]{"20040506", "20101112"}),
 
             () -> assertThat(complexField.getFieldType().getChildren().get(0).getId(), is(COMPLEX_DATE_TIME_FIELD)),
-            () -> assertThat(complexField.getFieldType().getChildren().get(0).getDisplayContextParameter(), is("#DATETIMEDISPLAY(yyyy),#DATETIMEENTRY(MM-yyyy)")),
+            () -> assertThat(complexField.getFieldType().getChildren().get(0).getDisplayContextParameter(), 
+                is("#DATETIMEDISPLAY(yyyy),#DATETIMEENTRY(MM-yyyy)")),
             () -> assertThat(mapOf(complexField.getValue()).get(COMPLEX_DATE_TIME_FIELD), is("2005-03-28T07:45:30.000")),
             () -> assertThat(mapOf(complexField.getFormattedValue()).get(COMPLEX_DATE_TIME_FIELD), is("03-2005")),
 
@@ -122,11 +124,11 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
             () -> assertThat(complexCollectionField.getId(), is(COLLECTION_COMPLEX_DATE_TIME)),
             () -> assertComplexCollectionDCP(complexCollectionField),
             () -> assertComplexCollectionValues(arrayOf(complexCollectionField.getValue()), 0,
-                "1963-05-07", "1999-08-19" ,"2008-04-02T16:37:00.000",
+                "1963-05-07", "1999-08-19", "2008-04-02T16:37:00.000",
                 "2010-06-17T19:20:00.000", "1981-02-08", "2020-02-19",
                 "2002-03-04T02:02:00.000", "2007-07-17T07:07:00.000"),
             () -> assertComplexCollectionValues(arrayOf(complexCollectionField.getFormattedValue()), 0,
-                "07-05-1963", "1999-08-19" ,"2008-04-02T16:37",
+                "07-05-1963", "1999-08-19", "2008-04-02T16:37",
                 "2010-06-17T19:20:00.000", "02-1981", "2020-02-19",
                 "2002-03-04", "2007-07-17T07:07:00.000")
         );
@@ -193,8 +195,8 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
     private void assertCollectionField(CaseViewField caseViewField,
                                        String id,
                                        String displayContextParameter,
-                                       String expectedValues[],
-                                       String expectedFormattedValues[]) {
+                                       String[] expectedValues,
+                                       String[] expectedFormattedValues) {
         ArrayList<LinkedHashMap<String, Object>> value = arrayOf(caseViewField.getValue());
         ArrayList<LinkedHashMap<String, Object>> formattedValue = arrayOf(caseViewField.getFormattedValue());
 

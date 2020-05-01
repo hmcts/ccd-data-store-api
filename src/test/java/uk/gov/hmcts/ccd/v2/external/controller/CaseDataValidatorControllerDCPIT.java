@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.validateContent;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
     private static final String VALIDATE = "/case-types/DCP/validate?pageId=UPDATEfirst";
     private static final int NUMBER_OF_CASES = 2;

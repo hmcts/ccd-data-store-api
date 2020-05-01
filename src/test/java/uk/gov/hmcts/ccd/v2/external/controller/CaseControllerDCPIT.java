@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class CaseControllerDCPIT extends WireMockBaseTest {
     private static final String CREATE_CASE = "/case-types/DCP/cases";
     private static final String SUBMIT_EVENT = "/cases/1587051668000989/events";

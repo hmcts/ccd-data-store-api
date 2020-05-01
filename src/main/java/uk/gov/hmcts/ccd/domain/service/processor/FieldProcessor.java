@@ -52,10 +52,18 @@ public abstract class FieldProcessor {
 
             if (complexCaseField.isCollectionFieldType()) {
                 newNode.set(fieldId,
-                    executeCollection(caseFieldNode, complexCaseField, fieldPath, wizardPageComplexFieldOverride(wizardPageField, fieldPath).orElse(null), topLevelField
+                    executeCollection(caseFieldNode,
+                        complexCaseField,
+                        fieldPath,
+                        wizardPageComplexFieldOverride(wizardPageField, fieldPath).orElse(null),
+                        topLevelField
                 ));
             } else if (complexCaseField.isComplexFieldType()) {
-                JsonNode resultNode = executeComplex(caseFieldNode, complexCaseField.getFieldType().getComplexFields(), wizardPageField, fieldPath, topLevelField);
+                JsonNode resultNode = executeComplex(caseFieldNode,
+                    complexCaseField.getFieldType().getComplexFields(),
+                    wizardPageField,
+                    fieldPath,
+                    topLevelField);
                 if (resultNode != null) {
                     newNode.set(fieldId, resultNode);
                 }
