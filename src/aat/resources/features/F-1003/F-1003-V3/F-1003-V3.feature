@@ -1,4 +1,4 @@
-@F-1003-V3
+@F-1003-V3 @Ignore
 Feature: F-1003-V3: Submit Case Creation (V3)
 
   Background: Load test data for the scenario
@@ -36,7 +36,7 @@ Feature: F-1003-V3: Submit Case Creation (V3)
     And   the response has all other details as expected,
     And   a call [to retrieve case details by case id] will get the expected response as in [Default_Get_Case_Data_Base_01].
 
-  @S-1032 @Ignore # Defect AM-707
+  @S-1032 @Ignore # Defect AM-707 / RDM-8403
   Scenario: must get an error response for a malformed case type ID
     Given a user with [an active caseworker profile in CCD with full permissions on a document field],
     And   a successful call [to upload a document with mandatory metadata] as in [Default_Document_Upload_Data],
