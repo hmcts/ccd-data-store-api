@@ -21,7 +21,7 @@
         },
         {
           "key": "files",
-          "filePath": "features/Sample.pdf"
+          "filePath": "features/common/files/Sample.pdf"
         }
       ]
     }
