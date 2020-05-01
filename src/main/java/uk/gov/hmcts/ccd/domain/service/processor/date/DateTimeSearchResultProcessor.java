@@ -67,7 +67,7 @@ public class DateTimeSearchResultProcessor {
             return createArrayNodeFrom((ArrayNode) object, viewColumn, viewColumn.getCaseFieldId());
         } else if (object instanceof ObjectNode && !isNullOrEmpty((ObjectNode) object)) {
             return createObjectNodeFrom((ObjectNode) object,
-                viewColumn, 
+                viewColumn,
                 viewColumn.getCaseFieldTypeDefinition().getComplexFields(),
                 viewColumn.getCaseFieldId());
         } else if (object instanceof LocalDateTime) {
