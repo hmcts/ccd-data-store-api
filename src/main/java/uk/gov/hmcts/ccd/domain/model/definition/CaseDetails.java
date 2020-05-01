@@ -27,8 +27,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_M
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_PAYMENT_HISTORY_VIEWER;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_PAYMENT_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
 @SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
 public class CaseDetails implements Cloneable {
@@ -243,16 +243,16 @@ public class CaseDetails implements Cloneable {
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
         return isFieldWithNoValue(caseTypeTabField)
             || hasDataForTabField(caseTypeTabField)
-            || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
+            || getMetadata().containsKey(caseTypeTabField.getCaseFieldDefinition().getId());
     }
 
     private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
-        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
+        return data.keySet().contains(caseTypeTabField.getCaseFieldDefinition().getId());
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
-        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL)
-            || caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
+        return caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(LABEL)
+            || caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
     }
 
     @JsonIgnore

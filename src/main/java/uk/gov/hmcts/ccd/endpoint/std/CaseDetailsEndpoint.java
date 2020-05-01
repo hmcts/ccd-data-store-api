@@ -42,7 +42,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -161,7 +161,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 404, message = "No case found for the given ID"),
         @ApiResponse(code = 422, message = "Process could not be started")
     })
-    public StartEventTrigger startEventForCaseworker(
+    public StartEventResult startEventForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -171,11 +171,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @ApiParam(value = "Event ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCase(caseId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
     }
 
     @Transactional
@@ -186,7 +186,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 404, message = "No case found for the given ID"),
         @ApiResponse(code = 422, message = "Process could not be started")
     })
-    public StartEventTrigger startEventForCitizen(
+    public StartEventResult startEventForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -196,11 +196,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @ApiParam(value = "Event ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCase(caseId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
     }
 
     @Transactional
@@ -210,7 +210,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "Case creation process started"),
         @ApiResponse(code = 422, message = "Process could not be started")
     })
-    public StartEventTrigger startCaseForCaseworker(
+    public StartEventResult startCaseForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -218,11 +218,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Event ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCaseType(caseTypeId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
     @Transactional
@@ -232,7 +232,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "Case creation process started"),
         @ApiResponse(code = 422, message = "Process could not be started")
     })
-    public StartEventTrigger startCaseForCitizen(
+    public StartEventResult startCaseForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -240,11 +240,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Event ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCaseType(caseTypeId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")

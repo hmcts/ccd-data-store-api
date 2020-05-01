@@ -1,26 +1,30 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
-
-import java.time.LocalDateTime;
-import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -121,10 +125,10 @@ class SearchResultProcessorTest {
     }
 
     @Test
-    void shouldProcessComplexTypesWithDCP() throws JsonProcessingException {
+    void shouldProcessComplexTypesWithDCP() throws IOException {
         caseFields.put(COMPLEX_FIELD, MAPPER.readTree("{\"ComplexDateField\": \"2020-10-05\"}"));
         viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
-        CaseField complexField = caseField("ComplexDateField", fieldType("Date"), "#DATETIMEDISPLAY(MM-yyyy)");
+        CaseFieldDefinition complexField = caseField("ComplexDateField", fieldType("Date"), "#DATETIMEDISPLAY(MM-yyyy)");
         SearchResultViewColumn complexColumn = new SearchResultViewColumn(COMPLEX_FIELD,
             fieldType(COMPLEX_FIELD_TYPE, COMPLEX_FIELD_TYPE, Collections.singletonList(complexField), null), null, 1, false, null);
         viewColumns.add(complexColumn);
@@ -143,7 +147,7 @@ class SearchResultProcessorTest {
     }
 
     @Test
-    void shouldProcessCollectionsWithDCP() throws JsonProcessingException {
+    void shouldProcessCollectionsWithDCP() throws IOException {
         caseFields.put(COLLECTION_FIELD,
             MAPPER.readTree("[{\"id\": \"1\", \"value\": \"2020-10-05\"},{\"id\": \"2\", \"value\": \"1999-12-01\"}]"));
         viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
@@ -176,12 +180,12 @@ class SearchResultProcessorTest {
     }
 
     @Test
-    void shouldProcessCollectionOfComplexTypesWithDCP() throws JsonProcessingException {
+    void shouldProcessCollectionOfComplexTypesWithDCP() throws IOException {
         caseFields.put(COLLECTION_FIELD,
             MAPPER.readTree("[{\"id\": \"1\", \"value\": {\"NestedDate\": \"2020-10-05\"}},"
                             + "{\"id\": \"2\", \"value\": {\"NestedDate\": \"1992-07-30\"}}]"));
-        CaseField nestedDateField = caseField("NestedDate", fieldType("Date"), "#DATETIMEDISPLAY(MM-yyyy)");
-        FieldType complexFieldType = fieldType(COMPLEX_FIELD_TYPE, COMPLEX_FIELD_TYPE, Collections.singletonList(nestedDateField), null);
+        CaseFieldDefinition nestedDateField = caseField("NestedDate", fieldType("Date"), "#DATETIMEDISPLAY(MM-yyyy)");
+        FieldTypeDefinition complexFieldType = fieldType(COMPLEX_FIELD_TYPE, COMPLEX_FIELD_TYPE, Collections.singletonList(nestedDateField), null);
         SearchResultViewColumn collectionColumn = new SearchResultViewColumn(COLLECTION_FIELD,
             fieldType(COLLECTION_FIELD_TYPE, COLLECTION_FIELD_TYPE, null, complexFieldType), null, 1, false, null);
         viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
@@ -237,24 +241,24 @@ class SearchResultProcessorTest {
         );
     }
 
-    private CaseField caseField(String id, FieldType fieldType, String displayContextParameter) {
-        CaseField caseField = new CaseField();
+    private CaseFieldDefinition caseField(String id, FieldTypeDefinition fieldType, String displayContextParameter) {
+        CaseFieldDefinition caseField = new CaseFieldDefinition();
         caseField.setId(id);
-        caseField.setFieldType(fieldType);
+        caseField.setFieldTypeDefinition(fieldType);
         caseField.setDisplayContextParameter(displayContextParameter);
         return caseField;
     }
 
-    private FieldType fieldType(String id, String type, List<CaseField> complexFields, FieldType collectionFieldType) {
-        FieldType fieldType = new FieldType();
+    private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields, FieldTypeDefinition collectionFieldType) {
+        FieldTypeDefinition fieldType = new FieldTypeDefinition();
         fieldType.setId(id);
         fieldType.setType(type);
         fieldType.setComplexFields(complexFields);
-        fieldType.setCollectionFieldType(collectionFieldType);
+        fieldType.setCollectionFieldTypeDefinition(collectionFieldType);
         return fieldType;
     }
 
-    private FieldType fieldType(String fieldType) {
+    private FieldTypeDefinition fieldType(String fieldType) {
         return fieldType(fieldType, fieldType, Collections.emptyList(), null);
     }
 

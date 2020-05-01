@@ -979,10 +979,10 @@ class SecurityValidationServiceTest {
 
     private void assertThrowsSecurityValidationDueToClassificationException(CaseDetails caseDetails, CallbackResponse callbackResponse) {
         final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
-        ValidationException validationException =
-            assertThrows(ValidationException.class, () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
-                                                                                                                         caseDetails,
-                                                                                                                         defaultDataClassification));
+        ValidationException validationException = assertThrows(ValidationException.class,
+            () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
+                caseDetails,
+                defaultDataClassification));
         assertEquals("The event cannot be complete due to a callback returned data validation error (c)", validationException.getMessage());
     }
 

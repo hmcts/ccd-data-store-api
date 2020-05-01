@@ -12,7 +12,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
@@ -39,7 +39,7 @@ public class DocumentManagementRestClient {
         this.restTemplate = restTemplate;
     }
 
-    public Document getDocument(FieldType fieldType, String url) {
+    public Document getDocument(FieldTypeDefinition fieldTypeDefinition, String url) {
         final HttpHeaders headers = securityUtils.authorizationHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity requestEntity = new HttpEntity(headers);
@@ -62,9 +62,9 @@ public class DocumentManagementRestClient {
 
         } catch (Exception e) {
             LOG.error("Cannot sanitize document for the Case Field Type:{}, Case Field Type Id:{} because of unreachable url",
-                fieldType.getType(), fieldType.getId(), e);
+                fieldTypeDefinition.getType(), fieldTypeDefinition.getId(), e);
             throw new ApiException(String.format("Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of %s",
-                fieldType.getType(), fieldType.getId(), e));
+                fieldTypeDefinition.getType(), fieldTypeDefinition.getId(), e));
         }
 
         return document;

@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.Strings;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -16,9 +20,9 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
-import java.util.*;
-
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
 import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.getDisplayContextParameterOfType;
 import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.hasDisplayContextParameterType;
 
@@ -80,13 +84,12 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         return caseViewField;
     }
 
-    @Override
     protected JsonNode executeCollection(JsonNode collectionNode,
                                          CommonField caseViewField,
                                          String fieldPath,
                                          WizardPageComplexFieldOverride override,
                                          CommonField topLevelField) {
-        final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
+        final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
         final DisplayContext displayContext = displayContext(topLevelField, override);
 
         if ((hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), ENUM_MAP.get(displayContext))
@@ -105,7 +108,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
                             displayContext)
                         : executeComplex(
                             item.get(CollectionValidator.VALUE),
-                            caseViewField.getFieldType().getChildren(),
+                            caseViewField.getFieldTypeDefinition().getChildren(),
                             null,
                             fieldPath,
                             topLevelField));

@@ -47,7 +47,7 @@ class CaseResourceTest {
 
     @BeforeEach
     void setUp() {
-        caseDetails = newCaseDetails();
+        caseDetails = caseDetails();
         caseDataContent = newCaseDataContent().build();
     }
 
@@ -168,7 +168,7 @@ class CaseResourceTest {
         }
     }
 
-    private CaseDetails newCaseDetails() {
+    private CaseDetails caseDetails() {
         final CaseDetails caseDetails = new CaseDetails();
 
         caseDetails.setReference(REFERENCE);

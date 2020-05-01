@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.Strings;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
@@ -14,11 +16,11 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.*;
-import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
+import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.getDisplayContextParameterOfType;
+import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.hasDisplayContextParameterType;
 
 @Component
 public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
@@ -54,7 +56,7 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
                                          String fieldPath,
                                          WizardPageComplexFieldOverride override,
                                          CommonField topLevelField) {
-        final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldType().getCollectionFieldType().getType());
+        final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
 
         if ((hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
             && isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES))
@@ -65,7 +67,9 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
                     isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
                         ? createNode(caseViewField.getDisplayContextParameter(), item.get(CollectionValidator.VALUE).asText(), collectionFieldType, fieldPath)
-                        : executeComplex(item.get(CollectionValidator.VALUE), caseViewField.getFieldType().getChildren(), null, fieldPath, topLevelField));
+                        : executeComplex(item.get(CollectionValidator.VALUE),
+                            caseViewField.getFieldTypeDefinition().getChildren(),
+                            null, fieldPath, topLevelField));
                 newNode.add(newItem);
             });
 
@@ -98,7 +102,9 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
                     fieldPath,
                     valueToConvert,
                     format,
-                    baseType == BaseType.get(DATETIME) ? DateTimeFormatParser.DATE_TIME_FORMAT : DateTimeFormatParser.DATE_FORMAT)
+                    baseType == BaseType.get(DATETIME)
+                        ? DateTimeFormatParser.DATE_TIME_FORMAT
+                        : DateTimeFormatParser.DATE_FORMAT)
             );
         }
     }

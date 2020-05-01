@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 @Named
 @Singleton
@@ -25,7 +25,7 @@ public class DynamicListValidator implements BaseTypeValidator {
     }
 
     @Override
-    public List<ValidationResult> validate(String dataFieldId, JsonNode dataValue, CaseField caseFieldDefinition) {
+    public List<ValidationResult> validate(String dataFieldId, JsonNode dataValue, CaseFieldDefinition caseFieldDefinition) {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }

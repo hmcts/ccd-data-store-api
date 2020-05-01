@@ -9,7 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
     @Inject
     private CaseDataValidator caseDataValidator;
-    private List<CaseField> caseFields;
+    private List<CaseFieldDefinition> caseFields;
 
     @BeforeClass
     public static void setUpClass() {
@@ -145,7 +145,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "    }\n" +
             "  }\n" +
             "]\n";
-        final List<CaseField> caseFields = BaseTest.getCaseFieldsFromJson(unknownType);
+        final List<CaseFieldDefinition> caseFields = BaseTest.getCaseFieldsFromJson(unknownType);
         final String data =
             "{\n" +
             "  \"Person\" : {\n" +
@@ -337,8 +337,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "    \"min\": 10\n" +
             "  }\n" +
             "}]";
-        final List<CaseField> caseFields =
-            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+        final List<CaseFieldDefinition> caseFields =
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, STRING_NODE_TYPE);
 
@@ -361,8 +361,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "  }\n" +
             "}]";
 
-        final List<CaseField> caseFields =
-            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+        final List<CaseFieldDefinition> caseFields =
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
 
         final Map<String, JsonNode> invalidMaxVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}", STRING_NODE_TYPE);
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(invalidMaxVal, caseFields).size());

@@ -2,19 +2,18 @@ package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.processor.*;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -38,7 +37,7 @@ class DefaultValidateCaseFieldsOperationTest {
     @Mock
     private FieldProcessorService fieldProcessorService;
     @Mock
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
     @Mock
     private CaseDataContent caseDataContent;
 
@@ -50,8 +49,8 @@ class DefaultValidateCaseFieldsOperationTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        doReturn(true).when(caseType).hasEventId(eventId);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+        doReturn(true).when(caseTypeDefinition).hasEventId(eventId);
 
         doReturn(data).when(caseDataContent).getData();
         Event event = anEvent().withEventId(eventId).build();
@@ -67,7 +66,7 @@ class DefaultValidateCaseFieldsOperationTest {
 
         assertAll(
             () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-            () -> verify(caseTypeService).validateData(data, caseType),
+            () -> verify(caseTypeService).validateData(data, caseTypeDefinition),
             () -> assertThat(result, is(data))
         );
     }

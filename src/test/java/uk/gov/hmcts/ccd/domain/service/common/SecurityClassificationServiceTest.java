@@ -34,9 +34,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 @SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
@@ -79,9 +79,9 @@ public class SecurityClassificationServiceTest {
         private static final String SC_RESTRICTED = "RESTRICTED";
         private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
         private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
-        private final CaseField testCaseField11 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
-        private final CaseField testCaseField12 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
-        private final CaseType testCaseType = newCaseType()
+        private final CaseFieldDefinition testCaseField11 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
+        private final CaseFieldDefinition testCaseField12 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
+        private final CaseTypeDefinition testCaseTypeDefinition = newCaseType()
             .withId(CASE_TYPE_ONE)
             .withField(testCaseField11)
             .withField(testCaseField12)
@@ -92,7 +92,7 @@ public class SecurityClassificationServiceTest {
         void userHasEnoughSecurityClassificationForField() {
             doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
             assertTrue(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-                testCaseType,
+                testCaseTypeDefinition,
                 CASE_FIELD_ID_1_1));
         }
 
@@ -101,7 +101,7 @@ public class SecurityClassificationServiceTest {
         void userDoesNotHaveEnoughSecurityClassificationForField() {
             doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
             assertFalse(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-                testCaseType,
+                testCaseTypeDefinition,
                 CASE_FIELD_ID_1_2));
         }
     }
@@ -274,27 +274,27 @@ public class SecurityClassificationServiceTest {
     @DisplayName("getClassificationForEvent()")
     class GetSecurityClassificationForEvent {
 
-        private final CaseType caseType = new CaseType();
+        private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
         @BeforeEach
         void setUp() throws IOException {
-            CaseEvent createEvent = new CaseEvent();
+            CaseEventDefinition createEvent = new CaseEventDefinition();
             createEvent.setId("createEvent");
             createEvent.setSecurityClassification(RESTRICTED);
-            CaseEvent updateEvent = new CaseEvent();
+            CaseEventDefinition updateEvent = new CaseEventDefinition();
             updateEvent.setId("updateEvent");
             updateEvent.setSecurityClassification(PRIVATE);
-            List<CaseEvent> events = Arrays.asList(createEvent, updateEvent);
-            caseType.setEvents(events);
+            List<CaseEventDefinition> events = Arrays.asList(createEvent, updateEvent);
+            caseTypeDefinition.setEvents(events);
         }
 
         @Test
         @DisplayName("should return classification relevant for event")
         void shouldGetClassificationForEvent() {
-            CaseEvent eventTrigger = new CaseEvent();
-            eventTrigger.setId("createEvent");
-            SecurityClassification result = securityClassificationService.getClassificationForEvent(caseType,
-                                                                                                    eventTrigger);
+            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+            caseEventDefinition.setId("createEvent");
+            SecurityClassification result = securityClassificationService.getClassificationForEvent(caseTypeDefinition,
+                                                                                                    caseEventDefinition);
 
             assertThat(result, is(equalTo(RESTRICTED)));
         }
@@ -302,17 +302,17 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should fail to return fields when event not found")
         void shouldThrowRuntimeExceptionIfEventNotFound() {
-            CaseEvent eventTrigger = new CaseEvent();
-            eventTrigger.setId("unknown");
+            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+            caseEventDefinition.setId("unknown");
 
             assertThrows(RuntimeException.class, () ->
-                securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
+                securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition));
         }
     }
 
     @Nested
     @DisplayName("Apply to fields of CaseDetails")
-     class ApplyToCaseDetailsFields {
+    class ApplyToCaseDetailsFields {
 
         private static final String FIRST_CHILD_ID = "46f98326-6c88-426d-82be-d362f0246b7a";
         private static final String SECOND_CHILD_ID = "7c7cfd2a-b5d7-420a-8420-3ac3019cfdc7";

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,7 +25,7 @@ public class CaseSanitiser {
         });
     }
 
-    public Map<String, JsonNode> sanitise(final CaseType caseType, final Map<String, JsonNode> caseData) {
+    public Map<String, JsonNode> sanitise(final CaseTypeDefinition caseTypeDefinition, final Map<String, JsonNode> caseData) {
 
         final Map<String, JsonNode> sanitisedData = new HashMap<>();
 
@@ -33,20 +33,20 @@ public class CaseSanitiser {
             return sanitisedData;
         }
 
-        final Map<String, CaseField> fieldsMap = new HashMap<>();
+        final Map<String, CaseFieldDefinition> fieldsMap = new HashMap<>();
 
-        caseType.getCaseFields().forEach(field -> {
+        caseTypeDefinition.getCaseFieldDefinitions().forEach(field -> {
             fieldsMap.put(field.getId(), field);
         });
 
         caseData.forEach((key, value) -> {
             if (fieldsMap.containsKey(key)) {
-                final CaseField caseField = fieldsMap.get(key);
-                final FieldType fieldType = caseField.getFieldType();
+                final CaseFieldDefinition caseFieldDefinition = fieldsMap.get(key);
+                final FieldTypeDefinition fieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition();
 
-                if (sanitisers.containsKey(fieldType.getType())) {
-                    final Sanitiser sanitiser = sanitisers.get(fieldType.getType());
-                    sanitisedData.put(key, sanitiser.sanitise(fieldType, value));
+                if (sanitisers.containsKey(fieldTypeDefinition.getType())) {
+                    final Sanitiser sanitiser = sanitisers.get(fieldTypeDefinition.getType());
+                    sanitisedData.put(key, sanitiser.sanitise(fieldTypeDefinition, value));
                 } else {
                     sanitisedData.put(key, value);
                 }

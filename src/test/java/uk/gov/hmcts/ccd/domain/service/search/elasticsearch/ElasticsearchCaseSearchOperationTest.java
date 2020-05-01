@@ -86,7 +86,7 @@ class ElasticsearchCaseSearchOperationTest {
 
     @Nested
     @DisplayName("Single case type search")
-    class SingleCaseTypeSearch {
+    class SingleCaseTypeDefinitionSearch {
 
         @Test
         @DisplayName("should execute search on Elasticsearch for a single case type and return results")

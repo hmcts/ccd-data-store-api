@@ -193,8 +193,8 @@ public class ApplicationParams {
         return uiDefinitionHost + "/api/display/tab-structure/" + encode(caseTypeId);
     }
 
-    public String displayWizardPageCollection(final String caseTypeId, final String eventTriggerId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventTriggerId);
+    public String displayWizardPageCollection(final String caseTypeId, final String eventId) {
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventId);
     }
 
     public String jurisdictionDefURL() {

@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -110,10 +110,10 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     @Test(expected = ResourceNotFoundException.class)
     public void shouldReturnFieldTypeListWhenGetBaseTypesIsCalled() {
-        FieldType[] fieldTypeArr = {new FieldType(), new FieldType()};
-        doReturn(fieldTypeArr).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
-        List<FieldType> fieldTypes = caseDefinitionRepository.getBaseTypes();
-        assertEquals(2, fieldTypes.size());
+        FieldTypeDefinition[] fieldTypeDefinitionArr = {new FieldTypeDefinition(), new FieldTypeDefinition()};
+        doReturn(fieldTypeDefinitionArr).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
+        List<FieldTypeDefinition> fieldTypeDefinitions = caseDefinitionRepository.getBaseTypes();
+        assertEquals(2, fieldTypeDefinitions.size());
     }
 
     @Test
@@ -183,10 +183,10 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     @Test
     public void shouldGetNullJurisdictionsDefinition() {
-        List<Jurisdiction> emptyJurisdictions = Lists.newArrayList();
-        doReturn(emptyJurisdictions).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
+        List<JurisdictionDefinition> emptyJurisdictionDefinitions = Lists.newArrayList();
+        doReturn(emptyJurisdictionDefinitions).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        Jurisdiction jurisdiction = caseDefinitionRepository.getJurisdiction("PROBATE_NOT_FOUND");
-        assertThat(jurisdiction, nullValue());
+        JurisdictionDefinition jurisdictionDefinition = caseDefinitionRepository.getJurisdiction("PROBATE_NOT_FOUND");
+        assertThat(jurisdictionDefinition, nullValue());
     }
 }
