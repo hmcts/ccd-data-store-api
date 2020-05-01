@@ -303,6 +303,7 @@ public class CaseDocumentAttacher {
             }
 
         } else {
+            checkCaseDetailBeforeNodeType();
             if (value instanceof ArrayNode) {
                 Iterator<JsonNode> arrayNode = ((ArrayNode) value).elements();
                 while (arrayNode.hasNext()) {
@@ -320,6 +321,15 @@ public class CaseDocumentAttacher {
     }
 
     private void checkNodeTypeAndExtractDocuments(Map<String, JsonNode> documentsDifference, JsonNode value) {
+
+        if (!value.isNull()) {
+            value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
+                Collections.singletonMap(node.getKey(), node.getValue()),
+                documentsDifference));
+        }
+    }
+
+    private void checkCaseDetailBeforeNodeType() {
         if (caseBeforeNode instanceof ArrayNode) {
             Iterator<JsonNode> arrayNode = ((ArrayNode) caseBeforeNode).elements();
             while (arrayNode.hasNext()) {
@@ -340,11 +350,6 @@ public class CaseDocumentAttacher {
                 JsonNode before = caseBeforeNode.get(fieldName);
                 recursiveMapForCaseDetailsBefore.put(fieldName, before);
             }
-        }
-        if (!value.isNull()) {
-            value.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
-                Collections.singletonMap(node.getKey(), node.getValue()),
-                documentsDifference));
         }
     }
 
