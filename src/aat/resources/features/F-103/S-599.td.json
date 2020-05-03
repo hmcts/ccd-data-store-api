@@ -14,11 +14,11 @@
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "headers": {
-      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
-      "Content-Length" : "[[ANYTHING_PRESENT]]"
+      "Content-Encoding" : "[[ANY_STRING_PRESENT]]",
+      "Content-Length" : "[[ANY_INTEGER_PRESENT]]"
     },
     "body": {
-      "exception": "[[ANYTHING_PRESENT]]",
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "message": "No case found",
       "details": null,
       "callbackErrors": null,
