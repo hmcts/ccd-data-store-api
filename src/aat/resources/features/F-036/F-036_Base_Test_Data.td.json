@@ -10,8 +10,7 @@
   "request": {
     "_extends_": "Common_Request",
     "headers": {
-      "experimental": "true",
-      "Content-Type": "application/json"
+      "experimental": "true"
     },
     "pathVariables": {
       "caseId": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",

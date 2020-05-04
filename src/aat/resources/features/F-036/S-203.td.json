@@ -16,7 +16,6 @@
     "_extends_": "Common_404_Response",
     "headers" : {
       "Content-Encoding" : "gzip",
-      "Content-Type": "application/json",
       "Content-Length" : "[[ANYTHING_PRESENT]]"
     },
     "body" : {

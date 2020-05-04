@@ -43,7 +43,7 @@ public class DateTimeValidator implements BaseTypeValidator {
         try {
             dateTimeValue = LocalDateTime.parse(dataValue.asText(), ISO_DATE_TIME);
         } catch (DateTimeParseException e) {
-            return Collections.singletonList(new ValidationResult(dataValue + " is not a valid ISO 8601 date time", dataFieldId));
+            return Collections.singletonList(new ValidationResult("Date or Time entered is not valid", dataFieldId));
         }
 
         if (!checkMax(caseFieldDefinition.getFieldType().getMax(), dateTimeValue)) {

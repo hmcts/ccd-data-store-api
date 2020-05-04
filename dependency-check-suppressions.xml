@@ -6,7 +6,6 @@
         <cve>CVE-2018-1258</cve>
     </suppress>
 
-
     <!-- THIS CVEs should not be removed until the elastic search client is updated to 7.
     Before updating the elastic client make sure that the server has been updated to 7 -->
     <suppress>
@@ -24,6 +23,21 @@
         <!-- Temporary suppression to ignore until it's fixed in master -->
         <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
+    <!--These javascript CVEs relate to Liquibase's web based admin UI which we don't use or expose-->
+    <suppress>
+        <notes><![CDATA[file name: liquibase-core-3.6.3.jar: bootstrap.*]]></notes>
+        <packageUrl regex="true">^pkg:javascript/bootstrap@.*$</packageUrl>
+        <cve>CVE-2019-8331</cve>
+        <cve>CVE-2018-14040</cve>
+        <cve>CVE-2018-14041</cve>
+        <cve>CVE-2018-14042</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[file name: liquibase-core-3.6.3.jar: jquery-1.11.0.min.js]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2019-11358</cve>
+        <cve>CVE-2015-9251</cve>
+  </suppress>
 
     <!-- THIS WILL BE FIX IN RDM-7997-->
     <suppress>
@@ -110,7 +124,6 @@
    <packageUrl regex="true">^pkg:maven/org\.springframework/spring-jcl@.*$</packageUrl>
    <cve>CVE-2020-5398</cve>
 </suppress>
-    <!-- THIS WILL BE FIX IN RDM-7997-->
     <suppress>
         <notes><![CDATA[
    relates to spring_framework spring-security
@@ -118,7 +131,6 @@
         <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
         <cve>CVE-2020-5398</cve>
     </suppress>
-
     <!-- THIS WILL BE FIX IN Rdm 7943-->
     <suppress>
         <notes>Temporary suppression for on-going developments</notes>

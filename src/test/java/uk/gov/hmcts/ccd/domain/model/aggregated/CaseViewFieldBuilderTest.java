@@ -69,6 +69,7 @@ public class CaseViewFieldBuilderTest {
         CASE_FIELD.setLabel("First name");
         CASE_FIELD.setSecurityLabel("LO1");
         CASE_FIELD.setMetadata(false);
+        CASE_FIELD.setFormattedValue("DisplayValue");
 
         CASE_FIELD_2.setId("PersonLastName");
 
@@ -76,7 +77,7 @@ public class CaseViewFieldBuilderTest {
 
         EVENT_FIELD.setCaseFieldId("PersonFirstName");
         EVENT_FIELD.setDisplayContext(READONLY);
-        EVENT_FIELD.setDisplayContext("#TABLE(Title, FirstName, MiddleName)");
+        EVENT_FIELD.setDisplayContextParameter("#TABLE(Title, FirstName, MiddleName)");
         EVENT_FIELD.setShowCondition("ShowCondition");
         EVENT_FIELD.setShowSummaryChangeOption(Boolean.TRUE);
         EVENT_FIELD.setShowSummaryContentOption(3);
@@ -111,11 +112,12 @@ public class CaseViewFieldBuilderTest {
             assertThat(field.getSecurityLabel(), equalTo(CASE_FIELD.getSecurityLabel()));
             assertThat(field.getValidationExpression(), is(nullValue()));
             assertThat(field.getDisplayContext(), is(EVENT_FIELD.getDisplayContext()));
-            assertThat(field.getDisplayContextParameter(), is(EVENT_FIELD.getDisplayContextParamter()));
+            assertThat(field.getDisplayContextParameter(), is(EVENT_FIELD.getDisplayContextParameter()));
             assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
             assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
             assertThat(field.getShowSummaryContentOption(), is(3));
             assertThat(field.isMetadata(), is(false));
+            assertThat(field.getFormattedValue(), is(CASE_FIELD.getFormattedValue()));
 
             CaseViewField metadataField = fieldBuilder.build(CASE_FIELD_3, EVENT_FIELD_3);
             assertThat(metadataField.isMetadata(), is(true));
