@@ -18,58 +18,56 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8",
-      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
-      "Content-Length" : "[[ANYTHING_PRESENT]]"
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8"
     },
     "body": {
       "auditEvents": [
         {
-          "id": "[[ANYTHING_PRESENT]]",
-          "summary": "[[ANYTHING_PRESENT]]",
-          "description": "[[ANYTHING_PRESENT]]",
-          "user_id": "[[ANYTHING_PRESENT]]",
-          "user_last_name": "[[ANYTHING_PRESENT]]",
-          "user_first_name": "[[ANYTHING_PRESENT]]",
-          "event_name": "[[ANYTHING_PRESENT]]",
+          "id": "CREATE",
+          "summary": "",
+          "description": "",
+          "user_id": "95f3608d-1912-46fa-b2d3-152807cb600c",
+          "user_last_name": "testsurname",
+          "user_first_name": "testfirstname",
+          "event_name": "Create a new case",
           "created_date": "[[ANYTHING_PRESENT]]",
-          "case_type_id": "[[ANYTHING_PRESENT]]",
-          "case_type_version": "[[ANYTHING_PRESENT]]",
-          "state_id": "[[ANYTHING_PRESENT]]",
-          "state_name": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "AAT_AUTH_15",
+          "case_type_version": "[[ANY_INTEGER_NOT_NULLABLE]]",
+          "state_id": "TODO",
+          "state_name": "To do",
           "data": {
-            "MoneyGBPField": "[[ANYTHING_PRESENT]]",
-            "FixedListField": "[[ANYTHING_PRESENT]]",
+            "MoneyGBPField": "4200",
+            "FixedListField": "VALUE3",
             "AddressUKField": {
-              "County": "[[ANYTHING_PRESENT]]",
-              "Country": "[[ANYTHING_PRESENT]]",
-              "PostCode": "[[ANYTHING_PRESENT]]",
-              "PostTown": "[[ANYTHING_PRESENT]]",
-              "AddressLine1": "[[ANYTHING_PRESENT]]",
-              "AddressLine2": "[[ANYTHING_PRESENT]]",
-              "AddressLine3": "[[ANYTHING_PRESENT]]"
+              "County": "Greater London",
+              "Country": "UK",
+              "PostCode": "SW1H 9AJ",
+              "PostTown": "Westminster",
+              "AddressLine1": "102 Petty France",
+              "AddressLine2": "CCD",
+              "AddressLine3": "c/o HMCTS Reform"
             },
             "ComplexField": {
-              "ComplexTextField": "[[ANYTHING_PRESENT]]",
-              "ComplexFixedListField": "[[ANYTHING_PRESENT]]"
+              "ComplexTextField": "Nested text",
+              "ComplexFixedListField": "VALUE2"
             },
-            "DateTimeField": "[[ANYTHING_PRESENT]]",
-            "PhoneUKField": "[[ANYTHING_PRESENT]]",
-            "NumberField": "[[ANYTHING_PRESENT]]",
+            "DateTimeField": "1988-07-07T22:20:00",
+            "PhoneUKField": "07123456789",
+            "NumberField": "164528",
             "MultiSelectListField" : [ "OPTION2", "OPTION4" ],
-            "YesOrNoField": "[[ANYTHING_PRESENT]]",
-            "EmailField": "[[ANYTHING_PRESENT]]",
-            "TextField": "[[ANYTHING_PRESENT]]",
-            "DateField": "[[ANYTHING_PRESENT]]",
-            "TextAreaField": "[[ANYTHING_PRESENT]]",
+            "YesOrNoField": "Yes",
+            "EmailField": "ccd@hmcts.net",
+            "TextField": "Some Text",
+            "DateField": "2017-02-13",
+            "TextAreaField": "Line1\nLine2",
             "CollectionField": [
               {
-                "id": "[[ANYTHING_PRESENT]]",
-                "value": "[[ANYTHING_PRESENT]]"
+                "id": "CollectionField1",
+                "value": "Alias 1"
               },
               {
-                "id": "[[ANYTHING_PRESENT]]",
-                "value": "[[ANYTHING_PRESENT]]"
+                "id": "CollectionField2",
+                "value": "Alias 2"
               }
             ]
           },
