@@ -1,4 +1,3 @@
-package uk.gov.hmcts.ccd.v2.external.controller;/*
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -127,9 +126,9 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
                                                                                .withBody(String.format(caseTypeResponseString, super.wiremockPort))));
 
         final MvcResult result = mockMvc
-            .perform(get(String.format("http://localhost:%s/cases/1504259907353123/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97", super.wiremockPort))
+            .perform(get(String.format("http://localhost:%s/cases/1504259907353520/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0", super.wiremockPort))
                          .contentType(MediaType.APPLICATION_JSON)
-                         .header("Accept", V2.MediaType.CASE_DOCUMENTS)
+                         .header("Accept", V2.MediaType.CASE_DOCUMENT)
                          .header("experimental", true))
             .andExpect(status().is(200))
             .andReturn();
@@ -143,21 +142,22 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
         assertAll(
             () -> assertThat(self.get().getHref(),
                              is(String
-                                    .format("http://localhost:%s/cases/1504259907353123/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97", super.wiremockPort))),
-            () -> assertThat(caseDocumentResource.getDocumentMetadata(),
+                                    .format("http://localhost:%s/cases/1504259907353520/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0", super.wiremockPort))),
+            () -> assertThat(caseDocumentMetadata,
                              allOf(hasProperty("caseId", is("Claimant ID")),
                                    hasProperty("caseTypeId", is("Document identifying identity")),
                                    hasProperty("jurisdictionId", is("ID")))),
-            () -> assertThat(caseDocumentResource.getDocumentMetadata().getDocument(),
+            () -> assertThat(caseDocumentMetadata,
                              allOf(hasProperty("url", is("Claimant Address")),
                                    hasProperty("name", is("Document identifying address")),
                                    hasProperty("type", is("Address")),
                                    hasProperty("description", is(DOCUMENT_URL)),
-                                   hasProperty("id", is("Address")))),
-            () -> assertThat(caseDocumentResource.getDocumentMetadata().getDocument().getPermissions(), hasSize(2)),
-            () -> assertThat(caseDocumentResource.getDocumentMetadata().getDocument().getPermissions(),
-                             hasItems(Permission.READ, Permission.UPDATE)));
+                                   hasProperty("id", is("Address"))))
+            //() -> assertThat(caseDocumentResource.getDocumentMetadata().getDocument().getPermissions(), hasSize(2)),
+            //() -> assertThat(caseDocumentResource.getDocumentMetadata().getDocument().getPermissions(),
+            //    hasItems(Permission.READ, Permission.UPDATE))
+            //() -> assertThat(caseDocumentResource.getDocumentMetadata().getDocumentPermissions(),
+            //    hasItems(Permission.READ, Permission.UPDATE))
+        );
     }
-
 }
-*/
