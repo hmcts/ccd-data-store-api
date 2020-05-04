@@ -107,12 +107,18 @@ public class HttpErrorTest {
     }
 
     @ResponseStatus(code = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-    class TestCodeStatusException extends RuntimeException {}
+    class TestCodeStatusException extends RuntimeException {
+
+    }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    class TestValueStatusException extends RuntimeException {}
+    class TestValueStatusException extends RuntimeException {
+
+    }
 
     @ResponseStatus(reason = "Some error reason")
-    class TestReasonException extends RuntimeException {}
+    class TestReasonException extends RuntimeException {
+
+    }
 
 }

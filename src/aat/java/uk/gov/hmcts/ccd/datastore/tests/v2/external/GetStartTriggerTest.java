@@ -42,7 +42,7 @@ class GetStartTriggerTest extends BaseTest {
         @Test
         @DisplayName("should retrieve trigger when the case type and event exists")
         void shouldRetrieveWhenExists() {
-            callGetStartCaseTrigger(CASE_TYPE, CREATE)
+            callStartCaseEvent(CASE_TYPE, CREATE)
                 .when()
                 .get("/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
@@ -81,7 +81,7 @@ class GetStartTriggerTest extends BaseTest {
         @Test
         @DisplayName("should get 404 when case type does not exist")
         void should404WhenCaseTypeDoesNotExist() {
-            callGetStartCaseTrigger(INVALID_CASE_TYPE_ID, CREATE)
+            callStartCaseEvent(INVALID_CASE_TYPE_ID, CREATE)
                 .when()
                 .get("/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
@@ -92,7 +92,7 @@ class GetStartTriggerTest extends BaseTest {
         @Test
         @DisplayName("should get 404 when event trigger does not exist")
         void should404WhenEventTriggerDoesNotExist() {
-            callGetStartCaseTrigger(CASE_TYPE, INVALID_EVENT_TRIGGER_ID)
+            callStartCaseEvent(CASE_TYPE, INVALID_EVENT_TRIGGER_ID)
                 .when()
                 .get("/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
@@ -103,7 +103,7 @@ class GetStartTriggerTest extends BaseTest {
 
     @Nested
     @DisplayName("Start event trigger")
-    class StartEventTrigger {
+    class StartEventResult {
         private static final String INVALID_CASE_REFERENCE = "1234123412341234";
         private static final String NOT_FOUND_CASE_REFERENCE = "1234123412341238";
 
@@ -215,23 +215,23 @@ class GetStartTriggerTest extends BaseTest {
         }
     }
 
-    private RequestSpecification callGetStartCaseTrigger(String caseTypeId, String eventTriggerId) {
+    private RequestSpecification callStartCaseEvent(String caseTypeId, String eventId) {
         return asAutoTestCaseworker(FALSE)
             .get()
             .given()
             .pathParam("caseTypeId", caseTypeId)
-            .pathParam("triggerId", eventTriggerId)
-            .accept(V2.MediaType.START_CASE_TRIGGER)
+            .pathParam("triggerId", eventId)
+            .accept(V2.MediaType.START_CASE_EVENT)
             .header("experimental", "true");
     }
 
-    private RequestSpecification callGetStartEventTrigger(String caseId, String eventTriggerId) {
+    private RequestSpecification callGetStartEventTrigger(String caseId, String eventId) {
         return asAutoTestCaseworker(FALSE)
             .get()
             .given()
             .pathParam("caseId", caseId)
-            .pathParam("triggerId", eventTriggerId)
-            .accept(V2.MediaType.START_EVENT_TRIGGER)
+            .pathParam("triggerId", eventId)
+            .accept(V2.MediaType.START_EVENT)
             .header("experimental", "true");
     }
 }

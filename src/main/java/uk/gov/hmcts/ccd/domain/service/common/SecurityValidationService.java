@@ -30,7 +30,9 @@ public class SecurityValidationService {
     private static final String CLASSIFICATION = "classification";
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data validation error (c)";
 
-    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails, Map<String, JsonNode> defaultDataClassification) {
+    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse,
+                                                     CaseDetails caseDetails,
+                                                     Map<String, JsonNode> defaultDataClassification) {
 
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
@@ -97,8 +99,8 @@ public class SecurityValidationService {
     }
 
     private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
-        return defaultDataClassification != null && callbackDataClassification != null &&
-            defaultDataClassification.size() == callbackDataClassification.size();
+        return defaultDataClassification != null && callbackDataClassification != null
+            && defaultDataClassification.size() == callbackDataClassification.size();
     }
 
 

@@ -97,13 +97,13 @@ class CaseDetailsTest {
     }
 
     private CaseTypeTabField createCaseTypeTabField(String id, String type) {
-        CaseTypeTabField tabField = new CaseTypeTabField();
-        CaseField caseField = new CaseField();
+        CaseFieldDefinition caseField = new CaseFieldDefinition();
         caseField.setId(id);
-        FieldType labelFieldType = new FieldType();
+        FieldTypeDefinition labelFieldType = new FieldTypeDefinition();
         labelFieldType.setType(type);
-        caseField.setFieldType(labelFieldType);
-        tabField.setCaseField(caseField);
+        caseField.setFieldTypeDefinition(labelFieldType);
+        CaseTypeTabField tabField = new CaseTypeTabField();
+        tabField.setCaseFieldDefinition(caseField);
         return tabField;
     }
 

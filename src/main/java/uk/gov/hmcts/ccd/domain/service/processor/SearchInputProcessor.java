@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCriteriaOperation;
@@ -79,7 +79,7 @@ public class SearchInputProcessor {
                         processValue(id, input.getDisplayContextParameter(),
                             metadata.getOptionalMetadata(field).get(), input.getField().getType()));
                 }
-        });
+            });
 
         return metadata;
     }
@@ -105,7 +105,7 @@ public class SearchInputProcessor {
         if (field.isPresent() && DisplayContextParameter
             .hasDisplayContextParameterType(field.get().getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)) {
             newParams.put(fieldPath,
-                processValue(fieldPath, field.get().getDisplayContextParameter(), queryValue, field.get().getFieldType()));
+                processValue(fieldPath, field.get().getDisplayContextParameter(), queryValue, field.get().getFieldTypeDefinition()));
         } else {
             newParams.put(fieldPath, queryValue);
         }
@@ -116,14 +116,14 @@ public class SearchInputProcessor {
         return splitPath.length > 1 && Ints.tryParse(splitPath[1]) == null;
     }
 
-    private String processValue(String id, String displayContextParameter, String value, FieldType fieldType) {
+    private String processValue(String id, String displayContextParameter, String value, FieldTypeDefinition fieldType) {
         try {
-            if (fieldType.getType().equals(FieldType.DATE)) {
+            if (fieldType.getType().equals(FieldTypeDefinition.DATE)) {
                 return dateTimeFormatParser.convertDateToIso8601(format(displayContextParameter, fieldType), value);
-            } else if (fieldType.getType().equals(FieldType.DATETIME)) {
+            } else if (fieldType.getType().equals(FieldTypeDefinition.DATETIME)) {
                 return dateTimeFormatParser.convertDateTimeToIso8601(format(displayContextParameter, fieldType), value);
-            } else if (fieldType.getType().equals(FieldType.COLLECTION)) {
-                return processValue(id, displayContextParameter, value, fieldType.getCollectionFieldType());
+            } else if (fieldType.getType().equals(FieldTypeDefinition.COLLECTION)) {
+                return processValue(id, displayContextParameter, value, fieldType.getCollectionFieldTypeDefinition());
             } else {
                 return value;
             }
@@ -137,12 +137,12 @@ public class SearchInputProcessor {
         }
     }
 
-    private String format(String displayContextParameter, FieldType fieldType) {
+    private String format(String displayContextParameter, FieldTypeDefinition fieldType) {
         return DisplayContextParameter
             .getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEENTRY)
             .map(DisplayContextParameter::getValue)
-            .orElseGet(() -> fieldType.getType().equals(FieldType.DATE) ?
-                DateTimeFormatParser.DATE_FORMAT :
-                DateTimeFormatParser.DATE_TIME_FORMAT);
+            .orElseGet(() -> fieldType.getType().equals(FieldTypeDefinition.DATE)
+                ? DateTimeFormatParser.DATE_FORMAT
+                : DateTimeFormatParser.DATE_TIME_FORMAT);
     }
 }

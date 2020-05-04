@@ -15,6 +15,10 @@ import uk.gov.hmcts.befta.BeftaMain;
         features = { "classpath:features" }, tags = { "not @Ignore" })
 public class DataStoreBeftaRunner {
 
+    private DataStoreBeftaRunner() {
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
+    }
+
     @BeforeClass
     public static void setUp() {
         BeftaMain.setUp(new DataStoreTestAutomationAdapter());

@@ -227,16 +227,16 @@ public class MetaData {
             return false;
         }
         MetaData metaData = (MetaData) o;
-        return Objects.equals(caseTypeId, metaData.caseTypeId) &&
-               Objects.equals(jurisdiction, metaData.jurisdiction) &&
-               Objects.equals(state, metaData.state) &&
-               Objects.equals(caseReference, metaData.caseReference) &&
-               Objects.equals(createdDate, metaData.createdDate) &&
-               Objects.equals(lastModifiedDate, metaData.lastModifiedDate) &&
-               Objects.equals(lastStateModifiedDate, metaData.lastStateModifiedDate) &&
-               Objects.equals(securityClassification, metaData.securityClassification) &&
-               Objects.equals(page, metaData.page) &&
-               Objects.equals(sortDirection, metaData.sortDirection);
+        return Objects.equals(caseTypeId, metaData.caseTypeId)
+            && Objects.equals(jurisdiction, metaData.jurisdiction)
+            && Objects.equals(state, metaData.state)
+            && Objects.equals(caseReference, metaData.caseReference)
+            && Objects.equals(createdDate, metaData.createdDate)
+            && Objects.equals(lastModifiedDate, metaData.lastModifiedDate)
+            && Objects.equals(lastStateModifiedDate, metaData.lastStateModifiedDate)
+            && Objects.equals(securityClassification, metaData.securityClassification)
+            && Objects.equals(page, metaData.page)
+            && Objects.equals(sortDirection, metaData.sortDirection);
     }
 
     @Override

@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetBannerOperation;
@@ -24,12 +24,12 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIBannerResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.BannerViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionViewResource;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionConfigResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionConfigViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.SearchInputsViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.WorkbasketInputsViewResource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
@@ -69,12 +69,12 @@ class UIDefinitionControllerTest {
                                         .withBannerUrlText("Click here to see it.>>>")
                                         .withBannerUrl("http://localhost:3451/test").build();
 
-    private JurisdictionUiConfig jurisdictionUiConfig1 = newJurisdictionUiConfig()
+    private JurisdictionUiConfigDefinition jurisdictionUiConfigDefinition1 = newJurisdictionUiConfig()
                                                                     .withId("Reference 1")
                                                                     .withName("Name 1")
                                                                     .withShutteredEnabled(true)
                                                                     .build();
-    private JurisdictionUiConfig jurisdictionUiConfig2 = newJurisdictionUiConfig()
+    private JurisdictionUiConfigDefinition jurisdictionUiConfigDefinition2 = newJurisdictionUiConfig()
                                                                     .withId("Reference 2")
                                                                     .withName("Name 2")
                                                                     .withShutteredEnabled(false)
@@ -83,7 +83,8 @@ class UIDefinitionControllerTest {
     private final List<WorkbasketInput> workbasketInputs = Lists.newArrayList(workbasketInput1, workbasketInput2);
     private final List<SearchInput> searchInputs = Lists.newArrayList(searchInput1, searchInput2);
     private final List<Banner> banners = Lists.newArrayList(banner1, banner2);
-    private final List<JurisdictionUiConfig> jurisdictionUiConfigs = Lists.newArrayList(jurisdictionUiConfig1, jurisdictionUiConfig2);
+    private final List<JurisdictionUiConfigDefinition> jurisdictionUiConfigDefinitions =
+        Lists.newArrayList(jurisdictionUiConfigDefinition1, jurisdictionUiConfigDefinition2);
     private final List<String> jurisdictionReferenes = Lists.newArrayList("TEST", "FAMILY LAW");
 
     @Mock
@@ -91,7 +92,7 @@ class UIDefinitionControllerTest {
 
     @Mock
     private GetBannerOperation getBannerOperation;
-    
+
     @Mock
     private GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation;
 
@@ -108,7 +109,7 @@ class UIDefinitionControllerTest {
         doReturn(workbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ID, CAN_READ, WORKBASKET);
         doReturn(searchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ID, CAN_READ, SEARCH);
         doReturn(banners).when(getBannerOperation).execute(jurisdictionReferenes);
-        doReturn(jurisdictionUiConfigs).when(getJurisdictionUiConfigOperation).execute(jurisdictionReferenes);
+        doReturn(jurisdictionUiConfigDefinitions).when(getJurisdictionUiConfigOperation).execute(jurisdictionReferenes);
     }
 
     @Nested
@@ -118,12 +119,12 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when case found")
         void caseFound() {
-            final ResponseEntity<UIWorkbasketInputsResource> response = uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID);
+            final ResponseEntity<WorkbasketInputsViewResource> response = uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                    UIWorkbasketInputsResource.UIWorkbasketInput[] workbasketInputs = response.getBody().getWorkbasketInputs();
+                    WorkbasketInputsViewResource.WorkbasketInputView[] workbasketInputs = response.getBody().getWorkbasketInputs();
                     assertThat(Lists.newArrayList(workbasketInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
                         hasProperty("field", hasProperty("id", is("field2"))),
                             hasProperty("field", hasProperty("showCondition", is(SHOW_CONDITION)))));
@@ -148,12 +149,12 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when case found")
         void caseFound() {
-            final ResponseEntity<UISearchInputsResource> response = uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID);
+            final ResponseEntity<SearchInputsViewResource> response = uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                    UISearchInputsResource.UISearchInput[] searchInputs = response.getBody().getSearchInputs();
+                    SearchInputsViewResource.SearchInputView[] searchInputs = response.getBody().getSearchInputs();
                     assertThat(Lists.newArrayList(searchInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
                                                                           hasProperty("field", hasProperty("id", is("field2"))),
                                                                           hasProperty("field", hasProperty("showCondition", is(SHOW_CONDITION)))));
@@ -177,12 +178,12 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when banners found")
         void bannerFound() {
-            final ResponseEntity<UIBannerResource> response = uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes));
+            final ResponseEntity<BannerViewResource> response = uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes));
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                    UIBannerResource bannerResource = response.getBody();
+                    BannerViewResource bannerResource = response.getBody();
                     assertThat(Lists.newArrayList(bannerResource.getBanners()), hasItems(hasProperty("bannerDescription", is("Test Description1")),
                         hasProperty("bannerDescription", is("Test Description2"))));
                 }
@@ -201,7 +202,7 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return empty list of banners")
         void shouldReturnEmptyBannersList() {
-            ResponseEntity<UIBannerResource>  responseEntity = uiDefinitionController.getBanners(Optional.empty());
+            ResponseEntity<BannerViewResource>  responseEntity = uiDefinitionController.getBanners(Optional.empty());
             assertEquals(0, responseEntity.getBody().getBanners().size());
         }
 
@@ -268,7 +269,7 @@ class UIDefinitionControllerTest {
             when(userProfile.getJurisdictions()).thenReturn(jurisdictionDisplayProperties);
             when(getUserProfileOperation.execute(ArgumentMatchers.any())).thenReturn(userProfile);
 
-            ResponseEntity<UIJurisdictionResource> response = uiDefinitionController.getJurisdictions("create");
+            ResponseEntity<JurisdictionViewResource> response = uiDefinitionController.getJurisdictions("create");
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -276,21 +277,21 @@ class UIDefinitionControllerTest {
             );
         }
     }
-  
+
     @Nested
     @DisplayName("GET /internal/jurisdiction-ui-configs")
-    class GetJurisdictionUiConfigs {
+    class GetJurisdictionUiConfigsDefinition {
 
         @Test
         @DisplayName("should return 200 when jurisdiction UI configs found")
         void caseFound() {
-            final ResponseEntity<UIJurisdictionConfigResource> response = uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes));
+            final ResponseEntity<JurisdictionConfigViewResource> response = uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes));
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                	UIJurisdictionConfigResource uiJurisdictionConfigResource = response.getBody();
-                    assertThat(Lists.newArrayList(uiJurisdictionConfigResource.getConfigs()),hasItems(
+                    JurisdictionConfigViewResource jurisdictionConfigViewResource = response.getBody();
+                    assertThat(Lists.newArrayList(jurisdictionConfigViewResource.getConfigs()), hasItems(
                         hasProperty("id", is("Reference 1")),
                         hasProperty("id", is("Reference 2")),
                         hasProperty("name", is("Name 1")),

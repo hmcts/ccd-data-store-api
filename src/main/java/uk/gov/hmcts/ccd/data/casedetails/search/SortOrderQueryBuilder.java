@@ -22,7 +22,7 @@ public class SortOrderQueryBuilder {
             if (sortOrderField.isMetadata()) {
                 sb.append(getMataFieldName(sortOrderField.getCaseFieldId()));
             } else {
-                sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
+                sb.append(convertFieldNameToJsonbSqlFormat(sortOrderField.getCaseFieldId()));
             }
             sb.append(SPACE);
             sb.append(fromOptionalString(ofNullable(sortOrderField.getDirection())));
@@ -38,7 +38,7 @@ public class SortOrderQueryBuilder {
         return CaseField.valueOf(metaFieldName).getDbColumnName();
     }
 
-    private static String convertFieldNameToJSONBsqlFormat(final String in) {
+    private static String convertFieldNameToJsonbSqlFormat(final String in) {
         return DATA_FIELD + " #>> '{" + StringUtils.replace(in, ".", ",") + "}'";
     }
 

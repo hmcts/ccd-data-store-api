@@ -8,9 +8,9 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
 public abstract class AbstractDefaultGetCaseViewOperation {
 
@@ -61,11 +61,11 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         }
     }
 
-    CaseType getCaseType(String caseTypeId) {
+    CaseTypeDefinition getCaseType(String caseTypeId) {
         return caseTypeService.getCaseType(caseTypeId);
     }
 
-    CaseType getCaseType(String jurisdictionId, String caseTypeId) {
+    CaseTypeDefinition getCaseType(String jurisdictionId, String caseTypeId) {
         return caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
     }
 
@@ -78,8 +78,8 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         return getTabs(caseDetails, data, getCaseTabCollection(caseDetails.getCaseTypeId()));
     }
 
-    CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data, CaseTabCollection caseTabCollection) {
-        return caseTabCollection.getTabs().stream().map(tab -> {
+    CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data, CaseTypeTabsDefinition caseTypeTabsDefinition) {
+        return caseTypeTabsDefinition.getTabs().stream().map(tab -> {
             CommonField[] caseViewFields = tab.getTabFields().stream()
                 .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
                 .map(caseTypeTabField -> CaseViewField.createFrom(caseTypeTabField, data))
@@ -91,7 +91,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         }).toArray(CaseViewTab[]::new);
     }
 
-    CaseTabCollection getCaseTabCollection(String caseTypeId) {
+    CaseTypeTabsDefinition getCaseTabCollection(String caseTypeId) {
         return uiDefinitionRepository.getCaseTabCollection(caseTypeId);
     }
 
@@ -99,18 +99,18 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         return caseDetails::existsInData;
     }
 
-    List<CaseViewField> getMetadataFields(CaseType caseType, CaseDetails caseDetails) {
-        return caseType.getCaseFields().stream()
-            .filter(CaseField::isMetadata)
+    List<CaseViewField> getMetadataFields(CaseTypeDefinition caseTypeDefinition, CaseDetails caseDetails) {
+        return caseTypeDefinition.getCaseFieldDefinitions().stream()
+            .filter(CaseFieldDefinition::isMetadata)
             .map(caseField -> CaseViewField.createFrom(caseField, caseDetails.getCaseDataAndMetadata()))
             .collect(Collectors.toList());
     }
 
-    protected void hydrateHistoryField(CaseDetails caseDetails, CaseType caseType, List<CaseViewEvent> events) {
-        for (CaseField caseField : caseType.getCaseFields()) {
-            if (caseField.getFieldType().getType().equals(CASE_HISTORY_VIEWER)) {
+    protected void hydrateHistoryField(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, List<CaseViewEvent> events) {
+        for (CaseFieldDefinition caseFieldDefinition : caseTypeDefinition.getCaseFieldDefinitions()) {
+            if (caseFieldDefinition.getFieldTypeDefinition().getType().equals(CASE_HISTORY_VIEWER)) {
                 JsonNode eventsNode = objectMapperService.convertObjectToJsonNode(events);
-                caseDetails.getData().put(caseField.getId(), eventsNode);
+                caseDetails.getData().put(caseFieldDefinition.getId(), eventsNode);
                 return;
             }
         }

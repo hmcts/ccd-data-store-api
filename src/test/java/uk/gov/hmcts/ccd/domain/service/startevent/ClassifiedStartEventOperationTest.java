@@ -23,9 +23,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -57,17 +57,17 @@ class ClassifiedStartEventOperationTest {
 
     private CaseDetails caseDetails;
     private CaseDetails classifiedDetails;
-    private StartEventTrigger startEvent;
-    private CaseType caseType;
+    private StartEventResult startEvent;
+    private CaseTypeDefinition caseTypeDefinition;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
         caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
-        startEvent = new StartEventTrigger();
+        startEvent = new StartEventResult();
         startEvent.setCaseDetails(caseDetails);
-        caseType = newCaseType().build();
+        caseTypeDefinition = newCaseType().build();
 
         classifiedDetails = new CaseDetails();
         doReturn(Optional.of(classifiedDetails)).when(classificationService).applyClassification(caseDetails);
@@ -88,7 +88,7 @@ class ClassifiedStartEventOperationTest {
         void shouldCallDecoratedStartEventOperation() {
             doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = classifiedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE_WARNING);
 
@@ -109,7 +109,7 @@ class ClassifiedStartEventOperationTest {
         void shouldCallDecoratedStartEventOperation() {
             doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = classifiedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE_WARNING);
 
@@ -150,7 +150,7 @@ class ClassifiedStartEventOperationTest {
         void shouldReturnEventTriggerWhenCaseDetailsNull() {
             startEvent.setCaseDetails(null);
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+            final StartEventResult output = classifiedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                                                                                                EVENT_TRIGGER_ID,
                                                                                                IGNORE_WARNING);
 
@@ -164,7 +164,7 @@ class ClassifiedStartEventOperationTest {
         @DisplayName("should return event trigger with classified case details when not null")
         void shouldReturnEventTriggerWithClassifiedCaseDetails() {
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+            final StartEventResult output = classifiedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                                                                                                EVENT_TRIGGER_ID,
                                                                                                IGNORE_WARNING);
 
@@ -181,7 +181,7 @@ class ClassifiedStartEventOperationTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+            doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
             doReturn(startEvent).when(startEventOperation).triggerStartForDraft(DRAFT_REFERENCE,
                                                                                 IGNORE_WARNING);
             when(draftGateway.getCaseDetails(Draft.stripId(DRAFT_REFERENCE))).thenReturn(caseDetails);
@@ -204,7 +204,7 @@ class ClassifiedStartEventOperationTest {
 
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> verify(caseDataService).getDefaultSecurityClassifications(eq(caseType), eq(caseDetails.getData()), eq(Maps.newHashMap()))
+                () -> verify(caseDataService).getDefaultSecurityClassifications(eq(caseTypeDefinition), eq(caseDetails.getData()), eq(Maps.newHashMap()))
             );
         }
 
@@ -213,7 +213,7 @@ class ClassifiedStartEventOperationTest {
         void shouldReturnEventTriggerWhenCaseDetailsNull() {
             startEvent.setCaseDetails(null);
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE,
+            final StartEventResult output = classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE,
                                                                                                 IGNORE_WARNING);
 
             assertAll(
@@ -226,7 +226,7 @@ class ClassifiedStartEventOperationTest {
         @DisplayName("should return event trigger with classified case details when not null")
         void shouldReturnEventTriggerWithClassifiedCaseDetails() {
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE,
+            final StartEventResult output = classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE,
                                                                                                 IGNORE_WARNING);
 
             assertAll(
