@@ -17,8 +17,7 @@
     "_extends_": "Common_400_Response",
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip",
-      "Content-Type": "application/json"
+      "Content-Encoding" : "gzip"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",

@@ -1,5 +1,14 @@
 package uk.gov.hmcts.ccd.v2.external.resource;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.Link;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -8,14 +17,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.hateoas.Link;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 @DisplayName("CaseDataResource")
 class CaseDataResourceTest {
@@ -30,7 +31,7 @@ class CaseDataResourceTest {
     public static final Map<String, JsonNode> UNWRAPPED_DATA = newCaseData()
         .withPair("aField", JSON_NODE_FACTORY.textNode("aValue"))
         .build();
-    private static final JsonNode UNWRAPPED_DATA_NODE =  MAPPER.convertValue(UNWRAPPED_DATA, JsonNode.class);
+    private static final JsonNode UNWRAPPED_DATA_NODE = JacksonUtils.convertValueJsonNode(UNWRAPPED_DATA);
     private static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent().withData(DATA).build();
 
     private final String linkSelfForCaseData = String.format("/case-types/%s/validate?pageId=pageId", CASE_TYPE_ID);

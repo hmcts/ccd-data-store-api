@@ -7,6 +7,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ToString
 public class CaseEvent implements Serializable {
@@ -198,5 +199,11 @@ public class CaseEvent implements Serializable {
 
     public void setCanSaveDraft(Boolean canSaveDraft) {
         this.canSaveDraft = canSaveDraft;
+    }
+
+    public Optional<CaseEventField> getCaseEventField(String caseFieldId) {
+        return getCaseFields().stream()
+            .filter(f -> f.getCaseFieldId().equals(caseFieldId))
+            .findFirst();
     }
 }

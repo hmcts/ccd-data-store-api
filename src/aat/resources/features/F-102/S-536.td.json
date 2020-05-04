@@ -13,7 +13,7 @@
       "Authorization": "Dummy_Authorization"
     },
     "pathVariables": {
-      "uid": "[[DYNAMIC]]"
+      "uid": "[[DEFAULT_AUTO_VALUE]]"
     },
     "queryParams": {
       "access": "create"

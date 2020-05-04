@@ -9,7 +9,7 @@
 	],
 	"request": {
     "pathVariables": {
-      "cid": "[[DYNAMIC]]"
+      "cid": "[[DEFAULT_AUTO_VALUE]]"
     }
 	},
 	"expectedResponse": {
@@ -19,6 +19,7 @@
       "_extends_": "Common_Response_Headers",
       "Content-Encoding" : "gzip",
       "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-start-event-trigger.v2+json;charset=UTF-8",
       "Vary" : "Accept-Encoding"
     },
     "body" : {

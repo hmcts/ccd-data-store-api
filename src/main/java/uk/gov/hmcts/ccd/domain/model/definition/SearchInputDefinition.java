@@ -15,6 +15,7 @@ public class SearchInputDefinition implements Serializable {
 
     private String caseTypeId = null;
     private List<SearchInputField> fields = new ArrayList<>();
+    private String displayContextParameter = null;
 
     /**
      **/
@@ -38,6 +39,18 @@ public class SearchInputDefinition implements Serializable {
 
     public void setFields(List<SearchInputField> fields) {
         this.fields = fields;
+    }
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("display_context_parameter")
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
+    }
+
+    public void setDisplayContextParameter(String displayContextParameter) {
+        this.displayContextParameter = displayContextParameter;
     }
 
 }
