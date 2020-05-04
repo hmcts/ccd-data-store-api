@@ -26,8 +26,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
+      "Content-Encoding": "gzip"
     },
     "body": {
       "token": "[[ANYTHING_PRESENT]]",
