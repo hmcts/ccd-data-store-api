@@ -5,6 +5,8 @@
         <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258</notes>
         <cve>CVE-2018-1258</cve>
     </suppress>
+
+    <!-- THIS WILL BE FIX IN RDM-8001-->
     <suppress>
         <notes><![CDATA[
             A permission issue was found in Elasticsearch versions before 5.6.15 and 6.6.1 when Field Level Security and Document Level
@@ -35,6 +37,8 @@
         <cve>CVE-2019-11358</cve>
         <cve>CVE-2015-9251</cve>
     </suppress>
+
+    <!-- THIS WILL BE FIX IN RDM-7997-->
     <suppress>
    <notes><![CDATA[
    file name: spring-aspects-5.1.6.RELEASE.jar
@@ -119,7 +123,8 @@
    <packageUrl regex="true">^pkg:maven/org\.springframework/spring-jcl@.*$</packageUrl>
    <cve>CVE-2020-5398</cve>
 </suppress>
-    <!-- FIXME : RDM-7451 -->
+
+    <!-- THIS WILL BE FIX IN RDM-8001-->
     <suppress>
         <notes><![CDATA[
    relates to spring_framework spring-security
@@ -128,47 +133,11 @@
         <cve>CVE-2020-5398</cve>
     </suppress>
 
-    <!-- FIXME : RDM-78578 -->
+    <!-- THIS WILL BE FIX IN RDM-8001-->
     <suppress>
         <notes>Temporary suppression for on-going developments</notes>
         <cpe>cpe:2.3:a:checkstyle:checkstyle:*:*:*:*:*:*:*:*</cpe>
         <cve>CVE-2019-10782</cve>
     </suppress>
 
-    <!-- FIXME : RDM-???? -->
-    <suppress>
-        <notes>Temporary suppression for on-going developments</notes>
-        <cve>CVE-2020-1938</cve>
-        <cve>CVE-2020-8840</cve>
-        <cve>CVE-2020-9547</cve>
-        <cve>CVE-2020-9548</cve>
-        <cve>CVE-2020-9546</cve>
-        <cve>CVE-2020-10673</cve>
-        <cve>CVE-2020-10672</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-10968</cve>
-     </suppress>
-     <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-10969</cve>
-     </suppress>
-     <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-11111</cve>
-     </suppress>
-     <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-11112</cve>
-     </suppress>
-     <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-11113</cve>
-     </suppress>
 </suppressions>
