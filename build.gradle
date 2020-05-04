@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.2.4.RELEASE'
+        springBootVersion = '2.2.5.RELEASE'
     }
     dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
@@ -220,6 +220,17 @@ dependencies {
 
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.3'
     compile "com.fasterxml.jackson.core:jackson-databind:2.10.3"
+
+    // use the latest org.springframework.security
+    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.3.0.RELEASE'
+
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.3.0.RELEASE'
+
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.3.0.RELEASE'
+
+    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.3.0.RELEASE'
+
+
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'

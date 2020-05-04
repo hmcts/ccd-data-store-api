@@ -5,9 +5,10 @@
         <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258</notes>
         <cve>CVE-2018-1258</cve>
     </suppress>
-
+  
     <!-- THIS CVEs should not be removed until the elastic search client is updated to 7.
     Before updating the elastic client make sure that the server has been updated to 7 -->
+
     <suppress>
         <notes><![CDATA[
             A permission issue was found in Elasticsearch versions before 5.6.15 and 6.6.1 when Field Level Security and Document Level
@@ -23,7 +24,8 @@
         <!-- Temporary suppression to ignore until it's fixed in master -->
         <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
-    <!--These javascript CVEs relate to Liquibase's web based admin UI which we don't use or expose-->
+
+    <!--  This has been fixed in RDM-8001-->
     <suppress>
         <notes><![CDATA[file name: liquibase-core-3.6.3.jar: bootstrap.*]]></notes>
         <packageUrl regex="true">^pkg:javascript/bootstrap@.*$</packageUrl>
@@ -37,98 +39,5 @@
         <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
         <cve>CVE-2019-11358</cve>
         <cve>CVE-2015-9251</cve>
-  </suppress>
-
-    <!-- THIS WILL BE FIX IN RDM-7997-->
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-aspects-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-aspects@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-orm-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-orm@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-jdbc-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-jdbc@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-webmvc-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-webmvc@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-context-support-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-context-support@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-context-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-context@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-aop-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-aop@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-tx-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-tx@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-tx-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-tx@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-expression-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-expression@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-core-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-core@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: spring-jcl-5.1.6.RELEASE.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-jcl@.*$</packageUrl>
-   <cve>CVE-2020-5398</cve>
-</suppress>
-    <suppress>
-        <notes><![CDATA[
-   relates to spring_framework spring-security
-   ]]></notes>
-        <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
-        <cve>CVE-2020-5398</cve>
     </suppress>
 </suppressions>
