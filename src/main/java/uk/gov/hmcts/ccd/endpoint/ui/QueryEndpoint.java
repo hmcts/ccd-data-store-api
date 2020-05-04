@@ -160,7 +160,7 @@ public class QueryEndpoint {
         metadata.setState(param(params, STATE.getParameterName()));
         metadata.setCaseReference(param(params, CASE_REFERENCE.getParameterName()));
         metadata.setCreatedDate(param(params, CREATED_DATE.getParameterName()));
-        metadata.setLastModified(param(params, LAST_MODIFIED_DATE.getParameterName()));
+        metadata.setLastModifiedDate(param(params, LAST_MODIFIED_DATE.getParameterName()));
         metadata.setLastStateModifiedDate(param(params, LAST_STATE_MODIFIED_DATE.getParameterName()));
         metadata.setSecurityClassification(param(params, SECURITY_CLASSIFICATION.getParameterName()));
         metadata.setPage(param(params, PAGE_PARAM));
