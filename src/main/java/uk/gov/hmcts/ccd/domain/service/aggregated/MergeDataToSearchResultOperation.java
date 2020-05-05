@@ -162,7 +162,7 @@ public class MergeDataToSearchResultOperation {
 
         JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement)).orElse(null);
 
-        if (pathElements.size() == 1) {
+        if (caseField == null || pathElements.size() == 1) {
             return caseField;
         } else {
             List<String> tail = pathElements.subList(1, pathElements.size());
