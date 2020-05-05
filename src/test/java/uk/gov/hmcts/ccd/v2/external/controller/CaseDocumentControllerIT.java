@@ -1,12 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -43,56 +38,10 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseDocumentResource;
 
 public class CaseDocumentControllerIT extends WireMockBaseTest {
 
-    private static final String DOCUMENT_URL = "http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97";
-
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
     protected static final ObjectMapper mapper = new ObjectMapper();
-    private String caseTypeResponseString = "{\n" +
-                                            "      \"id\": \"TestCaseDocumentCase\",\n" +
-                                            "      \"version\": {\n" +
-                                            "        \"number\": 1,\n" +
-                                            "        \"live_from\": \"2017-01-01\"\n" +
-                                            "      },\n" +
-                                            "      \"name\": \"Test Case Document Case\",\n" +
-                                            "      \"description\": \"Test Case Document Case\",\n" +
-                                            "      \"printable_document_url\": \"http://localhost:%s/printables\",\n" +
-                                            "      \"jurisdiction\": {\n" +
-                                            "        \"id\": \"PROBATE\",\n" +
-                                            "        \"name\": \"Test\",\n" +
-                                            "        \"description\": \"Test Jurisdiction\"\n" +
-                                            "      },\n" +
-                                            "      \"security_classification\": \"PUBLIC\",\n" +
-                                            "      \"acls\": [\n" +
-                                            "        {\n" +
-                                            "          \"role\": \"caseworker-probate-public\",\n" +
-                                            "          \"create\": true,\n" +
-                                            "          \"read\": true,\n" +
-                                            "          \"update\": true,\n" +
-                                            "          \"delete\": false\n" +
-                                            "        },\n" +
-                                            "        {\n" +
-                                            "          \"role\": \"caseworker-probate-private\",\n" +
-                                            "          \"create\": true,\n" +
-                                            "          \"read\": true,\n" +
-                                            "          \"update\": true,\n" +
-                                            "          \"delete\": false\n" +
-                                            "        },\n" +
-                                            "        {\n" +
-                                            "          \"role\": \"citizen\",\n" +
-                                            "          \"create\": true,\n" +
-                                            "          \"read\": true,\n" +
-                                            "          \"update\": true,\n" +
-                                            "          \"delete\": false\n" +
-                                            "        }],\n" +
-                                            "      \"events\": [\n" +
-                                            "      ],\n" +
-                                            "      \"states\": [\n" +
-                                            "      ],\n" +
-                                            "      \"case_fields\": [\n" +
-                                            "      ]\n" +
-                                            "    }";
 
     @Inject
     protected DataSource db;
@@ -120,13 +69,8 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenGetValidCaseDocuments() throws Exception {
 
-        stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(urlMatching("/api/data/case-type/TestCaseDocumentField"))
-                                                               .willReturn(aResponse()
-                                                                               .withHeader("Content-Type", "application/json")
-                                                                               .withBody(String.format(caseTypeResponseString, super.wiremockPort))));
-
         final MvcResult result = mockMvc
-            .perform(get(String.format("http://localhost:%s/cases/1504259907353520/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0", super.wiremockPort))
+            .perform(get(String.format("http://localhost:%s/cases/1504259907353651/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", super.wiremockPort))
                          .contentType(MediaType.APPLICATION_JSON)
                          .header("Accept", V2.MediaType.CASE_DOCUMENT)
                          .header("experimental", true))
@@ -142,22 +86,10 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
         assertAll(
             () -> assertThat(self.get().getHref(),
                              is(String
-                                    .format("http://localhost:%s/cases/1504259907353520/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0", super.wiremockPort))),
-            () -> assertThat(caseDocumentMetadata,
-                             allOf(hasProperty("caseId", is("Claimant ID")),
-                                   hasProperty("caseTypeId", is("Document identifying identity")),
-                                   hasProperty("jurisdictionId", is("ID")))),
-            () -> assertThat(caseDocumentMetadata,
-                             allOf(hasProperty("url", is("Claimant Address")),
-                                   hasProperty("name", is("Document identifying address")),
-                                   hasProperty("type", is("Address")),
-                                   hasProperty("description", is(DOCUMENT_URL)),
-                                   hasProperty("id", is("Address"))))
-            //() -> assertThat(caseDocumentResource.getDocumentMetadata().getDocument().getPermissions(), hasSize(2)),
-            //() -> assertThat(caseDocumentResource.getDocumentMetadata().getDocument().getPermissions(),
-            //    hasItems(Permission.READ, Permission.UPDATE))
-            //() -> assertThat(caseDocumentResource.getDocumentMetadata().getDocumentPermissions(),
-            //    hasItems(Permission.READ, Permission.UPDATE))
+                                    .format("http://localhost:%s/cases/1504259907353651/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", super.wiremockPort))),
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), hasSize(1)),
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(),
+                hasItems(Permission.READ))
         );
     }
 }

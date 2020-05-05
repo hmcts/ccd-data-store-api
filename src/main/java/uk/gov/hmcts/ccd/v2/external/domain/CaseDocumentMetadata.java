@@ -1,10 +1,17 @@
 package uk.gov.hmcts.ccd.v2.external.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 public class CaseDocumentMetadata {
 
     private String caseId;
