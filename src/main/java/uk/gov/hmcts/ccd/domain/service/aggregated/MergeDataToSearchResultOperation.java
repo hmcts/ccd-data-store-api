@@ -136,8 +136,10 @@ public class MergeDataToSearchResultOperation {
         searchResult.getFieldsWithPaths().forEach(searchResultField -> {
             JsonNode jsonNode = caseData.get(searchResultField.getCaseFieldId());
             if (jsonNode != null) {
-                newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(),
-                    getObjectByPath(searchResultField, jsonNode));
+                Object objectByPath = getObjectByPath(searchResultField, jsonNode);
+                if (objectByPath != null) {
+                    newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(), objectByPath);
+                }
             }
         });
 
@@ -158,8 +160,7 @@ public class MergeDataToSearchResultOperation {
     private Object reduce(JsonNode caseFields, List<String> pathElements, String path) {
         String firstPathElement = pathElements.get(0);
 
-        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement))
-            .orElseThrow(() -> new BadRequestException(format(NESTED_ELEMENT_NOT_FOUND_FOR_PATH, path)));
+        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement)).orElse(null);
 
         if (pathElements.size() == 1) {
             return caseField;
