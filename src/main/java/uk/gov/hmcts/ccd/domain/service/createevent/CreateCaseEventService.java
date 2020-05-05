@@ -3,6 +3,21 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -37,23 +52,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.v3.V3;
 
 @Service
@@ -147,7 +145,7 @@ public class CreateCaseEventService {
         CaseDocumentAttacher caseDocumentAttacher = null;
         if (isApiVersion3) {
             caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
-            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForUpdate(content.getData(),caseDetailsBefore);
+            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForUpdate(content.getData(), caseDetailsBefore);
         }
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,

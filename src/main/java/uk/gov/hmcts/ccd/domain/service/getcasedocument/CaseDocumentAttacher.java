@@ -102,7 +102,7 @@ public class CaseDocumentAttacher {
                 if (jsonNode.get(HASH_TOKEN_STRING) != null) {
                     documentsBeforeCallback.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
-                } else if (caseDetailsBefore != null) {
+                } else {
                     existingDocument(caseDetailsBefore.getData(), documentId);
                     if (existingDocumentsInCase.isEmpty()) {
                         throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
