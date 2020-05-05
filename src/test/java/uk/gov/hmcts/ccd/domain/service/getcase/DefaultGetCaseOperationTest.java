@@ -47,7 +47,7 @@ class DefaultGetCaseOperationTest {
 
     @Nested
     @DisplayName("execute(caseReference)")
-    class execute_caseReference {
+    class ExecuteCaseReference {
 
         @Test
         @DisplayName("should throw Bad Request exception when case reference is null")

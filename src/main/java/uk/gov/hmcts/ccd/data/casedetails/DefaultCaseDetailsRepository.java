@@ -36,6 +36,7 @@ import java.util.Optional;
 @Named
 @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
 @Singleton
+@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
@@ -92,6 +93,17 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return find(jurisdiction, id, null).map(this.caseDetailsMapper::entityToModel);
     }
 
+    /**
+     * @param id Internal case ID
+     * @return Case details if found; null otherwise
+     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
+     */
+    @Override
+    @Deprecated
+    public CaseDetails findById(final Long id) {
+        return findById(null, id).orElse(null);
+    }
+
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
         return findByReference(jurisdiction, caseReference.toString());
@@ -105,17 +117,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public Optional<CaseDetails> findByReference(String caseReference) {
         return findByReference(null, caseReference);
-    }
-
-    /**
-     * @param id Internal case ID
-     * @return Case details if found; null otherwise
-     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
-     */
-    @Override
-    @Deprecated
-    public CaseDetails findById(final Long id) {
-        return findById(null, id).orElse(null);
     }
 
     /**

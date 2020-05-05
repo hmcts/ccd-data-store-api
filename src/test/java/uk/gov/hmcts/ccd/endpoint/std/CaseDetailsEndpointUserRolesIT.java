@@ -41,7 +41,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     private static final String JURISDICTION = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
-    private static final String GET_PAGINATED_SEARCH_METADATA_CITIZENS = "/citizens/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
+    private static final String GET_PAGINATED_SEARCH_METADATA_CITIZENS
+        = "/citizens/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
     private static final String UID = "123";
     private static final int NUMBER_OF_CASES = 18;
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
@@ -75,16 +76,16 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
-        final String DESCRIPTION = "A very long comment.......";
-        final String SUMMARY = "Short comment";
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
 
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
-        triggeringEvent.setDescription(DESCRIPTION);
-        triggeringEvent.setSummary(SUMMARY);
+        triggeringEvent.setDescription(description);
+        triggeringEvent.setSummary(summary);
         caseDetailsToSave.setEvent(triggeringEvent);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CREATOR_ROLE, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -120,24 +121,24 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
         assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
-        assertEquals("Description", DESCRIPTION, caseAuditEvent.getDescription());
-        assertEquals("Summary", SUMMARY, caseAuditEvent.getSummary());
+        assertEquals("Description", description, caseAuditEvent.getDescription());
+        assertEquals("Summary", summary, caseAuditEvent.getSummary());
         assertTrue(caseAuditEvent.getDataClassification().isEmpty());
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
     }
 
     @Test
     public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCitizen() throws Exception {
-        final String DESCRIPTION = "A very long comment.......";
-        final String SUMMARY = "Short comment";
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
-        triggeringEvent.setDescription(DESCRIPTION);
-        triggeringEvent.setSummary(SUMMARY);
+        triggeringEvent.setDescription(description);
+        triggeringEvent.setSummary(summary);
         caseDetailsToSave.setEvent(triggeringEvent);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CREATOR_ROLE, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -173,8 +174,8 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
         assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
-        assertEquals("Description", DESCRIPTION, caseAuditEvent.getDescription());
-        assertEquals("Summary", SUMMARY, caseAuditEvent.getSummary());
+        assertEquals("Description", description, caseAuditEvent.getDescription());
+        assertEquals("Summary", summary, caseAuditEvent.getSummary());
         assertTrue(caseAuditEvent.getDataClassification().isEmpty());
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
     }
