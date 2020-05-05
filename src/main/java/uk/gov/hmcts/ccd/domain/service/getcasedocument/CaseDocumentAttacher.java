@@ -154,8 +154,19 @@ public class CaseDocumentAttacher {
                 }
                 ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
-                jsonNode.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
-                    Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+                if (jsonNode instanceof ArrayNode) {
+                    Iterator<JsonNode> arrayNode = ((ArrayNode) jsonNode).elements();
+                    while (arrayNode.hasNext()) {
+                        JsonNode arrayNodeElement = arrayNode.next();
+                        arrayNodeElement.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
+                            Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+
+                    }
+
+                } else {
+                    jsonNode.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
+                        Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+                }
             }
         });
     }
