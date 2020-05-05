@@ -103,7 +103,7 @@ public class CaseDocumentAttacher {
                     documentsBeforeCallback.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
                 } else {
-                    existingDocument(caseDetailsBefore.getData(), documentId);
+                    isExistingDocumentInCase(caseDetailsBefore.getData(), documentId);
                     if (existingDocumentsInCase.isEmpty()) {
                         throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
                     } else {
@@ -112,19 +112,23 @@ public class CaseDocumentAttacher {
                 }
             } else {
                 if (jsonNode instanceof ArrayNode) {
-                    Iterator<JsonNode> arrayNode = ((ArrayNode) jsonNode).elements();
-                    while (arrayNode.hasNext()) {
-                        JsonNode arrayNodeElement = arrayNode.next();
-                        arrayNodeElement.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
-                            Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
-
-                    }
+                    getArrayNodeElementsBeforeCallback(caseDetailsBefore, (ArrayNode) jsonNode);
                 } else {
                     jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
                         Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
                 }
             }
         });
+    }
+
+    private void getArrayNodeElementsBeforeCallback(CaseDetails caseDetailsBefore, ArrayNode jsonNode) {
+        Iterator<JsonNode> arrayNode = jsonNode.elements();
+        while (arrayNode.hasNext()) {
+            JsonNode arrayNodeElement = arrayNode.next();
+            arrayNodeElement.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
+                Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
+
+        }
     }
 
     public void extractDocumentsAfterCallBack(CaseDetails caseDetails, boolean callBackWasCalled) {
@@ -155,13 +159,7 @@ public class CaseDocumentAttacher {
                 ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
                 if (jsonNode instanceof ArrayNode) {
-                    Iterator<JsonNode> arrayNode = ((ArrayNode) jsonNode).elements();
-                    while (arrayNode.hasNext()) {
-                        JsonNode arrayNodeElement = arrayNode.next();
-                        arrayNodeElement.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
-                            Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
-
-                    }
+                    extractArrayNodesAfterCallback(documentMap, (ArrayNode) jsonNode);
 
                 } else {
                     jsonNode.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
@@ -169,6 +167,15 @@ public class CaseDocumentAttacher {
                 }
             }
         });
+    }
+
+    private void extractArrayNodesAfterCallback(Map<String, String> documentMap, ArrayNode jsonNode) {
+        Iterator<JsonNode> arrayNode = jsonNode.elements();
+        while (arrayNode.hasNext()) {
+            JsonNode arrayNodeElement = arrayNode.next();
+            arrayNodeElement.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
+                Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+        }
     }
 
     public void restCallToAttachCaseDocuments() {
@@ -410,7 +417,7 @@ public class CaseDocumentAttacher {
         return jsonNode.has(DOCUMENT_BINARY_URL) || jsonNode.has(DOCUMENT_URL);
     }
 
-    private void existingDocument(Map<String, JsonNode> caseDetailBefore, String newDocumentId) {
+    private void isExistingDocumentInCase(Map<String, JsonNode> caseDetailBefore, String newDocumentId) {
 
         caseDetailBefore.forEach((field, jsonNode) -> {
             if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
@@ -424,18 +431,17 @@ public class CaseDocumentAttacher {
                     Iterator<JsonNode> arrayNode = ((ArrayNode) jsonNode).elements();
                     while (arrayNode.hasNext()) {
                         JsonNode arrayNodeElement = arrayNode.next();
-                        arrayNodeElement.fields().forEachRemaining(node -> existingDocument(
+                        arrayNodeElement.fields().forEachRemaining(node -> isExistingDocumentInCase(
                             Collections.singletonMap(node.getKey(), node.getValue()), newDocumentId));
 
                     }
 
                 } else {
-                    jsonNode.fields().forEachRemaining(node -> existingDocument(
+                    jsonNode.fields().forEachRemaining(node -> isExistingDocumentInCase(
                         Collections.singletonMap(node.getKey(), node.getValue()), newDocumentId));
                 }
             }
         });
-
     }
 
 }
