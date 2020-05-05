@@ -279,6 +279,7 @@ public class CaseDocumentAttacherTest {
         Set<String> expectedOutput = new HashSet<>();
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
         expectedOutput.add("320233b8-fb61-4b58-8731-23c83638c9c6");
+        expectedOutput.add("b5eb1f0e-64cd-4ccb-996a-6915c28fa65d");
 
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
@@ -294,6 +295,7 @@ public class CaseDocumentAttacherTest {
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0976");
         expectedOutput.add("8da17150-c001-47d7-bfeb-3dabed9e0222");
         expectedOutput.add("335a9a09-7a51-40e9-8196-6b9e26fce6ff");
+        expectedOutput.add("b5eb1f0e-64cd-4ccb-996a-6915c28fa65d");
 
         final Set<String> output = caseDocumentAttacher.differenceBeforeAndAfterInCaseDetails(caseDetails.getData(), caseDataContent);
 
@@ -360,10 +362,12 @@ public class CaseDocumentAttacherTest {
             {"f0550adc-eaea-4232-b52f-1c4ac0534d60", "UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q"},
             {"5c4b5564-a29f-47d3-8c51-50e2d4629435", "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc"},
             {"7b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec", "7b8930ef-2bcd-44cd-8a78-17b8930ef-27b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec"},
+            {"95f048e7-9574-4a3d-9189-986015276fd7", "adfadfafgsdgsadgwrgsrg"},
+            {"3ca8b55e-76fe-4723-bb60-4e14e950bb0c", "sdg455sfgsfgfsgfsgsgsdgsdgsdgdsgs"}
         }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
         assertAll(
-            () -> assertEquals(caseDocumentAttacher.documentsBeforeCallback, expectedMap));
+            () -> assertEquals( expectedMap, caseDocumentAttacher.documentsBeforeCallback));
     }
 
     @Test

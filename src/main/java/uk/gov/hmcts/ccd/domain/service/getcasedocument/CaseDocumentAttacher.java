@@ -15,8 +15,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import liquibase.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -39,14 +37,12 @@ import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 public class CaseDocumentAttacher {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaseDocumentAttacher.class);
-
     Map<String, String> documentsBeforeCallback = new HashMap<>();
     Map<String, String> documentsAfterCallback = null;
     Map<String, String> documentAfterCallbackOriginalCopy = new HashMap<>();
     Map<String, JsonNode> recursiveMapForCaseDetailsBefore = new HashMap<>();
     CaseDocumentsMetadata caseDocumentsMetadata = null;
-    Set<String> existingDocumentsInCase = new HashSet();
+    Set<String> existingDocumentsInCase = new HashSet<>();
 
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
@@ -108,14 +104,12 @@ public class CaseDocumentAttacher {
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
                 } else if (caseDetailsBefore != null) {
                     existingDocument(caseDetailsBefore.getData(), documentId);
-                    if (existingDocumentsInCase.size() == 0) {
+                    if (existingDocumentsInCase.isEmpty()) {
                         throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
                     } else {
                         existingDocumentsInCase.clear();
                     }
                 }
-
-
             } else {
                 if (jsonNode instanceof ArrayNode) {
                     Iterator<JsonNode> arrayNode = ((ArrayNode) jsonNode).elements();
@@ -125,7 +119,6 @@ public class CaseDocumentAttacher {
                             Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
 
                     }
-
                 } else {
                     jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
                         Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
@@ -342,7 +335,6 @@ public class CaseDocumentAttacher {
                 }
 
             }
-
         } else {
             Iterator<String> fieldNames = caseBeforeNode.fieldNames();
             while (fieldNames.hasNext()) {
