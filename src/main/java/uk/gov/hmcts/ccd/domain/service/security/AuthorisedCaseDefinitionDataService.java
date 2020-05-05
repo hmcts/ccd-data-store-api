@@ -5,14 +5,14 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 public interface AuthorisedCaseDefinitionDataService {
 
-    Optional<CaseType> getAuthorisedCaseType(String caseTypeId, Predicate<AccessControlList> access);
+    Optional<CaseTypeDefinition> getAuthorisedCaseType(String caseTypeId, Predicate<AccessControlList> access);
 
-    List<CaseState> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access);
+    List<CaseStateDefinition> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access);
 
     List<String> getUserAuthorisedCaseStateIds(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access);
 

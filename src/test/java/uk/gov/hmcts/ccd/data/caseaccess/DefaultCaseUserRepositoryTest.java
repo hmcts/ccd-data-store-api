@@ -108,12 +108,12 @@ public class DefaultCaseUserRepositoryTest extends BaseTest {
     })
     public void shouldFindCaseRolesUserPerformsForCase() {
 
-        List<String> caseRoles = repository.findCaseRoles(CASE_ID , USER_ID);
+        List<String> caseRoles = repository.findCaseRoles(CASE_ID, USER_ID);
 
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_CREATOR));
 
-        caseRoles = repository.findCaseRoles(CASE_ID_GRANTED , USER_ID_GRANTED);
+        caseRoles = repository.findCaseRoles(CASE_ID_GRANTED, USER_ID_GRANTED);
 
         assertThat(caseRoles.size(), equalTo(2));
         assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
