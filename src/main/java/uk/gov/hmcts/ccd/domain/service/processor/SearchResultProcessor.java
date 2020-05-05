@@ -142,8 +142,10 @@ public class SearchResultProcessor {
         ArrayNode newNode = MAPPER.createArrayNode();
         originalNode.forEach(item -> {
             JsonNode newItem = item.deepCopy();
-            ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                createCollectionValue(item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix));
+            if (newItem.isObject()) {
+                ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
+                    createCollectionValue(item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix));
+            }
             newNode.add(newItem);
         });
 
