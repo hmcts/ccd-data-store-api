@@ -113,7 +113,7 @@ public class CaseDocumentAttacherTest {
 
     @Test
     @DisplayName(
-        "should  filter the Case Document Meta Data while  2 documents with hashcode  from request and  2 new documents without hash token from callback "
+        "should filter the Case Document Meta Data while 2 documents with hashcode from request and 2 new documents without hash token from callback "
         + "response")
     void shouldFilterCaseDocumentMetaData_With_Scenario_1() {
 
@@ -140,7 +140,7 @@ public class CaseDocumentAttacherTest {
 
     @Test
     @DisplayName(
-        "should  filter the Case Document Meta Data while  2 documents with hashcode  from request and  2 new documents with hash token from callback "
+        "should filter the Case Document Meta Data while 2 documents with hashcode from request and 2 new documents with hash token from callback "
         + "response")
     void shouldFilterCaseDocumentMetaData_With_Scenario_2() {
         prepareInputs();
@@ -170,7 +170,7 @@ public class CaseDocumentAttacherTest {
 
     @Test
     @DisplayName(
-        "should  filter the Case Document Meta Data while  2 documents with hashcode  from request and  replace 1 documents without hash token from callback"
+        "should filter the Case Document Meta Data while 2 documents with hashcode from request and replace 1 documents without hash token from callback"
         + " response")
     void shouldFilterCaseDocumentMetaData_With_Scenario_3() {
         prepareInputs();
@@ -193,7 +193,7 @@ public class CaseDocumentAttacherTest {
 
     @Test
     @DisplayName(
-        "should  filter the Case Document Meta Data while  2 documents with hashcode from request and  replace 1 documents with hash token from callback "
+        "should filter the Case Document Meta Data while 2 documents with hashcode from request and replace 1 documents with hash token from callback "
         + "response")
     void shouldFilterCaseDocumentMetaData_With_Scenario_4() {
         prepareInputs();
@@ -218,7 +218,7 @@ public class CaseDocumentAttacherTest {
     }
 
     @Test
-    @DisplayName("should filter the Case Document Meta Data while  2 documents with hashcode from request and  no response from callback ")
+    @DisplayName("should filter the Case Document Meta Data while 2 documents with hashcode from request and no response from callback ")
     void shouldFilterCaseDocumentMetaData_With_Scenario_5() {
         prepareInputs();
         Map<String, String> afterCallBack = new HashMap<>();
@@ -238,7 +238,7 @@ public class CaseDocumentAttacherTest {
     }
 
     @Test
-    @DisplayName("should  throw Service Exception with 500 While all hashToken tempered of user provided documents by Callback Service ")
+    @DisplayName("should throw Service Exception with 500 While all hashToken tempered of user provided documents by Callback Service ")
     void shouldThrowExceptionWhileHashTokenTempered_Scenario_6() {
         prepareInputs();
         Map<String, String> afterCallBack = new HashMap<>();
@@ -256,7 +256,7 @@ public class CaseDocumentAttacherTest {
     }
 
     @Test
-    @DisplayName("should  throw Service Exception with 500 While only one hashToken tempered of user provided documents by Callback Service ")
+    @DisplayName("should throw Service Exception with 500 While only one hashToken tempered of user provided documents by Callback Service ")
     void shouldThrowExceptionWhileHashTokenTempered_Scenario_7() {
         prepareInputs();
         Map<String, String> afterCallBack = new HashMap<>();
@@ -317,7 +317,7 @@ public class CaseDocumentAttacherTest {
 
     @Test
     @DisplayName(
-        "should  filter the Case Document Meta Data while  2 documents with hashcode coming from request and  2 documents without hash token from callback "
+        "should filter the Case Document Meta Data while 2 documents with hashcode coming from request and 2 documents without hash token from callback "
         + "response")
     void shouldFilterCaseDocumentMetaData() {
         Map<String, String> beforeCallBack = new HashMap<>();
