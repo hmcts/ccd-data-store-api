@@ -35,6 +35,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -460,7 +461,7 @@ class MergeDataToSearchResultOperationTest {
 
     @Test
     @DisplayName("should throw BadRequestException for Search Results when no nested element found for the path")
-    void throwsBadRequestExceptionWhenNoNestedElementFoundForPath1() {
+    void viewColumnsNotReturnedWhenNoNestedElementFoundForPath() {
 
         SearchResult searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID,
@@ -468,15 +469,18 @@ class MergeDataToSearchResultOperationTest {
                 FAMILY_DETAILS, ""))
             .build();
 
-        final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> {
-                CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID)
-                    .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()).build();
-                classUnderTest.execute(caseTypeWithoutCaseFieldDefinition, searchResult, caseDetailsList, NO_ERROR);
-            });
+        CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID)
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()).build();
+        final SearchResultView searchResultView  = classUnderTest.execute(caseTypeWithoutCaseFieldDefinition,
+                                                                            searchResult, caseDetailsList, NO_ERROR);
 
-        Assert.assertThat(exception.getMessage(),
-            Matchers.is("Nested element not found for path InvalidElementPath"));
+        assertAll(
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(0)),
+            () -> assertNull(searchResultView.getSearchResultViewItems().get(0).getCaseFields()
+                .get("InvalidElementPath")),
+            () -> assertNull(searchResultView.getSearchResultViewItems().get(1).getCaseFields()
+                .get("InvalidElementPath")));
     }
 
     private FieldTypeDefinition textFieldType() {
