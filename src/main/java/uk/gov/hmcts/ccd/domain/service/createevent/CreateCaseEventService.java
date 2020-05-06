@@ -3,6 +3,24 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -25,6 +43,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
@@ -33,26 +52,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.inject.Inject;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.v3.V3;
 
 @Service
 public class CreateCaseEventService {
 
+    private final HttpServletRequest request;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private final UserRepository userRepository;
@@ -71,6 +76,9 @@ public class CreateCaseEventService {
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
     private final Clock clock;
+    private final RestTemplate restTemplate;
+    private final ApplicationParams applicationParams;
+    private final SecurityUtils securityUtils;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -88,7 +96,13 @@ public class CreateCaseEventService {
                                   final SecurityClassificationService securityClassificationService,
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
-                                  @Qualifier("utcClock") final Clock clock) {
+                                  @Qualifier("utcClock") final Clock clock,
+                                  @Qualifier("restTemplate") final RestTemplate restTemplate,
+                                  ApplicationParams applicationParams,
+                                  SecurityUtils securityUtils,
+                                  HttpServletRequest request
+                                  ) {
+        this.request = request;
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -105,6 +119,9 @@ public class CreateCaseEventService {
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.userAuthorisation = userAuthorisation;
         this.clock = clock;
+        this.restTemplate = restTemplate;
+        this.applicationParams = applicationParams;
+        this.securityUtils = securityUtils;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -120,6 +137,16 @@ public class CreateCaseEventService {
         eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
 
         validatePreState(caseDetails, eventTrigger);
+
+        // Logic start from here to attach document with case ID
+        boolean isApiVersion3 = request.getContentType() != null
+            && request.getContentType().equals(V3.MediaType.CREATE_EVENT);
+
+        CaseDocumentAttacher caseDocumentAttacher = null;
+        if (isApiVersion3) {
+            caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
+            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForUpdate(content.getData(), caseDetailsBefore);
+        }
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
             caseDetailsBefore,
@@ -132,9 +159,18 @@ public class CreateCaseEventService {
 
         validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
         LocalDateTime timeNow = now();
+
+        if (isApiVersion3) {
+            caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, caseDetailsBefore, content.getEvent().getEventId(), newState.isPresent());
+        }
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, eventTrigger, newState, timeNow);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType, timeNow);
 
+
+        if (isApiVersion3) {
+            //rest api call
+            caseDocumentAttacher.restCallToAttachCaseDocuments();
+        }
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
             .savedCaseDetails(savedCaseDetails)

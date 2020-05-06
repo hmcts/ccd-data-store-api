@@ -1,0 +1,12 @@
+{
+  "DocumentField7": {
+    "document_url": "http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97",
+    "document_filename": "Screenshot 2020-02-24 at 13.32.03.png",
+    "document_binary_url": "http://dm-store:8080/documents/a780ee98-3136-4be9-bf56-a46f8da1bc97/binary"
+  },
+  "DocumentField2" : {
+    "document_url" : "http://dm-store:8080/documents/e16f2ae0-d6ce-4bd0-a652-47b3c4d86292",
+    "document_filename" : "Screenshot 2020-02-19 at 17.17.42.png",
+    "document_binary_url" : "http://dm-store:8080/documents/e16f2ae0-d6ce-4bd0-a652-47b3c4d86292/binary"
+  }
+}
