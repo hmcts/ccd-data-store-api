@@ -9,9 +9,9 @@
     "body": {
       "data": {
         "DocumentField1": {
-          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
           "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "document_binary_url": "http://dm-store:8080/documents/123e4567-e89b-12d3-&^%$-426655440000/binary",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/123e4567-e89b-12d3-&^%$-426655440000/binary",
           "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
         }
       }
@@ -25,7 +25,7 @@
       "details" : {
         "field_errors" : [ {
           "id" : "DocumentField1",
-          "message" : "http://dm-store:8080/documents/123e4567-e89b-12d3-&^%$-426655440000/binary does not match Document Management domain or expected URL path"
+          "message" : "{{DM_STORE_BASE_URL}}/documents/123e4567-e89b-12d3-&^%$-426655440000/binary does not match Document Management domain or expected URL path"
         } ]
       },
       "callbackErrors": null,
