@@ -2,12 +2,17 @@
   "title": "must receive an error response for a malformed document ID",
 
   "_guid_": "S-1006",
-  "_extends_": "F-1001_Test_Data_Base",
+  "_extends_": "F-1001_V2_Test_Data_Base",
 
   "specs": [
     "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
     "contains a malformed document ID"
   ],
+
+  "productName": "CCD Data Store",
+  "operationName": "Get Document AM Data",
+  "method": "GET",
+  "uri": "/cases/{caseId}/documents/{documentId}",
 
   "request": {
     "pathVariables": {
