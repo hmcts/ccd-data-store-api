@@ -35,8 +35,8 @@ import static uk.gov.hmcts.ccd.MockUtils.*;
 public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
 
-    private static final String GET_EVENT_TRIGGER_FOR_CASE = "/internal/cases/1504259907353529/" +
-        "/event-triggers/HAS_PRE_STATES_EVENT";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE = "/internal/cases/1504259907353529/"
+        + "/event-triggers/HAS_PRE_STATES_EVENT";
 
     @Inject
     private WebApplicationContext wac;

@@ -33,7 +33,6 @@ import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
@@ -178,10 +177,10 @@ public abstract class BaseTest {
     }
 
     private List<String> determineSequences(JdbcTemplate jdbcTemplate) {
-        final String SEQUENCE_NAME_KEY = "relname";
+        final String sequenceNameKey = "relname";
         String query = "SELECT c.relname FROM pg_class c WHERE c.relkind = 'S'";
         return jdbcTemplate.queryForList(query).stream()
-            .map(sequenceInfo -> (String) sequenceInfo.get(SEQUENCE_NAME_KEY))
+            .map(sequenceInfo -> (String) sequenceInfo.get(sequenceNameKey))
             .collect(Collectors.toList());
     }
 
