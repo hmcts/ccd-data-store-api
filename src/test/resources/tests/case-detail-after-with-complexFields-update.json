@@ -67,16 +67,19 @@
   "CollectionField": [],
   "ComplexField2": {
     "ComplexTextField": null,
-    "ComplexNestedField": {
-      "DocumentField10": {
-        "document_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0222",
-        "document_filename": "Screenshot 2020-02-24 at 13.32.03.png",
-        "document_binary_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0222/binary"
-      },
-      "DocumentField11": {
-        "document_url": "http://dm-store:8080/documents/335a9a09-7a51-40e9-8196-6b9e26fce6ff",
-        "document_filename": "Screenshot 2020-02-24 at 13.32.03.png"
+    "ComplexNestedField": [
+      {
+        "DocumentField10": {
+          "document_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0222",
+          "document_filename": "Screenshot 2020-02-24 at 13.32.03.png",
+          "document_binary_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0222/binary"
+        }
       }
+    ],
+    "DocumentField11": {
+      "document_url": "http://dm-store:8080/documents/335a9a09-7a51-40e9-8196-6b9e26fce6ff",
+      "document_filename": "Screenshot 2020-02-24 at 13.32.03.png"
     }
   }
 }
+

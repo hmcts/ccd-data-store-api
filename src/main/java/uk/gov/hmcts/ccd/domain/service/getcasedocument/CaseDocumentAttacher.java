@@ -15,8 +15,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import liquibase.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -39,14 +37,12 @@ import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 public class CaseDocumentAttacher {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaseDocumentAttacher.class);
-
     Map<String, String> documentsBeforeCallback = new HashMap<>();
     Map<String, String> documentsAfterCallback = null;
     Map<String, String> documentAfterCallbackOriginalCopy = new HashMap<>();
     Map<String, JsonNode> recursiveMapForCaseDetailsBefore = new HashMap<>();
     CaseDocumentsMetadata caseDocumentsMetadata = null;
-    Set<String> existingDocumentsInCase = new HashSet();
+    Set<String> existingDocumentsInCase = new HashSet<>();
 
     public static final String COMPLEX = "Complex";
     public static final String COLLECTION = "Collection";
@@ -104,32 +100,33 @@ public class CaseDocumentAttacher {
                 if (jsonNode.get(HASH_TOKEN_STRING) != null) {
                     documentsBeforeCallback.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                     ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
-                } else if (caseDetailsBefore != null) {
-                    existingDocument(caseDetailsBefore.getData(), documentId);
-                    if (existingDocumentsInCase.size() == 0) {
+                } else {
+                    isExistingDocumentInCase(caseDetailsBefore.getData(), documentId);
+                    if (existingDocumentsInCase.isEmpty()) {
                         throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
                     } else {
                         existingDocumentsInCase.clear();
                     }
                 }
-
-
             } else {
                 if (jsonNode instanceof ArrayNode) {
-                    Iterator<JsonNode> arrayNode = ((ArrayNode) jsonNode).elements();
-                    while (arrayNode.hasNext()) {
-                        JsonNode arrayNodeElement = arrayNode.next();
-                        arrayNodeElement.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
-                            Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
-
-                    }
-
+                    getArrayNodeElementsBeforeCallback(caseDetailsBefore, (ArrayNode) jsonNode);
                 } else {
                     jsonNode.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
                         Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
                 }
             }
         });
+    }
+
+    private void getArrayNodeElementsBeforeCallback(CaseDetails caseDetailsBefore, ArrayNode jsonNode) {
+        Iterator<JsonNode> arrayNode = jsonNode.elements();
+        while (arrayNode.hasNext()) {
+            JsonNode arrayNodeElement = arrayNode.next();
+            arrayNodeElement.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForUpdate(
+                Collections.singletonMap(node.getKey(), node.getValue()), caseDetailsBefore));
+
+        }
     }
 
     public void extractDocumentsAfterCallBack(CaseDetails caseDetails, boolean callBackWasCalled) {
@@ -160,13 +157,7 @@ public class CaseDocumentAttacher {
                 ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
             } else {
                 if (jsonNode instanceof ArrayNode) {
-                    Iterator<JsonNode> arrayNode = ((ArrayNode) jsonNode).elements();
-                    while (arrayNode.hasNext()) {
-                        JsonNode arrayNodeElement = arrayNode.next();
-                        arrayNodeElement.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
-                            Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
-
-                    }
+                    extractArrayNodesAfterCallback(documentMap, (ArrayNode) jsonNode);
 
                 } else {
                     jsonNode.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
@@ -174,6 +165,15 @@ public class CaseDocumentAttacher {
                 }
             }
         });
+    }
+
+    private void extractArrayNodesAfterCallback(Map<String, String> documentMap, ArrayNode jsonNode) {
+        Iterator<JsonNode> arrayNode = jsonNode.elements();
+        while (arrayNode.hasNext()) {
+            JsonNode arrayNodeElement = arrayNode.next();
+            arrayNodeElement.fields().forEachRemaining(node -> extractDocumentIdsAfterCallback(
+                Collections.singletonMap(node.getKey(), node.getValue()), documentMap));
+        }
     }
 
     public void restCallToAttachCaseDocuments() {
@@ -351,7 +351,6 @@ public class CaseDocumentAttacher {
                 }
 
             }
-
         } else {
             Iterator<String> fieldNames = caseBeforeNode.fieldNames();
             while (fieldNames.hasNext()) {
@@ -419,7 +418,7 @@ public class CaseDocumentAttacher {
         return jsonNode.has(DOCUMENT_BINARY_URL) || jsonNode.has(DOCUMENT_URL);
     }
 
-    private void existingDocument(Map<String, JsonNode> caseDetailBefore, String newDocumentId) {
+    private void isExistingDocumentInCase(Map<String, JsonNode> caseDetailBefore, String newDocumentId) {
 
         caseDetailBefore.forEach((field, jsonNode) -> {
             if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
@@ -433,18 +432,17 @@ public class CaseDocumentAttacher {
                     Iterator<JsonNode> arrayNode = ((ArrayNode) jsonNode).elements();
                     while (arrayNode.hasNext()) {
                         JsonNode arrayNodeElement = arrayNode.next();
-                        arrayNodeElement.fields().forEachRemaining(node -> existingDocument(
+                        arrayNodeElement.fields().forEachRemaining(node -> isExistingDocumentInCase(
                             Collections.singletonMap(node.getKey(), node.getValue()), newDocumentId));
 
                     }
 
                 } else {
-                    jsonNode.fields().forEachRemaining(node -> existingDocument(
+                    jsonNode.fields().forEachRemaining(node -> isExistingDocumentInCase(
                         Collections.singletonMap(node.getKey(), node.getValue()), newDocumentId));
                 }
             }
         });
-
     }
 
 }

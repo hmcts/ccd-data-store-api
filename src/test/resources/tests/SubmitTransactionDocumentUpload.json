@@ -40,5 +40,22 @@
     "hashToken": "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc"
   },
   "FixedListField": "VALUE2",
-  "CollectionField": []
+  "CollectionField": [
+    {
+      "DocumentField1InsideCollectionArray": {
+        "document_url": "http://dm-store:8080/documents/95f048e7-9574-4a3d-9189-986015276fd7",
+        "document_filename": "DocumentField1InsideCollectionArray.png",
+        "document_binary_url": "http://dm-store:8080/documents/95f048e7-9574-4a3d-9189-986015276fd7/binary",
+        "hashToken": "adfadfafgsdgsadgwrgsrg"
+      }
+    },
+    {
+      "DocumentField2InsideCollectionArray": {
+        "document_url": "http://dm-store:8080/documents/3ca8b55e-76fe-4723-bb60-4e14e950bb0c",
+        "document_filename": "DocumentField2InsideCollectionArray.jpeg",
+        "document_binary_url": "http://dm-store:8080/documents/3ca8b55e-76fe-4723-bb60-4e14e950bb0c/binary",
+        "hashToken": "sdg455sfgsfgfsgfsgsgsdgsdgsdgdsgs"
+      }
+    }
+  ]
 }
