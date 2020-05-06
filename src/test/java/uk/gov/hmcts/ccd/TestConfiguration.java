@@ -29,11 +29,12 @@ import java.util.Arrays;
 
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 
 @Configuration
 @Profile("test")
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 class TestConfiguration extends ContextCleanupListener {
 
     private final ApplicationParams applicationParams;
@@ -43,6 +44,8 @@ class TestConfiguration extends ContextCleanupListener {
     private EmbeddedPostgres pg;
 
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long regex expressions
     private static final String baseTypes =
         "[\n" +
             "  {\n" +
@@ -104,7 +107,7 @@ class TestConfiguration extends ContextCleanupListener {
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     @Primary
     CaseDefinitionRepository caseDefinitionRepository() throws IOException {
-        final FieldType[] fieldTypes = mapper.readValue(baseTypes.getBytes(), FieldType[].class);
+        final FieldTypeDefinition[] fieldTypeDefinitions = mapper.readValue(baseTypes.getBytes(), FieldTypeDefinition[].class);
         final DefaultCaseDefinitionRepository caseDefinitionRepository = mock(DefaultCaseDefinitionRepository.class);
 
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);
@@ -115,7 +118,7 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getLatestVersionFromDefinitionStore(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseType(anyInt(), anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseTypesForJurisdiction(any())).thenCallRealMethod();
-        when(caseDefinitionRepository.getBaseTypes()).thenReturn(Arrays.asList(fieldTypes));
+        when(caseDefinitionRepository.getBaseTypes()).thenReturn(Arrays.asList(fieldTypeDefinitions));
         when(caseDefinitionRepository.getUserRoleClassifications(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getClassificationsForUserRoleList(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdiction(anyString())).thenCallRealMethod();

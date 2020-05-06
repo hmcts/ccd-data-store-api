@@ -8,13 +8,13 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -27,7 +27,7 @@ import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 
 import java.util.List;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
 @Service
 @Qualifier(DefaultGetCaseViewOperation.QUALIFIER)
@@ -61,42 +61,46 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
 
-        final CaseType caseType = getCaseType(caseDetails.getJurisdiction(), caseDetails.getCaseTypeId());
+        final CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getJurisdiction(), caseDetails.getCaseTypeId());
         final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
-        final CaseTabCollection caseTabCollection = getCaseTabCollection(caseDetails.getCaseTypeId());
+        final CaseTypeTabsDefinition caseTypeTabsDefinition = getCaseTabCollection(caseDetails.getCaseTypeId());
 
-        return merge(caseDetails, events, caseType, caseTabCollection);
+        return merge(caseDetails, events, caseTypeDefinition, caseTypeTabsDefinition);
     }
 
-    private CaseView merge(CaseDetails caseDetails, List<AuditEvent> events, CaseType caseType, CaseTabCollection caseTabCollection) {
+    private CaseView merge(CaseDetails caseDetails, List<AuditEvent> events,
+                           CaseTypeDefinition caseTypeDefinition,
+                           CaseTypeTabsDefinition caseTypeTabsDefinition) {
         CaseView caseView = new CaseView();
         caseView.setCaseId(caseDetails.getReference().toString());
-        caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
+        caseView.setChannels(caseTypeTabsDefinition.getChannels().toArray(new String[0]));
 
-        CaseState caseState = caseTypeService.findState(caseType, caseDetails.getState());
-        caseView.setState(new ProfileCaseState(caseState.getId(), caseState.getName(), caseState.getDescription(), caseState.getTitleDisplay()));
+        CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
+        caseView.setState(new ProfileCaseState(caseStateDefinition.getId(),
+            caseStateDefinition.getName(), caseStateDefinition.getDescription(),
+            caseStateDefinition.getTitleDisplay()));
 
-        caseView.setCaseType(CaseViewType.createFrom(caseType));
+        caseView.setCaseType(CaseViewType.createFrom(caseTypeDefinition));
         final CaseViewEvent[] caseViewEvents = convertToCaseViewEvent(events);
-        if (caseTabCollection.hasTabFieldType(CASE_HISTORY_VIEWER)) {
-            hydrateHistoryField(caseDetails, caseType, Lists.newArrayList(caseViewEvents));
+        if (caseTypeTabsDefinition.hasTabFieldType(CASE_HISTORY_VIEWER)) {
+            hydrateHistoryField(caseDetails, caseTypeDefinition, Lists.newArrayList(caseViewEvents));
         }
-        caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTabCollection));
-        caseView.setMetadataFields(getMetadataFields(caseType, caseDetails));
+        caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTypeTabsDefinition));
+        caseView.setMetadataFields(getMetadataFields(caseTypeDefinition, caseDetails));
 
-        final CaseViewTrigger[] triggers = caseType.getEvents()
+        final CaseViewActionableEvent[] actionableEvents = caseTypeDefinition.getEvents()
             .stream()
-            .filter(event -> eventTriggerService.isPreStateValid(caseState.getId(), event))
+            .filter(event -> eventTriggerService.isPreStateValid(caseStateDefinition.getId(), event))
             .map(event -> {
-                final CaseViewTrigger trigger = new CaseViewTrigger();
-                trigger.setId(event.getId());
-                trigger.setName(event.getName());
-                trigger.setDescription(event.getDescription());
-                trigger.setOrder(event.getDisplayOrder());
-                return trigger;
+                final CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
+                caseViewActionableEvent.setId(event.getId());
+                caseViewActionableEvent.setName(event.getName());
+                caseViewActionableEvent.setDescription(event.getDescription());
+                caseViewActionableEvent.setOrder(event.getDisplayOrder());
+                return caseViewActionableEvent;
             })
-            .toArray(CaseViewTrigger[]::new);
-        caseView.setTriggers(triggers);
+            .toArray(CaseViewActionableEvent[]::new);
+        caseView.setActionableEvents(actionableEvents);
 
         caseView.setEvents(caseViewEvents);
 

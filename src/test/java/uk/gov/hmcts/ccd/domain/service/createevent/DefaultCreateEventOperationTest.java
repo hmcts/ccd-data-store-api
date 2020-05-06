@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -57,11 +58,11 @@ class DefaultCreateEventOperationTest {
     private Event event;
 
     private Map<String, JsonNode> data;
-    private CaseType caseType;
-    private CaseEvent eventTrigger;
+    private CaseTypeDefinition caseTypeDefinition;
+    private CaseEventDefinition caseEventDefinition;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
-    private CaseState postState;
+    private CaseStateDefinition postState;
     private CaseDataContent caseDataContent;
 
     private static Event buildEvent() {
@@ -79,30 +80,30 @@ class DefaultCreateEventOperationTest {
         event = buildEvent();
         data = buildJsonNodeData();
         caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN).withIgnoreWarning(IGNORE_WARNING).build();
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(JURISDICTION_ID);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
-        caseType = new CaseType();
-        caseType.setId(CASE_TYPE_ID);
-        caseType.setJurisdiction(jurisdiction);
-        caseType.setVersion(version);
+        caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        caseTypeDefinition.setVersion(version);
 
-        eventTrigger = new CaseEvent();
-        eventTrigger.setPostState(POST_STATE);
+        caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setPostState(POST_STATE);
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
         caseDetailsBefore = mock(CaseDetails.class);
-        postState = new CaseState();
+        postState = new CaseStateDefinition();
         postState.setId(POST_STATE);
 
         CreateCaseEventResult caseEventResult =  CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
             .savedCaseDetails(caseDetails)
-            .eventTrigger(eventTrigger)
+            .eventTrigger(caseEventDefinition)
             .build();
 
         given(createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent)).willReturn(caseEventResult);
@@ -112,19 +113,19 @@ class DefaultCreateEventOperationTest {
     @Test
     @DisplayName("should invoke after submit callback")
     void shouldInvokeAfterSubmitCallback() {
-        eventTrigger.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
         AfterSubmitCallbackResponse response = new AfterSubmitCallbackResponse();
         response.setConfirmationHeader("Header");
         response.setConfirmationBody("Body");
         doReturn(ResponseEntity.ok(response)).when(callbackInvoker)
-            .invokeSubmittedCallback(eventTrigger,
+            .invokeSubmittedCallback(caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertAll(
-            () -> verify(callbackInvoker).invokeSubmittedCallback(eventTrigger, caseDetailsBefore, this.caseDetails),
+            () -> verify(callbackInvoker).invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore, this.caseDetails),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
@@ -135,9 +136,9 @@ class DefaultCreateEventOperationTest {
     @Test
     @DisplayName("should return incomplete response status if remote endpoint is down")
     void shouldReturnIncomplete() {
-        eventTrigger.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
         doThrow(new CallbackException("Testing failure")).when(callbackInvoker)
-            .invokeSubmittedCallback(eventTrigger,
+            .invokeSubmittedCallback(caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails);
 
