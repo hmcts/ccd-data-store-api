@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -18,7 +18,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
 /**
- * Max and Min is expressed as EPOCH
+ * Max and Min is expressed as EPOCH.
  */
 @Named
 @Singleton
@@ -34,7 +34,7 @@ public class DateValidator implements BaseTypeValidator {
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
-                                           final CaseField caseFieldDefinition) {
+                                           final CaseFieldDefinition caseFieldDefinition) {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
@@ -46,17 +46,17 @@ public class DateValidator implements BaseTypeValidator {
             return Collections.singletonList(new ValidationResult("Date or Time entered is not valid", dataFieldId));
         }
 
-        if (!checkMax(caseFieldDefinition.getFieldType().getMax(), dateValue)) {
+        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), dateValue)) {
             return Collections.singletonList(new ValidationResult("The date should be earlier than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldType().getMax())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMax())), dataFieldId));
         }
 
-        if (!checkMin(caseFieldDefinition.getFieldType().getMin(), dateValue)) {
+        if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), dateValue)) {
             return Collections.singletonList(new ValidationResult("The date should be later than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldType().getMin())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMin())), dataFieldId));
         }
 
-        if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), dataValue.asText())) {
+        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataValue.asText())) {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
 

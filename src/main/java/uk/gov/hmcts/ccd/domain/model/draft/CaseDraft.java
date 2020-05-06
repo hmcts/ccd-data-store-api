@@ -15,7 +15,7 @@ public class CaseDraft {
     private String userId;
     private String jurisdictionId;
     private String caseTypeId;
-    private String eventTriggerId;
+    private String eventId;
 
     private CaseDataContent caseDataContent;
 
@@ -43,12 +43,12 @@ public class CaseDraft {
         this.caseTypeId = caseTypeId;
     }
 
-    public String getEventTriggerId() {
-        return eventTriggerId;
+    public String getEventId() {
+        return eventId;
     }
 
-    public void setEventTriggerId(String eventTriggerId) {
-        this.eventTriggerId = eventTriggerId;
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
     public CaseDataContent getCaseDataContent() {

@@ -62,7 +62,7 @@ public class DraftsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Event Trigger ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @RequestBody final CaseDataContent caseDataContent) {
 
         return upsertDraftOperation.executeSave(caseTypeId, caseDataContent);
@@ -85,7 +85,7 @@ public class DraftsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Event Trigger ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Event Trigger ID", required = true)
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {

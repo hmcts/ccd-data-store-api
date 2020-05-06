@@ -23,8 +23,8 @@ import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 
 import javax.inject.Inject;
 
@@ -93,9 +93,9 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        UICaseViewResource savedCaseResource = mapper.readValue(content, UICaseViewResource.class);
+        CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
-        assertEquals("Should not contain events with case role access", 1, savedCaseResource.getEvents().length);
+        assertEquals("Should not contain events with case role access", 1, savedCaseResource.getCaseViewEvents().length);
     }
 
     @Test
@@ -119,9 +119,9 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        UICaseViewResource savedCaseResource = mapper.readValue(content, UICaseViewResource.class);
+        CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
-        assertEquals("Should contain events with case role access", 2, savedCaseResource.getEvents().length);
+        assertEquals("Should contain events with case role access", 2, savedCaseResource.getCaseViewEvents().length);
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
@@ -151,7 +151,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
-        UIEventViewResource response = mapper.readValue(content, UIEventViewResource.class);
+        CaseHistoryViewResource response = mapper.readValue(content, CaseHistoryViewResource.class);
         assertThat(response.getEvent().getId(), is(1L));
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);

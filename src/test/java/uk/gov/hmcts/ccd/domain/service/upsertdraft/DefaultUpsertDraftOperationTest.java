@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -49,7 +49,7 @@ class DefaultUpsertDraftOperationTest {
     private static final String CTID = "TestAddressBookCase";
     private static final String ETID = "createCase";
     private static final String DID = "5";
-    private static final CaseType CASE_TYPE = newCaseType()
+    private static final CaseTypeDefinition CASE_TYPE = newCaseType()
         .withId(CTID)
         .withJurisdiction(newJurisdiction().withJurisdictionId(JID).build())
         .withEvent(newCaseEvent().withId(ETID).build())
@@ -88,7 +88,7 @@ class DefaultUpsertDraftOperationTest {
             .withUserId(UID)
             .withJurisdictionId(JID)
             .withCaseTypeId(CTID)
-            .withEventTriggerId(ETID)
+            .withEventId(ETID)
             .withCaseDataContent(caseDataContent)
             .build();
     }
@@ -108,7 +108,7 @@ class DefaultUpsertDraftOperationTest {
             () -> assertThat(captor.getValue().getDocument(), hasProperty("userId", is(caseDraft.getUserId()))),
             () -> assertThat(captor.getValue().getDocument(), hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
             () -> assertThat(captor.getValue().getDocument(), hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
-            () -> assertThat(captor.getValue().getDocument(), hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("eventId", is(caseDraft.getEventId()))),
             () -> assertThat(captor.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
             () -> assertThat(captor.getValue().getDocument(), hasProperty("caseDataContent", hasProperty("data", is(SANITISED_DATA)))),
             () -> assertThat(captor.getValue().getMaxTTLDays(), is(DRAFT_MAX_STALE_DAYS)),
@@ -134,7 +134,7 @@ class DefaultUpsertDraftOperationTest {
             () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("userId", is(caseDraft.getUserId()))),
             () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
             () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
-            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("eventId", is(caseDraft.getEventId()))),
             () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
             () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseDataContent", hasProperty("data", is(SANITISED_DATA)))),
             () -> assertThat(caseDataContentCaptor.getValue().getType(), is(CASE_DATA_CONTENT)),

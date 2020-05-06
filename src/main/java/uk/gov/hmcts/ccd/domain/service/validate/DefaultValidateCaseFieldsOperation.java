@@ -1,14 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
-import javax.inject.Inject;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
@@ -35,24 +34,24 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         if (content == null || content.getEvent() == null || content.getEventId() == null) {
             throw new ValidationException("Cannot validate case field because of event is not specified");
         }
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
-        if (!hasEventId(caseType, content.getEventId())) {
+        if (!hasEventId(caseTypeDefinition, content.getEventId())) {
             throw new ValidationException("Cannot validate case field because of event " + content.getEventId() + " is not found in case type definition");
         }
-        content.setData(fieldProcessorService.processData(content.getData(), caseType, content.getEventId()));
-        caseTypeService.validateData(content.getData(), caseType);
+        content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, content.getEventId()));
+        caseTypeService.validateData(content.getData(), caseTypeDefinition);
         return content.getData();
     }
 
-    private boolean hasEventId(CaseType caseType, String eventId) {
-        return caseType.hasEventId(eventId);
+    private boolean hasEventId(CaseTypeDefinition caseTypeDefinition, String eventId) {
+        return caseTypeDefinition.hasEventId(eventId);
     }
 
     @Override
-    public void validateData(Map<String, JsonNode> data, CaseType caseType) {
-        caseTypeService.validateData(data, caseType);
+    public void validateData(Map<String, JsonNode> data, CaseTypeDefinition caseTypeDefinition) {
+        caseTypeService.validateData(data, caseTypeDefinition);
     }
 }

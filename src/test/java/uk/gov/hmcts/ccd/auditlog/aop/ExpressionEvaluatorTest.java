@@ -6,7 +6,7 @@ import org.springframework.context.expression.AnnotatedElementKey;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.util.ReflectionUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseRole;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseRoleDefinition;
 
 import java.lang.reflect.Method;
 
@@ -56,8 +56,8 @@ public class ExpressionEvaluatorTest {
 
     @Test
     public void shouldParseBeanExpressions() {
-        Method method = ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class, CaseRole.class);
-        CaseRole caseRole = new CaseRole();
+        Method method = ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class, CaseRoleDefinition.class);
+        CaseRoleDefinition caseRole = new CaseRoleDefinition();
         caseRole.setName("citizen");
         EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method, new Object[] {
             "test", caseRole});
@@ -70,8 +70,8 @@ public class ExpressionEvaluatorTest {
     @Test
     public void shouldThrowErrorWhenPropertyNotFound() {
 
-        Method method = ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class, CaseRole.class);
-        CaseRole caseRole = new CaseRole();
+        Method method = ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class, CaseRoleDefinition.class);
+        CaseRoleDefinition caseRole = new CaseRoleDefinition();
         caseRole.setName("citizen");
         EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method, new Object[] {
             "test", caseRole});
@@ -91,7 +91,7 @@ public class ExpressionEvaluatorTest {
         private void hello(String foo, Boolean flag) {
         }
 
-        private void hello(String foo, CaseRole caseRole) {
+        private void hello(String foo, CaseRoleDefinition caseRole) {
         }
     }
 }
