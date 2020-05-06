@@ -7,7 +7,7 @@
   ],
   "request": {
     "pathVariables": {
-      "CaseTypeID": "Non-Existing-Case-type-ID"
+      "CaseTypeID": "NonExistingCasetypeID"
     }
   },
   "expectedResponse": {
@@ -19,7 +19,7 @@
     },
     "body": {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message" : "Resource not found when getting case type version for 'Non-Existing-Case-type-ID'.",
+      "message" : "Resource not found when getting case type version for 'NonExistingCasetypeID'.",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

@@ -8,6 +8,9 @@
   },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
+    "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+    "Content-Length" : "[[ANYTHING_PRESENT]]",
+    "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
     "body" : {
       "_links" : {
         "self" : {

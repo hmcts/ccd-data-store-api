@@ -4,7 +4,7 @@
   "headers": {
     "Content-Encoding" : "[[ANYTHING_PRESENT]]",
     "Content-Length" : "[[ANYTHING_PRESENT]]",
-    "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
+    "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v3+json;charset=UTF-8",
     "Vary" : "Accept-Encoding"
   },
   "body": {

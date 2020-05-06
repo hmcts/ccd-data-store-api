@@ -34,9 +34,8 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers" : {
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-documents.v2+json;charset=UTF-8",
-      "Content-Length" : "[[ANY_INTEGER_NOT_NULLABLE]]",
-      "Content-Encoding": "gzip"
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-document+json; version=1.0;charset=UTF-8",
+      "Content-Length" : "[[ANY_INTEGER_NOT_NULLABLE]]"
     },
     "body": {
       "_links": {
