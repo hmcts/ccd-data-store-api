@@ -82,7 +82,6 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
         CaseDocumentMetadata caseDocumentMetadata = caseDocumentResource.getDocumentMetadata();
         Optional<Link> self = caseDocumentResource.getLink("self");
 
-
         assertAll(
             () -> assertThat(self.get().getHref(),
                              is(String
