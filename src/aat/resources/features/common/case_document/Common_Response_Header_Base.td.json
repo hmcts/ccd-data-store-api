@@ -1,20 +1,15 @@
 {
   "_guid_": "Common_Response_Header_Base",
 
-  "Access-Control-Allow-Credentials": "true",
-  "Access-Control-Allow-Headers": "undefined",
-  "Access-Control-Allow-Methods": "GET,POST,OPTIONS,PUT,DELETE",
-  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-  "connection": "close",
-  "date": "[[ANYTHING_PRESENT]]",
-  "Expires": "0",
-  "Pragma": "no-cache",
-  "request-context": "[[ANYTHING_PRESENT]]",
-  "Strict-Transport-Security": "[[ANYTHING_PRESENT]]",
-  "Surrogate-Control": "no-store",
-  "transfer-encoding": "chunked",
-  "x-content-type-options": "nosniff",
-  "x-frame-options": "DENY",
-  "x-xss-protection": "1; mode=block"
-
+  "Cache-Control" : "[[ANYTHING_PRESENT]]",
+  "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+  "Content-Length" : "[[ANYTHING_PRESENT]]",
+  "Content-Type" : "application/json",
+  "Date" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+  "Expires" : "[[ANY_NUMBER_NOT_NULLABLE]]",
+  "Pragma" : "no-cache",
+  "Vary" : "Accept-Encoding",
+  "X-Content-Type-Options" : "nosniff",
+  "X-Frame-Options" : "DENY",
+  "X-Xss-Protection" : "1; mode=block"
 }
