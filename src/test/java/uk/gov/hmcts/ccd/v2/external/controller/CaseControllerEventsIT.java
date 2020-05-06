@@ -1,22 +1,31 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.mockito.Mock;
-
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpHeaders;
-
 import org.springframework.http.MediaType;
-
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -28,37 +37,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.GetCaseDocumentsOperationTest;
 import uk.gov.hmcts.ccd.v2.V2;
-
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
-
 import uk.gov.hmcts.ccd.v3.V3;
-
-import java.io.IOException;
-
-import java.io.InputStream;
-
-import java.util.HashMap;
-
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-
-import static org.junit.Assert.assertNotNull;
-
-import static org.mockito.Mockito.doReturn;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 
 public class CaseControllerEventsIT extends WireMockBaseTest {
@@ -85,11 +69,9 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
     @Mock
     private SecurityContext securityContext;
 
-
     private MockMvc mockMvc;
 
     private JdbcTemplate template;
-
 
     @Before
     public void setUp() {
