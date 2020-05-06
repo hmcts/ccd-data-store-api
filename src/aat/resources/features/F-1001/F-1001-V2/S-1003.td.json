@@ -22,6 +22,11 @@
 
   "expectedResponse": {
     "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Type" : "application/json"
+    },
     "body": {
       "exception" : "uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentNotFoundException",
       "message" : "No document found for this case reference: ${[scenarioContext][childContexts][F-1001-V2_Case_Creation_Main][testData][actualResponse][body][id]}",
