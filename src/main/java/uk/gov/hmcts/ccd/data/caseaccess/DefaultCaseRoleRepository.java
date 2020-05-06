@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseRole;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseRoleDefinition;
 
 @Service
 @Qualifier(DefaultCaseRoleRepository.QUALIFIER)
@@ -36,8 +36,8 @@ public class DefaultCaseRoleRepository implements CaseRoleRepository {
     public Set<String> getCaseRoles(String caseTypeId) {
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
         String caseRolesUrl = String.format("%s/%s/roles", applicationParams.caseRolesURL(), caseTypeId);
-        CaseRole[] caseRoles = restTemplate.exchange(caseRolesUrl, GET, requestEntity, CaseRole[].class).getBody();
+        CaseRoleDefinition[] caseRoleDefinitions = restTemplate.exchange(caseRolesUrl, GET, requestEntity, CaseRoleDefinition[].class).getBody();
 
-        return Arrays.stream(caseRoles).map(CaseRole::getId).collect(Collectors.toSet());
+        return Arrays.stream(caseRoleDefinitions).map(CaseRoleDefinition::getId).collect(Collectors.toSet());
     }
 }

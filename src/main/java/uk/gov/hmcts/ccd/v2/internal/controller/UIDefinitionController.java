@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.*;
@@ -47,7 +47,8 @@ public class UIDefinitionController {
     public UIDefinitionController(@Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER) GetCriteriaOperation getCriteriaOperation,
                                   @Qualifier(DefaultGetBannerOperation.QUALIFIER) GetBannerOperation getBannerOperation,
                                   @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation,
-                                  @Qualifier(DefaultGetJurisdictionUiConfigOperation.QUALIFIER) GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation) {
+                                  @Qualifier(DefaultGetJurisdictionUiConfigOperation.QUALIFIER)
+                                          GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation) {
         this.getCriteriaOperation = getCriteriaOperation;
         this.getBannerOperation = getBannerOperation;
         this.getJurisdictionUiConfigOperation = getJurisdictionUiConfigOperation;
@@ -74,18 +75,18 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIWorkbasketInputsResource.class
+            response = WorkbasketInputsViewResource.class
         ),
         @ApiResponse(
             code = 404,
             message = "Case type not found"
         )
     })
-    public ResponseEntity<UIWorkbasketInputsResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
+    public ResponseEntity<WorkbasketInputsViewResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
 
         WorkbasketInput[] workbasketInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, WORKBASKET).toArray(new WorkbasketInput[0]);
 
-        return ResponseEntity.ok(new UIWorkbasketInputsResource(workbasketInputs, caseTypeId));
+        return ResponseEntity.ok(new WorkbasketInputsViewResource(workbasketInputs, caseTypeId));
     }
 
     @GetMapping(
@@ -105,18 +106,18 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UISearchInputsResource.class
+            response = SearchInputsViewResource.class
         ),
         @ApiResponse(
             code = 404,
             message = "Case type not found"
         )
     })
-    public ResponseEntity<UISearchInputsResource> getSearchInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
+    public ResponseEntity<SearchInputsViewResource> getSearchInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
 
         SearchInput[] searchInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, SEARCH).toArray(new SearchInput[0]);
 
-        return ResponseEntity.ok(new UISearchInputsResource(searchInputs, caseTypeId));
+        return ResponseEntity.ok(new SearchInputsViewResource(searchInputs, caseTypeId));
     }
 
     @GetMapping(
@@ -136,14 +137,14 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIBannerResource.class
+            response = BannerViewResource.class
         )
     })
-    public ResponseEntity<UIBannerResource> getBanners(@RequestParam("ids") Optional<List<String>> idsOptional) {
+    public ResponseEntity<BannerViewResource> getBanners(@RequestParam("ids") Optional<List<String>> idsOptional) {
         List<Banner> listOfBanners = idsOptional.isPresent()
-                                        ? getBannerOperation.execute(idsOptional.get())
-                                        : Lists.newArrayList();
-        return ResponseEntity.ok(new UIBannerResource(listOfBanners));
+            ? getBannerOperation.execute(idsOptional.get())
+            : Lists.newArrayList();
+        return ResponseEntity.ok(new BannerViewResource(listOfBanners));
     }
 
     @GetMapping(
@@ -163,14 +164,14 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIJurisdictionConfigResource.class
+            response = JurisdictionConfigViewResource.class
         )
     })
-    public ResponseEntity<UIJurisdictionConfigResource> getJurisdictionUiConfigs(@RequestParam("ids") Optional<List<String>> idsOptional) {
-        List<JurisdictionUiConfig> listOfConfigs = idsOptional.isPresent()
-                                        ? getJurisdictionUiConfigOperation.execute(idsOptional.get())
-                                        : Lists.newArrayList();
-        return ResponseEntity.ok(new UIJurisdictionConfigResource(listOfConfigs));
+    public ResponseEntity<JurisdictionConfigViewResource> getJurisdictionUiConfigs(@RequestParam("ids") Optional<List<String>> idsOptional) {
+        List<JurisdictionUiConfigDefinition> listOfConfigs = idsOptional.isPresent()
+            ? getJurisdictionUiConfigOperation.execute(idsOptional.get())
+            : Lists.newArrayList();
+        return ResponseEntity.ok(new JurisdictionConfigViewResource(listOfConfigs));
     }
 
     @GetMapping(
@@ -190,7 +191,7 @@ public class UIDefinitionController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UIJurisdictionResource.class
+            response = JurisdictionViewResource.class
         ),
         @ApiResponse(
             code = 404,
@@ -201,14 +202,14 @@ public class UIDefinitionController {
             message = "Access can only be 'create', 'read' or 'update'"
         )
     })
-    public ResponseEntity<UIJurisdictionResource> getJurisdictions(@RequestParam(value = "access") String access) {
+    public ResponseEntity<JurisdictionViewResource> getJurisdictions(@RequestParam(value = "access") String access) {
         if (accessMap.get(access) == null) {
             throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
         }
-        JurisdictionDisplayProperties[] jurisdictions =  getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions();
+        JurisdictionDisplayProperties[] jurisdictions = getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions();
         if (jurisdictions == null || jurisdictions.length == 0) {
             throw new ResourceNotFoundException("No jurisdictions found");
         }
-        return ResponseEntity.ok(new UIJurisdictionResource(jurisdictions, access));
+        return ResponseEntity.ok(new JurisdictionViewResource(jurisdictions, access));
     }
 }

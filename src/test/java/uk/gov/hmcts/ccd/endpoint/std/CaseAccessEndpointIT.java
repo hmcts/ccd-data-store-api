@@ -69,13 +69,11 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenFindIdsCalled() throws Exception {
 
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
-            CASE_TYPE + "/cases/ids?userId=" + USER_ID;
+        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/ids?userId=" + USER_ID;
 
         grantAccess();
 
-        final String aUrl = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
-            CASE_TYPE + "/cases/" + CASE_ID + "/users";
+        final String aUrl = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_ID + "/users";
 
         mockMvc.perform(post(aUrl)
             .contentType(MediaType.APPLICATION_JSON)
@@ -97,8 +95,7 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturnEmptyListWhenFindIdsCalledAndNoGrantsExist() throws Exception {
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
-            CASE_TYPE + "/cases/ids?userId=12312312312321";
+        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/ids?userId=12312312312321";
 
         final MvcResult mvcResult = mockMvc.perform(get(url))
             .andExpect(status().isOk())
@@ -174,9 +171,9 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn204WhenRevokeCalledTwice() throws Exception {
-       grantAccess();
-       revokeAccess();
-       revokeAccess();
+        grantAccess();
+        revokeAccess();
+        revokeAccess();
     }
 
     @Test
@@ -186,8 +183,7 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     }
 
     private void revokeAccess() throws Exception {
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
-            CASE_TYPE + "/cases/" + CASE_ID + "/users/" + USER_ID;
+        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_ID + "/users/" + USER_ID;
 
         mockMvc.perform(delete(url))
             .andExpect(status().isNoContent())

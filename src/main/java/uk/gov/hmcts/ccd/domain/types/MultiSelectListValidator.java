@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,7 +27,7 @@ public class MultiSelectListValidator implements BaseTypeValidator {
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
-                                           final CaseField caseFieldDefinition) {
+                                           final CaseFieldDefinition caseFieldDefinition) {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
@@ -41,7 +41,7 @@ public class MultiSelectListValidator implements BaseTypeValidator {
 
         final List<ValidationResult> results = new ArrayList<>();
 
-        final List<FixedListItem> validValues = caseFieldDefinition.getFieldType().getFixedListItems();
+        final List<FixedListItemDefinition> validValues = caseFieldDefinition.getFieldTypeDefinition().getFixedListItemDefinitions();
 
         final HashSet<String> uniqueValues = new HashSet<>();
 
@@ -60,14 +60,14 @@ public class MultiSelectListValidator implements BaseTypeValidator {
             }
         });
 
-        final BigDecimal minimum = caseFieldDefinition.getFieldType().getMin();
+        final BigDecimal minimum = caseFieldDefinition.getFieldTypeDefinition().getMin();
         if (!checkMin(minimum, uniqueValues.size())) {
             final String message = String.format("Select at least %d %s",
                                                  minimum.intValue(), minimum.equals(ONE) ? "option" : "options");
             results.add(new ValidationResult(message, dataFieldId));
         }
 
-        final BigDecimal maximum = caseFieldDefinition.getFieldType().getMax();
+        final BigDecimal maximum = caseFieldDefinition.getFieldTypeDefinition().getMax();
         if (!checkMax(maximum, uniqueValues.size())) {
             final String message = String.format("Cannot select more than %d %s",
                                                  maximum.intValue(), maximum.equals(ONE) ? "option" : "options");

@@ -30,8 +30,8 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
                            @Nullable Exception ex) {
-        if (hasLogAudit(handler) &&
-            !applicationParams.getAuditLogIgnoreStatuses().contains(response.getStatus())) {
+        if (hasLogAudit(handler)
+            && !applicationParams.getAuditLogIgnoreStatuses().contains(response.getStatus())) {
             AuditContext auditContext = AuditContextHolder.getAuditContext();
             auditContext = populateHttpSemantics(auditContext, request, response);
             try {

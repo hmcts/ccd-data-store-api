@@ -7,11 +7,11 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 
 public class UserDefault {
     private String id;
-    private List<Jurisdiction> jurisdictions;
+    private List<JurisdictionDefinition> jurisdictionDefinitions;
 
     @ApiModelProperty(value = "")
     @JsonProperty("work_basket_default_jurisdiction")
@@ -26,10 +26,11 @@ public class UserDefault {
 
     private String workBasketDefaultState;
 
-    public void addJurisdiction(Jurisdiction jurisdiction) {
-        if (jurisdictions == null)
-            jurisdictions = new ArrayList<>();
-        jurisdictions.add(jurisdiction);
+    public void addJurisdiction(JurisdictionDefinition jurisdictionDefinition) {
+        if (jurisdictionDefinitions == null) {
+            jurisdictionDefinitions = new ArrayList<>();
+        }
+        jurisdictionDefinitions.add(jurisdictionDefinition);
     }
 
     public String getId() {
@@ -40,12 +41,12 @@ public class UserDefault {
         this.id = id;
     }
 
-    public List<Jurisdiction> getJurisdictions() {
-        return jurisdictions;
+    public List<JurisdictionDefinition> getJurisdictionDefinitions() {
+        return jurisdictionDefinitions;
     }
 
-    public void setJurisdictions(List<Jurisdiction> jurisdictions) {
-        this.jurisdictions = jurisdictions;
+    public void setJurisdictionDefinitions(List<JurisdictionDefinition> jurisdictionDefinitions) {
+        this.jurisdictionDefinitions = jurisdictionDefinitions;
     }
 
     public String getWorkBasketDefaultJurisdiction() {
@@ -73,6 +74,6 @@ public class UserDefault {
     }
 
     public List<String> getJurisdictionsId() {
-        return this.jurisdictions.stream().map(Jurisdiction::getId).collect(toList());
+        return this.jurisdictionDefinitions.stream().map(JurisdictionDefinition::getId).collect(toList());
     }
 }

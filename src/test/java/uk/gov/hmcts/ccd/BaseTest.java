@@ -65,6 +65,7 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public abstract class BaseTest {
     protected static final ObjectMapper mapper = new ObjectMapper();
     protected static final TypeReference<HashMap<String, JsonNode>> STRING_NODE_TYPE = new TypeReference<HashMap<String, JsonNode>>() {};
@@ -176,10 +177,10 @@ public abstract class BaseTest {
     }
 
     private List<String> determineSequences(JdbcTemplate jdbcTemplate) {
-        final String SEQUENCE_NAME_KEY = "relname";
+        final String sequenceNameKey = "relname";
         String query = "SELECT c.relname FROM pg_class c WHERE c.relkind = 'S'";
         return jdbcTemplate.queryForList(query).stream()
-            .map(sequenceInfo -> (String) sequenceInfo.get(SEQUENCE_NAME_KEY))
+            .map(sequenceInfo -> (String) sequenceInfo.get(sequenceNameKey))
             .collect(Collectors.toList());
     }
 
@@ -282,29 +283,29 @@ public abstract class BaseTest {
     }
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, Long caseReference, String eventId) {
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
 
-        final CaseType caseType = new CaseType();
-        caseType.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEvent eventTrigger = new CaseEvent();
-        eventTrigger.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdiction, caseType);
+        return eventTokenService.generateToken(userId, getCase(template, caseReference), caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
     }
 
     protected String generateEventTokenNewCase(String userId, String jurisdictionId, String caseTypeId, String eventId) {
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
 
-        final CaseType caseType = new CaseType();
-        caseType.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEvent eventTrigger = new CaseEvent();
-        eventTrigger.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, eventTrigger, jurisdiction, caseType);
+        return eventTokenService.generateToken(userId, caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
     }
 
     protected CaseDetails getCase(JdbcTemplate template, String caseReference) {
@@ -325,7 +326,7 @@ public abstract class BaseTest {
             .next();
     }
 
-    public static List<CaseField> getCaseFieldsFromJson(String json) throws IOException {
-        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+    public static List<CaseFieldDefinition> getCaseFieldsFromJson(String json) throws IOException {
+        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
     }
 }

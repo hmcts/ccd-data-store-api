@@ -29,12 +29,15 @@ class GetUIUserProfileTest extends BaseTest {
             .statusCode(200)
             .assertThat()
 
-//            .body("user.idam.defaultService", equalTo("CCD"))
-//            .body("user.idam.roles", hasItems(equalTo("caseworker"),
-//                                              equalTo("caseworker-autotest1"),
-//                                              equalTo("caseworker-loa1"),
-//                                              equalTo("caseworker-autotest1-loa1")))
-//            .body("channels.id", is(nullValue()))
+            // commented out in commit f628cdc: "Comment out IDAM section to relax assert conditions and unblock non AAT environments" see PR-360
+            //
+            //    .body("user.idam.defaultService", equalTo("CCD"))
+            //    .body("user.idam.roles", hasItems(equalTo("caseworker"),
+            //                                      equalTo("caseworker-autotest1"),
+            //                                      equalTo("caseworker-loa1"),
+            //                                      equalTo("caseworker-autotest1-loa1")))
+            //    .body("channels.id", is(nullValue()))
+
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.name", equalTo("Auto Test 1"))
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.description", equalTo("Content for the Test Jurisdiction."))
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.caseTypes.find { it.id == 'MAPPER' }.name", equalTo("Case type for Mapper"))

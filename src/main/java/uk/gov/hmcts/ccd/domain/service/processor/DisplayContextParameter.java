@@ -64,8 +64,7 @@ public class DisplayContextParameter {
     }
 
     public static boolean hasDisplayContextParameterType(String displayContextParameter, DisplayContextParameterType type) {
-        return !Strings.isNullOrEmpty(displayContextParameter) &&
-            getDisplayContextParameterOfType(displayContextParameter, type)
-                .isPresent();
+        return !Strings.isNullOrEmpty(displayContextParameter)
+            && getDisplayContextParameterOfType(displayContextParameter, type).isPresent();
     }
 }

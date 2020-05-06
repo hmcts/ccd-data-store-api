@@ -1,15 +1,16 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 public class JurisdictionDisplayProperties {
     private String id;
     private String name;
     private String description;
 
-    private List<CaseType> caseTypes = new ArrayList<>();
+    private List<CaseTypeDefinition> caseTypeDefinitions = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -35,11 +36,12 @@ public class JurisdictionDisplayProperties {
         this.description = description;
     }
 
-    public List<CaseType> getCaseTypes() {
-        return caseTypes;
+    @JsonProperty("caseTypes")
+    public List<CaseTypeDefinition> getCaseTypeDefinitions() {
+        return caseTypeDefinitions;
     }
 
-    public void setCaseTypes(List<CaseType> caseTypes) {
-        this.caseTypes = caseTypes;
+    public void setCaseTypeDefinitions(List<CaseTypeDefinition> caseTypeDefinitions) {
+        this.caseTypeDefinitions = caseTypeDefinitions;
     }
 }

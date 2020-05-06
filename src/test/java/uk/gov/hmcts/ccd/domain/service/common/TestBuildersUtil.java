@@ -8,11 +8,47 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.DefaultSettings;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.aggregated.User;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
+import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.draft.*;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.Banner;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
+import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
+import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
@@ -28,8 +64,9 @@ import java.util.function.Consumer;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
+@SuppressWarnings("checkstyle:MethodName") // method naming predates checkstyle implementation in module
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -237,8 +274,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseDraftBuilder withEventTriggerId(String eventTriggerId) {
-            this.caseDraft.setEventTriggerId(eventTriggerId);
+        public CaseDraftBuilder withEventId(String eventId) {
+            this.caseDraft.setEventId(eventId);
             return this;
         }
 
@@ -274,8 +311,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CreateCaseDraftBuilder withTTLDays(Integer TTLDays) {
-            this.createCaseDraftRequest.setMaxTTLDays(TTLDays);
+        public CreateCaseDraftBuilder withTTLDays(Integer ttlDays) {
+            this.createCaseDraftRequest.setMaxTTLDays(ttlDays);
             return this;
         }
 
@@ -396,12 +433,12 @@ public class TestBuildersUtil {
     }
 
     public static class CaseTypeBuilder {
-        private final CaseType caseType;
+        private final CaseTypeDefinition caseTypeDefinition;
         private final List<AccessControlList> acls = newArrayList();
 
         private CaseTypeBuilder() {
-            this.caseType = new CaseType();
-            caseType.setJurisdiction(new Jurisdiction());
+            this.caseTypeDefinition = new CaseTypeDefinition();
+            caseTypeDefinition.setJurisdictionDefinition(new JurisdictionDefinition());
         }
 
         public static CaseTypeBuilder newCaseType() {
@@ -409,43 +446,43 @@ public class TestBuildersUtil {
         }
 
         public CaseTypeBuilder withId(String id) {
-            caseType.setId(id);
+            caseTypeDefinition.setId(id);
             return this;
 
         }
 
-        public CaseTypeBuilder withJurisdiction(Jurisdiction jurisdiction) {
-            caseType.setJurisdiction(jurisdiction);
+        public CaseTypeBuilder withJurisdiction(JurisdictionDefinition jurisdictionDefinition) {
+            caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
             return this;
         }
 
         public CaseTypeBuilder withCaseTypeId(String caseTypeId) {
-            caseType.setId(caseTypeId);
+            caseTypeDefinition.setId(caseTypeId);
             return this;
         }
 
-        public CaseTypeBuilder withEvent(CaseEvent event) {
-            caseType.getEvents().add(event);
+        public CaseTypeBuilder withEvent(CaseEventDefinition event) {
+            caseTypeDefinition.getEvents().add(event);
             return this;
         }
 
-        public CaseTypeBuilder withEvents(List<CaseEvent> event) {
-            caseType.getEvents().addAll(event);
+        public CaseTypeBuilder withEvents(List<CaseEventDefinition> event) {
+            caseTypeDefinition.getEvents().addAll(event);
             return this;
         }
 
-        public CaseTypeBuilder withCaseFields(List<CaseField> fields) {
-            caseType.getCaseFields().addAll(fields);
+        public CaseTypeBuilder withCaseFields(List<CaseFieldDefinition> fields) {
+            caseTypeDefinition.getCaseFieldDefinitions().addAll(fields);
             return this;
         }
 
-        public CaseTypeBuilder withState(CaseState state) {
-            caseType.getStates().add(state);
+        public CaseTypeBuilder withState(CaseStateDefinition state) {
+            caseTypeDefinition.getStates().add(state);
             return this;
         }
 
-        public CaseTypeBuilder withField(CaseField field) {
-            caseType.getCaseFields().add(field);
+        public CaseTypeBuilder withField(CaseFieldDefinition field) {
+            caseTypeDefinition.getCaseFieldDefinitions().add(field);
             return this;
         }
 
@@ -454,13 +491,13 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseType build() {
-            caseType.setAccessControlLists(this.acls);
-            return caseType;
+        public CaseTypeDefinition build() {
+            caseTypeDefinition.setAccessControlLists(this.acls);
+            return caseTypeDefinition;
         }
 
         public CaseTypeBuilder withSecurityClassification(SecurityClassification securityClassification) {
-            caseType.setSecurityClassification(securityClassification);
+            caseTypeDefinition.setSecurityClassification(securityClassification);
             return this;
         }
     }
@@ -471,7 +508,7 @@ public class TestBuildersUtil {
 
         private BannerBuilder() {
             this.banner = new Banner();
-            this.banner.setJurisdiction(new Jurisdiction());
+            this.banner.setJurisdictionDefinition(new JurisdictionDefinition());
         }
 
         public static BannerBuilder newBanner() {
@@ -506,10 +543,10 @@ public class TestBuildersUtil {
 
     public static class JurisdictionUiConfigBuilder {
 
-        private final JurisdictionUiConfig jurisdictionUiConfig;
+        private final JurisdictionUiConfigDefinition jurisdictionUiConfigDefinition;
 
         private JurisdictionUiConfigBuilder() {
-            this.jurisdictionUiConfig = new JurisdictionUiConfig();
+            this.jurisdictionUiConfigDefinition = new JurisdictionUiConfigDefinition();
         }
 
         public static JurisdictionUiConfigBuilder newJurisdictionUiConfig() {
@@ -517,28 +554,28 @@ public class TestBuildersUtil {
         }
 
         public JurisdictionUiConfigBuilder withShutteredEnabled(Boolean shuttered) {
-            this.jurisdictionUiConfig.setShuttered(shuttered);
+            this.jurisdictionUiConfigDefinition.setShuttered(shuttered);
             return this;
         }
 
         public JurisdictionUiConfigBuilder withId(String id) {
-            this.jurisdictionUiConfig.setId(id);
+            this.jurisdictionUiConfigDefinition.setId(id);
             return this;
         }
 
         public JurisdictionUiConfigBuilder withName(String name) {
-            this.jurisdictionUiConfig.setName(name);
+            this.jurisdictionUiConfigDefinition.setName(name);
             return this;
         }
 
-        public JurisdictionUiConfig build() {
-            return jurisdictionUiConfig;
+        public JurisdictionUiConfigDefinition build() {
+            return jurisdictionUiConfigDefinition;
         }
     }
 
     public static class CaseViewBuilder {
         private final CaseView caseView;
-        private final List<CaseViewTrigger> caseViewTriggers = newArrayList();
+        private final List<CaseViewActionableEvent> caseViewActionableEvents = newArrayList();
 
         private CaseViewBuilder() {
             this.caseView = new CaseView();
@@ -549,8 +586,8 @@ public class TestBuildersUtil {
             return new CaseViewBuilder();
         }
 
-        public CaseViewBuilder withCaseViewTrigger(CaseViewTrigger caseViewTrigger) {
-            this.caseViewTriggers.add(caseViewTrigger);
+        public CaseViewBuilder withCaseViewActionableEvent(CaseViewActionableEvent caseViewActionableEvent) {
+            this.caseViewActionableEvents.add(caseViewActionableEvent);
             return this;
         }
 
@@ -578,7 +615,7 @@ public class TestBuildersUtil {
         }
 
         public CaseView build() {
-            caseView.setTriggers(caseViewTriggers.toArray(new CaseViewTrigger[]{}));
+            caseView.setActionableEvents(caseViewActionableEvents.toArray(new CaseViewActionableEvent[]{}));
             return caseView;
         }
     }
@@ -619,11 +656,11 @@ public class TestBuildersUtil {
     }
 
     public static class CaseStateBuilder {
-        private final CaseState caseState;
+        private final CaseStateDefinition caseStateDefinition;
         private final List<AccessControlList> acls = newArrayList();
 
         private CaseStateBuilder() {
-            this.caseState = new CaseState();
+            this.caseStateDefinition = new CaseStateDefinition();
         }
 
         public static CaseStateBuilder newState() {
@@ -636,13 +673,13 @@ public class TestBuildersUtil {
         }
 
         public CaseStateBuilder withId(String id) {
-            caseState.setId(id);
+            caseStateDefinition.setId(id);
             return this;
         }
 
-        public CaseState build() {
-            caseState.setAccessControlLists(this.acls);
-            return caseState;
+        public CaseStateDefinition build() {
+            caseStateDefinition.setAccessControlLists(this.acls);
+            return caseStateDefinition;
         }
     }
 
@@ -735,11 +772,11 @@ public class TestBuildersUtil {
     }
 
     public static class CaseEventBuilder {
-        private final CaseEvent caseEvent;
+        private final CaseEventDefinition caseEventDefinition;
         private final List<AccessControlList> accessControlLists = newArrayList();
 
         private CaseEventBuilder() {
-            this.caseEvent = new CaseEvent();
+            this.caseEventDefinition = new CaseEventDefinition();
         }
 
         public static CaseEventBuilder newCaseEvent() {
@@ -752,37 +789,37 @@ public class TestBuildersUtil {
         }
 
         public CaseEventBuilder withId(String id) {
-            caseEvent.setId(id);
+            caseEventDefinition.setId(id);
             return this;
         }
 
-        public CaseEvent build() {
-            caseEvent.setAccessControlLists(accessControlLists);
-            return caseEvent;
+        public CaseEventDefinition build() {
+            caseEventDefinition.setAccessControlLists(accessControlLists);
+            return caseEventDefinition;
         }
 
         public CaseEventBuilder withCanSaveDraft(Boolean canSaveDraft) {
-            caseEvent.setCanSaveDraft(canSaveDraft);
+            caseEventDefinition.setCanSaveDraft(canSaveDraft);
             return this;
         }
 
         public CaseEventBuilder withName(String name) {
-            caseEvent.setName(name);
+            caseEventDefinition.setName(name);
             return this;
         }
 
         public CaseEventBuilder withDescription(String description) {
-            caseEvent.setDescription(description);
+            caseEventDefinition.setDescription(description);
             return this;
         }
 
         public CaseEventBuilder withShowSummary(Boolean showSummary) {
-            caseEvent.setShowSummary(showSummary);
+            caseEventDefinition.setShowSummary(showSummary);
             return this;
         }
 
         public CaseEventBuilder withShowEventNotes(Boolean showEventNotes) {
-            caseEvent.setShowEventNotes(showEventNotes);
+            caseEventDefinition.setShowEventNotes(showEventNotes);
             return this;
         }
     }
@@ -818,99 +855,99 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class CaseViewTriggerBuilder {
-        private final CaseViewTrigger caseViewTrigger;
+    public static class CaseViewActionableEventBuilder {
+        private final CaseViewActionableEvent caseViewActionableEvent;
 
-        private CaseViewTriggerBuilder() {
-            this.caseViewTrigger = new CaseViewTrigger();
+        private CaseViewActionableEventBuilder() {
+            this.caseViewActionableEvent = new CaseViewActionableEvent();
         }
 
-        public static CaseViewTriggerBuilder aViewTrigger() {
-            return new CaseViewTriggerBuilder();
+        public static CaseViewActionableEventBuilder aViewTrigger() {
+            return new CaseViewActionableEventBuilder();
         }
 
-        public CaseViewTriggerBuilder withId(String id) {
-            caseViewTrigger.setId(id);
+        public CaseViewActionableEventBuilder withId(String id) {
+            caseViewActionableEvent.setId(id);
             return this;
         }
 
-        public CaseViewTrigger build() {
-            return caseViewTrigger;
+        public CaseViewActionableEvent build() {
+            return caseViewActionableEvent;
         }
     }
 
-    public static class CaseEventTriggerBuilder {
-        private final CaseEventTrigger caseEventTrigger;
+    public static class CaseUpdateViewEventBuilder {
+        private final CaseUpdateViewEvent caseUpdateViewEvent;
         private final List<CaseViewField> caseFields = Lists.newArrayList();
         private final List<WizardPage> wizardPages = Lists.newArrayList();
 
-        private CaseEventTriggerBuilder() {
-            this.caseEventTrigger = new CaseEventTrigger();
+        private CaseUpdateViewEventBuilder() {
+            this.caseUpdateViewEvent = new CaseUpdateViewEvent();
         }
 
-        public static CaseEventTriggerBuilder newCaseEventTrigger() {
-            return new CaseEventTriggerBuilder();
+        public static CaseUpdateViewEventBuilder newCaseUpdateViewEvent() {
+            return new CaseUpdateViewEventBuilder();
         }
 
-        public CaseEventTriggerBuilder withId(String id) {
-            caseEventTrigger.setId(id);
+        public CaseUpdateViewEventBuilder withId(String id) {
+            caseUpdateViewEvent.setId(id);
             return this;
         }
 
-        public CaseEventTriggerBuilder withWizardPage(WizardPage wizardPage) {
+        public CaseUpdateViewEventBuilder withWizardPage(WizardPage wizardPage) {
             this.wizardPages.add(wizardPage);
             return this;
         }
 
-        public CaseEventTriggerBuilder withCaseId(String caseId) {
-            this.caseEventTrigger.setCaseId(caseId);
+        public CaseUpdateViewEventBuilder withCaseId(String caseId) {
+            this.caseUpdateViewEvent.setCaseId(caseId);
             return this;
         }
 
-        public CaseEventTriggerBuilder withField(CaseViewField caseField) {
+        public CaseUpdateViewEventBuilder withField(CaseViewField caseField) {
             caseFields.add(caseField);
             return this;
         }
 
-        public CaseEventTriggerBuilder withName(String name) {
-            this.caseEventTrigger.setName(name);
+        public CaseUpdateViewEventBuilder withName(String name) {
+            this.caseUpdateViewEvent.setName(name);
             return this;
         }
 
-        public CaseEventTriggerBuilder withDescription(String description) {
-            this.caseEventTrigger.setDescription(description);
+        public CaseUpdateViewEventBuilder withDescription(String description) {
+            this.caseUpdateViewEvent.setDescription(description);
             return this;
         }
 
-        public CaseEventTriggerBuilder withEventToken(String token) {
-            this.caseEventTrigger.setEventToken(token);
+        public CaseUpdateViewEventBuilder withEventToken(String token) {
+            this.caseUpdateViewEvent.setEventToken(token);
             return this;
         }
 
-        public CaseEventTriggerBuilder withShowSummary(Boolean isShowSummary) {
-            this.caseEventTrigger.setShowSummary(isShowSummary);
+        public CaseUpdateViewEventBuilder withShowSummary(Boolean isShowSummary) {
+            this.caseUpdateViewEvent.setShowSummary(isShowSummary);
             return this;
         }
 
-        public CaseEventTriggerBuilder withShowEventNotes(Boolean isShowEventNotes) {
-            this.caseEventTrigger.setShowEventNotes(isShowEventNotes);
+        public CaseUpdateViewEventBuilder withShowEventNotes(Boolean isShowEventNotes) {
+            this.caseUpdateViewEvent.setShowEventNotes(isShowEventNotes);
             return this;
         }
 
-        public CaseEventTriggerBuilder withEndButtonLabel(String endButtonLabel) {
-            this.caseEventTrigger.setEndButtonLabel(endButtonLabel);
+        public CaseUpdateViewEventBuilder withEndButtonLabel(String endButtonLabel) {
+            this.caseUpdateViewEvent.setEndButtonLabel(endButtonLabel);
             return this;
         }
 
-        public CaseEventTriggerBuilder withCanSaveDraft(boolean isSaveDraft) {
-            this.caseEventTrigger.setCanSaveDraft(isSaveDraft);
+        public CaseUpdateViewEventBuilder withCanSaveDraft(boolean isSaveDraft) {
+            this.caseUpdateViewEvent.setCanSaveDraft(isSaveDraft);
             return this;
         }
 
-        public CaseEventTrigger build() {
-            this.caseEventTrigger.setCaseFields(this.caseFields);
-            caseEventTrigger.setWizardPages(this.wizardPages);
-            return caseEventTrigger;
+        public CaseUpdateViewEvent build() {
+            this.caseUpdateViewEvent.setCaseFields(this.caseFields);
+            caseUpdateViewEvent.setWizardPages(this.wizardPages);
+            return caseUpdateViewEvent;
         }
     }
 
@@ -955,29 +992,29 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class StartEventTriggerBuilder {
-        private final StartEventTrigger startEventTrigger;
+    public static class StartEventResultBuilder {
+        private final StartEventResult startEventResult;
 
-        private StartEventTriggerBuilder() {
-            this.startEventTrigger = new StartEventTrigger();
+        private StartEventResultBuilder() {
+            this.startEventResult = new StartEventResult();
         }
 
-        public static StartEventTriggerBuilder newStartEventTrigger() {
-            return new StartEventTriggerBuilder();
+        public static StartEventResultBuilder newStartEventTrigger() {
+            return new StartEventResultBuilder();
         }
 
-        public StartEventTriggerBuilder withCaseDetails(CaseDetails caseDetails) {
-            this.startEventTrigger.setCaseDetails(caseDetails);
+        public StartEventResultBuilder withCaseDetails(CaseDetails caseDetails) {
+            this.startEventResult.setCaseDetails(caseDetails);
             return this;
         }
 
-        public StartEventTriggerBuilder withEventToken(String token) {
-            this.startEventTrigger.setToken(token);
+        public StartEventResultBuilder withEventToken(String token) {
+            this.startEventResult.setToken(token);
             return this;
         }
 
-        public StartEventTrigger build() {
-            return startEventTrigger;
+        public StartEventResult build() {
+            return startEventResult;
         }
     }
 
@@ -1025,13 +1062,13 @@ public class TestBuildersUtil {
     }
 
     public static class CaseFieldBuilder {
-        private final CaseField caseField;
+        private final CaseFieldDefinition caseFieldDefinition;
         private final List<AccessControlList> accessControlLists = newArrayList();
         private final List<ComplexACL> complexACLs = newArrayList();
-        private FieldType caseFieldType;
+        private FieldTypeDefinition caseFieldTypeDefinition;
 
         private CaseFieldBuilder() {
-            this.caseField = new CaseField();
+            this.caseFieldDefinition = new CaseFieldDefinition();
         }
 
         public static CaseFieldBuilder newCaseField() {
@@ -1039,22 +1076,22 @@ public class TestBuildersUtil {
         }
 
         public CaseFieldBuilder withId(String id) {
-            caseField.setId(id);
+            caseFieldDefinition.setId(id);
             return this;
         }
 
         public CaseFieldBuilder withSC(String securityClassification) {
-            caseField.setSecurityLabel(securityClassification);
+            caseFieldDefinition.setSecurityLabel(securityClassification);
             return this;
         }
 
-        public CaseFieldBuilder withFieldType(FieldType fieldType) {
-            caseFieldType = fieldType;
+        public CaseFieldBuilder withFieldType(FieldTypeDefinition fieldTypeDefinition) {
+            caseFieldTypeDefinition = fieldTypeDefinition;
             return this;
         }
 
         public CaseFieldBuilder withFieldLabelText(String label) {
-            caseField.setLabel(label);
+            caseFieldDefinition.setLabel(label);
             return this;
         }
 
@@ -1069,33 +1106,28 @@ public class TestBuildersUtil {
         }
 
         public CaseFieldBuilder withOrder(final int order) {
-            caseField.setOrder(order);
+            caseFieldDefinition.setOrder(order);
             return this;
         }
 
         public CaseFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
-            caseField.setDisplayContextParameter(displayContextParameter);
+            caseFieldDefinition.setDisplayContextParameter(displayContextParameter);
             return this;
         }
 
-        public CaseFieldBuilder withFormattedValue(final String formattedValue) {
-            caseField.setFormattedValue(formattedValue);
-            return this;
-        }
-
-        public CaseField build() {
-            caseField.setAccessControlLists(accessControlLists);
-            caseField.setComplexACLs(complexACLs);
-            caseField.setFieldType(caseFieldType);
-            return caseField;
+        public CaseFieldDefinition build() {
+            caseFieldDefinition.setAccessControlLists(accessControlLists);
+            caseFieldDefinition.setComplexACLs(complexACLs);
+            caseFieldDefinition.setFieldTypeDefinition(caseFieldTypeDefinition);
+            return caseFieldDefinition;
         }
     }
 
     public static class FixedListItemBuilder {
-        private final FixedListItem fixedListItem;
+        private final FixedListItemDefinition fixedListItemDefinition;
 
         public FixedListItemBuilder() {
-            this.fixedListItem = new FixedListItem();
+            this.fixedListItemDefinition = new FixedListItemDefinition();
         }
 
         public static FixedListItemBuilder aFixedListItem() {
@@ -1103,26 +1135,26 @@ public class TestBuildersUtil {
         }
 
         public FixedListItemBuilder withCode(String code) {
-            this.fixedListItem.setCode(code);
+            this.fixedListItemDefinition.setCode(code);
             return this;
         }
 
         public FixedListItemBuilder withOrder(String order) {
-            this.fixedListItem.setOrder(order);
+            this.fixedListItemDefinition.setOrder(order);
             return this;
         }
 
-        public FixedListItem build() {
-            return fixedListItem;
+        public FixedListItemDefinition build() {
+            return fixedListItemDefinition;
         }
     }
 
     public static class FieldTypeBuilder {
-        private final FieldType fieldType;
-        private final List<CaseField> complexFields;
+        private final FieldTypeDefinition fieldTypeDefinition;
+        private final List<CaseFieldDefinition> complexFields;
 
         private FieldTypeBuilder() {
-            this.fieldType = new FieldType();
+            this.fieldTypeDefinition = new FieldTypeDefinition();
             this.complexFields = Lists.newArrayList();
         }
 
@@ -1131,53 +1163,53 @@ public class TestBuildersUtil {
         }
 
         public FieldTypeBuilder withId(String id) {
-            fieldType.setId(id);
+            fieldTypeDefinition.setId(id);
             return this;
         }
 
         public FieldTypeBuilder withType(String type) {
-            fieldType.setType(type);
+            fieldTypeDefinition.setType(type);
             return this;
         }
 
-        public FieldTypeBuilder withComplexField(CaseField complexField) {
+        public FieldTypeBuilder withComplexField(CaseFieldDefinition complexField) {
             complexFields.add(complexField);
             return this;
         }
 
-        public FieldTypeBuilder withCollectionFieldType(FieldType collectionFieldType) {
-            fieldType.setCollectionFieldType(collectionFieldType);
+        public FieldTypeBuilder withCollectionFieldType(FieldTypeDefinition collectionFieldTypeDefinition) {
+            fieldTypeDefinition.setCollectionFieldTypeDefinition(collectionFieldTypeDefinition);
             return this;
         }
 
-        public FieldTypeBuilder withCollectionField(CaseField complexField) {
-            fieldType.setCollectionFieldType(aFieldType()
+        public FieldTypeBuilder withCollectionField(CaseFieldDefinition complexField) {
+            fieldTypeDefinition.setCollectionFieldTypeDefinition(aFieldType()
                 .withComplexField(complexField)
                 .withType(COMPLEX)
                 .build());
             return this;
         }
 
-        public FieldTypeBuilder withFixedListItems(final FixedListItem... fixedListItems) {
-            fieldType.setFixedListItems(Lists.newArrayList(fixedListItems));
+        public FieldTypeBuilder withFixedListItems(final FixedListItemDefinition... fixedListItemDefinitions) {
+            fieldTypeDefinition.setFixedListItemDefinitions(Lists.newArrayList(fixedListItemDefinitions));
             return this;
         }
 
-        public FieldTypeBuilder withFixedListItems(final List<FixedListItem> fixedListItems) {
-            fieldType.setFixedListItems(fixedListItems);
+        public FieldTypeBuilder withFixedListItems(final List<FixedListItemDefinition> fixedListItemDefinitions) {
+            fieldTypeDefinition.setFixedListItemDefinitions(fixedListItemDefinitions);
             return this;
         }
 
-        public FieldType build() {
-            fieldType.setComplexFields(complexFields);
-            return fieldType;
+        public FieldTypeDefinition build() {
+            fieldTypeDefinition.setComplexFields(complexFields);
+            return fieldTypeDefinition;
         }
     }
 
     public static class CaseViewFieldBuilder {
         private final CaseViewField caseViewField;
         private final List<AccessControlList> acls = newArrayList();
-        private FieldType caseFieldType;
+        private FieldTypeDefinition caseFieldTypeDefinition;
 
         private CaseViewFieldBuilder() {
             this.caseViewField = new CaseViewField();
@@ -1192,8 +1224,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseViewFieldBuilder withFieldType(FieldType fieldType) {
-            this.caseFieldType = fieldType;
+        public CaseViewFieldBuilder withFieldType(FieldTypeDefinition fieldTypeDefinition) {
+            this.caseFieldTypeDefinition = fieldTypeDefinition;
             return this;
         }
 
@@ -1204,7 +1236,7 @@ public class TestBuildersUtil {
 
         public CaseViewField build() {
             this.caseViewField.setAccessControlLists(acls);
-            this.caseViewField.setFieldType(this.caseFieldType);
+            this.caseViewField.setFieldTypeDefinition(this.caseFieldTypeDefinition);
             return this.caseViewField;
         }
     }
@@ -1231,38 +1263,38 @@ public class TestBuildersUtil {
     }
 
     public static class JurisdictionBuilder {
-        private final Jurisdiction jurisdiction;
+        private final JurisdictionDefinition jurisdictionDefinition;
 
         public static JurisdictionBuilder newJurisdiction() {
             return new JurisdictionBuilder();
         }
 
         private JurisdictionBuilder() {
-            this.jurisdiction = new Jurisdiction();
+            this.jurisdictionDefinition = new JurisdictionDefinition();
         }
 
         public JurisdictionBuilder withJurisdictionId(String id) {
-            jurisdiction.setId(id);
+            jurisdictionDefinition.setId(id);
             return this;
         }
 
         public JurisdictionBuilder withName(String name) {
-            jurisdiction.setName(name);
+            jurisdictionDefinition.setName(name);
             return this;
         }
 
         public JurisdictionBuilder withDescription(String description) {
-            jurisdiction.setDescription(description);
+            jurisdictionDefinition.setDescription(description);
             return this;
         }
 
-        public JurisdictionBuilder withCaseType(CaseType caseType) {
-            jurisdiction.getCaseTypes().add(caseType);
+        public JurisdictionBuilder withCaseType(CaseTypeDefinition caseTypeDefinition) {
+            jurisdictionDefinition.getCaseTypeDefinitions().add(caseTypeDefinition);
             return this;
         }
 
-        public Jurisdiction build() {
-            return jurisdiction;
+        public JurisdictionDefinition build() {
+            return jurisdictionDefinition;
         }
     }
 
@@ -1286,15 +1318,15 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public WorkbasketInputBuilder withShowCondition(String showCondition) {
-            field.setShowCondition(showCondition);
+        public WorkbasketInputBuilder withFieldId(String fieldId, String elementPath) {
+            field.setId(fieldId);
+            field.setElementPath(elementPath);
             this.workbasketInput.setField(field);
             return this;
         }
 
-        public WorkbasketInputBuilder withFieldId(String fieldId, String elementPath) {
-            field.setId(fieldId);
-            field.setElementPath(elementPath);
+        public WorkbasketInputBuilder withShowCondition(String showCondition) {
+            field.setShowCondition(showCondition);
             this.workbasketInput.setField(field);
             return this;
         }
@@ -1338,6 +1370,13 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public SearchInputBuilder withFieldId(String fieldId, String elementPath) {
+            field.setId(fieldId);
+            field.setElementPath(elementPath);
+            this.searchInput.setField(field);
+            return this;
+        }
+
         public SearchInputBuilder withShowCondition(String showCondition) {
             field.setShowCondition(showCondition);
             this.searchInput.setField(field);
@@ -1346,13 +1385,6 @@ public class TestBuildersUtil {
 
         public SearchInputBuilder withDisplayContextParameter(String displayContextParameter) {
             this.searchInput.setDisplayContextParameter(displayContextParameter);
-            return this;
-        }
-
-        public SearchInputBuilder withFieldId(String fieldId, String elementPath) {
-            field.setId(fieldId);
-            field.setElementPath(elementPath);
-            this.searchInput.setField(field);
             return this;
         }
 
@@ -1419,8 +1451,8 @@ public class TestBuildersUtil {
             this.caseTypeTabField = new CaseTypeTabField();
         }
 
-        public CaseTypeTabFieldBuilder withCaseField(CaseField caseField) {
-            this.caseTypeTabField.setCaseField(caseField);
+        public CaseTypeTabFieldBuilder withCaseField(CaseFieldDefinition caseFieldDefinition) {
+            this.caseTypeTabField.setCaseFieldDefinition(caseFieldDefinition);
             return this;
         }
 
@@ -1440,13 +1472,13 @@ public class TestBuildersUtil {
     }
 
     public static class CaseTypeTabBuilder {
-        private final CaseTypeTab caseTypeTab;
+        private final CaseTypeTabDefinition caseTypeTabDefinition;
         private final List<CaseTypeTabField> caseTypeTabFields;
 
         private CaseTypeTabBuilder() {
             this.caseTypeTabFields = newArrayList();
-            this.caseTypeTab = new CaseTypeTab();
-            this.caseTypeTab.setTabFields(caseTypeTabFields);
+            this.caseTypeTabDefinition = new CaseTypeTabDefinition();
+            this.caseTypeTabDefinition.setTabFields(caseTypeTabFields);
         }
 
         public CaseTypeTabBuilder withTabField(CaseTypeTabField field) {
@@ -1454,8 +1486,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseTypeTab build() {
-            return this.caseTypeTab;
+        public CaseTypeTabDefinition build() {
+            return this.caseTypeTabDefinition;
         }
 
         public static CaseTypeTabBuilder newCaseTab() {
@@ -1465,13 +1497,13 @@ public class TestBuildersUtil {
     }
 
     public static class CaseTabCollectionBuilder {
-        private final List<CaseTypeTab> tabs;
-        private final CaseTabCollection caseTabCollection;
+        private final List<CaseTypeTabDefinition> tabs;
+        private final CaseTypeTabsDefinition caseTypeTabsDefinition;
 
         private CaseTabCollectionBuilder() {
             this.tabs = newArrayList();
-            this.caseTabCollection = new CaseTabCollection();
-            this.caseTabCollection.setTabs(tabs);
+            this.caseTypeTabsDefinition = new CaseTypeTabsDefinition();
+            this.caseTypeTabsDefinition.setTabs(tabs);
         }
 
         public static CaseTabCollectionBuilder newCaseTabCollection() {
@@ -1479,36 +1511,36 @@ public class TestBuildersUtil {
         }
 
         public CaseTabCollectionBuilder withFieldIds(String... caseFieldIds) {
-            CaseTypeTab tab = new CaseTypeTab();
+            CaseTypeTabDefinition tab = new CaseTypeTabDefinition();
             List<CaseTypeTabField> tabFields = new ArrayList<>();
             asList(caseFieldIds).forEach(caseFieldId -> {
-                CaseField caseField = new CaseField();
-                caseField.setId(caseFieldId);
-                FieldType fieldType = new FieldType();
-                fieldType.setType("YesOrNo");
-                caseField.setFieldType(fieldType);
+                CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+                caseFieldDefinition.setId(caseFieldId);
+                FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+                fieldTypeDefinition.setType("YesOrNo");
+                caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
                 CaseTypeTabField tabField = new CaseTypeTabField();
-                tabField.setCaseField(caseField);
+                tabField.setCaseFieldDefinition(caseFieldDefinition);
                 tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
                 tabField.setDisplayContextParameter("#TABLE(Title, FirstName, MiddleName)");
                 tabFields.add(tabField);
             });
             tab.setShowCondition("tabShowCondition");
             tab.setTabFields(tabFields);
-            List<CaseTypeTab> tabs = new ArrayList<>();
+            List<CaseTypeTabDefinition> tabs = new ArrayList<>();
             tabs.add(tab);
-            caseTabCollection.setTabs(tabs);
+            caseTypeTabsDefinition.setTabs(tabs);
 
             return this;
         }
 
-        public CaseTabCollectionBuilder withTab(CaseTypeTab tab) {
+        public CaseTabCollectionBuilder withTab(CaseTypeTabDefinition tab) {
             tabs.add(tab);
             return this;
         }
 
-        public CaseTabCollection build() {
-            return caseTabCollection;
+        public CaseTypeTabsDefinition build() {
+            return caseTypeTabsDefinition;
         }
     }
 

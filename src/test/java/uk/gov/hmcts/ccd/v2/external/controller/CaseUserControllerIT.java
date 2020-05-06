@@ -72,11 +72,11 @@ public class CaseUserControllerIT extends WireMockBaseTest {
         String role2 = "[CLAIMANT]";
         String userId = "a_target_user_id";
         String caseId = "1504259907353529";
-        String URL =  "/cases/" + caseId + "/users/" + userId;
+        String requestUrl =  "/cases/" + caseId + "/users/" + userId;
         CaseUser caseUser = new CaseUser();
         caseUser.setCaseRoles(Sets.newHashSet(role1, role2));
 
-        final MvcResult mvcResult = mockMvc.perform(put(URL)
+        final MvcResult mvcResult = mockMvc.perform(put(requestUrl)
             .contentType(JSON_CONTENT_TYPE)
             .accept(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseUser))

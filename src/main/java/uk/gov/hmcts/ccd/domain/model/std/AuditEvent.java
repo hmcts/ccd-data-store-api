@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@SuppressWarnings("checkstyle:SummaryJavadoc") // Javadoc predates checkstyle implementation in module
 public class AuditEvent extends Event {
     @JsonIgnore
     private Long id;

@@ -1,40 +1,40 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
-
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
-import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @DisplayName("DefaultGetCriteriaOperationTest")
 public class DefaultGetCriteriaOperationTest {
@@ -48,11 +48,11 @@ public class DefaultGetCriteriaOperationTest {
     private static final String DISPLAY_CONTEXT_PARAMETER = "#KEY(Value)";
     private static final String SHOW_CONDITION = "some show condition";
 
-    private final CaseType caseType = new CaseType();
-    private final CaseField caseField1 = new CaseField();
-    private final CaseField caseField2 = new CaseField();
-    private final CaseField caseField3 = new CaseField();
-    private final CaseField caseField4 = new CaseField();
+    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+    private final CaseFieldDefinition caseFieldDefinition1 = new CaseFieldDefinition();
+    private final CaseFieldDefinition caseFieldDefinition2 = new CaseFieldDefinition();
+    private final CaseFieldDefinition caseFieldDefinition3 = new CaseFieldDefinition();
+    private final CaseFieldDefinition caseFieldDefinition4 = new CaseFieldDefinition();
 
     @Mock
     private UIDefinitionRepository uiDefinitionRepository;
@@ -60,43 +60,51 @@ public class DefaultGetCriteriaOperationTest {
     private CaseDefinitionRepository caseDefinitionRepository;
     private DefaultGetCriteriaOperation defaultGetCriteriaOperation;
 
-    private CaseField name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private CaseField surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private CaseField dob = newCaseField().withId(DOB).withFieldType(aFieldType().withId(DATE_TYPE).withType(DATE_TYPE).build())
+    private CaseFieldDefinition name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
+    private CaseFieldDefinition surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
+    private FieldTypeDefinition personFieldTypeDefinition = aFieldType()
+        .withId(PERSON)
+        .withType(COMPLEX)
+        .withComplexField(name)
+        .withComplexField(surname)
+        .build();
+    private CaseFieldDefinition person = newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
+    private CaseFieldDefinition dob = newCaseField().withId(DOB).withFieldType(aFieldType().withId(DATE_TYPE).withType(DATE_TYPE).build())
         .withDisplayContextParameter(DISPLAY_CONTEXT_PARAMETER).build();
-    private FieldType personFieldType = aFieldType().withId(PERSON).withType(COMPLEX)
+    private FieldTypeDefinition personFieldType = aFieldType().withId(PERSON).withType(COMPLEX)
         .withComplexField(name).withComplexField(surname).withComplexField(dob).build();
-    private CaseField person = newCaseField().withId(PERSON).withFieldType(personFieldType).build();
 
-    private FieldType debtorFieldType = aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
-    private CaseField debtorDetails = newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldType).build();
+    private FieldTypeDefinition debtorFieldTypeDefinition = aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
+    private CaseFieldDefinition debtorDetails = newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldTypeDefinition).build();
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
-        FieldType fieldType = new FieldType();
-        caseField1.setId("field1");
-        caseField1.setFieldType(fieldType);
-        caseField2.setId("field2");
-        caseField2.setFieldType(fieldType);
-        caseField3.setId("field3");
-        caseField3.setFieldType(fieldType);
-        caseField4.setId("field4");
-        caseField4.setFieldType(fieldType);
-        caseField4.setMetadata(true);
-        caseType.setId("Test case type");
-        caseType.setCaseFields(asList(caseField1, caseField2, caseField3, caseField4, debtorDetails));
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        caseFieldDefinition1.setId("field1");
+        caseFieldDefinition1.setFieldTypeDefinition(fieldTypeDefinition);
+        caseFieldDefinition2.setId("field2");
+        caseFieldDefinition2.setFieldTypeDefinition(fieldTypeDefinition);
+        caseFieldDefinition3.setId("field3");
+        caseFieldDefinition3.setFieldTypeDefinition(fieldTypeDefinition);
+        caseFieldDefinition4.setId("field4");
+        caseFieldDefinition4.setFieldTypeDefinition(fieldTypeDefinition);
+        caseFieldDefinition4.setMetadata(true);
+        caseTypeDefinition.setId("Test case type");
+        caseTypeDefinition.setCaseFieldDefinitions(asList(caseFieldDefinition1,
+                                                    caseFieldDefinition2, caseFieldDefinition3,
+                                                    caseFieldDefinition4, debtorDetails));
 
         defaultGetCriteriaOperation = new DefaultGetCriteriaOperation(uiDefinitionRepository, caseDefinitionRepository);
 
-        doReturn(caseType).when(caseDefinitionRepository).getCaseType(caseType.getId());
-        doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseType.getId());
-        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputDefinitions(caseType.getId());
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(caseTypeDefinition.getId());
+        doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseTypeDefinition.getId());
+        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputFieldDefinitions(caseTypeDefinition.getId());
     }
 
     @Test
     void shouldReturnWorkbasketInputs() {
-        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET);
+        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(4)),
@@ -107,7 +115,7 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldReturnSearchInputs() {
-        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH);
+        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(4)),
@@ -118,14 +126,14 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldReturnSearchInputsWithShowCondition() {
-        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH);
+        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH);
 
         assertThat(searchInputs, hasItems(hasProperty("field", hasProperty("showCondition", equalTo(SHOW_CONDITION)))));
     }
 
     @Test
     void shouldReturnWorkbasketInputsWithNullShowCondition() {
-        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET);
+        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, WORKBASKET);
 
         assertThat(workbasketInputs, hasItems(hasProperty("field", hasProperty("showCondition", nullValue()))));
     }
@@ -133,25 +141,25 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldReturnWorkbasketInputsWhenCaseFieldElementPathDefined() {
-        doReturn(generateWorkbasketInputWithPathElements()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseType.getId());
-        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET);
+        doReturn(generateWorkbasketInputWithPathElements()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseTypeDefinition.getId());
+        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(5)),
             () -> assertThat(workbasketInputs.get(4).getField().getId(), is(DEBTOR_DETAILS)),
-            () -> assertThat(workbasketInputs.get(4).getField().getType().getType(), is(name.getFieldType().getType())),
-            () -> assertThat(workbasketInputs.get(4).getField().getType().getId(), is(name.getFieldType().getId())),
+            () -> assertThat(workbasketInputs.get(4).getField().getType().getType(), is(name.getFieldTypeDefinition().getType())),
+            () -> assertThat(workbasketInputs.get(4).getField().getType().getId(), is(name.getFieldTypeDefinition().getId())),
             () -> assertThat(workbasketInputs.get(4).getField().getType().getChildren().size(), is(0))
         );
     }
 
     @Test
     void shouldThrowResourceNotFoundExceptionWhenCaseFieldNotFoundInCaseTypeForWorkbasketInput() {
-        doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseType.getId());
-        caseType.setCaseFields(Collections.emptyList());
+        doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseTypeDefinition.getId());
+        caseTypeDefinition.setCaseFieldDefinitions(Collections.emptyList());
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET));
+            () -> defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, WORKBASKET));
 
         assertThat(exception.getMessage(),
             is("CaseField with id=[field1] and path=[null] not found"));
@@ -159,155 +167,101 @@ public class DefaultGetCriteriaOperationTest {
 
     @Test
     void shouldReturnSearchInputsWhenCaseFieldElementPathDefined() {
-        doReturn(generateSearchInputWithPathElements()).when(uiDefinitionRepository).getSearchInputDefinitions(caseType.getId());
-        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH);
+        doReturn(generateSearchInputWithPathElements()).when(uiDefinitionRepository).getSearchInputFieldDefinitions(caseTypeDefinition.getId());
+        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(5)),
             () -> assertThat(searchInputs.get(4).getField().getId(), is(DEBTOR_DETAILS)),
-            () -> assertThat(searchInputs.get(4).getField().getType().getType(), is(name.getFieldType().getType())),
-            () -> assertThat(searchInputs.get(4).getField().getType().getId(), is(name.getFieldType().getId())),
+            () -> assertThat(searchInputs.get(4).getField().getType().getType(), is(name.getFieldTypeDefinition().getType())),
+            () -> assertThat(searchInputs.get(4).getField().getType().getId(), is(name.getFieldTypeDefinition().getId())),
             () -> assertThat(searchInputs.get(4).getField().getType().getChildren().size(), is(0)));
     }
 
     @Test
     void shouldThrowResourceNotFoundExceptionWhenCaseFieldNotFoundInCaseTypeForSearchInput() {
-        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputDefinitions(caseType.getId());
-        caseType.setCaseFields(Collections.emptyList());
+        doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputFieldDefinitions(caseTypeDefinition.getId());
+        caseTypeDefinition.setCaseFieldDefinitions(Collections.emptyList());
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH));
+            () -> defaultGetCriteriaOperation.execute(caseTypeDefinition.getId(), CAN_READ, SEARCH));
 
         assertThat(exception.getMessage(),
             is("CaseField with id=[field1] and path=[null] not found"));
     }
 
-    @Test
-    void shouldReturnWorkbasketInputsWithDisplayContextParameter() {
-        WorkbasketInputDefinition workbasketInputDefinition = new WorkbasketInputDefinition();
-        workbasketInputDefinition.setCaseTypeId(caseType.getId());
-        workbasketInputDefinition.setFields(
-            asList(
-                getWorkbasketInputField(debtorDetails.getId(), 1, PERSON + "." + DOB, null),
-                getWorkbasketInputField(caseField1.getId(), 2, null, "#KEY2(Value2)")
-            )
-        );
-
-        doReturn(workbasketInputDefinition).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseType.getId());
-        List<? extends CriteriaInput> workbasketInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, WORKBASKET);
-
-        assertAll(
-            () -> assertThat(workbasketInputs.size(), is(2)),
-            () -> assertThat(workbasketInputs.get(0).getField().getId(), is(DEBTOR_DETAILS)),
-            () -> assertThat(workbasketInputs.get(0).getField().getElementPath(), is(PERSON + "." + DOB)),
-            () -> assertThat(workbasketInputs.get(0).getDisplayContextParameter(), is(DISPLAY_CONTEXT_PARAMETER)),
-            () -> assertThat(workbasketInputs.get(1).getField().getId(), is("field1")),
-            () -> assertThat(workbasketInputs.get(1).getField().getElementPath(), is(nullValue())),
-            () -> assertThat(workbasketInputs.get(1).getDisplayContextParameter(), is("#KEY2(Value2)"))
-        );
+    private WorkbasketInputFieldsDefinition generateWorkbasketInput() {
+        WorkbasketInputFieldsDefinition workbasketInputFieldsDefinition = new WorkbasketInputFieldsDefinition();
+        workbasketInputFieldsDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        workbasketInputFieldsDefinition.setFields(
+            asList(getWorkbasketInputField(caseFieldDefinition1.getId(), 1),
+                getWorkbasketInputField(caseFieldDefinition2.getId(), 2),
+                getWorkbasketInputField(caseFieldDefinition3.getId(), 3),
+                getWorkbasketInputField(caseFieldDefinition4.getId(), 4)));
+        return workbasketInputFieldsDefinition;
     }
 
-    @Test
-    void shouldReturnSearchInputsWithDisplayContextParameter() {
-        SearchInputDefinition searchInputDefinition = new SearchInputDefinition();
-        searchInputDefinition.setCaseTypeId(caseType.getId());
-        searchInputDefinition.setFields(
-            asList(
-                getSearchInputField(debtorDetails.getId(), 1, PERSON + "." + DOB, null),
-                getSearchInputField(caseField1.getId(), 2, null, "#KEY2(Value2)")
-            )
-        );
-
-        doReturn(searchInputDefinition).when(uiDefinitionRepository).getSearchInputDefinitions(caseType.getId());
-        List<? extends CriteriaInput> searchInputs = defaultGetCriteriaOperation.execute(caseType.getId(), CAN_READ, SEARCH);
-
-        assertAll(
-            () -> assertThat(searchInputs.size(), is(2)),
-            () -> assertThat(searchInputs.get(0).getField().getId(), is(DEBTOR_DETAILS)),
-            () -> assertThat(searchInputs.get(0).getField().getElementPath(), is(PERSON + "." + DOB)),
-            () -> assertThat(searchInputs.get(0).getDisplayContextParameter(), is(DISPLAY_CONTEXT_PARAMETER)),
-            () -> assertThat(searchInputs.get(1).getField().getId(), is("field1")),
-            () -> assertThat(searchInputs.get(1).getField().getElementPath(), is(nullValue())),
-            () -> assertThat(searchInputs.get(1).getDisplayContextParameter(), is("#KEY2(Value2)"))
-        );
-    }
-
-    private WorkbasketInputDefinition generateWorkbasketInput() {
-        WorkbasketInputDefinition workbasketInputDefinition = new WorkbasketInputDefinition();
-        workbasketInputDefinition.setDisplayContextParameter("#DATETIME(“YYYY-MM-DD hh:mm:ss”)");
-        workbasketInputDefinition.setCaseTypeId(caseType.getId());
-        workbasketInputDefinition.setFields(
-            asList(getWorkbasketInputField(caseField1.getId(), 1),
-                getWorkbasketInputField(caseField2.getId(), 2),
-                getWorkbasketInputField(caseField3.getId(), 3),
-                getWorkbasketInputField(caseField4.getId(), 4)));
-        return workbasketInputDefinition;
-    }
-
-    private WorkbasketInputDefinition generateWorkbasketInputWithPathElements() {
+    private WorkbasketInputFieldsDefinition generateWorkbasketInputWithPathElements() {
         String path = PERSON + "." + NAME;
-        WorkbasketInputDefinition workbasketInputDefinition = new WorkbasketInputDefinition();
-        workbasketInputDefinition.setCaseTypeId(caseType.getId());
-        workbasketInputDefinition.setFields(asList(
-            getWorkbasketInputField(caseField1.getId(), 1),
-            getWorkbasketInputField(caseField2.getId(), 2),
-            getWorkbasketInputField(caseField3.getId(), 3),
-            getWorkbasketInputField(caseField4.getId(), 4),
-            getWorkbasketInputField(debtorDetails.getId(), 5, path, null)
+        WorkbasketInputFieldsDefinition workbasketInputFieldsDefinition = new WorkbasketInputFieldsDefinition();
+        workbasketInputFieldsDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        workbasketInputFieldsDefinition.setFields(asList(
+            getWorkbasketInputField(caseFieldDefinition1.getId(), 1),
+            getWorkbasketInputField(caseFieldDefinition2.getId(), 2),
+            getWorkbasketInputField(caseFieldDefinition3.getId(), 3),
+            getWorkbasketInputField(caseFieldDefinition4.getId(), 4),
+            getWorkbasketInputField(debtorDetails.getId(), 5, path)
         ));
-        return workbasketInputDefinition;
+        return workbasketInputFieldsDefinition;
     }
 
     private WorkbasketInputField getWorkbasketInputField(String id, int order) {
-        return getWorkbasketInputField(id, order, null, null);
+        return getWorkbasketInputField(id, order, null);
     }
 
-    private WorkbasketInputField getWorkbasketInputField(String id, int order, String path, String displayContextParameter) {
+    private WorkbasketInputField getWorkbasketInputField(String id, int order, String path) {
         WorkbasketInputField workbasketInputField = new WorkbasketInputField();
         workbasketInputField.setCaseFieldId(id);
         workbasketInputField.setLabel(id);
         workbasketInputField.setDisplayOrder(order);
         workbasketInputField.setCaseFieldPath(path);
-        workbasketInputField.setDisplayContextParameter(displayContextParameter);
         return workbasketInputField;
     }
 
-    private SearchInputDefinition generateSearchInputWithPathElements() {
+    private SearchInputFieldsDefinition generateSearchInputWithPathElements() {
         String path = PERSON + "." + NAME;
-        SearchInputDefinition searchInputDefinition = new SearchInputDefinition();
-        searchInputDefinition.setCaseTypeId(caseType.getId());
-        searchInputDefinition.setDisplayContextParameter("#DATETIME(“YYYY-MM-DD hh:mm:ss”)");
-        searchInputDefinition.setFields(asList(
-            getSearchInputField(caseField1.getId(), 1),
-            getSearchInputField(caseField2.getId(), 2),
-            getSearchInputField(caseField3.getId(), 3),
-            getSearchInputField(caseField4.getId(), 4),
-            getSearchInputField(debtorDetails.getId(), 5, path, null)));
-        return searchInputDefinition;
+        SearchInputFieldsDefinition searchInputFieldsDefinition = new SearchInputFieldsDefinition();
+        searchInputFieldsDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        searchInputFieldsDefinition.setFields(asList(
+            getSearchInputField(caseFieldDefinition1.getId(), 1),
+            getSearchInputField(caseFieldDefinition2.getId(), 2),
+            getSearchInputField(caseFieldDefinition3.getId(), 3),
+            getSearchInputField(caseFieldDefinition4.getId(), 4),
+            getSearchInputField(debtorDetails.getId(), 5, path)));
+        return searchInputFieldsDefinition;
     }
 
-    private SearchInputDefinition generateSearchInput() {
-        SearchInputDefinition searchInputDefinition = new SearchInputDefinition();
-        searchInputDefinition.setCaseTypeId(caseType.getId());
-        searchInputDefinition.setFields(asList(getSearchInputField(caseField1.getId(), 1),
-            getSearchInputField(caseField2.getId(), 2),
-            getSearchInputField(caseField3.getId(), 3),
-            getSearchInputField(caseField4.getId(), 4)));
-        return searchInputDefinition;
+    private SearchInputFieldsDefinition generateSearchInput() {
+        SearchInputFieldsDefinition searchInputFieldsDefinition = new SearchInputFieldsDefinition();
+        searchInputFieldsDefinition.setCaseTypeId(caseTypeDefinition.getId());
+        searchInputFieldsDefinition.setFields(asList(getSearchInputField(caseFieldDefinition1.getId(), 1),
+            getSearchInputField(caseFieldDefinition2.getId(), 2),
+            getSearchInputField(caseFieldDefinition3.getId(), 3),
+            getSearchInputField(caseFieldDefinition4.getId(), 4)));
+        return searchInputFieldsDefinition;
 
     }
 
     private SearchInputField getSearchInputField(String id, int order) {
-        return getSearchInputField(id, order, null, null);
+        return getSearchInputField(id, order, null);
     }
 
-    private SearchInputField getSearchInputField(String id, int order, String path, String displayContextParameter) {
+    private SearchInputField getSearchInputField(String id, int order, String path) {
         SearchInputField searchInputField = new SearchInputField();
         searchInputField.setCaseFieldId(id);
         searchInputField.setLabel(id);
         searchInputField.setDisplayOrder(order);
         searchInputField.setCaseFieldPath(path);
-        searchInputField.setDisplayContextParameter(displayContextParameter);
         searchInputField.setShowCondition(SHOW_CONDITION);
         return searchInputField;
     }

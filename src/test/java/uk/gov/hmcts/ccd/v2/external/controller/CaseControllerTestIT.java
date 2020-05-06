@@ -152,14 +152,14 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     @Test
     public void shouldReturn201WhenPostCreateCase() throws Exception {
         final String URL =  "/case-types/" + CASE_TYPE + "/cases";
-        final String DESCRIPTION = "A very long comment.......";
-        final String SUMMARY = "Short comment";
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
-        triggeringEvent.setDescription(DESCRIPTION);
-        triggeringEvent.setSummary(SUMMARY);
+        triggeringEvent.setDescription(description);
+        triggeringEvent.setSummary(summary);
         caseDetailsToSave.setEvent(triggeringEvent);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -194,16 +194,16 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
-        final String DESCRIPTION = "A very long comment.......";
-        final String SUMMARY = "Short comment";
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
 
         final String URL =  "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
-        triggeringEvent.setDescription(DESCRIPTION);
-        triggeringEvent.setSummary(SUMMARY);
+        triggeringEvent.setDescription(description);
+        triggeringEvent.setSummary(summary);
         caseDetailsToSave.setEvent(triggeringEvent);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CREATOR_ROLE, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
