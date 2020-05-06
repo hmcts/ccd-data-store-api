@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *  Utility class handling the SpEL expression parsing
+ *  Utility class handling the SpEL expression parsing.
  *
  */
 public class ExpressionEvaluator extends CachedExpressionEvaluator {

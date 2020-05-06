@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation on the endpoint method to create the audit log entry and send to stdout
+ * Use this annotation on the endpoint method to create the audit log entry and send to stdout.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
