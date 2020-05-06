@@ -1,0 +1,120 @@
+{
+  "_guid_": "F-1003-V2_Get_Case_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Get case details",
+  "method": "GET",
+  "uri": "/cases/{cid}",
+  "specs": [
+    "to retrieve case details by case id"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "request": {
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+    "Content-Length" : "[[ANYTHING_PRESENT]]",
+    "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "{{TEST_URL}}/cases/${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+        }
+      },
+      "id" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+      "jurisdiction" : "BEFTA_JURISDICTION_2",
+      "case_type" : "BEFTA_CASETYPE_2_1",
+      "created_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "state" : "TODO",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "MoneyGBPField" : null,
+        "FixedListField" : "VALUE2",
+        "AddressUKField" : {
+          "County" : null,
+          "Country" : null,
+          "PostCode" : null,
+          "PostTown" : null,
+          "AddressLine1" : null,
+          "AddressLine2" : null,
+          "AddressLine3" : null
+        },
+        "DocumentField1" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
+        },
+        "ComplexField" : {
+          "ComplexTextField" : "aefaefa",
+          "ComplexNestedField" : {
+            "NestedNumberField" : null,
+            "NestedCollectionTextField" : [ ]
+          },
+          "ComplexFixedListField" : "VALUE2"
+        },
+        "FixedRadioListField" : "RADIOVALUE3",
+        "DateTimeField" : null,
+        "PhoneUKField" : "08888899999",
+        "NumberField" : "11111",
+        "MultiSelectListField" : [ "OPTION5", "OPTION4", "OPTION3" ],
+        "YesOrNoField" : "No",
+        "EmailField" : "a@b.com",
+        "TextField" : "A text fields",
+        "DateField" : null,
+        "TextAreaField" : "fqeadadfTSFGsfs`f`sfs`f",
+        "CollectionField" : [ ]
+      },
+      "data_classification" : {
+        "MoneyGBPField" : "PUBLIC",
+        "FixedListField" : "PUBLIC",
+        "AddressUKField" : {
+          "value" : {
+            "County" : "PUBLIC",
+            "Country" : "PUBLIC",
+            "PostCode" : "PUBLIC",
+            "PostTown" : "PUBLIC",
+            "AddressLine1" : "PUBLIC",
+            "AddressLine2" : "PUBLIC",
+            "AddressLine3" : "PUBLIC"
+          },
+          "classification" : "PUBLIC"
+        },
+        "DocumentField1" : "PUBLIC",
+        "FixedRadioListField" : "PUBLIC",
+        "DateTimeField" : "PUBLIC",
+        "PhoneUKField" : "PUBLIC",
+        "NumberField" : "PUBLIC",
+        "MultiSelectListField" : "PUBLIC",
+        "YesOrNoField" : "PUBLIC",
+        "EmailField" : "PUBLIC",
+        "TextField" : "PUBLIC",
+        "DateField" : "PUBLIC",
+        "TextAreaField" : "PUBLIC",
+        "CollectionField" : {
+          "value" : [ ],
+          "classification" : "PUBLIC"
+        }
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}
