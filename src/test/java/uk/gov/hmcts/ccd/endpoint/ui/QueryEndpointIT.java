@@ -941,10 +941,10 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Should only get valid triggers", 1, actionableEvents.length);
 
         // checks Trigger 1 content
-        assertEquals("Trigger ID", "HAS_PRE_STATES_EVENT", triggers[0].getId());
-        assertEquals("Trigger Name", "HAS PRE STATES EVENT", triggers[0].getName());
-        assertEquals("Trigger Description", "Test event for non null pre-states", triggers[0].getDescription());
-        assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
+        assertEquals("Trigger ID", "HAS_PRE_STATES_EVENT", actionableEvents[0].getId());
+        assertEquals("Trigger Name", "HAS PRE STATES EVENT", actionableEvents[0].getName());
+        assertEquals("Trigger Description", "Test event for non null pre-states", actionableEvents[0].getDescription());
+        assertEquals("Trigger Order", Integer.valueOf(1), actionableEvents[0].getOrder());
 
         // audit-log assertions
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);

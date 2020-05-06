@@ -295,8 +295,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
         assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        Map sanitizedData = mapper.convertValue(SANITIZED_DATA, new TypeReference<HashMap<String, JsonNode>>() {});
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
+        Map sanitizedDataMap = mapper.convertValue(sanitizedData, new TypeReference<HashMap<String, JsonNode>>() {});
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
         assertEquals("Incorrect security classification size", 5, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
                                                               "  \"PersonAddress\":{" +
@@ -392,9 +392,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
         assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        Map sanitizedData = mapper.convertValue(SANITIZED_DATA, new TypeReference<HashMap<String, JsonNode>>() {});
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
-
+        Map sanitizedDataMap = mapper.convertValue(sanitizedData, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
         assertEquals("Incorrect security classification size", 4, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
                                                               "  \"PersonAddress\":{" +
@@ -1235,7 +1235,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoDataForCaseworker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -1306,8 +1306,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId());
         assertEquals("Case in state 4", caseAuditEvent.getStateName());
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
-        assertEquals(summary, caseAuditEvent.getSummary());
-        assertEquals(description, caseAuditEvent.getDescription());
+        assertEquals(SUMMARY, caseAuditEvent.getSummary());
+        assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
         JSONAssert.assertEquals(expectedClassificationString,
             mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
     }
@@ -1317,7 +1317,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoDataForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode DATA = mapper.readTree("{" +
@@ -1387,8 +1387,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId());
         assertEquals("Case in state 4", caseAuditEvent.getStateName());
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
-        assertEquals(summary, caseAuditEvent.getSummary());
-        assertEquals(description, caseAuditEvent.getDescription());
+        assertEquals(SUMMARY, caseAuditEvent.getSummary());
+        assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
         JSONAssert.assertEquals(expectedClassificationString,
             mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
     }
@@ -1397,7 +1397,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldUpdateLastStateModifiedTimeWhenAnEventTriggeredStateTransition() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -1830,7 +1830,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, null, DESCRIPTION));
 
@@ -1865,7 +1865,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, null, DESCRIPTION));
 
@@ -1900,10 +1900,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithBlankSummaryForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String SUMMARY = "        ";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String summary = "        ";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, summary, DESCRIPTION));
 
         final String token = generateEventToken(template,
                                                 UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
@@ -1933,7 +1933,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         verify(auditRepository).save(captor.capture());
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is(CASE_REFERENCE));
+        assertThat(captor.getValue().getCaseId(), is(caseReference));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
         assertThat(captor.getValue().getHttpStatus(), is(201));
@@ -1946,10 +1946,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithBlankSummaryForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String SUMMARY = "        ";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String summary = "        ";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, summary, DESCRIPTION));
         final String token = generateEventToken(template,
                                                 UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
@@ -1978,7 +1978,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         verify(auditRepository).save(captor.capture());
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is(CASE_REFERENCE));
+        assertThat(captor.getValue().getCaseId(), is(caseReference));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
         assertThat(captor.getValue().getHttpStatus(), is(201));
@@ -1991,10 +1991,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn422WhenPostCreateCaseEventWithSummaryTooLongForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String SUMMARY = new String(new char[1025]).replace("\0", "-");
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String summary = new String(new char[1025]).replace("\0", "-");
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, summary, DESCRIPTION));
 
         final String token = generateEventToken(template,
                                                 UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
@@ -2027,10 +2027,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn422WhenPostCreateCaseEventWithSummaryTooLongForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String SUMMARY = new String(new char[1025]).replace("\0", "-");
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String summary = new String(new char[1025]).replace("\0", "-");
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, summary, DESCRIPTION));
 
         final String token = generateEventToken(template,
                                                 UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
@@ -2063,10 +2063,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn422WhenPostCreateCaseEventWithDescriptionTooLongForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String DESCRIPTION = new String(new char[65666]).replace("\0", "-");
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String description = new String(new char[65666]).replace("\0", "-");
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, description));
 
         final String token = generateEventToken(template,
                                                 UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
@@ -2099,10 +2099,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn422WhenPostCreateCaseEventWithDescriptionTooLongForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String DESCRIPTION = new String(new char[65666]).replace("\0", "-");
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String description = new String(new char[65666]).replace("\0", "-");
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, description));
 
         final String token = generateEventToken(template,
                                                 UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
@@ -2135,7 +2135,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventIdForCaseworker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(null, SUMMARY, DESCRIPTION));
 
@@ -2170,7 +2170,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventIdForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(null, SUMMARY, DESCRIPTION));
 
@@ -2271,7 +2271,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNonExistentCaseIdForCaseWorker() throws Exception {
         final String caseReference = "9999999999999995";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2295,7 +2295,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNonExistentCaseIdForCitizen() throws Exception {
         final String caseReference = "9999999999999995";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2319,12 +2319,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn400WhenPostCreateCaseEventWithInvalidCaseIdForCaseWorker() throws Exception {
         final String caseReference = "invalidReference";
-        final String EVENT = "HAS_PRE_STATES_EVENT";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String hasPreStatesEvent = "HAS_PRE_STATES_EVENT";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        caseDetailsToSave.setEvent(createEvent(EVENT, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setEvent(createEvent(hasPreStatesEvent, SUMMARY, DESCRIPTION));
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, 1504259907353537L, eventId);
+        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, 1504259907353537L,
+            hasPreStatesEvent);
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
@@ -2343,12 +2344,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn400WhenPostCreateCaseEventWithInvalidCaseIdForCitizen() throws Exception {
         final String caseReference = "invalidReference";
-        final String EVENT = "HAS_PRE_STATES_EVENT";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String hasPreStatesEvent = "HAS_PRE_STATES_EVENT";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        caseDetailsToSave.setEvent(createEvent(EVENT, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setEvent(createEvent(hasPreStatesEvent, SUMMARY, DESCRIPTION));
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, 1504259907353537L, eventId);
+        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, 1504259907353537L,
+            hasPreStatesEvent);
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
@@ -2367,19 +2369,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithUnknownFieldsForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
-        final JsonNode INVALID_DATA = mapper.readTree("{ \"XXX\": \"YYY\" }");
-        final JsonNode INITIAL_DATA = mapper.readTree("{" +
-                                                      "\"PersonAddress\":{" +
-                                                      "\"Country\":\"Wales\"," +
-                                                      "\"Postcode\":\"W11 5DF\"," +
-                                                      "\"AddressLine1\":\"Flat 9\"," +
-                                                      "\"AddressLine2\":\"2 Hubble Avenue\"," +
-                                                      "\"AddressLine3\":\"ButtonVillie\"}," +
-                                                      "\"PersonLastName\":\"Roof\"," +
-                                                      "\"PersonFirstName\":\"George\"}");
+        final JsonNode invalidData = mapper.readTree("{ \"XXX\": \"YYY\" }");
+        final JsonNode initialData = mapper.readTree("{" +
+                                                     "\"PersonAddress\":{" +
+                                                     "\"Country\":\"Wales\"," +
+                                                     "\"Postcode\":\"W11 5DF\"," +
+                                                     "\"AddressLine1\":\"Flat 9\"," +
+                                                     "\"AddressLine2\":\"2 Hubble Avenue\"," +
+                                                     "\"AddressLine3\":\"ButtonVillie\"}," +
+                                                     "\"PersonLastName\":\"Roof\"," +
+                                                     "\"PersonFirstName\":\"George\"}");
         final Map<String, JsonNode> expectedData = mapper.convertValue(initialData, new TypeReference<HashMap<String, JsonNode>>() {
         });
 
@@ -2419,19 +2421,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithUnknownFieldsForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
-        final JsonNode INVALID_DATA = mapper.readTree("{ \"XXX\": \"YYY\" }");
-        final JsonNode INITIAL_DATA = mapper.readTree("{" +
-                                                      "\"PersonAddress\":{" +
-                                                      "\"Country\":\"Wales\"," +
-                                                      "\"Postcode\":\"W11 5DF\"," +
-                                                      "\"AddressLine1\":\"Flat 9\"," +
-                                                      "\"AddressLine2\":\"2 Hubble Avenue\"," +
-                                                      "\"AddressLine3\":\"ButtonVillie\"}," +
-                                                      "\"PersonLastName\":\"Roof\"," +
-                                                      "\"PersonFirstName\":\"George\"}");
+        final JsonNode invalidData = mapper.readTree("{ \"XXX\": \"YYY\" }");
+        final JsonNode initialData = mapper.readTree("{" +
+                                                     "\"PersonAddress\":{" +
+                                                     "\"Country\":\"Wales\"," +
+                                                     "\"Postcode\":\"W11 5DF\"," +
+                                                     "\"AddressLine1\":\"Flat 9\"," +
+                                                     "\"AddressLine2\":\"2 Hubble Avenue\"," +
+                                                     "\"AddressLine3\":\"ButtonVillie\"}," +
+                                                     "\"PersonLastName\":\"Roof\"," +
+                                                     "\"PersonFirstName\":\"George\"}");
         final Map<String, JsonNode> expectedData = mapper.convertValue(initialData, new TypeReference<HashMap<String, JsonNode>>() {
         });
 
@@ -2471,7 +2473,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn409WhenPostCreateCaseEventWithCaseVersionConflictForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2498,7 +2500,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn409WhenPostCreateCaseEventWithCaseVersionConflictForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2525,7 +2527,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2552,7 +2554,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2890,7 +2892,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenPostCreateCaseEventWithNoUpdateCaseAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353578";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_UPDATE_CASE_ACCESS  + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_UPDATE_CASE_ACCESS  + "/cases/" + caseReference + "/events";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -2918,7 +2921,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenPostCreateCaseEventWithNoCreateEventAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353586";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_EVENT_ACCESS  + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_CREATE_EVENT_ACCESS  + "/cases/" + caseReference + "/events";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -3019,7 +3023,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenPostCreateCaseEventWithNoCreateFieldAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353594";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_FIELD_ACCESS  + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_CREATE_FIELD_ACCESS  + "/cases/" + caseReference + "/events";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -3047,7 +3052,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenPostCreateCaseEventWithNoUpdateFieldAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353602";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_UPDATE_FIELD_ACCESS  + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_UPDATE_FIELD_ACCESS  + "/cases/" + caseReference + "/events";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -3132,7 +3138,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn201WhenPostCreateCaseEventWithValidData(String userRole) throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -3215,15 +3221,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId());
         assertEquals("Case in state 4", caseAuditEvent.getStateName());
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
-        assertEquals(summary, caseAuditEvent.getSummary());
-        assertEquals(description, caseAuditEvent.getDescription());
+        assertEquals(SUMMARY, caseAuditEvent.getSummary());
+        assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
         JSONAssert.assertEquals(expectedClassificationString,
             mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
     }
 
     private void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinary(String userRole) throws Exception {
         final String caseReference = "1504259907353529";
-        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
