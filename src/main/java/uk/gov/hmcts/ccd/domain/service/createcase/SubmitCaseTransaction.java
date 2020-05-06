@@ -129,7 +129,7 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion3) {
-            caseDocumentAttacher.caseDocumentAttachOperation(newCaseDetails, null, event.getEventId(), aboutToSubmitCallbackResponse.getState().isPresent());
+            caseDocumentAttacher.caseDocumentAttachOperation(newCaseDetails,  aboutToSubmitCallbackResponse.getState().isPresent());
             caseDocumentAttacher.restCallToAttachCaseDocuments();
         }
 

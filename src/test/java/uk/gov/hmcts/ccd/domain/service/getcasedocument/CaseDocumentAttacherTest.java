@@ -663,7 +663,7 @@ public class CaseDocumentAttacherTest {
             {"e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", "4d49edc151423fb7b2e1f22d87b2d041b34"}
         }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
-        caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, null, "CREATE", false);
+        caseDocumentAttacher.caseDocumentAttachOperation(caseDetails,  false);
         List<DocumentHashToken> actual = caseDocumentAttacher.caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
@@ -688,7 +688,7 @@ public class CaseDocumentAttacherTest {
             {"e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", "4d49edc151423fb7b2e1f22d87b2d041b34"}
         }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
-        caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, null, "CREATE", true);
+        caseDocumentAttacher.caseDocumentAttachOperation(caseDetails,  true);
         List<DocumentHashToken> actual = caseDocumentAttacher.caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
@@ -715,13 +715,21 @@ public class CaseDocumentAttacherTest {
             DocumentHashToken.builder().id("8da17150-c001-47d7-bfeb-3dabed9e0976")
                 .hashToken("41134reqrfadfed49edc151423fb7b2e1f22d87b2d041b34").build()
         );
+        caseDocumentAttacher.caseDocumentsMetadata  = CaseDocumentsMetadata.builder()
+            .caseId("12345556")
+            .caseTypeId("BEFTA_CASETYPE_2")
+            .jurisdictionId("BEFTA_JURISDICTION_2")
+            .documentHashToken(Collections.singletonList(
+           DocumentHashToken.builder().id("8da17150-c001-47d7-bfeb-3dabed9e0976")
+               .hashToken("41134reqrfadfed49edc151423fb7b2e1f22d87b2d041b34").build()))
+            .build();
 
         caseDocumentAttacher.documentsBeforeCallback = Stream.of(new String[][]{
             {"b6ee2bff-8244-431f-94ec-9d8ecace8dd6", "4d49edc151423fb7b2e1f22d89a2d041b43"},
             {"e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", "4d49edc151423fb7b2e1f22d87b2d041b34"}
         }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
-        caseDocumentAttacher.caseDocumentAttachOperation(caseUpdatePayload, existingCaseDetails, "UPDATE", true);
+        caseDocumentAttacher.findDifferenceWithExistingCaseDetail(existingCaseDetails,caseUpdatePayload);
         List<DocumentHashToken> actual = caseDocumentAttacher.caseDocumentsMetadata.getDocumentHashToken();
 
         assertAll(
@@ -729,38 +737,6 @@ public class CaseDocumentAttacherTest {
     }
 
 
-    @Test
-    @DisplayName("should call caseDocumentAttachOperation and filter the documents for CMC_EVENT_UPDATE case scenario with callback")
-    void shouldFilterCaseDocumentMetaDataUpdateScenarioWithoutCallbackForCMC() throws IOException {
-        caseDetailsBefore = buildCaseData("case-detail-before-update.json");
-        caseDataContent = buildCaseData("case-detail-after-update.json");
-        CaseDetails existingCaseDetails = new CaseDetails();
-        existingCaseDetails.setReference(1111122222333334L);
-        existingCaseDetails.setCaseTypeId("BEFTA_CASETYPE_2");
-        existingCaseDetails.setData(caseDetailsBefore);
-
-        CaseDetails caseUpdatePayload = new CaseDetails();
-        caseUpdatePayload.setReference(1111122222333334L);
-        caseUpdatePayload.setCaseTypeId("BEFTA_CASETYPE_2");
-        caseUpdatePayload.setData(caseDataContent);
-
-        prepareInputs();
-        List<DocumentHashToken> expected = Collections.singletonList(
-            DocumentHashToken.builder().id("8da17150-c001-47d7-bfeb-3dabed9e0976")
-                             .hashToken("41134reqrfadfed49edc151423fb7b2e1f22d87b2d041b34").build()
-                                                                    );
-
-        caseDocumentAttacher.documentsBeforeCallback = Stream.of(new String[][]{
-            {"b6ee2bff-8244-431f-94ec-9d8ecace8dd6", "4d49edc151423fb7b2e1f22d89a2d041b43"},
-            {"e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", "4d49edc151423fb7b2e1f22d87b2d041b34"}
-        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
-
-        caseDocumentAttacher.caseDocumentAttachOperation(caseUpdatePayload, existingCaseDetails, CMC_EVENT_UPDATE, true);
-        List<DocumentHashToken> actual = caseDocumentAttacher.caseDocumentsMetadata.getDocumentHashToken();
-
-        assertAll(
-            () -> assertEquals(expected, actual));
-    }
 
 
     static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {

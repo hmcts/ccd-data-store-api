@@ -51,8 +51,6 @@ public class CaseDocumentAttacher {
     public static final String DOCUMENT_BINARY_URL = "document_binary_url";
     public static final String HASH_TOKEN_STRING = "hashToken";
     public static final String BINARY = "/binary";
-    public static final String EVENT_UPDATE = "UPDATE";
-    public static final String CMC_EVENT_UPDATE = "ReviewedPaperResponse";
 
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
@@ -364,15 +362,18 @@ public class CaseDocumentAttacher {
     }
 
 
-    public void caseDocumentAttachOperation(CaseDetails caseDetails, CaseDetails caseDetailsBefore, String eventType, boolean callBackWasCalled) {
+    public void caseDocumentAttachOperation(CaseDetails caseDetails,  boolean callBackWasCalled) {
         extractDocumentsAfterCallBack(caseDetails, callBackWasCalled);
         consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata, documentsBeforeCallback, documentsAfterCallback);
-        if (eventType.equals(EVENT_UPDATE) || eventType.equals(CMC_EVENT_UPDATE)) {
-            //find difference between request payload and existing case detail in db
-            final Set<String> filterDocumentSet = differenceBeforeAndAfterInCaseDetails(caseDetailsBefore.getData(), caseDetails.getData());
-            //to filter the DocumentMetaData based on filterDocumentSet.
-            filterDocumentMetaData(filterDocumentSet);
-        }
+
+    }
+
+    public void findDifferenceWithExistingCaseDetail(CaseDetails caseDetailsBefore,CaseDetails caseDetails) {
+
+        final Set<String> filterDocumentSet = differenceBeforeAndAfterInCaseDetails(caseDetailsBefore.getData(), caseDetails.getData());
+
+        //to filter the DocumentMetaData based on filterDocumentSet.
+        filterDocumentMetaData(filterDocumentSet);
     }
 
     private void findDocumentsId(Map<String, JsonNode> sanitisedDataToAttachDoc, Set<String> filterDocumentSet) {
