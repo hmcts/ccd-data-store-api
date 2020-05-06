@@ -163,7 +163,8 @@ public class CreateCaseEventService {
         LocalDateTime timeNow = now();
 
         if (isApiVersion3) {
-            caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, caseDetailsBefore, content.getEvent().getEventId(), newState.isPresent());
+            caseDocumentAttacher.caseDocumentAttachOperation(caseDetails,  newState.isPresent());
+            caseDocumentAttacher.findDifferenceWithExistingCaseDetail(caseDetailsBefore,caseDetails);
         }
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, eventTrigger, newState, timeNow);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType, timeNow);
