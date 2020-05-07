@@ -26,7 +26,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1001-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
+      "caseId": "${[scenarioContext][childContexts][S-1015-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
       "documentId": "${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}"
     }
   },
@@ -34,18 +34,18 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers" : {
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-documents.v2+json;charset=UTF-8",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-documents.v3+json;charset=UTF-8",
       "Content-Length" : "[[ANY_INTEGER_NOT_NULLABLE]]",
       "Content-Encoding": "gzip"
     },
     "body": {
       "_links": {
         "self": {
-          "href": "{{TEST_URL}}/cases/${[scenarioContext][childContexts][F-1001-V3_Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}"
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][childContexts][S-1015-V3_Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}"
         }
       },
       "documentMetadata": {
-        "caseId": "${[scenarioContext][childContexts][F-1001-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
+        "caseId": "${[scenarioContext][childContexts][S-1015-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
         "documentPermissions": {
           "id": "${[scenarioContext][testData][request][pathVariables][documentId]}",
           "permissions": [
