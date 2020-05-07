@@ -11,10 +11,6 @@
 		"uses the Case ID of the case just created",
 		"has the 200 return code"
 	],
-  "user": {
-    "username": "befta.caseworker.1@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
-  },
 	"request": {
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]"
