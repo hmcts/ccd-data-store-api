@@ -24,7 +24,7 @@ public class AuditLogFormatter {
             .append(getPair("idamId", entry.getIdamId()))
             .append(getPair("invokingService", entry.getInvokingService()))
             .append(getPair("endpointCalled", entry.getHttpMethod() + " " + entry.getPath()))
-            .append(getPair("operationOutcome", String.valueOf(entry.getHttpStatus())))
+            .append(getPair("operationalOutcome", String.valueOf(entry.getHttpStatus())))
             .append(getPair("caseType", entry.getCaseType()))
             .append(getPair("jurisdiction", entry.getJurisdiction()))
             .append(getPair("eventSelected", entry.getEventSelected()))

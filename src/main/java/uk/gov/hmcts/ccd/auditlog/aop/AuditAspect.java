@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.expression.AnnotatedElementKey;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.SpelEvaluationException;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Aspect
 @Component
+@ConditionalOnProperty(name = "audit.log.enabled", havingValue = "true")
 public class AuditAspect {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuditAspect.class);
@@ -39,6 +41,7 @@ public class AuditAspect {
             String jurisdiction =  getValue(joinPoint, logAudit.jurisdiction(), result, String.class);
             String eventName =  getValue(joinPoint, logAudit.eventName(), result, String.class);
             String targetIdamId =  getValue(joinPoint, logAudit.targetIdamId(), result, String.class);
+            String caseTypeIds =  getValue(joinPoint, logAudit.caseTypeIds(), result, String.class);
             List<String> targetCaseRoles =  getValue(joinPoint, logAudit.targetCaseRoles(), result, List.class);
 
             AuditContextHolder.setAuditContext(AuditContext.auditContextWith()
@@ -48,6 +51,7 @@ public class AuditAspect {
                 .jurisdiction(jurisdiction)
                 .eventName(eventName)
                 .targetIdamId(targetIdamId)
+                .caseTypeIds(caseTypeIds)
                 .targetCaseRoles(targetCaseRoles)
                 .build());
         }

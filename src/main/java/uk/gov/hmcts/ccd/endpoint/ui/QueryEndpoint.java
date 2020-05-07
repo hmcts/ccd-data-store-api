@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
@@ -30,8 +32,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.*;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
@@ -124,6 +129,8 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria"),
         @ApiResponse(code = 412, message = "Mismatch between case type and workbasket definitions")})
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
+        caseId = "T(uk.gov.hmcts.ccd.endpoint.ui.QueryEndpoint).buildCaseIds(#result)")
     public SearchResultView searchNew(@PathVariable("jid") final String jurisdictionId,
                                       @PathVariable("ctid") final String caseTypeId,
                                       @RequestParam java.util.Map<String, String> params) {
@@ -190,6 +197,8 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A displayable case")
     })
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", caseId = "#cid")
     public CaseView findCase(@PathVariable("jid") final String jurisdictionId,
                              @PathVariable("ctid") final String caseTypeId,
                              @PathVariable("cid") final String cid) {
@@ -271,6 +280,12 @@ public class QueryEndpoint {
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("getCaseHistoryForEvent has been completed in {} millisecs...", between.toMillis());
         return caseView;
+    }
+
+    public static String buildCaseIds(SearchResultView searchResultView) {
+        return searchResultView.getSearchResultViewItems().stream().limit(MAX_CASE_IDS_LIST)
+            .map(c -> c.getCaseId())
+            .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
 }

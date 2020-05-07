@@ -37,7 +37,7 @@ class AuditLogFormatterTest {
             + "idamId:test_idamId,"
             + "invokingService:test_invokingService,"
             + "endpointCalled:GET test_path,"
-            + "operationOutcome:200,"
+            + "operationalOutcome:200,"
             + "caseType:test_caseType,"
             + "jurisdiction:test_jurisdiction,"
             + "eventSelected:test_eventSelected,"

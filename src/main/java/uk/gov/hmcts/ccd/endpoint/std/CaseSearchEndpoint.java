@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
@@ -21,6 +23,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
 @RestController
 @RequestMapping(path = "/",
@@ -51,6 +57,8 @@ public class CaseSearchEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search request")
     })
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, caseTypeIds = "#caseTypeIds",
+        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseSearchEndpoint).buildCaseIds(#result)")
     public CaseSearchResult searchCases(
         @ApiParam(value = "Case type ID(s)", required = true)
         @RequestParam("ctid") List<String> caseTypeIds,
@@ -96,5 +104,11 @@ public class CaseSearchEndpoint {
         blackListedQueryOpt.ifPresent(blacklisted -> {
             throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
         });
+    }
+
+    public static String buildCaseIds(CaseSearchResult caseSearchResult) {
+        return caseSearchResult.getCases().stream().limit(MAX_CASE_IDS_LIST)
+            .map(c -> String.valueOf(c.getReference()))
+            .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 }

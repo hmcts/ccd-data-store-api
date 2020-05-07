@@ -46,6 +46,7 @@ class AuditInterceptorTest {
         response = new MockHttpServletResponse();
         response.setStatus(STATUS);
 
+        given(applicationParams.isAuditLogEnabled()).willReturn(true);
         given(applicationParams.getAuditLogIgnoreStatuses()).willReturn(Lists.newArrayList(404));
     }
 
@@ -102,5 +103,16 @@ class AuditInterceptorTest {
         interceptor.afterCompletion(request, response, handler, null);
 
         assertThat(AuditContextHolder.getAuditContext()).isNull();
+    }
+
+    @Test
+    void shouldNotAuditIfDisabled() {
+
+        given(applicationParams.isAuditLogEnabled()).willReturn(false);
+
+        interceptor.afterCompletion(request, response, handler, null);
+
+        verifyZeroInteractions(auditService);
+
     }
 }

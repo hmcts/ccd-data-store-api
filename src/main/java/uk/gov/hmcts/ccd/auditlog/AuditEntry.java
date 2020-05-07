@@ -17,6 +17,7 @@ public class AuditEntry {
     private String idamId;
     private String caseId;
     private String caseType;
+    private String listOfCaseTypes;
     private String jurisdiction;
     private String eventSelected;
     private String invokingService;

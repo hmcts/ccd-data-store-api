@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -38,9 +40,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.*;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
@@ -51,6 +56,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "/", description = "Standard case API")
 public class CaseDetailsEndpoint {
+
     private final GetCaseOperation getCaseOperation;
     private final CreateCaseOperation createCaseOperation;
     private final CreateEventOperation createEventOperation;
@@ -96,6 +102,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID"),
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
+    @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#caseId", jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId")
     public CaseDetails findCaseDetailsForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -122,6 +130,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID"),
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
+    @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#caseId", jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId")
     public CaseDetails findCaseDetailsForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -242,6 +252,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 422, message = "Case submission failed"),
         @ApiResponse(code = 409, message = "Case reference not unique")
     })
+    @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseId = "#result.reference",
+        jurisdiction = "#result.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails saveCaseDetailsForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -267,6 +279,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 422, message = "Case submission failed"),
         @ApiResponse(code = 409, message = "Case reference not unique")
     })
+    @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseId = "#result.reference",
+        jurisdiction = "#result.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails saveCaseDetailsForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -324,6 +338,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 409, message = "Case altered outside of transaction"),
         @ApiResponse(code = 422, message = "Event submission failed")
     })
+    @LogAudit(operationType = AuditOperationType.UPDATE_CASE, caseId = "#caseId", jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails createCaseEventForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -350,6 +366,8 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 409, message = "Case altered outside of transaction"),
         @ApiResponse(code = 422, message = "Event submission failed")
     })
+    @LogAudit(operationType = AuditOperationType.UPDATE_CASE, caseId = "#caseId", jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails createCaseEventForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -387,6 +405,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
+        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
                                                        @PathVariable("jid") final String jurisdictionId,
                                                        @PathVariable("ctid") final String caseTypeId,
@@ -399,6 +419,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
+        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCitizens(@PathVariable("uid") final String uid,
                                                     @PathVariable("jid") final String jurisdictionId,
                                                     @PathVariable("ctid") final String caseTypeId,
@@ -491,5 +513,11 @@ public class CaseDetailsEndpoint {
         metadata.setSortDirection(param(queryParameters, SORT_PARAM));
 
         return metadata;
+    }
+
+    public static String buildCaseIds(List<CaseDetails> caseDetails) {
+        return caseDetails.stream().limit(MAX_CASE_IDS_LIST)
+            .map(c -> String.valueOf(c.getReference()))
+            .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 }
