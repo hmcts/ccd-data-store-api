@@ -17,9 +17,9 @@
       "id" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
       "data" : {
         "DocumentField1" : {
-          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
           "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
         }
       }
     }
