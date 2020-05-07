@@ -1,0 +1,27 @@
+{
+  "_guid_": "S-1013_Get_Case_Data_Base",
+  "_extends_": "F-1002-Default_Get_Case_Data_Base",
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "{{TEST_URL}}/cases/${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+        }
+      },
+      "id" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+      "data" : {
+        "DocumentField1" : {
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
+        }
+      }
+    }
+  }
+}
