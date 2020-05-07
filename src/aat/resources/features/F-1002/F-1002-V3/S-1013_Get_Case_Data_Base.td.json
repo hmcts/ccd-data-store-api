@@ -1,6 +1,11 @@
 {
   "_guid_": "S-1013_Get_Case_Data_Base",
   "_extends_": "F-1002-Default_Get_Case_Data_Base",
+
+  "specs": [
+    "to get the same case containing new documents from data store"
+  ],
+
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
@@ -17,9 +22,9 @@
       "id" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
       "data" : {
         "DocumentField1" : {
-          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
-          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
+          "document_url" : "http://dm-store:8080/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "http://dm-store:8080/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}/binary"
         }
       }
     }

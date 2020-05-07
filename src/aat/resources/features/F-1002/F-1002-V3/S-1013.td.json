@@ -1,7 +1,7 @@
 {
   "_guid_": "S-1013",
   "_extends_": "F-1002-V3_Test_Base_Request_Body",
-  "title": "must successfully update case data content with Id and Token for a new document",
+  "title": "must successfully update case data content for multiple documents",
 
   "specs": [
     "contains the Case Id along with ids and hash tokens of the documents uploaded above"
@@ -11,10 +11,10 @@
     "body": {
       "data": {
         "DocumentField1": {
-          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
-          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
-          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}"
         }
       },
       "event_token": "${[scenarioContext][childContexts][S-1013-V3_Update_Event_Token_Creation][testData][actualResponse][body][token]}"
@@ -26,9 +26,9 @@
     "body": {
       "data": {
         "DocumentField1": {
-          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
-          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}/binary"
         }
       }
     }
