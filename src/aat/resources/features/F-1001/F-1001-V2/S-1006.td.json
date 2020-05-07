@@ -24,9 +24,7 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Type" : "application/json"
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]"
     },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",

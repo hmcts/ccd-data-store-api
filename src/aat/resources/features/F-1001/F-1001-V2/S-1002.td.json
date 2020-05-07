@@ -26,9 +26,7 @@
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "headers": {
-      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Type" : "application/json"
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]"
     },
     "body": {
       "exception" : "uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentNotFoundException",

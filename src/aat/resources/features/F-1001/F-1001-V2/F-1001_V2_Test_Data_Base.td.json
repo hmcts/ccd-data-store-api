@@ -26,7 +26,6 @@
   "expectedResponse": {
     "headers": {
       "Content-Length" : "[[ANY_INTEGER_NOT_NULLABLE]]",
-      "Content-Encoding": "gzip",
       "Content-Type": "application/json"
     }
   }
