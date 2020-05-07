@@ -1,6 +1,10 @@
 {
   "_guid_": "F-1001-V3_Test_Base_Response_Body",
   "_extends_": "Common_201_Response",
+  "headers": {
+    "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v3+json;charset=UTF-8",
+    "Transfer-Encoding" : "chunked"
+  },
   "body": {
     "_links" : {
       "self" : {
