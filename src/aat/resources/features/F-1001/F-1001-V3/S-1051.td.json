@@ -2,7 +2,7 @@
 {
   "title": "must successfully receive a document am data with a list of permissions",
   "_extends_": "F-1001_V3_Test_Data_Base",
-  "_guid_": "S-1015",
+  "_guid_": "S-1051",
   "productName": "CCD Data Store",
   "operationName": "Get Document AM Data",
   "method": "GET",
@@ -26,7 +26,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][S-1015-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
+      "caseId": "${[scenarioContext][childContexts][S-1051-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
       "documentId": "${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}"
     }
   },
@@ -41,11 +41,11 @@
     "body": {
       "_links": {
         "self": {
-          "href": "{{TEST_URL}}/cases/${[scenarioContext][childContexts][S-1015-V3_Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}"
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][childContexts][S-1051-V3_Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}"
         }
       },
       "documentMetadata": {
-        "caseId": "${[scenarioContext][childContexts][S-1015-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
+        "caseId": "${[scenarioContext][childContexts][S-1051-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
         "documentPermissions": {
           "id": "${[scenarioContext][testData][request][pathVariables][documentId]}",
           "permissions": [

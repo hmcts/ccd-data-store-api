@@ -1,7 +1,7 @@
 {
   "title": "must receive an error response for a malformed document ID",
 
-  "_guid_": "S-1020",
+  "_guid_": "S-1055",
   "_extends_": "F-1001_V3_Test_Data_Base",
 
   "specs": [
