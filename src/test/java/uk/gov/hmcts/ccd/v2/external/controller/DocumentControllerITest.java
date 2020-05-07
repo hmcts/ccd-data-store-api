@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
@@ -27,14 +29,9 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -44,6 +41,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DocumentControllerITest extends WireMockBaseTest {
 
     private static final String PRINTABLE_URL = "http://remote_host/print/cases/1565620330684549?jwt=test";
+    private static final String CASE_ID = "1504259907353529";
+    private static final String REQUEST_ID = "request-id";
+    private static final String REQUEST_ID_VALUE = "1234567898765432";
+
+    @SpyBean
+    private AuditRepository auditRepository;
 
     @Inject
     private WebApplicationContext wac;
@@ -126,10 +129,12 @@ public class DocumentControllerITest extends WireMockBaseTest {
                                     .withBody(String.format(caseTypeResponseString, super.wiremockPort))));
 
         final MvcResult result = mockMvc
-            .perform(get(String.format("http://localhost:%s/cases/1504259907353529/documents", super.wiremockPort))
-                         .contentType(MediaType.APPLICATION_JSON)
-                         .header("Accept", V2.MediaType.CASE_DOCUMENTS)
-                         .header("experimental", true))
+            .perform(
+                get(String.format("http://localhost:%s/cases/" + CASE_ID + "/documents", super.wiremockPort))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Accept", V2.MediaType.CASE_DOCUMENTS)
+                    .header(REQUEST_ID, REQUEST_ID_VALUE)
+                    .header("experimental", true))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -138,7 +143,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
         Optional<Link> self = documentsResource.getLink("self");
 
         assertAll(
-            () -> assertThat(self.get().getHref(), is(String.format("http://localhost:%s/cases/1504259907353529/documents", super.wiremockPort))),
+            () -> assertThat(self.get().getHref(), is(String.format("http://localhost:%s/cases/" + CASE_ID + "/documents", super.wiremockPort))),
             () -> assertThat(documentResources, hasItems(allOf(hasProperty("name", is("Claimant ID")),
                                                                hasProperty("description", is("Document identifying identity")),
                                                                hasProperty("type", is("ID")),

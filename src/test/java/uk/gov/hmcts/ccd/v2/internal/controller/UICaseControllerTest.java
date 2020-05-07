@@ -16,8 +16,8 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -74,7 +74,7 @@ class UICaseControllerTest {
         @Test
         @DisplayName("should return 200 when case found")
         void caseFound() {
-            final ResponseEntity<CaseViewResource> response = caseController.getCaseVieew(CASE_REFERENCE);
+            final ResponseEntity<CaseViewResource> response = caseController.getCaseView(CASE_REFERENCE);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -88,7 +88,7 @@ class UICaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                () -> caseController.getCaseVieew(CASE_REFERENCE));
+                () -> caseController.getCaseView(CASE_REFERENCE));
         }
 
         @Test
@@ -97,7 +97,7 @@ class UICaseControllerTest {
             when(getCaseViewOperation.execute(CASE_REFERENCE)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class,
-                () -> caseController.getCaseVieew(CASE_REFERENCE));
+                () -> caseController.getCaseView(CASE_REFERENCE));
         }
     }
 
