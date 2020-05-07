@@ -1,0 +1,12 @@
+{
+  "_guid_": "S-1014_Get_Case_Data_Base",
+  "_extends_": "F-1002-Default_Get_Case_Data_Base",
+
+  "specs": [
+    "to get the same case with unmodified contents from data store"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
+}

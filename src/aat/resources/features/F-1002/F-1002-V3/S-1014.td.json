@@ -1,0 +1,40 @@
+{
+  "_guid_": "S-1014",
+  "_extends_": "F-1002-V3_Test_Base_Request_Body",
+  "title": "must get an error response for a wrong hash token with out any change applied to Case",
+
+  "specs": [
+    "is to update the case created above, with some updates in non document fields and the Document field",
+    "contains a Document Id just created above, along with a wrong hash token for it"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate",
+        "DocumentField1": {
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "00000adba426c8f8b00000eb69eb9c000f501eb67c4c52c7fc37c1a000000000"
+        }
+      },
+      "event_token": "${[scenarioContext][childContexts][S-1014-V3_Update_Event_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "[[ANYTHING_PRESENT]]",
+      "path": "/cases/${[scenarioContext][childContexts][F-1002-V3-Case_Creation_Data][testData][actualResponse][body][id]}/events",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
+

@@ -1,0 +1,42 @@
+{
+  "_guid_": "S-1017",
+  "_extends_": "F-1002-V3_Test_Base_Request_Body",
+  "title": "must get an error response for a non existing Case Id",
+
+  "specs": [
+    "contains a non existing Case Id"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "0000006856000000"
+    },
+    "body": {
+      "data": {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate",
+        "DocumentField1": {
+          "document_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "http://dm-store:8080/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+        }
+      },
+      "event_token": "${[scenarioContext][childContexts][S-1017-V3_Update_Event_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message" : "Case ID is not valid",
+      "path": "/cases/${[scenarioContext][testData][request][pathVariables][cid]}/events",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
+
