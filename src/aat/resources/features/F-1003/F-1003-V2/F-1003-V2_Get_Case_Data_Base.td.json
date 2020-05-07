@@ -24,11 +24,19 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_200_Response",
+    "responseCode" : 200,
+    "responseMessage" : "OK",
     "headers": {
-      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8"
+      "Cache-Control" : "[[ANYTHING_PRESENT]]",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
+      "Date" : "[[ANYTHING_PRESENT]]",
+      "Expires" : "[[ANYTHING_PRESENT]]",
+      "Pragma" : "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security" : "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding" : "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options" : "[[ANYTHING_PRESENT]]",
+      "X-Frame-Options" : "[[ANYTHING_PRESENT]]",
+      "X-Xss-Protection" : "[[ANYTHING_PRESENT]]"
     },
     "body" : {
       "_links" : {

@@ -1,4 +1,3 @@
-
 {
   "title": "must successfully receive a document am data with a list of permissions",
   "_extends_": "F-1001_V2_Test_Data_Base",
@@ -7,7 +6,6 @@
   "operationName": "Get Document AM Data",
   "method": "GET",
   "uri": "/cases/{caseId}/documents/{documentId}",
-
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.2.solicitor.2@gmail.com",
@@ -22,7 +20,6 @@
     "by a privileged user with full ACL to create a case of this case type",
     "is to attach the document uploaded above to a new case"
   ],
-
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
@@ -30,12 +27,20 @@
       "documentId": "${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}"
     }
   },
-
   "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers" : {
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-document+json; version=1.0;charset=UTF-8",
-      "Content-Length" : "[[ANY_INTEGER_NOT_NULLABLE]]"
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "Cache-Control": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Expires": "[[ANYTHING_PRESENT]]",
+      "Pragma": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options": "[[ANYTHING_PRESENT]]",
+      "X-Frame-Options": "[[ANYTHING_PRESENT]]",
+      "X-Xss-Protection": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-document+json; version=1.0;charset=UTF-8",
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
     },
     "body": {
       "_links": {
