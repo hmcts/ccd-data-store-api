@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.expression.AnnotatedElementKey;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.SpelEvaluationException;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Aspect
 @Component
+@ConditionalOnProperty(name = "audit.log.enabled", havingValue = "true")
 public class AuditAspect {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuditAspect.class);
