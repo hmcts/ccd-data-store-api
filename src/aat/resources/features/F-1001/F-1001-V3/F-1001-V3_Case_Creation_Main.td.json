@@ -1,0 +1,11 @@
+{
+  "_guid_": "F-1001-V3_Case_Creation_Main",
+  "_extends_": "F-1001-V3_Test_Create_Case_Data",
+  "title": "must successfully create a case with new document uploded",
+  "specs": [
+    "by a privileged user with full ACL to create a case of this case type"
+  ],
+  "expectedResponse": {
+    "_extends_": "F-1001-V3_Test_Base_Response_Body"
+  }
+}

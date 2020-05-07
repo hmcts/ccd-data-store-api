@@ -1,0 +1,11 @@
+{
+  "_guid_": "F-1001-V3_Test_Create_Case_Data",
+  "_extends_": "F-1001-V3-Base-Root",
+  "productName": "CCD Data Store",
+  "operationName": "Submit Case Creation (V3)",
+  "specs": [
+    "contains necessary details about the document attached to the case"
+  ],
+  "method": "POST",
+  "uri": "case-types/{CaseTypeID}/cases"
+}
