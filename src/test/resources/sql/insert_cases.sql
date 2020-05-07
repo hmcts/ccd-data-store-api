@@ -11,7 +11,7 @@ VALUES (1, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -268,7 +268,7 @@ VALUES (5, 'TestAddressBookCaseNoUpdateCaseAccess', 'PROBATE', 'CaseCreated', 'P
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -304,7 +304,7 @@ VALUES (6, 'TestAddressBookCaseNoCreateEventAccess', 'PROBATE', 'CaseCreated', '
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -340,7 +340,7 @@ VALUES (7, 'TestAddressBookCaseNoCreateFieldAccess', 'PROBATE', 'CaseCreated', '
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -376,7 +376,7 @@ VALUES (8, 'TestAddressBookCaseNoCreateFieldAccess', 'PROBATE', 'CaseCreated', '
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -412,7 +412,7 @@ VALUES (9, 'TestAddressBookCaseNoReadCaseTypeAccess', 'PROBATE', 'CaseCreated', 
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -448,7 +448,7 @@ VALUES (10, 'TestAddressBookCaseNoReadFieldAccess', 'PROBATE', 'CaseCreated', 'P
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -484,7 +484,7 @@ VALUES (11, 'TestAddressBookCaseNoReadEventAccess', 'PROBATE', 'CaseCreated', 'P
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -520,7 +520,7 @@ VALUES (12, 'TestAddressBookCaseNoReadCaseTypeAccess', 'PROBATE', 'CaseCreated',
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
