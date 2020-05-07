@@ -4,7 +4,7 @@ Feature: F-1001-V3: Get Document AM Data for a given Case ID and Document ID (V3
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-1015
+  @S-1051
   Scenario: must successfully receive a document am data with a list of permissions
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type],
     And a user with [an active Solicitor profile having full permissions on the same case type]
@@ -18,7 +18,7 @@ Feature: F-1001-V3: Get Document AM Data for a given Case ID and Document ID (V3
     And the response [contains the requested document am data],
     And the response has all other details as expected
 
-  @S-1016
+  @S-1052
   Scenario: must receive an error response for an active Solicitor profile who does not have READ access
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
     And a user with [an active Solicitor profile having full permissions on the same case type]
@@ -32,7 +32,7 @@ Feature: F-1001-V3: Get Document AM Data for a given Case ID and Document ID (V3
     Then a negative response is received
     And the response has all other details as expected
 
-  @S-1017
+  @S-1053
   Scenario: must receive an error response for a non existing document id
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
     And a successful call [to upload a document with mandatory metadata] as in [Default_Document_Upload_Data],
@@ -55,7 +55,7 @@ Feature: F-1001-V3: Get Document AM Data for a given Case ID and Document ID (V3
 #    Then a negative response is received
 #    And the response has all other details as expected
 
-  @S-1019
+  @S-1054
   Scenario: must receive an error response for a non existing case id
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
     And a successful call [to upload a document with mandatory metadata] as in [Default_Document_Upload_Data],
@@ -66,7 +66,7 @@ Feature: F-1001-V3: Get Document AM Data for a given Case ID and Document ID (V3
     And the response has all other details as expected
 
 
-  @S-1020
+  @S-1055
   Scenario: must receive an error response for a malformed document ID
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
     When a request is prepared with appropriate values
@@ -76,12 +76,12 @@ Feature: F-1001-V3: Get Document AM Data for a given Case ID and Document ID (V3
     And the response has all the details as expected
 
   #Generic Scenarios for Security
-  @S-1021 @Ignore
+  @S-1056 @Ignore
   Scenario: generic scenario for Unauthorized
 
-  @S-1022 @Ignore
+  @S-1057 @Ignore
   Scenario: generic scenario for Forbidden
 
   #Generic Scenarios for media type
-  @S-1023 @Ignore
+  @S-1058 @Ignore
   Scenario: generic scenario for Unsupported Media Type
