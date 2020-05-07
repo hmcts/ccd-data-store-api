@@ -34,18 +34,19 @@ Feature: F-1002: Submit Event for an Existing Case (V3)
     And the response has all other details as expected,
     And a call [to retrieve case details by case id] will get the expected response as in [S-1012_Get_Case_Data_Base].
 
-  @S-1013  #not implemented yet
+  @S-1013
   Scenario: must successfully update case data content for multiple documents
     Given a user with [an active caseworker profile in CCD with full permissions on a document field],
     And another successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation],
     And another successful call [by same user to create a case of this case type] as in [F-1002-V3-Case_Creation_Data],
     And a successful call [by same user to upload a document with mandatory metadata] as in [Default_Document_Upload_1],
-#    And a successful call [by same user to upload a document with mandatory metadata] as in [Default_Document_Upload_2],
-#    And a successful call [by same user to upload a document with mandatory metadata] as in [Default_Document_Upload_3],
+    And a successful call [by same user to upload another document with mandatory metadata] as in [Default_Document_Upload_2],
+    And a successful call [by same user to upload another document with mandatory metadata] as in [Default_Document_Upload_3],
     And another successful call [to get an update event token for the case just created]  as in [S-1013-V3_Update_Event_Token_Creation],
     When a request is prepared with appropriate values,
     And the request [contains an Event Id received from upstream],
     And the request [contains the Case Id along with ids and hash tokens of the documents uploaded above],
+    And the request [also contains updates in non document fields],
     And it is submitted to call the [Submit Event for an Existing Case (V3)] operation of [CCD Data Store],
     Then a positive response is received,
     And the response has all other details as expected,
