@@ -63,7 +63,7 @@ Feature: F-1002: Submit Event for an Existing Case (V3)
     And it is submitted to call the [Submit Event for an Existing Case (V3)] operation of [CCD Data Store],
     Then a negative response is received,
     And the response has all the details as expected.
-#    ////And a call [to get the same case with unmodified contents from data store] will get the expected response as in [S-1014_Get_Case_Data_Base].
+    And a call [to get the same case with unmodified contents from data store] will get the expected response as in [S-1014_Get_Case_Data_Base].
 
   @S-1015
   Scenario: must get an error response for a non existing document Id
