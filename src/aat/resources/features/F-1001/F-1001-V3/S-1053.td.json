@@ -1,7 +1,7 @@
 {
   "title": "must receive an error response for a non existing document id",
 
-  "_guid_": "S-1017",
+  "_guid_": "S-1053",
   "_extends_": "F-1001_V3_Test_Data_Base",
 
   "specs": [
@@ -15,7 +15,9 @@
   "uri": "/cases/{caseId}/documents/{documentId}",
 
   "request": {
+    "_extends_": "Common_Request",
     "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][S-1053-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
       "documentId": "00000000-0000-0000-0000-000000000000"
     }
   },
@@ -24,8 +26,8 @@
     "_extends_": "Common_404_Response",
     "body": {
       "exception" : "uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentNotFoundException",
-      "message" : "No document found for this case reference: ${[scenarioContext][childContexts][F-1001-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
-      "path" : "/cases/${[scenarioContext][childContexts][F-1001-V3_Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}",
+      "message" : "No document found for this case reference: ${[scenarioContext][childContexts][S-1053-V3_Case_Creation_Main][testData][actualResponse][body][id]}",
+      "path" : "/cases/${[scenarioContext][childContexts][S-1053-V3_Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1015-V3_Case_Creation_Main",
+  "_guid_": "S-1051-V3_Case_Creation_Main",
   "_extends_": "F-1001-V3_Test_Create_Case_Data",
   "title": "must successfully create a case with new document uploded",
   "specs": [
