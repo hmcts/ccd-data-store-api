@@ -1,0 +1,34 @@
+{
+  "_guid_": "S-1024_Get_Case_Data_Base",
+  "_extends_": "F-1002-Default_Get_Case_Data_Base",
+  "specs": [
+    "to get the same case with unmodified contents from data store"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][S-1024-V2_Update_Event_Token_Creation][testData][Request][pathVariables][cid]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][parentContext][childContexts][S-1024-V2_Update_Event_Token_Creation][testData][Request][pathVariables][cid]}"
+        }
+      },
+      "id": "${[scenarioContext][parentContext][childContexts][S-1024-V2_Update_Event_Token_Creation][testData][Request][pathVariables][cid]}",
+      "data": {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate",
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "00000adba426c8f8b00000eb69eb9c000f501eb67c4c52c7fc37c1a000000000"
+        }
+      }
+    }
+  }
+}

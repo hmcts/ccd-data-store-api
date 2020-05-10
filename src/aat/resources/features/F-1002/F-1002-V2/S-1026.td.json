@@ -1,0 +1,39 @@
+{
+  "_guid_": "S-1026",
+  "_extends_": "F-1002-V2_Test_Base_Request_Body",
+  "title": "must get an error response for a malformed document Id",
+
+  "specs": [
+    "contains a malformed document Id"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate",
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/00000000-@@@@-^&*$-0000-000000000000/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+        }
+      },
+      "event_token": "${[scenarioContext][childContexts][S-1026-V2_Update_Event_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message" : "The input document id is invalid",
+      "path": "/cases/${[scenarioContext][childContexts][F-1002-V2-Case_Creation_Data][testData][actualResponse][body][id]}/events",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
+
