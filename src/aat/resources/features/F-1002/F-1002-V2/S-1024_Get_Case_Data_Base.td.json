@@ -23,9 +23,9 @@
         "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
         "TextField" : "NonDocumentFieldsUpdate",
         "DocumentField1": {
-          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
-          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "document_filename": "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "hashToken": "00000adba426c8f8b00000eb69eb9c000f501eb67c4c52c7fc37c1a000000000"
         }
       }
