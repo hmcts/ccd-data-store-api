@@ -81,7 +81,7 @@ Feature: F-1002: Submit Event for an Existing Case (V3)
     Then a negative response is received,
     And the response has all the details as expected.
 
-  @S-1016 # Defect AM-724 for expected 422
+  @S-1016
   Scenario: must get an error response for a malformed document Id
     Given a user with [an active caseworker profile in CCD with full permissions on a document field],
     And another successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation],
