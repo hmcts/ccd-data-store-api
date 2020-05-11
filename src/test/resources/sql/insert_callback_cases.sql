@@ -10,7 +10,7 @@ VALUES ('CallbackCase', 'TEST', 'CaseCreated', 'PUBLIC',
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           }
         }',
         '{
