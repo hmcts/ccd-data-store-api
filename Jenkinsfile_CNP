@@ -75,6 +75,7 @@ env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 
+
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')

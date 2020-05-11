@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
-
-import static org.springframework.http.ResponseEntity.status;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -27,6 +21,12 @@ import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.DraftViewResource;
+
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping(path = "/internal")

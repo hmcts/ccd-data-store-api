@@ -1,0 +1,29 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/caseworkers/uid/jurisdictions/jid/case-types/TestAddressBookCase/roles"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id" : "[DEFENDANT]",
+        "name" : "DEFENDANT",
+        "description" : "DEFENDANT"
+      },
+      {
+        "id" : "[SOLICITOR]",
+        "name" : "SOLICITOR",
+        "description" : "SOLICITOR"
+      },
+      {
+        "id" : "[CLAIMANT]",
+        "name" : "CLAIMANT",
+        "description" : "CLAIMANT"
+      }
+    ]
+  }
+}

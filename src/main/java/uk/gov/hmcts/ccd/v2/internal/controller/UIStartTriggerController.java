@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import static uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.forCase;
-import static uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.forCaseType;
-import static uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.forDraft;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -18,6 +14,8 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
+
+import static uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.*;
 
 @RestController
 @RequestMapping(path = "/internal")
