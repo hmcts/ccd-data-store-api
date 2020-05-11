@@ -1,5 +1,5 @@
-@F-1002
-Feature: F-1002: Submit Event for an Existing Case (V3)
+@F-1002-V3
+Feature: F-1002-V3: Submit Event for an Existing Case (V3)
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
