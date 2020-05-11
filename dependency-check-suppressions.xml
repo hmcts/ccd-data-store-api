@@ -148,6 +148,7 @@
         <cve>CVE-2020-11619</cve>
         <cve>CVE-2020-11620</cve>
         <cve>CVE-2020-9488</cve>
+        <cve>CVE-2020-10683</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>

@@ -144,6 +144,7 @@ public class CreateCaseEventService {
 
         CaseDocumentAttacher caseDocumentAttacher = null;
         if (isApiVersion3) {
+            validateCaseFieldsOperation.validateData(content.getData(), caseType);
             caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
             caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForUpdate(content.getData(), caseDetailsBefore);
         }
