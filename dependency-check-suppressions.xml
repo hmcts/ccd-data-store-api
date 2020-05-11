@@ -173,4 +173,11 @@
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
         <cve>CVE-2020-11113</cve>
      </suppress>
+      </suppress>
+    <suppress>
+      <notes><![CDATA[
+          file name: dom4j-2.1.1.jar
+          ]]></notes>
+      <cve>CVE-2020-10683</cve>
+  </suppress>
 </suppressions>
