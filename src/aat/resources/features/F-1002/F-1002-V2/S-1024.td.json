@@ -1,0 +1,45 @@
+{
+  "_guid_": "S-1024",
+  "_extends_": "F-1002-V2_Test_Base_Request_Body",
+  "title": "must get a success response for a wrong hash token with out any change applied to Case",
+
+  "specs": [
+    "is to update the case created above, with some updates in non document fields and the Document field",
+    "contains a Document Id just created above, along with a wrong hash token for it"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate",
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "00000adba426c8f8b00000eb69eb9c000f501eb67c4c52c7fc37c1a000000000"
+        }
+      },
+      "event_token": "${[scenarioContext][childContexts][S-1024-V2_Update_Event_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "F-1002-V2_Test_Base_Response_Body",
+
+    "body": {
+      "data": {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate",
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "hashToken": "00000adba426c8f8b00000eb69eb9c000f501eb67c4c52c7fc37c1a000000000"
+        }
+      }
+    }
+  }
+}
+
