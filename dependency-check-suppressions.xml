@@ -173,4 +173,25 @@
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
         <cve>CVE-2020-11113</cve>
      </suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: log4j-to-slf4j-2.12.1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j-to-slf4j@.*$</packageUrl>
+   <cve>CVE-2020-9488</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: log4j-api-2.11.1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j-api@.*$</packageUrl>
+   <cve>CVE-2020-9488</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: dom4j-2.1.1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
+   <cve>CVE-2020-10683</cve>
+</suppress>
 </suppressions>
