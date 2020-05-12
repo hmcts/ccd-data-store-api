@@ -43,7 +43,7 @@ public class CaseViewResource extends RepresentationModel {
     public CaseViewResource(@NonNull CaseView caseView) {
         copyProperties(caseView);
 
-        add(linkTo(methodOn(UICaseController.class).getCaseVieew(reference)).withSelfRel());
+        add(linkTo(methodOn(UICaseController.class).getCaseView(reference)).withSelfRel());
     }
 
     private void copyProperties(CaseView caseView) {
