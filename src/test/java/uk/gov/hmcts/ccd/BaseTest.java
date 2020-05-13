@@ -22,6 +22,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -31,7 +33,6 @@ import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
@@ -53,6 +54,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyBoolean;
@@ -87,6 +89,9 @@ public abstract class BaseTest {
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     private CaseDefinitionRepository caseDefinitionRepository;
     @Inject
+    @Qualifier(DefaultCaseRoleRepository.QUALIFIER)
+    private CaseRoleRepository caseRoleRepository;
+    @Inject
     private HttpUIDefinitionGateway uiDefinitionRepository;
     @Inject
     @Qualifier(DefaultUserRepository.QUALIFIER)
@@ -110,6 +115,7 @@ public abstract class BaseTest {
         final SecurityUtils securityUtils = mock(SecurityUtils.class);
         Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
+        ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
@@ -143,18 +149,39 @@ public abstract class BaseTest {
 
     @After
     public void clearDownData() {
-
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-        jdbcTemplate.queryForList(
-            "SELECT "
-                + "'TRUNCATE TABLE \"' || tablename || '\" CASCADE;' as truncate_statement "
-                + "FROM pg_tables "
-                + "WHERE schemaname = 'public' "
-                + "AND tablename NOT IN ('databasechangeloglock','databasechangelog')"
-        ).stream()
-            .map(resultRow -> resultRow.get("truncate_statement"))
-            .forEach(truncateStatement -> jdbcTemplate.execute(truncateStatement.toString()));
+        List<String> tables = determineTables(jdbcTemplate);
+        List<String> sequences = determineSequences(jdbcTemplate);
 
+        String truncateTablesQuery =
+            "START TRANSACTION;\n" +
+                tables.stream()
+                    .map(record -> String.format("TRUNCATE TABLE %s CASCADE;", record))
+                    .collect(Collectors.joining("\n")) +
+                "\nCOMMIT;";
+        jdbcTemplate.execute(truncateTablesQuery);
+
+        sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));
+    }
+
+    private List<String> determineTables(JdbcTemplate jdbcTemplate) {
+        return jdbcTemplate.queryForList("SELECT * FROM pg_catalog.pg_tables").stream()
+            .filter(tableInfo -> tableInfo.get("schemaname").equals("public"))
+            .map(tableInfo -> (String)tableInfo.get("tablename"))
+            .filter(BaseTest::notLiquibase)
+            .collect(Collectors.toList());
+    }
+
+    private static boolean notLiquibase(String tableName) {
+        return !tableName.equals("databasechangelog") && !tableName.equals("databasechangeloglock");
+    }
+
+    private List<String> determineSequences(JdbcTemplate jdbcTemplate) {
+        final String sequenceNameKey = "relname";
+        String query = "SELECT c.relname FROM pg_class c WHERE c.relkind = 'S'";
+        return jdbcTemplate.queryForList(query).stream()
+            .map(sequenceInfo -> (String) sequenceInfo.get(sequenceNameKey))
+            .collect(Collectors.toList());
     }
 
     protected CaseDetails mapCaseData(ResultSet resultSet, Integer i) throws SQLException {

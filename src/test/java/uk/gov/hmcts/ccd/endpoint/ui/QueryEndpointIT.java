@@ -1,34 +1,14 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
-import javax.inject.Inject;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
-import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
-import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_DATE_TIME_FIELD;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -40,6 +20,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -50,6 +33,26 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
+
+import javax.inject.Inject;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
 
 public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
@@ -108,6 +111,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
     @Inject
     private WebApplicationContext wac;
+
+    @SpyBean
+    private AuditRepository auditRepository;
 
     @Mock
     private Authentication authentication;
@@ -189,7 +195,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(2).getCaseId());
@@ -205,6 +211,15 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("Country"));
         assertEquals("W11 5DF", ((Map) searchResultViewItems.get(2).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
+
+        // audit-log assertions
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.SEARCH_CASE.getLabel()));
+        assertThat(captor.getValue().getJurisdiction(), is(TEST_JURISDICTION));
+        assertThat(captor.getValue().getCaseType(), is(TEST_CASE_TYPE));
+        assertThat(captor.getValue().getCaseId(), is("DRAFT5,1504259907353529,1504259907353545"));
     }
 
     @Test
@@ -261,7 +276,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
             .get("Postcode"));
     }
 
@@ -339,7 +354,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
     }
 
@@ -540,7 +555,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
@@ -605,7 +620,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .get("AddressLine3"));
         assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
@@ -864,7 +879,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected address value", "Fake Street", addressNode.get("AddressLine2"));
         assertEquals("Unexpected address value", "Hexton", addressNode.get("AddressLine3"));
         assertEquals("Unexpected address value", "England", addressNode.get("Country"));
-        assertEquals("Unexpected address value", "HX08 UTG", addressNode.get("Postcode"));
+        assertEquals("Unexpected address value", "HX08 5TG", addressNode.get("Postcode"));
 
         final CaseViewTab documentTab = caseViewTabs[2];
         assertNotNull("First tab is null", documentTab);
@@ -935,6 +950,15 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Trigger Name", "HAS PRE STATES EVENT", actionableEvents[0].getName());
         assertEquals("Trigger Description", "Test event for non null pre-states", actionableEvents[0].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(1), actionableEvents[0].getOrder());
+
+        // audit-log assertions
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.SEARCH_CASE.getLabel()));
+        assertThat(captor.getValue().getJurisdiction(), is(TEST_JURISDICTION));
+        assertThat(captor.getValue().getCaseType(), is(TEST_CASE_TYPE));
+        assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
     }
 
     @Test
@@ -1509,7 +1533,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected address value", "Fake Street", addressNode.get("AddressLine2"));
         assertEquals("Unexpected address value", "Hexton", addressNode.get("AddressLine3"));
         assertEquals("Unexpected address value", "England", addressNode.get("Country"));
-        assertEquals("Unexpected address value", "HX08 UTG", addressNode.get("Postcode"));
+        assertEquals("Unexpected address value", "HX08 5TG", addressNode.get("Postcode"));
 
         final CaseViewTab documentTab = caseViewTabs[2];
         assertNotNull("First tab is null", documentTab);

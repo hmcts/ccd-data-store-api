@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,22 +23,20 @@ import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 import javax.inject.Inject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_CREATE;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_DELETE;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_READ;
-import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_UPDATE;
+import static uk.gov.hmcts.ccd.MockUtils.*;
 
 public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
+
+    private static final String GET_EVENT_TRIGGER_FOR_CASE = "/internal/cases/1504259907353529/"
+        + "/event-triggers/HAS_PRE_STATES_EVENT";
 
     @Inject
     private WebApplicationContext wac;
@@ -223,5 +222,29 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
         final CaseFieldDefinition hobby = children.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
+    public void shouldStartEventTrigger() throws Exception {
+
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
+
+        final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE)
+            .contentType(JSON_CONTENT_TYPE)
+            .accept(V2.MediaType.CASE_UPDATE_VIEW_EVENT)
+            .headers(headers))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final CaseUpdateViewEventResource caseUpdateViewEventResource =
+            mapper.readValue(result.getResponse().getContentAsString(), CaseUpdateViewEventResource.class);
+        assertNotNull("UI Start Trigger Resource is null", caseUpdateViewEventResource);
+
+        assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseId(), is("1504259907353529"));
     }
 }
