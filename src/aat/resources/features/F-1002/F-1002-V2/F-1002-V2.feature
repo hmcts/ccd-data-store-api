@@ -1,5 +1,5 @@
 @F-1002-V2
-Feature: F-1002: Submit Event for an Existing Case (V2)
+Feature: F-1002-V2: Submit Event for an Existing Case (V2)
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
@@ -101,9 +101,9 @@ Feature: F-1002: Submit Event for an Existing Case (V2)
     And it is submitted to call the [Submit Event for an Existing Case (V2)] operation of [CCD Data Store],
     Then a negative response is received,
     And the response has all the details as expected.
-#
-#  @S-1029
-#  Scenario: generic scenario for Unauthorised
-#
-#  @S-1030
-#  Scenario: generic scenario for Forbidden
+
+  @S-1029
+  Scenario: generic scenario for Unauthorised
+
+  @S-1030
+  Scenario: generic scenario for Forbidden

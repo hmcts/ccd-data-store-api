@@ -1,5 +1,5 @@
-@F-1002
-Feature: F-1002: Submit Event for an Existing Case (V3)
+@F-1002-V3
+Feature: F-1002-V3: Submit Event for an Existing Case (V3)
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
@@ -68,7 +68,7 @@ Feature: F-1002: Submit Event for an Existing Case (V3)
     And the response has all the details as expected,
     And a call [to get the same case with unmodified contents from data store] will get the expected response as in [S-1014_Get_Case_Data_Base].
 
-  @S-1015
+  @S-1015 # Defect AM-708
   Scenario: must get an error response for a non existing document Id
     Given a user with [an active caseworker profile in CCD with full permissions on a document field],
     And another successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation],
@@ -81,7 +81,7 @@ Feature: F-1002: Submit Event for an Existing Case (V3)
     Then a negative response is received,
     And the response has all the details as expected.
 
-  @S-1016 # Defect AM-724 for expected 422
+  @S-1016
   Scenario: must get an error response for a malformed document Id
     Given a user with [an active caseworker profile in CCD with full permissions on a document field],
     And another successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation],
