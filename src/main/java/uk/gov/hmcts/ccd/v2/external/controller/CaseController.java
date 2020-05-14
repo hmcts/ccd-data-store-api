@@ -108,10 +108,8 @@ public class CaseController {
             V2.MediaType.CREATE_EVENT
         },
         consumes  = {
-            MediaType.APPLICATION_JSON_VALUE
+            V2.MediaType.CREATE_EVENT
         }
-
-
     )
     @ApiOperation(
         value = "Submit event creation",
