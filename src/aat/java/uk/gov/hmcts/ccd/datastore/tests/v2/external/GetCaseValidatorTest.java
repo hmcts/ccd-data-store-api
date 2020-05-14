@@ -3,9 +3,6 @@ package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 import java.util.function.Supplier;
 
 import static java.lang.Boolean.FALSE;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.*;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 
@@ -38,58 +35,6 @@ class GetCaseValidatorTest extends BaseTest {
     @Nested
     @DisplayName("Start case trigger")
     class StartCaseTrigger {
-
-        @Test
-        @DisplayName("should validate when the case type and event exists")
-        void shouldRetrieveWhenExists() throws JsonProcessingException {
-            callCaseDataValidate(CASE_TYPE, getBody(CREATE))
-                .when()
-                .post("/case-types/{caseTypeId}/validate")
-
-                .then()
-                .log().ifError()
-                .statusCode(200)
-                .assertThat()
-
-                // Metadata
-                .rootPath("data")
-                .body("MoneyGBPField", equalTo(MONEY_GBP))
-                .body("FixedListField", equalTo(FIXED_LIST))
-                .body("AddressUKField.AddressLine1", equalTo(ADDRESS_LINE_1))
-                .body("AddressUKField.AddressLine2", equalTo(ADDRESS_LINE_2))
-                .body("AddressUKField.AddressLine3", equalTo(ADDRESS_LINE_3))
-                .body("AddressUKField.PostTown", equalTo(ADDRESS_POST_TOWN))
-                .body("AddressUKField.County", equalTo(ADDRESS_COUNTY))
-                .body("AddressUKField.PostCode", equalTo(ADDRESS_POSTCODE))
-                .body("AddressUKField.Country", equalTo(ADDRESS_COUNTRY))
-                .body("ComplexField.ComplexTextField", equalTo(COMPLEX_TEXT))
-                .body("ComplexField.ComplexFixedListField", equalTo(COMPLEX_FIXED_LIST))
-                .body("DateTimeField", equalTo(DATE_TIME))
-                .body("PhoneUKField", equalTo(PHONE_UK))
-                .body("NumberField", equalTo(NUMBER))
-                .body("MultiSelectListField", contains(MULTI_SELECT_LIST))
-                .body("YesOrNoField", equalTo(YES_OR_NO))
-                .body("EmailField", equalTo(EMAIL))
-                .body("TextField", equalTo(TEXT))
-                .body("DateField", equalTo(DATE))
-                .body("TextAreaField", equalTo(TEXT_AREA))
-                .body("CollectionField[0].value", equalTo(COLLECTION_VALUE_1))
-                .body("CollectionField[1].value", equalTo(COLLECTION_VALUE_2))
-
-                .rootPath("_links")
-                .body("self.href", equalTo(String.format("%s/case-types/%s/validate{?pageId}", aat.getTestUrl(), CASE_TYPE)));
-        }
-
-        @Test
-        @DisplayName("should get 404 when case type does not exist")
-        void should404WhenCaseTypeDoesNotExist() throws JsonProcessingException {
-            callCaseDataValidate(INVALID_CASE_TYPE_ID, getBody(CREATE))
-                .when()
-                .post("/case-types/{caseTypeId}/validate")
-
-                .then()
-                .statusCode(404);
-        }
 
         @Test
         @DisplayName("should get 404 when event not provided")
