@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import static java.lang.Boolean.FALSE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,7 +36,7 @@ class GetCaseValidatorTest extends BaseTest {
     class StartCaseTrigger {
 
         @Test
-        @DisplayName("should get 404 when event not provided")
+        @DisplayName("should get 422 when event not provided")
         void should422WhenEventNotProvided() throws JsonProcessingException {
             callCaseDataValidate(INVALID_CASE_TYPE_ID, getBody(null))
                 .when()
@@ -51,17 +50,6 @@ class GetCaseValidatorTest extends BaseTest {
         @DisplayName("should get 422 when event trigger does not exist")
         void should422WhenEventTriggerDoesNotExist() throws JsonProcessingException {
             callCaseDataValidate(CASE_TYPE, getBody(INVALID_EVENT_TRIGGER_ID))
-                .when()
-                .post("/case-types/{caseTypeId}/validate")
-
-                .then()
-                .statusCode(422);
-        }
-
-        @Test
-        @DisplayName("should get 422 when event trigger does not exist")
-        void should422WhenCaseDataInvalid() throws JsonProcessingException {
-            callCaseDataValidate(CASE_TYPE, getBody(CREATE, CaseWithInvalidData::build))
                 .when()
                 .post("/case-types/{caseTypeId}/validate")
 
