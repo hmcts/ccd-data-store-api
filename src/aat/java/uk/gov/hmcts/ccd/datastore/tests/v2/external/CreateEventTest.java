@@ -47,8 +47,10 @@ class CreateEventTest extends BaseTest {
                                         .submitAndGetReference();
 
         String eventToken = aat.getCcdHelper().generateTokenUpdateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
+        RequestSpecification requestSpecification = callCreateEvent(caseReference.toString(), getBody(caseReference.toString(), UPDATE, eventToken, FullCaseUpdated::build));
+        requestSpecification.contentType(V2.MediaType.CREATE_EVENT);
 
-        callCreateEvent(caseReference.toString(), getBody(caseReference.toString(), UPDATE, eventToken, FullCaseUpdated::build))
+        requestSpecification
             .when()
             .post("/cases/{caseReference}/events")
 
@@ -98,7 +100,10 @@ class CreateEventTest extends BaseTest {
     @Test
     @DisplayName("should get 404 when case reference does NOT exist")
     void should404WhenNotExists() {
-        callCreateEvent(NOT_FOUND_CASE_REFERENCE, getBody(NOT_FOUND_CASE_REFERENCE, UPDATE, EVENT_TOKEN, CaseWithInvalidData::build))
+        RequestSpecification requestSpecification = callCreateEvent(NOT_FOUND_CASE_REFERENCE, getBody(NOT_FOUND_CASE_REFERENCE, UPDATE, EVENT_TOKEN, CaseWithInvalidData::build));
+        requestSpecification.contentType(V2.MediaType.CREATE_EVENT);
+
+        requestSpecification
             .when()
             .post("/cases/{caseReference}/events")
 
@@ -109,7 +114,10 @@ class CreateEventTest extends BaseTest {
     @Test
     @DisplayName("should get 400 when case reference invalid")
     void should400WhenReferenceInvalid() {
-        callCreateEvent(INVALID_CASE_REFERENCE, getBody(INVALID_CASE_REFERENCE, UPDATE, EVENT_TOKEN))
+        RequestSpecification requestSpecification = callCreateEvent(INVALID_CASE_REFERENCE, getBody(INVALID_CASE_REFERENCE, UPDATE, EVENT_TOKEN));
+
+        requestSpecification.contentType(V2.MediaType.CREATE_EVENT);
+        requestSpecification
             .when()
             .post("/cases/{caseReference}/events")
 
@@ -128,7 +136,10 @@ class CreateEventTest extends BaseTest {
 
         String eventToken = aat.getCcdHelper().generateTokenUpdateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
 
-        callCreateEvent(caseReference.toString(), getBody(INVALID_CASE_REFERENCE, INVALID_EVENT_TRIGGER_ID, eventToken, CaseWithInvalidData::build))
+        RequestSpecification requestSpecification = callCreateEvent(caseReference.toString(), getBody(INVALID_CASE_REFERENCE, INVALID_EVENT_TRIGGER_ID, eventToken, CaseWithInvalidData::build));
+        requestSpecification.contentType(V2.MediaType.CREATE_EVENT);
+
+        requestSpecification
             .when()
             .post("/cases/{caseReference}/events")
 
