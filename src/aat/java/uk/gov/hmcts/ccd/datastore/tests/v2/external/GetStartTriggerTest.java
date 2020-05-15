@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 import static java.lang.Boolean.FALSE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.ccd.v2.V2;
 
 @DisplayName("Get start trigger by case type and event ids")
 class GetStartTriggerTest extends BaseTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     protected GetStartTriggerTest(AATHelper aat) {
         super(aat);
@@ -23,7 +21,6 @@ class GetStartTriggerTest extends BaseTest {
     @Nested
     @DisplayName("Start event trigger")
     class StartEventResult {
-        private static final String INVALID_CASE_REFERENCE = "1234123412341234";
         private static final String NOT_FOUND_CASE_REFERENCE = "1234123412341238";
 
         @Test
