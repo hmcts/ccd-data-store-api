@@ -9,8 +9,9 @@
          splitStatements="true"
          stripComments="true">
         CREATE INDEX IF NOT EXISTS idx_case_data_deceaseddateofbirth ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{deceasedDateOfBirth}'))));
-        CREATE INDEX IF NOT EXISTS idx_case_data_createdingapsfrom_dwpstate ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{createdingapsfrom,dwpstate}'))));
+        CREATE INDEX IF NOT EXISTS idx_case_data_createdingapsfrom_dwpstate ON public.case_data USING BTREE ((trim(upper((data #>> '{createdInGapsFrom}')))),(trim(upper((data #>> '{dwpState}')))));
         CREATE INDEX IF NOT EXISTS idx_case_data_d8petitionerlastname ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{D8PetitionerLastName}'))));
+        CREATE INDEX IF NOT EXISTS idx_case_data_appeal_appellant_identity_nino ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{appeal,appellant,identity,nino}'))));
     </sql>
 </changeSet>
 </databaseChangeLog>
