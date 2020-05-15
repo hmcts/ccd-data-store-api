@@ -10,7 +10,7 @@
 	],
   "request": {
     "pathVariables": {
-      "cid": "1234567890123456"
+      "cid": "1234123412341238"
     }
   },
 	"expectedResponse": {
