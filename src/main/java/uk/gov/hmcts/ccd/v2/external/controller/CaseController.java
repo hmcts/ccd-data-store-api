@@ -97,7 +97,6 @@ public class CaseController {
         return ResponseEntity.ok(new CaseResource(caseDetails));
     }
 
-
     @Transactional
     @PostMapping(
         path = "/cases/{caseId}/events",
