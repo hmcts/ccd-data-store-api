@@ -67,7 +67,6 @@
   },
   "expectedResponse": {
     "headers": {
-      "Content-Type": "[[ANYTHING_PRESENT]]",
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding" : "gzip"
     }

@@ -44,7 +44,9 @@ def secrets = [
         secret('ccd-befta-caseworker-3-pwd', 'CCD_BEFTA_CASEWORKER_3_PWD'),
         secret('ccd-befta-citizen-2-pwd', 'CCD_BEFTA_CITIZEN_2_PWD'),
         secret('ccd-befta-citizen-3-pwd', 'CCD_BEFTA_CITIZEN_3_PWD'),
-        secret('ccd-befta-solicitor-3-pwd', 'CCD_BEFTA_SOLICITOR_3_PWD')
+        secret('ccd-befta-solicitor-3-pwd', 'CCD_BEFTA_SOLICITOR_3_PWD'),
+        secret('ccd-befta-caseworker-1-no-profile-pwd', 'CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD'),
+        secret('ccd-befta-caseworker-1-no-profile-pwd', 'CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD')
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET')
@@ -71,9 +73,9 @@ env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
 env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-staging.service.core-compute-aat.internal"
-env.BEFTA_RESPONSE_HEADER_CHECK_POLICY = "JUST_WARN"
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-603.service.core-compute-preview.internal"
+env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 
 withPipeline(type, product, component) {
     onMaster {

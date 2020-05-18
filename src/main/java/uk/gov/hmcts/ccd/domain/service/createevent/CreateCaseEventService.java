@@ -44,6 +44,7 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
@@ -75,6 +76,7 @@ public class CreateCaseEventService {
     private final SecurityClassificationService securityClassificationService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
+    private final FieldProcessorService fieldProcessorService;
     private final Clock clock;
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
@@ -101,6 +103,7 @@ public class CreateCaseEventService {
                                   ApplicationParams applicationParams,
                                   SecurityUtils securityUtils,
                                   HttpServletRequest request
+                                  final FieldProcessorService fieldProcessorService,
                                   ) {
         this.request = request;
         this.userRepository = userRepository;
@@ -118,6 +121,7 @@ public class CreateCaseEventService {
         this.securityClassificationService = securityClassificationService;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.userAuthorisation = userAuthorisation;
+        this.fieldProcessorService = fieldProcessorService;
         this.clock = clock;
         this.restTemplate = restTemplate;
         this.applicationParams = applicationParams;
@@ -138,6 +142,8 @@ public class CreateCaseEventService {
 
         validatePreState(caseDetails, eventTrigger);
 
+        content.setData(fieldProcessorService.processData(content.getData(), caseType, eventTrigger));
+
         // Logic start from here to attach document with case ID
         boolean isApiVersion3 = request.getContentType() != null
             && request.getContentType().equals(V3.MediaType.CREATE_EVENT);
@@ -148,6 +154,7 @@ public class CreateCaseEventService {
             caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
             caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForUpdate(content.getData(), caseDetailsBefore);
         }
+
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
             caseDetailsBefore,

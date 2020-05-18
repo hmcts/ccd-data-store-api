@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
@@ -10,16 +8,14 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @Named
 @Singleton
 public class CaseAuditEventMapper {
-    private static final ObjectMapper mapper = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
-    };
 
     public AuditEvent entityToModel(final CaseAuditEventEntity caseAuditEventEntity) {
         final AuditEvent auditEvent = new AuditEvent();
@@ -36,9 +32,8 @@ public class CaseAuditEventMapper {
         auditEvent.setUserLastName(caseAuditEventEntity.getUserLastName());
         auditEvent.setSecurityClassification(caseAuditEventEntity.getSecurityClassification());
         if (caseAuditEventEntity.getData() != null) {
-            auditEvent.setData(mapper.convertValue(caseAuditEventEntity.getData(), STRING_JSON_MAP_TYPE));
-            auditEvent.setDataClassification(mapper.convertValue(caseAuditEventEntity.getDataClassification(),
-                                                                 STRING_JSON_MAP_TYPE));
+            auditEvent.setData(JacksonUtils.convertValue(caseAuditEventEntity.getData()));
+            auditEvent.setDataClassification(JacksonUtils.convertValue(caseAuditEventEntity.getDataClassification()));
         }
         auditEvent.setEventId(caseAuditEventEntity.getEventId());
         auditEvent.setEventName(caseAuditEventEntity.getEventName());
@@ -69,12 +64,11 @@ public class CaseAuditEventMapper {
         newCaseAuditEventEntity.setUserFirstName(auditEvent.getUserFirstName());
         newCaseAuditEventEntity.setSecurityClassification(auditEvent.getSecurityClassification());
         if (auditEvent.getData() == null) {
-            newCaseAuditEventEntity.setData(mapper.createObjectNode());
-            newCaseAuditEventEntity.setDataClassification(mapper.createObjectNode());
+            newCaseAuditEventEntity.setData(MAPPER.createObjectNode());
+            newCaseAuditEventEntity.setDataClassification(MAPPER.createObjectNode());
         } else {
-            newCaseAuditEventEntity.setData(mapper.convertValue(auditEvent.getData(), JsonNode.class));
-            newCaseAuditEventEntity.setDataClassification(mapper.convertValue(auditEvent.getDataClassification(),
-                                                                              JsonNode.class));
+            newCaseAuditEventEntity.setData(JacksonUtils.convertValueJsonNode(auditEvent.getData()));
+            newCaseAuditEventEntity.setDataClassification(JacksonUtils.convertValueJsonNode(auditEvent.getDataClassification()));
         }
         newCaseAuditEventEntity.setEventId(auditEvent.getEventId());
         newCaseAuditEventEntity.setEventName(auditEvent.getEventName());
@@ -92,7 +86,7 @@ public class CaseAuditEventMapper {
 
     public List<AuditEvent> entityToModel(final List<CaseAuditEventEntity> caseEventEntities) {
         return caseEventEntities.stream()
-                                .map(this::entityToModel)
-                                .collect(Collectors.toList());
+            .map(this::entityToModel)
+            .collect(Collectors.toList());
     }
 }
