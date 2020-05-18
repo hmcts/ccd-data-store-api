@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
@@ -18,26 +19,30 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseTypeService caseTypeService;
+    private final FieldProcessorService fieldProcessorService;
 
     @Inject DefaultValidateCaseFieldsOperation(
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-        final CaseTypeService caseTypeService) {
+        final CaseTypeService caseTypeService,
+        final FieldProcessorService fieldProcessorService) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseTypeService = caseTypeService;
+        this.fieldProcessorService = fieldProcessorService;
     }
 
     @Override
     public final Map<String, JsonNode> validateCaseDetails(String caseTypeId, CaseDataContent content) {
-        if (content == null || content.getEvent().getEventId() == null) {
+        if (content == null || content.getEvent() == null || content.getEventId() == null) {
             throw new ValidationException("Cannot validate case field because of event is not specified");
         }
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {
-            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
+            throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
         if (!hasEventId(caseType, content.getEventId())) {
-            throw new ValidationException("Cannot validate case field because of event" + content.getEventId() + " is not found in case type definition");
+            throw new ValidationException("Cannot validate case field because of event " + content.getEventId() + " is not found in case type definition");
         }
+        content.setData(fieldProcessorService.processData(content.getData(), caseType, content.getEventId()));
         caseTypeService.validateData(content.getData(), caseType);
         return content.getData();
     }

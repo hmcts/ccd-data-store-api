@@ -1,26 +1,26 @@
 package uk.gov.hmcts.ccd.domain.types;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
 @Named
 @Singleton
 public class CaseDataValidator {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
 
@@ -39,8 +39,7 @@ public class CaseDataValidator {
     public List<ValidationResult> validate(final Map<String, JsonNode> data,
                                            final List<CaseField> caseFieldDefinitions,
                                            final String fieldIdPrefix) {
-        return (data == null) ?
-            new ArrayList<>() :
+        return (data == null) ? new ArrayList<>() :
             data.entrySet().stream()
                 .map(caseDataPair -> caseFieldDefinitions.stream()
                     .filter(caseField -> caseField.getId().equalsIgnoreCase(caseDataPair.getKey()))
@@ -66,7 +65,7 @@ public class CaseDataValidator {
 
         if (BaseType.get(COMPLEX) == fieldType) {
             return validate(
-                MAPPER.convertValue(dataValue, STRING_JSON_MAP),
+                JacksonUtils.convertValue(dataValue),
                 caseFieldDefinition.getFieldType().getComplexFields(),
                 fieldIdPrefix + dataFieldId + FIELD_SEPARATOR);
         } else if (BaseType.get(COLLECTION) == fieldType) {
@@ -129,7 +128,7 @@ public class CaseDataValidator {
             return validateSimpleField(index, itemValue, caseField, fieldIdPrefix, baseType);
         } else if (itemValue.isObject()) {
             return validate(
-                MAPPER.convertValue(itemValue, STRING_JSON_MAP),
+                JacksonUtils.convertValue(itemValue),
                 fieldType.getComplexFields(),
                 itemFieldId + FIELD_SEPARATOR);
         }

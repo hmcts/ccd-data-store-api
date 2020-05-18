@@ -33,6 +33,7 @@
           "id" : "TextField",
           "elementPath" : null,
           "metadata" : false,
+          "show_condition": null,
           "field_type" : {
             "id" : "Text",
             "type" : "Text",
@@ -43,7 +44,8 @@
             "complex_fields" : [ ],
             "collection_field_type" : null
           }
-        }
+        },
+        "display_context_parameter" : null
       }, {
         "label" : "Last State Modified Date",
         "order" : 2,
@@ -51,6 +53,7 @@
           "id" : "[LAST_STATE_MODIFIED_DATE]",
           "elementPath" : null,
           "metadata" : true,
+          "show_condition": null,
           "field_type" : {
             "id" : "Date",
             "type" : "Date",
@@ -61,7 +64,8 @@
             "complex_fields" : [ ],
             "collection_field_type" : null
           }
-        }
+        },
+        "display_context_parameter" : null
       } ],
       "_links" : {
         "self" : {
