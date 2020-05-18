@@ -102,8 +102,8 @@ public class CreateCaseEventService {
                                   @Qualifier("restTemplate") final RestTemplate restTemplate,
                                   ApplicationParams applicationParams,
                                   SecurityUtils securityUtils,
-                                  HttpServletRequest request
-                                  final FieldProcessorService fieldProcessorService,
+                                  HttpServletRequest request,
+                                  final FieldProcessorService fieldProcessorService
                                   ) {
         this.request = request;
         this.userRepository = userRepository;
