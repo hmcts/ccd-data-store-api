@@ -20,8 +20,16 @@ public class AuthenticatedUser {
         return id;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public String getAccessToken() {
         return accessToken;
     }
 
+    public List<String> getRoles() {
+        return roles;
+    }
 }
+
