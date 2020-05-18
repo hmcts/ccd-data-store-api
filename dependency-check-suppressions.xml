@@ -61,4 +61,32 @@
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
    <cpe>cpe:/a:dom4j_project:dom4j</cpe>
 </suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-security-config-5.3.0.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
+   <cve>CVE-2020-5407</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-security-web-5.3.0.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
+   <cve>CVE-2020-5407</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-security-core-5.3.0.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+   <cve>CVE-2020-5407</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-security-crypto-5.3.0.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
+   <cve>CVE-2020-5407</cve>
+</suppress>
 </suppressions>
