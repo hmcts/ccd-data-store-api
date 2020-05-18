@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.EmptyCase;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
@@ -19,24 +18,6 @@ class CreateCaseTest extends BaseTest {
 
     protected CreateCaseTest(AATHelper aat) {
         super(aat);
-    }
-
-    @Test
-    @DisplayName("should create a new empty case")
-    void shouldCreateEmptyCase() {
-        Event.create()
-             .as(asAutoTestCaseworker())
-             .withData(EmptyCase.build())
-             .submit()
-
-             .then()
-             .log().ifError()
-             .statusCode(201)
-
-             .assertThat()
-             .body("jurisdiction", equalTo(AATCaseType.JURISDICTION))
-             .body("case_type_id", equalTo(AATCaseType.CASE_TYPE))
-             .body("state", equalTo(AATCaseType.State.TODO));
     }
 
     @Test
@@ -58,24 +39,6 @@ class CreateCaseTest extends BaseTest {
             .body("state", equalTo(AATCaseType.State.TODO));
     }
 
-    @Test
-    @DisplayName("should create a case if caseworker has 'CRUD' access on CaseType")
-    void shouldCreateCaseWithFullAccessForCaseType() {
-        //Case Type with "CRUD" access to the role autoTestCaseWorker
-        Event.create("AAT_AUTH_15")
-            .as(asAutoTestCaseworker())
-            .withData(AATCaseBuilder.FullCase.build())
-            .submit()
-
-            .then()
-            .log().ifError()
-            .statusCode(201)
-
-            .assertThat()
-            .body("jurisdiction", equalTo(AATCaseType.JURISDICTION))
-            .body("case_type_id", equalTo("AAT_AUTH_15"))
-            .body("state", equalTo(AATCaseType.State.TODO));
-    }
 
     @Test
     @DisplayName("should create a case if caseworker has 'C' access on CaseType")
