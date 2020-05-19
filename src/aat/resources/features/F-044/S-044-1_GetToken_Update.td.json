@@ -10,8 +10,8 @@
   ],
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
     }
   },
   "request": {
@@ -19,9 +19,9 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "jid": "BEFTA_JURISDICTION_3",
-      "ctid": "BEFTA_CASETYPE_3_4",
-      "uid": "[[DYNAMIC]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_DateTimeFormats",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "cid": "${[scenarioContext][parentContext][childContexts][S-044-TEMP_CreateCase][testData][actualResponse][body][id]}",
       "etid": "UPDATE"
     }

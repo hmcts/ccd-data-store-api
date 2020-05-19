@@ -13,8 +13,8 @@
     "_extends_": "Common_Request",
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid" : "AUTOTEST1",
-      "ctid" : "AAT"
+      "jid": "BEFTA_JURISDICTION_3",
+      "ctid": "BEFTA_CASETYPE_3_2"
     },
     "body" : {
       "data": {
