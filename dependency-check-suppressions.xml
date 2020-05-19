@@ -194,4 +194,60 @@
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
    <cve>CVE-2020-10683</cve>
 </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-config-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-config-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
+        <cpe>cpe:/a:security-framework_project:security-framework</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-web-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-web-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
+        <cpe>cpe:/a:security-framework_project:security-framework</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-core-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-core-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+        <cpe>cpe:/a:security-framework_project:security-framework</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-crypto-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-crypto-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
+        <cpe>cpe:/a:security-framework_project:security-framework</cpe>
+    </suppress>
 </suppressions>
