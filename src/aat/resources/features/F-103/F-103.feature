@@ -1,5 +1,5 @@
-@F-new
-Feature: F-new: Create case for caseworker using V2 api
+@F-103
+Feature: F-103: Create case for caseworker using V2 api
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
@@ -7,7 +7,7 @@ Feature: F-new: Create case for caseworker using V2 api
   @S-new.1
   Scenario: must validate date in a right format
     Given a user with [an active profile in CCD]
-    And a successful call [to create a token for case creation] as in [F-new_GetToken]
+    And a successful call [to create a token for case creation] as in [F-103_GetToken]
     When a request is prepared with appropriate values
     And the request [contains valid value for a formatted Date field]
     And it is submitted to call the [create case] operation of [CCD Data Store]
@@ -18,7 +18,7 @@ Feature: F-new: Create case for caseworker using V2 api
   @S-new.2
   Scenario: must accpet null for date when it is optional and has displayformat set
     Given a user with [an active profile in CCD]
-    And a successful call [to create a token for case creation] as in [F-new_GetToken]
+    And a successful call [to create a token for case creation] as in [F-103_GetToken]
     When a request is prepared with appropriate values
     And the request [contains null value for a formatted Date field]
     And it is submitted to call the [create case] operation of [CCD Data Store]
@@ -29,7 +29,7 @@ Feature: F-new: Create case for caseworker using V2 api
   @S-new.3
   Scenario: must return an error for date value with invalid format
     Given a user with [an active profile in CCD]
-    And a successful call [to create a token for case creation] as in [F-new_GetToken]
+    And a successful call [to create a token for case creation] as in [F-103_GetToken]
     When a request is prepared with appropriate values
     And the request [contains Date field with incorrect format]
     And it is submitted to call the [create case] operation of [CCD Data Store]
