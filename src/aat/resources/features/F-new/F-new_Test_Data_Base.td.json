@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-new_Test_Data_Base",
+  "_guid_": "F-103_Test_Data_Base",
   "productName": "CCD Data Store",
   "operationName": "create case",
   "method": "POST",
@@ -23,7 +23,7 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token": "${[scenarioContext][childContexts][F-new_GetToken][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][childContexts][F-103_GetToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },
