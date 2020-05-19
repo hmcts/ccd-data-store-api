@@ -9,7 +9,7 @@
   "uri": "/case-types/{ctid}/cases",
   "user": {
     "username": "master.caseworker@gmail.com",
-    "password": "[[CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
   },
   "request": {
     "_extends_": "Common_Request",
