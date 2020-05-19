@@ -98,6 +98,6 @@ Feature: F-037: Submit event for an existing case (V2)
     And the request [contains a case Id that has just been created]
     And the request [contains Update token created as in S-037-1_GetToken_Update]
     And it is submitted to call the [submit event for a created case (V2)] operation of [CCD data store]
-#    Then a positive response is received
-#    And the response [contains the case detail for the updated case, along with a HTTP 200 OK]
-#    And the response has all other details as expected
+    Then a positive response is received
+    And the response [contains the case detail for the updated case, along with a HTTP 201 OK]
+    And the response has all other details as expected

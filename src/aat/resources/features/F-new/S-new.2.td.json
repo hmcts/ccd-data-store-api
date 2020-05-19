@@ -2,73 +2,108 @@
 	"_guid_": "S-new.2",
 	"_extends_": "F-new_Test_Data_Base",
 
-	"title": "must accept null for date when it is optional and has displayformat set",
+	"title": "must return an error for date value with invalid format",
 
 	"specs": [
 		"an active profile in CCD",
-    "contains null value for a formatted Date field",
-		"has 200 return code"
+    "contains Date field with incorrect format",
+		"has 422 return code"
 	],
   "request": {
     "body": {
       "data": {
-        "TextField": "test",
-        "NumberField": "33",
-        "YesOrNoField": "No",
-        "DateField": null,
-        "DateTimeField": null,
-        "StandardDate": "2020-02-19",
-        "StandardDateTime": "2019-03-21T11:43:23.000"
+        "DateField": "23-01",
+        "DateTimeField": "2000-23-01",
+        "StandardDate": "2016-12-01",
+        "StandardDateTime": "1998-09-01T16:01",
+        "CollectionDate": [
+          {
+            "id": null,
+            "value": "03"
+          },
+          {
+            "id": null,
+            "value": ""
+          }
+        ],
+        "CollectionDateTime": [
+          {
+            "id": null,
+            "value": "2002-01"
+          }
+        ],
+        "ComplexDateTime": {
+          "DateField": "11-02",
+          "DateTimeField": "04-30T01:01",
+          "StandardDate": "2010-02-02",
+          "StandardDateTime": "2019-12-20T01:01:01.000",
+          "NestedComplex": {
+            "DateField": "01-2019",
+            "DateTimeField": "2019-01-01",
+            "StandardDate": "2019-01-01",
+            "StandardDateTime": "2019-01-01T01:01:01.000"
+          }
+        },
+        "CollectionComplexDateTime": [
+          {
+            "id": null,
+            "value": {
+              "DateField": "01-02",
+              "DateTimeField": "10-01T01:01",
+              "StandardDate": "2019-01-01",
+              "StandardDateTime": "2019-01-01T01:01:01.000",
+              "NestedComplex": {
+                "DateField": "2019-01-01",
+                "DateTimeField": "2019-01-01T01:01:01.000",
+                "StandardDate": "2019-01-01",
+                "StandardDateTime": "2019-01-01T01:01:01.000"
+              }
+            }
+          },
+          {
+            "id": null,
+            "value": {
+              "DateField": "",
+              "DateTimeField": null,
+              "StandardDate": null,
+              "StandardDateTime": null,
+              "NestedComplex": {
+                "DateField": null,
+                "DateTimeField": null,
+                "StandardDate": null,
+                "StandardDateTime": null
+              }
+            }
+          }
+        ]
       },
-      "event_data": {
-        "TextField": "test",
-        "NumberField": 33,
-        "YesOrNoField": "No",
-        "DateField": null,
-        "DateTimeField": null,
-        "StandardDate": "2020-02-19",
-        "StandardDateTime": "2019-03-21T11:43:23.000"
-      }
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-new_GetToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
     "body": {
-      "_links": {
-        "self": {
-          "href": "http://localhost:4452/case-types/BEFTA_CASETYPE_3_4/cases{?ignore-warning}"
-        }
-      },
-      "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "BEFTA_JURISDICTION_3",
-      "case_type": "BEFTA_CASETYPE_3_4",
-      "created_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "last_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "state": "TODO",
-      "security_classification": "PUBLIC",
-      "data" : {
-        "YesOrNoField" : "No",
-        "StandardDateTime" : "2019-03-21T11:43:23.000",
-        "TextField" : "test",
-        "StandardDate" : "2020-02-19",
-        "DateField" : null,
-        "DateTimeField" : null,
-        "NumberField" : "33"
-      },
-      "data_classification" : {
-        "YesOrNoField" : "PUBLIC",
-        "StandardDateTime" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "StandardDate" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "DateTimeField" : "PUBLIC",
-        "NumberField" : "PUBLIC"
-      },
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException",
+      "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "status" : 422,
+      "error" : "Unprocessable Entity",
+      "message" : "Processing of data failed",
+      "path" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "details" : "Unable to process field DateField with value 23-01. Expected format to be either dd or yyyy-MM-dd",
+      "callbackErrors" : null,
+      "callbackWarnings" : null
     }
   }
 }

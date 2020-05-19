@@ -6,15 +6,16 @@
   ],
   "request": {
   "pathVariables" : {
-    "jid": "BEFTA_JURISDICTION_3",
-    "ctid": "BEFTA_CASETYPE_3_4",
+    "uid": "[[DEFAULT_AUTO_VALUE]]",
+    "jid": "BEFTA_MASTER",
+    "ctid": "FT_DateTimeFormats",
     "etid": "CREATE"
   }
   },
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+      "username": "master.caseworker@gmail.com",
+      "password": "[[CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
     }
   },
   "expectedResponse": {
@@ -32,10 +33,10 @@
       "token": "[[ANYTHING_PRESENT]]",
       "case_details": {
         "id": null,
-        "jurisdiction": "BEFTA_JURISDICTION_3",
+        "jurisdiction": "BEFTA_MASTER",
         "state": null,
         "version": null,
-        "case_type_id": "BEFTA_CASETYPE_3_4",
+        "case_type_id": "FT_DateTimeFormats",
         "created_date": null,
         "last_modified": null,
         "last_state_modified_date": null,

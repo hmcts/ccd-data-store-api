@@ -12,11 +12,75 @@
   "request": {
     "body": {
       "data": {
-        "TextField": "s",
-        "NumberField": "23",
-        "YesOrNoField": "Yes",
-        "DateField": "2020-12-20",
-        "DateTimeField": null
+        "DateField": "23",
+        "DateTimeField": null,
+        "StandardDate": "2016-12-01",
+        "StandardDateTime": "1998-09-01T16:01",
+        "CollectionDate": [
+          {
+            "id": null,
+            "value": "03"
+          },
+          {
+            "id": null,
+            "value": ""
+          }
+        ],
+        "CollectionDateTime": [
+          {
+            "id": null,
+            "value": "2002-01"
+          }
+        ],
+        "ComplexDateTime": {
+          "DateField": null,
+          "DateTimeField": "04-30T01:01",
+          "StandardDate": "2010-02-02",
+          "StandardDateTime": "2019-12-20T01:01:01.000",
+          "NestedComplex": {
+            "DateField": "01-2019",
+            "DateTimeField": "2019-01-01",
+            "StandardDate": "2019-01-01",
+            "StandardDateTime": "2019-01-01T01:01:01.000"
+          }
+        },
+        "CollectionComplexDateTime": [
+          {
+            "id": null,
+            "value": {
+              "DateField": "01-02",
+              "DateTimeField": "10-01T01:01",
+              "StandardDate": "2019-01-01",
+              "StandardDateTime": "2019-01-01T01:01:01.000",
+              "NestedComplex": {
+                "DateField": "2019-01-01",
+                "DateTimeField": "2019-01-01T01:01:01.000",
+                "StandardDate": "2019-01-01",
+                "StandardDateTime": "2019-01-01T01:01:01.000"
+              }
+            }
+          },
+          {
+            "id": null,
+            "value": {
+              "DateField": "",
+              "DateTimeField": null,
+              "StandardDate": null,
+              "StandardDateTime": null,
+              "NestedComplex": {
+                "DateField": null,
+                "DateTimeField": null,
+                "StandardDate": null,
+                "StandardDateTime": null
+              }
+            }
+          }
+        ]
+      },
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
       }
     }
   },
@@ -27,15 +91,71 @@
 			"Content-Type": "application/json",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
-		"body": {
-        "data" : {
-          "YesOrNoField" : "Yes",
-          "TextField" : "s",
-          "DateField" : "2020-12-20",
-          "DateTimeField" : null,
-          "NumberField" : "23"
+    "body" : {
+      "data" : {
+        "CollectionComplexDateTime" : [ {
+          "id" : null,
+          "value" : {
+            "DateField" : "1970-02-01",
+            "DateTimeField" : "1970-10-01T01:01:00.000",
+            "StandardDate" : "2019-01-01",
+            "StandardDateTime" : "2019-01-01T01:01:01.000",
+            "NestedComplex" : {
+              "DateField" : "2019-01-01",
+              "DateTimeField" : "2019-01-01T01:01:01.000",
+              "StandardDate" : "2019-01-01",
+              "StandardDateTime" : "2019-01-01T01:01:01.000"
+            }
+          }
+        }, {
+          "id" : null,
+          "value" : {
+            "DateField" : "",
+            "DateTimeField" : null,
+            "StandardDate" : null,
+            "StandardDateTime" : null,
+            "NestedComplex" : {
+              "DateField" : null,
+              "DateTimeField" : null,
+              "StandardDate" : null,
+              "StandardDateTime" : null
+            }
+          }
+        } ],
+        "ComplexDateTime" : {
+          "DateField" : null,
+          "DateTimeField" : "1970-04-30T01:01:00.000",
+          "StandardDate" : "2010-02-02",
+          "StandardDateTime" : "2019-12-20T01:01:01.000",
+          "NestedComplex" : {
+            "DateField" : "2019-01-01",
+            "DateTimeField" : "2019-01-01T00:00:00.000",
+            "StandardDate" : "2019-01-01",
+            "StandardDateTime" : "2019-01-01T01:01:01.000"
+          }
         },
-      "_links" : "[[ANYTHING_PRESENT]]"
+        "CollectionDate" : [ {
+          "id" : null,
+          "value" : "1970-03-01"
+        }, {
+          "id" : null,
+          "value" : ""
+        } ],
+        "CollectionDateTime" : [ {
+          "id" : null,
+          "value" : "2002-01-01T00:00:00.000"
+        } ],
+        "StandardDateTime" : "1998-09-01T16:01",
+        "StandardDate" : "2016-12-01",
+        "DateField" : "1970-01-23",
+        "DateTimeField" : null
+      },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:4452/case-types/FT_DateTimeFormats/validate{?pageId}",
+          "templated" : true
+        }
+      }
     }
 	}
 }

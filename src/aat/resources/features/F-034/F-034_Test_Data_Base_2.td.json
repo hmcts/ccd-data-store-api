@@ -5,13 +5,13 @@
   "method": "POST",
   "uri": "/case-types/{ctid}/validate",
   "user": {
-    "username": "befta.caseworker.3@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
   },
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "ctid": "BEFTA_CASETYPE_3_4"
+      "ctid": "FT_DateTimeFormats"
     },
     "headers": {
       "experimental": true
