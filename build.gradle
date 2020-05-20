@@ -633,10 +633,12 @@ task smoke(type: Test) {
     }
 
     doFirst {
+        generateCucumberReports.enabled = true
         javaexec {
-            main = "uk.gov.hmcts.ccd.datastore.befta.TestDataLoaderMain"
-            classpath += sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['']
+            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '@Smoke', '--glue',
+                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
         }
     }
 
