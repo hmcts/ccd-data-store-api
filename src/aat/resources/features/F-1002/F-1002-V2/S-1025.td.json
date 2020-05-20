@@ -1,0 +1,45 @@
+{
+  "_guid_": "S-1025",
+  "_extends_": "F-1002-V2_Test_Base_Request_Body",
+  "title": "must get a success response for a non existing document Id",
+
+  "specs": [
+    "contains a non existing document Id"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate",
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/00000000-0000-0000-0000-000000000000/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+        }
+      },
+      "event_token": "${[scenarioContext][childContexts][S-1025-V2_Update_Event_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-1002-V2_Test_Base_Response_Body",
+
+    "body": {
+      "data": {
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/00000000-0000-0000-0000-000000000000/binary",
+          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+        },
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate"
+      }
+    }
+  }
+}
+

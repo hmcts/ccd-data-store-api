@@ -6,6 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.v2.V2.EXPERIMENTAL_HEADER;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CaseControllerTestIT extends WireMockBaseTest {
 
@@ -83,6 +87,43 @@ public class CaseControllerTestIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        assertNotNull("Content Should not be null", content);
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
+    }
+
+    @Test
+    @Ignore("Enabled this once createCase endpoint is merged from  develop branch")
+    public void shouldReturn201WhenPostCreateCaseV3() throws Exception {
+        final String URL =  "/case-types/" + CASE_TYPE + "/cases";
+        final String DESCRIPTION = "A very long comment.......";
+        final String SUMMARY = "Short comment";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(TEST_EVENT_ID);
+        triggeringEvent.setDescription(DESCRIPTION);
+        triggeringEvent.setSummary(SUMMARY);
+        caseDetailsToSave.setEvent(triggeringEvent);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final Map<String, String> parameterMap = new HashMap<>(4);
+        parameterMap.put("charset", "UTF-8");
+        MediaType JSON_CONTENT_V3_CREATE_CASE = new MediaType(
+            "application",
+            "vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v3+json",
+            parameterMap);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                                                        .header(EXPERIMENTAL_HEADER, "experimental")
+                                                        .contentType(JSON_CONTENT_V3_CREATE_CASE)
+                                                        .content(mapper.writeValueAsString(caseDetailsToSave))
+                                                   ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

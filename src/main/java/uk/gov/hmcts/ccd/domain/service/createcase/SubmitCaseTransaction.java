@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -19,13 +22,16 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+import uk.gov.hmcts.ccd.v3.V3;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -36,6 +42,7 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Service
 class SubmitCaseTransaction {
 
+    private final HttpServletRequest request;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final CaseTypeService caseTypeService;
@@ -44,17 +51,25 @@ class SubmitCaseTransaction {
     private final SecurityClassificationService securityClassificationService;
     private final CaseUserRepository caseUserRepository;
     private final UserAuthorisation userAuthorisation;
+    private final RestTemplate restTemplate;
+    private final ApplicationParams applicationParams;
+    private final SecurityUtils securityUtils;
 
-    @Inject
+   @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                  final CaseAuditEventRepository caseAuditEventRepository,
                                  final CaseTypeService caseTypeService,
                                  final CallbackInvoker callbackInvoker,
                                  final UIDService uidService,
                                  final SecurityClassificationService securityClassificationService,
-                                 final @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository,
-                                 final UserAuthorisation userAuthorisation
+                                 final @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
+                                 final UserAuthorisation userAuthorisation,
+                                 final HttpServletRequest request,
+                                 final RestTemplate restTemplate,
+                                 final ApplicationParams applicationParams,
+                                 final SecurityUtils securityUtils
                                  ) {
+        this.request = request;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
         this.caseTypeService = caseTypeService;
@@ -63,7 +78,10 @@ class SubmitCaseTransaction {
         this.securityClassificationService = securityClassificationService;
         this.caseUserRepository = caseUserRepository;
         this.userAuthorisation = userAuthorisation;
-    }
+        this.restTemplate = restTemplate;
+        this.applicationParams = applicationParams;
+        this.securityUtils = securityUtils;
+   }
 
     @Transactional(REQUIRES_NEW)
     @Retryable(
@@ -83,6 +101,15 @@ class SubmitCaseTransaction {
         newCaseDetails.setLastStateModifiedDate(now);
         newCaseDetails.setReference(Long.valueOf(uidService.generateUID()));
 
+        boolean isApiVersion3 = request.getContentType() != null
+            && request.getContentType().equals(V3.MediaType.CREATE_CASE);
+
+        CaseDocumentAttacher caseDocumentAttacher = null;
+        if (isApiVersion3) {
+            caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
+            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForCreateCase(newCaseDetails.getData());
+        }
+
         /*
             About to submit
 
@@ -99,6 +126,11 @@ class SubmitCaseTransaction {
             caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()),
                                            idamUser.getId(),
                                            CREATOR.getRole());
+        }
+
+        if (isApiVersion3) {
+            caseDocumentAttacher.caseDocumentAttachOperation(newCaseDetails,  aboutToSubmitCallbackResponse.getState().isPresent());
+            caseDocumentAttacher.restCallToAttachCaseDocuments();
         }
 
         return savedCaseDetails;
