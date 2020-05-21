@@ -1,5 +1,5 @@
 {
-  "_guid_": "Token_Creation_For_S-035.01_Case",
+  "_guid_": "S-035.01_Case_Token_Creation",
   "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
   "specs": [
     "to create a token for case creation"
