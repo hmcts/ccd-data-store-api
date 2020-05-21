@@ -59,7 +59,6 @@ Feature: F-035: Retrieve a case by id
  @S-591
   Scenario: must return status 200 along with the case-view object successfully
     Given a user with [an active profile in CCD]
-    And a successful call [to create a token for case creation] as in [S-035.01_GetToken]
     And a case that has just been created as in [S-035.01_Case]
     When a request is prepared with appropriate values
     And the request [uses the case-reference of the case just created]
