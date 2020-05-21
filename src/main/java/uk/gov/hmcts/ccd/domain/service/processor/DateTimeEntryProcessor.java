@@ -16,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
 import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.getDisplayContextParameterOfType;
@@ -58,18 +57,14 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
                                          CommonField topLevelField) {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
 
-        if ((hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), DisplayContextParameterType.DATETIMEENTRY)
-            && isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES))
-            || BaseType.get(COMPLEX) == collectionFieldType) {
+        if (shouldExecuteCollection(collectionNode, caseViewField,
+            DisplayContextParameterType.DATETIMEENTRY, collectionFieldType, SUPPORTED_TYPES)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                    isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
-                        ? createNode(caseViewField.getDisplayContextParameter(), item.get(CollectionValidator.VALUE).asText(), collectionFieldType, fieldPath)
-                        : executeComplex(item.get(CollectionValidator.VALUE),
-                            caseViewField.getFieldTypeDefinition().getChildren(),
-                            null, fieldPath, topLevelField));
+                    createCollectionValueNode(item.get(CollectionValidator.VALUE),
+                        collectionFieldType, caseViewField, fieldPath, topLevelField));
                 newNode.add(newItem);
             });
 
@@ -77,6 +72,23 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
         }
 
         return collectionNode;
+    }
+
+    private JsonNode createCollectionValueNode(JsonNode valueNode,
+                                               BaseType collectionFieldType,
+                                               CommonField caseViewField,
+                                               String fieldPath,
+                                               CommonField topLevelField) {
+        if (valueNode.isNull()) {
+            return valueNode;
+        }
+        return isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
+            ? createNode(caseViewField.getDisplayContextParameter(), valueNode.asText(), collectionFieldType, fieldPath)
+            : executeComplex(valueNode,
+                            caseViewField.getFieldTypeDefinition().getChildren(),
+                            null,
+                            fieldPath,
+                            topLevelField);
     }
 
     private TextNode createNode(String displayContextParameter, String valueToConvert, BaseType baseType, String fieldPath) {

@@ -24,16 +24,28 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
+import java.io.IOException;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 
 class DateTimeEntryProcessorTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String ID = "FieldId";
+
+    private static final String DATETIME_FIELD_TYPE = "DateTime";
+    private static final String DATE_FIELD_TYPE = "Date";
+    private static final String COLLECTION_FIELD_TYPE = "Collection";
+    private static final String COMPLEX_FIELD_TYPE = "Complex";
 
     @InjectMocks
     private DateTimeEntryProcessor dateTimeEntryProcessor;
@@ -57,11 +69,11 @@ class DateTimeEntryProcessorTest {
         when(definitionRepository.getBaseTypes()).thenReturn(Collections.EMPTY_LIST);
         BaseType.setCaseDefinitionRepository(definitionRepository);
         BaseType.initialise();
+        setUpBaseTypes();
     }
 
     @Test
     void shouldReturnProcessedNodeForSimpleField() throws IOException {
-        setUpBaseType("DateTime");
         String json = "{\"DateTimeField\":\"13/03/2020\"}";
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
         CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
@@ -81,7 +93,6 @@ class DateTimeEntryProcessorTest {
 
     @Test
     void shouldReturnProcessedNodeForSimpleFieldNullDisplayContextParameter() throws IOException {
-        setUpBaseType("DateTime");
         String json = "{\"DateTimeField\":\"2020-03-13T00:00:00.000\"}";
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
         CaseViewField caseViewField = caseViewField(ID, null, fieldType());
@@ -101,7 +112,6 @@ class DateTimeEntryProcessorTest {
 
     @Test
     void shouldReturnProcessedNodeForSimpleFieldIncorrectDisplayContextParameter() throws IOException {
-        setUpBaseType("DateTime");
         String json = "{\"DateTimeField\":\"2020-03-13T00:00:00.000\"}";
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
         CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
@@ -121,7 +131,6 @@ class DateTimeEntryProcessorTest {
 
     @Test
     void shouldReturnProcessedNodeForCollectionField() throws IOException {
-        setUpBaseType("Collection");
         String json = "{\"CollectionField\":[{\"id\":\"id1\",\"value\":\"13/03/2020\"},{\"id\":\"id2\",\"value\":\"25/12/1995\"}]}";
         JsonNode node = MAPPER.readTree(json).get("CollectionField");
         CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)",
@@ -149,8 +158,51 @@ class DateTimeEntryProcessorTest {
     }
 
     @Test
+    void shouldReturnProcessedNodeForComplexField() throws IOException {
+        String json = "{\n"
+                      + "    \"ComplexField\": {\n"
+                      + "        \"ComplexDateTimeField\": \"2001\",\n"
+                      + "        \"ComplexNestedField\": {\n"
+                      + "            \"NestedDateField\": \"12\",\n"
+                      + "            \"NestedCollectionTextField\": []\n"
+                      + "        }\n"
+                      + "    }\n"
+                      + "}";
+        JsonNode node = MAPPER.readTree(json).get("ComplexField");
+        CaseFieldDefinition caseField1 = newCaseField().withId("ComplexDateTimeField")
+            .withFieldType(fieldType()).withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build();
+        CaseFieldDefinition caseField2 = newCaseField().withId("NestedDateField")
+            .withFieldType(fieldType("Date", "Date", null, null)).withDisplayContextParameter("#DATETIMEENTRY(MM)").build();
+        CaseFieldDefinition caseField3 = newCaseField().withId("NestedCollectionTextField")
+            .withFieldType(fieldType("Collection", "Collection", null, fieldType())).build();
+        CaseFieldDefinition caseField4 = newCaseField().withId("LabelField")
+            .withFieldType(fieldType("Label", "Label", null, null)).build();
+        CaseFieldDefinition caseField5 = newCaseField().withId("ComplexNestedField")
+            .withFieldType(fieldType("Complex", "Complex", Arrays.asList(caseField2, caseField3, caseField4), null)).build();
+        CaseFieldDefinition caseField6 = newCaseField().withId("ComplexField")
+            .withFieldType(fieldType("Complex", "Complex", Arrays.asList(caseField1, caseField5), null)).build();
+        CaseViewField caseViewField = caseViewField(ID, null,
+            fieldType("Complex", "Complex", Arrays.asList(caseField1, caseField5), null)
+        );
+
+        Mockito.when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
+        Mockito.when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2001")).thenReturn("2001-01-01T00:00:00.000");
+        Mockito.when(dateTimeFormatParser.convertDateToIso8601("MM", "12")).thenReturn("1970-12-01");
+
+        JsonNode result = dateTimeEntryProcessor.execute(node, caseField6, new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
+
+        assertAll(
+            () -> assertThat(result.isObject(), is(true)),
+            () -> assertThat(result.size(), is(2)),
+            () -> assertThat(result.get("ComplexDateTimeField").asText(), is("2001-01-01T00:00:00.000")),
+            () -> assertThat(result.get("ComplexNestedField").get("NestedDateField").asText(), is("1970-12-01")),
+            () -> assertThat(result.get("ComplexNestedField").get("NestedCollectionTextField").isArray(), is(true)),
+            () -> assertThat(result.get("ComplexNestedField").get("NestedCollectionTextField").size(), is(0))
+        );
+    }
+
+    @Test
     void shouldThrowErrorDetailingExpectedDateTimeFormat() throws IOException {
-        setUpBaseType("DateTime");
         String json = "{\"DateTimeField\":\"abc\"}";
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
         CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
@@ -169,7 +221,6 @@ class DateTimeEntryProcessorTest {
 
     @Test
     void shouldThrowErrorDetailingExpectedDateFormat() throws IOException {
-        setUpBaseType("Date");
         String json = "{\"DateField\":\"abc\"}";
         JsonNode node = MAPPER.readTree(json).get("DateField");
         CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType("Date", "Date", Collections.emptyList(), null));
@@ -217,11 +268,17 @@ class DateTimeEntryProcessorTest {
     }
 
     private FieldTypeDefinition fieldType() {
+        return fieldType("DateTime");
+    }
+
+    private FieldTypeDefinition fieldType(String fieldType) {
         return fieldType("DateTime", "DateTime", Collections.emptyList(), null);
     }
 
-    private void setUpBaseType(String baseType) {
-        when(fieldType.getType()).thenReturn(baseType);
-        BaseType.register(new BaseType(fieldType));
+    private void setUpBaseTypes() {
+        BaseType.register(new BaseType(fieldType(DATE_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(DATETIME_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(COLLECTION_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(COMPLEX_FIELD_TYPE)));
     }
 }
