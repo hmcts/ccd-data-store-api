@@ -14,8 +14,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInpu
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
@@ -39,10 +39,10 @@ class ClassifiedGetCriteriaOperationTest {
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
     private static final String CASE_FIELD_ID_1_4 = "CASE_FIELD_1_4";
-    private static final CaseField CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(PUBLIC).build();
-    private static final CaseField CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(PUBLIC).build();
-    private static final CaseField CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).withSC(PUBLIC).build();
-    private static final CaseField CASE_FIELD_1_4 = newCaseField().withId(CASE_FIELD_ID_1_4).withSC(PUBLIC).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(PUBLIC).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(PUBLIC).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).withSC(PUBLIC).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_4 = newCaseField().withId(CASE_FIELD_ID_1_4).withSC(PUBLIC).build();
     private static List<WorkbasketInput> testWorkbasketInputs;
     private static List<SearchInput> testSearchInputs;
 
@@ -55,7 +55,7 @@ class ClassifiedGetCriteriaOperationTest {
     private SecurityClassificationService classificationService;
 
     private ClassifiedGetCriteriaOperation classUnderTest;
-    private CaseType testCaseType;
+    private CaseTypeDefinition testCaseTypeDefinition;
 
     @BeforeEach
     void setUp() {
@@ -72,7 +72,7 @@ class ClassifiedGetCriteriaOperationTest {
         );
 
         MockitoAnnotations.initMocks(this);
-        testCaseType = newCaseType()
+        testCaseTypeDefinition = newCaseType()
             .withJurisdiction(newJurisdiction()
                                   .withJurisdictionId(JURISDICTION_ID)
                                   .build())
@@ -81,9 +81,9 @@ class ClassifiedGetCriteriaOperationTest {
             .withField(CASE_FIELD_1_3)
             .withField(CASE_FIELD_1_4)
             .build();
-        testCaseType.setId(CASE_TYPE_ONE);
+        testCaseTypeDefinition.setId(CASE_TYPE_ONE);
 
-        doReturn(testCaseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ONE);
+        doReturn(testCaseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ONE);
 
         classUnderTest = new ClassifiedGetCriteriaOperation(getCriteriaOperation, caseDefinitionRepository, classificationService);
 
@@ -95,13 +95,13 @@ class ClassifiedGetCriteriaOperationTest {
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE,
             CAN_READ, WORKBASKET);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-            testCaseType, CASE_FIELD_ID_1_1);
+            testCaseTypeDefinition, CASE_FIELD_ID_1_1);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-            testCaseType, CASE_FIELD_ID_1_2);
+            testCaseTypeDefinition, CASE_FIELD_ID_1_2);
         doReturn(false).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-            testCaseType, CASE_FIELD_ID_1_3);
+            testCaseTypeDefinition, CASE_FIELD_ID_1_3);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-            testCaseType, CASE_FIELD_ID_1_4);
+            testCaseTypeDefinition, CASE_FIELD_ID_1_4);
 
 
         final List<? extends CriteriaInput> workbasketInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
@@ -131,13 +131,13 @@ class ClassifiedGetCriteriaOperationTest {
     void shouldFilterSearchInputFieldsWithSC() {
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-            testCaseType, CASE_FIELD_ID_1_1);
+            testCaseTypeDefinition, CASE_FIELD_ID_1_1);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-            testCaseType, CASE_FIELD_ID_1_2);
+            testCaseTypeDefinition, CASE_FIELD_ID_1_2);
         doReturn(false).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-            testCaseType, CASE_FIELD_ID_1_3);
+            testCaseTypeDefinition, CASE_FIELD_ID_1_3);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-            testCaseType, CASE_FIELD_ID_1_4);
+            testCaseTypeDefinition, CASE_FIELD_ID_1_4);
 
 
         final List<? extends CriteriaInput> searchInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);

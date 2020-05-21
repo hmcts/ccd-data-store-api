@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class CaseDetailsMapper {
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
     };
 
     public CaseDetails entityToModel(final CaseDetailsEntity caseDetailsEntity) {
@@ -39,6 +39,12 @@ public class CaseDetailsMapper {
             caseDetails.setDataClassification(mapper.convertValue(caseDetailsEntity.getDataClassification(), STRING_JSON_MAP_TYPE));
         }
         return caseDetails;
+    }
+
+    public List<CaseDetails> entityToModel(final List<CaseDetailsEntity> caseDataEntities) {
+        return caseDataEntities.stream()
+            .map(this::entityToModel)
+            .collect(Collectors.toList());
     }
 
     public CaseDetailsEntity modelToEntity(final CaseDetails caseDetails) {
@@ -68,11 +74,5 @@ public class CaseDetailsMapper {
     private Long getLongId(CaseDetails caseDetails) {
         String id = caseDetails.getId();
         return id == null ? null : Long.valueOf(id);
-    }
-
-    public List<CaseDetails> entityToModel(final List<CaseDetailsEntity> caseDataEntities) {
-        return caseDataEntities.stream()
-            .map(this::entityToModel)
-            .collect(Collectors.toList());
     }
 }

@@ -7,6 +7,10 @@ import static org.awaitility.Awaitility.with;
 
 public class TestUtils {
 
+    private TestUtils() {
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
+    }
+
     public static void withRetries(long retryPollDelay, long retryPollInterval, String conditionDesc, Callable<Boolean> conditionEvaluator) {
         with()
             .pollDelay(retryPollDelay, TimeUnit.MILLISECONDS)

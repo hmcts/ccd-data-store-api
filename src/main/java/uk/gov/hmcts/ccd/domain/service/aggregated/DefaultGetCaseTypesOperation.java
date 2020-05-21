@@ -7,10 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 /**
+ * Default {@link GetCaseTypesOperation}.
  *
  * @deprecated current implementation has serious performance issues
  */
@@ -29,7 +30,7 @@ public class DefaultGetCaseTypesOperation implements GetCaseTypesOperation {
     }
 
     @Override
-    public List<CaseType> execute(String jurisdictionId, Predicate<AccessControlList> access) {
+    public List<CaseTypeDefinition> execute(String jurisdictionId, Predicate<AccessControlList> access) {
         return caseTypeService.getCaseTypesForJurisdiction(jurisdictionId);
     }
 

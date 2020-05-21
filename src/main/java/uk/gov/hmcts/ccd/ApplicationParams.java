@@ -125,6 +125,12 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
+    @Value("#{'${audit.log.ignore.statues}'.split(',')}")
+    private List<Integer> auditLogIgnoreStatuses;
+
+    @Value("${audit.log.enabled:true}")
+    private boolean auditLogEnabled;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -193,8 +199,8 @@ public class ApplicationParams {
         return uiDefinitionHost + "/api/display/tab-structure/" + encode(caseTypeId);
     }
 
-    public String displayWizardPageCollection(final String caseTypeId, final String eventTriggerId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventTriggerId);
+    public String displayWizardPageCollection(final String caseTypeId, final String eventId) {
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventId);
     }
 
     public String jurisdictionDefURL() {
@@ -204,9 +210,9 @@ public class ApplicationParams {
     public String bannersURL() {
         return uiDefinitionHost + "/api/display/banners";
     }
-    
+
     public String jurisdictionUiConfigsURL() {
-    	return uiDefinitionHost + "/api/display/jurisdiction-ui-configs";
+        return uiDefinitionHost + "/api/display/jurisdiction-ui-configs";
     }
 
     public String searchInputDefinition(final String caseTypeId) {
@@ -343,5 +349,13 @@ public class ApplicationParams {
 
     public Integer getElasticSearchRequestTimeout() {
         return elasticSearchRequestTimeout;
+    }
+
+    public List<Integer> getAuditLogIgnoreStatuses() {
+        return auditLogIgnoreStatuses;
+    }
+
+    public boolean isAuditLogEnabled() {
+        return auditLogEnabled;
     }
 }

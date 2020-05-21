@@ -20,6 +20,10 @@
       "case_id": null,
       "case_fields": [
         {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
+        {
           "id": "TextField",
           "label": "A `Text` field",
           "hidden": false,
@@ -39,6 +43,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -74,6 +79,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -109,6 +115,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -144,6 +151,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -179,6 +187,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -214,6 +223,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -249,6 +259,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -284,6 +295,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -319,6 +331,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -370,6 +383,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -431,6 +445,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -475,6 +490,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
           "show_condition": null,
@@ -539,7 +555,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "ComplexFixedListField",
@@ -591,7 +608,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "ComplexNestedField",
@@ -642,7 +660,8 @@
                       ],
                       "complexACLs": [],
                       "display_context": null,
-                      "display_context_parameter": null
+                      "display_context_parameter": null,
+                      "formatted_value": null
                     },
                     {
                       "id": "NestedCollectionTextField",
@@ -686,7 +705,8 @@
                       ],
                       "complexACLs": [],
                       "display_context": null,
-                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)"
+                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
+                      "formatted_value": null
                     }
                   ],
                   "collection_field_type": null
@@ -707,7 +727,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -715,6 +736,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -778,7 +800,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "AddressLine2",
@@ -813,7 +836,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "AddressLine3",
@@ -848,7 +872,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "PostTown",
@@ -883,7 +908,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "County",
@@ -918,7 +944,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "PostCode",
@@ -953,7 +980,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               },
               {
                 "id": "Country",
@@ -988,7 +1016,8 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -996,6 +1025,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -1031,6 +1061,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -1082,6 +1113,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,

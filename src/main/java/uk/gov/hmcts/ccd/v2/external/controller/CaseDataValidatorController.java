@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import java.util.HashMap;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,13 +14,15 @@ import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(path = "/case-types")
 public class CaseDataValidatorController {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final MidEventCallback midEventCallback;
@@ -52,7 +52,7 @@ public class CaseDataValidatorController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UICaseViewResource.class
+            response = CaseViewResource.class
         ),
         @ApiResponse(
             code = 404,

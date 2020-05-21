@@ -1,0 +1,37 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/display/work-basket-input-definition/TestAddressBookCase?version=33"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "fields": [
+        {
+          "case_type_id": "TestAddressBookCase",
+          "case_field_id": "PersonFirstName",
+          "label": "First Name",
+          "order": 1,
+          "show_condition": "PersonLastName=\"tom\""
+        },
+        {
+          "case_type_id": "TestAddressBookCase",
+          "case_field_id": "PersonLastName",
+          "label": "Last Name",
+          "order": 1,
+          "show_condition": null
+        },
+        {
+          "case_type_id": "TestAddressBookCase",
+          "case_field_id": "PersonAddress",
+          "label": "Address",
+          "order": 1,
+          "show_condition": null
+        }
+      ]
+    }
+  }
+}

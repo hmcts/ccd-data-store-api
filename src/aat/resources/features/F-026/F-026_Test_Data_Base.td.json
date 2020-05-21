@@ -10,7 +10,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "AUTOTEST1",
       "ctid": "AAT_AUTH_15"
     }
@@ -18,8 +18,7 @@
   "expectedResponse": {
     "headers": {
       "Content-Length": "[[ANY_INTEGER_NULLABLE]]",
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/json"
+      "Content-Encoding": "gzip"
     }
   }
 }

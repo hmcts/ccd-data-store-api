@@ -121,7 +121,7 @@ class CaseControllerTest {
 
     @Nested
     @DisplayName("POST /cases/{caseId}/events")
-    class PostCaseEvent {
+    class PostCaseEventDefinition {
 
         @Test
         @DisplayName("should return 201 when case event created")

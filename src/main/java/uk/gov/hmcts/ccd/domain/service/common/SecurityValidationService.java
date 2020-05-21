@@ -24,13 +24,15 @@ public class SecurityValidationService {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityValidationService.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data validation error (c)";
 
-    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails, Map<String, JsonNode> defaultDataClassification) {
+    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse,
+                                                     CaseDetails caseDetails,
+                                                     Map<String, JsonNode> defaultDataClassification) {
 
         if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
             caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
@@ -97,8 +99,8 @@ public class SecurityValidationService {
     }
 
     private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
-        return defaultDataClassification != null && callbackDataClassification != null &&
-            defaultDataClassification.size() == callbackDataClassification.size();
+        return defaultDataClassification != null && callbackDataClassification != null
+            && defaultDataClassification.size() == callbackDataClassification.size();
     }
 
 

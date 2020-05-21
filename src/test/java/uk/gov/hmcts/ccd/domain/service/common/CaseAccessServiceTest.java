@@ -64,14 +64,14 @@ class CaseAccessServiceTest {
     @DisplayName("when user is a solicitor")
     class WhenSolicitor {
 
-        private final String[] ROLES = {
+        private final String[] roles = {
             "somethingThatIsNotASolicitor",
             "somethingThatIsA-solicitor"
         };
 
         @BeforeEach
         void setUp() {
-            withRoles(ROLES);
+            withRoles(roles);
         }
 
         @Test
@@ -89,7 +89,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -98,13 +98,13 @@ class CaseAccessServiceTest {
     @DisplayName("when user is from local authority")
     class WhenLocalAuthority {
 
-        private final String[] ROLES = {
+        private final String[] roles = {
             "caseworker-superdupajurisdiction-localAuthority"
         };
 
         @BeforeEach
         void setUp() {
-            withRoles(ROLES);
+            withRoles(roles);
         }
 
         @Test
@@ -122,7 +122,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -131,13 +131,13 @@ class CaseAccessServiceTest {
     @DisplayName("when user is not from local authority")
     class WhenNotLocalAuthority {
 
-        private final String[] ROLES = {
+        private final String[] roles = {
             "caseworker-publiclaw-localauthority"
         };
 
         @BeforeEach
         void setUp() {
-            withRoles(ROLES);
+            withRoles(roles);
         }
 
         @Test
@@ -155,7 +155,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give ALL access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
             assertThat(accessLevel, equalTo(AccessLevel.ALL));
         }
     }
@@ -164,14 +164,14 @@ class CaseAccessServiceTest {
     @DisplayName("when user is a panel member")
     class WhenPanelMember {
 
-        private final String[] ROLES = {
+        private final String[] roles = {
             "other",
             "some-panelmember"
         };
 
         @BeforeEach
         void setUp() {
-            withRoles(ROLES);
+            withRoles(roles);
         }
 
         @Test
@@ -189,7 +189,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -198,14 +198,14 @@ class CaseAccessServiceTest {
     @DisplayName("when user is a citizen")
     class WhenCitizen {
 
-        private final String[] ROLES = {
+        private final String[] roles = {
             "citizen",
             "probate-private-beta"
         };
 
         @BeforeEach
         void setUp() {
-            withRoles(ROLES);
+            withRoles(roles);
         }
 
         @Test
@@ -231,7 +231,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -240,13 +240,13 @@ class CaseAccessServiceTest {
     @DisplayName("when user is a letter-holder")
     class WhenLetterHolder {
 
-        private final String[] ROLES = {
+        private final String[] roles = {
             "letter-holder"
         };
 
         @BeforeEach
         void setUp() {
-            withRoles(ROLES);
+            withRoles(roles);
         }
 
         @Test
@@ -264,7 +264,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -273,13 +273,13 @@ class CaseAccessServiceTest {
     @DisplayName("when user is a citizen-loaX")
     class WhenCitizenLoaX {
 
-        private final String[] ROLES = {
+        private final String[] roles = {
             "citizen-loaX"
         };
 
         @BeforeEach
         void setUp() {
-            withRoles(ROLES);
+            withRoles(roles);
         }
 
         @Test
@@ -297,7 +297,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -306,7 +306,7 @@ class CaseAccessServiceTest {
     @DisplayName("when user is NOT a citizen or a solicitor")
     class WhenOther {
 
-        private final String[] ROLES = {
+        private final String[] roles = {
             "caseworker-divorce",
             "not-citizen",
             "somethingThatIsNotASolicitor",
@@ -316,7 +316,7 @@ class CaseAccessServiceTest {
 
         @BeforeEach
         void setUp() {
-            withRoles(ROLES);
+            withRoles(roles);
         }
 
         @Test
@@ -334,7 +334,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give ALL access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
             assertThat(accessLevel, equalTo(AccessLevel.ALL));
         }
     }
@@ -346,13 +346,13 @@ class CaseAccessServiceTest {
         @Nested
         @DisplayName("when a solicitor")
         class WhenSolicitor {
-            private final String[] ROLES = {
+            private final String[] roles = {
                 "judiciary-solicitor"
             };
 
             @BeforeEach
             void setUp() {
-                withRoles(ROLES);
+                withRoles(roles);
             }
 
             @Test
@@ -368,13 +368,13 @@ class CaseAccessServiceTest {
         @Nested
         @DisplayName("when a citizen")
         class WhenCitizen {
-            private final String[] ROLES = {
+            private final String[] roles = {
                 "citizen"
             };
 
             @BeforeEach
             void setUp() {
-                withRoles(ROLES);
+                withRoles(roles);
             }
 
             @Test
@@ -390,13 +390,13 @@ class CaseAccessServiceTest {
         @Nested
         @DisplayName("when a letter holder")
         class WhenLetterHolder {
-            private final String[] ROLES = {
+            private final String[] roles = {
                 "letter-holder"
             };
 
             @BeforeEach
             void setUp() {
-                withRoles(ROLES);
+                withRoles(roles);
             }
 
             @Test
@@ -412,13 +412,13 @@ class CaseAccessServiceTest {
         @Nested
         @DisplayName("when a case worker")
         class WhenCaseWorker {
-            private final String[] ROLES = {
+            private final String[] roles = {
                 "caseworker-divorce"
             };
 
             @BeforeEach
             void setUp() {
-                withRoles(ROLES);
+                withRoles(roles);
             }
 
             @Test

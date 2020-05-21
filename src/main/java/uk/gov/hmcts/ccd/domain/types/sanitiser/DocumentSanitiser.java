@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
@@ -41,7 +41,7 @@ public class DocumentSanitiser implements Sanitiser {
         return TYPE;
     }
 
-    public JsonNode sanitise(FieldType fieldType, JsonNode fieldData) {
+    public JsonNode sanitise(FieldTypeDefinition fieldTypeDefinition, JsonNode fieldData) {
         final ObjectNode sanitisedData = JSON_NODE_FACTORY.objectNode();
 
         if ((fieldData.has(DOCUMENT_BINARY_URL)
@@ -52,35 +52,37 @@ public class DocumentSanitiser implements Sanitiser {
             final String documentUrl = fieldData.get(DOCUMENT_URL).textValue();
 
             sanitisedData.put(DOCUMENT_URL, documentUrl);
-            Document document = documentManagementRestClient.getDocument(fieldType, documentUrl);
+            Document document = documentManagementRestClient.getDocument(fieldTypeDefinition, documentUrl);
 
             Binary binary = document.get_links().getBinary();
-            validateBinaryLink(fieldType, binary);
+            validateBinaryLink(fieldTypeDefinition, binary);
             sanitisedData.put(DOCUMENT_BINARY_URL, binary.getHref());
-            validateDocumentFilename(fieldType, document);
+            validateDocumentFilename(fieldTypeDefinition, document);
             sanitisedData.put(DOCUMENT_FILENAME, document.getOriginalDocumentName());
             return sanitisedData;
         }
     }
 
-    private void validateBinaryLink(FieldType fieldType, Binary binary) {
+    private void validateBinaryLink(FieldTypeDefinition fieldTypeDefinition, Binary binary) {
         if (binary == null || StringUtils.isBlank(binary.getHref())) {
             LOG.error(String.format(
                 "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary url missing",
-                fieldType.getType(), fieldType.getId()));
-            throw new ValidationException(String.format("Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary url missing",
-                fieldType.getType(), fieldType.getId()));
+                fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
+            throw new ValidationException(String.format(
+                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary url missing",
+                fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
 
         }
     }
 
-    private void validateDocumentFilename(FieldType fieldType, Document document) {
+    private void validateDocumentFilename(FieldTypeDefinition fieldTypeDefinition, Document document) {
         if (StringUtils.isBlank(document.getOriginalDocumentName())) {
             LOG.error(String.format(
                 "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document filename missing",
-                fieldType.getType(), fieldType.getId()));
-            throw new ValidationException(String.format("Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document filename missing",
-                fieldType.getType(), fieldType.getId()));
+                fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
+            throw new ValidationException(String.format(
+                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document filename missing",
+                fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
 
         }
     }

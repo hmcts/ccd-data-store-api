@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -16,28 +16,28 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 public class CollectionSanitiserTest {
 
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
     private static final String TYPE_1 = "Type1";
-    private static final FieldType FIELD_1_TYPE = new FieldType();
+    private static final FieldTypeDefinition FIELD_1_TYPE = new FieldTypeDefinition();
 
     private static final JsonNode ITEM_1_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 1");
     private static final JsonNode ITEM_1_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 1");
     private static final JsonNode ITEM_2_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 2");
     private static final JsonNode ITEM_2_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 2");
 
-    private static final FieldType COLLECTION_FIELD_TYPE = new FieldType();
+    private static final FieldTypeDefinition COLLECTION_FIELD_TYPE = new FieldTypeDefinition();
     private static final JsonNode UNIQUE_ID = JSON_FACTORY.textNode("123");
 
     static {
         FIELD_1_TYPE.setId(TYPE_1);
         FIELD_1_TYPE.setType(TYPE_1);
 
-        COLLECTION_FIELD_TYPE.setCollectionFieldType(FIELD_1_TYPE);
+        COLLECTION_FIELD_TYPE.setCollectionFieldTypeDefinition(FIELD_1_TYPE);
     }
 
     private Sanitiser type1Sanitiser;

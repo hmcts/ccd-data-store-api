@@ -23,15 +23,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final AuthCheckerServiceAndUserFilter authCheckerFilter;
     private static final String[] AUTH_WHITELIST = {
-            "/swagger-ui.html",
-            "/webjars/springfox-swagger-ui/**",
-            "/swagger-resources/**",
-            "/v2/**",
-            "/health",
-            "/health/liveness",
-            "/status/health",
-            "/loggers/**",
-            "/"
+        "/swagger-ui.html",
+        "/webjars/springfox-swagger-ui/**",
+        "/swagger-resources/**",
+        "/v2/**",
+        "/health",
+        "/health/liveness",
+        "/status/health",
+        "/loggers/**",
+        "/"
     };
 
     @Inject

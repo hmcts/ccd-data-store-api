@@ -3,19 +3,12 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.List;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -31,7 +24,11 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
+import javax.transaction.Transactional;
+import java.util.List;
+
 import static org.springframework.http.ResponseEntity.status;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.*;
 
 @RestController
 @RequestMapping(path = "/")
@@ -85,6 +82,8 @@ public class CaseController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
+    @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
+        jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
@@ -129,6 +128,8 @@ public class CaseController {
             message = V2.Error.CASE_ALTERED
         )
     })
+    @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction",
+        caseType = "#result.body.caseType", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createEvent(@PathVariable("caseId") String caseId,
                                                     @RequestBody final CaseDataContent content) {
         if (!caseReferenceService.validateUID(caseId)) {
@@ -210,6 +211,8 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
+    @LogAudit(operationType = CREATE_CASE, caseId = "#result.body.reference",
+        jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {

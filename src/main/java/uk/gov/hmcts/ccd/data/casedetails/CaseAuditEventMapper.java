@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class CaseAuditEventMapper {
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP_TYPE = new TypeReference<HashMap<String, JsonNode>>() {
     };
 
     public AuditEvent entityToModel(final CaseAuditEventEntity caseAuditEventEntity) {
@@ -51,6 +51,12 @@ public class CaseAuditEventMapper {
             auditEvent.setSignificantItem(significantItem);
         }
         return auditEvent;
+    }
+
+    public List<AuditEvent> entityToModel(final List<CaseAuditEventEntity> caseEventEntities) {
+        return caseEventEntities.stream()
+            .map(this::entityToModel)
+            .collect(Collectors.toList());
     }
 
     public CaseAuditEventEntity modelToEntity(final AuditEvent auditEvent) {
@@ -88,11 +94,5 @@ public class CaseAuditEventMapper {
             newCaseAuditEventEntity.setSignificantItemEntity(significantItemEntity);
         }
         return newCaseAuditEventEntity;
-    }
-
-    public List<AuditEvent> entityToModel(final List<CaseAuditEventEntity> caseEventEntities) {
-        return caseEventEntities.stream()
-                                .map(this::entityToModel)
-                                .collect(Collectors.toList());
     }
 }

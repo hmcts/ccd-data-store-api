@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 @Named
 @Singleton
@@ -40,10 +40,10 @@ public class CollectionSanitiser implements Sanitiser {
     }
 
     @Override
-    public JsonNode sanitise(FieldType fieldType, JsonNode fieldData) {
+    public JsonNode sanitise(FieldTypeDefinition fieldTypeDefinition, JsonNode fieldData) {
         final ArrayNode sanitisedData = JSON_NODE_FACTORY.arrayNode();
 
-        final FieldType itemType = fieldType.getCollectionFieldType();
+        final FieldTypeDefinition itemType = fieldTypeDefinition.getCollectionFieldTypeDefinition();
 
         fieldData.forEach(item -> {
             if (item.hasNonNull(VALUE)) {

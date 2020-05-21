@@ -16,13 +16,11 @@ Background:
 
 
   @S-109
-  Scenario: must return appropriate negative response for a user not having a profile in CCD
+  Scenario: must return a list of jurisdictions for a valid user with no CCD user profile
     Given a user with [no profile in CCD]
     When a request is prepared with appropriate values
-    And the request [uses a Case ID that doesn’t exist in CCD]
     And it is submitted to call the [Get default settings for user] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [has the 403 return code]
+    Then a positive response is received
     And the response has all the details as expected
 
   @S-107 @Ignore # re-write as part of RDM-6847
