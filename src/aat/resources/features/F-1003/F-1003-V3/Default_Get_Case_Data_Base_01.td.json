@@ -1,0 +1,141 @@
+{
+  "_guid_": "Default_Get_Case_Data_Base_01",
+  "_extends_": "Default_Get_Case_Data_Base",
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8"
+    },
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "{{TEST_URL}}/cases/${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+        }
+      },
+      "id" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+      "jurisdiction" : "BEFTA_JURISDICTION_2",
+      "case_type" : "BEFTA_CASETYPE_2_1",
+      "created_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "state" : "TODO",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "MoneyGBPField" : null,
+        "FixedListField" : "VALUE2",
+        "AddressUKField" : {
+          "County" : null,
+          "Country" : null,
+          "PostCode" : null,
+          "PostTown" : null,
+          "AddressLine1" : null,
+          "AddressLine2" : null,
+          "AddressLine3" : null
+        },
+        "DocumentField1" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField2" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_01][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_01][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_01][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField3" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_02][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_02][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_02][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField4" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_03][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_03][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_03][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField5" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_04][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_04][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_04][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField6" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_05][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_05][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_05][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField7" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_06][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_06][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_06][customValues][documentIdInTheResponse]}/binary"
+        },
+        "ComplexField" : {
+          "ComplexTextField" : "aefaefa",
+          "ComplexNestedField" : {
+            "NestedNumberField" : null,
+            "NestedCollectionTextField" : [ ]
+          },
+          "ComplexFixedListField" : "VALUE2"
+        },
+        "FixedRadioListField" : "RADIOVALUE3",
+        "DateTimeField" : null,
+        "PhoneUKField" : "08888899999",
+        "NumberField" : "11111",
+        "MultiSelectListField" : [ "OPTION5", "OPTION4", "OPTION3" ],
+        "YesOrNoField" : "No",
+        "EmailField" : "a@b.com",
+        "TextField" : "A text fields",
+        "DateField" : null,
+        "TextAreaField" : "fqeadadfTSFGsfs`f`sfs`f",
+        "CollectionField" : [ ]
+      },
+      "data_classification" : {
+        "MoneyGBPField" : "PUBLIC",
+        "FixedListField" : "PUBLIC",
+        "AddressUKField" : {
+          "value" : {
+            "County" : "PUBLIC",
+            "Country" : "PUBLIC",
+            "PostCode" : "PUBLIC",
+            "PostTown" : "PUBLIC",
+            "AddressLine1" : "PUBLIC",
+            "AddressLine2" : "PUBLIC",
+            "AddressLine3" : "PUBLIC"
+          },
+          "classification" : "PUBLIC"
+        },
+        "DocumentField1" : "PUBLIC",
+        "DocumentField2" : "PUBLIC",
+        "DocumentField3" : "PUBLIC",
+        "DocumentField4" : "PUBLIC",
+        "DocumentField5" : "PUBLIC",
+        "DocumentField6" : "PUBLIC",
+        "DocumentField7" : "PUBLIC",
+        "FixedRadioListField" : "PUBLIC",
+        "DateTimeField" : "PUBLIC",
+        "PhoneUKField" : "PUBLIC",
+        "NumberField" : "PUBLIC",
+        "MultiSelectListField" : "PUBLIC",
+        "YesOrNoField" : "PUBLIC",
+        "EmailField" : "PUBLIC",
+        "TextField" : "PUBLIC",
+        "DateField" : "PUBLIC",
+        "TextAreaField" : "PUBLIC",
+        "CollectionField" : {
+          "value" : [ ],
+          "classification" : "PUBLIC"
+        }
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}

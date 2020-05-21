@@ -1,0 +1,81 @@
+{
+  "id": "CollectionField",
+  "label": "A `Collection` of `Text` fields",
+  "hidden": false,
+  "order": null,
+  "metadata": false,
+  "case_type_id": "BEFTA_CASETYPE_2_1",
+  "hint_text": "Zero to many items, here of type `Text`",
+  "field_type": {
+    "id": "CollectionField-dece6e7d-cd0a-4926-9e32-6992e20bc4cb",
+    "type": "Collection",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": {
+      "id": "Text",
+      "type": "Text",
+      "min": null,
+      "max": null,
+      "regular_expression": null,
+      "fixed_list_items": [],
+      "complex_fields": null,
+      "collection_field_type": {
+        "id": "Text",
+        "type": "Text",
+        "min": null,
+        "max": null,
+        "regular_expression": null,
+        "fixed_list_items": [],
+        "complex_fields": null,
+        "collection_field_type": null
+      }
+    }
+  },
+  "security_classification": "PUBLIC",
+  "live_from": "2017-01-01",
+  "live_until": null,
+  "show_condition": null,
+  "acls": [
+    {
+      "role": "caseworker-befta_jurisdiction_2",
+      "create": true,
+      "read": true,
+      "update": true,
+      "delete": false
+    },
+    {
+      "role": "caseworker-befta_jurisdiction_2-solicitor_1",
+      "create": true,
+      "read": true,
+      "update": true,
+      "delete": false
+    },
+    {
+      "role": "caseworker-befta_jurisdiction_2-solicitor_2",
+      "create": true,
+      "read": true,
+      "update": true,
+      "delete": false
+    },
+    {
+      "role": "caseworker-befta_jurisdiction_2-solicitor_3",
+      "create": true,
+      "read": true,
+      "update": true,
+      "delete": false
+    },
+    {
+      "role": "citizen",
+      "create": true,
+      "read": true,
+      "update": true,
+      "delete": false
+    }
+  ],
+  "complexACLs": [],
+  "display_context": null,
+  "display_context_parameter": null
+}

@@ -1,0 +1,45 @@
+{
+  "_guid_": "S-1013_Get_Case_Data_Base",
+  "_extends_": "F-1002-Default_Get_Case_Data_Base",
+
+  "specs": [
+    "to get the same case containing new documents from data store"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "{{TEST_URL}}/cases/${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+        }
+      },
+      "id" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+      "data" : {
+        "MoneyGBPField" : "10131013",
+        "EmailField" : "S1013NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate",
+        "DocumentField1" : {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField2": {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_2][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_2][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_2][customValues][documentIdInTheResponse]}/binary"
+        },
+        "DocumentField3": {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_3][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_3][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_3][customValues][documentIdInTheResponse]}/binary"
+        }
+      }
+    }
+  }
+}

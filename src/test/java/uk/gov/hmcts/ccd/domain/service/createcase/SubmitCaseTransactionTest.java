@@ -1,15 +1,47 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.isNotNull;
+import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -26,23 +58,12 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import uk.gov.hmcts.ccd.v3.V3;
 
 class SubmitCaseTransactionTest {
 
@@ -64,6 +85,10 @@ class SubmitCaseTransactionTest {
     public static final String DESCRIPTION = "Description";
     public static final String URL = "http://www.yahooo.com";
     public static final SignificantItemType DOCUMENT = SignificantItemType.DOCUMENT;
+
+    public static final String COMPLEX = "Complex";
+    public static final String COLLECTION = "Collection";
+
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -90,6 +115,21 @@ class SubmitCaseTransactionTest {
     @Mock
     private UserAuthorisation userAuthorisation;
 
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
+    private CaseDocumentAttacher caseDocumentAttacher;
+
+    @Mock
+    private SecurityUtils securityUtils;
+
+    @Mock
+    private HttpServletRequest request;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -109,7 +149,12 @@ class SubmitCaseTransactionTest {
                                                           uidService,
                                                           securityClassificationService,
                                                           caseUserRepository,
-                                                          userAuthorisation);
+                                                          userAuthorisation,
+                                                          request,
+                                                          restTemplate,
+                                                          applicationParams,
+                                                          securityUtils
+        );
 
         event = buildEvent();
         caseType = buildCaseType();
@@ -117,6 +162,9 @@ class SubmitCaseTransactionTest {
         eventTrigger = buildEventTrigger();
         state = buildState();
         final AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn("http://localhost:4455").when(applicationParams).getCaseDocumentAmApiHost();
+        doReturn("/cases/documents/attachToCase").when(applicationParams).getAttachDocumentPath();
+        doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(STATE_ID).when(savedCaseDetails).getState();
 
         doReturn(state).when(caseTypeService).findState(caseType, STATE_ID);
@@ -188,6 +236,113 @@ class SubmitCaseTransactionTest {
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
             () -> assertAuditEvent(auditEventCaptor.getValue())
         );
+    }
+
+    @Test
+    @DisplayName("should create a case for V3 endpoint")
+    void shouldPersistCreateCaseEventV2() throws IOException {
+        doReturn(V3.MediaType.CREATE_CASE).when(request).getContentType();
+        CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setState("SomeState");
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+                                                                             null,
+                                                                             inputCaseDetails, caseType, IGNORE_WARNING
+                                                                            );
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        inputCaseDetails.setData(dataMap);
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
+        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
+        doReturn(responseEntity).when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         inputCaseDetails,
+                                         IGNORE_WARNING);
+
+
+        verify(restTemplate , times(1)).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+    }
+
+    @Test
+    @DisplayName("should create a case for V3 endpoint")
+    void shouldPersistCreateCaseEventV2NoCallback() throws IOException {
+        doReturn(V3.MediaType.CREATE_CASE).when(request).getContentType();
+        CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setState("SomeState");
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+                                                                             null,
+                                                                             inputCaseDetails, caseType, IGNORE_WARNING
+                                                                            );
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        inputCaseDetails.setData(dataMap);
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
+        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
+        doReturn(responseEntity).when(restTemplate).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         inputCaseDetails,
+                                         IGNORE_WARNING);
+
+        verify(restTemplate , times(1)).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
+    }
+
+    @Test
+    @DisplayName("should not invoke any methods corresponding to create case v3")
+    void shouldNotInvokeAttachDocumentToCase() throws IOException {
+        CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setState("SomeState");
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+                                                                             null,
+                                                                             inputCaseDetails, caseType, IGNORE_WARNING
+                                                                            );
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        inputCaseDetails.setData(dataMap);
+        doReturn(dataMap).when(this.caseDetails).getData();
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         inputCaseDetails,
+                                         IGNORE_WARNING);
+
+        verify(restTemplate , times(0)).exchange(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.any(),
+            ArgumentMatchers.<Class<String>>any());
     }
 
     @Test
@@ -267,6 +422,15 @@ class SubmitCaseTransactionTest {
             () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
     }
 
+    private void assertCaseData(final CaseDetails caseDetails) {
+        assertAll("Assert Casedetails",
+                  () -> assertThat(caseDetails.getData().get("DocumentField4"), isNotNull()),
+                  () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_url"), isNotNull()),
+                  () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_binary_url"), isNotNull())
+
+                 );
+    }
+
     private void assertAuditEventWithSignificantDocument(final AuditEvent auditEvent) {
         assertAll("Audit event",
             () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
@@ -319,4 +483,15 @@ class SubmitCaseTransactionTest {
         idamUser.setEmail(IDAM_EMAIL);
         return idamUser;
     }
+
+    static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
+        InputStream inputStream =
+            SubmitCaseTransactionTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
+
+        HashMap<String, JsonNode> result =
+            new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {});
+
+        return result;
+    }
+
 }

@@ -135,6 +135,18 @@ class CaseControllerTest {
         }
 
         @Test
+        @DisplayName("should call V3 endpoint and return 201 when case event created")
+        void caseEventCreatedV21() {
+            final ResponseEntity<CaseResource> response = caseController.createEventV3(CASE_REFERENCE, CASE_DATA_CONTENT);
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
+                () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE))
+            );
+        }
+
+
+        @Test
         @DisplayName("should propagate BadRequestException when case reference not valid")
         void caseReferenceNotValid() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
@@ -170,6 +182,21 @@ class CaseControllerTest {
                 () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE)),
                 () -> assertThat(response.getBody().getLastStateModifiedOn(), is(stateModified))
             );
+        }
+
+        @Test
+        @DisplayName("should call V3 endpoint and return 201 when case is created")
+        void caseEventCreatedV21() {
+            LocalDateTime stateModified = LocalDateTime.now();
+            when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
+
+            final ResponseEntity<CaseResource> response = caseController.createCaseV3(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
+                () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE)),
+                () -> assertThat(response.getBody().getLastStateModifiedOn(), is(stateModified))
+                     );
         }
 
         @Test

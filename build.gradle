@@ -142,7 +142,7 @@ configurations {
 }
 
 checkstyle {
-    maxWarnings = 2934 // In the Ideal world this should be 0
+    maxWarnings = 2970 // In the Ideal world this should be 0
     toolVersion = '8.18'
 }
 
@@ -270,7 +270,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '2.6.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '2.7.0'
 }
 // end::dependencies[]
 
