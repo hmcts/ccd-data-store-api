@@ -29,6 +29,6 @@ public final class V3 {
         public static final String CASE_ID_INVALID = "Case ID is not valid";
         public static final String CASE_ALTERED = "Case altered outside of transaction";
         public static final String CASE_FIELD_INVALID = "Cannot validate case field";
-        public static final String GRANT_FORBIDDEN = "Grant action is reserved to users with entire jurisdiction access";
+        public static final String GRANT_FORBIDDEN = "The user has provided an invalid hashToken for document";
     }
 }
