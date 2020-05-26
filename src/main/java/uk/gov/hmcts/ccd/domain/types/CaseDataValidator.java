@@ -1,26 +1,27 @@
 package uk.gov.hmcts.ccd.domain.types;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 @Named
 @Singleton
 public class CaseDataValidator {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
 
@@ -66,7 +67,7 @@ public class CaseDataValidator {
 
         if (BaseType.get(COMPLEX) == fieldType) {
             return validate(
-                MAPPER.convertValue(dataValue, STRING_JSON_MAP),
+                JacksonUtils.convertValue(dataValue),
                 caseFieldDefinition.getFieldTypeDefinition().getComplexFields(),
                 fieldIdPrefix + dataFieldId + FIELD_SEPARATOR);
         } else if (BaseType.get(COLLECTION) == fieldType) {
@@ -129,7 +130,7 @@ public class CaseDataValidator {
             return validateSimpleField(index, itemValue, caseFieldDefinition, fieldIdPrefix, baseType);
         } else if (itemValue.isObject()) {
             return validate(
-                MAPPER.convertValue(itemValue, STRING_JSON_MAP),
+                JacksonUtils.convertValue(itemValue),
                 fieldTypeDefinition.getComplexFields(),
                 itemFieldId + FIELD_SEPARATOR);
         }

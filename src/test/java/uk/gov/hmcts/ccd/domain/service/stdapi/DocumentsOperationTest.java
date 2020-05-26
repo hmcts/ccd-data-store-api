@@ -1,21 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.stdapi;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -35,10 +19,24 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
+
 @AutoConfigureWireMock(port = 0)
 @DirtiesContext
 public class DocumentsOperationTest extends BaseTest {
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
@@ -95,7 +93,7 @@ public class DocumentsOperationTest extends BaseTest {
     @Test
     public void shouldReturnNoDocumentsIfNoDocumentsRetrieved() throws Exception {
         stubFor(post(urlMatching(TEST_URL + ".*"))
-                    .willReturn(okJson(mapper.writeValueAsString(new ArrayList<>())).withStatus(200)));
+            .willReturn(okJson(mapper.writeValueAsString(new ArrayList<>())).withStatus(200)));
 
         final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
         assertEquals("Incorrect number of documents", 0, results.size());

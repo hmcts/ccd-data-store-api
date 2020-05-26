@@ -1,11 +1,23 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+
+import java.io.IOException;
+import java.util.Map;
+
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.STRING_JSON_MAP;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.addressesStart;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getPeopleCollectionFieldDefinition;
@@ -24,21 +36,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBu
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-
-import java.io.IOException;
-import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 class CompoundAccessControlServiceTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private CompoundAccessControlService compoundAccessControlService;
     private static final String newAddress1 = "      {\n"
         + "        \"value\": {\n"
@@ -1660,14 +1659,14 @@ class CompoundAccessControlServiceTest {
             people += args[i] + (i == args.length - 1 ? "" : ",");
         }
         people = people + peopleEnd;
-        final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(people), STRING_JSON_MAP);
+        final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(people));
 
-        return MAPPER.convertValue(data, JsonNode.class);
+        return JacksonUtils.convertValueJsonNode(data);
     }
 
     static JsonNode generateJsonNodeWithData(String stringData) throws IOException {
-        final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(stringData), STRING_JSON_MAP);
+        final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(stringData));
 
-        return MAPPER.convertValue(data, JsonNode.class);
+        return JacksonUtils.convertValueJsonNode(data);
     }
 }

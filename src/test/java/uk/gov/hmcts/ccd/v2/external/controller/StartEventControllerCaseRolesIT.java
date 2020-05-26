@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -17,6 +19,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.v2.CaseRolesTestData;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -24,9 +28,17 @@ import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.Assert.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -40,15 +52,13 @@ public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
     private static JsonNode CALLBACK_DATA = null;
     private static final String CALLBACK_DATA_JSON_STRING =
         "{\n" +
-        "  \"PersonFirstName\": \"ccd-First Name\"\n" +
-        "}\n";
-
+            "  \"PersonFirstName\": \"ccd-First Name\"\n" +
+            "}\n";
     private static JsonNode CALLBACK_DATA_CLASSIFICATION = null;
     private static final String CALLBACK_DATA_CLASSIFICATION_JSON_STRING =
         "{\n" +
-        "    \"PersonFirstName\": \"PUBLIC\"\n" +
-        "}";
-
+            "    \"PersonFirstName\": \"PUBLIC\"\n" +
+            "  }";
     @Inject
     private WebApplicationContext wac;
 
@@ -88,8 +98,8 @@ public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
+        callbackResponse.setDataClassification(JacksonUtils.convertValue(CALLBACK_DATA_CLASSIFICATION));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/CaseRolesCase"))
@@ -113,5 +123,18 @@ public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
         assertEquals("Unexpected CaseDetails.data size", 1, startEventResource.getCaseDetails().getData().size());
 
         assertTrue(startEventResource.getCaseDetails().getData().containsKey("PersonFirstName"));
+    }
+
+    private Matcher<Iterable<? extends CaseViewField>> hasIds(String[] expectedIds) {
+        return containsInAnyOrder(Arrays.stream(expectedIds).map(this::id).collect(Collectors.toList()));
+    }
+
+    private Matcher<CaseViewField> id(String id) {
+        return new FeatureMatcher<CaseViewField, String>(equalTo(id), "id", "id") {
+            @Override
+            protected String featureValueOf(CaseViewField actual) {
+                return actual.getId();
+            }
+        };
     }
 }
