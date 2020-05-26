@@ -23,7 +23,7 @@ java:
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=require"
     DATA_STORE_DB_MAX_POOL_SIZE: 48
     CCD_DRAFT_TTL_DAYS: 180
-    DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,bulk_scan_payment_processor,ccd_case_document_am_api,pcq_consolidation_service,em_npa_app
+    DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,bulk_scan_payment_processor,pcq_consolidation_service,em_npa_app,ecm_consumer,ccd_case_document_am_api
     DEFINITION_CACHE_MAX_IDLE_SEC: 259200
     DEFINITION_CACHE_LATEST_VERSION_TTL_SEC: 1
     DEFINITION_CACHE_MAX_SIZE: 5000
