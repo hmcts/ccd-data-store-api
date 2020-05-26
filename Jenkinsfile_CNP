@@ -94,7 +94,6 @@ withPipeline(type, product, component) {
     disableLegacyDeploymentOnAAT()
     loadVaultSecrets(secrets)
     enableDbMigration('ccd')
-    installCharts()
     disableLegacyDeployment()
 
     after('test') {
