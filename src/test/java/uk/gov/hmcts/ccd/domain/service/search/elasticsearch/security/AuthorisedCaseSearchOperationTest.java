@@ -247,9 +247,9 @@ class AuthorisedCaseSearchOperationTest {
 
         @Test
         void shouldAllowAllPassedAuthorisedCaseTypes() {
-            UICaseSearchResult uiCaseSearchResult = UICaseSearchResult.EMPTY;
-            CaseSearchResult caseSearchResult = new CaseSearchResult();
-            List<String> caseTypeIds = Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2);
+            final UICaseSearchResult uiCaseSearchResult = UICaseSearchResult.EMPTY;
+            final CaseSearchResult caseSearchResult = new CaseSearchResult();
+            final List<String> caseTypeIds = Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2);
             CaseTypeDefinition caseTypeDefinition2 = new CaseTypeDefinition();
             caseTypeDefinition2.setId(CASE_TYPE_ID_2);
             when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ))
@@ -266,8 +266,8 @@ class AuthorisedCaseSearchOperationTest {
 
         @Test
         void shouldRemoveNonAuthorisedCaseTypes() {
-            UICaseSearchResult uiCaseSearchResult = UICaseSearchResult.EMPTY;
-            CaseSearchResult caseSearchResult = new CaseSearchResult();
+            final UICaseSearchResult uiCaseSearchResult = UICaseSearchResult.EMPTY;
+            final CaseSearchResult caseSearchResult = new CaseSearchResult();
             List<String> caseTypeIds = Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2);
             when(userService.getUserCaseTypes()).thenReturn(singletonList(caseTypeDefinition));
             when(caseSearchOperation.executeInternal(any(), any(), any())).thenReturn(uiCaseSearchResult);
@@ -281,8 +281,8 @@ class AuthorisedCaseSearchOperationTest {
 
         @Test
         void shouldUseAllAuthorisedCaseTypesWhenNoneSpecified() {
-            UICaseSearchResult uiCaseSearchResult = UICaseSearchResult.EMPTY;
-            CaseSearchResult caseSearchResult = new CaseSearchResult();
+            final UICaseSearchResult uiCaseSearchResult = UICaseSearchResult.EMPTY;
+            final CaseSearchResult caseSearchResult = new CaseSearchResult();
             CaseTypeDefinition caseTypeDefinition2 = new CaseTypeDefinition();
             caseTypeDefinition2.setId(CASE_TYPE_ID_2);
             when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ))
