@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Strings;
 
 import java.util.Arrays;
@@ -17,10 +19,12 @@ public enum UseCase {
         this.reference = reference;
     }
 
+    @JsonValue
     public String getReference() {
         return reference;
     }
 
+    @JsonCreator
     public static UseCase valueOfReference(String reference) {
         if (Strings.isNullOrEmpty(reference)) {
             return DEFAULT;
