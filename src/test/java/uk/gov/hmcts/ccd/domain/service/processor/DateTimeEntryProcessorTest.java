@@ -150,9 +150,9 @@ class DateTimeEntryProcessorTest {
         assertAll(
             () -> assertThat(result.isArray(), is(true)),
             () -> assertThat(result.size(), is(2)),
-            //() -> assertThat(result.get(0).get(CollectionValidator.VALUE).asText(), is("2020-03-13T00:00:00.000")),
+            () -> assertThat(result.get(0).get(CollectionValidator.VALUE).asText(), is("2020-03-13T00:00:00.000")),
             () -> assertThat(result.get(0).get("id").asText(), is("id1")),
-            //() -> assertThat(result.get(1).get(CollectionValidator.VALUE).asText(), is("1995-12-25T00:00:00.000")),
+            () -> assertThat(result.get(1).get(CollectionValidator.VALUE).asText(), is("1995-12-25T00:00:00.000")),
             () -> assertThat(result.get(1).get("id").asText(), is("id2"))
         );
     }
@@ -194,8 +194,8 @@ class DateTimeEntryProcessorTest {
         assertAll(
             () -> assertThat(result.isObject(), is(true)),
             () -> assertThat(result.size(), is(2)),
-            //() -> assertThat(result.get("ComplexDateTimeField").asText(), is("2001-01-01T00:00:00.000")),
-            //() -> assertThat(result.get("ComplexNestedField").get("NestedDateField").asText(), is("1970-12-01")),
+            () -> assertThat(result.get("ComplexDateTimeField").asText(), is("2001-01-01T00:00:00.000")),
+            () -> assertThat(result.get("ComplexNestedField").get("NestedDateField").asText(), is("1970-12-01")),
             () -> assertThat(result.get("ComplexNestedField").get("NestedCollectionTextField").isArray(), is(true)),
             () -> assertThat(result.get("ComplexNestedField").get("NestedCollectionTextField").size(), is(0))
         );
