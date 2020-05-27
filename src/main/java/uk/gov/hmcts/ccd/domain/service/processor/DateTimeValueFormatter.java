@@ -20,7 +20,6 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
 import static uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter.getDisplayContextParameterOfType;
@@ -92,12 +91,12 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
         final DisplayContext displayContext = displayContext(topLevelField, override);
 
-        if ((hasDisplayContextParameterType(caseViewField.getDisplayContextParameter(), ENUM_MAP.get(displayContext))
-            && isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES))
-            || BaseType.get(COMPLEX) == collectionFieldType) {
+        if (shouldExecuteCollection(collectionNode, caseViewField, ENUM_MAP.get(displayContext), collectionFieldType, SUPPORTED_TYPES)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
+                final JsonNode valueNode = item.get(CollectionValidator.VALUE);
+                final String valueToConvert = valueNode.isNull() ? null : valueNode.asText();
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
                     isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
                         ? createNode(
@@ -105,8 +104,8 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
                             item.get(CollectionValidator.VALUE).asText(),
                             collectionFieldType,
                             fieldPath,
-                            displayContext)
-                        : executeComplex(
+                            displayContext) :
+                        executeComplex(
                             item.get(CollectionValidator.VALUE),
                             caseViewField.getFieldTypeDefinition().getChildren(),
                             null,

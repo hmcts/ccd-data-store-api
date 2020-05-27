@@ -1,11 +1,10 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @DisplayName("Create case")
 class CreateCaseTest extends BaseTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String NOT_FOUND_CASE_REFERENCE = "1234123412341238";
     private static final String INVALID_CASE_REFERENCE = "1234123412341234";
     private static final String INVALID_EVENT_TRIGGER_ID = "invalidEvent";
@@ -119,7 +117,7 @@ class CreateCaseTest extends BaseTest {
             .withEventId(eventId)
             .withToken(eventToken)
             .toCaseDataContent();
-        return () -> MAPPER.convertValue(caseDataContent, JsonNode.class).toString();
+        return () -> JacksonUtils.convertValueJsonNode(caseDataContent).toString();
     }
 
 }

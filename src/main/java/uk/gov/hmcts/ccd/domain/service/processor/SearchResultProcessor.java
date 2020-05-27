@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
+import static uk.gov.hmcts.ccd.domain.service.processor.FieldProcessor.isNullOrEmpty;
+
 @Component
 public class SearchResultProcessor {
 
@@ -59,11 +61,11 @@ public class SearchResultProcessor {
 
     private Object processObject(final Object object,
                                  final SearchResultViewColumn viewColumn) {
-        if (object instanceof TextNode && !FieldProcessor.isNullOrEmpty((TextNode) object)) {
+        if (object instanceof TextNode && !isNullOrEmpty((TextNode) object)) {
             return createTextNodeFrom((TextNode) object, viewColumn, viewColumn.getCaseFieldId());
-        } else if (object instanceof ArrayNode && !FieldProcessor.isNullOrEmpty((ArrayNode) object)) {
+        } else if (object instanceof ArrayNode && !isNullOrEmpty((ArrayNode) object)) {
             return createArrayNodeFrom((ArrayNode) object, viewColumn, viewColumn.getCaseFieldId());
-        } else if (object instanceof ObjectNode && !FieldProcessor.isNullOrEmpty((ObjectNode) object)) {
+        } else if (object instanceof ObjectNode && !isNullOrEmpty((ObjectNode) object)) {
             return createObjectNodeFrom((ObjectNode) object,
                 viewColumn,
                 viewColumn.getCaseFieldTypeDefinition().getComplexFields(),
@@ -80,7 +82,7 @@ public class SearchResultProcessor {
                                           final SearchResultViewColumn viewColumn,
                                           final List<CaseFieldDefinition> complexCaseFields,
                                           final String fieldPrefix) {
-        if (FieldProcessor.isNullOrEmpty(originalNode)) {
+        if (isNullOrEmpty(originalNode)) {
             return originalNode;
         }
 
@@ -92,7 +94,7 @@ public class SearchResultProcessor {
             final JsonNode caseFieldNode = originalNode.get(fieldId);
             final String fieldPath = fieldPrefix + FIELD_SEPARATOR + fieldId;
 
-            if (FieldProcessor.isNullOrEmpty(caseFieldNode)) {
+            if (isNullOrEmpty(caseFieldNode)) {
                 newNode.set(fieldId, caseFieldNode);
             } else if (complexFieldType == BaseType.get(COLLECTION)) {
                 newNode.set(fieldId,
@@ -144,16 +146,27 @@ public class SearchResultProcessor {
         ArrayNode newNode = MAPPER.createArrayNode();
         originalNode.forEach(item -> {
             JsonNode newItem = item.deepCopy();
-            ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                item.get(CollectionValidator.VALUE) instanceof TextNode
-                    ? createTextNodeFrom((TextNode) item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix)
-                    : createObjectNodeFrom((ObjectNode) item.get(CollectionValidator.VALUE),
-                                           viewColumn,
-                                           viewColumn.getCaseFieldTypeDefinition().getChildren(),
-                                           fieldPrefix));
+            if (newItem.isObject()) {
+                ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
+                    createCollectionValue(item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix));
+            }
             newNode.add(newItem);
         });
 
         return newNode;
+    }
+
+    private JsonNode createCollectionValue(JsonNode existingValue,
+                                           SearchResultViewColumn viewColumn,
+                                           String fieldPrefix) {
+        if (isNullOrEmpty(existingValue)) {
+            return existingValue;
+        }
+        return existingValue instanceof TextNode
+            ? createTextNodeFrom((TextNode) existingValue, viewColumn, fieldPrefix) :
+            createObjectNodeFrom((ObjectNode) existingValue,
+                                viewColumn,
+                                viewColumn.getCaseFieldTypeDefinition().getChildren(),
+                                fieldPrefix);
     }
 }

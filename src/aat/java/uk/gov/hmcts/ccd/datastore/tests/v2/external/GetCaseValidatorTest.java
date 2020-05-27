@@ -1,20 +1,21 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
-import java.util.function.Supplier;
-
 import static java.lang.Boolean.FALSE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import java.util.function.Supplier;
+
+import io.restassured.specification.RequestSpecification;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.*;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -22,7 +23,6 @@ import uk.gov.hmcts.ccd.v2.V2;
 
 @DisplayName("Get UI start trigger by case type and event ids")
 class GetCaseValidatorTest extends BaseTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final String INVALID_CASE_TYPE_ID = "invalidCaseType";
     private static final String INVALID_EVENT_TRIGGER_ID = "invalidEvent";
@@ -78,7 +78,7 @@ class GetCaseValidatorTest extends BaseTest {
                 .withData(caseDataSupplier.get())
                 .withEventId(eventId)
                 .toCaseDataContent();
-            return () -> MAPPER.convertValue(caseDataContent, JsonNode.class).toString();
+            return () -> JacksonUtils.convertValueJsonNode(caseDataContent).toString();
         }
 
     }
