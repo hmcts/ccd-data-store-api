@@ -101,7 +101,8 @@ class CrossCaseTypeSearchRequestTest {
                 () -> assertThat(sourceFields, hasItem(MetaData.CaseField.JURISDICTION.getDbColumnName())),
                 () -> assertThat(sourceFields, hasItem(MetaData.CaseField.SECURITY_CLASSIFICATION.getDbColumnName())),
                 () -> assertThat(sourceFields, hasItem(MetaData.CaseField.LAST_MODIFIED_DATE.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.STATE.getDbColumnName()))
+                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.STATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem("data_classification"))
             );
         }
     }

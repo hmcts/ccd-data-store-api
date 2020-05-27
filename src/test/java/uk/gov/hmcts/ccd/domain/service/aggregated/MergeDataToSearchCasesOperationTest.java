@@ -1,0 +1,413 @@
+package uk.gov.hmcts.ccd.domain.service.aggregated;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.UseCase;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewColumn;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchHeaderMetadata;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil.CaseDetailsBuilder.caseDetails;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+
+class MergeDataToSearchCasesOperationTest {
+
+    private static final String CASE_TYPE_ID_1 = "CASE_TYPE_1";
+    private static final String CASE_TYPE_ID_2 = "CASE_TYPE_2";
+    private static final String JURISDICTION = "JURISDICTION";
+    private static final String CASE_FIELD_1 = "Case field 1";
+    private static final String CASE_FIELD_2 = "Case field 2";
+    private static final String CASE_FIELD_3 = "Case field 3";
+    private static final String CASE_FIELD_4 = "Case field 4";
+    private static final String CASE_FIELD_5 = "Case field 5";
+    private static final String ROLE_IN_USER_ROLE_1 = "Role 1";
+    private static final String ROLE_IN_USER_ROLE_2 = "Role 2";
+    private static final String ROLE_NOT_IN_USER_ROLE = "Role X";
+
+    private static final String FAMILY_DETAILS = "FamilyDetails";
+    private static final String FATHER_NAME_VALUE = "Simmon";
+    private static final String MOTHER_NAME_VALUE = "Hanna";
+    private static final String POSTCODE_VALUE = "SW1P 4ER";
+    private static final String FAMILY_DETAILS_VALUE = "{\"FatherName\":\"" + FATHER_NAME_VALUE + "\","
+                                                       + "\"MotherName\":\"" + MOTHER_NAME_VALUE + "\","
+                                                       + "\"FamilyAddress\":{"
+                                                       + "\"County\":\"\","
+                                                       + "\"Country\":\"United Kingdom\","
+                                                       + "\"PostCode\":\"" + POSTCODE_VALUE + "\","
+                                                       + "\"PostTown\":\"London\","
+                                                       + "\"AddressLine1\":\"40 Edric House\","
+                                                       + "\"AddressLine2\":\"\",\"AddressLine3\":\"\"}"
+                                                       + "}";
+    private static final String FAMILY_DETAILS_PATH = "FatherName";
+    private static final String FAMILY_DETAILS_PATH_NESTED = "FamilyAddress.PostCode";
+    private static final String FAMILY = "FamilyDetails";
+    private static final String FATHER_NAME = "FatherName";
+    private static final String MOTHER_NAME = "MotherName";
+    private static final String FAMILY_ADDRESS = "FamilyAddress";
+    private static final String ADDRESS_LINE_1 = "AddressLine1";
+    private static final String POSTCODE = "PostCode";
+
+    private static final String TEXT_TYPE = "Text";
+    private static final String SEPARATOR = ".";
+
+    private static final LocalDateTime CREATED_DATE = LocalDateTime.of(2000, 1, 2, 12, 0);
+    private static final LocalDateTime LAST_MODIFIED_DATE = LocalDateTime.of(1987, 12, 4, 17, 30);
+    private static final LocalDateTime LAST_STATE_MODIFIED_DATE = LocalDateTime.of(2015, 6, 17, 20, 45);
+    private static final SecurityClassification SECURITY_CLASSIFICATION = SecurityClassification.PUBLIC;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private GetCaseTypeOperation getCaseTypeOperation;
+
+    @Mock
+    private SearchQueryOperation searchQueryOperation;
+
+    private MergeDataToSearchCasesOperation classUnderTest;
+
+    private Map<String, JsonNode> dataMap;
+    private JurisdictionDefinition jurisdiction;
+    private CaseSearchResult caseSearchResult;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        MockitoAnnotations.initMocks(this);
+
+        dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3, CASE_FIELD_4, CASE_FIELD_5);
+        ObjectNode familyDetails = (ObjectNode) new ObjectMapper().readTree(FAMILY_DETAILS_VALUE);
+        dataMap.put(FAMILY_DETAILS, familyDetails);
+
+        CaseDetails caseDetails1 = caseDetails().withReference(999L).withData(dataMap).withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(JURISDICTION).withState("state1").withCreated(CREATED_DATE).withLastModified(LAST_MODIFIED_DATE)
+            .withLastStateModified(LAST_STATE_MODIFIED_DATE).withSecurityClassification(SECURITY_CLASSIFICATION).build();
+        CaseDetails caseDetails2 = caseDetails().withReference(1000L).withData(dataMap).withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(JURISDICTION).withState("state2").build();
+        CaseDetails caseDetails3 = caseDetails().withReference(1001L).withData(dataMap).withCaseTypeId(CASE_TYPE_ID_2)
+            .withJurisdiction(JURISDICTION).withState("state2").build();
+
+        caseSearchResult = new CaseSearchResult(3L, Arrays.asList(caseDetails1, caseDetails2, caseDetails3));
+
+        final CaseFieldDefinition fatherName = newCaseField().withId(FATHER_NAME).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition motherName = newCaseField().withId(MOTHER_NAME).withFieldType(textFieldType()).build();
+
+        final CaseFieldDefinition addressLine1 = newCaseField().withId(ADDRESS_LINE_1).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE).withFieldType(textFieldType()).build();
+        final FieldTypeDefinition addressFieldTypeDefinition = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
+            .withComplexField(addressLine1).withComplexField(postCode).build();
+        final CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition).build();
+
+        final FieldTypeDefinition familyDetailsFieldTypeDefinition =
+            aFieldType().withId(FAMILY).withType(COMPLEX)
+                .withComplexField(fatherName)
+                .withComplexField(motherName)
+                .withComplexField(familyAddress)
+                .build();
+
+        jurisdiction = new JurisdictionDefinition();
+        jurisdiction.setId(JURISDICTION);
+        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(jurisdiction)
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition).build())
+            .build();
+
+        CaseTypeDefinition caseTypeDefinition2 = newCaseType()
+            .withCaseTypeId(CASE_TYPE_ID_2)
+            .withJurisdiction(jurisdiction)
+            .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
+            .build();
+
+        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeDefinition1));
+        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_2), any())).thenReturn(Optional.of(caseTypeDefinition2));
+
+        SearchResult caseType1SearchResult = searchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, ""),
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_2, "", CASE_FIELD_2, ""))
+            .build();
+        SearchResult caseType2SearchResult = searchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID_2, CASE_FIELD_4, "", CASE_FIELD_4, ""))
+            .build();
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
+
+        classUnderTest = new MergeDataToSearchCasesOperation(userRepository, getCaseTypeOperation, searchQueryOperation);
+    }
+
+    @Test
+    void shouldBuildCaseSearchResultHeaders() {
+        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2),
+            caseSearchResult, UseCase.WORKBASKET);
+
+        assertAll(
+            () -> assertThat(uiCaseSearchResult.getHeaders().size(), is(2)),
+            () -> assertMetadata(uiCaseSearchResult.getHeaders().get(0).getMetadata(), CASE_TYPE_ID_1, JURISDICTION),
+            () -> assertCasesList(uiCaseSearchResult.getHeaders().get(0).getCases(), 2, "999", "1000"),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(2)),
+            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(0), CASE_FIELD_1, CASE_FIELD_1, TEXT_TYPE),
+            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(1), CASE_FIELD_2, CASE_FIELD_2, TEXT_TYPE),
+            () -> assertMetadata(uiCaseSearchResult.getHeaders().get(1).getMetadata(), CASE_TYPE_ID_2, JURISDICTION),
+            () -> assertCasesList(uiCaseSearchResult.getHeaders().get(1).getCases(), 1, "1001"),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(1).getFields().size(), is(1)),
+            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(1).getFields().get(0), CASE_FIELD_4, CASE_FIELD_4, TEXT_TYPE)
+        );
+    }
+
+    @Test
+    void shouldBuildCaseSearchResultCases() {
+        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2),
+            caseSearchResult, UseCase.ORG_CASES);
+
+        Map<String, Object> caseDataDifferences = Maps.difference(uiCaseSearchResult.getCases().get(0).getFields(),
+            dataMap).entriesOnlyOnRight();
+        assertAll(
+            () -> assertThat(uiCaseSearchResult.getCases().size(), is(3)),
+            () -> assertThat(uiCaseSearchResult.getCases().get(0).getCaseId(), is("999")),
+            () -> assertThat(uiCaseSearchResult.getCases().get(1).getCaseId(), is("1000")),
+            () -> assertThat(uiCaseSearchResult.getCases().get(2).getCaseId(), is("1001")),
+            () -> assertThat(caseDataDifferences.isEmpty(), is(true)),
+            () -> assertThat(Maps.difference(uiCaseSearchResult.getCases().get(0).getFieldsFormatted(),
+                uiCaseSearchResult.getCases().get(0).getFields()).areEqual(), is(true)),
+            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[JURISDICTION]"), is(JURISDICTION)),
+            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[STATE]"), is("state1")),
+            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[LAST_STATE_MODIFIED_DATE]"), is(LAST_STATE_MODIFIED_DATE)),
+            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[CREATED_DATE]"), is(CREATED_DATE)),
+            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[CASE_REFERENCE]"), is(999L)),
+            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[SECURITY_CLASSIFICATION]"), is(SECURITY_CLASSIFICATION)),
+            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[CASE_TYPE]"), is(CASE_TYPE_ID_1)),
+            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[LAST_MODIFIED_DATE]"), is(LAST_MODIFIED_DATE))
+        );
+    }
+
+    @Test
+    void shouldBuildCaseSearchResultTotal() {
+        final UICaseSearchResult searchResultView = classUnderTest.execute(Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2),
+            caseSearchResult, UseCase.WORKBASKET);
+
+        assertAll(
+            () -> assertThat(searchResultView.getTotal(), is(3L))
+        );
+    }
+
+    @Test
+    void shouldBuildHeaderFieldsWithComplexFields() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, ""),
+                buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME, ""),
+                buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME, ""))
+            .build();
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+
+        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1),
+            caseSearchResult, UseCase.WORKBASKET);
+
+        assertAll(
+            () -> assertThat(uiCaseSearchResult.getHeaders().size(), is(1)),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(3)),
+            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(0),
+                CASE_FIELD_1, CASE_FIELD_1, TEXT_TYPE),
+            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(1),
+                FAMILY_DETAILS + SEPARATOR + FATHER_NAME, FATHER_NAME, TEXT_TYPE),
+            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(2),
+                FAMILY_DETAILS + SEPARATOR + MOTHER_NAME, MOTHER_NAME, TEXT_TYPE)
+        );
+    }
+
+    @Test
+    void shouldBuildHeaderFieldsForPermittedRoles() {
+        CaseTypeDefinition caseTypeDefinition = newCaseType()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(jurisdiction)
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
+            .build();
+        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_4, "",   CASE_FIELD_4, "");
+        searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
+        SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_5, "", CASE_FIELD_5, "");
+        searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, ""),
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_2, "", CASE_FIELD_2, ""),
+                searchResultFieldWithValidRole,
+                searchResultFieldWithInvalidRole)
+            .build();
+        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeDefinition));
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1));
+
+        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1),
+            caseSearchResult, UseCase.WORKBASKET);
+
+        assertAll(
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(3)),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(2).getCaseFieldId(), is(CASE_FIELD_4))
+        );
+    }
+
+    @Test
+    void shouldBuildHeaderFieldsWithNoDuplicateColumnsForMultiplePermittedRoles() {
+        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_4, "", CASE_FIELD_4, "");
+        searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
+        SearchResultField searchResultFieldWithValidRole2 = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_4, "", CASE_FIELD_4, "");
+        searchResultFieldWithValidRole2.setRole(ROLE_IN_USER_ROLE_2);
+        SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_5, "", CASE_FIELD_5, "");
+        searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, ""),
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, ""),
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, ""),
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_2, "", CASE_FIELD_2, ""),
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_2, "", CASE_FIELD_2, ""),
+                searchResultFieldWithValidRole,
+                searchResultFieldWithValidRole2,
+                searchResultFieldWithInvalidRole)
+            .build();
+        CaseTypeDefinition caseTypeDefinition = newCaseType()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(jurisdiction)
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).build())
+            .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
+            .build();
+        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeDefinition));
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+
+        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1),
+            caseSearchResult, UseCase.WORKBASKET);
+
+        assertAll(
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(3)),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(2).getCaseFieldId(), is(CASE_FIELD_4))
+        );
+    }
+
+    @Test
+    void shouldBuildResultsWithComplexNestedElements() {
+        SearchResult searchResult = searchResult().withSearchResultFields(
+            buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FAMILY_DETAILS_PATH, FAMILY_DETAILS, ""),
+            buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FAMILY_DETAILS_PATH_NESTED, FAMILY_DETAILS, ""))
+            .build();
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+
+        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1),
+            caseSearchResult, UseCase.WORKBASKET);
+
+        assertAll(
+            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(0),
+                FAMILY + SEPARATOR + FATHER_NAME, FAMILY_DETAILS, TEXT_TYPE),
+            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(1),
+                FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED, FAMILY_DETAILS, TEXT_TYPE),
+            () -> assertThat(((TextNode)uiCaseSearchResult.getCases().get(0).getFields()
+                    .get(FAMILY + SEPARATOR + FATHER_NAME)).asText(), is(FATHER_NAME_VALUE)),
+            () -> assertThat(((TextNode)uiCaseSearchResult.getCases().get(0).getFields()
+                    .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asText(), is(POSTCODE_VALUE))
+        );
+    }
+
+    @Test
+    void shouldThrowBadRequestExceptionWhenNoNestedElementFoundForPath() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID_1,
+                FAMILY_DETAILS, "InvalidElement",
+                FAMILY_DETAILS, ""))
+            .build();
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+
+        final BadRequestException exception = assertThrows(BadRequestException.class,
+            () -> classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1), caseSearchResult, UseCase.WORKBASKET));
+
+        assertAll(
+            () -> assertThat(exception.getMessage(), is("CaseField FamilyDetails has no nested elements with code InvalidElement."))
+        );
+    }
+
+    @Test
+    void shouldThrowBadRequestExceptionWhenNoNestedElementFoundForPath1() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID_1,
+                FAMILY_DETAILS, "InvalidElementPath",
+                FAMILY_DETAILS, ""))
+            .build();
+        CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID_1).withJurisdiction(jurisdiction)
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()).build();
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeWithoutCaseFieldDefinition));
+
+        final BadRequestException exception = assertThrows(BadRequestException.class,
+            () -> classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1), caseSearchResult, UseCase.WORKBASKET));
+
+        assertAll(
+            () -> assertThat(exception.getMessage(), is("Nested element not found for path InvalidElementPath"))
+        );
+    }
+
+    private void assertMetadata(UICaseSearchHeaderMetadata metadata, String caseTypeId, String jurisdiction) {
+        assertAll(
+            () -> assertThat(metadata.getJurisdiction(), is(jurisdiction)),
+            () -> assertThat(metadata.getCaseTypeId(), is(caseTypeId))
+        );
+    }
+
+    private void assertCasesList(List<String> actualValues, int expectedSize, String... expectedValues) {
+        assertAll(
+            () -> assertThat(actualValues.size(), is(expectedSize)),
+            () -> IntStream.range(0, actualValues.size()).forEach(idx -> assertThat(actualValues.get(idx), is(expectedValues[idx])))
+        );
+    }
+
+    private void assertHeaderField(SearchResultViewColumn field, String caseFieldId, String label, String fieldType) {
+        assertAll(
+            () -> assertThat(field.getCaseFieldId(), is(caseFieldId)),
+            () -> assertThat(field.getLabel(), is(label)),
+            () -> assertThat(field.getCaseFieldTypeDefinition().getType(), is(fieldType))
+        );
+    }
+
+    private FieldTypeDefinition textFieldType() {
+        return aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build();
+    }
+}
