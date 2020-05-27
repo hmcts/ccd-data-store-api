@@ -2,15 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -79,20 +72,4 @@ class CaseDetailsUtil extends CaseDetails {
             return caseDetails;
         }
     }
-//
-//    static SearchResultField buildSearchResultField(String caseTypedId,
-//                                                    String caseFieldId,
-//                                                    String caseFieldPath,
-//                                                    String label,
-//                                                    String displayContextParameter) {
-//        SearchResultField searchResultField = new SearchResultField();
-//        searchResultField.setCaseFieldId(caseFieldId);
-//        searchResultField.setCaseFieldPath(caseFieldPath);
-//        searchResultField.setCaseTypeId(caseTypedId);
-//        searchResultField.setLabel(label);
-//        searchResultField.setDisplayOrder(1);
-//        searchResultField.setDisplayContextParameter(displayContextParameter);
-//        return searchResultField;
-//    }
-//
 }

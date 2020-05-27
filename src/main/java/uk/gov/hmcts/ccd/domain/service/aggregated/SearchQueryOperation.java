@@ -24,7 +24,6 @@ import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
@@ -100,13 +99,21 @@ public class SearchQueryOperation {
             case ORG_CASES:
                 return uiDefinitionRepository.getSearchCasesResult(caseTypeId, useCase);
             default:
-                // TODO: Only requested fields
                 return buildSearchResultFromCaseFields(caseTypeDefinition);
         }
     }
 
     public List<SortOrderField> getSortOrders(CaseTypeDefinition caseType, UseCase useCase) {
         return getSortOrders(getSearchResultDefinition(caseType, useCase));
+    }
+
+    private List<SortOrderField> getSortOrders(SearchResult searchResult) {
+        return Arrays.stream(searchResult.getFields())
+            .filter(this::hasSortField)
+            .filter(this::filterByRole)
+            .sorted(Comparator.comparing(srf -> srf.getSortOrder().getPriority()))
+            .map(this::toSortOrderField)
+            .collect(Collectors.toList());
     }
 
     private SearchResult buildSearchResultFromCaseFields(final CaseTypeDefinition caseTypeDefinition) {
@@ -129,15 +136,6 @@ public class SearchQueryOperation {
     private void addSortOrderFields(MetaData metadata, SearchResult searchResult) {
         List<SortOrderField> sortOrders = getSortOrders(searchResult);
         metadata.setSortOrderFields(sortOrders);
-    }
-
-    private List<SortOrderField> getSortOrders(SearchResult searchResult) {
-        return Arrays.stream(searchResult.getFields())
-            .filter(this::hasSortField)
-            .filter(this::filterByRole)
-            .sorted(Comparator.comparing(srf -> srf.getSortOrder().getPriority()))
-            .map(this::toSortOrderField)
-            .collect(Collectors.toList());
     }
 
     private boolean hasSortField(SearchResultField searchResultField) {

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.search.elasticsearch;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -18,16 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UICaseSearchResultTest {
 
-    private final static String JURISDICTION = "Jurisdiction";
-    private final static String CASE_TYPE = "CaseTypeA";
-
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
+    private static final String JURISDICTION = "Jurisdiction";
+    private static final String CASE_TYPE = "CaseTypeA";
 
     @Test
     void shouldFindHeaderByCaseType() {

@@ -120,10 +120,10 @@ class ElasticsearchQueryHelperTest {
 
     @Test
     void shouldPrepareBasicCrossCaseTypeRequest() {
-        String QUERY_STRING = "{\"_source\":[\"alias.TextAlias\",\"alias.DateAlias\"],\"query\":{}}";
+        String queryString = "{\"_source\":[\"alias.TextAlias\",\"alias.DateAlias\"],\"query\":{}}";
 
         final CrossCaseTypeSearchRequest request = elasticsearchQueryHelper
-            .prepareRequest(Arrays.asList(CASE_TYPE_A, CASE_TYPE_B), UseCase.ORG_CASES.getReference(), QUERY_STRING);
+            .prepareRequest(Arrays.asList(CASE_TYPE_A, CASE_TYPE_B), UseCase.ORG_CASES.getReference(), queryString);
 
         assertAll(
             () -> assertThat(request.getCaseTypeIds().size(), is(2)),

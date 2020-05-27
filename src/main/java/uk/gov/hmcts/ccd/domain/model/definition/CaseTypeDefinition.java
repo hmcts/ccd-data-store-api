@@ -6,16 +6,13 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 

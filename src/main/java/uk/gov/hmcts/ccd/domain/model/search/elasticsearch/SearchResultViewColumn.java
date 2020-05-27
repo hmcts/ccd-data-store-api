@@ -5,10 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter;
-import uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameterType;
-
-import java.util.Optional;
 
 @NoArgsConstructor
 @AllArgsConstructor
