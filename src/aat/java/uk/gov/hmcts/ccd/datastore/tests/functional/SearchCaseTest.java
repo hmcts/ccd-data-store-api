@@ -1,18 +1,19 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
-import io.restassured.http.ContentType;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import io.restassured.http.ContentType;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
-
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @ExtendWith(CaseTestDataLoaderExtension.class)
 @DisplayName("Search cases")
@@ -43,7 +44,7 @@ class SearchCaseTest extends BaseTest {
     @DisplayName("should retrieve when a case exists if caseworker has 'CRUD' access on CaseType")
     void shouldRetrieveCaseWhenExistsWithFullAccessForCaseType() {
         // Prepare new case in known state
-        final Long caseReference = createFullCase("AAT_AUTH_15");
+        createFullCase("AAT_AUTH_15");
 
         asAutoTestCaseworker()
             .get()
@@ -63,7 +64,7 @@ class SearchCaseTest extends BaseTest {
     @DisplayName("should retrieve when a case exists if caseworker has 'CR' access on CaseType")
     void shouldRetrieveCaseWhenExistsWithCRAccessForCaseType() {
         // Prepare new case in known state
-        final Long caseReference = createFullCase("AAT_AUTH_3");
+        createFullCase("AAT_AUTH_3");
 
         asAutoTestCaseworker()
             .get()
@@ -83,7 +84,7 @@ class SearchCaseTest extends BaseTest {
     @DisplayName("should retrieve when a case exists if caseworker has 'R' access on CaseType")
     void shouldRetrieveCaseWhenExistsWithRAccessForCaseType() {
         // Prepare new case in known state
-        final Long caseReference = createFullCase("AAT_AUTH_2");
+        createFullCase("AAT_AUTH_2");
 
         asAutoTestCaseworker()
             .get()
@@ -103,7 +104,7 @@ class SearchCaseTest extends BaseTest {
     @DisplayName("should retrieve when a case exists if caseworker has 'RU' access on CaseType")
     void shouldRetrieveCaseWhenExistsWithRUAccessForCaseType() {
         // Prepare new case in known state
-        final Long caseReference = createFullCase("AAT_AUTH_6");
+        createFullCase("AAT_AUTH_6");
 
         asAutoTestCaseworker()
             .get()
@@ -123,7 +124,7 @@ class SearchCaseTest extends BaseTest {
     @DisplayName("should retrieve empty result when a case exists if caseworker has 'CU' access on CaseType")
     void shouldRetrieveEmptyResultWhenExistsWithCRAccessForCaseType() {
         // Prepare new case in known state
-        final Long caseReference = createFullCase("AAT_AUTH_5");
+        createFullCase("AAT_AUTH_5");
 
         asAutoTestCaseworker()
             .get()
@@ -143,7 +144,7 @@ class SearchCaseTest extends BaseTest {
     @DisplayName("should retrieve empty result when a case exists if caseworker has 'U' access on CaseType")
     void shouldRetrieveEmptyResultWhenExistsWithUAccessForCaseType() {
         // Prepare new case in known state
-        final Long caseReference = createFullCase("AAT_AUTH_4");
+        createFullCase("AAT_AUTH_4");
 
         asAutoTestCaseworker()
             .get()
@@ -163,7 +164,7 @@ class SearchCaseTest extends BaseTest {
     @DisplayName("should retrieve empty result when a case exists if caseworker has 'D' access on CaseType")
     void shouldRetrieveEmptyResultWhenExistsWithDAccessForCaseType() {
         // Prepare new case in known state
-        final Long caseReference = createFullCase("AAT_AUTH_8");
+        createFullCase("AAT_AUTH_8");
 
         asAutoTestCaseworker()
             .get()
@@ -183,7 +184,7 @@ class SearchCaseTest extends BaseTest {
     @DisplayName("should retrieve empty result when a case exists if caseworker has 'C' access on CaseType")
     void shouldRetrieveEmptyResultWhenExistsWithCAccessForCaseType() {
         // Prepare new case in known state
-        final Long caseReference = createFullCase("AAT_AUTH_1");
+        createFullCase("AAT_AUTH_1");
 
         asAutoTestCaseworker()
             .get()
