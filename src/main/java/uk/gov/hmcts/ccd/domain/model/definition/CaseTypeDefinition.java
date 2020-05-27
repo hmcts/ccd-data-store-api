@@ -2,13 +2,22 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
 @ToString
 public class CaseTypeDefinition implements Serializable {
@@ -167,5 +176,28 @@ public class CaseTypeDefinition implements Serializable {
     @JsonIgnore
     public Optional<CaseFieldDefinition> getCaseField(String caseFieldId) {
         return caseFieldDefinitions.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
+    }
+
+    @JsonIgnore
+    public Optional<CommonField> getCommonFieldByPath(String path) {
+        if (StringUtils.isBlank(path)) {
+            return Optional.empty();
+        }
+        List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(toList());
+
+        Optional<CaseFieldDefinition> topLevelCaseField = getCaseField(pathElements.get(0));
+        if (topLevelCaseField.isPresent()) {
+            return topLevelCaseField.get().getComplexFieldNestedField(pathElements.stream().skip(1).collect(Collectors.joining(",")));
+        }
+
+        return Optional.empty();
+    }
+
+    @JsonIgnore
+    public Map<String, TextNode> getLabelsFromCaseFields() {
+        return getCaseFieldDefinitions()
+            .stream()
+            .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
+            .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField -> instance.textNode(caseField.getLabel())));
     }
 }

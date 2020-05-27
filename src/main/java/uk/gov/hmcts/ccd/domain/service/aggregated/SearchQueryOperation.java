@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
+import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
@@ -65,7 +67,8 @@ public class SearchQueryOperation {
             return new SearchResultView(Collections.emptyList(), Collections.emptyList(), NO_ERROR);
         }
 
-        final SearchResult searchResult = getSearchResultDefinition(caseType.get(), view);
+        final SearchResult searchResult = getSearchResultDefinition(caseType.get(),
+            view == null ? UseCase.SEARCH : UseCase.valueOfReference(view));
 
         addSortOrderFields(metadata, searchResult);
 
@@ -87,22 +90,51 @@ public class SearchQueryOperation {
         return mergeDataToSearchResultOperation.execute(caseType.get(), searchResult, draftsAndCases, draftResultError);
     }
 
-    private SearchResult getSearchResultDefinition(final CaseTypeDefinition caseTypeDefinition, final String view) {
-        if (WORKBASKET.equalsIgnoreCase(view)) {
-            return uiDefinitionRepository.getWorkBasketResult(caseTypeDefinition.getId());
+    public SearchResult getSearchResultDefinition(final CaseTypeDefinition caseTypeDefinition, final UseCase useCase) {
+        final String caseTypeId = caseTypeDefinition.getId();
+        switch (useCase) {
+            case WORKBASKET:
+                return uiDefinitionRepository.getWorkBasketResult(caseTypeId);
+            case SEARCH:
+                return uiDefinitionRepository.getSearchResult(caseTypeId);
+            case ORG_CASES:
+                return uiDefinitionRepository.getSearchCasesResult(caseTypeId, useCase);
+            default:
+                // TODO: Only requested fields
+                return buildSearchResultFromCaseFields(caseTypeDefinition);
         }
-        return uiDefinitionRepository.getSearchResult(caseTypeDefinition.getId());
     }
 
-    private void addSortOrderFields(MetaData metadata,SearchResult searchResult) {
+    public List<SortOrderField> getSortOrders(CaseTypeDefinition caseType, UseCase useCase) {
+        return getSortOrders(getSearchResultDefinition(caseType, useCase));
+    }
+
+    private SearchResult buildSearchResultFromCaseFields(final CaseTypeDefinition caseTypeDefinition) {
+        SearchResult searchResult = new SearchResult();
+        List<SearchResultField> searchResultFields = new ArrayList<>();
+
+        caseTypeDefinition.getCaseFieldDefinitions().forEach(field -> {
+            SearchResultField searchResultField = new SearchResultField();
+            searchResultField.setCaseFieldId(field.getId());
+            searchResultField.setCaseTypeId(field.getCaseTypeId());
+            searchResultField.setLabel(field.getLabel());
+            searchResultField.setMetadata(field.isMetadata());
+            searchResultFields.add(searchResultField);
+        });
+
+        searchResult.setFields(searchResultFields.toArray(new SearchResultField[0]));
+        return searchResult;
+    }
+
+    private void addSortOrderFields(MetaData metadata, SearchResult searchResult) {
         List<SortOrderField> sortOrders = getSortOrders(searchResult);
         metadata.setSortOrderFields(sortOrders);
     }
 
     private List<SortOrderField> getSortOrders(SearchResult searchResult) {
         return Arrays.stream(searchResult.getFields())
-            .filter(searchResultField -> hasSortField(searchResultField))
-            .filter(searchResultField -> filterByRole(searchResultField))
+            .filter(this::hasSortField)
+            .filter(this::filterByRole)
             .sorted(Comparator.comparing(srf -> srf.getSortOrder().getPriority()))
             .map(this::toSortOrderField)
             .collect(Collectors.toList());

@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 /**
@@ -179,6 +180,30 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                     "Problem getting WorkBasketResult definition for case type: %s because of %s",
                     caseTypeId,
                     e.getMessage()));
+        }
+    }
+
+    @Override
+    public SearchResult getSearchCasesResult(int version, String caseTypeId, UseCase useCase) {
+        try {
+            final Instant start = Instant.now();
+            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            final SearchResult
+                searchResult =
+                restTemplate.exchange(withVersionQueryParam(applicationParams.displaySearchCasesResultDefURL(caseTypeId, useCase), version),
+                    HttpMethod.GET,
+                    requestEntity,
+                    SearchResult.class).getBody();
+            final Duration duration = Duration.between(start, Instant.now());
+            LOG.debug("Rest API getSearchCasesResultGetHttp called for {}, finished in {}",
+                caseTypeId,
+                duration.toMillis());
+            return searchResult;
+        } catch (final Exception e) {
+            throw new ServiceException(String.format(
+                "Problem getting SearchCasesResult definition for case type: %s because of %s",
+                caseTypeId,
+                e.getMessage()));
         }
     }
 

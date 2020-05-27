@@ -127,19 +127,19 @@ class CaseSearchEndpointTest {
 
         endpoint.searchCases(singletonList(CASE_TYPE_ID), query);
 
-        verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class));
+        verify(caseSearchOperation).executeExternal(any(CrossCaseTypeSearchRequest.class));
     }
 
     @Test
     void searchCaseDetailsInvokesOperation() {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
         CaseSearchResult result = mock(CaseSearchResult.class);
-        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
+        when(caseSearchOperation.executeExternal(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
 
         CaseSearchResult caseSearchResult = endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest);
 
-        verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class));
+        verify(caseSearchOperation).executeExternal(any(CrossCaseTypeSearchRequest.class));
         assertThat(caseSearchResult, is(result));
     }
 }

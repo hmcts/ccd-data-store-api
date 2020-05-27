@@ -18,12 +18,8 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
-import uk.gov.hmcts.ccd.domain.model.definition.SortOrder;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
@@ -201,7 +197,7 @@ public class SearchQueryOperationTest {
         doReturn(drafts).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
 
-        searchQueryOperation.execute("not a" + WORKBASKET, metadata, criteria);
+        searchQueryOperation.execute(SEARCH_VIEW, metadata, criteria);
 
         assertAll(
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
@@ -331,6 +327,79 @@ public class SearchQueryOperationTest {
         assertThat(metadata.getSortOrderFields().size(), is(1));
         assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_ID_1_2 + "." + CASE_FIELD_PATH));
         assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC));
+    }
+
+    @Test
+    public void shouldGetSearchResultDefinitionForWorkbasket() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
+            .build();
+        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
+
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, UseCase.WORKBASKET);
+
+        verify(uiDefinitionRepository).getWorkBasketResult(eq(CASE_TYPE_ID));
+        verifyNoMoreInteractions(uiDefinitionRepository);
+        assertAll(
+            () -> assertThat(result, is(searchResult))
+        );
+    }
+
+    @Test
+    public void shouldGetSearchResultDefinitionForSearch() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
+            .build();
+        doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
+
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, UseCase.SEARCH);
+
+        verify(uiDefinitionRepository).getSearchResult(eq(CASE_TYPE_ID));
+        verifyNoMoreInteractions(uiDefinitionRepository);
+        assertAll(
+            () -> assertThat(result, is(searchResult))
+        );
+    }
+
+    @Test
+    public void shouldGetSearchResultDefinitionForOrgCases() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
+            .build();
+        doReturn(searchResult).when(uiDefinitionRepository).getSearchCasesResult(CASE_TYPE_ID, UseCase.ORG_CASES);
+
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, UseCase.ORG_CASES);
+
+        verify(uiDefinitionRepository).getSearchCasesResult(eq(CASE_TYPE_ID), eq(UseCase.ORG_CASES));
+        verifyNoMoreInteractions(uiDefinitionRepository);
+        assertAll(
+            () -> assertThat(result, is(searchResult))
+        );
+    }
+
+    @Test
+    public void shouldGetSearchResultDefinitionForDefaultUseCase() {
+        CaseFieldDefinition caseField = newCaseField()
+            .withId(CASE_FIELD_ID_1_1)
+            .withCaseTypeId(CASE_TYPE_ID)
+            .withFieldLabelText("Label")
+            .withMetadata(true)
+            .build();
+        CaseTypeDefinition caseTypeDefinition = newCaseType()
+            .withId(CASE_TYPE_ID)
+            .withField(caseField)
+            .build();
+
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, UseCase.DEFAULT);
+
+        verifyNoMoreInteractions(uiDefinitionRepository);
+        assertAll(
+            () -> assertThat(result.getFields().length, is(1)),
+            () -> assertThat(result.getFields()[0].getCaseFieldId(), is(CASE_FIELD_ID_1_1)),
+            () -> assertThat(result.getFields()[0].getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(result.getFields()[0].getLabel(), is("Label")),
+            () -> assertThat(result.getFields()[0].isMetadata(), is(true))
+        );
     }
 
     private static SearchResultField buildSortResultField(String caseFieldId,

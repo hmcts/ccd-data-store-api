@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 
 @Named
 @Singleton
@@ -36,6 +37,11 @@ public class UIDefinitionRepository {
     public SearchResult getSearchResult(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
         return cachedUiDefinitionGateway.getSearchResult(version.getVersion(), caseTypeId);
+    }
+
+    public SearchResult getSearchCasesResult(final String caseTypeId, final UseCase useCase) {
+        final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
+        return cachedUiDefinitionGateway.getSearchCasesResult(version.getVersion(), caseTypeId, useCase);
     }
 
     public SearchInputFieldsDefinition getSearchInputFieldDefinitions(final String caseTypeId) {

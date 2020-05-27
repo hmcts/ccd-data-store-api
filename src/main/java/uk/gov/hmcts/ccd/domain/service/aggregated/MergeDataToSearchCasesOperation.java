@@ -4,72 +4,99 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
-import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
-import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
-import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.UseCase;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
-@Named
-@Singleton
-public class MergeDataToSearchResultOperation {
+@Service
+public class MergeDataToSearchCasesOperation {
 
     private final UserRepository userRepository;
-    private final SearchResultProcessor searchResultProcessor;
+    private final GetCaseTypeOperation getCaseTypeOperation;
+    private final SearchQueryOperation searchQueryOperation;
 
-    public MergeDataToSearchResultOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                            final SearchResultProcessor searchResultProcessor) {
+    public MergeDataToSearchCasesOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                                           @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
+                                           final SearchQueryOperation searchQueryOperation) {
         this.userRepository = userRepository;
-        this.searchResultProcessor = searchResultProcessor;
+        this.getCaseTypeOperation = getCaseTypeOperation;
+        this.searchQueryOperation = searchQueryOperation;
     }
 
-    public SearchResultView execute(final CaseTypeDefinition caseTypeDefinition,
-                                    final SearchResult searchResult,
-                                    final List<CaseDetails> caseDetails,
-                                    final String resultError) {
-
-        final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseTypeDefinition, searchResult);
-
-        final List<SearchResultViewItem> viewItems = caseDetails.stream()
-            .map(caseData -> buildSearchResultViewItem(caseData, caseTypeDefinition, searchResult))
-            .collect(Collectors.toList());
-
-        return searchResultProcessor.execute(viewColumns, viewItems, resultError);
+    public UICaseSearchResult execute(final List<String> caseTypeIds,
+                                      final CaseSearchResult caseSearchResult,
+                                      final UseCase useCase) {
+        return new UICaseSearchResult(
+            buildHeaders(caseTypeIds, useCase, caseSearchResult),
+            buildItems(useCase, caseSearchResult),
+            caseSearchResult.getTotal()
+        );
     }
 
-    private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseTypeDefinition caseTypeDefinition,
-                                                                    SearchResult searchResult) {
+    private List<SearchResultViewItem> buildItems(UseCase useCase, CaseSearchResult caseSearchResult) {
+        List<SearchResultViewItem> items = new ArrayList<>();
+        caseSearchResult.getCases().forEach(caseDetails -> {
+            getCaseTypeDefinition(caseDetails.getCaseTypeId()).ifPresent(caseType -> {
+                final SearchResult searchResult = searchQueryOperation.getSearchResultDefinition(caseType, useCase);
+                items.add(buildSearchResultViewItem(caseDetails, caseType, searchResult));
+            });
+        });
+
+        return items;
+    }
+
+    private List<UICaseSearchHeader> buildHeaders(List<String> caseTypeIds, UseCase useCase, CaseSearchResult caseSearchResult) {
+        List<UICaseSearchHeader> headers = new ArrayList<>();
+        caseTypeIds.forEach(caseTypeId -> {
+            getCaseTypeDefinition(caseTypeId).ifPresent(caseType -> {
+                UICaseSearchHeader caseSearchHeader = buildHeader(useCase, caseSearchResult, caseTypeId, caseType);
+                headers.add(caseSearchHeader);
+            });
+        });
+
+        return headers;
+    }
+
+    private Optional<CaseTypeDefinition> getCaseTypeDefinition(String caseTypeId) {
+        return getCaseTypeOperation.execute(caseTypeId, CAN_READ);
+    }
+
+    private UICaseSearchHeader buildHeader(UseCase useCase, CaseSearchResult caseSearchResult, String caseTypeId, CaseTypeDefinition caseType) {
+        final SearchResult searchResult = searchQueryOperation.getSearchResultDefinition(caseType, useCase);
+        return new UICaseSearchHeader(
+            new UICaseSearchHeaderMetadata(caseType.getJurisdictionId(), caseTypeId),
+            buildSearchResultViewColumns(caseType, searchResult),
+            caseSearchResult.buildCaseReferenceList(caseTypeId)
+        );
+    }
+
+    private List<SearchResultViewColumn> buildSearchResultViewColumns(final CaseTypeDefinition caseTypeDefinition,
+                                                                      final SearchResult searchResult) {
         final HashSet<String> addedFields = new HashSet<>();
 
         return Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseTypeDefinition.getCaseFieldDefinitions().stream()
-                    .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
-                    .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
-                    .map(caseField -> createSearchResultViewColumn(searchResultField, caseField))
-                    )
+                .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
+                .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
+                .map(caseField -> buildSearchResultViewColumn(searchResultField, caseField))
+            )
             .collect(Collectors.toList());
     }
 
-    private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseFieldDefinition caseFieldDefinition) {
+    private SearchResultViewColumn buildSearchResultViewColumn(final SearchResultField searchResultField,
+                                                               final CaseFieldDefinition caseFieldDefinition) {
         CommonField commonField = commonField(searchResultField, caseFieldDefinition);
         return new SearchResultViewColumn(
             searchResultField.buildCaseFieldId(),
@@ -94,8 +121,6 @@ public class MergeDataToSearchResultOperation {
         }
     }
 
-
-
     private CommonField commonField(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {
         return caseFieldDefinition.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
             .orElseThrow(() ->
@@ -110,8 +135,8 @@ public class MergeDataToSearchResultOperation {
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
-                                                          final CaseTypeDefinition caseTypeDefinition,
-                                                          final SearchResult searchResult) {
+                                                           final CaseTypeDefinition caseTypeDefinition,
+                                                           final SearchResult searchResult) {
 
         Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
         Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
@@ -140,8 +165,6 @@ public class MergeDataToSearchResultOperation {
         newResults.putAll(caseData);
         newResults.putAll(labels);
         newResults.putAll(metadata);
-
         return newResults;
     }
-
 }

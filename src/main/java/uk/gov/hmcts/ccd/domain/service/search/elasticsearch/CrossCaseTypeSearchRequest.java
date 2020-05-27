@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +10,10 @@ import java.util.stream.StreamSupport;
 import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -45,6 +49,7 @@ public class CrossCaseTypeSearchRequest {
         this.searchRequestJsonNode = searchRequestJsonNode;
         this.multiCaseTypeSearch = multiCaseTypeSearch;
         this.aliasFields.addAll(aliasFields);
+        addMetadataSourceFields();
         validateJsonSearchRequest();
     }
 
@@ -72,6 +77,14 @@ public class CrossCaseTypeSearchRequest {
 
     public boolean hasAliasField(SearchAliasField searchAliasField) {
         return aliasFields.stream().anyMatch(aliasField -> aliasField.equalsIgnoreCase(searchAliasField.getId()));
+    }
+
+    private void addMetadataSourceFields() {
+        JsonNode sourceNode = searchRequestJsonNode.get(SOURCE);
+        if (sourceNode != null && sourceNode.isArray()) {
+            Arrays.stream(MetaData.CaseField.values())
+                .forEach(field -> ((ArrayNode)sourceNode).add(new TextNode(field.getDbColumnName())));
+        }
     }
 
     public static class Builder {

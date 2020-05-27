@@ -8,12 +8,15 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 
 public interface UIDefinitionGateway {
 
     SearchResult getWorkBasketResult(int version, String caseTypeId);
 
     SearchResult getSearchResult(int version, String caseTypeId);
+
+    SearchResult getSearchCasesResult(int version, String caseTypeId, UseCase useCase);
 
     SearchInputFieldsDefinition getSearchInputFieldDefinitions(int version, String caseTypeId);
 

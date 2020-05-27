@@ -1,13 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
@@ -24,11 +16,22 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.UseCase;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
+import uk.gov.hmcts.ccd.domain.service.aggregated.MergeDataToSearchCasesOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
@@ -43,28 +46,36 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private final CaseDetailsMapper caseDetailsMapper;
     private final ApplicationParams applicationParams;
     private final CaseSearchRequestSecurity caseSearchRequestSecurity;
+    private final MergeDataToSearchCasesOperation mergeDataToSearchCasesOperation;
 
     @Autowired
     public ElasticsearchCaseSearchOperation(JestClient jestClient,
                                             @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
                                             CaseDetailsMapper caseDetailsMapper,
                                             ApplicationParams applicationParams,
-                                            CaseSearchRequestSecurity caseSearchRequestSecurity) {
+                                            CaseSearchRequestSecurity caseSearchRequestSecurity,
+                                            MergeDataToSearchCasesOperation mergeDataToSearchCasesOperation) {
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
         this.caseDetailsMapper = caseDetailsMapper;
         this.applicationParams = applicationParams;
         this.caseSearchRequestSecurity = caseSearchRequestSecurity;
+        this.mergeDataToSearchCasesOperation = mergeDataToSearchCasesOperation;
     }
 
     @Override
-    public CaseSearchResult execute(CrossCaseTypeSearchRequest request) {
+    public CaseSearchResult executeExternal(CrossCaseTypeSearchRequest request) {
         MultiSearchResult result = search(request);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);
         } else {
             throw new BadSearchRequest(result.getErrorMessage());
         }
+    }
+
+    @Override
+    public UICaseSearchResult executeInternal(CaseSearchResult caseSearchResult, List<String> caseTypeIds, UseCase useCase) {
+        return mergeDataToSearchCasesOperation.execute(caseTypeIds, caseSearchResult, useCase);
     }
 
     private MultiSearchResult search(CrossCaseTypeSearchRequest request) {
