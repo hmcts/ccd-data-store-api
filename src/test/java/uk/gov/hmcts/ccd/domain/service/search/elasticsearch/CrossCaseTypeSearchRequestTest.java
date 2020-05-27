@@ -11,6 +11,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_CLASSIFICATION_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 class CrossCaseTypeSearchRequestTest {
@@ -94,15 +95,15 @@ class CrossCaseTypeSearchRequestTest {
                 () -> assertThat(request.getSearchRequestJsonNode(), is(jsonNode)),
                 () -> assertThat(request.getCaseTypeIds(), is(caseTypeIds)),
                 () -> assertThat(sourceFields, hasItem("data.name")),
-                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.CASE_REFERENCE.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.CREATED_DATE.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.CASE_TYPE.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.JURISDICTION.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.SECURITY_CLASSIFICATION.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.LAST_MODIFIED_DATE.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem(MetaData.CaseField.STATE.getDbColumnName())),
-                () -> assertThat(sourceFields, hasItem("data_classification"))
+                () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CREATED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CASE_TYPE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(JURISDICTION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(STATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(DATA_CLASSIFICATION_COL))
             );
         }
     }

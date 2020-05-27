@@ -61,7 +61,7 @@ public class UICaseSearchController {
         )
     })
     // TODO: Docs
-    public ResponseEntity<CaseSearchResultViewResource> getCases(@ApiParam(value = "Case type ID(s)")
+    public ResponseEntity<CaseSearchResultViewResource> searchCases(@ApiParam(value = "Case type ID(s)")
                                      @RequestParam(value = "ctid", required = false) List<String> caseTypeIds,
                                      @ApiParam(value = "Case type ID(s)")
                                      @RequestParam(value = "usecase", required = false) final String useCase,

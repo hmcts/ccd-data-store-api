@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_CLASSIFICATION_COL;
 import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,7 +38,6 @@ public class CrossCaseTypeSearchRequest {
 
     private static final String SOURCE = "_source";
     private static final String SEARCH_ALIAS_FIELD_PREFIX = "alias.";
-    private static final String DATA_CLASSIFICATION = "data_classification";
 
     private final List<String> caseTypeIds = new ArrayList<>();
     private final JsonNode searchRequestJsonNode;
@@ -85,7 +85,7 @@ public class CrossCaseTypeSearchRequest {
         if (sourceNode != null && sourceNode.isArray()) {
             Arrays.stream(MetaData.CaseField.values())
                 .forEach(field -> ((ArrayNode)sourceNode).add(new TextNode(field.getDbColumnName())));
-            ((ArrayNode)sourceNode).add(new TextNode(DATA_CLASSIFICATION));
+            ((ArrayNode)sourceNode).add(new TextNode(DATA_CLASSIFICATION_COL));
         }
     }
 
