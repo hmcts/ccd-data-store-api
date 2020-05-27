@@ -5,7 +5,10 @@ import lombok.extern.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.search.*;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.*;
@@ -14,6 +17,10 @@ import uk.gov.hmcts.ccd.v2.internal.resource.*;
 
 import java.time.*;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
 @RestController
 @RequestMapping(path = "/internal/searchCases")
@@ -61,6 +68,8 @@ public class UICaseSearchController {
         )
     })
     // TODO: Docs
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, caseTypeIds = "#caseTypeIds",
+        caseId = "T(uk.gov.hmcts.ccd.v2.internal.controller.UICaseSearchController).buildCaseIds(#result)")
     public ResponseEntity<CaseSearchResultViewResource> searchCases(@ApiParam(value = "Case type ID(s)")
                                      @RequestParam(value = "ctid", required = false) List<String> caseTypeIds,
                                      @ApiParam(value = "Case type ID(s)")
@@ -82,5 +91,11 @@ public class UICaseSearchController {
         log.debug("Internal searchCases execution completed in {} millisecs...", between.toMillis());
 
         return ResponseEntity.ok(new CaseSearchResultViewResource(uiCaseSearchResult));
+    }
+
+    public static String buildCaseIds(ResponseEntity<CaseSearchResultViewResource> response) {
+        return response.getBody().getCases().stream().limit(MAX_CASE_IDS_LIST)
+            .map(SearchResultViewItem::getCaseId)
+            .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 }
