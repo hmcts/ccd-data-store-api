@@ -1,6 +1,12 @@
 package uk.gov.hmcts.ccd.endpoint;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class CallbackTestData {
+
+    private CallbackTestData() {
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor
+    }
+
     public static String getTestDefinition(final Integer portNumber) {
 
         final String port = portNumber.toString();

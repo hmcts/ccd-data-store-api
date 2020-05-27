@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 @Service
@@ -39,9 +39,9 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
     @Override
     public CaseHistoryView execute(String caseReference, Long eventId) {
         CaseDetails caseDetails = getCase(caseReference);
-        CaseType caseType = getCaseType(caseDetails.getCaseTypeId());
+        CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
         Set<String> userRoles = getUserRoles(caseDetails.getId());
-        verifyCaseTypeReadAccess(caseType, userRoles);
+        verifyCaseTypeReadAccess(caseTypeDefinition, userRoles);
         CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseReference, eventId);
         filterAllowedTabsWithFields(caseHistoryView, userRoles);
         return caseHistoryView;

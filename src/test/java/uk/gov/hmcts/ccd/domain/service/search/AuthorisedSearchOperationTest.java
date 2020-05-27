@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
@@ -13,13 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -31,17 +29,24 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 class AuthorisedSearchOperationTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     private static final String CASE_TYPE_ID = "GrantOnly";
@@ -65,8 +70,8 @@ class AuthorisedSearchOperationTest {
 
     private MetaData metaData;
     private HashMap<String, String> criteria;
-    private CaseType caseType;
-    private final List<CaseField> caseFields = Lists.newArrayList();
+    private CaseTypeDefinition caseType;
+    private final List<CaseFieldDefinition> caseFields = Lists.newArrayList();
 
     private JsonNode classifiedDataNode1;
     private JsonNode classifiedDataClassificationNode1;
@@ -86,8 +91,8 @@ class AuthorisedSearchOperationTest {
 
         metaData = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
-        caseType = new CaseType();
-        caseType.setCaseFields(caseFields);
+        caseType = new CaseTypeDefinition();
+        caseType.setCaseFieldDefinitions(caseFields);
 
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(userRepository.getUserRoles()).thenReturn(USER_ROLES);
@@ -109,8 +114,8 @@ class AuthorisedSearchOperationTest {
         ((ObjectNode) authorisedDataClassificationNode1).put("classificationTestField11", "classificationTestValue11");
 
         classifiedCase1 = new CaseDetails();
-        classifiedCase1.setData(MAPPER.convertValue(classifiedDataNode1, STRING_JSON_MAP));
-        classifiedCase1.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode1, STRING_JSON_MAP));
+        classifiedCase1.setData(JacksonUtils.convertValue(classifiedDataNode1));
+        classifiedCase1.setDataClassification(JacksonUtils.convertValue(classifiedDataClassificationNode1));
 
         caseFields.addAll(getCaseFieldsWithIds("dataTestField21", "dataTestField22", "classificationTestField21", "classificationTestField22"));
 
@@ -127,8 +132,8 @@ class AuthorisedSearchOperationTest {
         ((ObjectNode) authorisedDataClassificationNode2).put("classificationTestField21", "classificationTestValue21");
 
         classifiedCase2 = new CaseDetails();
-        classifiedCase2.setData(MAPPER.convertValue(classifiedDataNode2, STRING_JSON_MAP));
-        classifiedCase2.setDataClassification(MAPPER.convertValue(classifiedDataClassificationNode2, STRING_JSON_MAP));
+        classifiedCase2.setData(JacksonUtils.convertValue(classifiedDataNode2));
+        classifiedCase2.setDataClassification(JacksonUtils.convertValue(classifiedDataClassificationNode2));
 
         doReturn(Arrays.asList(classifiedCase1, classifiedCase2)).when(nextOperationInChain).execute(metaData, criteria);
         doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase1.getState()), eq(caseType), eq(USER_ROLES), eq(CAN_READ));
@@ -164,10 +169,10 @@ class AuthorisedSearchOperationTest {
             caseDefinitionRepository, accessControlService, userRepository);
     }
 
-    private List<CaseField> getCaseFieldsWithIds(String... dataTestFields) {
+    private List<CaseFieldDefinition> getCaseFieldsWithIds(String... dataTestFields) {
         return Stream.of(dataTestFields)
             .map(field -> {
-                CaseField caseField = new CaseField();
+                CaseFieldDefinition caseField = new CaseFieldDefinition();
                 caseField.setId(field);
                 return caseField;
             })
@@ -209,13 +214,13 @@ class AuthorisedSearchOperationTest {
             () -> assertThat(output, hasSize(2)),
             () -> assertThat(output, hasItems(classifiedCase1, classifiedCase2)),
             () -> assertThat(output.get(0).getData(),
-                is(equalTo(MAPPER.convertValue(authorisedDataNode1, STRING_JSON_MAP)))),
+                is(equalTo(JacksonUtils.convertValue(authorisedDataNode1)))),
             () -> assertThat(output.get(0).getDataClassification(),
-                is(equalTo(MAPPER.convertValue(authorisedDataClassificationNode1, STRING_JSON_MAP)))),
+                is(equalTo(JacksonUtils.convertValue(authorisedDataClassificationNode1)))),
             () -> assertThat(output.get(1).getData(),
-                is(equalTo(MAPPER.convertValue(authorisedDataNode2, STRING_JSON_MAP)))),
+                is(equalTo(JacksonUtils.convertValue(authorisedDataNode2)))),
             () -> assertThat(output.get(1).getDataClassification(),
-                is(equalTo(MAPPER.convertValue(authorisedDataClassificationNode2, STRING_JSON_MAP)))),
+                is(equalTo(JacksonUtils.convertValue(authorisedDataClassificationNode2)))),
             () -> inOrder.verify(nextOperationInChain).execute(metaData, criteria),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(userRepository).getUserRoles(),
@@ -272,7 +277,8 @@ class AuthorisedSearchOperationTest {
         assertAll(
             () -> assertThat(output, is(notNullValue())),
             () -> assertThat(output, hasSize(0)),
-            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
+            () -> verify(accessControlService, never())
+                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
         );
     }
 }

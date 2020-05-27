@@ -58,4 +58,9 @@ public class SecurityUtils {
                              .map(GrantedAuthority::getAuthority)
                              .collect(Collectors.joining(","));
     }
+
+    public String getServiceName() {
+        final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return serviceAndUser.getServicename();
+    }
 }

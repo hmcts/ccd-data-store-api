@@ -21,19 +21,19 @@ public class ElasticsearchTextAreaFieldTest extends ElasticsearchBaseTest {
         assertElasticsearchEnabled();
     }
 
+    @Nested
+    @DisplayName("Tests to verify cases on Text Area Field")
+    class DateTimeField {
 
-        @Nested
-        @DisplayName("Tests to verify cases on Text Area Field")
-        class DateTimeField {
-
-            @Test
-            @DisplayName("should return case for exact match on a text area field")
-            void shouldReturnCaseForExactMatchOnDateTimeField() {
-              //  searchCaseForExactMatchAndVerifyResponse("TextAreaField", TEXT_AREA);
-            }
+        @Test
+        @DisplayName("should return case for exact match on a text area field")
+        void shouldReturnCaseForExactMatchOnDateTimeField() {
+          //  searchCaseForExactMatchAndVerifyResponse("TextAreaField", TEXT_AREA);
         }
 
     }
+
+}
 
 
 
