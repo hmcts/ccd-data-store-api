@@ -47,7 +47,7 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
     @Override
     @Cacheable("searchCasesResultCache")
     public SearchResult getSearchCasesResult(final int version, final String caseTypeId, final UseCase useCase) {
-        LOG.debug("remote retrieving version {} of search result for {}", version, caseTypeId);
+        LOG.debug("remote retrieving version {} of search cases result for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getSearchCasesResult(version, caseTypeId, useCase);
     }
 
