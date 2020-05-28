@@ -1,0 +1,92 @@
+{
+  "data": {
+    "TextField": "Text1",
+    "MoneyGBPField": null,
+    "FixedRadioListField": null,
+    "YesOrNoField": null,
+    "AddressUKField": {
+      "AddressLine2": null,
+      "PostCode": null,
+      "AddressLine1": null,
+      "PostTown": null,
+      "County": null,
+      "AddressLine3": null,
+      "Country": null
+    },
+    "MultiSelectListField": [],
+    "DateField": null,
+    "EmailField": "email1@gmail.com",
+    "ComplexField": {
+      "ComplexNestedField": {
+        "NestedCollectionTextField": [],
+        "NestedNumberField": null
+      },
+      "ComplexFixedListField": null,
+      "ComplexTextField": null
+    },
+    "NumberField": null,
+    "FixedListField": null,
+    "PhoneUKField": null,
+    "TextAreaField": null,
+    "CollectionField": [],
+    "DateTimeField": null
+  },
+  "last_modified": "2020-05-11T12:45:09.022Z",
+  "@version": "1",
+  "security_classification": "PUBLIC",
+  "@timestamp": "2020-05-28T15:51:59.096Z",
+  "case_type_id": "AAT",
+  "state": "TODO",
+  "created_date": "2020-05-07T15:53:40.974Z",
+  "data_classification": {
+    "TextField": "PUBLIC",
+    "MoneyGBPField": "PUBLIC",
+    "FixedRadioListField": "PUBLIC",
+    "YesOrNoField": "PUBLIC",
+    "AddressUKField": {
+      "classification": "PUBLIC",
+      "value": {
+        "AddressLine2": "PUBLIC",
+        "PostCode": "PUBLIC",
+        "AddressLine1": "PUBLIC",
+        "PostTown": "PUBLIC",
+        "County": "PUBLIC",
+        "AddressLine3": "PUBLIC",
+        "Country": "PUBLIC"
+      }
+    },
+    "MultiSelectListField": "PUBLIC",
+    "DateField": "PUBLIC",
+    "EmailField": "PUBLIC",
+    "ComplexField": {
+      "classification": "PUBLIC",
+      "value": {
+        "ComplexNestedField": {
+          "classification": "PUBLIC",
+          "value": {
+            "NestedCollectionTextField": {
+              "classification": "PUBLIC",
+              "value": []
+            },
+            "NestedNumberField": "PUBLIC"
+          }
+        },
+        "ComplexFixedListField": "PUBLIC",
+        "ComplexTextField": "PUBLIC"
+      }
+    },
+    "NumberField": "PUBLIC",
+    "FixedListField": "PUBLIC",
+    "PhoneUKField": "PUBLIC",
+    "TextAreaField": "PUBLIC",
+    "CollectionField": {
+      "classification": "PUBLIC",
+      "value": []
+    },
+    "DateTimeField": "PUBLIC"
+  },
+  "index_id": "aat_cases",
+  "id": 1,
+  "reference": 1588866820969121,
+  "jurisdiction": "AUTOTEST1"
+}

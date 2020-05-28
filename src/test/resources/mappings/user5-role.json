@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/user-role?role=Y2FzZXdvcmtlci1hdXRvdGVzdDE%3D"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 1,
+      "created_at": "2020-01-03T18:27:15.624563",
+      "live_from": null,
+      "live_to": null,
+      "role": "caseworker-autotest1",
+      "security_classification": "PUBLIC"
+    }
+  }
+}
