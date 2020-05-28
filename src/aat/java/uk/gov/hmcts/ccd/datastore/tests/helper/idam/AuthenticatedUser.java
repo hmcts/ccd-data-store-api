@@ -32,4 +32,3 @@ public class AuthenticatedUser {
         return roles;
     }
 }
-
