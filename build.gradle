@@ -708,7 +708,7 @@ task smoke(type: Test) {
         includeTags 'smoke'
     }
 
-    doFirst {
+    doLast {
         generateCucumberReports.enabled = true
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
