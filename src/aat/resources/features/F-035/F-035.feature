@@ -46,7 +46,7 @@ Feature: F-035: Retrieve a case by id
     And the response [contains an HTTP-400 Bad Request]
     And the response has all other details as expected
 
-  @S-158
+  @S-158 @Ignore # defect RDM-6665
   Scenario: should get 404 when case reference does not exist
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
