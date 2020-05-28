@@ -11,7 +11,6 @@ import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import pl.allegro.tech.embeddedelasticsearch.IndexSettings;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -64,10 +63,5 @@ public class ElasticsearchITConfiguration {
                 embeddedElastic().index(idx, INDEX_TYPE, caseString);
             }
         }
-    }
-
-    @PreDestroy
-    public void contextDestroyed() throws IOException, InterruptedException {
-        embeddedElastic().stop();
     }
 }
