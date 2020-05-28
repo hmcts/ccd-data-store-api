@@ -197,8 +197,7 @@ public class ApplicationParams {
     }
 
     public String displaySearchCasesResultDefURL(final String caseTypeId, final UseCase useCase) {
-        // TODO: Add use case to request when request param is available
-        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId);
+        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?usecase=" + useCase.getReference();
     }
 
     public String displayCaseTabCollection(final String caseTypeId) {
