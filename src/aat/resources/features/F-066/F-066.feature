@@ -44,7 +44,7 @@ Feature: F-066: Retrieve a start event trigger by ID for dynamic display
     And the response [includes a HTTP 400 'Bad Request']
     And the response has all the details as expected
 
-  @S-178 @Ignore # This scenario is returning 400 instead of expected 404, Need to raise defect JIRA
+  @S-178
   Scenario: must return negative response when request contains a non-existing case reference
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
