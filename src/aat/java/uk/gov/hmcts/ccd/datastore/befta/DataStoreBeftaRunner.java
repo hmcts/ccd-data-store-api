@@ -7,12 +7,12 @@ import org.junit.runner.RunWith;
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
 import uk.gov.hmcts.befta.BeftaMain;
+import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
 
 @RunWith(Cucumber.class)
 @CucumberOptions(plugin = "json:target/cucumber.json",
-    glue = "uk.gov.hmcts.befta.player",
-        features = { "classpath:features" }, tags = { "not @Ignore" })
+    glue = {"uk.gov.hmcts.befta.player", "uk.gov.hmcts.ccd.datastore.befta"}, features = { "classpath:features" }, tags = { "not @Ignore" })
 public class DataStoreBeftaRunner {
 
     private DataStoreBeftaRunner() {
@@ -26,7 +26,7 @@ public class DataStoreBeftaRunner {
 
     @AfterClass
     public static void tearDown() {
-        BeftaMain.tearDown();
+        new ElasticsearchTestDataLoaderExtension().close();
     }
 
 }
