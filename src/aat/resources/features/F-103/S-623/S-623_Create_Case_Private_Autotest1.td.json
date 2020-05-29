@@ -5,7 +5,7 @@
     "body": {
       "event_token": "${[scenarioContext][parentContext][childContexts][S-623_Create_Case_Private_Autotest1_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
-        "TextAreaField": "text area field value"
+        "TextAreaField": "asdfghjkl"
       }
     }
   }

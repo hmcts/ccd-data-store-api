@@ -2,8 +2,9 @@
   "_guid_": "S-622",
   "_extends_": "F-103_Test_Data_Base",
   "specs": [
-    "is configured to search for exact PhoneUK field value from previously created case",
-    "contains the previously created case"
+    "is configured to search for exact PhoneUK value from previously created case",
+    "contains the previously created case",
+    "a valid profile"
   ],
 
   "request": {

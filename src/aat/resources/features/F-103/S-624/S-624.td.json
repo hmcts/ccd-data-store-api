@@ -3,14 +3,15 @@
   "_extends_": "F-103_Test_Data_Base",
   "specs": [
     "is configured to search for exact Text field value from previously created case",
-    "contains the previously created case"
+    "contains the previously created case",
+    "a valid profile"
   ],
 
   "request": {
     "body": {
       "query": {
         "match": {
-          "data.TextField": "qwerty"
+          "data.TextField": "BEFTA"
         }
       }
     }
@@ -62,7 +63,7 @@
             "OPTION1"
           ],
           "YesOrNoField": "Yes",
-          "TextField": "qwerty",
+          "TextField": "BEFTA",
           "DateField": "1989-09-19",
           "TextAreaField": "text area",
           "CollectionField": [

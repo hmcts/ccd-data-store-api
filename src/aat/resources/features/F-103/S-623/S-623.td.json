@@ -3,14 +3,15 @@
   "_extends_": "F-103_Test_Data_Base",
   "specs": [
     "is configured to search for exact Text Area field value from previously created case",
-    "contains the previously created case"
+    "contains the previously created case",
+    "a valid profile"
   ],
 
   "request": {
     "body": {
       "query": {
         "match": {
-          "data.TextAreaField": "text area field value"
+          "data.TextAreaField": "asdfghjkl"
         }
       }
     }
@@ -64,7 +65,7 @@
           "YesOrNoField": "Yes",
           "TextField": "text",
           "DateField": "1989-09-19",
-          "TextAreaField": "text area field value",
+          "TextAreaField": "asdfghjkl",
           "CollectionField": [
             {
               "value": "collection text",

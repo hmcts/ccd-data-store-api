@@ -3,7 +3,8 @@
   "_extends_": "F-103_Test_Data_Base",
   "specs": [
     "is configured to search for exact number field value from previously created case",
-    "contains the previously created case"
+    "contains the previously created case",
+    "a valid profile"
   ],
 
   "request": {
@@ -32,7 +33,7 @@
         "security_classification": "PRIVATE",
         "case_data": {
           "FixedListField": "VALUE1",
-          "MoneyGBPField": "66",
+          "MoneyGBPField": "1000",
           "AddressUKField": {
             "PostCode": "SW1H 9AJ",
             "AddressLine2": "",
