@@ -137,7 +137,7 @@
 
     <!-- FIXME : RDM-???? -->
     <suppress>
-        <notes>Temporary suppression for on-going developments</notes>
+        <notes>Temporary suppression for on-going developments.</notes>
         <cve>CVE-2020-1938</cve>
         <cve>CVE-2020-8840</cve>
         <cve>CVE-2020-9547</cve>
@@ -147,6 +147,10 @@
         <cve>CVE-2020-10672</cve>
         <cve>CVE-2020-11619</cve>
         <cve>CVE-2020-11620</cve>
+        <cve>CVE-2020-10683</cve>
+        <cve>CVE-2020-5407</cve>
+        <cve>CVE-2020-5408</cve>
+        <cve>CVE-2020-9484</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
