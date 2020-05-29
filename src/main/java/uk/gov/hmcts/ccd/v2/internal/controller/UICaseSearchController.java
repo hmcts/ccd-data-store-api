@@ -24,9 +24,12 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
 @RestController
 @RequestMapping(path = "/internal/searchCases")
+@Api(tags = {"Elastic Based Search API"})
+@SwaggerDefinition(tags = {
+    @Tag(name = "Elastic Based Search API", description = "Internal ElasticSearch based search API")
+})
 @Slf4j
 public class UICaseSearchController {
-    private static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
 
     private final CaseSearchOperation caseSearchOperation;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
@@ -49,37 +52,57 @@ public class UICaseSearchController {
         }
     )
     @ApiOperation(
-        value = "Elastic search for cases returning paginated data",
+        value = "Search cases according to the provided ElasticSearch query. Supports searching across multiple case types and a use case.",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
         @ApiResponse(
             code = 200,
-            message = "Success",
+            message = "Success.",
             response = CaseSearchResultViewResource.class
         ),
         @ApiResponse(
             code = 400,
-            message = ERROR_CASE_ID_INVALID
+            message = "Request is invalid. For some other types HTTP code 500 is returned instead.\n"
+                      + "Examples include:\n"
+                      + "- Unsupported use case specified in `usecase` query parameter.\n"
+                      + "- Query is missing required `query` field.\n"
+                      + "- Query includes blacklisted type.\n"
+                      + "- Query has failed in ElasticSearch - for example, a sort is attempted on an unknown/unmapped field."
+        ),
+        @ApiResponse(
+            code = 401,
+            message = "Request doesn't include a valid `Authorization` header. "
+                      + "This applies to all missing, malformed & expired tokens."
+        ),
+        @ApiResponse(
+            code = 403,
+            message = "Request doesn't include a valid `ServiceAuthorization` header. "
+                      + "This applies to all missing, malformed & expired tokens.\n\n"
+                      + "A valid S2S token issued to the name of a non-permitted API Client will also return the same."
         ),
         @ApiResponse(
             code = 404,
-            message = "Case not found"
+            message = "Case type specified in `ctid` query parameter could not be found."
+        ),
+        @ApiResponse(
+            code = 500,
+            message = "An unexpected situation that is not attributable to the user or API Client; or request is invalid. "
+                      + "For some other types HTTP code 400 is returned instead.\n"
+                      + "Invalid request examples include:\n"
+                      + "- Malformed JSON request."
         )
     })
-    // TODO: Docs
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, caseTypeIds = "#caseTypeIds",
         caseId = "T(uk.gov.hmcts.ccd.v2.internal.controller.UICaseSearchController).buildCaseIds(#result)")
-    public ResponseEntity<CaseSearchResultViewResource> searchCases(@ApiParam(value = "Case type ID(s)")
+    public ResponseEntity<CaseSearchResultViewResource> searchCases(
+                                     @ApiParam(value = "Comma-separated list of case type ID(s).")
                                      @RequestParam(value = "ctid", required = false) List<String> caseTypeIds,
-                                     @ApiParam(value = "Case type ID(s)")
+                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` or `ORGCASES`.")
                                      @RequestParam(value = "usecase", required = false) final String useCase,
                                      @ApiParam(value = "Native ElasticSearch Search API request. Please refer to the ElasticSearch official "
-                                         + "documentation. For cross case type search, "
-                                         + "the search results will contain only metadata by default (no case field data). To get case data in the "
-                                         + "search results, please state the alias fields to be returned in the _source property for e.g."
-                                         + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
-                                         required = true)
+                                         + "documentation.",
+                                     example = "{\"_source\":[\"data.TextField\"],\"query\":{\"match_all\":{}},\"size\":20,\"from\":1}")
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 

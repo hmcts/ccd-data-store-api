@@ -17,20 +17,32 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 import uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint;
+import uk.gov.hmcts.ccd.endpoint.ui.QueryEndpoint;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
+import uk.gov.hmcts.ccd.v2.internal.controller.UICaseController;
 
 @Configuration
 @EnableSwagger2WebMvc
 public class SwaggerConfiguration {
 
     @Bean
-    public Docket apiV1() {
-        return getNewDocketForPackageOf(CaseDetailsEndpoint.class, "v1", apiV1Info());
+    public Docket apiV1External() {
+        return getNewDocketForPackageOf(CaseDetailsEndpoint.class, "v1_external", apiV1Info());
     }
 
     @Bean
-    public Docket apiV2() {
-        return getNewDocketForPackageOf(CaseController.class, "v2", apiV2Info());
+    public Docket apiV2External() {
+        return getNewDocketForPackageOf(CaseController.class, "v2_external", apiV2Info());
+    }
+
+    @Bean
+    public Docket apiV1Internal() {
+        return getNewDocketForPackageOf(QueryEndpoint.class, "v1_internal", apiV1Info());
+    }
+
+    @Bean
+    public Docket apiV2Internal() {
+        return getNewDocketForPackageOf(UICaseController.class, "v2_internal", apiV2Info());
     }
 
     private Docket getNewDocketForPackageOf(Class<?> klazz, String groupName, ApiInfo apiInfo) {

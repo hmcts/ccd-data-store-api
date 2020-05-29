@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = {"Elastic Based Search API"})
 @SwaggerDefinition(tags = {
-    @Tag(name = "Elastic Based Search API", description = "New ElasticSearch based search API")
+    @Tag(name = "Elastic Based Search API", description = "External ElasticSearch based search API")
 })
 @Slf4j
 public class CaseSearchEndpoint {
