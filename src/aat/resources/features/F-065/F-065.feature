@@ -29,7 +29,7 @@
       And the response [contains the case view history]
       And the response has all other details as expected
 
-    @S-163 @Ignore #Defect submitted RDM-6868
+    @S-163
     Scenario: must return 404 when case reference does NOT exist
       Given a user with [an active profile in CCD]
       When a request is prepared with appropriate values
