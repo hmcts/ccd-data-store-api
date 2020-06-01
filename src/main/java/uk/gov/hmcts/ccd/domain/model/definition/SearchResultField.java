@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -11,12 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.lang.String.format;
-
 public class SearchResultField implements Serializable {
-
-    private static final String NESTED_ELEMENT_NOT_FOUND_FOR_PATH = "Nested element not found for path %s";
-
+    
     @JsonProperty("case_type_id")
     private String caseTypeId;
     @JsonProperty("case_field_id")
