@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.elasticsearch.common.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.ccd.data.user.UserService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseTypeOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypeOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
@@ -66,20 +66,13 @@ public class ElasticsearchQueryHelper {
         this.elasticsearchMappings = elasticsearchMappings;
     }
 
-    public CrossCaseTypeSearchRequest prepareRequest(List<String> caseTypeIds, String useCaseString, String jsonSearchRequest) {
-        UseCase useCase;
-        try {
-            useCase = UseCase.valueOfReference(useCaseString);
-        } catch (IllegalArgumentException ex) {
-            throw new BadSearchRequest(String.format("The provided use case '%s' is unsupported.", useCaseString));
-        }
-
+    public CrossCaseTypeSearchRequest prepareRequest(List<String> caseTypeIds, String useCase, String jsonSearchRequest) {
         rejectBlackListedQuery(jsonSearchRequest);
 
         final List<String> updatedCaseTypeIds = buildCaseTypeIds(caseTypeIds);
 
         JsonNode searchRequest = stringToJsonNode(jsonSearchRequest);
-        if (useCase != UseCase.DEFAULT) {
+        if (!Strings.isNullOrEmpty(useCase)) {
             applyConfiguredSort(searchRequest, updatedCaseTypeIds, useCase);
         }
 
@@ -89,7 +82,7 @@ public class ElasticsearchQueryHelper {
             .build();
     }
 
-    private void applyConfiguredSort(JsonNode searchRequest, List<String> caseTypeIds, UseCase useCase) {
+    private void applyConfiguredSort(JsonNode searchRequest, List<String> caseTypeIds, String useCase) {
         JsonNode sortNode = searchRequest.get(SORT);
         if (sortNode == null) {
             ArrayNode appliedSortsNode = buildSortNode(caseTypeIds, useCase);
@@ -99,13 +92,13 @@ public class ElasticsearchQueryHelper {
         }
     }
 
-    private ArrayNode buildSortNode(List<String> caseTypeIds, UseCase useCase) {
+    private ArrayNode buildSortNode(List<String> caseTypeIds, String useCase) {
         ArrayNode sortNode = objectMapper.createArrayNode();
         caseTypeIds.forEach(caseTypeId -> addCaseTypeSorts(caseTypeId, useCase, sortNode));
         return sortNode;
     }
 
-    private void addCaseTypeSorts(String caseTypeId, UseCase useCase, ArrayNode sortNode) {
+    private void addCaseTypeSorts(String caseTypeId, String useCase, ArrayNode sortNode) {
         Optional<CaseTypeDefinition> caseTypeOpt = getCaseTypeOperation.execute(caseTypeId, CAN_READ);
         caseTypeOpt.ifPresent(caseType -> searchQueryOperation.getSortOrders(caseType, useCase)
             .forEach(field -> sortNode.add(buildSortOrderFieldNode(caseType, field))));

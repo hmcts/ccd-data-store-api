@@ -81,7 +81,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     @Override
     public UICaseSearchResult executeInternal(CaseSearchResult caseSearchResult,
                                               List<String> caseTypeIds,
-                                              UseCase useCase) {
+                                              String useCase) {
         List<String> authorisedCaseTypeIds = getAuthorisedCaseTypes(caseTypeIds)
             .stream()
             .map(CaseTypeDefinition::getId)
@@ -131,7 +131,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     private UICaseSearchResult filterFields(CaseSearchResult caseSearchResult,
                                             List<String> caseTypeIds,
-                                            UseCase useCase) {
+                                            String useCase) {
         // TODO: Filter out fields from result that haven't been requested before returning (RDM-8556)
         return caseSearchOperation.executeInternal(caseSearchResult, caseTypeIds, useCase);
     }

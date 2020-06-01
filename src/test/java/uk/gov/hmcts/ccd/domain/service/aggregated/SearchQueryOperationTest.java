@@ -19,7 +19,6 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
@@ -44,8 +43,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.*;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -72,6 +70,7 @@ public class SearchQueryOperationTest {
     private static final String USER_ROLE_1 = "Role 1";
     private static final String USER_ROLE_2 = "Role 2";
     private static final String CASE_FIELD_PATH = "nestedFieldPath";
+    private static final String ORG_CASES = "ORGCASES";
 
     @Mock
     private SearchOperation searchOperation;
@@ -336,7 +335,7 @@ public class SearchQueryOperationTest {
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
 
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, UseCase.WORKBASKET);
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, WORKBASKET);
 
         verify(uiDefinitionRepository).getWorkBasketResult(eq(CASE_TYPE_ID));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -352,7 +351,7 @@ public class SearchQueryOperationTest {
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
 
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, UseCase.SEARCH);
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, SEARCH);
 
         verify(uiDefinitionRepository).getSearchResult(eq(CASE_TYPE_ID));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -366,11 +365,11 @@ public class SearchQueryOperationTest {
         SearchResult searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
             .build();
-        doReturn(searchResult).when(uiDefinitionRepository).getSearchCasesResult(CASE_TYPE_ID, UseCase.ORG_CASES);
+        doReturn(searchResult).when(uiDefinitionRepository).getSearchCasesResult(CASE_TYPE_ID, ORG_CASES);
 
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, UseCase.ORG_CASES);
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, ORG_CASES);
 
-        verify(uiDefinitionRepository).getSearchCasesResult(eq(CASE_TYPE_ID), eq(UseCase.ORG_CASES));
+        verify(uiDefinitionRepository).getSearchCasesResult(eq(CASE_TYPE_ID), eq(ORG_CASES));
         verifyNoMoreInteractions(uiDefinitionRepository);
         assertAll(
             () -> assertThat(result, is(searchResult))
@@ -390,7 +389,7 @@ public class SearchQueryOperationTest {
             .withField(caseField)
             .build();
 
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, UseCase.DEFAULT);
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, "");
 
         verifyNoMoreInteractions(uiDefinitionRepository);
         assertAll(

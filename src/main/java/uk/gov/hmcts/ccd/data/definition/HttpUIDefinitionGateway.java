@@ -25,7 +25,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 /**
@@ -184,7 +183,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public SearchResult getSearchCasesResult(int version, String caseTypeId, UseCase useCase) {
+    public SearchResult getSearchCasesResult(int version, String caseTypeId, String useCase) {
         try {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());

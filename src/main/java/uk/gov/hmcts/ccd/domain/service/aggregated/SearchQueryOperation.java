@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
@@ -30,6 +30,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 public class SearchQueryOperation {
     protected static final String NO_ERROR = null;
     public static final String WORKBASKET = "WORKBASKET";
+    public static final String SEARCH = "SEARCH";
 
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
     private final GetCaseTypeOperation getCaseTypeOperation;
@@ -67,7 +68,7 @@ public class SearchQueryOperation {
         }
 
         final SearchResult searchResult = getSearchResultDefinition(caseType.get(),
-            view == null ? UseCase.SEARCH : UseCase.valueOfReference(view));
+            Strings.isNullOrEmpty(view) ? SEARCH : view);
 
         addSortOrderFields(metadata, searchResult);
 
@@ -89,21 +90,23 @@ public class SearchQueryOperation {
         return mergeDataToSearchResultOperation.execute(caseType.get(), searchResult, draftsAndCases, draftResultError);
     }
 
-    public SearchResult getSearchResultDefinition(final CaseTypeDefinition caseTypeDefinition, final UseCase useCase) {
+    public SearchResult getSearchResultDefinition(final CaseTypeDefinition caseTypeDefinition, final String useCase) {
         final String caseTypeId = caseTypeDefinition.getId();
+        if (Strings.isNullOrEmpty(useCase)) {
+            return buildSearchResultFromCaseFields(caseTypeDefinition);
+        }
+        // TODO: Once all *ResultFields tabs are merged, remove switch statement and always call default method
         switch (useCase) {
             case WORKBASKET:
                 return uiDefinitionRepository.getWorkBasketResult(caseTypeId);
             case SEARCH:
                 return uiDefinitionRepository.getSearchResult(caseTypeId);
-            case ORG_CASES:
-                return uiDefinitionRepository.getSearchCasesResult(caseTypeId, useCase);
             default:
-                return buildSearchResultFromCaseFields(caseTypeDefinition);
+                return uiDefinitionRepository.getSearchCasesResult(caseTypeId, useCase);
         }
     }
 
-    public List<SortOrderField> getSortOrders(CaseTypeDefinition caseType, UseCase useCase) {
+    public List<SortOrderField> getSortOrders(CaseTypeDefinition caseType, String useCase) {
         return getSortOrders(getSearchResultDefinition(caseType, useCase));
     }
 

@@ -40,7 +40,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -54,6 +53,7 @@ class AuthorisedCaseSearchOperationTest {
 
     private static final String CASE_TYPE_ID_1 = "caseType1";
     private static final String CASE_TYPE_ID_2 = "caseType2";
+    private static final String ORG_CASES = "ORGCASES";
 
     @Mock
     private CaseSearchOperation caseSearchOperation;
@@ -258,10 +258,10 @@ class AuthorisedCaseSearchOperationTest {
             when(caseSearchOperation.executeInternal(any(), any(), any())).thenReturn(uiCaseSearchResult);
 
             final UICaseSearchResult result = authorisedCaseDetailsSearchOperation
-                .executeInternal(caseSearchResult, caseTypeIds, UseCase.ORG_CASES);
+                .executeInternal(caseSearchResult, caseTypeIds, ORG_CASES);
 
             verify(caseSearchOperation).executeInternal(eq(caseSearchResult),
-                argThat(arg -> arg.size() == 2 && arg.containsAll(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))), eq(UseCase.ORG_CASES));
+                argThat(arg -> arg.size() == 2 && arg.containsAll(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))), eq(ORG_CASES));
         }
 
         @Test
@@ -273,10 +273,10 @@ class AuthorisedCaseSearchOperationTest {
             when(caseSearchOperation.executeInternal(any(), any(), any())).thenReturn(uiCaseSearchResult);
 
             final UICaseSearchResult result = authorisedCaseDetailsSearchOperation
-                .executeInternal(caseSearchResult, caseTypeIds, UseCase.ORG_CASES);
+                .executeInternal(caseSearchResult, caseTypeIds, ORG_CASES);
 
             verify(caseSearchOperation).executeInternal(eq(caseSearchResult),
-                argThat(arg -> arg.size() == 1 && arg.contains(CASE_TYPE_ID_1)), eq(UseCase.ORG_CASES));
+                argThat(arg -> arg.size() == 1 && arg.contains(CASE_TYPE_ID_1)), eq(ORG_CASES));
         }
 
         @Test
@@ -291,10 +291,10 @@ class AuthorisedCaseSearchOperationTest {
             when(caseSearchOperation.executeInternal(any(), any(), any())).thenReturn(uiCaseSearchResult);
 
             final UICaseSearchResult result = authorisedCaseDetailsSearchOperation
-                .executeInternal(caseSearchResult, null, UseCase.ORG_CASES);
+                .executeInternal(caseSearchResult, null, ORG_CASES);
 
             verify(caseSearchOperation).executeInternal(eq(caseSearchResult),
-                argThat(arg -> arg.size() == 2 && arg.containsAll(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))), eq(UseCase.ORG_CASES));
+                argThat(arg -> arg.size() == 2 && arg.containsAll(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))), eq(ORG_CASES));
         }
     }
 

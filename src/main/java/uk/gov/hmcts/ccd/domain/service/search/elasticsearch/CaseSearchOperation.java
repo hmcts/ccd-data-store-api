@@ -12,5 +12,5 @@ public interface CaseSearchOperation {
 
     UICaseSearchResult executeInternal(CaseSearchResult caseSearchResult,
                                        List<String> caseTypeIds,
-                                       UseCase useCase);
+                                       String useCase);
 }

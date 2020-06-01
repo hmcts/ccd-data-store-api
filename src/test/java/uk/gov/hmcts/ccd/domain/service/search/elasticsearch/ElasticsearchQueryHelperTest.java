@@ -15,7 +15,6 @@ import uk.gov.hmcts.ccd.data.user.UserService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypeOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -30,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
@@ -37,6 +37,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 class ElasticsearchQueryHelperTest {
 
     private static final String QUERY_STRING = "{\"query\":{}}";
+    private static final String ORG_CASES = "ORGCASES";
+    private static final String DEFAULT_USE_CASE = "";
     private static final String ASC = "ASC";
     private static final String DESC = "DESC";
     private static final String CASE_TYPE_A = "MAPPER";
@@ -107,7 +109,7 @@ class ElasticsearchQueryHelperTest {
     @Test
     void shouldPrepareBasicSingleCaseTypeRequest() {
         final CrossCaseTypeSearchRequest request = elasticsearchQueryHelper
-            .prepareRequest(Collections.singletonList(CASE_TYPE_A), UseCase.DEFAULT.getReference(), QUERY_STRING);
+            .prepareRequest(Collections.singletonList(CASE_TYPE_A), DEFAULT_USE_CASE, QUERY_STRING);
 
         assertAll(
             () -> assertThat(request.getCaseTypeIds().size(), is(1)),
@@ -123,7 +125,7 @@ class ElasticsearchQueryHelperTest {
         String queryString = "{\"_source\":[\"alias.TextAlias\",\"alias.DateAlias\"],\"query\":{}}";
 
         final CrossCaseTypeSearchRequest request = elasticsearchQueryHelper
-            .prepareRequest(Arrays.asList(CASE_TYPE_A, CASE_TYPE_B), UseCase.ORG_CASES.getReference(), queryString);
+            .prepareRequest(Arrays.asList(CASE_TYPE_A, CASE_TYPE_B), ORG_CASES, queryString);
 
         assertAll(
             () -> assertThat(request.getCaseTypeIds().size(), is(2)),
@@ -145,7 +147,7 @@ class ElasticsearchQueryHelperTest {
         ));
 
         final CrossCaseTypeSearchRequest request = elasticsearchQueryHelper
-            .prepareRequest(null, UseCase.ORG_CASES.getReference(), QUERY_STRING);
+            .prepareRequest(null, ORG_CASES, QUERY_STRING);
 
         assertAll(
             () -> assertThat(request.getCaseTypeIds().size(), is(2)),
@@ -165,7 +167,7 @@ class ElasticsearchQueryHelperTest {
         when(elasticsearchMappings.isDefaultTextMetadata(eq(MetaData.CaseField.LAST_MODIFIED_DATE.getDbColumnName()))).thenReturn(false);
 
         final CrossCaseTypeSearchRequest request = elasticsearchQueryHelper
-            .prepareRequest(Collections.singletonList(CASE_TYPE_A), UseCase.SEARCH.getReference(), QUERY_STRING);
+            .prepareRequest(Collections.singletonList(CASE_TYPE_A), SEARCH, QUERY_STRING);
 
         assertAll(
             () -> assertThat(request.getSearchRequestJsonNode().toString(),
@@ -185,7 +187,7 @@ class ElasticsearchQueryHelperTest {
         when(elasticsearchMappings.isDefaultTextCaseData(eq(COLLECTION_DATE_FIELD_TYPE))).thenReturn(false);
 
         final CrossCaseTypeSearchRequest request = elasticsearchQueryHelper
-            .prepareRequest(Collections.singletonList(CASE_TYPE_A), UseCase.WORKBASKET.getReference(), QUERY_STRING);
+            .prepareRequest(Collections.singletonList(CASE_TYPE_A), WORKBASKET, QUERY_STRING);
 
         assertAll(
             () -> assertThat(request.getSearchRequestJsonNode().toString(),
@@ -200,21 +202,11 @@ class ElasticsearchQueryHelperTest {
         String queryString = "{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}";
 
         final CrossCaseTypeSearchRequest request = elasticsearchQueryHelper
-            .prepareRequest(Collections.singletonList(CASE_TYPE_A), UseCase.SEARCH.getReference(), queryString);
+            .prepareRequest(Collections.singletonList(CASE_TYPE_A), SEARCH, queryString);
 
         assertAll(
             () -> assertThat(request.getSearchRequestJsonNode().toString(),
                 is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}"))
-        );
-    }
-
-    @Test
-    void shouldRejectRequestsWithInvalidUseCase() {
-        final BadSearchRequest exception = assertThrows(BadSearchRequest.class,
-            () -> elasticsearchQueryHelper.prepareRequest(Collections.singletonList(CASE_TYPE_A), "INVALID", QUERY_STRING));
-
-        assertAll(
-            () -> assertThat(exception.getMessage(), is("The provided use case 'INVALID' is unsupported."))
         );
     }
 
@@ -247,7 +239,7 @@ class ElasticsearchQueryHelperTest {
                                + "}";
 
         BadSearchRequest exception = assertThrows(BadSearchRequest.class,
-            () -> elasticsearchQueryHelper.prepareRequest(Collections.singletonList(CASE_TYPE_A), UseCase.DEFAULT.getReference(), searchRequest));
+            () -> elasticsearchQueryHelper.prepareRequest(Collections.singletonList(CASE_TYPE_A), DEFAULT_USE_CASE, searchRequest));
 
         assertAll(
             () -> assertThat(exception.getMessage(), is("Query of type 'query_string' is not allowed"))
@@ -260,7 +252,7 @@ class ElasticsearchQueryHelperTest {
 
         NullPointerException exception = assertThrows(NullPointerException.class,
             () -> elasticsearchQueryHelper.prepareRequest(Collections.singletonList(CASE_TYPE_A),
-                UseCase.WORKBASKET.getReference(), QUERY_STRING));
+                WORKBASKET, QUERY_STRING));
 
         assertAll(
             () -> assertThat(exception.getMessage(),

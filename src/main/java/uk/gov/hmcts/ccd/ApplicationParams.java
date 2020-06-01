@@ -11,7 +11,6 @@ import static java.util.stream.Collectors.toList;
 
 import com.hazelcast.config.EvictionPolicy;
 import org.springframework.beans.factory.annotation.Value;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Named
@@ -196,8 +195,8 @@ public class ApplicationParams {
         return uiDefinitionHost + "/api/display/search-result-definition/" + encode(caseTypeId);
     }
 
-    public String displaySearchCasesResultDefURL(final String caseTypeId, final UseCase useCase) {
-        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?usecase=" + useCase.getReference();
+    public String displaySearchCasesResultDefURL(final String caseTypeId, final String useCase) {
+        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?usecase=" + useCase;
     }
 
     public String displayCaseTabCollection(final String caseTypeId) {

@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.io.Serializable;
@@ -35,7 +34,7 @@ public class SearchResultField implements Serializable {
     @JsonProperty("display_context_parameter")
     private String displayContextParameter = null;
     @JsonProperty("use_case")
-    private UseCase useCase;
+    private String useCase;
 
     public String getCaseTypeId() {
         return caseTypeId;
@@ -120,11 +119,11 @@ public class SearchResultField implements Serializable {
         this.displayContextParameter = displayContextParameter;
     }
 
-    public UseCase getUseCase() {
+    public String getUseCase() {
         return useCase;
     }
 
-    public void setUseCase(UseCase useCase) {
+    public void setUseCase(String useCase) {
         this.useCase = useCase;
     }
 

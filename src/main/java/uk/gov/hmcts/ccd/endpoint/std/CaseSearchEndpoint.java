@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import io.swagger.annotations.*;
+import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
@@ -66,7 +66,7 @@ public class CaseSearchEndpoint {
 
         CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(
             caseTypeIds,
-            UseCase.DEFAULT.getReference(),
+            Strings.EMPTY,
             jsonSearchRequest
         );
 

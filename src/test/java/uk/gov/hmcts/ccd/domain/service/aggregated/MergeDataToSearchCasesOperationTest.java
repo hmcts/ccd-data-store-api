@@ -14,11 +14,11 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchHeaderMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil.CaseDetailsBuilder.caseDetails;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
@@ -170,7 +171,7 @@ class MergeDataToSearchCasesOperationTest {
     @Test
     void shouldBuildCaseSearchResultHeaders() {
         final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2),
-            caseSearchResult, UseCase.WORKBASKET);
+            caseSearchResult, WORKBASKET);
 
         assertAll(
             () -> assertThat(uiCaseSearchResult.getHeaders().size(), is(2)),
@@ -189,7 +190,7 @@ class MergeDataToSearchCasesOperationTest {
     @Test
     void shouldBuildCaseSearchResultCases() {
         final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2),
-            caseSearchResult, UseCase.ORG_CASES);
+            caseSearchResult, "ORGCASES");
 
         Map<String, Object> caseDataDifferences = Maps.difference(uiCaseSearchResult.getCases().get(0).getFields(),
             dataMap).entriesOnlyOnRight();
@@ -215,7 +216,7 @@ class MergeDataToSearchCasesOperationTest {
     @Test
     void shouldBuildCaseSearchResultTotal() {
         final UICaseSearchResult searchResultView = classUnderTest.execute(Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2),
-            caseSearchResult, UseCase.WORKBASKET);
+            caseSearchResult, WORKBASKET);
 
         assertAll(
             () -> assertThat(searchResultView.getTotal(), is(3L))
@@ -233,7 +234,7 @@ class MergeDataToSearchCasesOperationTest {
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
 
         final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1),
-            caseSearchResult, UseCase.WORKBASKET);
+            caseSearchResult, WORKBASKET);
 
         assertAll(
             () -> assertThat(uiCaseSearchResult.getHeaders().size(), is(1)),
@@ -273,7 +274,7 @@ class MergeDataToSearchCasesOperationTest {
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1));
 
         final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1),
-            caseSearchResult, UseCase.WORKBASKET);
+            caseSearchResult, WORKBASKET);
 
         assertAll(
             () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(3)),
@@ -315,7 +316,7 @@ class MergeDataToSearchCasesOperationTest {
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
 
         final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1),
-            caseSearchResult, UseCase.WORKBASKET);
+            caseSearchResult, WORKBASKET);
 
         assertAll(
             () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(3)),
@@ -334,7 +335,7 @@ class MergeDataToSearchCasesOperationTest {
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
 
         final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1),
-            caseSearchResult, UseCase.WORKBASKET);
+            caseSearchResult, WORKBASKET);
 
         assertAll(
             () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(0),
@@ -358,7 +359,7 @@ class MergeDataToSearchCasesOperationTest {
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1), caseSearchResult, UseCase.WORKBASKET));
+            () -> classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1), caseSearchResult, WORKBASKET));
 
         assertAll(
             () -> assertThat(exception.getMessage(), is("CaseField FamilyDetails has no nested elements with code InvalidElement."))
@@ -378,10 +379,23 @@ class MergeDataToSearchCasesOperationTest {
         when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeWithoutCaseFieldDefinition));
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1), caseSearchResult, UseCase.WORKBASKET));
+            () -> classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1), caseSearchResult, WORKBASKET));
 
         assertAll(
             () -> assertThat(exception.getMessage(), is("Nested element not found for path InvalidElementPath"))
+        );
+    }
+
+    @Test
+    void shouldThrowBadSearchRequestExceptionWhenUseCaseDoesNotExist() {
+        SearchResult searchResult = searchResult().withSearchResultFields().build();
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+
+        final BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
+            classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1), caseSearchResult, "INVALID"));
+
+        assertAll(
+            () -> assertThat(exception.getMessage(), is("The provided use case 'INVALID' is unsupported for case type 'CASE_TYPE_1'."))
         );
     }
 

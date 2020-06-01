@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
@@ -27,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 class UICaseSearchControllerTest {
 
@@ -58,11 +58,11 @@ class UICaseSearchControllerTest {
         List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
 
         final ResponseEntity<CaseSearchResultViewResource> response = controller
-            .searchCases(caseTypeIds, UseCase.WORKBASKET.getReference(), searchRequest);
+            .searchCases(caseTypeIds, WORKBASKET, searchRequest);
 
         verify(elasticsearchQueryHelper).prepareRequest(eq(caseTypeIds), eq("WORKBASKET"), eq(searchRequest));
         verify(caseSearchOperation).executeExternal(eq(preparedRequest));
-        verify(caseSearchOperation).executeInternal(eq(caseSearchResult), eq(caseTypeIds), eq(UseCase.WORKBASKET));
+        verify(caseSearchOperation).executeInternal(eq(caseSearchResult), eq(caseTypeIds), eq(WORKBASKET));
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
             () -> assertThat(response.getBody().getHeaders(), is(uiCaseSearchResult.getHeaders())),

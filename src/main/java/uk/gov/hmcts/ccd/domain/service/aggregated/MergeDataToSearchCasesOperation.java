@@ -10,9 +10,9 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,7 +37,7 @@ public class MergeDataToSearchCasesOperation {
 
     public UICaseSearchResult execute(final List<String> caseTypeIds,
                                       final CaseSearchResult caseSearchResult,
-                                      final UseCase useCase) {
+                                      final String useCase) {
         return new UICaseSearchResult(
             buildHeaders(caseTypeIds, useCase, caseSearchResult),
             buildItems(useCase, caseSearchResult),
@@ -45,7 +45,7 @@ public class MergeDataToSearchCasesOperation {
         );
     }
 
-    private List<SearchResultViewItem> buildItems(UseCase useCase, CaseSearchResult caseSearchResult) {
+    private List<SearchResultViewItem> buildItems(String useCase, CaseSearchResult caseSearchResult) {
         List<SearchResultViewItem> items = new ArrayList<>();
         caseSearchResult.getCases().forEach(caseDetails -> {
             getCaseTypeDefinition(caseDetails.getCaseTypeId()).ifPresent(caseType -> {
@@ -57,7 +57,7 @@ public class MergeDataToSearchCasesOperation {
         return items;
     }
 
-    private List<UICaseSearchHeader> buildHeaders(List<String> caseTypeIds, UseCase useCase, CaseSearchResult caseSearchResult) {
+    private List<UICaseSearchHeader> buildHeaders(List<String> caseTypeIds, String useCase, CaseSearchResult caseSearchResult) {
         List<UICaseSearchHeader> headers = new ArrayList<>();
         caseTypeIds.forEach(caseTypeId -> {
             getCaseTypeDefinition(caseTypeId).ifPresent(caseType -> {
@@ -73,8 +73,12 @@ public class MergeDataToSearchCasesOperation {
         return getCaseTypeOperation.execute(caseTypeId, CAN_READ);
     }
 
-    private UICaseSearchHeader buildHeader(UseCase useCase, CaseSearchResult caseSearchResult, String caseTypeId, CaseTypeDefinition caseType) {
+    private UICaseSearchHeader buildHeader(String useCase, CaseSearchResult caseSearchResult, String caseTypeId, CaseTypeDefinition caseType) {
         final SearchResult searchResult = searchQueryOperation.getSearchResultDefinition(caseType, useCase);
+        if (searchResult.getFields().length == 0) {
+            throw new BadSearchRequest(String.format("The provided use case '%s' is unsupported for case type '%s'.",
+                useCase, caseType.getId()));
+        }
         return new UICaseSearchHeader(
             new UICaseSearchHeaderMetadata(caseType.getJurisdictionId(), caseTypeId),
             buildSearchResultViewColumns(caseType, searchResult),

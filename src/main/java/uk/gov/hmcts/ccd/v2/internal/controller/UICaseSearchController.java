@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import com.google.common.base.Strings;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
@@ -106,9 +107,10 @@ public class UICaseSearchController {
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 
-        CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(caseTypeIds, useCase, jsonSearchRequest);
+        String useCaseTransformed = Strings.isNullOrEmpty(useCase) ? useCase : useCase.toUpperCase();
+        CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(caseTypeIds, useCaseTransformed, jsonSearchRequest);
         CaseSearchResult caseSearchResult = caseSearchOperation.executeExternal(request);
-        UICaseSearchResult uiCaseSearchResult = caseSearchOperation.executeInternal(caseSearchResult, caseTypeIds, UseCase.valueOfReference(useCase));
+        UICaseSearchResult uiCaseSearchResult = caseSearchOperation.executeInternal(caseSearchResult, caseTypeIds, useCaseTransformed);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("Internal searchCases execution completed in {} millisecs...", between.toMillis());
