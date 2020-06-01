@@ -143,5 +143,4 @@ public class MergeDataToSearchResultOperation {
 
         return newResults;
     }
-
 }
