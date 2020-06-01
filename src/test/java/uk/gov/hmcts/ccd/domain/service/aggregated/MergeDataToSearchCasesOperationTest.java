@@ -367,7 +367,7 @@ class MergeDataToSearchCasesOperationTest {
     }
 
     @Test
-    void shouldThrowBadRequestExceptionWhenNoNestedElementFoundForPath1() {
+    void shouldNotNotReturnHeaderFieldsWhenNoNestedElementFoundForPath() {
         SearchResult searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID_1,
                 FAMILY_DETAILS, "InvalidElementPath",
@@ -378,12 +378,15 @@ class MergeDataToSearchCasesOperationTest {
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
         when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeWithoutCaseFieldDefinition));
 
-        final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1), caseSearchResult, WORKBASKET));
+        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(Collections.singletonList(CASE_TYPE_ID_1),
+            caseSearchResult, WORKBASKET);
 
         assertAll(
-            () -> assertThat(exception.getMessage(), is("Nested element not found for path InvalidElementPath"))
-        );
+            () -> assertThat(uiCaseSearchResult.getCases().size(), is(3)),
+            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(0)),
+            () -> assertNull(uiCaseSearchResult.getCases().get(0).getFields().get("InvalidElementPath")),
+            () -> assertNull(uiCaseSearchResult.getCases().get(1).getFields().get("InvalidElementPath")),
+            () -> assertNull(uiCaseSearchResult.getCases().get(2).getFields().get("InvalidElementPath")));
     }
 
     @Test
