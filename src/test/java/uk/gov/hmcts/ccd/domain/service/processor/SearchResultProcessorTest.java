@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -30,6 +31,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.MULTI_SELECT_LIST;
 
 class SearchResultProcessorTest {
 
@@ -241,6 +243,35 @@ class SearchResultProcessorTest {
         );
     }
 
+    @Test
+    void shouldUseOriginalValueForMultiSelectListField() throws JsonProcessingException {
+        final String multiSelectField = "MultiSelectField";
+        caseFields.put(multiSelectField,
+            MAPPER.readTree("[\"Value1\", \"Value2\"]"));
+        SearchResultViewColumn column1 = new SearchResultViewColumn(multiSelectField,
+            fieldType(MULTI_SELECT_LIST), null, 1, false, null);
+        List<SearchResultViewColumn> columns = new ArrayList<>();
+        columns.addAll(Arrays.asList(column1));
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
+        viewColumns.add(column1);
+
+        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+
+        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        final ArrayNode multiSelectResult = (ArrayNode)itemResult.getCaseFields().get(multiSelectField);
+        final ArrayNode multiSelectResultFormatted = (ArrayNode)itemResult.getCaseFieldsFormatted().get(multiSelectField);
+        assertAll(
+            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
+            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
+            () -> assertThat(multiSelectResult.size(), is(2)),
+            () -> assertThat(multiSelectResult.get(0).asText(), is("Value1")),
+            () -> assertThat(multiSelectResult.get(1).asText(), is("Value2")),
+            () -> assertThat(multiSelectResultFormatted.size(), is(2)),
+            () -> assertThat(multiSelectResultFormatted.get(0).asText(), is("Value1")),
+            () -> assertThat(multiSelectResultFormatted.get(1).asText(), is("Value2"))
+        );
+    }
+
     private CaseFieldDefinition caseField(String id, FieldTypeDefinition fieldType, String displayContextParameter) {
         CaseFieldDefinition caseField = new CaseFieldDefinition();
         caseField.setId(id);
@@ -267,5 +298,6 @@ class SearchResultProcessorTest {
         BaseType.register(new BaseType(fieldType(DATETIME_FIELD_TYPE)));
         BaseType.register(new BaseType(fieldType(COLLECTION_FIELD_TYPE)));
         BaseType.register(new BaseType(fieldType(COMPLEX_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(MULTI_SELECT_LIST)));
     }
 }

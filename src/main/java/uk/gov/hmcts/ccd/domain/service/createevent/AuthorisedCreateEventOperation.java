@@ -1,17 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -24,14 +18,23 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.Map;
+import java.util.Set;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
+
 @Service
 @Qualifier("authorised")
 public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
 
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final CreateEventOperation createEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final GetCaseOperation getCaseOperation;
@@ -87,22 +90,21 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                 return null;
             }
 
-            caseDetails.setData(MAPPER.convertValue(
+            caseDetails.setData(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
                     userRoles,
                     CAN_READ,
-                    false),
-                STRING_JSON_MAP));
-            caseDetails.setDataClassification(MAPPER.convertValue(
+                    false)));
+
+            caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
                     userRoles,
                     CAN_READ,
-                    true),
-                STRING_JSON_MAP));
+                    true)));
         }
         return caseDetails;
     }

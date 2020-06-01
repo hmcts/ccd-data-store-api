@@ -10,19 +10,19 @@
 	],
   "request": {
     "pathVariables": {
-      "cid": "1234567890123456"
+      "cid": "1234123412341238"
     }
   },
 	"expectedResponse": {
     "_extends_": "Common_404_Response",
 		"headers": {
       "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip",
-      "Connection" : "close"
+      "Content-Encoding" : "gzip"
     },
     "body" : {
-      "exception" : "[[ANYTHING_PRESENT]]",
-      "message" : "Case ID is not valid",
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "No case exist with id=1234123412341238",
+      "path" : "/internal/cases/1234123412341238/event-triggers/START_PROGRESS",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

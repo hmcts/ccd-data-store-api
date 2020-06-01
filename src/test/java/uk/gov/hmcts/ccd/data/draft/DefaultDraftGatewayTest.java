@@ -1,5 +1,39 @@
 package uk.gov.hmcts.ccd.data.draft;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Maps;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
+import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
@@ -16,7 +50,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
@@ -24,36 +62,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCase
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftBuilder.anDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.newUpdateCaseDraft;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.collect.Maps;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
-import uk.gov.hmcts.ccd.domain.model.draft.*;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
 class DefaultDraftGatewayTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     public static final TextNode VALUE_CLASS = JSON_NODE_FACTORY.textNode("valueClass");
     public static final TextNode VALUE = JSON_NODE_FACTORY.textNode("value");
-    private static final ObjectMapper mapper = new ObjectMapper();
     private static final String CASE_DATA_CONTENT = "CaseDataContent";
     private static final String UID = "1";
     private static final String JID = "TEST";
@@ -128,7 +140,7 @@ class DefaultDraftGatewayTest {
         draft = anDraft()
             .withId(DID)
             .withType(TYPE)
-            .withDocument(mapper.convertValue(caseDraft, JsonNode.class))
+            .withDocument(JacksonUtils.convertValueJsonNode(caseDraft))
             .withCreated(NOW)
             .withUpdated(NOW_PLUS_5_MIN)
             .build();
@@ -142,7 +154,7 @@ class DefaultDraftGatewayTest {
             .withType(CASE_DATA_CONTENT)
             .build();
         draftGateway = new DefaultDraftGateway(createDraftRestTemplate, restTemplate, securityUtils, applicationParams,
-                                               draftResponseToCaseDetailsBuilder);
+            draftResponseToCaseDetailsBuilder);
     }
 
     @Test
@@ -229,18 +241,18 @@ class DefaultDraftGatewayTest {
             () -> assertThat(result, hasProperty("document", hasProperty("eventId", is(caseDraft.getEventId())))),
             () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("data", is(caseDataContent.getData()))))),
             () -> assertThat(result,
-                             hasProperty("document",
-                                         hasProperty("caseDataContent",
-                                                     hasProperty("securityClassification", is(caseDataContent.getSecurityClassification()))))),
+                hasProperty("document",
+                    hasProperty("caseDataContent",
+                        hasProperty("securityClassification", is(caseDataContent.getSecurityClassification()))))),
             () -> assertThat(result,
-                             hasProperty("document",
-                                         hasProperty("caseDataContent",
-                                                     hasProperty("dataClassification", is(caseDataContent.getDataClassification()))))),
+                hasProperty("document",
+                    hasProperty("caseDataContent",
+                        hasProperty("dataClassification", is(caseDataContent.getDataClassification()))))),
             () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("token", is(caseDataContent.getToken()))))),
             () -> assertThat(result,
-                             hasProperty("document", hasProperty("caseDataContent", hasProperty("ignoreWarning", is(caseDataContent.getIgnoreWarning()))))),
+                hasProperty("document", hasProperty("caseDataContent", hasProperty("ignoreWarning", is(caseDataContent.getIgnoreWarning()))))),
             () -> assertThat(result,
-                             hasProperty("document", hasProperty("caseDataContent", hasProperty("event", samePropertyValuesAs(caseDataContent.getEvent()))))),
+                hasProperty("document", hasProperty("caseDataContent", hasProperty("event", samePropertyValuesAs(caseDataContent.getEvent()))))),
             () -> assertThat(result, hasProperty("created", is(NOW.toLocalDateTime()))),
             () -> assertThat(result, hasProperty("updated", is(NOW_PLUS_5_MIN.toLocalDateTime())))
         );
