@@ -136,10 +136,9 @@ public class SearchResultField implements Serializable {
     private Object reduce(JsonNode caseFields, List<String> pathElements, String path) {
         String firstPathElement = pathElements.get(0);
 
-        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement))
-            .orElseThrow(() -> new BadRequestException(format(NESTED_ELEMENT_NOT_FOUND_FOR_PATH, path)));
+        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement)).orElse(null);
 
-        if (pathElements.size() == 1) {
+        if (caseField == null || pathElements.size() == 1) {
             return caseField;
         } else {
             List<String> tail = pathElements.subList(1, pathElements.size());
