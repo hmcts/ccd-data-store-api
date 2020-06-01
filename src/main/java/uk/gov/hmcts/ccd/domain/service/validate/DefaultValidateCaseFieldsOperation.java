@@ -95,7 +95,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
 
     private  boolean validateOrgPolicyCaseAssignedRole(CaseEventFieldComplexDefinition caseEventFieldComplexDefinition, String defaultValue) {
         if (!caseEventFieldComplexDefinition.getDefaultValue().equals(defaultValue)) {
-            throw new ValidationException(ORGANISATION_POLICY_ROLE + " filed has an incorrect value.");
+            throw new ValidationException("The organisation policy role filed has an incorrect value.");
         }
         return false;
     }

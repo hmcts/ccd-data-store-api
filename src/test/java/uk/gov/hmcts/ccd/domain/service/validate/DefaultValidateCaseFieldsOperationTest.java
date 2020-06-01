@@ -101,7 +101,7 @@ class DefaultValidateCaseFieldsOperationTest {
             assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
         assertThat(exception.getMessage(),
-            startsWith("OrgPolicyCaseAssignedRole filed has an incorrect value"));
+            startsWith("The organisation policy role filed has an incorrect value."));
 
     }
 
