@@ -20,10 +20,10 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
-        if (key.toString().startsWith("caseIdAsIntegerFrom")){
+        if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
             try {
-                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts."+childContext+".testData.actualResponse.body.id");
+                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
