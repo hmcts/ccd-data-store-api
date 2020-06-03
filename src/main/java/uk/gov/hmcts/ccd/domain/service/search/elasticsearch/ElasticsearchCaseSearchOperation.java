@@ -1,5 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
@@ -21,14 +29,6 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMa
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)

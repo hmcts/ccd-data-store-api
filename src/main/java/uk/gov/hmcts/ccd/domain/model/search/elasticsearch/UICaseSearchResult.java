@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.search.elasticsearch;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -10,9 +12,10 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 
 @Data
+@AllArgsConstructor
 public class UICaseSearchResult {
 
-    public static final UICaseSearchResult EMPTY = new UICaseSearchResult(emptyList(), emptyList(), 0L);
+    public static final UICaseSearchResult EMPTY = new UICaseSearchResult(emptyList(), emptyList(), 0L, null);
 
     @NonNull
     private List<SearchResultViewHeaderGroup> headers;
@@ -20,6 +23,7 @@ public class UICaseSearchResult {
     private List<SearchResultViewItem> cases;
     @NonNull
     private Long total;
+    private String useCase;
 
     public Optional<SearchResultViewHeaderGroup> findHeaderByCaseType(String caseTypeId) {
         return headers.stream().filter(header -> header.getMetadata().getCaseTypeId().equals(caseTypeId)).findFirst();

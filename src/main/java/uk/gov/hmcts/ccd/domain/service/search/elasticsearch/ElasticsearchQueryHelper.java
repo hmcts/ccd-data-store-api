@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -91,7 +92,7 @@ public class ElasticsearchQueryHelper {
 
     private void applyConfiguredSort(JsonNode searchRequest, String caseTypeId, String useCase) {
         JsonNode sortNode = searchRequest.get(SORT);
-        if (sortNode == null) {
+        if (sortNode == null || useCase == null) {
             ArrayNode appliedSortsNode = buildSortNode(caseTypeId, useCase);
             if (appliedSortsNode.size() > 0) {
                 ((ObjectNode)searchRequest).set(SORT, appliedSortsNode);
@@ -113,11 +114,11 @@ public class ElasticsearchQueryHelper {
 
     private ObjectNode buildSortOrderFieldNode(CaseTypeDefinition caseTypeDefinition, SortOrderField sortOrderField) {
         ObjectNode objectNode = objectMapper.createObjectNode();
-        final CommonField commonField = caseTypeDefinition.getComplexSubfieldDefinitionByPath(sortOrderField.getCaseFieldId()).orElseThrow(() ->
+        CommonField commonField = caseTypeDefinition.getComplexSubfieldDefinitionByPath(sortOrderField.getCaseFieldId()).orElseThrow(() ->
             new NullPointerException(String.format("Case field '%s' does not exist in configuration for case type '%s'.",
                 sortOrderField.getCaseFieldId(), caseTypeDefinition.getId()))
         );
-        final FieldTypeDefinition fieldType = commonField.getFieldTypeDefinition();
+        FieldTypeDefinition fieldType = commonField.getFieldTypeDefinition();
 
         StringBuilder sb = new StringBuilder();
 

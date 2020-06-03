@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,6 +26,9 @@ public class CaseSearchResultViewResource extends RepresentationModel {
     private List<SearchResultViewItem> cases;
     @ApiModelProperty(value = "Total number of search results (including results not returned due to pagination)")
     private Long total;
+    @ApiModelProperty(value = "The use case that the response represents; null for standard requests")
+    @JsonProperty("use_case")
+    private String useCase;
 
     public CaseSearchResultViewResource(@NonNull UICaseSearchResult uiCaseSearchResult) {
         copyProperties(uiCaseSearchResult);
@@ -34,5 +38,6 @@ public class CaseSearchResultViewResource extends RepresentationModel {
         this.headers = uiCaseSearchResult.getHeaders();
         this.cases = uiCaseSearchResult.getCases();
         this.total = uiCaseSearchResult.getTotal();
+        this.useCase = uiCaseSearchResult.getUseCase();
     }
 }

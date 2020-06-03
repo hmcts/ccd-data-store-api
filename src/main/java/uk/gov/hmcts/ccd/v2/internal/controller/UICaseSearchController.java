@@ -120,7 +120,7 @@ public class UICaseSearchController {
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 
-        String useCaseUppercase = Strings.isNullOrEmpty(useCase) ? useCase : useCase.toUpperCase();
+        String useCaseUppercase = Strings.isNullOrEmpty(useCase) ? null : useCase.toUpperCase();
         CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(caseTypeId, jsonSearchRequest, useCaseUppercase);
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(request);
         UICaseSearchResult uiCaseSearchResult = caseSearchResultGenerator.execute(caseTypeId, caseSearchResult, useCaseUppercase);

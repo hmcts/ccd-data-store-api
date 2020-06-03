@@ -45,7 +45,8 @@ public class CaseSearchResultGenerator {
         return new UICaseSearchResult(
             buildHeaders(caseTypeId, useCase, caseSearchResult),
             buildItems(useCase, caseSearchResult),
-            caseSearchResult.getTotal()
+            caseSearchResult.getTotal(),
+            useCase
         );
     }
 

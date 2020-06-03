@@ -19,15 +19,17 @@ class CaseSearchResultViewResourceTest {
         List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
         List<SearchResultViewItem> cases = new ArrayList<>();
         Long total = 3L;
+        String useCase = "ORGCASES";
 
-        UICaseSearchResult uiCaseSearchResult = new UICaseSearchResult(headers, cases, total);
+        UICaseSearchResult uiCaseSearchResult = new UICaseSearchResult(headers, cases, total, useCase);
 
-        final CaseSearchResultViewResource resource = new CaseSearchResultViewResource(uiCaseSearchResult);
+        CaseSearchResultViewResource resource = new CaseSearchResultViewResource(uiCaseSearchResult);
 
         assertAll(
             () -> assertThat(resource.getCases(), sameInstance(cases)),
             () -> assertThat(resource.getHeaders(), sameInstance(headers)),
-            () -> assertThat(resource.getTotal(), sameInstance(total))
+            () -> assertThat(resource.getTotal(), sameInstance(total)),
+            () -> assertThat(resource.getUseCase(), sameInstance(useCase))
         );
     }
 }
