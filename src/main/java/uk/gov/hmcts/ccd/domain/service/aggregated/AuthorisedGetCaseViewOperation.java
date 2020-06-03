@@ -56,7 +56,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         verifyCaseTypeReadAccess(caseType, userRoles);
         filterCaseTabFieldsByReadAccess(caseView, userRoles);
         filterAllowedTabsWithFields(caseView, userRoles);
-        return filterUpsertAccess(caseId, caseType, userRoles, caseView);
+        return filterUpsertAccess(caseReference, caseType, userRoles, caseView);
     }
 
     private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<String> userRoles) {
@@ -69,7 +69,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
             }).toArray(CaseViewTab[]::new));
     }
 
-    private CaseView filterUpsertAccess(String caseId, CaseType caseType, Set<String> userRoles, CaseView caseView) {
+    private CaseView filterUpsertAccess(String caseReference, CaseType caseType, Set<String> userRoles, CaseView caseView) {
         CaseViewTrigger[] authorisedTriggers;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseType,
                                                                      userRoles,
@@ -80,8 +80,8 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
                                                                       CAN_UPDATE)) {
             authorisedTriggers = new CaseViewTrigger[]{};
 
-            LOG.info("No authorised triggers for caseId={} caseType={} caseState={}, caseTypeACLs={}, userRoles={}",
-                caseId,
+            LOG.info("No authorised triggers for caseReference={} caseType={} caseState={}, caseTypeACLs={}, userRoles={}",
+                caseReference,
                 caseType.getId(),
                 caseView.getState().getId(),
                 caseType.getAccessControlLists(),
