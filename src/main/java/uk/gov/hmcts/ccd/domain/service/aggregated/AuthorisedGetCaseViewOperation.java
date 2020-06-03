@@ -86,8 +86,8 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
             LOG.info("No authorised triggers for caseReference={} caseType={} version={} caseState={}, caseTypeACLs={}, caseStateACLs={} userRoles={}",
                 caseReference,
                 caseType.getId(),
-                caseType.getVersion().getNumber(),
-                caseView.getState().getId(),
+                caseType.getVersion() != null ? caseType.getVersion().getNumber() : "",
+                caseView.getState() != null ? caseView.getState().getId() : "",
                 caseType.getAccessControlLists(),
                 caseType.getStates()
                     .stream()
@@ -98,10 +98,10 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
                 userRoles);
 
         } else {
-            LOG.info("No authorised triggers for caseReference={} caseType={} version={}",
+            LOG.info("Authorised triggers for caseReference={} caseType={} version={}",
                 caseReference,
                 caseType.getId(),
-                caseType.getVersion().getNumber());
+                caseType.getVersion() != null ? caseType.getVersion().getNumber() : "");
             authorisedTriggers = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getTriggers(),
                                                                                                 caseType.getEvents(),
                                                                                                 userRoles);
