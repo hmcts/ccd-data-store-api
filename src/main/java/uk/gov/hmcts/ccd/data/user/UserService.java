@@ -1,10 +1,7 @@
 package uk.gov.hmcts.ccd.data.user;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -60,13 +56,6 @@ public class UserService {
         });
 
         return createUserProfile(idamProperties, userId, jurisdictionDefinitions);
-    }
-
-    public List<CaseTypeDefinition> getUserCaseTypes() {
-        return Arrays.stream(getUserProfile().getJurisdictions())
-            .map(JurisdictionDisplayProperties::getCaseTypeDefinitions)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
     }
 
     private UserProfile createUserProfile(IdamProperties idamProperties, String userId, List<JurisdictionDefinition> jurisdictionsDefinition) {

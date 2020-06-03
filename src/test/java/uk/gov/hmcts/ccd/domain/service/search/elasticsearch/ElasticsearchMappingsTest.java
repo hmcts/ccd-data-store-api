@@ -17,20 +17,11 @@ class ElasticsearchMappingsTest {
     @BeforeEach
     void setUp() {
         ElasticsearchMappings.TypeMappings typeMappings = new ElasticsearchMappings.TypeMappings(
-            Arrays.asList("Text", "TextArea", "FixedList", "FixedListEdit", "MultiSelectList", "FixedRadioList", "DynamicList"),
-            Arrays.asList("Number", "MoneyGBP"),
-            Arrays.asList("Date", "Time", "DateTime"),
-            Arrays.asList("PhoneUK"),
-            Arrays.asList("YesOrNo", "Email", "Postcode"),
-            Arrays.asList("Document")
+            Arrays.asList("Text", "TextArea", "FixedList", "FixedListEdit", "MultiSelectList", "FixedRadioList", "DynamicList")
         );
 
         ElasticsearchMappings.CasePredefinedMappings casePredefinedMappings = new ElasticsearchMappings.CasePredefinedMappings(
-            Arrays.asList("reference", "jurisdiction", "state", "case_type_id"),
-            Arrays.asList("id"),
-            Arrays.asList("created_date", "last_modified"),
-            Arrays.asList("security_classification"),
-            Arrays.asList("@timestamp", "@version", "index_id")
+            Arrays.asList("reference", "jurisdiction", "state", "case_type_id")
         );
 
         elasticsearchMappings = new ElasticsearchMappings(typeMappings, casePredefinedMappings);

@@ -21,15 +21,15 @@ class UICaseSearchResultTest {
 
     @Test
     void shouldFindHeaderByCaseType() {
-        UICaseSearchHeader correctHeader = new UICaseSearchHeader(
-            new UICaseSearchHeaderMetadata(JURISDICTION, CASE_TYPE), emptyList(), emptyList()
+        SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
+            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE), emptyList(), emptyList()
         );
-        UICaseSearchHeader otherHeader = new UICaseSearchHeader(
-            new UICaseSearchHeaderMetadata(JURISDICTION, "Other Case Type"), emptyList(), emptyList()
+        SearchResultViewHeaderGroup otherHeader = new SearchResultViewHeaderGroup(
+            new HeaderGroupMetadata(JURISDICTION, "Other Case Type"), emptyList(), emptyList()
         );
         UICaseSearchResult uiCaseSearchResult = new UICaseSearchResult(Arrays.asList(otherHeader, correctHeader), emptyList(), 0L);
 
-        final Optional<UICaseSearchHeader> result = uiCaseSearchResult.findHeaderByCaseType(CASE_TYPE);
+        final Optional<SearchResultViewHeaderGroup> result = uiCaseSearchResult.findHeaderByCaseType(CASE_TYPE);
 
         assertAll(
             () -> assertTrue(result.isPresent()),
@@ -39,12 +39,12 @@ class UICaseSearchResultTest {
 
     @Test
     void shouldNotFindNonExistingHeader() {
-        UICaseSearchHeader header = new UICaseSearchHeader(
-            new UICaseSearchHeaderMetadata(JURISDICTION, CASE_TYPE), emptyList(), emptyList()
+        SearchResultViewHeaderGroup header = new SearchResultViewHeaderGroup(
+            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE), emptyList(), emptyList()
         );
         UICaseSearchResult uiCaseSearchResult = new UICaseSearchResult(Collections.singletonList(header), emptyList(), 0L);
 
-        final Optional<UICaseSearchHeader> result = uiCaseSearchResult.findHeaderByCaseType("Other Case Type");
+        final Optional<SearchResultViewHeaderGroup> result = uiCaseSearchResult.findHeaderByCaseType("Other Case Type");
 
         assertAll(
             () -> assertFalse(result.isPresent())
@@ -82,11 +82,11 @@ class UICaseSearchResultTest {
         SearchResultViewItem correctItem1 = new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
         SearchResultViewItem correctItem2 = new SearchResultViewItem("222", Collections.emptyMap(), Collections.emptyMap());
         SearchResultViewItem otherItem3 = new SearchResultViewItem("333", Collections.emptyMap(), Collections.emptyMap());
-        UICaseSearchHeader correctHeader = new UICaseSearchHeader(
-            new UICaseSearchHeaderMetadata(JURISDICTION, CASE_TYPE), emptyList(), Arrays.asList("111", "222")
+        SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
+            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE), emptyList(), Arrays.asList("111", "222")
         );
-        UICaseSearchHeader otherHeader = new UICaseSearchHeader(
-            new UICaseSearchHeaderMetadata(JURISDICTION, "Other Case Type"), emptyList(), Arrays.asList("333")
+        SearchResultViewHeaderGroup otherHeader = new SearchResultViewHeaderGroup(
+            new HeaderGroupMetadata(JURISDICTION, "Other Case Type"), emptyList(), Arrays.asList("333")
         );
         UICaseSearchResult uiCaseSearchResult = new UICaseSearchResult(
             Arrays.asList(otherHeader, correctHeader), Arrays.asList(correctItem1, otherItem3, correctItem2), 0L
@@ -103,8 +103,8 @@ class UICaseSearchResultTest {
 
     @Test
     void shouldReturnEmptyListWhenNoCasesForCaseType() {
-        UICaseSearchHeader header = new UICaseSearchHeader(
-            new UICaseSearchHeaderMetadata(JURISDICTION, CASE_TYPE), emptyList(), emptyList()
+        SearchResultViewHeaderGroup header = new SearchResultViewHeaderGroup(
+            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE), emptyList(), emptyList()
         );
         UICaseSearchResult uiCaseSearchResult = new UICaseSearchResult(
             singletonList(header), emptyList(), 0L

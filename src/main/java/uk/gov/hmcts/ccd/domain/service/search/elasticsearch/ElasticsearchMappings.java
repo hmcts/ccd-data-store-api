@@ -35,11 +35,6 @@ public class ElasticsearchMappings {
     public static class TypeMappings {
 
         private final List<String> defaultText;
-        private final List<String> defaultDouble;
-        private final List<String> defaultDate;
-        private final List<String> ccdPhoneUK;
-        private final List<String> defaultKeyword;
-        private final List<String> ccdDocument;
     }
 
     @AllArgsConstructor
@@ -47,9 +42,5 @@ public class ElasticsearchMappings {
     public static class CasePredefinedMappings {
 
         private final List<String> defaultText;
-        private final List<String> defaultLong;
-        private final List<String> defaultDate;
-        private final List<String> defaultKeyword;
-        private final List<String> disabled;
     }
 }

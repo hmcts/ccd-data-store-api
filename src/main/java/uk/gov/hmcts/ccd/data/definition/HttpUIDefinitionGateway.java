@@ -185,20 +185,20 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     @Override
     public SearchResult getSearchCasesResult(int version, String caseTypeId, String useCase) {
         try {
-            final Instant start = Instant.now();
-            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            final SearchResult
+            Instant start = Instant.now();
+            HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            SearchResult
                 searchResult =
                 restTemplate.exchange(withVersionQueryParam(applicationParams.displaySearchCasesResultDefURL(caseTypeId, useCase), version),
                     HttpMethod.GET,
                     requestEntity,
                     SearchResult.class).getBody();
-            final Duration duration = Duration.between(start, Instant.now());
+            Duration duration = Duration.between(start, Instant.now());
             LOG.debug("Rest API getSearchCasesResultGetHttp called for {}, finished in {}",
                 caseTypeId,
                 duration.toMillis());
             return searchResult;
-        } catch (final Exception e) {
+        } catch (Exception e) {
             throw new ServiceException(String.format(
                 "Problem getting SearchCasesResult definition for case type: %s because of %s",
                 caseTypeId,

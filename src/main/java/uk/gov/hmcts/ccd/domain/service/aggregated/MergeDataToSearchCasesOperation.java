@@ -57,11 +57,11 @@ public class MergeDataToSearchCasesOperation {
         return items;
     }
 
-    private List<UICaseSearchHeader> buildHeaders(List<String> caseTypeIds, String useCase, CaseSearchResult caseSearchResult) {
-        List<UICaseSearchHeader> headers = new ArrayList<>();
+    private List<SearchResultViewHeaderGroup> buildHeaders(List<String> caseTypeIds, String useCase, CaseSearchResult caseSearchResult) {
+        List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
         caseTypeIds.forEach(caseTypeId -> {
             getCaseTypeDefinition(caseTypeId).ifPresent(caseType -> {
-                UICaseSearchHeader caseSearchHeader = buildHeader(useCase, caseSearchResult, caseTypeId, caseType);
+                SearchResultViewHeaderGroup caseSearchHeader = buildHeader(useCase, caseSearchResult, caseTypeId, caseType);
                 headers.add(caseSearchHeader);
             });
         });
@@ -73,20 +73,20 @@ public class MergeDataToSearchCasesOperation {
         return getCaseTypeOperation.execute(caseTypeId, CAN_READ);
     }
 
-    private UICaseSearchHeader buildHeader(String useCase, CaseSearchResult caseSearchResult, String caseTypeId, CaseTypeDefinition caseType) {
+    private SearchResultViewHeaderGroup buildHeader(String useCase, CaseSearchResult caseSearchResult, String caseTypeId, CaseTypeDefinition caseType) {
         final SearchResult searchResult = searchQueryOperation.getSearchResultDefinition(caseType, useCase);
         if (searchResult.getFields().length == 0) {
             throw new BadSearchRequest(String.format("The provided use case '%s' is unsupported for case type '%s'.",
                 useCase, caseType.getId()));
         }
-        return new UICaseSearchHeader(
-            new UICaseSearchHeaderMetadata(caseType.getJurisdictionId(), caseTypeId),
+        return new SearchResultViewHeaderGroup(
+            new HeaderGroupMetadata(caseType.getJurisdictionId(), caseTypeId),
             buildSearchResultViewColumns(caseType, searchResult),
-            caseSearchResult.buildCaseReferenceList(caseTypeId)
+            caseSearchResult.getCaseReferences(caseTypeId)
         );
     }
 
-    private List<SearchResultViewColumn> buildSearchResultViewColumns(final CaseTypeDefinition caseTypeDefinition,
+    private List<SearchResultViewHeader> buildSearchResultViewColumns(final CaseTypeDefinition caseTypeDefinition,
                                                                       final SearchResult searchResult) {
         final HashSet<String> addedFields = new HashSet<>();
 
@@ -99,10 +99,10 @@ public class MergeDataToSearchCasesOperation {
             .collect(Collectors.toList());
     }
 
-    private SearchResultViewColumn buildSearchResultViewColumn(final SearchResultField searchResultField,
+    private SearchResultViewHeader buildSearchResultViewColumn(final SearchResultField searchResultField,
                                                                final CaseFieldDefinition caseFieldDefinition) {
         CommonField commonField = commonField(searchResultField, caseFieldDefinition);
-        return new SearchResultViewColumn(
+        return new SearchResultViewHeader(
             searchResultField.buildCaseFieldId(),
             commonField.getFieldTypeDefinition(),
             searchResultField.getLabel(),

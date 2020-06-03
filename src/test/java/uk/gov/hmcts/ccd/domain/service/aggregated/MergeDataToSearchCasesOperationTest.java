@@ -14,8 +14,8 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewColumn;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchHeaderMetadata;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -402,7 +402,7 @@ class MergeDataToSearchCasesOperationTest {
         );
     }
 
-    private void assertMetadata(UICaseSearchHeaderMetadata metadata, String caseTypeId, String jurisdiction) {
+    private void assertMetadata(HeaderGroupMetadata metadata, String caseTypeId, String jurisdiction) {
         assertAll(
             () -> assertThat(metadata.getJurisdiction(), is(jurisdiction)),
             () -> assertThat(metadata.getCaseTypeId(), is(caseTypeId))
@@ -416,7 +416,7 @@ class MergeDataToSearchCasesOperationTest {
         );
     }
 
-    private void assertHeaderField(SearchResultViewColumn field, String caseFieldId, String label, String fieldType) {
+    private void assertHeaderField(SearchResultViewHeader field, String caseFieldId, String label, String fieldType) {
         assertAll(
             () -> assertThat(field.getCaseFieldId(), is(caseFieldId)),
             () -> assertThat(field.getLabel(), is(label)),

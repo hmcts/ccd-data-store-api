@@ -26,7 +26,7 @@ class CaseSearchResultTest {
         cases.add(caseDetails(CASE_TYPE_A, 555L));
         CaseSearchResult caseSearchResult = new CaseSearchResult(5L, cases);
 
-        final List<String> result = caseSearchResult.buildCaseReferenceList(CASE_TYPE_A);
+        final List<String> result = caseSearchResult.getCaseReferences(CASE_TYPE_A);
 
         assertAll(
             () -> assertThat(result.size(), is(3)),
@@ -40,7 +40,7 @@ class CaseSearchResultTest {
     void shouldReturnEmptyListWhenNoCasesFound() {
         CaseSearchResult caseSearchResult = new CaseSearchResult(1L, Collections.singletonList(caseDetails(CASE_TYPE_A, 111L)));
 
-        final List<String> result = caseSearchResult.buildCaseReferenceList(CASE_TYPE_B);
+        final List<String> result = caseSearchResult.getCaseReferences(CASE_TYPE_B);
 
         assertAll(
             () -> assertTrue(result.isEmpty())
@@ -51,7 +51,7 @@ class CaseSearchResultTest {
     void shouldReturnEmptyListWhenCasesIsNull() {
         CaseSearchResult caseSearchResult = new CaseSearchResult();
 
-        final List<String> result = caseSearchResult.buildCaseReferenceList(CASE_TYPE_A);
+        final List<String> result = caseSearchResult.getCaseReferences(CASE_TYPE_A);
 
         assertAll(
             () -> assertTrue(result.isEmpty())

@@ -6,15 +6,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.common.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
-import uk.gov.hmcts.ccd.data.user.UserService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -46,7 +44,6 @@ public class ElasticsearchQueryHelper {
     private final ObjectMapperService objectMapperService;
     private final SearchQueryOperation searchQueryOperation;
     private final GetCaseTypeOperation getCaseTypeOperation;
-    private final UserService userService;
     private final ElasticsearchMappings elasticsearchMappings;
 
     @Autowired
@@ -55,29 +52,29 @@ public class ElasticsearchQueryHelper {
                                     ObjectMapperService objectMapperService,
                                     SearchQueryOperation searchQueryOperation,
                                     @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) GetCaseTypeOperation getCaseTypeOperation,
-                                    UserService userService,
                                     ElasticsearchMappings elasticsearchMappings) {
         this.objectMapper = objectMapper;
         this.applicationParams = applicationParams;
         this.objectMapperService = objectMapperService;
         this.searchQueryOperation = searchQueryOperation;
         this.getCaseTypeOperation = getCaseTypeOperation;
-        this.userService = userService;
         this.elasticsearchMappings = elasticsearchMappings;
     }
 
     public CrossCaseTypeSearchRequest prepareRequest(List<String> caseTypeIds, String useCase, String jsonSearchRequest) {
-        rejectBlackListedQuery(jsonSearchRequest);
+        if (CollectionUtils.isEmpty(caseTypeIds)) {
+            throw new BadSearchRequest("At least one case type ID is required.");
+        }
 
-        final List<String> updatedCaseTypeIds = buildCaseTypeIds(caseTypeIds);
+        rejectBlackListedQuery(jsonSearchRequest);
 
         JsonNode searchRequest = stringToJsonNode(jsonSearchRequest);
         if (!Strings.isNullOrEmpty(useCase)) {
-            applyConfiguredSort(searchRequest, updatedCaseTypeIds, useCase);
+            applyConfiguredSort(searchRequest, caseTypeIds, useCase);
         }
 
         return new CrossCaseTypeSearchRequest.Builder()
-            .withCaseTypes(updatedCaseTypeIds)
+            .withCaseTypes(caseTypeIds)
             .withSearchRequest(searchRequest)
             .build();
     }
@@ -106,7 +103,7 @@ public class ElasticsearchQueryHelper {
 
     private ObjectNode buildSortOrderFieldNode(CaseTypeDefinition caseTypeDefinition, SortOrderField sortOrderField) {
         ObjectNode objectNode = objectMapper.createObjectNode();
-        final CommonField commonField = caseTypeDefinition.getCommonFieldByPath(sortOrderField.getCaseFieldId()).orElseThrow(() ->
+        final CommonField commonField = caseTypeDefinition.getComplexSubfieldDefinitionByPath(sortOrderField.getCaseFieldId()).orElseThrow(() ->
             new NullPointerException(String.format("Case field '%s' does not exist in configuration for case type '%s'.",
                 sortOrderField.getCaseFieldId(), caseTypeDefinition.getId()))
         );
@@ -149,11 +146,5 @@ public class ElasticsearchQueryHelper {
         blackListedQueryOpt.ifPresent(blacklisted -> {
             throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
         });
-    }
-
-    private List<String> buildCaseTypeIds(List<String> caseTypeIds) {
-        return CollectionUtils.isEmpty(caseTypeIds)
-            ? userService.getUserCaseTypes().stream().map(CaseTypeDefinition::getId).collect(Collectors.toList())
-            : caseTypeIds;
     }
 }

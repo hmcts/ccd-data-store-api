@@ -9,14 +9,14 @@ import java.util.List;
 
 @Data
 @ApiModel(description = "Definition of a case type in the context of the search")
-public class UICaseSearchHeader {
+public class SearchResultViewHeaderGroup {
 
     @NonNull
     @ApiModelProperty(value = "Metadata for the case type")
-    private UICaseSearchHeaderMetadata metadata;
+    private HeaderGroupMetadata metadata;
     @NonNull
     @ApiModelProperty(value = "Definition of the fields for the case type")
-    private List<SearchResultViewColumn> fields;
+    private List<SearchResultViewHeader> fields;
     @NonNull
     @ApiModelProperty(value = "Case references for the case type that are returned in the search")
     private List<String> cases;

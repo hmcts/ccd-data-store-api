@@ -33,7 +33,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.JsonPathExtension;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.data.user.UserService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -67,8 +66,6 @@ class AuthorisedCaseSearchOperationTest {
     private SecurityClassificationService classificationService;
     @Mock
     private ObjectMapperService objectMapperService;
-    @Mock
-    private UserService userService;
 
     private final ObjectNode searchRequestJsonNode = JsonNodeFactory.instance.objectNode();
 
@@ -254,7 +251,6 @@ class AuthorisedCaseSearchOperationTest {
             caseTypeDefinition2.setId(CASE_TYPE_ID_2);
             when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ))
                 .thenReturn(Optional.of(caseTypeDefinition2));
-            when(userService.getUserCaseTypes()).thenReturn(Arrays.asList(caseTypeDefinition, caseTypeDefinition2));
             when(caseSearchOperation.executeInternal(any(), any(), any())).thenReturn(uiCaseSearchResult);
 
             final UICaseSearchResult result = authorisedCaseDetailsSearchOperation
@@ -269,7 +265,6 @@ class AuthorisedCaseSearchOperationTest {
             final UICaseSearchResult uiCaseSearchResult = UICaseSearchResult.EMPTY;
             final CaseSearchResult caseSearchResult = new CaseSearchResult();
             List<String> caseTypeIds = Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2);
-            when(userService.getUserCaseTypes()).thenReturn(singletonList(caseTypeDefinition));
             when(caseSearchOperation.executeInternal(any(), any(), any())).thenReturn(uiCaseSearchResult);
 
             final UICaseSearchResult result = authorisedCaseDetailsSearchOperation
@@ -277,24 +272,6 @@ class AuthorisedCaseSearchOperationTest {
 
             verify(caseSearchOperation).executeInternal(eq(caseSearchResult),
                 argThat(arg -> arg.size() == 1 && arg.contains(CASE_TYPE_ID_1)), eq(ORG_CASES));
-        }
-
-        @Test
-        void shouldUseAllAuthorisedCaseTypesWhenNoneSpecified() {
-            final UICaseSearchResult uiCaseSearchResult = UICaseSearchResult.EMPTY;
-            final CaseSearchResult caseSearchResult = new CaseSearchResult();
-            CaseTypeDefinition caseTypeDefinition2 = new CaseTypeDefinition();
-            caseTypeDefinition2.setId(CASE_TYPE_ID_2);
-            when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ))
-                .thenReturn(Optional.of(caseTypeDefinition2));
-            when(userService.getUserCaseTypes()).thenReturn(Arrays.asList(caseTypeDefinition, caseTypeDefinition2));
-            when(caseSearchOperation.executeInternal(any(), any(), any())).thenReturn(uiCaseSearchResult);
-
-            final UICaseSearchResult result = authorisedCaseDetailsSearchOperation
-                .executeInternal(caseSearchResult, null, ORG_CASES);
-
-            verify(caseSearchOperation).executeInternal(eq(caseSearchResult),
-                argThat(arg -> arg.size() == 2 && arg.containsAll(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))), eq(ORG_CASES));
         }
     }
 

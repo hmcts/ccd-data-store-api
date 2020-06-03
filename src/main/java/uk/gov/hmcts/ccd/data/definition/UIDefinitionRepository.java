@@ -38,8 +38,8 @@ public class UIDefinitionRepository {
         return cachedUiDefinitionGateway.getSearchResult(version.getVersion(), caseTypeId);
     }
 
-    public SearchResult getSearchCasesResult(final String caseTypeId, final String useCase) {
-        final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
+    public SearchResult getSearchCasesResult(String caseTypeId, String useCase) {
+        CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
         return cachedUiDefinitionGateway.getSearchCasesResult(version.getVersion(), caseTypeId, useCase);
     }
 

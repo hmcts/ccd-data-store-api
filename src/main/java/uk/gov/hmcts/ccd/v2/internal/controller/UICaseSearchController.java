@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
@@ -13,7 +14,6 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.*;
-import uk.gov.hmcts.ccd.v2.*;
 import uk.gov.hmcts.ccd.v2.internal.resource.*;
 
 import java.time.*;
@@ -45,16 +45,10 @@ public class UICaseSearchController {
 
     @PostMapping(
         path = "",
-        headers = {
-            V2.EXPERIMENTAL_HEADER
-        },
-        produces = {
-            V2.MediaType.UI_CASE_SEARCH
-        }
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiOperation(
-        value = "Search cases according to the provided ElasticSearch query. Supports searching across multiple case types and a use case.",
-        notes = V2.EXPERIMENTAL_WARNING
+        value = "Search cases according to the provided ElasticSearch query. Supports searching across multiple case types and a use case."
     )
     @ApiResponses({
         @ApiResponse(
@@ -67,6 +61,7 @@ public class UICaseSearchController {
             message = "Request is invalid. For some other types HTTP code 500 is returned instead.\n"
                       + "Examples include:\n"
                       + "- Unsupported use case specified in `usecase` query parameter.\n"
+                      + "- No case type query parameter `ctid` provided.\n"
                       + "- Query is missing required `query` field.\n"
                       + "- Query includes blacklisted type.\n"
                       + "- Query has failed in ElasticSearch - for example, a sort is attempted on an unknown/unmapped field."
@@ -79,7 +74,7 @@ public class UICaseSearchController {
         @ApiResponse(
             code = 403,
             message = "Request doesn't include a valid `ServiceAuthorization` header. "
-                      + "This applies to all missing, malformed & expired tokens.\n\n"
+                      + "This applies to all missing, malformed & expired tokens.\n"
                       + "A valid S2S token issued to the name of a non-permitted API Client will also return the same."
         ),
         @ApiResponse(
@@ -94,23 +89,39 @@ public class UICaseSearchController {
                       + "- Malformed JSON request."
         )
     })
+    @ApiImplicitParams(
+        @ApiImplicitParam(
+            name = "jsonSearchRequest",
+            value = "Native ElasticSearch Search API request as a JSON string. "
+                    + "Please refer to the following for further information:\n"
+                    + "- [Official ElasticSearch Documentation - Search APIs]"
+                    + "(https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)\n"
+                    + "- [Official ElasticSearch Documentation - Query DSL]"
+                    + "(https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)\n"
+                    + "- [CCD ElasticSearch API LLD]"
+                    + "(https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=843514186"
+                    + "#CCDElasticSearchandnewsearchAPIDesign-ElasticSearchRequestsImportantConcepts)",
+            example = "{\n\t\"query\": { \n\t\t\"match_all\": {} \n\t},\n\t\"sort\": [\n\t\t{ \"reference.keyword\": \"asc\" }\n\t],"
+                      + "\n\t\"size\": 20,\n\t\"from\": 1\n}",
+            required = true
+        )
+    )
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, caseTypeIds = "#caseTypeIds",
         caseId = "T(uk.gov.hmcts.ccd.v2.internal.controller.UICaseSearchController).buildCaseIds(#result)")
     public ResponseEntity<CaseSearchResultViewResource> searchCases(
-                                     @ApiParam(value = "Comma-separated list of case type ID(s).")
-                                     @RequestParam(value = "ctid", required = false) List<String> caseTypeIds,
-                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` or `ORGCASES`.")
+                                     @ApiParam(value = "Comma-separated list of case type ID(s).", required = true)
+                                     @RequestParam(value = "ctid") List<String> caseTypeIds,
+                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` or `ORGCASES`. "
+                                         + "Used when the list of fields to return is configured in the CCD definition.\n"
+                                         + "If omitted, all case fields are returned.")
                                      @RequestParam(value = "usecase", required = false) final String useCase,
-                                     @ApiParam(value = "Native ElasticSearch Search API request. Please refer to the ElasticSearch official "
-                                         + "documentation.",
-                                     example = "{\"_source\":[\"data.TextField\"],\"query\":{\"match_all\":{}},\"size\":20,\"from\":1}")
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 
-        String useCaseTransformed = Strings.isNullOrEmpty(useCase) ? useCase : useCase.toUpperCase();
-        CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(caseTypeIds, useCaseTransformed, jsonSearchRequest);
+        String useCaseUppercase = Strings.isNullOrEmpty(useCase) ? useCase : useCase.toUpperCase();
+        CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(caseTypeIds, useCaseUppercase, jsonSearchRequest);
         CaseSearchResult caseSearchResult = caseSearchOperation.executeExternal(request);
-        UICaseSearchResult uiCaseSearchResult = caseSearchOperation.executeInternal(caseSearchResult, caseTypeIds, useCaseTransformed);
+        UICaseSearchResult uiCaseSearchResult = caseSearchOperation.executeInternal(caseSearchResult, caseTypeIds, useCaseUppercase);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("Internal searchCases execution completed in {} millisecs...", between.toMillis());

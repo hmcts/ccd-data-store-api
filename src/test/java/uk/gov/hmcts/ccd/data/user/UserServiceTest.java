@@ -110,30 +110,6 @@ public class UserServiceTest {
         assertNull(workbasketDefault);
     }
 
-    @Test
-    public void shouldReturnAllUserCaseTypes() {
-        CaseTypeDefinition caseTypeDefinition1 = mock(CaseTypeDefinition.class);
-        CaseTypeDefinition caseTypeDefinition2 = mock(CaseTypeDefinition.class);
-        CaseTypeDefinition caseTypeDefinition3 = mock(CaseTypeDefinition.class);
-        when(userRepoMock.getUserDetails()).thenReturn(mockIdamProps);
-        when(userRepoMock.getUserDefaultSettings("email"))
-            .thenThrow(new ResourceNotFoundException("No User profile exists for this userId email"));
-        when(jurisdictionsResolver.getJurisdictions()).thenReturn(Lists.newArrayList("J1", "J2"));
-        when(caseDefinitionRepoMock.getJurisdiction("J1")).thenReturn(j1);
-        when(caseDefinitionRepoMock.getJurisdiction("J2")).thenReturn(j2);
-        when(jurisdictionMapperMock.toResponse(j1)).thenReturn(jdp1);
-        when(jurisdictionMapperMock.toResponse(j2)).thenReturn(jdp2);
-        when(jdp1.getCaseTypeDefinitions()).thenReturn(Arrays.asList(caseTypeDefinition1, caseTypeDefinition2));
-        when(jdp2.getCaseTypeDefinitions()).thenReturn(Collections.singletonList(caseTypeDefinition3));
-
-        List<CaseTypeDefinition> caseTypes = userService.getUserCaseTypes();
-
-        assertAll(
-            () -> assertThat(caseTypes.size(), is(3)),
-            () -> assertThat(caseTypes, contains(caseTypeDefinition1, caseTypeDefinition2, caseTypeDefinition3))
-        );
-    }
-
     private UserDefault userDefault() {
         UserDefault userDefault = new UserDefault();
         userDefault.setWorkBasketDefaultJurisdiction("J1");

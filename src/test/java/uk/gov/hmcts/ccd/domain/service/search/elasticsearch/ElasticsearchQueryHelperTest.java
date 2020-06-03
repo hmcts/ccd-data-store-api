@@ -11,7 +11,6 @@ import org.mockito.Spy;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
-import uk.gov.hmcts.ccd.data.user.UserService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -31,7 +30,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class ElasticsearchQueryHelperTest {
@@ -78,8 +76,6 @@ class ElasticsearchQueryHelperTest {
     @Mock
     private GetCaseTypeOperation getCaseTypeOperation;
     @Mock
-    private UserService userService;
-    @Mock
     private ElasticsearchMappings elasticsearchMappings;
 
     private ObjectMapper objectMapperES = new ObjectMapper();
@@ -97,12 +93,12 @@ class ElasticsearchQueryHelperTest {
             .when(objectMapperService).convertStringToObject(anyString(), any());
         when(getCaseTypeOperation.execute(any(), any())).thenReturn(Optional.of(caseTypeDefinition));
         when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE_A);
-        when(caseTypeDefinition.getCommonFieldByPath(eq(JURISDICTION))).thenReturn(Optional.of(JURISDICTION_FIELD));
-        when(caseTypeDefinition.getCommonFieldByPath(eq(LAST_MODIFIED_DATE))).thenReturn(Optional.of(LAST_MODIFIED_DATE_FIELD));
-        when(caseTypeDefinition.getCommonFieldByPath(eq(TEXT_FIELD_ID))).thenReturn(Optional.of(TEXT_FIELD));
-        when(caseTypeDefinition.getCommonFieldByPath(eq(DATE_FIELD_ID))).thenReturn(Optional.of(DATE_FIELD));
-        when(caseTypeDefinition.getCommonFieldByPath(eq(COLLECTION_TEXT_FIELD_ID))).thenReturn(Optional.of(COLLECTION_TEXT_FIELD));
-        when(caseTypeDefinition.getCommonFieldByPath(eq(COLLECTION_DATE_FIELD_ID))).thenReturn(Optional.of(COLLECTION_DATE_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(JURISDICTION))).thenReturn(Optional.of(JURISDICTION_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(LAST_MODIFIED_DATE))).thenReturn(Optional.of(LAST_MODIFIED_DATE_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(TEXT_FIELD_ID))).thenReturn(Optional.of(TEXT_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(DATE_FIELD_ID))).thenReturn(Optional.of(DATE_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_TEXT_FIELD_ID))).thenReturn(Optional.of(COLLECTION_TEXT_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_DATE_FIELD_ID))).thenReturn(Optional.of(COLLECTION_DATE_FIELD));
         when(searchQueryOperation.getSortOrders(any(), any())).thenReturn(sortOrderFields);
     }
 
@@ -140,22 +136,12 @@ class ElasticsearchQueryHelperTest {
     }
 
     @Test
-    void shouldPrepareRequestWhenNoCaseTypesSpecified() {
-        when(userService.getUserCaseTypes()).thenReturn(Arrays.asList(
-            newCaseType().withCaseTypeId(CASE_TYPE_A).build(),
-            newCaseType().withCaseTypeId(CASE_TYPE_B).build()
-        ));
-
-        final CrossCaseTypeSearchRequest request = elasticsearchQueryHelper
-            .prepareRequest(null, ORG_CASES, QUERY_STRING);
+    void shouldErrorWhenNoCaseTypesSpecified() {
+        BadSearchRequest exception = assertThrows(BadSearchRequest.class, () -> elasticsearchQueryHelper
+            .prepareRequest(null, ORG_CASES, QUERY_STRING));
 
         assertAll(
-            () -> assertThat(request.getCaseTypeIds().size(), is(2)),
-            () -> assertThat(request.getCaseTypeIds().get(0), is(CASE_TYPE_A)),
-            () -> assertThat(request.getCaseTypeIds().get(1), is(CASE_TYPE_B)),
-            () -> assertThat(request.isMultiCaseTypeSearch(), is(true)),
-            () -> assertThat(request.getAliasFields().isEmpty(), is(true)),
-            () -> assertThat(request.getSearchRequestJsonNode().toString(), is("{\"query\":{}}"))
+            () -> assertThat(exception.getMessage(), is("At least one case type ID is required."))
         );
     }
 

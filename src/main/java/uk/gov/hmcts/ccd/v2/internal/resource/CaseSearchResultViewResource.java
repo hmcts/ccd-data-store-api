@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.hateoas.RepresentationModel;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchHeader;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
 public class CaseSearchResultViewResource extends RepresentationModel {
 
     @ApiModelProperty(value = "Headers for each case type")
-    private List<UICaseSearchHeader> headers;
+    private List<SearchResultViewHeaderGroup> headers;
     @ApiModelProperty(value = "All cases across case types")
     private List<SearchResultViewItem> cases;
     @ApiModelProperty(value = "Total number of search results (including results not returned due to pagination)")

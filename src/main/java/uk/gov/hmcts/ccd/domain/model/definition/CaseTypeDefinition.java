@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
@@ -176,18 +176,17 @@ public class CaseTypeDefinition implements Serializable {
     }
 
     @JsonIgnore
-    public Optional<CommonField> getCommonFieldByPath(String path) {
+    public Optional<CommonField> getComplexSubfieldDefinitionByPath(String path) {
         if (StringUtils.isBlank(path)) {
             return Optional.empty();
         }
         List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(toList());
 
         Optional<CaseFieldDefinition> topLevelCaseField = getCaseField(pathElements.get(0));
-        if (topLevelCaseField.isPresent()) {
-            return topLevelCaseField.get().getComplexFieldNestedField(pathElements.stream().skip(1).collect(Collectors.joining(",")));
-        }
 
-        return Optional.empty();
+        return topLevelCaseField.flatMap(f ->
+            f.getComplexFieldNestedField(pathElements.stream().skip(1).collect(Collectors.joining(",")))
+        );
     }
 
     @JsonIgnore
@@ -195,6 +194,6 @@ public class CaseTypeDefinition implements Serializable {
         return getCaseFieldDefinitions()
             .stream()
             .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
-            .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField -> instance.textNode(caseField.getLabel())));
+            .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField -> JsonNodeFactory.instance.textNode(caseField.getLabel())));
     }
 }
