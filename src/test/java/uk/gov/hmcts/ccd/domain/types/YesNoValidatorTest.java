@@ -126,7 +126,8 @@ class YesNoValidatorTest {
             result =
             validator.validate(FIELD_ID, NODE_FACTORY.pojoNode("Yes"), caseField);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("Yes is not " + YesNoValidator.TYPE_ID));
+        assertThat(result.get(0).getErrorMessage(), is(NODE_FACTORY.pojoNode("Yes") + " is not "
+            + YesNoValidator.TYPE_ID));
     }
 
     @Test

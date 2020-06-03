@@ -1,15 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.Map;
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -17,11 +14,12 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import java.util.Map;
+import java.util.Optional;
+
 // TODO CaseService and CaseDataService could probably be merged together.
 @Service
 public class CaseService {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final CaseDataService caseDataService;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -43,12 +41,12 @@ public class CaseService {
      * @return SHA1 hash of the given case data
      */
     public String hashData(CaseDetails caseDetails) {
-        final JsonNode jsonData = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+        final JsonNode jsonData = JacksonUtils.convertValueJsonNode(caseDetails.getData());
         return DigestUtils.sha1Hex(jsonData.toString());
     }
 
     /**
-     * @param caseTypeId caseTypeId of new case details
+     * @param caseTypeId     caseTypeId of new case details
      * @param jurisdictionId jurisdictionId of new case details
      * @return <code>CaseDetails</code> - new case details object
      */
@@ -61,14 +59,14 @@ public class CaseService {
     }
 
     /**
-     * @param content Data received from the client.
+     * @param content     Data received from the client.
      * @param caseDetails of the case.
      * @return <code>Optional&lt;CaseDetails&gt;<code/> - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
 
-            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
-            return caseDetails;
+        content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+        return caseDetails;
     }
 
     public CaseDetails clone(CaseDetails source) {

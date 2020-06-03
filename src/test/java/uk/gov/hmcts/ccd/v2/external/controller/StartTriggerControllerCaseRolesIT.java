@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.v2.CaseRolesTestData;
@@ -52,12 +53,12 @@ public class StartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         "{\n" +
             "  \"PersonFirstName\": \"ccd-First Name\"\n" +
             "}\n"
-                                                          );
+    );
     private final JsonNode CALLBACK_DATA_CLASSIFICATION = mapper.readTree(
         "{\n" +
             "    \"PersonFirstName\": \"PUBLIC\"\n" +
             "  }"
-                                                                         );
+    );
     @Inject
     private WebApplicationContext wac;
 
@@ -93,8 +94,8 @@ public class StartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
+        callbackResponse.setDataClassification(JacksonUtils.convertValue(CALLBACK_DATA_CLASSIFICATION));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/CaseRolesCase"))

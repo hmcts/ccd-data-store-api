@@ -1,32 +1,29 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
 @Service
 public class CaseDataService {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
     private static final String DEFAULT_CLASSIFICATION = "";
@@ -37,8 +34,8 @@ public class CaseDataService {
                                                                    final Map<String, JsonNode> caseData,
                                                                    final Map<String, JsonNode> currentDataClassification) {
         final JsonNode clonedDataClassification = cloneAndConvertDataMap(caseData);
-        deduceDefaultClassifications(clonedDataClassification, MAPPER.convertValue(currentDataClassification, JsonNode.class), caseType.getCaseFields(), EMPTY_STRING);
-        return MAPPER.convertValue(clonedDataClassification, STRING_JSON_MAP);
+        deduceDefaultClassifications(clonedDataClassification, JacksonUtils.convertValueJsonNode(currentDataClassification), caseType.getCaseFields(), EMPTY_STRING);
+        return JacksonUtils.convertValue(clonedDataClassification);
     }
 
     private void deduceDefaultClassifications(final JsonNode dataNode,
@@ -57,23 +54,23 @@ public class CaseDataService {
                     if (caseFieldType.equalsIgnoreCase(COMPLEX)) {
                         found = true;
                         deduceClassificationForComplexType(dataNode,
-                                                           getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName),
-                                                           fieldIdPrefix,
-                                                           fieldName,
-                                                           caseField);
+                            getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName),
+                            fieldIdPrefix,
+                            fieldName,
+                            caseField);
                     } else if (caseFieldType.equalsIgnoreCase(COLLECTION)) {
                         found = true;
                         deduceClassificationForCollectionType(dataNode,
-                                                              getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName),
-                                                              fieldIdPrefix,
-                                                              fieldName,
-                                                              caseField);
+                            getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName),
+                            fieldIdPrefix,
+                            fieldName,
+                            caseField);
                     } else {
                         found = true;
                         deduceClassificationForSimpleType((ObjectNode) dataNode,
-                                                          getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName),
-                                                          fieldName,
-                                                          caseField);
+                            getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName),
+                            fieldName,
+                            caseField);
                     }
                 }
             }
@@ -94,7 +91,7 @@ public class CaseDataService {
         }
         Iterator<JsonNode> iterator = existingDataClassificationArray.get(VALUE).iterator();
         JsonNode dataClassificationForData = getDataClassificationForData(field,
-                                                                          iterator);
+            iterator);
         return dataClassificationForData.has(VALUE) ? dataClassificationForData.get(VALUE) : JSON_NODE_FACTORY.objectNode();
     }
 
@@ -138,9 +135,9 @@ public class CaseDataService {
         }
         ObjectNode valueNode = JSON_NODE_FACTORY.objectNode();
         deduceClassificationForSimpleType(valueNode,
-                                          ofNullable(existingDataClassificationNode.get(CLASSIFICATION)).orElse(JSON_NODE_FACTORY.objectNode()),
-                                          CLASSIFICATION,
-                                          caseField);
+            ofNullable(existingDataClassificationNode.get(CLASSIFICATION)).orElse(JSON_NODE_FACTORY.objectNode()),
+            CLASSIFICATION,
+            caseField);
         valueNode.set(VALUE, fieldNode);
         ((ObjectNode) dataNode).set(fieldName, valueNode);
     }
@@ -153,9 +150,9 @@ public class CaseDataService {
             fieldIdPrefix + fieldName + FIELD_SEPARATOR);
         ObjectNode valueNode = JSON_NODE_FACTORY.objectNode();
         deduceClassificationForSimpleType(valueNode,
-                                          ofNullable(existingDataClassificationNode.get(CLASSIFICATION)).orElse(JSON_NODE_FACTORY.objectNode()),
-                                          CLASSIFICATION,
-                                          caseField);
+            ofNullable(existingDataClassificationNode.get(CLASSIFICATION)).orElse(JSON_NODE_FACTORY.objectNode()),
+            CLASSIFICATION,
+            caseField);
         valueNode.set(VALUE, dataNode.get(fieldName));
         ((ObjectNode) dataNode).set(fieldName, valueNode);
     }
@@ -167,7 +164,7 @@ public class CaseDataService {
             clone.put(entry.getKey(), entry.getValue().deepCopy());
         }
 
-        return  clone;
+        return clone;
     }
 
     private JsonNode cloneAndConvertDataMap(final Map<String, JsonNode> source) {
@@ -175,6 +172,6 @@ public class CaseDataService {
             return MAPPER.createObjectNode();
         }
         final Map<String, JsonNode> result = cloneDataMap(source);
-        return MAPPER.convertValue(result, JsonNode.class);
+        return JacksonUtils.convertValueJsonNode(result);
     }
 }

@@ -1,5 +1,22 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -16,23 +33,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
 class CaseServiceTest {
 
     private static final String JURISDICTION = "SSCS";
@@ -46,9 +46,7 @@ class CaseServiceTest {
     private static final String OTHER_NAME = "John";
     private static final String CASE_ID = "299";
     private final Map<String, JsonNode> data = new HashMap<>();
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
+    private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private CaseDataService caseDataService;
 
     @Mock
@@ -194,18 +192,20 @@ class CaseServiceTest {
         @Test
         @DisplayName("should return caseDetails")
         void populateCurrentCaseDetailsWithEventFields() throws Exception {
-            Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
+
+
+            Map<String, JsonNode> eventData = JacksonUtils.convertValue(MAPPER.readTree(
                 "{\n"
                     + "  \"PersonFirstName\": \"First Name\",\n"
                     + "  \"PersonLastName\": \"Last Name\"\n"
-                    + "}"), STRING_JSON_MAP);
+                    + "}"));
 
-            Map<String, JsonNode> resultData = MAPPER.convertValue(MAPPER.readTree(
+            Map<String, JsonNode> resultData = JacksonUtils.convertValue(MAPPER.readTree(
                 "{\n"
                     + "  \"PersonFirstName\": \"First Name\",\n"
                     + "  \"PersonLastName\": \"Last Name\",\n"
                     + "  \"Person\":{\"Names\":{\"FirstName\":\"Jack\"}}\n"
-                    + "}"), STRING_JSON_MAP);
+                    + "}"));
 
             CaseDataContent caseDataContent = newCaseDataContent()
                 .withData(data)

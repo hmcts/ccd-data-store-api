@@ -1,20 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -63,13 +55,21 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 public class TestBuildersUtil {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private TestBuildersUtil() {
     }
@@ -415,7 +415,7 @@ public class TestBuildersUtil {
         }
 
         public DataClassificationBuilder withData(String key, List value) {
-            dataClassification.put(key, MAPPER.convertValue(value, JsonNode.class));
+            dataClassification.put(key, JacksonUtils.convertValueJsonNode(value));
             return this;
         }
 
@@ -424,7 +424,7 @@ public class TestBuildersUtil {
         }
 
         public JsonNode buildAsNode() {
-            return MAPPER.convertValue(dataClassification, JsonNode.class);
+            return JacksonUtils.convertValueJsonNode(dataClassification);
         }
     }
 
@@ -553,7 +553,7 @@ public class TestBuildersUtil {
             this.jurisdictionUiConfig.setShuttered(shuttered);
             return this;
         }
-        
+
         public JurisdictionUiConfigBuilder withId(String id) {
             this.jurisdictionUiConfig.setId(id);
             return this;
@@ -1107,7 +1107,12 @@ public class TestBuildersUtil {
         }
 
         public CaseFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
-            caseField.setDisplayContext(displayContextParameter);
+            caseField.setDisplayContextParameter(displayContextParameter);
+            return this;
+        }
+
+        public CaseFieldBuilder withFormattedValue(final String formattedValue) {
+            caseField.setFormattedValue(formattedValue);
             return this;
         }
 
@@ -1297,9 +1302,11 @@ public class TestBuildersUtil {
 
     public static class WorkbasketInputBuilder {
         private final WorkbasketInput workbasketInput;
+        private final Field field;
 
         private WorkbasketInputBuilder() {
             this.workbasketInput = new WorkbasketInput();
+            this.field = new Field();
         }
 
         public static WorkbasketInputBuilder aWorkbasketInput() {
@@ -1307,22 +1314,31 @@ public class TestBuildersUtil {
         }
 
         public WorkbasketInputBuilder withFieldId(String fieldId) {
-            Field f = new Field();
-            f.setId(fieldId);
-            this.workbasketInput.setField(f);
+            field.setId(fieldId);
+            this.workbasketInput.setField(field);
+            return this;
+        }
+
+        public WorkbasketInputBuilder withShowCondition(String showCondition) {
+            field.setShowCondition(showCondition);
+            this.workbasketInput.setField(field);
             return this;
         }
 
         public WorkbasketInputBuilder withFieldId(String fieldId, String elementPath) {
-            Field f = new Field();
-            f.setId(fieldId);
-            f.setElementPath(elementPath);
-            this.workbasketInput.setField(f);
+            field.setId(fieldId);
+            field.setElementPath(elementPath);
+            this.workbasketInput.setField(field);
             return this;
         }
 
         public WorkbasketInputBuilder withUserRole(String role) {
             this.workbasketInput.setRole(role);
+            return this;
+        }
+
+        public WorkbasketInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.workbasketInput.setDisplayContextParameter(displayContextParameter);
             return this;
         }
 
@@ -1333,9 +1349,11 @@ public class TestBuildersUtil {
 
     public static class SearchInputBuilder {
         private final SearchInput searchInput;
+        private final Field field;
 
         private SearchInputBuilder() {
             this.searchInput = new SearchInput();
+            this.field = new Field();
         }
 
         public static SearchInputBuilder aSearchInput() {
@@ -1348,17 +1366,26 @@ public class TestBuildersUtil {
         }
 
         public SearchInputBuilder withFieldId(String fieldId) {
-            Field f = new Field();
-            f.setId(fieldId);
-            this.searchInput.setField(f);
+            field.setId(fieldId);
+            this.searchInput.setField(field);
+            return this;
+        }
+
+        public SearchInputBuilder withShowCondition(String showCondition) {
+            field.setShowCondition(showCondition);
+            this.searchInput.setField(field);
+            return this;
+        }
+
+        public SearchInputBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.searchInput.setDisplayContextParameter(displayContextParameter);
             return this;
         }
 
         public SearchInputBuilder withFieldId(String fieldId, String elementPath) {
-            Field f = new Field();
-            f.setId(fieldId);
-            f.setElementPath(elementPath);
-            this.searchInput.setField(f);
+            field.setId(fieldId);
+            field.setElementPath(elementPath);
+            this.searchInput.setField(field);
             return this;
         }
 
@@ -1436,6 +1463,11 @@ public class TestBuildersUtil {
 
         public static CaseTypeTabFieldBuilder newCaseTabField() {
             return new CaseTypeTabFieldBuilder();
+        }
+
+        public CaseTypeTabFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
+            caseTypeTabField.setDisplayContextParameter(displayContextParameter);
+            return this;
         }
 
     }

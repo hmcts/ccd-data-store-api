@@ -1,18 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -35,11 +23,24 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+
 class MidEventCallbackTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final String JURISDICTION_ID = "jurisdictionId";
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
@@ -123,11 +124,11 @@ class MidEventCallbackTest {
     @DisplayName("should update data from MidEvent callback")
     void shouldUpdateCaseDetailsFromMidEventCallback() throws Exception {
 
-        final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+        final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}"));
         CaseDetails updatedCaseDetails = caseDetails(data);
         CaseDataContent content = newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS)
             .build();
@@ -172,11 +173,11 @@ class MidEventCallbackTest {
     @DisplayName("should pass event data to MidEvent callback when available")
     void shouldPassEventDataToMidEventCallback() throws Exception {
 
-        Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
+        Map<String, JsonNode> eventData = JacksonUtils.convertValue((MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}")));
         CaseDetails updatedCaseDetails = caseDetails(eventData);
 
         CaseDataContent content = newCaseDataContent()
@@ -217,23 +218,23 @@ class MidEventCallbackTest {
     @DisplayName("should include data from existing case reference during a midevent callback")
     void shouldContainAllDataFromExistingCaseReferenceDuringAMidEventCallback() throws Exception {
 
-        Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
+        Map<String, JsonNode> eventData = JacksonUtils.convertValue((MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}")));
 
-        Map<String, JsonNode> existingData = MAPPER.convertValue(MAPPER.readTree(
+        Map<String, JsonNode> existingData = JacksonUtils.convertValue((MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonMiddleName\": \"Middle Name\"\n"
-                + "}"), STRING_JSON_MAP);
-        Map<String, JsonNode> combineData = MAPPER.convertValue(MAPPER.readTree(
+                + "}")));
+        Map<String, JsonNode> combineData = JacksonUtils.convertValue((MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\",\n"
                 + "  \"PersonMiddleName\": \"Middle Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}")));
         CaseDetails existingCaseDetails = caseDetails(existingData);
         CaseDetails combineCaseDetails = caseDetails(combineData);
         CaseDataContent content = newCaseDataContent()
