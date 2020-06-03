@@ -110,14 +110,13 @@ public class AccessControlService {
         return hasAccess;
     }
 
-    @SuppressWarnings("all")
     public boolean canAccessCaseEventWithCriteria(final String eventId,
                                                   final List<CaseEvent> caseEventDefinitions,
                                                   final Set<String> userRoles,
                                                   final Predicate<AccessControlList> criteria) {
         boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitions, userRoles, criteria);
         if (!hasAccess) {
-            LOG.info("No relevant event access for eventId={}, eventAcls={}, userRoles={}",
+            LOG.debug("No relevant event access for eventId={}, eventAcls={}, userRoles={}",
                 eventId,
                 getCaseEventAcls(caseEventDefinitions, eventId),
                 userRoles);
