@@ -27,7 +27,7 @@ public class CaseFieldPathUtils {
 
         Optional<CaseFieldDefinition> topLevelCaseField = caseTypeDefinition.getCaseField(pathElements.get(0));
 
-        return topLevelCaseField.flatMap(f -> getFieldDefinitionByPath(f, getPathElementsTailAsString(pathElements)));
+        return topLevelCaseField.flatMap(field -> getFieldDefinitionByPath(field, getPathElementsTailAsString(pathElements)));
     }
 
     public static Optional<CommonField> getFieldDefinitionByPath(CommonField commonField, String path) {
@@ -55,7 +55,7 @@ public class CaseFieldPathUtils {
         return reduce(node, pathElements);
     }
 
-    public static List<String> getPathElements(String path) {
+    private static List<String> getPathElements(String path) {
         return Arrays.stream(splitPath(path)).collect(toList());
     }
 
