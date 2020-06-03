@@ -1,6 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -81,8 +86,8 @@ class AuthorisedCaseSearchOperationTest {
     }
 
     @Nested
-    @DisplayName("External single case type search")
-    class ExternalSingleCaseTypeDefinitionSearch {
+    @DisplayName("Single case type search")
+    class SingleCaseTypeDefinitionSearch {
 
         @Test
         @DisplayName("should filter fields and return search results for valid query")
@@ -151,8 +156,8 @@ class AuthorisedCaseSearchOperationTest {
     }
 
     @Nested
-    @DisplayName("External cross case type search")
-    class ExternalCrossCaseTypeSearch {
+    @DisplayName("Cross case type search")
+    class CrossCaseTypeSearch {
 
         private final CaseDetails caseDetails = new CaseDetails();
         private CaseSearchResult searchResult;

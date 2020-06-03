@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.data.user;
 
 import com.google.common.collect.Lists;
-
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,7 +73,7 @@ public class UserServiceTest {
 
         assertThat(userProfile.getUser().getIdamProperties(), is(mockIdamProps));
         assertThat(userProfile.getJurisdictions(),
-                equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
+            equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
         WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
         assertThat(workbasketDefault.getJurisdictionId(), is("J1"));
         assertThat(workbasketDefault.getCaseTypeId(), is("CT"));

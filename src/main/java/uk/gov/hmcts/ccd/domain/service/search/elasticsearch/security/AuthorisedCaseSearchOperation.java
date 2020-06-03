@@ -1,5 +1,18 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static org.jooq.lambda.function.Functions.not;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -22,15 +35,6 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static org.jooq.lambda.function.Functions.not;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
@@ -68,14 +72,15 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
-        List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest.getCaseTypeIds());
+        List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
         CrossCaseTypeSearchRequest authorisedSearchRequest = createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
 
         return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
     }
 
-    private List<CaseTypeDefinition> getAuthorisedCaseTypes(List<String> caseTypeIds) {
-        return caseTypeIds.stream()
+    private List<CaseTypeDefinition> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
+        return searchRequest.getCaseTypeIds()
+            .stream()
             .map(caseTypeId -> authorisedCaseDefinitionDataService.getAuthorisedCaseType(caseTypeId, CAN_READ).orElse(null))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
@@ -177,7 +182,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         try {
             String fieldPath = JSON_PATH_ROOT_ELEMENT_PREFIX + sanitiseCollectionFieldInPath(caseType, path);
             return of(ofNullable(JsonPath.parse(caseDataJson).read(fieldPath, JsonNode.class))
-                          .orElse(NullNode.getInstance()));
+                .orElse(NullNode.getInstance()));
         } catch (PathNotFoundException e) {
             log.warn("Case field path not found in case data. {}", e.getMessage());
             return of(MissingNode.getInstance());
