@@ -16,12 +16,15 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
@@ -80,11 +83,18 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
                                                                       CAN_UPDATE)) {
             authorisedTriggers = new CaseViewTrigger[]{};
 
-            LOG.info("No authorised triggers for caseReference={} caseType={} caseState={}, caseTypeACLs={}, userRoles={}",
+            LOG.info("No authorised triggers for caseReference={} caseType={} version={} caseState={}, caseTypeACLs={}, caseStateACLs={} userRoles={}",
                 caseReference,
                 caseType.getId(),
+                caseType.getVersion().getNumber(),
                 caseView.getState().getId(),
                 caseType.getAccessControlLists(),
+                caseType.getStates()
+                    .stream()
+                    .filter(cState -> cState.getId().equalsIgnoreCase(caseView.getState().getId()))
+                    .map(CaseState::getAccessControlLists)
+                    .flatMap(Collection::stream)
+                    .collect(toList()),
                 userRoles);
 
         } else {

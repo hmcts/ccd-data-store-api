@@ -79,7 +79,7 @@ public class AccessControlService {
             && hasAccessControlList(userRoles, criteria, caseType.getAccessControlLists());
 
         if (!hasAccess) {
-            LOG.debug("No relevant case type access for caseTypeACLs={}, userRoles={}",
+            LOG.info("No relevant case type access for caseTypeACLs={}, userRoles={}",
                 caseType != null ? caseType.getAccessControlLists() : newArrayList(),
                 userRoles);
         }
@@ -91,17 +91,20 @@ public class AccessControlService {
                                                   final CaseType caseType,
                                                   final Set<String> userRoles,
                                                   final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasAccessControlList(userRoles, criteria, caseType.getStates()
+
+        List<AccessControlList> stateACLs = caseType.getStates()
             .stream()
             .filter(cState -> cState.getId().equalsIgnoreCase(caseState))
             .map(CaseState::getAccessControlLists)
             .flatMap(Collection::stream)
-            .collect(toList()));
+            .collect(toList());
+
+        boolean hasAccess = hasAccessControlList(userRoles, criteria, stateACLs);
 
         if (!hasAccess) {
-            LOG.debug("No relevant case state access for caseState= {}, caseTypeACLs={}, userRoles={}",
+            LOG.info("No relevant case state access for caseState={}, caseStateACL={}, userRoles={}",
                 caseState,
-                caseType.getAccessControlLists(),
+                stateACLs,
                 userRoles);
         }
         return hasAccess;
@@ -113,7 +116,7 @@ public class AccessControlService {
                                                   final Predicate<AccessControlList> criteria) {
         boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitions, userRoles, criteria);
         if (!hasAccess) {
-            LOG.debug("No relevant event access for eventId={}, eventAcls={}, userRoles={}",
+            LOG.info("No relevant event access for eventId={}, eventAcls={}, userRoles={}",
                 eventId,
                 getCaseEventAcls(caseEventDefinitions, eventId),
                 userRoles);
