@@ -11,8 +11,7 @@
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Type": "application/json"
+			"Content-Encoding": "gzip"
 		},
 		"body": {
 			"token": "[[ANYTHING_PRESENT]]",
@@ -27,10 +26,10 @@
 				"last_state_modified_date": null,
 				"security_classification": null,
 				"case_data": {
-					
+
 				},
 				"data_classification": {
-					
+
 				},
 				"after_submit_callback_response": null,
 				"callback_response_status_code": null,
@@ -38,7 +37,7 @@
 				"delete_draft_response_status_code": null,
 				"delete_draft_response_status": null,
 				"security_classifications": {
-					
+
 				}
 			},
 			"event_id": "CREATE"

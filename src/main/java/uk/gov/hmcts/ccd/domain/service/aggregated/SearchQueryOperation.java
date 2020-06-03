@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +11,19 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 public class SearchQueryOperation {
@@ -34,6 +36,7 @@ public class SearchQueryOperation {
     private final GetDraftsOperation getDraftsOperation;
     private final UIDefinitionRepository uiDefinitionRepository;
     private final UserRepository userRepository;
+    private final SearchInputProcessor searchInputProcessor;
 
     @Autowired
     public SearchQueryOperation(@Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
@@ -41,20 +44,22 @@ public class SearchQueryOperation {
                                 @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
                                 @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation,
                                 final UIDefinitionRepository uiDefinitionRepository,
-                                @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
+                                @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                                final SearchInputProcessor searchInputProcessor) {
         this.searchOperation = searchOperation;
         this.mergeDataToSearchResultOperation = mergeDataToSearchResultOperation;
         this.getCaseTypeOperation = getCaseTypeOperation;
         this.getDraftsOperation = getDraftsOperation;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.userRepository = userRepository;
+        this.searchInputProcessor = searchInputProcessor;
     }
 
     public SearchResultView execute(final String view,
                                     final MetaData metadata,
                                     final Map<String, String> queryParameters) {
 
-        Optional<CaseType> caseType = this.getCaseTypeOperation.execute(metadata.getCaseTypeId(), CAN_READ);
+        Optional<CaseTypeDefinition> caseType = this.getCaseTypeOperation.execute(metadata.getCaseTypeId(), CAN_READ);
 
         if (!caseType.isPresent()) {
             return new SearchResultView(Collections.emptyList(), Collections.emptyList(), NO_ERROR);
@@ -64,7 +69,10 @@ public class SearchQueryOperation {
 
         addSortOrderFields(metadata, searchResult);
 
-        final List<CaseDetails> cases = searchOperation.execute(metadata, queryParameters);
+        final List<CaseDetails> cases = searchOperation.execute(
+            searchInputProcessor.executeMetadata(view, metadata),
+            searchInputProcessor.executeQueryParams(view, metadata, queryParameters)
+        );
 
         String draftResultError = NO_ERROR;
         List<CaseDetails> draftsAndCases = Lists.newArrayList();
@@ -79,11 +87,11 @@ public class SearchQueryOperation {
         return mergeDataToSearchResultOperation.execute(caseType.get(), searchResult, draftsAndCases, draftResultError);
     }
 
-    private SearchResult getSearchResultDefinition(final CaseType caseType, final String view) {
+    private SearchResult getSearchResultDefinition(final CaseTypeDefinition caseTypeDefinition, final String view) {
         if (WORKBASKET.equalsIgnoreCase(view)) {
-            return uiDefinitionRepository.getWorkBasketResult(caseType.getId());
+            return uiDefinitionRepository.getWorkBasketResult(caseTypeDefinition.getId());
         }
-        return uiDefinitionRepository.getSearchResult(caseType.getId());
+        return uiDefinitionRepository.getSearchResult(caseTypeDefinition.getId());
     }
 
     private void addSortOrderFields(MetaData metadata,SearchResult searchResult) {

@@ -1,22 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import java.util.*;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
@@ -29,25 +13,45 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+
 class AuthorisedStartEventOperationTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_REFERENCE = "1234123412341234";
@@ -85,9 +89,9 @@ class AuthorisedStartEventOperationTest {
     private JsonNode authorisedCaseDetailsClassificationNode;
     private JsonNode classifiedCaseDetailsNode;
     private JsonNode classifiedCaseDetailsClassificationNode;
-    private StartEventTrigger classifiedStartEvent;
-    private final CaseType caseType = new CaseType();
-    private final List<CaseField> caseFields = Lists.newArrayList();
+    private StartEventResult classifiedStartEvent;
+    private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+    private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3,
@@ -113,10 +117,9 @@ class AuthorisedStartEventOperationTest {
             "classificationTestValue");
 
         classifiedCaseDetails = new CaseDetails();
-        classifiedCaseDetails.setData(MAPPER.convertValue(classifiedCaseDetailsNode, STRING_JSON_MAP));
-        classifiedCaseDetails.setDataClassification(MAPPER.convertValue(classifiedCaseDetailsClassificationNode,
-            STRING_JSON_MAP));
-        classifiedStartEvent = new StartEventTrigger();
+        classifiedCaseDetails.setData(JacksonUtils.convertValue(classifiedCaseDetailsNode));
+        classifiedCaseDetails.setDataClassification(JacksonUtils.convertValue(classifiedCaseDetailsClassificationNode));
+        classifiedStartEvent = new StartEventResult();
         classifiedStartEvent.setCaseDetails(classifiedCaseDetails);
 
         caseDetailsOptional = Optional.of(newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build());
@@ -128,17 +131,17 @@ class AuthorisedStartEventOperationTest {
             uidService,
             draftGateway,
             caseAccessService);
-        caseType.setCaseFields(caseFields);
-        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
+        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+        when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getUserRoles()).thenReturn(userRoles);
-        when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
-            eq(caseFields),
+            eq(caseFieldDefinitions),
             eq(userRoles),
             eq(CAN_READ),
             anyBoolean())).thenReturn(authorisedCaseDetailsNode);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
-            eq(caseFields),
+            eq(caseFieldDefinitions),
             eq(userRoles),
             eq(CAN_READ), anyBoolean())).thenReturn(
             authorisedCaseDetailsClassificationNode);
@@ -154,7 +157,7 @@ class AuthorisedStartEventOperationTest {
             doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseType,
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
                 userRoles,
                 CAN_CREATE)).thenReturn(true);
         }
@@ -163,7 +166,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -180,9 +183,9 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should filter out data when no case type read access")
         void shouldFilterOutDataWhenNoCaseTypeReadAccess() {
 
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)).thenReturn(false);
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -206,7 +209,7 @@ class AuthorisedStartEventOperationTest {
             doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseType,
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
                 userRoles,
                 CAN_CREATE)).thenReturn(true);
         }
@@ -215,7 +218,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -232,9 +235,9 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should filter out data when no case type read access")
         void shouldFilterOutDataWhenNoCaseTypeReadAccess() {
 
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)).thenReturn(false);
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -265,7 +268,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            StartEventTrigger output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+            StartEventResult output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -283,7 +286,7 @@ class AuthorisedStartEventOperationTest {
         void shouldReturnEventTriggerWhenCaseDetailsNull() {
             classifiedStartEvent.setCaseDetails(null);
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -297,7 +300,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should return event trigger with classified case details when not empty")
         void shouldReturnEventTriggerWithClassifiedCaseDetails() {
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+            final StartEventResult output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
 
@@ -311,10 +314,9 @@ class AuthorisedStartEventOperationTest {
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
                 () -> assertThat(output.getCaseDetails().getData(),
-                    is(equalTo(MAPPER.convertValue(authorisedCaseDetailsNode, STRING_JSON_MAP)))),
+                    is(equalTo(JacksonUtils.convertValue(authorisedCaseDetailsNode)))),
                 () -> assertThat(output.getCaseDetails().getDataClassification(),
-                    is(equalTo(MAPPER.convertValue(authorisedCaseDetailsClassificationNode,
-                        STRING_JSON_MAP)))),
+                    is(equalTo(JacksonUtils.convertValue(authorisedCaseDetailsClassificationNode)))),
                 () -> inOrder.verify(uidService).validateUID(CASE_REFERENCE),
                 () -> inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE),
                 () -> inOrder.verify(classifiedStartEventOperation).triggerStartForCase(CASE_REFERENCE,
@@ -322,16 +324,16 @@ class AuthorisedStartEventOperationTest {
                     IGNORE_WARNING),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseAccessService).getUserRoles(),
-                () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
+                () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                     eq(userRoles),
                     eq(CAN_READ)),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
-                    eq(caseFields),
+                    eq(caseFieldDefinitions),
                     eq(userRoles),
                     eq(CAN_READ),
                     anyBoolean()),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
-                    eq(caseFields),
+                    eq(caseFieldDefinitions),
                     eq(userRoles),
                     eq(CAN_READ),
                     anyBoolean())

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class SecurityUtils {
+    private static final String AUD_CLAIM = "aud";
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
 
@@ -69,5 +70,10 @@ public class SecurityUtils {
         return authorities.stream()
                              .map(GrantedAuthority::getAuthority)
                              .collect(Collectors.joining(","));
+    }
+
+    public String getServiceName() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return jwt.getClaim(AUD_CLAIM);
     }
 }

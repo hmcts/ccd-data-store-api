@@ -9,12 +9,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * endpoint at /health, but (legacy) Zabbix expects it at /status/health
  * (cf https://tools.hmcts.net/confluence/display/RD/Exposing+Application+Status+to+Zabbix).
  *
- * This redirect can be removed once Tactical env is decommissioned; we should configure the
+ * <p>This redirect can be removed once Tactical env is decommissioned; we should configure the
  * endpoint at /health, and also remove /health and /status/** from
  *
- * uk.gov.hmcts.ccd.definition.store.SecurityConfiguration
+ * <p>uk.gov.hmcts.ccd.definition.store.SecurityConfiguration
  *
- * using Spring Actuators own management.security.enabled property
+ * <p>using Spring Actuators own management.security.enabled property
  */
 @Configuration
 public class CNPHealthRedirectConfiguration extends WebMvcConfigurerAdapter {

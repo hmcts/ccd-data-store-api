@@ -25,17 +25,17 @@ public class HttpUIDefinitionGatewayServiceExceptionTest extends WireMockBaseTes
 
     @Test(expected = ServiceException.class)
     public void shouldGetServiceExceptionWhenGettingWorkbasketInputDefinitions() {
-            httpUIDefinitionGateway.getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
+        httpUIDefinitionGateway.getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
     }
 
     @Test(expected = ServiceException.class)
     public void shouldGetServiceExceptionWhenGettingWorkbasketResults() {
-            httpUIDefinitionGateway.getWorkBasketResult(VERSION, "TestAddressBookCase");
+        httpUIDefinitionGateway.getWorkBasketResult(VERSION, "TestAddressBookCase");
     }
 
     @Test(expected = ServiceException.class)
     public void shouldGetServiceExceptionWhenGettingSearchInputs() {
-        httpUIDefinitionGateway.getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
+        httpUIDefinitionGateway.getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
     }
 
     @Test(expected = ServiceException.class)

@@ -14,7 +14,11 @@ import static org.mockito.Mockito.when;
 
 public class MockUtils {
 
-    private MockUtils() {}
+    public static final String CCD_GW = "ccd_gw";
+
+    private MockUtils() {
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
+    }
 
     public static final String ROLE_CASEWORKER_PUBLIC = "caseworker-probate-public";
     public static final String ROLE_CASEWORKER_PRIVATE = "caseworker-probate-private";
@@ -33,6 +37,7 @@ public class MockUtils {
 
         Jwt jwt =   Jwt.withTokenValue(jwtToken)
             .claim("aClaim", "aClaim")
+            .claim("aud", CCD_GW)
             .header("aHeader", "aHeader")
             .build();
         when(authenticationMock.getPrincipal()).thenReturn(jwt);

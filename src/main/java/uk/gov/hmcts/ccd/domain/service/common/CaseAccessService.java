@@ -22,8 +22,8 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 /**
  * Check access to a case for the current user.
- * <p>
- * User with the following roles should only be given access to the cases explicitly granted:
+ *
+ * <p>User with the following roles should only be given access to the cases explicitly granted:
  * <ul>
  * <li>caseworker-*-solicitor: Solicitors</li>
  * <li>citizen(-loa[0-3]): Citizens</li>

@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.AbstractCaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -42,8 +42,8 @@ public abstract class AbstractAuthorisedCaseViewOperation {
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
-    void verifyCaseTypeReadAccess(CaseType caseType, Set<String> userRoles) {
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)) {
+    void verifyCaseTypeReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)) {
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(AccessControlService
                 .NO_CASE_TYPE_FOUND);
             resourceNotFoundException.withDetails(NO_CASE_TYPE_FOUND_DETAILS);
@@ -51,12 +51,12 @@ public abstract class AbstractAuthorisedCaseViewOperation {
         }
     }
 
-    protected CaseType getCaseType(String caseTypeId) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+    protected CaseTypeDefinition getCaseType(String caseTypeId) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
-        return caseType;
+        return caseTypeDefinition;
     }
 
     protected String getCaseId(String caseReference) {

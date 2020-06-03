@@ -71,7 +71,7 @@ public class UserRepositoryTest {
 
     @Nested
     @DisplayName("getUserRoles()")
-    class getUserRoles {
+    class GetUserRoles {
 
         @Test
         @DisplayName("should retrieve roles from security principals")
@@ -99,7 +99,7 @@ public class UserRepositoryTest {
 
     @Nested
     @DisplayName("getUserClassifications()")
-    class getUserClassifications {
+    class GetUserClassifications {
 
         @Test
         @DisplayName("should retrieve roles from user repository")

@@ -34,7 +34,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -68,7 +68,7 @@ public class DefaultUserRepository implements UserRepository {
     }
 
     @Override
-    public IDAMProperties getUserDetails() {
+    public IdamProperties getUserDetails() {
         UserInfo userInfo = securityUtils.getUserInfo();
         return  toIdamProperties(userInfo);
     }
@@ -158,8 +158,8 @@ public class DefaultUserRepository implements UserRepository {
             || ArrayUtils.contains(AuthCheckerConfiguration.getCitizenRoles(), role);
     }
 
-    private IDAMProperties toIdamProperties(UserInfo userInfo) {
-        IDAMProperties idamProperties = new IDAMProperties();
+    private IdamProperties toIdamProperties(UserInfo userInfo) {
+        IdamProperties idamProperties = new IdamProperties();
         idamProperties.setId(userInfo.getUid());
         idamProperties.setEmail(userInfo.getSub());
         idamProperties.setForename(userInfo.getGivenName());

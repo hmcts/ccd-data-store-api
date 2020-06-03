@@ -55,15 +55,15 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
 
         assertCaseDataResultSetSize();
 
-        String userJson = "{\n" +
-            "          \"sub\": \"Cloud.Strife@test.com\",\n" +
-            "          \"uid\": \"1234\",\n" +
-            "          \"roles\": [\n" +
-            "            \"caseworker\",\n" +
-            "            \"caseworker-test\"\n" +
-            "          ],\n" +
-            "          \"name\": \"Cloud Strife\"\n" +
-            "        }";
+        String userJson = "{\n"
+            + "          \"sub\": \"Cloud.Strife@test.com\",\n"
+            + "          \"uid\": \"1234\",\n"
+            + "          \"roles\": [\n"
+            + "            \"caseworker\",\n"
+            + "            \"caseworker-test\"\n"
+            + "          ],\n"
+            + "          \"name\": \"Cloud Strife\"\n"
+            + "        }";
         stubFor(WireMock.get(urlMatching("/o/userinfo"))
             .willReturn(okJson(userJson).withStatus(200)));
 

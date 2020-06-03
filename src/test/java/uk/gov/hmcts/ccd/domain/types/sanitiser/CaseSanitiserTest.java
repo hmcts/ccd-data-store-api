@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,12 +20,12 @@ public class CaseSanitiserTest {
 
     private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
 
-    private static final CaseType CASE_TYPE = new CaseType();
+    private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
 
     private static final String TYPE_SIMPLE = "Simple";
-    private static final FieldType SIMPLE_FIELD_TYPE = new FieldType();
+    private static final FieldTypeDefinition SIMPLE_FIELD_TYPE = new FieldTypeDefinition();
     private static final String SIMPLE_FIELD_ID = "FirstName";
-    private static final CaseField SIMPLE_FIELD = new CaseField();
+    private static final CaseFieldDefinition SIMPLE_FIELD = new CaseFieldDefinition();
     private static final JsonNode SIMPLE_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value");
     private static final JsonNode SIMPLE_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value");
     private static final String TYPE_OTHER = "Other";
@@ -34,9 +34,9 @@ public class CaseSanitiserTest {
         SIMPLE_FIELD_TYPE.setId(TYPE_SIMPLE);
         SIMPLE_FIELD_TYPE.setType(TYPE_SIMPLE);
         SIMPLE_FIELD.setId(SIMPLE_FIELD_ID);
-        SIMPLE_FIELD.setFieldType(SIMPLE_FIELD_TYPE);
+        SIMPLE_FIELD.setFieldTypeDefinition(SIMPLE_FIELD_TYPE);
 
-        CASE_TYPE.setCaseFields(Collections.singletonList(SIMPLE_FIELD));
+        CASE_TYPE.setCaseFieldDefinitions(Collections.singletonList(SIMPLE_FIELD));
     }
 
     private CaseSanitiser caseSanitiser;

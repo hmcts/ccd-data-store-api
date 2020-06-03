@@ -23,6 +23,8 @@ public class SearchResultField implements Serializable {
     private String role;
     @JsonProperty("sort_order")
     private SortOrder sortOrder;
+    @JsonProperty("display_context_parameter")
+    private String displayContextParameter = null;
 
     public String getCaseTypeId() {
         return caseTypeId;
@@ -97,5 +99,13 @@ public class SearchResultField implements Serializable {
             return getCaseFieldId() + '.' + getCaseFieldPath();
         }
         return getCaseFieldId();
+    }
+
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
+    }
+
+    public void setDisplayContextParameter(String displayContextParameter) {
+        this.displayContextParameter = displayContextParameter;
     }
 }

@@ -56,7 +56,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -236,12 +236,12 @@ class DefaultUserRepositoryTest {
         @DisplayName("should return the User Profile defaults for the user")
         void shouldReturnUserProfileDefaultsForUser() {
             when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
-            final Jurisdiction jurisdiction = new Jurisdiction();
-            jurisdiction.setId("TEST");
-            jurisdiction.setName("Test");
-            jurisdiction.setDescription("Test Jurisdiction");
+            final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+            jurisdictionDefinition.setId("TEST");
+            jurisdictionDefinition.setName("Test");
+            jurisdictionDefinition.setDescription("Test Jurisdiction");
             final UserDefault userDefault = new UserDefault();
-            userDefault.setJurisdictions(singletonList(jurisdiction));
+            userDefault.setJurisdictionDefinitions(singletonList(jurisdictionDefinition));
             final ResponseEntity<UserDefault> responseEntity = new ResponseEntity<>(userDefault, HttpStatus.OK);
             when(restTemplate
                 .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
