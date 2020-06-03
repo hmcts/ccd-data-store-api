@@ -133,7 +133,7 @@ public class MergeDataToSearchResultOperation {
             JsonNode jsonNode = caseData.get(searchResultField.getCaseFieldId());
             if (jsonNode != null) {
                 newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(),
-                    searchResultField.getObjectByPath(jsonNode));
+                    searchResultField.getCaseFieldNode(jsonNode));
             }
         });
 

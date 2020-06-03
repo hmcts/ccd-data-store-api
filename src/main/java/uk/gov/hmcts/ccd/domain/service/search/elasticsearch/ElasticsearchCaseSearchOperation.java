@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
-import uk.gov.hmcts.ccd.domain.service.aggregated.MergeDataToSearchCasesOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
@@ -45,36 +43,28 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private final CaseDetailsMapper caseDetailsMapper;
     private final ApplicationParams applicationParams;
     private final CaseSearchRequestSecurity caseSearchRequestSecurity;
-    private final MergeDataToSearchCasesOperation mergeDataToSearchCasesOperation;
 
     @Autowired
     public ElasticsearchCaseSearchOperation(JestClient jestClient,
                                             @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
                                             CaseDetailsMapper caseDetailsMapper,
                                             ApplicationParams applicationParams,
-                                            CaseSearchRequestSecurity caseSearchRequestSecurity,
-                                            MergeDataToSearchCasesOperation mergeDataToSearchCasesOperation) {
+                                            CaseSearchRequestSecurity caseSearchRequestSecurity) {
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
         this.caseDetailsMapper = caseDetailsMapper;
         this.applicationParams = applicationParams;
         this.caseSearchRequestSecurity = caseSearchRequestSecurity;
-        this.mergeDataToSearchCasesOperation = mergeDataToSearchCasesOperation;
     }
 
     @Override
-    public CaseSearchResult executeExternal(CrossCaseTypeSearchRequest request) {
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest request) {
         MultiSearchResult result = search(request);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);
         } else {
             throw new BadSearchRequest(result.getErrorMessage());
         }
-    }
-
-    @Override
-    public UICaseSearchResult executeInternal(CaseSearchResult caseSearchResult, List<String> caseTypeIds, String useCase) {
-        return mergeDataToSearchCasesOperation.execute(caseTypeIds, caseSearchResult, useCase);
     }
 
     private MultiSearchResult search(CrossCaseTypeSearchRequest request) {

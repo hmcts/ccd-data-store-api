@@ -15,7 +15,6 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -68,23 +67,11 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult executeExternal(CrossCaseTypeSearchRequest searchRequest) {
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
         List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest.getCaseTypeIds());
         CrossCaseTypeSearchRequest authorisedSearchRequest = createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
 
         return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
-    }
-
-    @Override
-    public UICaseSearchResult executeInternal(CaseSearchResult caseSearchResult,
-                                              List<String> caseTypeIds,
-                                              String useCase) {
-        List<String> authorisedCaseTypeIds = getAuthorisedCaseTypes(caseTypeIds)
-            .stream()
-            .map(CaseTypeDefinition::getId)
-            .collect(Collectors.toList());
-
-        return filterFields(caseSearchResult, authorisedCaseTypeIds, useCase);
     }
 
     private List<CaseTypeDefinition> getAuthorisedCaseTypes(List<String> caseTypeIds) {
@@ -112,17 +99,10 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             return CaseSearchResult.EMPTY;
         }
 
-        CaseSearchResult result = caseSearchOperation.executeExternal(authorisedSearchRequest);
+        CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
         filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest);
 
         return result;
-    }
-
-    private UICaseSearchResult filterFields(CaseSearchResult caseSearchResult,
-                                            List<String> caseTypeIds,
-                                            String useCase) {
-        // TODO: Filter out fields from result that haven't been requested before returning (RDM-8556)
-        return caseSearchOperation.executeInternal(caseSearchResult, caseTypeIds, useCase);
     }
 
     private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,

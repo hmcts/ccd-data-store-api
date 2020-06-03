@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import io.swagger.annotations.*;
-import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -64,13 +63,9 @@ public class CaseSearchEndpoint {
 
         Instant start = Instant.now();
 
-        CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(
-            caseTypeIds,
-            Strings.EMPTY,
-            jsonSearchRequest
-        );
+        CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(caseTypeIds, jsonSearchRequest);
 
-        CaseSearchResult result = caseSearchOperation.executeExternal(request);
+        CaseSearchResult result = caseSearchOperation.execute(request);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());

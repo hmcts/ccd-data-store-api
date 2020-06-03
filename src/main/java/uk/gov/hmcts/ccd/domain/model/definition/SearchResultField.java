@@ -3,15 +3,12 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class SearchResultField implements Serializable {
-    
+
     @JsonProperty("case_type_id")
     private String caseTypeId;
     @JsonProperty("case_field_id")
@@ -49,10 +46,6 @@ public class SearchResultField implements Serializable {
 
     public String getCaseFieldPath() {
         return caseFieldPath;
-    }
-
-    public List<String> getCaseFieldPathElements() {
-        return Arrays.stream(this.caseFieldPath.trim().split("\\.")).collect(Collectors.toList());
     }
 
     public void setCaseFieldPath(String caseFieldPath) {
@@ -122,22 +115,7 @@ public class SearchResultField implements Serializable {
         this.useCase = useCase;
     }
 
-    public Object getObjectByPath(JsonNode value) {
-        List<String> pathElements = getCaseFieldPathElements();
-
-        return reduce(value, pathElements, getCaseFieldPath());
-    }
-
-    private Object reduce(JsonNode caseFields, List<String> pathElements, String path) {
-        String firstPathElement = pathElements.get(0);
-
-        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement)).orElse(null);
-
-        if (caseField == null || pathElements.size() == 1) {
-            return caseField;
-        } else {
-            List<String> tail = pathElements.subList(1, pathElements.size());
-            return reduce(caseField, tail, path);
-        }
+    public JsonNode getCaseFieldNode(JsonNode topLevelCaseFieldNode) {
+        return CaseFieldPathUtils.getCaseFieldNodeByPath(topLevelCaseFieldNode, getCaseFieldPath());
     }
 }

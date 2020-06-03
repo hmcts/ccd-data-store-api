@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.common.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -61,17 +62,12 @@ public class ElasticsearchQueryHelper {
         this.elasticsearchMappings = elasticsearchMappings;
     }
 
-    public CrossCaseTypeSearchRequest prepareRequest(List<String> caseTypeIds, String useCase, String jsonSearchRequest) {
+    public CrossCaseTypeSearchRequest prepareRequest(List<String> caseTypeIds, String jsonSearchRequest) {
         if (CollectionUtils.isEmpty(caseTypeIds)) {
             throw new BadSearchRequest("At least one case type ID is required.");
         }
 
-        rejectBlackListedQuery(jsonSearchRequest);
-
-        JsonNode searchRequest = stringToJsonNode(jsonSearchRequest);
-        if (!Strings.isNullOrEmpty(useCase)) {
-            applyConfiguredSort(searchRequest, caseTypeIds, useCase);
-        }
+        JsonNode searchRequest = validateAndConvertRequest(jsonSearchRequest);
 
         return new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(caseTypeIds)
@@ -79,19 +75,33 @@ public class ElasticsearchQueryHelper {
             .build();
     }
 
-    private void applyConfiguredSort(JsonNode searchRequest, List<String> caseTypeIds, String useCase) {
+    public CrossCaseTypeSearchRequest prepareRequest(String caseTypeId, String jsonSearchRequest, String useCase) {
+        if (Strings.isNullOrEmpty(caseTypeId)) {
+            throw new BadSearchRequest("Case type ID is required.");
+        }
+
+        JsonNode searchRequest = validateAndConvertRequest(jsonSearchRequest);
+        applyConfiguredSort(searchRequest, caseTypeId, useCase);
+
+        return new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(Collections.singletonList(caseTypeId))
+            .withSearchRequest(searchRequest)
+            .build();
+    }
+
+    private void applyConfiguredSort(JsonNode searchRequest, String caseTypeId, String useCase) {
         JsonNode sortNode = searchRequest.get(SORT);
         if (sortNode == null) {
-            ArrayNode appliedSortsNode = buildSortNode(caseTypeIds, useCase);
+            ArrayNode appliedSortsNode = buildSortNode(caseTypeId, useCase);
             if (appliedSortsNode.size() > 0) {
                 ((ObjectNode)searchRequest).set(SORT, appliedSortsNode);
             }
         }
     }
 
-    private ArrayNode buildSortNode(List<String> caseTypeIds, String useCase) {
+    private ArrayNode buildSortNode(String caseTypeId, String useCase) {
         ArrayNode sortNode = objectMapper.createArrayNode();
-        caseTypeIds.forEach(caseTypeId -> addCaseTypeSorts(caseTypeId, useCase, sortNode));
+        addCaseTypeSorts(caseTypeId, useCase, sortNode);
         return sortNode;
     }
 
@@ -129,7 +139,8 @@ public class ElasticsearchQueryHelper {
         return objectNode;
     }
 
-    private JsonNode stringToJsonNode(String jsonSearchRequest) {
+    private JsonNode validateAndConvertRequest(String jsonSearchRequest) {
+        rejectBlackListedQuery(jsonSearchRequest);
         return objectMapperService.convertStringToObject(jsonSearchRequest, JsonNode.class);
     }
 

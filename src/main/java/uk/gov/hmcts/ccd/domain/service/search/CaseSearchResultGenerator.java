@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.aggregated;
+package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -11,6 +11,9 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseTypeOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypeOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -21,25 +24,26 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
-public class MergeDataToSearchCasesOperation {
+public class CaseSearchResultGenerator {
 
     private final UserRepository userRepository;
     private final GetCaseTypeOperation getCaseTypeOperation;
     private final SearchQueryOperation searchQueryOperation;
 
-    public MergeDataToSearchCasesOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                           @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
-                                           final SearchQueryOperation searchQueryOperation) {
+    public CaseSearchResultGenerator(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                                     @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
+                                     final SearchQueryOperation searchQueryOperation) {
         this.userRepository = userRepository;
         this.getCaseTypeOperation = getCaseTypeOperation;
         this.searchQueryOperation = searchQueryOperation;
     }
 
-    public UICaseSearchResult execute(final List<String> caseTypeIds,
+    public UICaseSearchResult execute(final String caseTypeId,
                                       final CaseSearchResult caseSearchResult,
                                       final String useCase) {
+        // TODO: Filter out fields from result that haven't been requested before returning (RDM-8556)
         return new UICaseSearchResult(
-            buildHeaders(caseTypeIds, useCase, caseSearchResult),
+            buildHeaders(caseTypeId, useCase, caseSearchResult),
             buildItems(useCase, caseSearchResult),
             caseSearchResult.getTotal()
         );
@@ -57,13 +61,11 @@ public class MergeDataToSearchCasesOperation {
         return items;
     }
 
-    private List<SearchResultViewHeaderGroup> buildHeaders(List<String> caseTypeIds, String useCase, CaseSearchResult caseSearchResult) {
+    private List<SearchResultViewHeaderGroup> buildHeaders(String caseTypeId, String useCase, CaseSearchResult caseSearchResult) {
         List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
-        caseTypeIds.forEach(caseTypeId -> {
-            getCaseTypeDefinition(caseTypeId).ifPresent(caseType -> {
-                SearchResultViewHeaderGroup caseSearchHeader = buildHeader(useCase, caseSearchResult, caseTypeId, caseType);
-                headers.add(caseSearchHeader);
-            });
+        getCaseTypeDefinition(caseTypeId).ifPresent(caseType -> {
+            SearchResultViewHeaderGroup caseSearchHeader = buildHeader(useCase, caseSearchResult, caseTypeId, caseType);
+            headers.add(caseSearchHeader);
         });
 
         return headers;
@@ -162,7 +164,7 @@ public class MergeDataToSearchCasesOperation {
             JsonNode jsonNode = caseData.get(searchResultField.getCaseFieldId());
             if (jsonNode != null) {
                 newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(),
-                    searchResultField.getObjectByPath(jsonNode));
+                    searchResultField.getCaseFieldNode(jsonNode));
             }
         });
 

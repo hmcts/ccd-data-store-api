@@ -40,15 +40,15 @@ class CaseSearchEndpointTest {
     void searchCaseDetailsInvokesOperation() {
         CaseSearchResult result = mock(CaseSearchResult.class);
         CrossCaseTypeSearchRequest preparedRequest = mock(CrossCaseTypeSearchRequest.class);
-        when(elasticsearchQueryHelper.prepareRequest(any(), any(), any())).thenReturn(preparedRequest);
-        when(caseSearchOperation.executeExternal(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
+        when(elasticsearchQueryHelper.prepareRequest(any(), any())).thenReturn(preparedRequest);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
         List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
 
         final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest);
 
-        verify(elasticsearchQueryHelper).prepareRequest(eq(caseTypeIds), eq(""), eq(searchRequest));
-        verify(caseSearchOperation).executeExternal(eq(preparedRequest));
+        verify(elasticsearchQueryHelper).prepareRequest(eq(caseTypeIds), eq(searchRequest));
+        verify(caseSearchOperation).execute(eq(preparedRequest));
         assertThat(caseSearchResult, is(result));
     }
 }
