@@ -72,8 +72,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
             }).toArray(CaseViewTab[]::new));
     }
 
-    @SuppressWarnings("all")
-    private CaseView filterUpsertAccess(String caseReference, CaseType caseType, Set<String> userRoles, CaseView caseView) { //NOSONAR
+    private CaseView filterUpsertAccess(String caseReference, CaseType caseType, Set<String> userRoles, CaseView caseView) {
         CaseViewTrigger[] authorisedTriggers;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseType,
                                                                      userRoles,

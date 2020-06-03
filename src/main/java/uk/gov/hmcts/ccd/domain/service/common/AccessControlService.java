@@ -110,6 +110,7 @@ public class AccessControlService {
         return hasAccess;
     }
 
+    @SuppressWarnings("javasecurity:S5145")
     public boolean canAccessCaseEventWithCriteria(final String eventId,
                                                   final List<CaseEvent> caseEventDefinitions,
                                                   final Set<String> userRoles,
