@@ -36,7 +36,6 @@ import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -166,19 +165,19 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(TEST_CASE_VIEW).when(getCaseViewOperation).execute(CASE_REFERENCE);
     }
 
-    @Test
-    @DisplayName("should call not-deprecated #execute(caseReference)")
-    void shouldCallNotDeprecatedExecute() {
-        final CaseView expectedCaseView = new CaseView();
-        doReturn(expectedCaseView).when(authorisedGetCaseViewOperation).execute(CASE_REFERENCE);
-
-        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
-
-        assertAll(
-            () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
-            () -> assertThat(actualCaseView, sameInstance(expectedCaseView))
-        );
-    }
+//    @Test
+//    @DisplayName("should call not-deprecated #execute(caseReference)")
+//    void shouldCallNotDeprecatedExecute() {
+//        final CaseView expectedCaseView = new CaseView();
+//        doReturn(expectedCaseView).when(authorisedGetCaseViewOperation).execute(CASE_REFERENCE);
+//
+//        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
+//
+//        assertAll(
+//            () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
+//            () -> assertThat(actualCaseView, sameInstance(expectedCaseView))
+//        );
+//    }
 
     @Test
     @DisplayName("should remove fields from tabs based on CRUD)")
