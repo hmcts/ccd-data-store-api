@@ -183,7 +183,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public SearchResult getSearchCasesResult(int version, String caseTypeId, String useCase) {
+    public SearchResult getSearchCasesResultDefinition(int version, String caseTypeId, String useCase) {
         try {
             Instant start = Instant.now();
             HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());

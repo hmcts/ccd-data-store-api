@@ -57,7 +57,7 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
     @Test
     @DisplayName("should Return search cases result fields")
     public void shouldReturnSearchCasesResultFields() {
-        final SearchResult searchResult = httpUIDefinitionGateway.getSearchCasesResult(VERSION, "TestAddressBookCase", ORG_CASES);
+        final SearchResult searchResult = httpUIDefinitionGateway.getSearchCasesResultDefinition(VERSION, "TestAddressBookCase", ORG_CASES);
         assertAll(
             () -> assertThat(searchResult.getFields().length, is(7)),
             () -> assertThat(searchResult.getFields()[0].getUseCase(), is(ORG_CASES))

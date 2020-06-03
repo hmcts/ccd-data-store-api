@@ -15,7 +15,7 @@ public interface UIDefinitionGateway {
 
     SearchResult getSearchResult(int version, String caseTypeId);
 
-    SearchResult getSearchCasesResult(int version, String caseTypeId, String useCase);
+    SearchResult getSearchCasesResultDefinition(int version, String caseTypeId, String useCase);
 
     SearchInputFieldsDefinition getSearchInputFieldDefinitions(int version, String caseTypeId);
 

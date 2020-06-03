@@ -40,7 +40,7 @@ public class UIDefinitionRepository {
 
     public SearchResult getSearchCasesResult(String caseTypeId, String useCase) {
         CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getSearchCasesResult(version.getVersion(), caseTypeId, useCase);
+        return cachedUiDefinitionGateway.getSearchCasesResultDefinition(version.getVersion(), caseTypeId, useCase);
     }
 
     public SearchInputFieldsDefinition getSearchInputFieldDefinitions(final String caseTypeId) {
