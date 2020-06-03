@@ -73,7 +73,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     }
 
     @SuppressWarnings("squid:javasecurity:S5145")
-    private CaseView filterUpsertAccess(String caseReference, CaseType caseType, Set<String> userRoles, CaseView caseView) {
+    private CaseView filterUpsertAccess(String caseReference, CaseType caseType, Set<String> userRoles, CaseView caseView) { //NOSONAR
         CaseViewTrigger[] authorisedTriggers;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseType,
                                                                      userRoles,
