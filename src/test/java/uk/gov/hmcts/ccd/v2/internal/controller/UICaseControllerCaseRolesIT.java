@@ -137,10 +137,16 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
 
     }
 
-    // @Test
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldGetEventById() throws Exception {
-        MockUtils.setSecurityAuthorities(UID_WITH_EVENT_ACCESS, authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+
+        UserInfo userInfo = UserInfo.builder()
+            .uid(UID_WITH_EVENT_ACCESS)
+            .roles(Lists.newArrayList(MockUtils.ROLE_CASEWORKER_PUBLIC))
+            .build();
+        stubFor(WireMock.get(urlMatching("/o/userinfo"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer " + UID_WITH_EVENT_ACCESS);

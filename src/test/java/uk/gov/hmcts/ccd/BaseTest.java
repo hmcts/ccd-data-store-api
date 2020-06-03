@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -123,7 +124,7 @@ public abstract class BaseTest {
 
     @Before
     public void initMock() throws IOException {
-
+        MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
