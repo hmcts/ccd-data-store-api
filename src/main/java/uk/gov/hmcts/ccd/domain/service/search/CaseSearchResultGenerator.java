@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseTypeOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypeOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -29,25 +30,40 @@ public class CaseSearchResultGenerator {
     private final UserRepository userRepository;
     private final GetCaseTypeOperation getCaseTypeOperation;
     private final SearchQueryOperation searchQueryOperation;
+    private final SearchResultProcessor searchResultProcessor;
 
-    public CaseSearchResultGenerator(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                     @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
-                                     final SearchQueryOperation searchQueryOperation) {
+    public CaseSearchResultGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+                                     @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) GetCaseTypeOperation getCaseTypeOperation,
+                                     SearchQueryOperation searchQueryOperation,
+                                     SearchResultProcessor searchResultProcessor) {
         this.userRepository = userRepository;
         this.getCaseTypeOperation = getCaseTypeOperation;
         this.searchQueryOperation = searchQueryOperation;
+        this.searchResultProcessor = searchResultProcessor;
     }
 
-    public UICaseSearchResult execute(final String caseTypeId,
-                                      final CaseSearchResult caseSearchResult,
-                                      final String useCase) {
+    public UICaseSearchResult execute(String caseTypeId,
+                                      CaseSearchResult caseSearchResult,
+                                      String useCase) {
+        List<SearchResultViewHeaderGroup> headerGroups = buildHeaders(caseTypeId, useCase, caseSearchResult);
+        List<SearchResultViewItem> items = buildItems(useCase, caseSearchResult);
+
+        if (itemsRequireFormatting(headerGroups)) {
+            items = searchResultProcessor.execute(headerGroups.get(0).getFields(), items);
+        }
+
         // TODO: Filter out fields from result that haven't been requested before returning (RDM-8556)
         return new UICaseSearchResult(
-            buildHeaders(caseTypeId, useCase, caseSearchResult),
-            buildItems(useCase, caseSearchResult),
+            headerGroups,
+            items,
             caseSearchResult.getTotal(),
             useCase
         );
+    }
+
+    private boolean itemsRequireFormatting(List<SearchResultViewHeaderGroup> headerGroups) {
+        return headerGroups.size() == 1
+               && headerGroups.get(0).getFields().stream().anyMatch(field -> field.getDisplayContextParameter() != null);
     }
 
     private List<SearchResultViewItem> buildItems(String useCase, CaseSearchResult caseSearchResult) {

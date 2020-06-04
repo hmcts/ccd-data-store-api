@@ -5,11 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.CommonViewHeader;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class SearchResultViewHeader {
+public class SearchResultViewHeader implements CommonViewHeader {
 
     @JsonProperty("case_field_id")
     private String caseFieldId;

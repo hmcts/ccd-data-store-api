@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
-import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
-import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
+import uk.gov.hmcts.ccd.domain.model.search.*;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
@@ -41,45 +39,43 @@ public class SearchResultProcessor {
         this.dateTimeFormatParser = dateTimeFormatParser;
     }
 
-    public SearchResultView execute(List<SearchResultViewColumn> viewColumns,
-                                    List<SearchResultViewItem> viewItems,
-                                    String resultError) {
-        for (SearchResultViewColumn viewColumn : viewColumns) {
+    public <T extends CommonViewHeader, U extends CommonViewItem> List<U> execute(List<T> viewHeaders, List<U> viewItems) {
+        for (T viewHeader : viewHeaders) {
             viewItems = viewItems.stream()
-                .map(viewItem -> processSearchResultViewItem(viewItem, viewColumn))
+                .map(viewItem -> processViewItem(viewItem, viewHeader))
                 .collect(Collectors.toList());
         }
 
-        return new SearchResultView(viewColumns, viewItems, resultError);
+        return viewItems;
     }
 
-    private SearchResultViewItem processSearchResultViewItem(SearchResultViewItem viewItem, SearchResultViewColumn viewColumn) {
-        viewItem.getCaseFieldsFormatted().replace(viewColumn.getCaseFieldId(),
-            processObject(viewItem.getCaseFields().get(viewColumn.getCaseFieldId()), viewColumn));
+    private <T extends CommonViewHeader, U extends CommonViewItem> U processViewItem(U viewItem, T viewHeader) {
+        viewItem.getFieldsFormatted().replace(viewHeader.getCaseFieldId(),
+            processObject(viewItem.getFields().get(viewHeader.getCaseFieldId()), viewHeader));
         return viewItem;
     }
 
     private Object processObject(final Object object,
-                                 final SearchResultViewColumn viewColumn) {
+                                 final CommonViewHeader viewHeader) {
         if (object instanceof TextNode && !isNullOrEmpty((TextNode) object)) {
-            return createTextNodeFrom((TextNode) object, viewColumn, viewColumn.getCaseFieldId());
+            return createTextNodeFrom((TextNode) object, viewHeader, viewHeader.getCaseFieldId());
         } else if (object instanceof ArrayNode && !isNullOrEmpty((ArrayNode) object)) {
-            return createArrayNodeFrom((ArrayNode) object, viewColumn, viewColumn.getCaseFieldId());
+            return createArrayNodeFrom((ArrayNode) object, viewHeader, viewHeader.getCaseFieldId());
         } else if (object instanceof ObjectNode && !isNullOrEmpty((ObjectNode) object)) {
             return createObjectNodeFrom((ObjectNode) object,
-                viewColumn,
-                viewColumn.getCaseFieldTypeDefinition().getComplexFields(),
-                viewColumn.getCaseFieldId());
+                viewHeader,
+                viewHeader.getCaseFieldTypeDefinition().getComplexFields(),
+                viewHeader.getCaseFieldId());
         } else if (object instanceof LocalDateTime) {
             return createTextNodeFrom(new TextNode(((LocalDateTime) object)
-                .format(DateTimeFormatter.ofPattern(DateTimeFormatParser.DATE_TIME_FORMAT))), viewColumn, viewColumn.getCaseFieldId());
+                .format(DateTimeFormatter.ofPattern(DateTimeFormatParser.DATE_TIME_FORMAT))), viewHeader, viewHeader.getCaseFieldId());
         }
 
         return object;
     }
 
     private JsonNode createObjectNodeFrom(final ObjectNode originalNode,
-                                          final SearchResultViewColumn viewColumn,
+                                          final CommonViewHeader viewHeader,
                                           final List<CaseFieldDefinition> complexCaseFields,
                                           final String fieldPrefix) {
         if (isNullOrEmpty(originalNode)) {
@@ -98,13 +94,13 @@ public class SearchResultProcessor {
                 newNode.set(fieldId, caseFieldNode);
             } else if (complexFieldType == BaseType.get(COLLECTION)) {
                 newNode.set(fieldId,
-                    createArrayNodeFrom((ArrayNode) caseFieldNode, viewColumn, fieldPath));
+                    createArrayNodeFrom((ArrayNode) caseFieldNode, viewHeader, fieldPath));
             } else if (complexFieldType == BaseType.get(COMPLEX)) {
                 Optional.ofNullable(
-                    createObjectNodeFrom((ObjectNode) caseFieldNode, viewColumn, complexCaseField.getFieldTypeDefinition().getComplexFields(), fieldPath))
+                    createObjectNodeFrom((ObjectNode) caseFieldNode, viewHeader, complexCaseField.getFieldTypeDefinition().getComplexFields(), fieldPath))
                     .ifPresent(result -> newNode.set(fieldId, result));
             } else {
-                newNode.set(fieldId, createTextNodeFrom((TextNode) caseFieldNode, viewColumn, fieldPath));
+                newNode.set(fieldId, createTextNodeFrom((TextNode) caseFieldNode, viewHeader, fieldPath));
             }
         });
 
@@ -112,16 +108,16 @@ public class SearchResultProcessor {
     }
 
     private JsonNode createTextNodeFrom(final TextNode originalNode,
-                                        final SearchResultViewColumn viewColumn,
+                                        final CommonViewHeader viewHeader,
                                         final String fieldPath) {
         if (Strings.isNullOrEmpty(originalNode.asText())) {
             return new TextNode(originalNode.asText());
         }
 
-        final Optional<CommonField> nestedField = viewColumn.getCaseFieldTypeDefinition().getNestedField(fieldPath, true);
+        final Optional<CommonField> nestedField = viewHeader.getCaseFieldTypeDefinition().getNestedField(fieldPath, true);
         final String displayContextParameter = nestedField
             .map(CommonField::getDisplayContextParameter)
-            .orElse(viewColumn.getDisplayContextParameter());
+            .orElse(viewHeader.getDisplayContextParameter());
 
         return DisplayContextParameter.getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEDISPLAY)
             .map(dcp -> {
@@ -129,10 +125,10 @@ public class SearchResultProcessor {
                     .map(CommonField::getFieldTypeDefinition)
                     .map(FieldTypeDefinition::getType)
                     .orElseGet(() -> {
-                        FieldTypeDefinition collectionFieldType = viewColumn.getCaseFieldTypeDefinition().getCollectionFieldTypeDefinition();
-                        return collectionFieldType == null ? viewColumn.getCaseFieldTypeDefinition().getType() : collectionFieldType.getType();
+                        FieldTypeDefinition collectionFieldType = viewHeader.getCaseFieldTypeDefinition().getCollectionFieldTypeDefinition();
+                        return collectionFieldType == null ? viewHeader.getCaseFieldTypeDefinition().getType() : collectionFieldType.getType();
                     });
-                if (fieldType.equals(FieldTypeDefinition.DATETIME) || viewColumn.isMetadata()) {
+                if (fieldType.equals(FieldTypeDefinition.DATETIME) || viewHeader.isMetadata()) {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDateTime(dcp.getValue(), originalNode.asText()));
                 } else {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDate(dcp.getValue(), originalNode.asText()));
@@ -141,14 +137,14 @@ public class SearchResultProcessor {
     }
 
     private ArrayNode createArrayNodeFrom(final ArrayNode originalNode,
-                                          final SearchResultViewColumn viewColumn,
+                                          final CommonViewHeader viewHeader,
                                           final String fieldPrefix) {
         ArrayNode newNode = MAPPER.createArrayNode();
         originalNode.forEach(item -> {
             JsonNode newItem = item.deepCopy();
             if (newItem.isObject()) {
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                    createCollectionValue(item.get(CollectionValidator.VALUE), viewColumn, fieldPrefix));
+                    createCollectionValue(item.get(CollectionValidator.VALUE), viewHeader, fieldPrefix));
             }
             newNode.add(newItem);
         });
@@ -157,16 +153,16 @@ public class SearchResultProcessor {
     }
 
     private JsonNode createCollectionValue(JsonNode existingValue,
-                                           SearchResultViewColumn viewColumn,
+                                           CommonViewHeader viewHeader,
                                            String fieldPrefix) {
         if (isNullOrEmpty(existingValue)) {
             return existingValue;
         }
         return existingValue instanceof TextNode
-            ? createTextNodeFrom((TextNode) existingValue, viewColumn, fieldPrefix) :
+            ? createTextNodeFrom((TextNode) existingValue, viewHeader, fieldPrefix) :
             createObjectNodeFrom((ObjectNode) existingValue,
-                                viewColumn,
-                                viewColumn.getCaseFieldTypeDefinition().getChildren(),
+                                viewHeader,
+                                viewHeader.getCaseFieldTypeDefinition().getChildren(),
                                 fieldPrefix);
     }
 }

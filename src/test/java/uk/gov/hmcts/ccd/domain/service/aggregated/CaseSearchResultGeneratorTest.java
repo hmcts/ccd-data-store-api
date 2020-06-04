@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
+import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultGenerator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -94,6 +95,9 @@ class CaseSearchResultGeneratorTest {
     @Mock
     private SearchQueryOperation searchQueryOperation;
 
+    @Mock
+    private SearchResultProcessor searchResultProcessor;
+
     private CaseSearchResultGenerator classUnderTest;
 
     private Map<String, JsonNode> dataMap;
@@ -165,8 +169,9 @@ class CaseSearchResultGeneratorTest {
                 buildSearchResultField(CASE_TYPE_ID_2, CASE_FIELD_4, "", CASE_FIELD_4, ""))
             .build();
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
+        doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(any(), any());
 
-        classUnderTest = new CaseSearchResultGenerator(userRepository, getCaseTypeOperation, searchQueryOperation);
+        classUnderTest = new CaseSearchResultGenerator(userRepository, getCaseTypeOperation, searchQueryOperation, searchResultProcessor);
     }
 
     @Test
@@ -336,6 +341,32 @@ class CaseSearchResultGeneratorTest {
             () -> assertThat(((TextNode)uiCaseSearchResult.getCases().get(0).getFields()
                     .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asText(), is(POSTCODE_VALUE))
         );
+    }
+
+    @Test
+    void shouldInvokeSearchProcessorDCPIsProvided() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "#DCP"))
+            .build();
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+
+        classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+
+        verify(searchResultProcessor).execute(any(), any());
+    }
+
+    @Test
+    void shouldNotInvokeSearchProcessorWhenNoDCPProvided() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, null))
+            .build();
+        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+
+        classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+
+        verifyNoMoreInteractions(searchResultProcessor);
     }
 
     @Test
