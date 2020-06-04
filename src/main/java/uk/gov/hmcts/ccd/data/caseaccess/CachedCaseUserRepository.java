@@ -19,6 +19,7 @@ public class CachedCaseUserRepository implements CaseUserRepository {
 
     private final Map<String, List<Long>> casesUserHasAccess = newHashMap();
     private final Map<String, List<String>> caseUserRoles = newHashMap();
+    private final Map<CaseAssignedUserRolesKey, List<CaseUserEntity>> caseAssignedUserRoles = newHashMap();
 
     public CachedCaseUserRepository(@Qualifier(DefaultCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository) {
         this.caseUserRepository = caseUserRepository;
@@ -42,5 +43,12 @@ public class CachedCaseUserRepository implements CaseUserRepository {
     @Override
     public List<String> findCaseRoles(final Long caseId, final String userId) {
         return caseUserRoles.computeIfAbsent(caseId + userId, e -> caseUserRepository.findCaseRoles(caseId, userId));
+    }
+
+    @Override
+    public List<CaseUserEntity> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
+        return caseAssignedUserRoles.computeIfAbsent(
+            new CaseAssignedUserRolesKey(caseIds, userIds),
+            e -> caseUserRepository.findCaseUserRoles(caseIds, userIds));
     }
 }

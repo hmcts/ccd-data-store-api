@@ -43,6 +43,8 @@ public final class V2 {
 
         public static final String CASE_EVENTS = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8";
 
+        public static final String CASE_USER_ROLES = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-user-roles.v2+json;charset=UTF-8";
+
     }
 
     public final class Error {
@@ -70,5 +72,8 @@ public final class V2 {
         public static final String ROLES_FOR_CASE_ID_NOT_FOUND = "Cannot find user roles or case roles for the case ID";
         public static final String CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID = "Cannot find case type definition for case ID";
         public static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+        public static final String EMPTY_CASE_ID_LIST = "Case ID list is empty";
+        public static final String USER_ID_INVALID = "User ID is not valid";
+        public static final String OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED = "Access to other user's case role assignments not granted";
     }
 }

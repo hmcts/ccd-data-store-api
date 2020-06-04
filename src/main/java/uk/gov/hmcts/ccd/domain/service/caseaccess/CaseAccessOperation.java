@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -11,11 +12,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
@@ -75,6 +78,16 @@ public class CaseAccessOperation {
 
         grantAddedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
         revokeRemovedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
+    }
+
+
+    public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
+        List<CaseUserEntity>  caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
+        return caseUserEntities.stream()
+            .map(cue -> new CaseAssignedUserRole(cue.getCasePrimaryKey().getCaseDataId(),
+                cue.getCasePrimaryKey().getUserId(),
+                cue.getCasePrimaryKey().getCaseRole()))
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private void validateCaseRoles(Set<String> validCaseRoles, Set<String> targetCaseRoles) {

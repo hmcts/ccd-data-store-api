@@ -53,4 +53,17 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
 
         return namedQuery.getResultList();
     }
+
+    public List<CaseUserEntity> findCaseUserRoles(final List<Long> caseIds, final List<String> userIds) {
+        if (userIds.size() == 0) {
+            TypedQuery<CaseUserEntity> namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_BY_CASE_IDS, CaseUserEntity.class);
+            namedQuery.setParameter(CaseUserEntity.PARAM_CASE_DATA_IDS, caseIds);
+            return namedQuery.getResultList();
+        } else {
+            TypedQuery<CaseUserEntity> namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES, CaseUserEntity.class);
+            namedQuery.setParameter(CaseUserEntity.PARAM_CASE_DATA_IDS, caseIds);
+            namedQuery.setParameter(CaseUserEntity.PARAM_USER_IDS, userIds);
+            return namedQuery.getResultList();
+        }
+    }
 }
