@@ -52,8 +52,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     private static final String INVALID_USER_IDS = USER_IDS_1 + ", ," + USER_IDS_2;
 
-    private static final String CASEWORKER_CAA = "caseworker-caa";
-    private static final String GET_CASE_ASSIGNED_USER_ROLES = "/case-users";
+    private final String caseworkerCaa = "caseworker-caa";
+    private final String getCaseAssignedUserRoles = "/case-users";
 
     private static final String PARAM_CASE_IDS = "case_ids";
     private static final String PARAM_USER_IDS = "user_ids";
@@ -90,9 +90,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_case_users_valid_case_ids.sql"
     })
     public void getUserCaseRolesAssignedToUser() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASEWORKER_CAA);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
-        final MvcResult result = mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, USER_IDS)
@@ -116,7 +116,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void shouldGetSelfCaseUserRolesAssigned() throws Exception {
         MockUtils.setSecurityAuthorities("89000", authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
-        final MvcResult result = mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, USER_IDS_1.toString())
@@ -142,9 +142,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_case_users_valid_case_ids.sql"
     })
     public void shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForPassedCaseId() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASEWORKER_CAA);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
-        final MvcResult result = mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_ID_2.toString())
             .headers(createHttpHeaders()))
@@ -180,9 +180,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_case_users_valid_case_ids.sql"
     })
     public void shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForListOfCaseIds() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASEWORKER_CAA);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
-        final MvcResult result = mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_IDS)
             .headers(createHttpHeaders()))
@@ -210,9 +210,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // AC-5
     @Test
     public void shouldThrowExceptionWhenEmptyCaseIDListPassed() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASEWORKER_CAA);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
-        String errorMessage = mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        String errorMessage = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, "")
             .param(PARAM_USER_IDS, USER_IDS)
@@ -225,9 +225,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     @Test
     public void shouldThrowExceptionWhenCaseIDNotPassed() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASEWORKER_CAA);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
-        mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_USER_IDS, USER_IDS)
             .headers(createHttpHeaders()))
@@ -238,9 +238,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // AC-6
     @Test
     public void shouldThrowExceptionWhenInvalidCaseIDIsPassed() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASEWORKER_CAA);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
-        String errorMessage = mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        String errorMessage = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, INVALID_CASE_ID.toString())
             .param(PARAM_USER_IDS, USER_IDS)
@@ -254,9 +254,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // AC-7
     @Test
     public void shouldThrowExceptionWhenInvalidUserIdDataPassed() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASEWORKER_CAA);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
-        String errorMessage = mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        String errorMessage = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, INVALID_USER_IDS)
@@ -270,9 +270,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // AC-8
     @Test
     public void shouldThrowExceptionWhenInvokingUserHasNoPrivileges() throws Exception {
-        MockUtils.setSecurityAuthorities( authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
-        String errorMessage = mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        String errorMessage = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, USER_IDS)
@@ -285,9 +285,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     @Test
     public void shouldThrowExceptionWhenUserRequestedForSelfCaseRoleAccessAlongWithOtherUsers() throws Exception {
-        MockUtils.setSecurityAuthorities( "89000", authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+        MockUtils.setSecurityAuthorities("89000", authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
-        String errorMessage = mockMvc.perform(get(GET_CASE_ASSIGNED_USER_ROLES)
+        String errorMessage = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, USER_IDS)

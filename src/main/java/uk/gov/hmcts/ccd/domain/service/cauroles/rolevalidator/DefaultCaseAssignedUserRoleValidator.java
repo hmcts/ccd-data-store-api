@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 @Qualifier("default")
 public class DefaultCaseAssignedUserRoleValidator implements CaseAssignedUserRoleValidator {
 
-    private final String CASE_ROLE_CASEWORKER_CAA = "caseworker-caa";
+    private final String roleCaseWorkerCaa = "caseworker-caa";
 
     private UserRepository userRepository;
 
@@ -21,7 +21,7 @@ public class DefaultCaseAssignedUserRoleValidator implements CaseAssignedUserRol
     }
 
     public boolean canAccessUserCaseRoles(List<String> userIds) {
-        boolean canAccess = this.userRepository.getUserRoles().contains(CASE_ROLE_CASEWORKER_CAA);
+        boolean canAccess = this.userRepository.getUserRoles().contains(roleCaseWorkerCaa);
         if (!canAccess) {
             canAccess = userIds.size() == 1 && userIds.contains(this.userRepository.getUserId());
         }

@@ -16,8 +16,12 @@ public class CaseAssignedUserRolesKey {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         CaseAssignedUserRolesKey that = (CaseAssignedUserRolesKey) o;
         if (caseIds == null || that.caseIds == null || caseIds.size() != that.caseIds.size()) {
             return false;

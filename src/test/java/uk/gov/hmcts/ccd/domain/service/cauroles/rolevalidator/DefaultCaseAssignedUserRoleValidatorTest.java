@@ -15,8 +15,8 @@ import static org.mockito.Mockito.when;
 
 class DefaultCaseAssignedUserRoleValidatorTest {
 
-    private static final String ROLE_CASEWORKER_CAA = "caseworker-caa";
-    private static final String ROLE_CASEWORKER_SOLICITOR = "caseworker-solicitor";
+    private final String roleCaseworkerCaa = "caseworker-caa";
+    private final String roleCaseworkerSolicitor = "caseworker-solicitor";
 
     @Mock
     private UserRepository userRepository;
@@ -33,7 +33,7 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Test
     @DisplayName("Can access case roles when user has caseworker-caa")
     void canAccessUserCaseRolesWhenUserRolesContainsValidAccessRole() {
-        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(ROLE_CASEWORKER_CAA));
+        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerCaa));
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList());
         assertTrue(canAccess);
     }
@@ -41,7 +41,7 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Test
     @DisplayName("Can access self case user roles")
     void canAccessSelfUserCaseRolesWhenSelfUserIdPassed() {
-        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(ROLE_CASEWORKER_SOLICITOR));
+        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
         when(userRepository.getUserId()).thenReturn("1234567");
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList("1234567"));
         assertTrue(canAccess);
@@ -50,7 +50,7 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Test
     @DisplayName("Can not access other user case roles")
     void canNotAccessOtherUserCaseRolesWhenMoreUserIdsPassedOtherThanSelf() {
-        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(ROLE_CASEWORKER_SOLICITOR));
+        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
         when(userRepository.getUserId()).thenReturn("1234567");
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList("1234567", "1234568"));
         assertFalse(canAccess);
@@ -59,7 +59,7 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Test
     @DisplayName("Can not access other user case roles when self id not passed")
     void canNotAccessOtherUserCaseRolesWhenSelfUserIdNotPassed() {
-        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(ROLE_CASEWORKER_SOLICITOR));
+        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
         when(userRepository.getUserId()).thenReturn("1234567");
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList("1234568"));
         assertFalse(canAccess);

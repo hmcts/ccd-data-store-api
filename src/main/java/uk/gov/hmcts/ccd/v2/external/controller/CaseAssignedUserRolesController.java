@@ -78,7 +78,7 @@ public class CaseAssignedUserRolesController {
 
         List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(listCaseIds
             .stream()
-            .map(caseId-> Long.valueOf(caseId))
+            .map(caseId -> Long.valueOf(caseId))
             .collect(Collectors.toCollection(ArrayList::new)), listUserIds);
         return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseIds, userIds, caseAssignedUserRoles));
     }
