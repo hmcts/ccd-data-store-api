@@ -41,8 +41,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     private static final Long INVALID_CASE_ID = 222L;
 
-    private static final Long CASE_ID_1 = 7578590391163133L;
-    private static final Long CASE_ID_2 = 6375837333991692L;
+    private static final String CASE_ID_1 = "7578590391163133";
+    private static final String CASE_ID_2 = "6375837333991692";
     private static final String CASE_IDS = CASE_ID_1 + "," + CASE_ID_2;
 
     private static final String USER_IDS_1 = "89000";
@@ -130,7 +130,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content, CaseAssignedUserRolesResource.class);
         assertNotNull("Case Assigned User Roles should not be null", caseAssignedUserRolesResource);
         assertEquals(1, caseAssignedUserRolesResource.getCaseAssignedUserRoles().size());
-        assertEquals(Long.valueOf(7578590391163133L), caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getCaseDataId());
+        assertEquals("7578590391163133", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getCaseDataId());
         assertEquals("89000", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getUserId());
         assertEquals("[CREATOR]", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getCaseRole());
     }
@@ -220,7 +220,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .andExpect(status().is(400))
             .andReturn().getResolvedException().getMessage();
 
-        assertTrue(StringUtils.contains(errorMessage, V2.Error.CASE_ID_INVALID));
+        assertTrue(StringUtils.contains(errorMessage, V2.Error.EMPTY_CASE_ID_LIST));
     }
 
     @Test

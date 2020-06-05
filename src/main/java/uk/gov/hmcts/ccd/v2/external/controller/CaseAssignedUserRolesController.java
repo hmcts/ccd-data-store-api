@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +67,9 @@ public class CaseAssignedUserRolesController {
         )
     })
     public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids") List<String> caseIds,
-                                                                          @RequestParam(value = "user_ids", required = false) List<String> userIds) {
+                                                                          @RequestParam(value = "user_ids", required = false)
+                                                                              Optional<List<String>> optionalUserIds) {
+        List<String> userIds = optionalUserIds.orElseGet(() -> Lists.newArrayList());
         validateRequestParams(caseIds, userIds);
         List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
             .stream()
@@ -75,20 +79,26 @@ public class CaseAssignedUserRolesController {
     }
 
     private void validateRequestParams(List<String> caseIds, List<String> userIds) {
-        if (caseIds.isEmpty()) {
-            throw new BadRequestException(V2.Error.EMPTY_CASE_ID_LIST);
+        List<String> errorMessages = Lists.newArrayList("Invalid data provided for the following inputs to the request:");
+        if (caseIds == null || caseIds.isEmpty()) {
+            errorMessages.add(V2.Error.EMPTY_CASE_ID_LIST);
+        } else {
+            caseIds.forEach(caseId -> {
+                if (!caseReferenceService.validateUID(caseId)) {
+                    errorMessages.add(V2.Error.CASE_ID_INVALID);
+                }
+            });
         }
-
-        caseIds.forEach(caseId -> {
-            if (!caseReferenceService.validateUID(caseId)) {
-                throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-            }
-        });
 
         userIds.forEach(userId -> {
             if (StringUtils.isAllBlank(userId)) {
-                throw new BadRequestException(V2.Error.USER_ID_INVALID);
+                errorMessages.add(V2.Error.USER_ID_INVALID);
             }
         });
+
+        if (errorMessages.size() > 1) {
+            String message = errorMessages.stream().collect(Collectors.joining("\n"));
+            throw new BadRequestException(message);
+        }
     }
 }

@@ -96,14 +96,11 @@ class CachedCaseUserRepositoryTest {
             () -> assertThat(returned, is(caseUserEntities)),
             () -> verify(caseUserRepository, times(1)).findCaseUserRoles(caseIds, userIds)
         );
-        List<Long> caseIdsModified = new ArrayList<>();
-        caseIdsModified.add(1235L);
-        caseIdsModified.add(1234L);
-        List<CaseUserEntity> returned2 = classUnderTest.findCaseUserRoles(caseIdsModified, userIds);
+        List<CaseUserEntity> returned2 = classUnderTest.findCaseUserRoles(caseIds, userIds);
 
         assertAll(
             () -> assertThat(returned2, is(caseUserEntities)),
-            () -> verifyNoMoreInteractions(caseUserRepository)
+            () -> verify(caseUserRepository, times(2)).findCaseUserRoles(caseIds, userIds)
         );
     }
 }

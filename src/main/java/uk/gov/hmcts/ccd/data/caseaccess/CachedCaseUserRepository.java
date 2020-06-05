@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,7 +19,6 @@ public class CachedCaseUserRepository implements CaseUserRepository {
 
     private final Map<String, List<Long>> casesUserHasAccess = newHashMap();
     private final Map<String, List<String>> caseUserRoles = newHashMap();
-    private final Map<CaseAssignedUserRolesKey, List<CaseUserEntity>> caseAssignedUserRoles = newHashMap();
 
     public CachedCaseUserRepository(@Qualifier(DefaultCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository) {
         this.caseUserRepository = caseUserRepository;
@@ -48,8 +46,6 @@ public class CachedCaseUserRepository implements CaseUserRepository {
 
     @Override
     public List<CaseUserEntity> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
-        return caseAssignedUserRoles.computeIfAbsent(
-            new CaseAssignedUserRolesKey(new HashSet<>(caseIds), new HashSet<>(userIds)),
-            e -> caseUserRepository.findCaseUserRoles(caseIds, userIds));
+        return caseUserRepository.findCaseUserRoles(caseIds, userIds);
     }
 }
