@@ -60,9 +60,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     }
 
     private void validateOrganisationPolicy(String caseTypeId, CaseDataContent content) {
-
         final List<String> errorList = new ArrayList<>();
-
         // if there is not a default value. it means that there will not be organisation policy validation.
         // hence if there is at least one ORGANISATION_POLICY_ROLE all default value logic will be executed.
         if (!isOrganisationPolicyLogicInTheContent(content)) {
