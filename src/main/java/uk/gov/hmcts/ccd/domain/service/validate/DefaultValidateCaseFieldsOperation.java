@@ -59,20 +59,25 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     }
 
     private void validateOrganisationPolicy(String caseTypeId, CaseDataContent content) {
-        final Optional<String> defaultValue = getOrganisationPolicyDefaultRoleValue(content);
+
         // if there is not a default value. it means that there will not be organisation policy validation.
-        if (!defaultValue.isPresent()) {
+        // hence if there is at least one ORGANISATION_POLICY_ROLE all default value logic will be executed.
+        if (!isOrganisationPolicyLogicInTheContent(content)) {
             return;
         }
-
         caseDefinitionRepository.getCaseType(caseTypeId).getEvents().stream().filter(
             event -> event.getId().equals(content.getEventId())
         ).forEach(
-            caseEventDefinition ->  caseEventDefinition.getCaseFields().stream().forEach(
+            caseEventDefinition -> caseEventDefinition.getCaseFields().stream().forEach(
                 caseField -> caseField.getCaseEventFieldComplexDefinitions().stream().filter(
                     caseEventFieldComplexDefinition -> {
                         if (caseEventFieldComplexDefinition.getReference().equals(ORGANISATION_POLICY_ROLE)) {
-                            return validateOrgPolicyCaseAssignedRole(caseEventFieldComplexDefinition, defaultValue.get());
+                            //get extract the default value  from the content for the current caseField
+                            final Optional<String> caseFieldDefaultValue = getDefaultValueFromContentByCaseFieldID(content, caseField.getCaseFieldId());
+                            return validateOrgPolicyCaseAssignedRole(
+                                caseEventFieldComplexDefinition,
+                                caseFieldDefaultValue,
+                                caseField.getCaseFieldId());
                         } else {
                             return false;
                         }
@@ -81,21 +86,31 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         );
     }
 
-    private Optional<String> getOrganisationPolicyDefaultRoleValue(final CaseDataContent content) {
+    private boolean isOrganisationPolicyLogicInTheContent(final CaseDataContent content) {
+        final JsonNode existingData = new ObjectMapper().convertValue(content.getData(), JsonNode.class);
+        final List<JsonNode> jsonNode = existingData.findParents(ORGANISATION_POLICY_ROLE);
+        final Optional<JsonNode> node = jsonNode.stream().findFirst();
+        return  node.isPresent();
+    }
 
-        final JsonNode existingDat  = new ObjectMapper().convertValue(content.getData(), JsonNode.class);
-        final List<JsonNode> jsonNode = existingDat.findParents(ORGANISATION_POLICY_ROLE);
-        final  Optional<JsonNode> node = jsonNode.stream().findFirst();
+    private Optional<String> getDefaultValueFromContentByCaseFieldID(final CaseDataContent content, final String caseFiledID) {
+        final JsonNode existingData = new ObjectMapper().convertValue(content.getData(), JsonNode.class);
+        final Optional<JsonNode> caseFieldNode = Optional.ofNullable(existingData.get(caseFiledID));
 
-        if (node.isPresent()) {
-            return Optional.of(node.get().get(ORGANISATION_POLICY_ROLE).textValue());
+        if (caseFieldNode.isPresent()) {
+            return Optional.of(caseFieldNode.get().get(ORGANISATION_POLICY_ROLE).textValue());
         }
         return Optional.ofNullable(null);
     }
 
-    private  boolean validateOrgPolicyCaseAssignedRole(CaseEventFieldComplexDefinition caseEventFieldComplexDefinition, String defaultValue) {
-        if (!caseEventFieldComplexDefinition.getDefaultValue().equals(defaultValue)) {
-            throw new ValidationException("The organisation policy role filed has an incorrect value.");
+    private boolean validateOrgPolicyCaseAssignedRole(final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition,
+                                                      final Optional<String> defaultValue, String caseFiledID) {
+        if (!defaultValue.isPresent()) {
+            throw new ValidationException("The organisation policy role filed " + caseFiledID + " cannot have an empty value.");
+        }
+
+        if (!caseEventFieldComplexDefinition.getDefaultValue().equals(defaultValue.get())) {
+            throw new ValidationException("The organisation policy role filed " + caseFiledID + " has an incorrect value.");
         }
         return false;
     }
