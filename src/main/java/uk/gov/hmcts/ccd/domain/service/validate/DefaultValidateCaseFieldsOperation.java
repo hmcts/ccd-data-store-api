@@ -116,9 +116,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
                                                    String caseFiledID, List<String> errorList) {
         if (!defaultValue.isPresent()) {
             errorList.add(caseFiledID + " cannot have an empty value.");
-        }
-
-        if (!caseEventFieldComplexDefinition.getDefaultValue().equals(defaultValue.get())) {
+        } else if (!caseEventFieldComplexDefinition.getDefaultValue().equals(defaultValue.get())) {
             errorList.add(caseFiledID + " has an incorrect value.");
         }
     }
