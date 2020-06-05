@@ -16,8 +16,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
-import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultGenerator;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -40,7 +41,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
-class CaseSearchResultGeneratorTest {
+class CaseSearchResultViewGeneratorTest {
 
     private static final String CASE_TYPE_ID_1 = "CASE_TYPE_1";
     private static final String CASE_TYPE_ID_2 = "CASE_TYPE_2";
@@ -89,12 +90,12 @@ class CaseSearchResultGeneratorTest {
     private UserRepository userRepository;
 
     @Mock
-    private GetCaseTypeOperation getCaseTypeOperation;
+    private CaseTypeService caseTypeService;
 
     @Mock
     private SearchQueryOperation searchQueryOperation;
 
-    private CaseSearchResultGenerator classUnderTest;
+    private CaseSearchResultViewGenerator classUnderTest;
 
     private Map<String, JsonNode> dataMap;
     private JurisdictionDefinition jurisdiction;
@@ -152,8 +153,8 @@ class CaseSearchResultGeneratorTest {
             .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
             .build();
 
-        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeDefinition1));
-        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_2), any())).thenReturn(Optional.of(caseTypeDefinition2));
+        when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition1);
+        when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_2))).thenReturn(caseTypeDefinition2);
 
         SearchResult caseType1SearchResult = searchResult()
             .withSearchResultFields(
@@ -166,50 +167,50 @@ class CaseSearchResultGeneratorTest {
             .build();
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
 
-        classUnderTest = new CaseSearchResultGenerator(userRepository, getCaseTypeOperation, searchQueryOperation);
+        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchQueryOperation);
     }
 
     @Test
     void shouldBuildCaseSearchResultHeaders() {
-        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
 
         assertAll(
-            () -> assertThat(uiCaseSearchResult.getHeaders().size(), is(1)),
-            () -> assertMetadata(uiCaseSearchResult.getHeaders().get(0).getMetadata(), CASE_TYPE_ID_1, JURISDICTION),
-            () -> assertCasesList(uiCaseSearchResult.getHeaders().get(0).getCases(), 2, "999", "1000"),
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(2)),
-            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(0), CASE_FIELD_1, CASE_FIELD_1, TEXT_TYPE)
+            () -> assertThat(caseSearchResultView.getHeaders().size(), is(1)),
+            () -> assertMetadata(caseSearchResultView.getHeaders().get(0).getMetadata(), CASE_TYPE_ID_1, JURISDICTION),
+            () -> assertCasesList(caseSearchResultView.getHeaders().get(0).getCases(), 2, "999", "1000"),
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(2)),
+            () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(0), CASE_FIELD_1, CASE_FIELD_1, TEXT_TYPE)
         );
     }
 
     @Test
     void shouldBuildCaseSearchResultCases() {
-        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, "ORGCASES");
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, "ORGCASES");
 
-        Map<String, Object> caseDataDifferences = Maps.difference(uiCaseSearchResult.getCases().get(0).getFields(),
+        Map<String, Object> caseDataDifferences = Maps.difference(caseSearchResultView.getCases().get(0).getFields(),
             dataMap).entriesOnlyOnRight();
         assertAll(
-            () -> assertThat(uiCaseSearchResult.getCases().size(), is(3)),
-            () -> assertThat(uiCaseSearchResult.getCases().get(0).getCaseId(), is("999")),
-            () -> assertThat(uiCaseSearchResult.getCases().get(1).getCaseId(), is("1000")),
-            () -> assertThat(uiCaseSearchResult.getCases().get(2).getCaseId(), is("1001")),
+            () -> assertThat(caseSearchResultView.getCases().size(), is(3)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getCaseId(), is("999")),
+            () -> assertThat(caseSearchResultView.getCases().get(1).getCaseId(), is("1000")),
+            () -> assertThat(caseSearchResultView.getCases().get(2).getCaseId(), is("1001")),
             () -> assertThat(caseDataDifferences.isEmpty(), is(true)),
-            () -> assertThat(Maps.difference(uiCaseSearchResult.getCases().get(0).getFieldsFormatted(),
-                uiCaseSearchResult.getCases().get(0).getFields()).areEqual(), is(true)),
-            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[JURISDICTION]"), is(JURISDICTION)),
-            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[STATE]"), is("state1")),
-            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[LAST_STATE_MODIFIED_DATE]"), is(LAST_STATE_MODIFIED_DATE)),
-            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[CREATED_DATE]"), is(CREATED_DATE)),
-            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[CASE_REFERENCE]"), is(999L)),
-            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[SECURITY_CLASSIFICATION]"), is(SECURITY_CLASSIFICATION)),
-            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[CASE_TYPE]"), is(CASE_TYPE_ID_1)),
-            () -> assertThat(uiCaseSearchResult.getCases().get(0).getFields().get("[LAST_MODIFIED_DATE]"), is(LAST_MODIFIED_DATE))
+            () -> assertThat(Maps.difference(caseSearchResultView.getCases().get(0).getFieldsFormatted(),
+                caseSearchResultView.getCases().get(0).getFields()).areEqual(), is(true)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[JURISDICTION]"), is(JURISDICTION)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[STATE]"), is("state1")),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[LAST_STATE_MODIFIED_DATE]"), is(LAST_STATE_MODIFIED_DATE)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CREATED_DATE]"), is(CREATED_DATE)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_REFERENCE]"), is(999L)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[SECURITY_CLASSIFICATION]"), is(SECURITY_CLASSIFICATION)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_TYPE]"), is(CASE_TYPE_ID_1)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[LAST_MODIFIED_DATE]"), is(LAST_MODIFIED_DATE))
         );
     }
 
     @Test
     void shouldBuildCaseSearchResultTotal() {
-        final UICaseSearchResult searchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView searchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
 
         assertAll(
             () -> assertThat(searchResultView.getTotal(), is(3L))
@@ -226,16 +227,16 @@ class CaseSearchResultGeneratorTest {
             .build();
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
 
-        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
 
         assertAll(
-            () -> assertThat(uiCaseSearchResult.getHeaders().size(), is(1)),
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(3)),
-            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(0),
+            () -> assertThat(caseSearchResultView.getHeaders().size(), is(1)),
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(3)),
+            () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(0),
                 CASE_FIELD_1, CASE_FIELD_1, TEXT_TYPE),
-            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(1),
+            () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(1),
                 FAMILY_DETAILS + SEPARATOR + FATHER_NAME, FATHER_NAME, TEXT_TYPE),
-            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(2),
+            () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(2),
                 FAMILY_DETAILS + SEPARATOR + MOTHER_NAME, MOTHER_NAME, TEXT_TYPE)
         );
     }
@@ -261,17 +262,17 @@ class CaseSearchResultGeneratorTest {
                 searchResultFieldWithValidRole,
                 searchResultFieldWithInvalidRole)
             .build();
-        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeDefinition));
+        when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1));
 
-        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
 
         assertAll(
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(3)),
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(2).getCaseFieldId(), is(CASE_FIELD_4))
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(3)),
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().get(2).getCaseFieldId(), is(CASE_FIELD_4))
         );
     }
 
@@ -302,17 +303,17 @@ class CaseSearchResultGeneratorTest {
             .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).build())
             .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
             .build();
-        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeDefinition));
+        when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
 
-        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
 
         assertAll(
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(3)),
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().get(2).getCaseFieldId(), is(CASE_FIELD_4))
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(3)),
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().get(2).getCaseFieldId(), is(CASE_FIELD_4))
         );
     }
 
@@ -324,16 +325,16 @@ class CaseSearchResultGeneratorTest {
             .build();
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
 
-        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
 
         assertAll(
-            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(0),
+            () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(0),
                 FAMILY + SEPARATOR + FATHER_NAME, FAMILY_DETAILS, TEXT_TYPE),
-            () -> assertHeaderField(uiCaseSearchResult.getHeaders().get(0).getFields().get(1),
+            () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(1),
                 FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED, FAMILY_DETAILS, TEXT_TYPE),
-            () -> assertThat(((TextNode)uiCaseSearchResult.getCases().get(0).getFields()
+            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
                     .get(FAMILY + SEPARATOR + FATHER_NAME)).asText(), is(FATHER_NAME_VALUE)),
-            () -> assertThat(((TextNode)uiCaseSearchResult.getCases().get(0).getFields()
+            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
                     .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asText(), is(POSTCODE_VALUE))
         );
     }
@@ -365,17 +366,17 @@ class CaseSearchResultGeneratorTest {
         CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID_1).withJurisdiction(jurisdiction)
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()).build();
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
-        when(getCaseTypeOperation.execute(eq(CASE_TYPE_ID_1), any())).thenReturn(Optional.of(caseTypeWithoutCaseFieldDefinition));
+        when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeWithoutCaseFieldDefinition);
 
-        final UICaseSearchResult uiCaseSearchResult = classUnderTest.execute(CASE_TYPE_ID_1,
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1,
             caseSearchResult, WORKBASKET);
 
         assertAll(
-            () -> assertThat(uiCaseSearchResult.getCases().size(), is(3)),
-            () -> assertThat(uiCaseSearchResult.getHeaders().get(0).getFields().size(), is(0)),
-            () -> assertNull(uiCaseSearchResult.getCases().get(0).getFields().get("InvalidElementPath")),
-            () -> assertNull(uiCaseSearchResult.getCases().get(1).getFields().get("InvalidElementPath")),
-            () -> assertNull(uiCaseSearchResult.getCases().get(2).getFields().get("InvalidElementPath")));
+            () -> assertThat(caseSearchResultView.getCases().size(), is(3)),
+            () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(0)),
+            () -> assertNull(caseSearchResultView.getCases().get(0).getFields().get("InvalidElementPath")),
+            () -> assertNull(caseSearchResultView.getCases().get(1).getFields().get("InvalidElementPath")),
+            () -> assertNull(caseSearchResultView.getCases().get(2).getFields().get("InvalidElementPath")));
     }
 
     @Test

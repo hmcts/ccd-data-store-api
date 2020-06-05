@@ -3,45 +3,34 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypeOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
-import java.util.*;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class ElasticsearchQueryHelperTest {
 
-    private static final String QUERY_STRING = "{\"query\":{}}";
-    private static final String ORG_CASES = "ORGCASES";
-    private static final String DEFAULT_USE_CASE = "";
-    private static final String ASC = "ASC";
-    private static final String DESC = "DESC";
     private static final String CASE_TYPE_A = "MAPPER";
-    private static final String CASE_TYPE_B = "AAT";
     private static final String TEXT_FIELD_ID = "TextField";
     private static final String DATE_FIELD_ID = "DateField";
     private static final String COLLECTION_TEXT_FIELD_ID = "CollectionTextField";
@@ -66,33 +55,22 @@ class ElasticsearchQueryHelperTest {
     @InjectMocks
     private ElasticsearchQueryHelper elasticsearchQueryHelper;
 
-    @Spy
-    private ObjectMapper objectMapper;
     @Mock
     private ApplicationParams applicationParams;
     @Mock
     private ObjectMapperService objectMapperService;
-    @Mock
-    private SearchQueryOperation searchQueryOperation;
-    @Mock
-    private GetCaseTypeOperation getCaseTypeOperation;
-    @Mock
-    private ElasticsearchMappings elasticsearchMappings;
 
     private ObjectMapper objectMapperES = new ObjectMapper();
 
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
-    private List<SortOrderField> sortOrderFields;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        sortOrderFields = new ArrayList<>();
         when(applicationParams.getSearchBlackList()).thenReturn(newArrayList("query_string"));
         doAnswer(invocation -> objectMapperES.readValue((String)invocation.getArgument(0), ObjectNode.class))
             .when(objectMapperService).convertStringToObject(anyString(), any());
-        when(getCaseTypeOperation.execute(any(), any())).thenReturn(Optional.of(caseTypeDefinition));
         when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE_A);
         when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(JURISDICTION))).thenReturn(Optional.of(JURISDICTION_FIELD));
         when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(LAST_MODIFIED_DATE))).thenReturn(Optional.of(LAST_MODIFIED_DATE_FIELD));
@@ -100,155 +78,32 @@ class ElasticsearchQueryHelperTest {
         when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(DATE_FIELD_ID))).thenReturn(Optional.of(DATE_FIELD));
         when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_TEXT_FIELD_ID))).thenReturn(Optional.of(COLLECTION_TEXT_FIELD));
         when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_DATE_FIELD_ID))).thenReturn(Optional.of(COLLECTION_DATE_FIELD));
-        when(searchQueryOperation.getSortOrders(any(), any())).thenReturn(sortOrderFields);
     }
 
-    @Nested
-    class PrepareRequestWithUseCaseTest {
+    @Test
+    void shouldConvertQueryToElasticSearchRequest() {
+        String searchRequest = "{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}";
 
-        @Test
-        void shouldPrepareBasicSingleCaseTypeRequest() {
-            CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(CASE_TYPE_A, QUERY_STRING, DEFAULT_USE_CASE);
+        ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
 
-            assertAll(
-                () -> assertThat(request.getCaseTypeIds().size(), is(1)),
-                () -> assertThat(request.getCaseTypeIds().get(0), is(CASE_TYPE_A)),
-                () -> assertThat(request.isMultiCaseTypeSearch(), is(false)),
-                () -> assertThat(request.getAliasFields().isEmpty(), is(true)),
-                () -> assertThat(request.getSearchRequestJsonNode().toString(), is("{\"query\":{}}"))
-            );
-        }
-
-        @Test
-        void shouldErrorWhenNoCaseTypesSpecified() {
-            BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
-                elasticsearchQueryHelper.prepareRequest(null, QUERY_STRING, ORG_CASES));
-
-            assertAll(
-                () -> assertThat(exception.getMessage(), is("Case type ID is required."))
-            );
-        }
-
-        @Test
-        void shouldApplyConfiguredSortForMetadataFields() {
-            sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(JURISDICTION).metadata(true).direction(ASC).build());
-            sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(LAST_MODIFIED_DATE).metadata(true).direction(DESC).build());
-            when(elasticsearchMappings.isDefaultTextMetadata(eq(MetaData.CaseField.JURISDICTION.getDbColumnName()))).thenReturn(true);
-            when(elasticsearchMappings.isDefaultTextMetadata(eq(MetaData.CaseField.LAST_MODIFIED_DATE.getDbColumnName()))).thenReturn(false);
-
-            CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(CASE_TYPE_A, QUERY_STRING, SEARCH);
-
-            assertAll(
-                () -> assertThat(request.getSearchRequestJsonNode().toString(),
-                    is("{\"query\":{},\"sort\":[{\"jurisdiction.keyword\":\"ASC\"},{\"last_modified\":\"DESC\"}]}"))
-            );
-        }
-
-        @Test
-        void shouldApplyConfiguredSortForCaseDataFields() {
-            sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(TEXT_FIELD_ID).direction(ASC).build());
-            sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(DATE_FIELD_ID).direction(DESC).build());
-            sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(COLLECTION_TEXT_FIELD_ID).direction(DESC).build());
-            sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(COLLECTION_DATE_FIELD_ID).direction(ASC).build());
-            when(elasticsearchMappings.isDefaultTextCaseData(eq(TEXT_FIELD_TYPE))).thenReturn(true);
-            when(elasticsearchMappings.isDefaultTextCaseData(eq(DATE_FIELD_TYPE))).thenReturn(false);
-            when(elasticsearchMappings.isDefaultTextCaseData(eq(COLLECTION_TEXT_FIELD_TYPE))).thenReturn(true);
-            when(elasticsearchMappings.isDefaultTextCaseData(eq(COLLECTION_DATE_FIELD_TYPE))).thenReturn(false);
-
-            CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(CASE_TYPE_A, QUERY_STRING, WORKBASKET);
-
-            assertAll(
-                () -> assertThat(request.getSearchRequestJsonNode().toString(),
-                    is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"},{\"data.DateField\":\"DESC\"},"
-                       + "{\"data.CollectionTextField.value.keyword\":\"DESC\"},{\"data.CollectionDateField.value\":\"ASC\"}]}"))
-            );
-        }
-
-        @Test
-        void shouldNotApplyConfiguredSortWhenRequestContainsSortOverride() {
-            sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(JURISDICTION).metadata(true).direction(ASC).build());
-            String searchRequest = "{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}";
-
-            CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(CASE_TYPE_A, searchRequest, SEARCH);
-
-            assertAll(
-                () -> assertThat(request.getSearchRequestJsonNode().toString(),
-                    is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}"))
-            );
-        }
-
-        @Test
-        void shouldRejectBlacklistedSearchQueries() {
-            String searchRequest = blacklistedQuery();
-
-            BadSearchRequest exception = assertThrows(BadSearchRequest.class,
-                () -> elasticsearchQueryHelper.prepareRequest(CASE_TYPE_A, searchRequest, DEFAULT_USE_CASE));
-
-            assertAll(
-                () -> assertThat(exception.getMessage(), is("Query of type 'query_string' is not allowed"))
-            );
-        }
-
-        @Test
-        void shouldThrowExceptionWhenSortOrderCaseFieldIsNotInCaseType() {
-            sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId("UnknownCaseField").direction(ASC).build());
-
-            NullPointerException exception = assertThrows(NullPointerException.class,
-                () -> elasticsearchQueryHelper.prepareRequest(CASE_TYPE_A, QUERY_STRING, WORKBASKET));
-
-            assertAll(
-                () -> assertThat(exception.getMessage(),
-                    is("Case field 'UnknownCaseField' does not exist in configuration for case type 'MAPPER'."))
-            );
-        }
+        assertAll(
+            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(), is(searchRequest))
+        );
     }
 
-    @Nested
-    class PrepareRequestWithoutUseCaseTest {
+    @Test
+    void shouldRejectBlacklistedSearchQueries() {
+        String searchRequest = blacklistedQuery();
 
-        @Test
-        void shouldPrepareBasicCrossCaseTypeRequest() {
-            String queryString = "{\"_source\":[\"alias.TextAlias\",\"alias.DateAlias\"],\"query\":{}}";
+        BadSearchRequest exception = assertThrows(BadSearchRequest.class,
+            () -> elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
 
-            CrossCaseTypeSearchRequest request = elasticsearchQueryHelper
-                .prepareRequest(Arrays.asList(CASE_TYPE_A, CASE_TYPE_B), queryString);
-
-            assertAll(
-                () -> assertThat(request.getCaseTypeIds().size(), is(2)),
-                () -> assertThat(request.getCaseTypeIds().get(0), is(CASE_TYPE_A)),
-                () -> assertThat(request.getCaseTypeIds().get(1), is(CASE_TYPE_B)),
-                () -> assertThat(request.isMultiCaseTypeSearch(), is(true)),
-                () -> assertThat(request.getAliasFields().size(), is(2)),
-                () -> assertThat(request.getAliasFields().get(0), is("TextAlias")),
-                () -> assertThat(request.getAliasFields().get(1), is("DateAlias")),
-                () -> assertThat(request.getSearchRequestJsonNode().toString(), is("{\"query\":{}}"))
-            );
-        }
-
-        @Test
-        void shouldErrorWhenNoCaseTypeSpecified() {
-            BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
-                elasticsearchQueryHelper.prepareRequest(null, QUERY_STRING));
-
-            assertAll(
-                () -> assertThat(exception.getMessage(), is("At least one case type ID is required."))
-            );
-        }
-
-        @Test
-        void shouldRejectBlacklistedSearchQueries() {
-            String searchRequest = blacklistedQuery();
-
-            BadSearchRequest exception = assertThrows(BadSearchRequest.class,
-                () -> elasticsearchQueryHelper.prepareRequest(Collections.singletonList(CASE_TYPE_A), searchRequest));
-
-            assertAll(
-                () -> assertThat(exception.getMessage(), is("Query of type 'query_string' is not allowed"))
-            );
-        }
+        assertAll(
+            () -> assertThat(exception.getMessage(), is("Query of type 'query_string' is not allowed"))
+        );
     }
 
-    private static String blacklistedQuery() {
+    private String blacklistedQuery() {
         return "{  \n"
                + "   \"query\":{  \n"
                + "      \"bool\":{  \n"

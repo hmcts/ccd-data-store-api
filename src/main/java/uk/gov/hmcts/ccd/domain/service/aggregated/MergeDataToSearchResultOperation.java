@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
 @Named
 @Singleton
@@ -110,9 +111,8 @@ public class MergeDataToSearchResultOperation {
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
-                                                          final CaseTypeDefinition caseTypeDefinition,
-                                                          final SearchResult searchResult) {
-
+                                                           final CaseTypeDefinition caseTypeDefinition,
+                                                           final SearchResult searchResult) {
         Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
         Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
         Map<String, TextNode> labels = caseTypeDefinition.getLabelsFromCaseFields();
@@ -130,10 +130,10 @@ public class MergeDataToSearchResultOperation {
         Map<String, Object> newResults = new HashMap<>();
 
         searchResult.getFieldsWithPaths().forEach(searchResultField -> {
-            JsonNode jsonNode = caseData.get(searchResultField.getCaseFieldId());
-            if (jsonNode != null) {
-                newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(),
-                    searchResultField.getCaseFieldNode(jsonNode));
+            JsonNode topLevelCaseFieldNode = caseData.get(searchResultField.getCaseFieldId());
+            if (topLevelCaseFieldNode != null) {
+                newResults.put(searchResultField.buildCaseFieldId(),
+                    getNestedCaseFieldByPath(topLevelCaseFieldNode, searchResultField.getCaseFieldPath()));
             }
         });
 

@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -48,6 +48,7 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 @ExtendWith(JsonPathExtension.class)
@@ -70,6 +71,8 @@ class AuthorisedCaseSearchOperationTest {
     private ObjectMapperService objectMapperService;
 
     private final ObjectNode searchRequestJsonNode = JsonNodeFactory.instance.objectNode();
+
+    private ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode);
 
     @InjectMocks
     private AuthorisedCaseSearchOperation authorisedCaseDetailsSearchOperation;
@@ -112,7 +115,7 @@ class AuthorisedCaseSearchOperationTest {
 
             CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(singletonList(CASE_TYPE_ID_1))
-                .withSearchRequest(searchRequestJsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .build();
 
             CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
@@ -136,7 +139,7 @@ class AuthorisedCaseSearchOperationTest {
         void shouldReturnEmptyCaseList() {
             CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(singletonList(CASE_TYPE_ID_1))
-                .withSearchRequest(searchRequestJsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .build();
             when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ)).thenReturn(Optional.empty());
 
@@ -187,7 +190,7 @@ class AuthorisedCaseSearchOperationTest {
 
             CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
-                .withSearchRequest(searchRequestJsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .withMultiCaseTypeSearch(true)
                 .withSourceFilterAliasFields(asList("name", "postcode"))
                 .build();
@@ -217,7 +220,7 @@ class AuthorisedCaseSearchOperationTest {
 
             CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
-                .withSearchRequest(searchRequestJsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .withMultiCaseTypeSearch(true)
                 .withSourceFilterAliasFields(asList("collection", "postcode"))
                 .build();

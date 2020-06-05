@@ -93,7 +93,7 @@ public class SearchQueryOperation {
     public SearchResult getSearchResultDefinition(final CaseTypeDefinition caseTypeDefinition, final String useCase) {
         final String caseTypeId = caseTypeDefinition.getId();
         if (Strings.isNullOrEmpty(useCase)) {
-            return buildSearchResultFromCaseFields(caseTypeDefinition);
+            return buildSearchResultDefinitionFromCaseFields(caseTypeDefinition);
         }
         // TODO: Once all *ResultFields tabs are merged, remove switch statement and always call default method
         switch (useCase) {
@@ -119,7 +119,7 @@ public class SearchQueryOperation {
             .collect(Collectors.toList());
     }
 
-    private SearchResult buildSearchResultFromCaseFields(final CaseTypeDefinition caseTypeDefinition) {
+    private SearchResult buildSearchResultDefinitionFromCaseFields(final CaseTypeDefinition caseTypeDefinition) {
         SearchResult searchResult = new SearchResult();
         List<SearchResultField> searchResultFields = new ArrayList<>();
 
