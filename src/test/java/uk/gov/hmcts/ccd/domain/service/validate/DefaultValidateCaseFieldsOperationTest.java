@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
@@ -118,7 +119,7 @@ class DefaultValidateCaseFieldsOperationTest {
             assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
         assertThat(exception.getMessage(),
-            startsWith("The organisation policy role filed"));
+            containsString("has an incorrect value"));
     }
 
     @Test
@@ -133,7 +134,7 @@ class DefaultValidateCaseFieldsOperationTest {
             assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
         assertThat(exception.getMessage(),
-            startsWith("The organisation policy role filed"));
+            containsString("incorrect value"));
     }
 
     @Test

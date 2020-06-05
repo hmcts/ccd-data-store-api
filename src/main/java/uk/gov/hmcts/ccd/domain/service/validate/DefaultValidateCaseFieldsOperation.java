@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,6 +61,8 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
 
     private void validateOrganisationPolicy(String caseTypeId, CaseDataContent content) {
 
+        final List<String> errorList = new ArrayList<>();
+
         // if there is not a default value. it means that there will not be organisation policy validation.
         // hence if there is at least one ORGANISATION_POLICY_ROLE all default value logic will be executed.
         if (!isOrganisationPolicyLogicInTheContent(content)) {
@@ -74,16 +77,21 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
                         if (caseEventFieldComplexDefinition.getReference().equals(ORGANISATION_POLICY_ROLE)) {
                             //get extract the default value  from the content for the current caseField
                             final Optional<String> caseFieldDefaultValue = getDefaultValueFromContentByCaseFieldID(content, caseField.getCaseFieldId());
-                            return validateOrgPolicyCaseAssignedRole(
+                            validateOrgPolicyCaseAssignedRole(
                                 caseEventFieldComplexDefinition,
                                 caseFieldDefaultValue,
-                                caseField.getCaseFieldId());
+                                caseField.getCaseFieldId(),
+                                errorList);
+                            return true;
                         } else {
                             return false;
                         }
                     }
                 ).collect(Collectors.toList()))
         );
+        if (errorList.size() != 0) {
+            throw new ValidationException("Roles validation error: " + String.join(", ", errorList));
+        }
     }
 
     private boolean isOrganisationPolicyLogicInTheContent(final CaseDataContent content) {
@@ -103,16 +111,16 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         return Optional.ofNullable(null);
     }
 
-    private boolean validateOrgPolicyCaseAssignedRole(final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition,
-                                                      final Optional<String> defaultValue, String caseFiledID) {
+    private void validateOrgPolicyCaseAssignedRole(final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition,
+                                                   final Optional<String> defaultValue,
+                                                   String caseFiledID, List<String> errorList) {
         if (!defaultValue.isPresent()) {
-            throw new ValidationException("The organisation policy role filed " + caseFiledID + " cannot have an empty value.");
+            errorList.add(caseFiledID + " cannot have an empty value.");
         }
 
         if (!caseEventFieldComplexDefinition.getDefaultValue().equals(defaultValue.get())) {
-            throw new ValidationException("The organisation policy role filed " + caseFiledID + " has an incorrect value.");
+            errorList.add(caseFiledID + " has an incorrect value.");
         }
-        return false;
     }
 
 
