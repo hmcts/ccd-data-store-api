@@ -1,15 +1,15 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import java.util.List;
+import java.util.Set;
 import org.apache.commons.collections.ListUtils;
 
 public class CaseAssignedUserRolesKey {
 
-    private final List<Long> caseIds;
+    private final Set<Long> caseIds;
 
-    private final List<String> userIds;
+    private final Set<String> userIds;
 
-    public CaseAssignedUserRolesKey(List<Long> caseIds, List<String> userIds) {
+    public CaseAssignedUserRolesKey(Set<Long> caseIds, Set<String> userIds) {
         this.caseIds = caseIds;
         this.userIds = userIds;
     }

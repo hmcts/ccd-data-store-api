@@ -84,7 +84,8 @@ public class CaseAccessOperation {
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
         List<CaseUserEntity>  caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
         return caseUserEntities.stream()
-            .map(cue -> new CaseAssignedUserRole(cue.getCasePrimaryKey().getCaseDataId(),
+            .map(cue -> new CaseAssignedUserRole(
+                String.valueOf(cue.getCasePrimaryKey().getCaseDataId()),
                 cue.getCasePrimaryKey().getUserId(),
                 cue.getCasePrimaryKey().getCaseRole()))
             .collect(Collectors.toCollection(ArrayList::new));

@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -38,10 +36,7 @@ public class CaseAssignedUserRolesController {
     }
 
     @GetMapping(
-        path = "/case-users",
-        produces = {
-            V2.MediaType.CASE_USER_ROLES
-        }
+        path = "/case-users"
     )
     @ApiOperation(
         value = "Retrieve Case user roles by Case ID and User ID"
@@ -69,22 +64,14 @@ public class CaseAssignedUserRolesController {
             message = V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED
         )
     })
-    // TODO: 01/06/2020  add LogAudit
-    public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids") String caseIds,
-                                                                          @RequestParam(value = "user_ids", required = false) String userIds) {
-        List<String> listUserIds = convertToList(userIds);
-        List<String> listCaseIds = convertToList(caseIds);
-        validateRequestParams(listCaseIds, listUserIds);
-
-        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(listCaseIds
+    public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids") List<String> caseIds,
+                                                                          @RequestParam(value = "user_ids", required = false) List<String> userIds) {
+        validateRequestParams(caseIds, userIds);
+        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
             .stream()
             .map(caseId -> Long.valueOf(caseId))
-            .collect(Collectors.toCollection(ArrayList::new)), listUserIds);
-        return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseIds, userIds, caseAssignedUserRoles));
-    }
-
-    private List<String> convertToList(String ids) {
-        return ids == null ? Collections.EMPTY_LIST : Arrays.asList(ids.split(","));
+            .collect(Collectors.toCollection(ArrayList::new)), userIds);
+        return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
     }
 
     private void validateRequestParams(List<String> caseIds, List<String> userIds) {
