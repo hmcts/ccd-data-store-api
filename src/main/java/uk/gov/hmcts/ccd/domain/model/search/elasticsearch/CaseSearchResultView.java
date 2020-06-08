@@ -12,9 +12,9 @@ import static java.util.Collections.emptyList;
 
 @Data
 @AllArgsConstructor
-public class UICaseSearchResult {
+public class CaseSearchResultView {
 
-    public static final UICaseSearchResult EMPTY = new UICaseSearchResult(emptyList(), emptyList(), 0L, null);
+    public static final CaseSearchResultView EMPTY = new CaseSearchResultView(emptyList(), emptyList(), 0L);
 
     @NonNull
     private List<SearchResultViewHeaderGroup> headers;
@@ -22,7 +22,6 @@ public class UICaseSearchResult {
     private List<SearchResultViewItem> cases;
     @NonNull
     private Long total;
-    private String useCase;
 
     public Optional<SearchResultViewHeaderGroup> findHeaderByCaseType(String caseTypeId) {
         return headers.stream().filter(header -> header.getMetadata().getCaseTypeId().equals(caseTypeId)).findFirst();

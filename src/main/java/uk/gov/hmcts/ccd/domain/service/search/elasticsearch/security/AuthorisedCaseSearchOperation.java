@@ -92,7 +92,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
         return new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(authorisedCaseTypeIds)
-            .withSearchRequest(originalSearchRequest.getSearchRequestJsonNode())
+            .withSearchRequest(originalSearchRequest.getElasticSearchRequest())
             .withMultiCaseTypeSearch(originalSearchRequest.isMultiCaseTypeSearch())
             .withSourceFilterAliasFields(originalSearchRequest.getAliasFields())
             .build();

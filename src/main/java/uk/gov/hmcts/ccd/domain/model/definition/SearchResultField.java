@@ -1,9 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import java.io.Serializable;
 
@@ -113,9 +111,5 @@ public class SearchResultField implements Serializable {
 
     public void setUseCase(String useCase) {
         this.useCase = useCase;
-    }
-
-    public JsonNode getCaseFieldNode(JsonNode topLevelCaseFieldNode) {
-        return CaseFieldPathUtils.getCaseFieldNodeByPath(topLevelCaseFieldNode, getCaseFieldPath());
     }
 }

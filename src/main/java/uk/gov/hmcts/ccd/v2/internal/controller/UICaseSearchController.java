@@ -10,14 +10,16 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.search.*;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
-import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultGenerator;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
+import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.*;
 import uk.gov.hmcts.ccd.v2.internal.resource.*;
 
 import java.time.*;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
@@ -27,23 +29,27 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 @RequestMapping(path = "/internal/searchCases")
 @Api(tags = {"Elastic Based Search API"})
 @SwaggerDefinition(tags = {
-    @Tag(name = "Elastic Based Search API", description = "Internal ElasticSearch based search API")
+    @Tag(name = "Elastic Based Search API", description = "Internal ElasticSearch based case search API, "
+        + "returning extra information required by the UI for display purposes on a UI.")
 })
 @Slf4j
 public class UICaseSearchController {
 
     private final CaseSearchOperation caseSearchOperation;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
-    private final CaseSearchResultGenerator caseSearchResultGenerator;
+    private final CaseSearchResultViewGenerator caseSearchResultViewGenerator;
+    private final ElasticsearchSortService elasticsearchSortService;
 
     @Autowired
     public UICaseSearchController(
         @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
         ElasticsearchQueryHelper elasticsearchQueryHelper,
-        CaseSearchResultGenerator caseSearchResultGenerator) {
+        CaseSearchResultViewGenerator caseSearchResultViewGenerator,
+        ElasticsearchSortService elasticsearchSortService) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
-        this.caseSearchResultGenerator = caseSearchResultGenerator;
+        this.caseSearchResultViewGenerator = caseSearchResultViewGenerator;
+        this.elasticsearchSortService = elasticsearchSortService;
     }
 
     @PostMapping(
@@ -113,7 +119,7 @@ public class UICaseSearchController {
     public ResponseEntity<CaseSearchResultViewResource> searchCases(
                                      @ApiParam(value = "Case type ID for search.", required = true)
                                      @RequestParam(value = "ctid") String caseTypeId,
-                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` or `ORGCASES`. "
+                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` or `orgCases`. "
                                          + "Used when the list of fields to return is configured in the CCD definition.\n"
                                          + "If omitted, all case fields are returned.")
                                      @RequestParam(value = "usecase", required = false) final String useCase,
@@ -121,14 +127,22 @@ public class UICaseSearchController {
         Instant start = Instant.now();
 
         String useCaseUppercase = Strings.isNullOrEmpty(useCase) ? null : useCase.toUpperCase();
-        CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(caseTypeId, jsonSearchRequest, useCaseUppercase);
+
+        ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
+        elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCase);
+
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(Collections.singletonList(caseTypeId))
+            .withSearchRequest(searchRequest)
+            .build();
+
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(request);
-        UICaseSearchResult uiCaseSearchResult = caseSearchResultGenerator.execute(caseTypeId, caseSearchResult, useCaseUppercase);
+        CaseSearchResultView caseSearchResultView = caseSearchResultViewGenerator.execute(caseTypeId, caseSearchResult, useCaseUppercase);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("Internal searchCases execution completed in {} millisecs...", between.toMillis());
 
-        return ResponseEntity.ok(new CaseSearchResultViewResource(uiCaseSearchResult));
+        return ResponseEntity.ok(new CaseSearchResultViewResource(caseSearchResultView));
     }
 
     public static String buildCaseIds(ResponseEntity<CaseSearchResultViewResource> response) {

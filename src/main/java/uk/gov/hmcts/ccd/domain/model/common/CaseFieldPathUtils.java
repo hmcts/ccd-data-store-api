@@ -19,6 +19,14 @@ public class CaseFieldPathUtils {
     private CaseFieldPathUtils() {
     }
 
+    /**
+     * Find a case field definition within a case type by its path.
+     * Supports top level and nested field paths.
+     *
+     * @param caseTypeDefinition The case type within which to search
+     * @param path The full stop (".") separated path
+     * @return The case field; empty if no such field exists
+     */
     public static Optional<CommonField> getFieldDefinitionByPath(CaseTypeDefinition caseTypeDefinition, String path) {
         if (StringUtils.isBlank(path)) {
             return Optional.empty();
@@ -30,14 +38,33 @@ public class CaseFieldPathUtils {
         return topLevelCaseField.flatMap(field -> getFieldDefinitionByPath(field, getPathElementsTailAsString(pathElements)));
     }
 
-    public static Optional<CommonField> getFieldDefinitionByPath(CommonField commonField, String path) {
+    /**
+     * Find a nested case field definition with a case field itself by its path.
+     *
+     * @param caseFieldDefinition The case field definition within which to search
+     * @param path The full stop (".") separated path
+     * @return The nested field. The case field passed in is returned if the path is empty;
+     *         empty if no such field exists
+     */
+    public static Optional<CommonField> getFieldDefinitionByPath(CommonField caseFieldDefinition, String path) {
         if (StringUtils.isBlank(path)) {
-            return Optional.of(commonField);
+            return Optional.of(caseFieldDefinition);
         }
 
-        return getFieldDefinitionByPath(commonField.getFieldTypeDefinition(), path, false);
+        return getFieldDefinitionByPath(caseFieldDefinition.getFieldTypeDefinition(), path, false);
     }
 
+    /**
+     * Find a nested case field definition within a field type definition by its path.
+     * For use with Complex fields.
+     *
+     * @param fieldTypeDefinition The field type definition to search within
+     * @param path The full stop (".") separated path
+     * @param pathIncludesParent Whether the path includes a parent field which should be discarded
+     *                           e.g. if the path is ParentField.ChildField then the path searched
+     *                           would simply be for ChildField
+     * @return The nested field; empty if no such field exists
+     */
     public static Optional<CommonField> getFieldDefinitionByPath(FieldTypeDefinition fieldTypeDefinition,
                                                                  String path,
                                                                  boolean pathIncludesParent) {
@@ -49,7 +76,14 @@ public class CaseFieldPathUtils {
         return reduce(fieldTypeDefinition.getChildren(), pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
     }
 
-    public static JsonNode getCaseFieldNodeByPath(JsonNode node, String path) {
+    /**
+     * Find a nested case field JsonNode by its case field path.
+     *
+     * @param node The node in which to search
+     * @param path The full stop (".") separated path e.g. NestedLevel1.NestedLevel2
+     * @return The node for the nested path; null if no node exists
+     */
+    public static JsonNode getNestedCaseFieldByPath(JsonNode node, String path) {
         List<String> pathElements = getPathElements(path);
 
         return reduce(node, pathElements);
