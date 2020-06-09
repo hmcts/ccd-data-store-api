@@ -10,12 +10,6 @@
     "Dil - with an active profile",
     "Steve - with an active profile",
     "Jamal -  who is a privileged user with permissions to access the case assignments of other users",
-    "by Jamal to assign Dil a few case roles to access C1",
-    "by Jamal to assign Dil a few case roles to access C2",
-    "by Jamal to assign Dil a few case roles to access C3",
-    "by Jamal to assign Steve a few case roles to access C1",
-    "by Jamal to assign Steve a few case roles to access C2",
-    "by Jamal to assign Steve a few case roles to access C3",
     "is made by Jamal with Case IDs of C1, C2 & C3 & no User ID"
   ],
   "request": {

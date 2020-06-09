@@ -9,9 +9,7 @@
     "Richard - who can create a case",
     "Dil - with an active profile",
     "Steve - with an active profile",
-    "Jamal -  who is a privileged user with permissions to access the case assignments of other users",
-    "by Jamal to assign Dil a few case roles to access C1",
-    "by Jamal to assign Steve a few case roles to access C1"
+    "Jamal -  who is a privileged user with permissions to access the case assignments of other users"
   ],
   "request": {
     "pathVariables": {
