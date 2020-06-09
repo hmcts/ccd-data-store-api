@@ -104,6 +104,9 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         final Optional<JsonNode> caseFieldNode = Optional.ofNullable(existingData.get(caseFiledID));
 
         if (caseFieldNode.isPresent()) {
+            if (caseFieldNode.get().get(ORGANISATION_POLICY_ROLE).isNull()) {
+                return Optional.ofNullable(null);
+            }
             return Optional.of(caseFieldNode.get().get(ORGANISATION_POLICY_ROLE).textValue());
         }
         return Optional.ofNullable(null);
