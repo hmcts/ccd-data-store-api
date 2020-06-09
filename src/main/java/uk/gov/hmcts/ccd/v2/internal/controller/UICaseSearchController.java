@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
 @RestController
-@RequestMapping(path = "/internal/searchCases")
+@RequestMapping(path = "/internal/searchCases", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = {"Elastic Based Search API"})
 @SwaggerDefinition(tags = {
     @Tag(name = "Elastic Based Search API", description = "Internal ElasticSearch based case search API, "
@@ -52,10 +52,7 @@ public class UICaseSearchController {
         this.elasticsearchSortService = elasticsearchSortService;
     }
 
-    @PostMapping(
-        path = "",
-        produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PostMapping(path = "")
     @ApiOperation(
         value = "Search cases according to the provided ElasticSearch query. Supports searching a single case type and a use case."
     )
