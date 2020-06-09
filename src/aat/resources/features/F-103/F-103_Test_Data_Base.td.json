@@ -7,7 +7,7 @@
   "uri": "/case-users",
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.caa.1@gmail.com",
+      "username": "befta.caseworker.caa@gmail.com",
       "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
     },
     "userRichard": {
