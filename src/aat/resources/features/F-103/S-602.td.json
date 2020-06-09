@@ -1,0 +1,35 @@
+{
+  "title": "must return 400 error response for invalid case id",
+  "_guid_": "S-602",
+  "productName": "CCD Data Store",
+  "operationName": "Get Case-Assigned Users and Roles",
+  "_extends_": "F-103_Test_Data_Base",
+
+  "specs": [
+    "Dil - with a valid User ID",
+    "Jamal -  who is a privileged user with permissions to access the case assignments of other users",
+    "uses an invalid case id",
+    "has the 400 return code"
+  ],
+  "request": {
+    "pathVariables": {
+      "case_ids": "12346657"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "Case ID is not valid",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

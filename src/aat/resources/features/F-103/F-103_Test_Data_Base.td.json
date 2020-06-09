@@ -1,0 +1,41 @@
+{
+  "_guid_": "F-103_Test_Data_Base",
+  "title": "Get Case-Assigned Users and Roles",
+  "productName": "CCD Data Store",
+  "operationName": "Get Case-Assigned Users and Roles",
+  "method": "GET",
+  "uri": "/case-users",
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.caa.1@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    },
+    "userRichard": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    },
+    "userDil": {
+      "username": "befta.caseworker.2.solicitor.3@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    },
+    "userSteve": {
+      "username": "befta.caseworker.2.solicitor.1@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "case_ids": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]}",
+      "user_ids": "${[scenarioContext][testData][users][userDil][id]}"
+    }
+  },
+  "expectedResponse": {
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

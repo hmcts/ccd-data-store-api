@@ -1,0 +1,34 @@
+{
+  "title": "must return 400 error response for mal-formatted user id list",
+  "_guid_": "S-603",
+  "productName": "CCD Data Store",
+  "operationName": "Get Case-Assigned Users and Roles",
+  "_extends_": "F-103_Test_Data_Base",
+
+"specs": [
+    "Richard - who can create a case",
+    "Dil - with an active profile",
+    "Jamal -  who is a privileged user with permissions to access the case assignments of other users",
+    "call by Jamal to assign Dil a few case roles to access C1",
+    "request is made by Dil with the Case ID of C1 & Dil's own User ID",
+    "has the 200 return code"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "${[scenarioContext][testData][users][userDil][id]}",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    },
+    "userDil": {
+      "username": "befta.caseworker.2.solicitor.3@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    }
+  }
+}
