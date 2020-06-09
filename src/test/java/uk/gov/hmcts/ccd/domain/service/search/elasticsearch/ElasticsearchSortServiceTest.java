@@ -112,7 +112,7 @@ class ElasticsearchSortServiceTest {
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
-                is("{\"query\":{},\"sort\":[{\"jurisdiction.keyword\":\"ASC\"},{\"last_modified\":\"DESC\"}]}"))
+                is("{\"query\":{},\"sort\":[{\"jurisdiction.keyword\":\"ASC\"},{\"last_modified\":\"DESC\"},\"created_date\"]}"))
         );
     }
 
@@ -133,7 +133,7 @@ class ElasticsearchSortServiceTest {
         assertAll(
             () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
                 is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"},{\"data.DateField\":\"DESC\"},"
-                   + "{\"data.CollectionTextField.value.keyword\":\"DESC\"},{\"data.CollectionDateField.value\":\"ASC\"}]}"))
+                   + "{\"data.CollectionTextField.value.keyword\":\"DESC\"},{\"data.CollectionDateField.value\":\"ASC\"},\"created_date\"]}"))
         );
     }
 
@@ -147,7 +147,20 @@ class ElasticsearchSortServiceTest {
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
-                is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}"))
+                is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"},\"created_date\"]}"))
+        );
+    }
+
+    @Test
+    void shouldApplyDefaultSortWhenNoSortsAreConfigured() throws JsonProcessingException {
+        String searchRequest = "{\"query\":{}}";
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class));
+
+        elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
+
+        assertAll(
+            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
+                is("{\"query\":{},\"sort\":[\"created_date\"]}"))
         );
     }
 
