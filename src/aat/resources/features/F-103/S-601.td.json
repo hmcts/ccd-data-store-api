@@ -18,18 +18,10 @@
   },
   "expectedResponse": {
     "_extends_": "Common_400_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    },
     "body": {
+      "_extends_": "Common_400_Response_Body",
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "timestamp": "[[ANYTHING_PRESENT]]",
-      "message": "Case ID list is empty",
-      "path": "[[ANYTHING_PRESENT]]",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
+      "message": "Case ID list is empty"
     }
   }
 }
