@@ -9,7 +9,7 @@
 "specs": [
     "Richard - who can create a case",
     "Jamal -  who is a privileged user with permissions to access the case assignments of other users",
-    "uses mal-formatted user id list",
+    "is made by Jamal with the Case ID of C1 & a malformed User ID list",
     "has the 400 return code"
   ],
   "request": {

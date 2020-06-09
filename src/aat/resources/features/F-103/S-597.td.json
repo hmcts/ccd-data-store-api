@@ -9,9 +9,7 @@
     "Richard - who can create a case",
     "Dil - with an active profile",
     "Jamal -  who is a privileged user with permissions to access the case assignments of other users",
-    "call by Jamal to assign Dil a few case roles to access C1",
-    "uses case id C1 and Dil's user Id",
-    "has the 200 return code"
+    "is made by Jamal with the Case ID of C1 & Dil's User ID"
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",

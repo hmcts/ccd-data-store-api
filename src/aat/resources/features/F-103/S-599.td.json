@@ -8,11 +8,10 @@
 "specs": [
     "Richard - who can create a case",
     "Dil - with an active profile",
+    "Steve - with an active profile",
     "Jamal -  who is a privileged user with permissions to access the case assignments of other users",
-    "call by Jamal to assign Dil a few case roles to access C1",
-    "call by Jamal to assign Steve a few case roles to access C1",
-    "request is made by Jamal with the Case ID of C1 & no user ids",
-    "has the 200 return code"
+    "by Jamal to assign Dil a few case roles to access C1",
+    "by Jamal to assign Steve a few case roles to access C1"
   ],
   "request": {
     "pathVariables": {

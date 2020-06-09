@@ -9,8 +9,7 @@
     "Richard - who can create a case",
     "Dil - with an active profile",
     "Steve -  who is not a privileged user and does not have permissions to access the case assignments of other users",
-    "uses case id C1 and Dil's user Id",
-    "has the 403 return code"
+    "is made by Steve with the Case ID of C1 & Dil's User ID"
   ],
   "users": {
     "invokingUser": {

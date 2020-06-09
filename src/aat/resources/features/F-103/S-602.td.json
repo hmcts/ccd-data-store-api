@@ -8,8 +8,7 @@
   "specs": [
     "Dil - with a valid User ID",
     "Jamal -  who is a privileged user with permissions to access the case assignments of other users",
-    "uses an invalid case id",
-    "has the 400 return code"
+    "is made by Jamal with a malformed Case ID & Dil's User ID"
   ],
   "request": {
     "pathVariables": {

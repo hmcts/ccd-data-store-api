@@ -12,7 +12,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And another successful call [to create a full case C1 for solicitor] as in [F103_Case_Data_Create]
     And a user [Dil - with an active profile],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
-    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Dil],
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with the Case ID of C1 & Dil's User ID]
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
@@ -28,7 +28,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And another successful call [to create a full case C1 for solicitor] as in [F103_Case_Data_Create]
     And a user [Dil - with an active profile],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
-    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Dil],
     When a request is prepared with appropriate values,
     And the request [is made by Dil with the Case ID of C1 & Dil's own User ID]
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
@@ -45,8 +45,8 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And a user [Dil - with an active profile],
     And a user [Steve - with an active profile],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
-    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base],
-    And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Test_Case_Access_Base_2],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Dil],
+    And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Steve],
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with the Case ID of C1 & no User ID]
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
@@ -58,18 +58,18 @@ Feature: F-103: Get Case-Assigned Users and Roles
   Scenario: when no User ID is supplied for a list of Case IDs, then the case roles relating to all users with access to all listed cases must be returned
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
-    And a successful call [by Richard to create a case - C1] as in [Prerequisite Case Creation Call for Case Assignment],
-    And a successful call [by Richard to create a case - C2] as in [Prerequisite Case Creation Call for Case Assignment],
-    And a successful call [by Richard to create a case - C3] as in [Prerequisite Case Creation Call for Case Assignment],
+    And a successful call [by Richard to create a case - C1] as in [F103_Case_Data_Create],
+    And a successful call [by Richard to create a case - C2] as in [F103_Case_Data_Create_C2],
+    And a successful call [by Richard to create a case - C3] as in [F103_Case_Data_Create_C3],
     And a user [Dil - with an active profile],
     And a user [Steve - with an active profile],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
-    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [Prerequisite Role Assignment for User],
-    And a successful call [by Jamal to assign Dil a few case roles to access C2] as in [Prerequisite Role Assignment for User],
-    And a successful call [by Jamal to assign Dil a few case roles to access C3] as in [Prerequisite Role Assignment for User],
-    And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [Prerequisite Role Assignment for User],
-    And a successful call [by Jamal to assign Steve a few case roles to access C2] as in [Prerequisite Role Assignment for User],
-    And a successful call [by Jamal to assign Steve a few case roles to access C3] as in [Prerequisite Role Assignment for User],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Dil],
+    And a successful call [by Jamal to assign Dil a few case roles to access C2] as in [F-103_Test_Case_Access_Base_Dil_C2],
+    And a successful call [by Jamal to assign Dil a few case roles to access C3] as in [F-103_Test_Case_Access_Base_Dil_C3],
+    And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Steve],
+    And a successful call [by Jamal to assign Steve a few case roles to access C2] as in [F-103_Test_Case_Access_Base_Steve_C2],
+    And a successful call [by Jamal to assign Steve a few case roles to access C3] as in [F-103_Test_Case_Access_Base_Steve_C3],
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with Case IDs of C1, C2 & C3 & no User ID]
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],

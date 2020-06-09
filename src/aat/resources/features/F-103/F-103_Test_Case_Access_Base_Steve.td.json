@@ -1,0 +1,30 @@
+{
+	"_guid_": "F-103_Test_Case_Access_Base_Steve",
+	"method": "PUT",
+	"uri": "/cases/{cid}/users/{uid}",
+	"users": {
+    "invokingUser": {
+      "username": "befta.caseworker.caa.1@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    },
+    "userRichard": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    },
+    "userDil": {
+      "username": "befta.caseworker.2.solicitor.3@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    },
+    "userSteve": {
+      "username": "befta.caseworker.2.solicitor.4@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+	},
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"cid": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]}",
+			"uid": "${[scenarioContext][testData][users][userSteve][id]}"
+		}
+	}
+}

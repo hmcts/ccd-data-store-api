@@ -1,5 +1,5 @@
 {
-	"_guid_": "F-101_Test_Data_Base",
+	"_guid_": "F-103_Test_Case_Access_Base_Dil_C3",
 	"method": "PUT",
 	"uri": "/cases/{cid}/users/{uid}",
 	"users": {
@@ -23,8 +23,8 @@
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {
-			"cid": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]}",
-			"uid": "${[scenarioContext][testData][users][userSteve][id]}"
+			"cid": "${[scenarioContext][childContexts][F103_Case_Data_Create_C3][testData][actualResponse][body][id]}",
+			"uid": "${[scenarioContext][testData][users][userDil][id]}"
 		}
 	}
 }
