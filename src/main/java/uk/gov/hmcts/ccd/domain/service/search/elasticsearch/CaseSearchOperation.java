@@ -1,16 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import uk.gov.hmcts.ccd.domain.model.search.*;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
-
-import java.util.List;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 
 
 public interface CaseSearchOperation {
 
-    CaseSearchResult executeExternal(CrossCaseTypeSearchRequest request);
+    CaseSearchResult execute(CrossCaseTypeSearchRequest request);
 
-    UICaseSearchResult executeInternal(CaseSearchResult caseSearchResult,
-                                       List<String> caseTypeIds,
-                                       UseCase useCase);
 }

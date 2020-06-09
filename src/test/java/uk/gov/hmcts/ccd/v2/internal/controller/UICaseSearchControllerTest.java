@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -9,11 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
+import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortService;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 import java.util.ArrayList;
@@ -21,12 +26,12 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 class UICaseSearchControllerTest {
 
@@ -38,6 +43,12 @@ class UICaseSearchControllerTest {
     @Mock
     private ElasticsearchQueryHelper elasticsearchQueryHelper;
 
+    @Mock
+    private CaseSearchResultViewGenerator caseSearchResultViewGenerator;
+
+    @Mock
+    private ElasticsearchSortService elasticsearchSortService;
+
     @InjectMocks
     private UICaseSearchController controller;
 
@@ -47,27 +58,34 @@ class UICaseSearchControllerTest {
     }
 
     @Test
-    void shouldSearchCaseDetails() {
+    void shouldSearchCaseDetails() throws JsonProcessingException {
         CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
-        CrossCaseTypeSearchRequest preparedRequest = mock(CrossCaseTypeSearchRequest.class);
-        UICaseSearchResult uiCaseSearchResult = mock(UICaseSearchResult.class);
-        when(elasticsearchQueryHelper.prepareRequest(any(), any(), any())).thenReturn(preparedRequest);
-        when(caseSearchOperation.executeExternal(any(CrossCaseTypeSearchRequest.class))).thenReturn(caseSearchResult);
-        when(caseSearchOperation.executeInternal(any(), any(), any())).thenReturn(uiCaseSearchResult);
+        CaseSearchResultView caseSearchResultView = mock(CaseSearchResultView.class);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
-        List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
+        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
+        when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(caseSearchResult);
+        when(caseSearchResultViewGenerator.execute(any(), any(), any())).thenReturn(caseSearchResultView);
 
         final ResponseEntity<CaseSearchResultViewResource> response = controller
-            .searchCases(caseTypeIds, UseCase.WORKBASKET.getReference(), searchRequest);
+            .searchCases(CASE_TYPE_ID, WORKBASKET, searchRequest);
 
-        verify(elasticsearchQueryHelper).prepareRequest(eq(caseTypeIds), eq("WORKBASKET"), eq(searchRequest));
-        verify(caseSearchOperation).executeExternal(eq(preparedRequest));
-        verify(caseSearchOperation).executeInternal(eq(caseSearchResult), eq(caseTypeIds), eq(UseCase.WORKBASKET));
+        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
+        verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
+            assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().get(0), is(CASE_TYPE_ID));
+            assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
+            assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
+            return true;
+        }));
+        verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET));
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-            () -> assertThat(response.getBody().getHeaders(), is(uiCaseSearchResult.getHeaders())),
-            () -> assertThat(response.getBody().getCases(), is(uiCaseSearchResult.getCases())),
-            () -> assertThat(response.getBody().getTotal(), is(uiCaseSearchResult.getTotal()))
+            () -> assertThat(response.getBody().getHeaders(), is(caseSearchResultView.getHeaders())),
+            () -> assertThat(response.getBody().getCases(), is(caseSearchResultView.getCases())),
+            () -> assertThat(response.getBody().getTotal(), is(caseSearchResultView.getTotal()))
         );
     }
 

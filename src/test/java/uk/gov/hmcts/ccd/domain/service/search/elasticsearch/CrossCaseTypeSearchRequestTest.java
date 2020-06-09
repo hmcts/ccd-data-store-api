@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 class CrossCaseTypeSearchRequestTest {
@@ -32,7 +33,7 @@ class CrossCaseTypeSearchRequestTest {
         String query = "{}";
         assertThrows(BadSearchRequest.class, () -> new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(singletonList("caseType"))
-            .withSearchRequest(objectMapper.readValue(query, JsonNode.class))
+            .withSearchRequest(new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class)))
             .build());
     }
 
@@ -44,15 +45,15 @@ class CrossCaseTypeSearchRequestTest {
         @DisplayName("should build non-multi-case-type search request")
         void shouldBuildNonMultiCaseTypeSearch() throws Exception {
             String query = "{\"query\":{}}";
-            JsonNode jsonNode = objectMapper.readTree(query);
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query));
             List<String> caseTypeIds = singletonList("CT");
             CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
-                .withSearchRequest(jsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .withCaseTypes(caseTypeIds)
                 .build();
 
             assertThat(request.isMultiCaseTypeSearch(), is(false));
-            assertThat(request.getSearchRequestJsonNode(), is(jsonNode));
+            assertThat(request.getSearchRequestJsonNode(), is(elasticsearchRequest.getSearchRequest()));
             assertThat(request.getCaseTypeIds(), hasSize(1));
             assertThat(request.getAliasFields().isEmpty(), is(true));
         }
@@ -61,16 +62,16 @@ class CrossCaseTypeSearchRequestTest {
         @DisplayName("should build multi-case-type search request")
         void shouldBuildMultiCaseTypeSearch() throws Exception {
             String query = "{\"_source\":[\"alias.name\"], \"query\":{}}";
-            JsonNode jsonNode = objectMapper.readTree(query);
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query));
             List<String> caseTypeIds = Arrays.asList("CT", "PT");
             CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
-                .withSearchRequest(jsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .withCaseTypes(caseTypeIds)
                 .withMultiCaseTypeSearch(true)
                 .build();
 
             assertThat(request.isMultiCaseTypeSearch(), is(true));
-            assertThat(request.getSearchRequestJsonNode(), is(jsonNode));
+            assertThat(request.getSearchRequestJsonNode(), is(elasticsearchRequest.getSearchRequest()));
             assertThat(request.getCaseTypeIds(), is(caseTypeIds));
             assertThat(request.getAliasFields(), hasItem("name"));
         }
@@ -79,11 +80,11 @@ class CrossCaseTypeSearchRequestTest {
         @DisplayName("should add metadata source fields for single case type search requests with source")
         void shouldAddMetadataSourceFields() throws Exception {
             String query = "{\"_source\":[\"data.name\"], \"query\":{}}";
-            JsonNode jsonNode = objectMapper.readTree(query);
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query));
             List<String> caseTypeIds = singletonList("CT");
 
             final CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
-                .withSearchRequest(jsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .withCaseTypes(caseTypeIds)
                 .build();
 
@@ -92,7 +93,7 @@ class CrossCaseTypeSearchRequestTest {
 
             assertAll(
                 () -> assertThat(request.isMultiCaseTypeSearch(), is(false)),
-                () -> assertThat(request.getSearchRequestJsonNode(), is(jsonNode)),
+                () -> assertThat(request.getSearchRequestJsonNode(), is(elasticsearchRequest.getSearchRequest())),
                 () -> assertThat(request.getCaseTypeIds(), is(caseTypeIds)),
                 () -> assertThat(sourceFields, hasItem("data.name")),
                 () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),

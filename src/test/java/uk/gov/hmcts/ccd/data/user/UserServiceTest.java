@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ccd.data.user;
 
 import com.google.common.collect.Lists;
-
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,18 +13,14 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
@@ -80,7 +73,7 @@ public class UserServiceTest {
 
         assertThat(userProfile.getUser().getIdamProperties(), is(mockIdamProps));
         assertThat(userProfile.getJurisdictions(),
-                equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
+            equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
         WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
         assertThat(workbasketDefault.getJurisdictionId(), is("J1"));
         assertThat(workbasketDefault.getCaseTypeId(), is("CT"));
@@ -108,30 +101,6 @@ public class UserServiceTest {
             equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
         WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
         assertNull(workbasketDefault);
-    }
-
-    @Test
-    public void shouldReturnAllUserCaseTypes() {
-        CaseTypeDefinition caseTypeDefinition1 = mock(CaseTypeDefinition.class);
-        CaseTypeDefinition caseTypeDefinition2 = mock(CaseTypeDefinition.class);
-        CaseTypeDefinition caseTypeDefinition3 = mock(CaseTypeDefinition.class);
-        when(userRepoMock.getUserDetails()).thenReturn(mockIdamProps);
-        when(userRepoMock.getUserDefaultSettings("email"))
-            .thenThrow(new ResourceNotFoundException("No User profile exists for this userId email"));
-        when(jurisdictionsResolver.getJurisdictions()).thenReturn(Lists.newArrayList("J1", "J2"));
-        when(caseDefinitionRepoMock.getJurisdiction("J1")).thenReturn(j1);
-        when(caseDefinitionRepoMock.getJurisdiction("J2")).thenReturn(j2);
-        when(jurisdictionMapperMock.toResponse(j1)).thenReturn(jdp1);
-        when(jurisdictionMapperMock.toResponse(j2)).thenReturn(jdp2);
-        when(jdp1.getCaseTypeDefinitions()).thenReturn(Arrays.asList(caseTypeDefinition1, caseTypeDefinition2));
-        when(jdp2.getCaseTypeDefinitions()).thenReturn(Collections.singletonList(caseTypeDefinition3));
-
-        List<CaseTypeDefinition> caseTypes = userService.getUserCaseTypes();
-
-        assertAll(
-            () -> assertThat(caseTypes.size(), is(3)),
-            () -> assertThat(caseTypes, contains(caseTypeDefinition1, caseTypeDefinition2, caseTypeDefinition3))
-        );
     }
 
     private UserDefault userDefault() {

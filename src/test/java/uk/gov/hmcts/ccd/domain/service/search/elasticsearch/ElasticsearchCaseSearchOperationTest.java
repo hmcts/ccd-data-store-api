@@ -1,9 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
@@ -11,13 +9,12 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation.MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,9 +37,7 @@ import org.powermock.reflect.Whitebox;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.UICaseSearchResult;
-import uk.gov.hmcts.ccd.domain.service.aggregated.MergeDataToSearchCasesOperation;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
@@ -80,10 +75,9 @@ class ElasticsearchCaseSearchOperationTest {
     @Mock
     private ObjectMapper objectMapper;
 
-    @Mock
-    private MergeDataToSearchCasesOperation mergeDataToSearchCasesOperation;
-
     private final ObjectNode searchRequestJsonNode = JsonNodeFactory.instance.objectNode();
+
+    private final ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode);
 
     @BeforeEach
     void setUp() {
@@ -113,14 +107,14 @@ class ElasticsearchCaseSearchOperationTest {
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, searchRequestJsonNode);
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
-                .withSearchRequest(searchRequestJsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
-            CaseSearchResult caseSearchResult = searchOperation.executeExternal(crossCaseTypeSearchRequest);
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails))),
@@ -160,15 +154,15 @@ class ElasticsearchCaseSearchOperationTest {
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
-            CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, searchRequestJsonNode);
-            CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, searchRequestJsonNode);
+            CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, elasticsearchRequest);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
-                .withSearchRequest(searchRequestJsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request1, request2);
 
-            CaseSearchResult caseSearchResult = searchOperation.executeExternal(crossCaseTypeSearchRequest);
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails, caseDetails))),
@@ -182,23 +176,6 @@ class ElasticsearchCaseSearchOperationTest {
     }
 
     @Nested
-    @DisplayName("Internal search")
-    class InternalSearch {
-
-        @Test
-        @DisplayName("should call converter to UICaseSearchResult")
-        void shouldConvertToInternalSearchResult() throws IOException {
-            CaseSearchResult caseSearchResult = new CaseSearchResult();
-            List<String> caseTypeIds = new ArrayList<>();
-            UseCase useCase = UseCase.WORKBASKET;
-
-            final UICaseSearchResult result = searchOperation.executeInternal(caseSearchResult, caseTypeIds, useCase);
-
-            verify(mergeDataToSearchCasesOperation).execute(eq(caseTypeIds), eq(caseSearchResult), eq(useCase));
-        }
-    }
-
-    @Nested
     @DisplayName("Elasticsearch search failure")
     class SearchFailure {
 
@@ -208,14 +185,14 @@ class ElasticsearchCaseSearchOperationTest {
             MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
             when(multiSearchResult.isSucceeded()).thenReturn(false);
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, searchRequestJsonNode);
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
-                .withSearchRequest(searchRequestJsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
-            assertThrows(BadSearchRequest.class, () -> searchOperation.executeExternal(crossCaseTypeSearchRequest));
+            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }
 
         @Test
@@ -233,14 +210,14 @@ class ElasticsearchCaseSearchOperationTest {
             when(multiSearchResult.isSucceeded()).thenReturn(true);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, searchRequestJsonNode);
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
-                .withSearchRequest(searchRequestJsonNode)
+                .withSearchRequest(elasticsearchRequest)
                 .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
-            assertThrows(BadSearchRequest.class, () -> searchOperation.executeExternal(crossCaseTypeSearchRequest));
+            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }
 
     }

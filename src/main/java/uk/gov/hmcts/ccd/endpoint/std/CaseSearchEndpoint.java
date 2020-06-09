@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 
@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = {"Elastic Based Search API"})
 @SwaggerDefinition(tags = {
-    @Tag(name = "Elastic Based Search API", description = "New ElasticSearch based search API")
+    @Tag(name = "Elastic Based Search API", description = "ElasticSearch based search API")
 })
 @Slf4j
 public class CaseSearchEndpoint {
@@ -64,13 +64,14 @@ public class CaseSearchEndpoint {
 
         Instant start = Instant.now();
 
-        CrossCaseTypeSearchRequest request = elasticsearchQueryHelper.prepareRequest(
-            caseTypeIds,
-            UseCase.DEFAULT.getReference(),
-            jsonSearchRequest
-        );
+        ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
 
-        CaseSearchResult result = caseSearchOperation.executeExternal(request);
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(caseTypeIds)
+            .withSearchRequest(elasticsearchRequest)
+            .build();
+
+        CaseSearchResult result = caseSearchOperation.execute(request);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());

@@ -25,18 +25,18 @@ class CreateCaseTest extends BaseTest {
     @DisplayName("should create a new empty case")
     void shouldCreateEmptyCase() {
         Event.create()
-             .as(asAutoTestCaseworker())
-             .withData(EmptyCase.build())
-             .submit()
+            .as(asAutoTestCaseworker())
+            .withData(EmptyCase.build())
+            .submit()
 
-             .then()
-             .log().ifError()
-             .statusCode(201)
+            .then()
+            .log().ifError()
+            .statusCode(201)
 
-             .assertThat()
-             .body("jurisdiction", equalTo(AATCaseType.JURISDICTION))
-             .body("case_type_id", equalTo(AATCaseType.CASE_TYPE))
-             .body("state", equalTo(AATCaseType.State.TODO));
+            .assertThat()
+            .body("jurisdiction", equalTo(AATCaseType.JURISDICTION))
+            .body("case_type_id", equalTo(AATCaseType.CASE_TYPE))
+            .body("state", equalTo(AATCaseType.State.TODO));
     }
 
     @Test

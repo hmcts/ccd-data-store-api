@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.format.DateTimeParseException;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DateTimeFormatParserTest {
 
@@ -34,7 +34,7 @@ class DateTimeFormatParserTest {
         final String dateTimeFormat = "dd/MM/yyyy";
         final String value = "20/10/2000";
 
-        final String result = dateTimeFormatParser.convertDateToIso8601(dateTimeFormat, value);
+        dateTimeFormatParser.convertDateToIso8601(dateTimeFormat, value);
     }
 
     @Test

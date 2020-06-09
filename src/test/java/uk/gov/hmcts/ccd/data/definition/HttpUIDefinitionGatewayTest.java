@@ -15,11 +15,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 
 public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
 
     private static final int VERSION = 33;
+    private static final String ORG_CASES = "ORGCASES";
 
     @Inject
     private HttpUIDefinitionGateway httpUIDefinitionGateway;
@@ -57,10 +57,10 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
     @Test
     @DisplayName("should Return search cases result fields")
     public void shouldReturnSearchCasesResultFields() {
-        final SearchResult searchResult = httpUIDefinitionGateway.getSearchCasesResult(VERSION, "TestAddressBookCase", UseCase.ORG_CASES);
+        final SearchResult searchResult = httpUIDefinitionGateway.getSearchCasesResultDefinition(VERSION, "TestAddressBookCase", ORG_CASES);
         assertAll(
             () -> assertThat(searchResult.getFields().length, is(7)),
-            () -> assertThat(searchResult.getFields()[0].getUseCase(), is(UseCase.ORG_CASES))
+            () -> assertThat(searchResult.getFields()[0].getUseCase(), is(ORG_CASES))
         );
     }
 }

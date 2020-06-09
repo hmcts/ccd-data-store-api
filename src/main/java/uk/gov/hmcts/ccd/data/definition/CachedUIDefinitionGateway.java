@@ -15,7 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.UseCase;
 
 @Named
 @Qualifier("Cache")
@@ -46,9 +45,9 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
 
     @Override
     @Cacheable("searchCasesResultCache")
-    public SearchResult getSearchCasesResult(final int version, final String caseTypeId, final UseCase useCase) {
-        LOG.debug("remote retrieving version {} of search cases result for {}", version, caseTypeId);
-        return httpUiDefinitionGateway.getSearchCasesResult(version, caseTypeId, useCase);
+    public SearchResult getSearchCasesResultDefinition(int version, String caseTypeId, String useCase) {
+        LOG.debug("remote retrieving version {} of search cases result definition for {}", version, caseTypeId);
+        return httpUiDefinitionGateway.getSearchCasesResultDefinition(version, caseTypeId, useCase);
     }
 
     @Override

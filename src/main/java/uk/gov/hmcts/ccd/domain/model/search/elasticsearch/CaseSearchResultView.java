@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.search.elasticsearch;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -10,18 +11,19 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 
 @Data
-public class UICaseSearchResult {
+@AllArgsConstructor
+public class CaseSearchResultView {
 
-    public static final UICaseSearchResult EMPTY = new UICaseSearchResult(emptyList(), emptyList(), 0L);
+    public static final CaseSearchResultView EMPTY = new CaseSearchResultView(emptyList(), emptyList(), 0L);
 
     @NonNull
-    private List<UICaseSearchHeader> headers;
+    private List<SearchResultViewHeaderGroup> headers;
     @NonNull
     private List<SearchResultViewItem> cases;
     @NonNull
     private Long total;
 
-    public Optional<UICaseSearchHeader> findHeaderByCaseType(String caseTypeId) {
+    public Optional<SearchResultViewHeaderGroup> findHeaderByCaseType(String caseTypeId) {
         return headers.stream().filter(header -> header.getMetadata().getCaseTypeId().equals(caseTypeId)).findFirst();
     }
 
@@ -31,7 +33,7 @@ public class UICaseSearchResult {
 
     public List<SearchResultViewItem> findCasesByCaseType(String caseTypeId) {
         List<String> references = findHeaderByCaseType(caseTypeId)
-            .map(UICaseSearchHeader::getCases)
+            .map(SearchResultViewHeaderGroup::getCases)
             .orElse(emptyList());
 
         return cases.stream().filter(item -> references.contains(item.getCaseId())).collect(Collectors.toList());

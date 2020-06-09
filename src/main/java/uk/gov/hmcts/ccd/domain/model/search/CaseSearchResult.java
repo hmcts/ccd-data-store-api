@@ -30,7 +30,7 @@ public class CaseSearchResult {
         return total;
     }
 
-    public List<String> buildCaseReferenceList(String caseTypeId) {
+    public List<String> getCaseReferences(String caseTypeId) {
         return cases == null
             ? emptyList()
             : cases.stream().filter(c -> c.getCaseTypeId().equals(caseTypeId)).map(CaseDetails::getReferenceAsString).collect(toList());

@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class SearchResultViewColumn {
+public class SearchResultViewHeader {
 
     @JsonProperty("case_field_id")
     private String caseFieldId;

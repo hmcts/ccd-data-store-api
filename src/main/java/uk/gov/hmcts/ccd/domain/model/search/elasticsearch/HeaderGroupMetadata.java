@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class UICaseSearchHeaderMetadata {
+public class HeaderGroupMetadata {
 
     @NonNull
     private String jurisdiction;
