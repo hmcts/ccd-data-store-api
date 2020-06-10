@@ -5,6 +5,11 @@
 		"pathVariables": {
 			"cid": "${[scenarioContext][childContexts][F103_Case_Data_Create_C2][testData][actualResponse][body][id]}",
 			"uid": "${[scenarioContext][testData][users][userDil][id]}"
-		}
+		},
+    "body": {
+      "case_roles": [
+        "[COLLABORATOR]"
+      ]
+    }
 	}
 }

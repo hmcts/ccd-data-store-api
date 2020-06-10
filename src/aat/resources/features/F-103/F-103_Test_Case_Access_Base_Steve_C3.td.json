@@ -7,5 +7,10 @@
 			"cid": "${[scenarioContext][childContexts][F103_Case_Data_Create_C3][testData][actualResponse][body][id]}",
 			"uid": "${[scenarioContext][testData][users][userSteve][id]}"
 		}
-	}
+	},
+  "body": {
+    "case_roles": [
+      "[Defendant]"
+    ]
+  }
 }

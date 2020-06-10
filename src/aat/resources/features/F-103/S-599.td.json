@@ -22,6 +22,17 @@
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "[[ANYTHING_PRESENT]]",
       "Content-Encoding" : "gzip"
+    },
+    "body" : {
+      "case-users" : [ {
+        "case_id": "[[ANY_STRING_NOT_NULLABLE]]",
+        "user_id": "[[ANY_STRING_NOT_NULLABLE]]",
+        "case_role":  "[DEFENDANT]"
+      }, {
+        "case_id": "[[ANY_STRING_NOT_NULLABLE]]",
+        "user_id": "[[ANY_STRING_NOT_NULLABLE]]",
+        "case_role":  "[COLLABORATOR]"
+      } ]
     }
   }
 }

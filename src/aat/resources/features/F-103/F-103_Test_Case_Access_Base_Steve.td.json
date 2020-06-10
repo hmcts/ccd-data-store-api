@@ -6,5 +6,10 @@
 			"cid": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]}",
 			"uid": "${[scenarioContext][testData][users][userSteve][id]}"
 		}
-	}
+	},
+  "body": {
+    "case_roles": [
+      "[COLLABORATOR]"
+    ]
+  }
 }

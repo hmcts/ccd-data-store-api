@@ -21,6 +21,11 @@
     }
 	},
 	"request": {
-		"_extends_": "Common_Request"
+		"_extends_": "Common_Request",
+    "body": {
+      "case_roles": [
+        "[DEFENDANT]"
+      ]
+    }
 	}
 }
