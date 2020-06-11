@@ -1,9 +1,9 @@
 {
-  "title": "must return 400 error response for mal-formatted user id list",
+  "title": "when the invoking user is not a privileged user but the request includes his/her own User ID, then the invoker's case roles for the case should be returned",
   "_guid_": "S-598",
   "productName": "CCD Data Store",
   "operationName": "Get Case-Assigned Users and Roles",
-  "_extends_": "F-103_Test_Data_Base",
+  "_extends_": "F-103_Case_Assigned_User_Roles_Base",
 
 "specs": [
     "Richard - who can create a case",

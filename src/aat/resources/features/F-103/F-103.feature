@@ -8,10 +8,10 @@ Feature: F-103: Get Case-Assigned Users and Roles
   Scenario: when a specific User ID is supplied for a specific case ID, then the case roles relating only to the User ID for that specific Case ID must be returned
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
-    And a successful call [to create a full case C1 for solicitor] as in [F103_Case_Data_Create]
+    And a successful call [by Richard to create a case - C1] as in [F103_Case_Data_Create]
     And a user [Dil - with an active profile],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
-    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Dil],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with the Case ID of C1 & Dil's User ID]
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
@@ -23,10 +23,10 @@ Feature: F-103: Get Case-Assigned Users and Roles
   Scenario: when the invoking user is not a privileged user but the request includes his/her own User ID, then the invoker's case roles for the case should be returned
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
-    And a successful call [to create a full case C1 for solicitor] as in [F103_Case_Data_Create]
+    And a successful call [by Richard to create a case - C1] as in [F103_Case_Data_Create]
     And a user [Dil - with an active profile],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
-    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Dil],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
     When a request is prepared with appropriate values,
     And the request [is made by Dil with the Case ID of C1 & Dil's own User ID]
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
@@ -38,12 +38,12 @@ Feature: F-103: Get Case-Assigned Users and Roles
   Scenario: when no User ID is supplied for a specific case ID, then the case roles relating to all  users with access to that case must be returned
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
-    And a successful call [to create a full case C1 for solicitor] as in [F103_Case_Data_Create]
+    And a successful call [by Richard to create a case - C1] as in [F103_Case_Data_Create]
     And a user [Dil - with an active profile],
     And a user [Steve - with an active profile],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
-    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Dil],
-    And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Steve],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
+    And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Jamal_Assign_Steve_Case_Role_To_C1],
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with the Case ID of C1 & no User ID]
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
@@ -61,10 +61,10 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And a user [Dil - with an active profile],
     And a user [Steve - with an active profile],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
-    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Dil],
-    And a successful call [by Jamal to assign Dil a few case roles to access C2] as in [F-103_Test_Case_Access_Base_Dil_C2],
-    And a successful call [by Jamal to assign Dil a few case roles to access C3] as in [F-103_Test_Case_Access_Base_Dil_C3],
-    And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Test_Case_Access_Base_Steve],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
+    And a successful call [by Jamal to assign Dil a few case roles to access C2] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C2],
+    And a successful call [by Jamal to assign Dil a few case roles to access C3] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C3],
+    And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Jamal_Assign_Steve_Case_Role_To_C1],
     And a successful call [by Jamal to assign Steve a few case roles to access C2] as in [F-103_Test_Case_Access_Base_Steve_C2],
     And a successful call [by Jamal to assign Steve a few case roles to access C3] as in [F-103_Test_Case_Access_Base_Steve_C3],
     When a request is prepared with appropriate values,
@@ -87,7 +87,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
 
 
   @S-602
-  Scenario:must return an error response for a malformed Case ID
+  Scenario: must return an error response for a malformed Case ID
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - with a valid User ID],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
@@ -102,7 +102,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
-    And a successful call [to create a full case C1 for solicitor] as in [F103_Case_Data_Create]
+    And a successful call [by Richard to create a case - C1] as in [F103_Case_Data_Create]
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with the Case ID of C1 & a malformed User ID list],
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
@@ -113,7 +113,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
   Scenario: must return an error response when the invoker does not have the required IDAM role(s) to query the role assignments for users listed in the query
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
-    And a successful call [to create a full case C1 for solicitor] as in [F103_Case_Data_Create]
+    And a successful call [by Richard to create a case - C1] as in [F103_Case_Data_Create]
     And a user [Dil - with an active profile],
     And a user [Steve -  who is not a privileged user and does not have permissions to access the case assignments of other users],
     When a request is prepared with appropriate values,

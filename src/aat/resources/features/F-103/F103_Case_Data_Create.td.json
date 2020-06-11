@@ -2,7 +2,7 @@
   "_guid_": "F103_Case_Data_Create",
   "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
   "specs": [
-    "to create a full case for solicitor"
+    "by Richard to create a case - C1"
   ],
   "users": {
     "invokingUser": {

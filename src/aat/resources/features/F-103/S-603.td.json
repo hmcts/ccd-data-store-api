@@ -1,9 +1,9 @@
 {
-  "title": "must return 400 error response for mal-formatted user id list",
+  "title": "must return an error response for a malformed User ID List (e.g. user1,user2,,user4)",
   "_guid_": "S-603",
   "productName": "CCD Data Store",
   "operationName": "Get Case-Assigned Users and Roles",
-  "_extends_": "F-103_Test_Data_Base",
+  "_extends_": "F-103_Case_Assigned_User_Roles_Base",
 
 
 "specs": [

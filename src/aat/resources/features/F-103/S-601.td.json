@@ -1,9 +1,9 @@
 {
-  "title": "must return 400 error response for no case id",
+  "title": "must return an error response for a missing Case ID",
   "_guid_": "S-601",
   "productName": "CCD Data Store",
   "operationName": "Get Case-Assigned Users and Roles",
-  "_extends_": "F-103_Test_Data_Base",
+  "_extends_": "F-103_Case_Assigned_User_Roles_Base",
 
   "specs": [
     "Dil - with a valid User ID",

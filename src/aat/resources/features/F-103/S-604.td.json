@@ -1,9 +1,9 @@
 {
-  "title": "must return 400 error response for mal-formatted user id list",
+  "title": "must return an error response when the invoker does not have the required IDAM role(s) to query the role assignments for users listed in the query",
   "_guid_": "S-604",
   "productName": "CCD Data Store",
   "operationName": "Get Case-Assigned Users and Roles",
-  "_extends_": "F-103_Test_Data_Base",
+  "_extends_": "F-103_Case_Assigned_User_Roles_Base",
 
 "specs": [
     "Richard - who can create a case",
