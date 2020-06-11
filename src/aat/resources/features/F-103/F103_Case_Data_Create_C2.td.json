@@ -3,5 +3,10 @@
   "_extends_": "F103_Case_Data_Create",
   "specs": [
     "by Richard to create a case - C2"
-  ]
+  ],
+  "request": {
+    "body": {
+      "event_token":  "${[scenarioContext][parentContext][childContexts][F103_Case_Data_Create_C2_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
 }
