@@ -4,6 +4,11 @@
   "specs": [
     "by Richard to create a case - C1"
   ],
+  "request": {
+    "body": {
+      "event_token":  "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation_Solicitor_1][testData][actualResponse][body][token]}"
+    }
+  },
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.2.solicitor.2@gmail.com",
