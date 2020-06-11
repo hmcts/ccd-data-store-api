@@ -2,6 +2,12 @@ package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -12,13 +18,6 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOperation {
@@ -61,60 +60,48 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
 
     private void validateOrganisationPolicy(String caseTypeId, CaseDataContent content) {
         final List<String> errorList = new ArrayList<>();
-        // if there is not a default value. it means that there will not be organisation policy validation.
-        // hence if there is at least one ORGANISATION_POLICY_ROLE all default value logic will be executed.
-        if (!isOrganisationPolicyLogicInTheContent(content)) {
-            return;
-        }
-        caseDefinitionRepository.getCaseType(caseTypeId).getEvents().stream().filter(
-            event -> event.getId().equals(content.getEventId())
-        ).forEach(
-            caseEventDefinition -> caseEventDefinition.getCaseFields().stream().forEach(
-                caseField -> caseField.getCaseEventFieldComplexDefinitions().stream().filter(
-                    caseEventFieldComplexDefinition -> {
-                        if (caseEventFieldComplexDefinition.getReference().equals(ORGANISATION_POLICY_ROLE)) {
-                            //get extract the default value  from the content for the current caseField
-                            final Optional<String> caseFieldDefaultValue = getDefaultValueFromContentByCaseFieldID(content, caseField.getCaseFieldId());
-                            validateOrgPolicyCaseAssignedRole(
-                                caseEventFieldComplexDefinition,
-                                caseFieldDefaultValue,
-                                caseField.getCaseFieldId(),
-                                errorList);
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                ).collect(Collectors.toList()))
-        );
+        caseDefinitionRepository.getCaseType(caseTypeId).getEvents().stream()
+            .filter(event -> event.getId().equals(content.getEventId()))
+            .forEach(caseEventDefinition -> caseEventDefinition.getCaseFields()
+                .stream()
+                .forEach(caseField -> caseField.getCaseEventFieldComplexDefinitions().stream()
+                    .filter(cefcDefinition -> isOrgPolicyCaseAssignedRole(cefcDefinition.getReference()))
+                    .forEach(cefcDefinition -> {
+                        //get extract the default value  from the content for the current caseField
+                        String reference = cefcDefinition.getReference();
+                        final Optional<String> caseFieldDefaultValue =
+                            getDefaultValueFromContentByCaseFieldID(content, caseField.getCaseFieldId(), reference);
+                        validateOrgPolicyCaseAssignedRole(
+                            cefcDefinition,
+                            caseFieldDefaultValue,
+                            caseField.getCaseFieldId(), errorList);
+                    })));
         if (errorList.size() != 0) {
             throw new ValidationException("Roles validation error: " + String.join(", ", errorList));
         }
     }
 
-    private boolean isOrganisationPolicyLogicInTheContent(final CaseDataContent content) {
-        final JsonNode existingData = new ObjectMapper().convertValue(content.getData(), JsonNode.class);
-        final List<JsonNode> jsonNode = existingData.findParents(ORGANISATION_POLICY_ROLE);
-        final Optional<JsonNode> node = jsonNode.stream().findFirst();
-        return  node.isPresent();
+    private boolean isOrgPolicyCaseAssignedRole(String reference) {
+        String[] referenceArray = reference.split(Pattern.quote("."));
+        return ORGANISATION_POLICY_ROLE.equals(referenceArray[referenceArray.length -1]);
     }
 
-    private Optional<String> getDefaultValueFromContentByCaseFieldID(final CaseDataContent content, final String caseFiledID) {
+    private Optional<String> getDefaultValueFromContentByCaseFieldID(final CaseDataContent content,
+                                                                     final String caseFiledID,
+                                                                     final String reference) {
         final JsonNode existingData = new ObjectMapper().convertValue(content.getData(), JsonNode.class);
         final Optional<JsonNode> caseFieldNode = Optional.ofNullable(existingData.get(caseFiledID));
 
-        if (caseFieldNode.isPresent()) {
-            if (caseFieldNode.get().get(ORGANISATION_POLICY_ROLE).isNull()) {
-                return Optional.ofNullable(null);
-            }
-            return Optional.of(caseFieldNode.get().get(ORGANISATION_POLICY_ROLE).textValue());
+        if (caseFieldNode.isPresent() && !caseFieldNode.get().get(reference).isNull())  {
+            return Optional.of(caseFieldNode.get().get(reference).textValue());
         }
         return Optional.ofNullable(null);
     }
 
     private void validateOrgPolicyCaseAssignedRole(final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition,
                                                    final Optional<String> defaultValue,
-                                                   String caseFiledID, List<String> errorList) {
+                                                   final String caseFiledID,
+                                                   final List<String> errorList) {
         if (!defaultValue.isPresent()) {
             errorList.add(caseFiledID + " cannot have an empty value.");
         } else if (!caseEventFieldComplexDefinition.getDefaultValue().equals(defaultValue.get())) {
