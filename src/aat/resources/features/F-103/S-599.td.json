@@ -1,7 +1,7 @@
 {
   "title": "when no User ID is supplied for a specific case ID, then the case roles relating to all  users with access to that case must be returned",
   "_guid_": "S-599",
-  "productName": "CCD Data Store",
+  "productName": "CCD Data Store api",
   "operationName": "Get Case-Assigned Users and Roles",
   "_extends_": "F-103_Case_Assigned_User_Roles_Base",
 

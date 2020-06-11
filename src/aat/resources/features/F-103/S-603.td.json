@@ -1,7 +1,7 @@
 {
   "title": "must return an error response for a malformed User ID List (e.g. user1,user2,,user4)",
   "_guid_": "S-603",
-  "productName": "CCD Data Store",
+  "productName": "CCD Data Store api",
   "operationName": "Get Case-Assigned Users and Roles",
   "_extends_": "F-103_Case_Assigned_User_Roles_Base",
 
