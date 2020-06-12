@@ -11,7 +11,7 @@
     "is made by Jamal with a malformed Case ID & Dil's User ID"
   ],
   "request": {
-    "pathVariables": {
+    "queryParams": {
       "case_ids": "12346657"
     }
   },

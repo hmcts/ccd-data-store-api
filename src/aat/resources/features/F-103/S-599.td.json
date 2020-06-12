@@ -12,7 +12,7 @@
     "Jamal -  who is a privileged user with permissions to access the case assignments of other users"
   ],
   "request": {
-    "pathVariables": {
+    "queryParams": {
       "user_ids": ""
     }
   },

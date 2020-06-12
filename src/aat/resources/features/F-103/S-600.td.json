@@ -13,7 +13,7 @@
     "is made by Jamal with Case IDs of C1, C2 & C3 & no User ID"
   ],
   "request": {
-    "pathVariables": {
+    "queryParams": {
       "user_ids": ""
     }
   },

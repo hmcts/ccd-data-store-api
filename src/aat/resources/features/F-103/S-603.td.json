@@ -12,7 +12,7 @@
     "is made by Jamal with the Case ID of C1 & a malformed User ID list"
   ],
   "request": {
-    "pathVariables": {
+    "queryParams": {
       "user_ids": "${[scenarioContext][testData][users][userDil][id]},,${[scenarioContext][testData][users][userRichard][id]}"
     }
   },
