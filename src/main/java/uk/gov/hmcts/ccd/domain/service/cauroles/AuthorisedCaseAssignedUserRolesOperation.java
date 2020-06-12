@@ -23,6 +23,14 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
         this.cauRoleValidator = cauRoleValidator;
     }
 
+    public void addCaseUserRoles(List<CaseAssignedUserRole> caseUserRoles) {
+        if (this.cauRoleValidator.canAddUserCaseRoles()) {
+            this.cauRolesOperation.addCaseUserRoles(caseUserRoles);
+        } else {
+            throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
+        }
+    }
+
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
         if (this.cauRoleValidator.canAccessUserCaseRoles(userIds)) {
             return this.cauRolesOperation.findCaseUserRoles(caseIds, userIds);

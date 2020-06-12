@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,13 +22,16 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private SecurityUtils securityUtils;
+
     private DefaultCaseAssignedUserRoleValidator caseAssignedUserRoleValidator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseAssignedUserRoleValidator = new DefaultCaseAssignedUserRoleValidator(userRepository);
+        caseAssignedUserRoleValidator = new DefaultCaseAssignedUserRoleValidator(userRepository, securityUtils);
     }
 
     @Test
