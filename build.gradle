@@ -583,6 +583,14 @@ configurations {
     all.collect { configuration ->
         configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
     }
+
+    all.resolutionStrategy {
+        eachDependency { details ->
+            if (details.requested.group == 'com.github.ben-manes.caffeine' && details.requested.name == 'caffeine') {
+                details.useVersion '2.8.7'
+            }
+        }
+    }
 }
 
 compileTestJava {
