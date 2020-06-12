@@ -81,7 +81,13 @@ public class CaseAccessOperation {
     }
 
 
-    public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
+    public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {
+        List<Long> caseIds = caseReferences.stream()
+            .map(caseReference -> {
+               Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(null, caseReference);
+               return caseDetails.isPresent() ? Long.valueOf(caseDetails.get().getId()) : null;
+            }).filter(caseId -> caseId == null).collect(Collectors.toList());
+
         List<CaseUserEntity>  caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
         return caseUserEntities.stream()
             .map(cue -> new CaseAssignedUserRole(
