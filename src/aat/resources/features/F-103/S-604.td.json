@@ -24,7 +24,7 @@
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null,
-      "exception": null
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException"
     }
   }
 }
