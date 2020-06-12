@@ -1,6 +1,8 @@
 {
 	"_guid_": "F-103_Case_Role_Assign_Base",
 	"method": "PUT",
+  "productName": "CCD Data Store",
+  "operationName": "Grant access to a case",
 	"uri": "/cases/{cid}/users/{uid}",
 	"users": {
     "invokingUser": {
