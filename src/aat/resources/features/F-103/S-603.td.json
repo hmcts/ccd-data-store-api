@@ -21,7 +21,10 @@
     "body": {
       "_extends_": "Common_400_Response_Body",
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message": "Invalid data provided for the following inputs to the request:\nUser ID is not valid"
+      "message": "Invalid data provided for the following inputs to the request:\nUser ID is not valid",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
     }
   }
 }

@@ -20,7 +20,10 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "body": {
-      "message": "Access to other user's case role assignments not granted"
+      "message": "Access to other user's case role assignments not granted",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
     }
   }
 }
