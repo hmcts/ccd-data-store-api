@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPattern": "/api/data/case-type/MAPPER"
+    "urlPattern": "/api/data/case-type/SECURITY"
   },
   "response": {
     "status": 200,
@@ -9,17 +9,17 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "id": "MAPPER",
-      "description": "Demonstrate Mapper's capability",
+      "id": "SECURITY",
+      "description": "Case type with security",
       "version": {
         "number": 47,
         "live_from": "2017-01-01T00:00:00.000+0000",
         "live_until": null
       },
-      "name": "Case type for Mapper",
+      "name": "Case type with security",
       "jurisdiction": {
-        "id": "AUTOTEST2",
-        "name": "Auto Test 2",
+        "id": "AUTOTEST1",
+        "name": "Auto Test 1",
         "description": "Content for the Test Jurisdiction.",
         "live_from": "2017-01-01T00:00:00.000+0000",
         "live_until": null,
@@ -132,7 +132,7 @@
               "case_fields_complex": []
             },
             {
-              "case_field_id": "OtherFixedListField",
+              "case_field_id": "FixedListField",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -196,6 +196,17 @@
               "label": null,
               "hint_text": null,
               "case_fields_complex": []
+            },
+            {
+              "case_field_id": "DocumentField",
+              "display_context": "OPTIONAL",
+              "display_context_parameter": null,
+              "show_condition": null,
+              "show_summary_change_option": true,
+              "show_summary_content_option": null,
+              "label": null,
+              "hint_text": null,
+              "case_fields_complex": []
             }
           ],
           "pre_states": [],
@@ -209,7 +220,7 @@
           "security_classification": "PUBLIC",
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
               "create": true,
               "read": true,
               "update": true,
@@ -240,7 +251,7 @@
           "security_classification": "PUBLIC",
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
               "create": true,
               "read": true,
               "update": true,
@@ -271,7 +282,7 @@
           "security_classification": "PUBLIC",
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
               "create": true,
               "read": true,
               "update": true,
@@ -302,7 +313,7 @@
           "security_classification": "PUBLIC",
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
               "create": true,
               "read": true,
               "update": true,
@@ -420,7 +431,7 @@
               "case_fields_complex": []
             },
             {
-              "case_field_id": "OtherFixedListField",
+              "case_field_id": "FixedListField",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -473,6 +484,17 @@
               "label": null,
               "hint_text": null,
               "case_fields_complex": []
+            },
+            {
+              "case_field_id": "DocumentField",
+              "display_context": "OPTIONAL",
+              "display_context_parameter": null,
+              "show_condition": null,
+              "show_summary_change_option": true,
+              "show_summary_content_option": null,
+              "label": null,
+              "hint_text": null,
+              "case_fields_complex": []
             }
           ],
           "pre_states": [
@@ -488,7 +510,7 @@
           "security_classification": "PUBLIC",
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
               "create": true,
               "read": true,
               "update": true,
@@ -606,7 +628,7 @@
               "case_fields_complex": []
             },
             {
-              "case_field_id": "OtherFixedListField",
+              "case_field_id": "FixedListField",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -674,7 +696,7 @@
           "security_classification": "PUBLIC",
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
               "create": true,
               "read": true,
               "update": true,
@@ -696,7 +718,21 @@
           "title_display": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-restricted",
               "create": true,
               "read": true,
               "update": true,
@@ -712,7 +748,7 @@
           "title_display": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1-restricted",
               "create": true,
               "read": true,
               "update": true,
@@ -728,7 +764,21 @@
           "title_display": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-restricted",
               "create": true,
               "read": true,
               "update": true,
@@ -739,7 +789,28 @@
       ],
       "acls": [
         {
-          "role": "caseworker-autotest2",
+          "role": "caseworker-autotest1",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-caa",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-autotest1-private",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-autotest1-restricted",
           "create": true,
           "read": true,
           "update": true,
@@ -749,7 +820,7 @@
       "searchAliasFields": [
         {
           "id": "TextAlias",
-          "caseTypeId": "MAPPER",
+          "caseTypeId": "SECURITY",
           "caseFieldPath": "TextField",
           "fieldType": {
             "id": "Text",
@@ -767,11 +838,11 @@
         {
           "metadata": true,
           "id": "[STATE]",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "State",
           "hint_text": null,
           "field_type": {
-            "id": "FixedList-MAPPER[STATE]",
+            "id": "FixedList-SECURITY[STATE]",
             "type": "FixedList",
             "min": null,
             "max": null,
@@ -808,7 +879,7 @@
         {
           "metadata": false,
           "id": "HistoryComponentField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `HistoryComponent` field",
           "hint_text": "History tab component",
           "field_type": {
@@ -827,7 +898,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -841,7 +919,7 @@
         {
           "metadata": false,
           "id": "FixedRadioListField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `FixedRadioList` field",
           "hint_text": "A fixed radio list",
           "field_type": {
@@ -876,7 +954,54 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null
+        },
+        {
+          "metadata": false,
+          "id": "DocumentField",
+          "case_type_id": "SECURITY",
+          "label": "A `Document` field",
+          "hint_text": "A document",
+          "field_type": {
+            "id": "Document",
+            "type": "Document",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2017-01-01",
+          "live_until": null,
+          "acls": [
+            {
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -890,7 +1015,7 @@
         {
           "metadata": false,
           "id": "AddressUKField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `AddressUK` field",
           "hint_text": "A UK address.",
           "field_type": {
@@ -1080,12 +1205,19 @@
             "collection_field_type": null
           },
           "hidden": false,
-          "security_classification": "PUBLIC",
+          "security_classification": "RESTRICTED",
           "live_from": "2017-01-01",
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1-restricted",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1099,7 +1231,7 @@
         {
           "metadata": false,
           "id": "ComplexField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `Complex` field",
           "hint_text": "Aggregate of fields",
           "field_type": {
@@ -1270,25 +1402,57 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
               "delete": false
             }
           ],
-          "complexACLs": [],
+          "complexACLs": [
+            {
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false,
+              "listElementCode": "ComplexTextField"
+            },
+            {
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false,
+              "listElementCode": "ComplexFixedListField"
+            },
+            {
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false,
+              "listElementCode": "ComplexNestedField"
+            }
+          ],
           "order": null,
           "show_condition": null
         },
         {
           "metadata": false,
           "id": "CollectionField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `Collection` of `Text` fields",
           "hint_text": "Zero to many items, here of type `Text`",
           "field_type": {
-            "id": "CollectionField-2c87a33b-3aca-4975-87da-0a8a73819b9f",
+            "id": "CollectionField-eb173d09-0c40-4344-9fb0-99d9c0620f5e",
             "type": "Collection",
             "min": null,
             "max": null,
@@ -1312,7 +1476,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1326,7 +1497,7 @@
         {
           "metadata": false,
           "id": "MultiSelectListField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `MultiSelectList` field",
           "hint_text": "Checkboxes to select many values.",
           "field_type": {
@@ -1371,7 +1542,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1384,8 +1562,8 @@
         },
         {
           "metadata": false,
-          "id": "OtherFixedListField",
-          "case_type_id": "MAPPER",
+          "id": "FixedListField",
+          "case_type_id": "SECURITY",
           "label": "A `FixedList` field",
           "hint_text": "A dropdown to select one value out of many.",
           "field_type": {
@@ -1420,7 +1598,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1434,7 +1619,7 @@
         {
           "metadata": false,
           "id": "TextAreaField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `TextArea` field",
           "hint_text": "Multiple lines of text.",
           "field_type": {
@@ -1453,7 +1638,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1467,7 +1659,7 @@
         {
           "metadata": false,
           "id": "DateTimeField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `DateTime` field",
           "hint_text": "A temporal value with time.",
           "field_type": {
@@ -1486,7 +1678,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1500,7 +1699,7 @@
         {
           "metadata": false,
           "id": "DateField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `Date` field",
           "hint_text": "A temporal value without time.",
           "field_type": {
@@ -1519,7 +1718,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1533,7 +1739,7 @@
         {
           "metadata": false,
           "id": "MoneyGBPField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `MoneyGBP` field",
           "hint_text": "A monetary value.",
           "field_type": {
@@ -1552,7 +1758,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1566,7 +1779,7 @@
         {
           "metadata": false,
           "id": "EmailField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "An `Email` field",
           "hint_text": "A valid email address.",
           "field_type": {
@@ -1585,7 +1798,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1599,7 +1819,7 @@
         {
           "metadata": false,
           "id": "PhoneUKField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `PhoneUK` field",
           "hint_text": "A UK phone number.",
           "field_type": {
@@ -1618,7 +1838,28 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-restricted",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-private",
               "create": true,
               "read": true,
               "update": true,
@@ -1632,7 +1873,7 @@
         {
           "metadata": false,
           "id": "YesOrNoField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `YesOrNo` field",
           "hint_text": "A simple boolean.",
           "field_type": {
@@ -1651,7 +1892,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1665,7 +1913,7 @@
         {
           "metadata": false,
           "id": "NumberField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `Number` field",
           "hint_text": "A numeric data.",
           "field_type": {
@@ -1684,7 +1932,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
@@ -1698,7 +1953,7 @@
         {
           "metadata": false,
           "id": "TextField",
-          "case_type_id": "MAPPER",
+          "case_type_id": "SECURITY",
           "label": "A `Text` field",
           "hint_text": "Some generic textual data.",
           "field_type": {
@@ -1717,7 +1972,14 @@
           "live_until": null,
           "acls": [
             {
-              "role": "caseworker-autotest2",
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,

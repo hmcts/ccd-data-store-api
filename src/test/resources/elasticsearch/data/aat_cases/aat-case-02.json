@@ -1,66 +1,59 @@
 {
+  "case_type_id": "AAT",
+  "created_date": "2020-05-14T12:40:56.240Z",
   "data": {
-    "TextField": "AAA AAT",
-    "MoneyGBPField": null,
-    "FixedRadioListField": null,
-    "YesOrNoField": null,
     "AddressUKField": {
-      "AddressLine2": null,
-      "PostCode": null,
       "AddressLine1": null,
-      "PostTown": null,
-      "County": null,
+      "AddressLine2": null,
       "AddressLine3": null,
-      "Country": null
+      "Country": null,
+      "County": null,
+      "PostCode": null,
+      "PostTown": null
     },
-    "MultiSelectListField": [],
-    "DateField": null,
-    "EmailField": null,
+    "CollectionField": [],
     "ComplexField": {
+      "ComplexFixedListField": null,
       "ComplexNestedField": {
         "NestedCollectionTextField": [],
         "NestedNumberField": null
       },
-      "ComplexFixedListField": null,
-      "ComplexTextField": null
+      "ComplexTextField": "ComplexTextValue"
     },
-    "NumberField": null,
+    "DateField": null,
+    "DateTimeField": null,
+    "EmailField": null,
     "FixedListField": null,
+    "FixedRadioListField": null,
+    "MoneyGBPField": null,
+    "MultiSelectListField": [],
+    "NumberField": null,
     "PhoneUKField": null,
     "TextAreaField": null,
-    "CollectionField": [],
-    "DateTimeField": null
+    "TextField": "CCC TextValue",
+    "YesOrNoField": null
   },
-  "last_modified": "2020-05-14T12:40:56.242Z",
-  "@version": "1",
-  "security_classification": "PUBLIC",
-  "@timestamp": "2020-05-28T15:51:59.101Z",
-  "case_type_id": "AAT",
-  "state": "TODO",
-  "created_date": "2020-05-14T12:40:56.240Z",
   "data_classification": {
-    "TextField": "PUBLIC",
-    "MoneyGBPField": "PUBLIC",
-    "FixedRadioListField": "PUBLIC",
-    "YesOrNoField": "PUBLIC",
     "AddressUKField": {
       "classification": "PUBLIC",
       "value": {
-        "AddressLine2": "PUBLIC",
-        "PostCode": "PUBLIC",
         "AddressLine1": "PUBLIC",
-        "PostTown": "PUBLIC",
-        "County": "PUBLIC",
+        "AddressLine2": "PUBLIC",
         "AddressLine3": "PUBLIC",
-        "Country": "PUBLIC"
+        "Country": "PUBLIC",
+        "County": "PUBLIC",
+        "PostCode": "PUBLIC",
+        "PostTown": "PUBLIC"
       }
     },
-    "MultiSelectListField": "PUBLIC",
-    "DateField": "PUBLIC",
-    "EmailField": "PUBLIC",
+    "CollectionField": {
+      "classification": "PUBLIC",
+      "value": []
+    },
     "ComplexField": {
       "classification": "PUBLIC",
       "value": {
+        "ComplexFixedListField": "PUBLIC",
         "ComplexNestedField": {
           "classification": "PUBLIC",
           "value": {
@@ -71,22 +64,26 @@
             "NestedNumberField": "PUBLIC"
           }
         },
-        "ComplexFixedListField": "PUBLIC",
         "ComplexTextField": "PUBLIC"
       }
     },
-    "NumberField": "PUBLIC",
+    "DateField": "PUBLIC",
+    "DateTimeField": "PUBLIC",
+    "EmailField": "PUBLIC",
     "FixedListField": "PUBLIC",
+    "FixedRadioListField": "PUBLIC",
+    "MoneyGBPField": "PUBLIC",
+    "MultiSelectListField": "PUBLIC",
+    "NumberField": "PUBLIC",
     "PhoneUKField": "PUBLIC",
     "TextAreaField": "PUBLIC",
-    "CollectionField": {
-      "classification": "PUBLIC",
-      "value": []
-    },
-    "DateTimeField": "PUBLIC"
+    "TextField": "PUBLIC",
+    "YesOrNoField": "PUBLIC"
   },
-  "index_id": "aat_cases",
-  "id": 4,
+  "jurisdiction": "AUTOTEST1",
+  "last_modified": "2020-05-14T12:40:56.242Z",
+  "last_state_modified_date": "2020-05-14T12:40:56.240Z",
   "reference": 1589460056217857,
-  "jurisdiction": "AUTOTEST1"
+  "security_classification": "PUBLIC",
+  "state": "IN_PROGRESS"
 }

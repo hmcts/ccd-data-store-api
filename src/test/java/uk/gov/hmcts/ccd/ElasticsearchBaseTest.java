@@ -1,43 +1,46 @@
 package uk.gov.hmcts.ccd;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Builder;
+import lombok.Singular;
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
+import org.elasticsearch.common.Strings;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 
 import java.io.IOException;
+import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDEX_TYPE;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDICES;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.*;
 
 public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
 
     private static final String DATA_DIR = "elasticsearch/data";
 
-    private EmbeddedElastic embeddedElastic;
-
-    @Autowired
-    public final void setEmbeddedElastic(EmbeddedElastic embeddedElastic) {
-        this.embeddedElastic = embeddedElastic;
-    }
-
-    @Before
-    public void initElastic() throws IOException, InterruptedException {
-        super.initMock();
+    @BeforeAll
+    public static void initElastic(@Autowired EmbeddedElastic embeddedElastic) throws IOException, InterruptedException {
         embeddedElastic.start();
-        initData();
+        initData(embeddedElastic);
     }
 
-    @After
-    public void tearDownElastic() {
+    @AfterAll
+    public static void tearDownElastic(@Autowired EmbeddedElastic embeddedElastic) {
         embeddedElastic.stop();
     }
 
-    private void initData() throws IOException {
+    private static void initData(EmbeddedElastic embeddedElastic) throws IOException {
         PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
         for (String idx : INDICES) {
             Resource[] resources = resourceResolver.getResources(String.format("classpath:%s/%s/*.json", DATA_DIR, idx));
@@ -45,6 +48,34 @@ public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
                 String caseString = IOUtils.toString(resource.getInputStream(), UTF_8);
                 embeddedElastic.index(idx, INDEX_TYPE, caseString);
             }
+        }
+    }
+
+    @Builder
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class ElasticsearchTestRequest {
+
+        private QueryBuilder query;
+        @Singular
+        @JsonProperty(SOURCE)
+        private List<String> sources;
+        @Singular
+        @JsonProperty(SORT)
+        private List<Object> sorts;
+        @JsonProperty
+        private Integer size;
+        @JsonProperty
+        private Integer from;
+
+        private final ObjectMapper objectMapper = new ObjectMapper();
+
+        @JsonRawValue
+        public String getQuery() {
+            return Strings.toString(query);
+        }
+
+        public String toJsonString() throws JsonProcessingException {
+            return objectMapper.writeValueAsString(this);
         }
     }
 }

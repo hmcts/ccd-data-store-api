@@ -8,6 +8,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import pl.allegro.tech.embeddedelasticsearch.IndexSettings;
 
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +21,7 @@ public class ElasticsearchITConfiguration {
     private static final String CONFIG_DIR = "elasticsearch/config";
     private static final String INDEX_SETTINGS = "classpath:" + CONFIG_DIR + "/index-settings.json";
     public static final String INDEX_TYPE = "_doc";
-    public static final String[] INDICES = { "aat_cases", "mapper_cases" };
+    public static final String[] INDICES = { "aat_cases", "mapper_cases", "security_cases" };
 
     @Value("${search.elastic.version}")
     private String elasticVersion;
@@ -46,5 +47,12 @@ public class ElasticsearchITConfiguration {
         }
 
         return builder.build();
+    }
+
+    @PreDestroy
+    public void contextDestroyed() throws IOException {
+        if (embeddedElastic() != null) {
+            embeddedElastic().stop();
+        }
     }
 }

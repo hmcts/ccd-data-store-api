@@ -8,6 +8,10 @@ import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -112,6 +116,7 @@ public abstract class BaseTest {
     private DocumentsOperation documentsOperation;
 
     @Before
+    @BeforeEach
     public void initMock() throws IOException {
 
         // IDAM
@@ -142,6 +147,7 @@ public abstract class BaseTest {
     }
 
     @BeforeClass
+    @BeforeAll
     public static void init() {
         mapper.registerModule(new JavaTimeModule());
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -151,6 +157,7 @@ public abstract class BaseTest {
     }
 
     @After
+    @AfterEach
     public void clearDownData() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         List<String> tables = determineTables(jdbcTemplate);

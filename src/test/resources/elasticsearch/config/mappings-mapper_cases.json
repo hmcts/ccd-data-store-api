@@ -3,167 +3,159 @@
     "dynamic": "strict",
     "properties": {
       "@timestamp": {
-        "type": "object",
-        "enabled": false
+        "enabled": false,
+        "type": "object"
       },
       "@version": {
-        "type": "object",
-        "enabled": false
+        "enabled": false,
+        "type": "object"
       },
       "alias": {
         "properties": {
-          "AliasText1": {
-            "type": "alias",
-            "path": "data.TextField"
+          "FixedListAlias": {
+            "path": "data.OtherFixedListField",
+            "type": "alias"
           },
-          "AliasText1_keyword": {
-            "type": "alias",
-            "path": "data.TextField.keyword"
-          },
-          "AliasText2": {
-            "type": "alias",
-            "path": "data.TextField"
-          },
-          "AliasText2_keyword": {
-            "type": "alias",
-            "path": "data.TextField.keyword"
+          "FixedListAlias_keyword": {
+            "path": "data.OtherFixedListField.keyword",
+            "type": "alias"
           },
           "TextAlias": {
-            "type": "alias",
-            "path": "data.TextField"
+            "path": "data.TextField",
+            "type": "alias"
           },
           "TextAlias_keyword": {
-            "type": "alias",
-            "path": "data.TextField.keyword"
+            "path": "data.TextField.keyword",
+            "type": "alias"
           }
         }
       },
       "case_type_id": {
-        "type": "text",
         "fields": {
           "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "type": "keyword"
           }
-        }
+        },
+        "type": "text"
       },
       "created_date": {
-        "type": "date",
-        "ignore_malformed": true
+        "ignore_malformed": true,
+        "type": "date"
       },
       "data": {
         "properties": {
           "AddressUKField": {
             "properties": {
               "AddressLine1": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               },
               "AddressLine2": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               },
               "AddressLine3": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               },
               "Country": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               },
               "County": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               },
               "PostCode": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               },
               "PostTown": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               }
             }
           },
           "CollectionField": {
             "properties": {
               "id": {
-                "type": "object",
-                "enabled": false
+                "enabled": false,
+                "type": "object"
               },
               "value": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               }
             }
           },
           "ComplexField": {
             "properties": {
               "ComplexFixedListField": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               },
               "ComplexNestedField": {
                 "properties": {
                   "NestedCollectionTextField": {
                     "properties": {
                       "id": {
-                        "type": "object",
-                        "enabled": false
+                        "enabled": false,
+                        "type": "object"
                       },
                       "value": {
-                        "type": "text",
                         "fields": {
                           "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                            "ignore_above": 256,
+                            "type": "keyword"
                           }
-                        }
+                        },
+                        "type": "text"
                       }
                     }
                   },
@@ -173,94 +165,94 @@
                 }
               },
               "ComplexTextField": {
-                "type": "text",
                 "fields": {
                   "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 256,
+                    "type": "keyword"
                   }
-                }
+                },
+                "type": "text"
               }
             }
           },
           "DateField": {
-            "type": "date",
-            "ignore_malformed": true
+            "ignore_malformed": true,
+            "type": "date"
           },
           "DateTimeField": {
-            "type": "date",
-            "ignore_malformed": true
+            "ignore_malformed": true,
+            "type": "date"
           },
           "EmailField": {
             "type": "keyword"
           },
-          "FixedListField": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          },
           "FixedRadioListField": {
-            "type": "text",
             "fields": {
               "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
+                "ignore_above": 256,
+                "type": "keyword"
               }
-            }
+            },
+            "type": "text"
           },
           "MoneyGBPField": {
             "type": "double"
           },
           "MultiSelectListField": {
-            "type": "text",
             "fields": {
               "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
+                "ignore_above": 256,
+                "type": "keyword"
               }
-            }
+            },
+            "type": "text"
           },
           "NumberField": {
             "type": "double"
           },
+          "OtherFixedListField": {
+            "fields": {
+              "keyword": {
+                "ignore_above": 256,
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          },
           "PhoneUKField": {
-            "type": "text",
             "analyzer": "standard",
-            "search_analyzer": "phone_number_analyzer"
+            "search_analyzer": "phone_number_analyzer",
+            "type": "text"
           },
           "TextAreaField": {
-            "type": "text",
             "fields": {
               "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
+                "ignore_above": 256,
+                "type": "keyword"
               }
-            }
+            },
+            "type": "text"
           },
           "TextField": {
-            "type": "text",
             "fields": {
               "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
+                "ignore_above": 256,
+                "type": "keyword"
               }
-            }
+            },
+            "type": "text"
           },
           "YesOrNoField": {
             "type": "keyword"
           },
           "[STATE]": {
-            "type": "text",
             "fields": {
               "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
+                "ignore_above": 256,
+                "type": "keyword"
               }
-            }
+            },
+            "type": "text"
           }
         }
       },
@@ -309,8 +301,8 @@
                     "type": "keyword"
                   },
                   "id": {
-                    "type": "object",
-                    "enabled": false
+                    "enabled": false,
+                    "type": "object"
                   }
                 }
               }
@@ -344,8 +336,8 @@
                                     "type": "keyword"
                                   },
                                   "id": {
-                                    "type": "object",
-                                    "enabled": false
+                                    "enabled": false,
+                                    "type": "object"
                                   }
                                 }
                               }
@@ -374,9 +366,6 @@
           "EmailField": {
             "type": "keyword"
           },
-          "FixedListField": {
-            "type": "keyword"
-          },
           "FixedRadioListField": {
             "type": "keyword"
           },
@@ -387,6 +376,9 @@
             "type": "keyword"
           },
           "NumberField": {
+            "type": "keyword"
+          },
+          "OtherFixedListField": {
             "type": "keyword"
           },
           "PhoneUKField": {
@@ -410,42 +402,46 @@
         "type": "long"
       },
       "index_id": {
-        "type": "object",
-        "enabled": false
+        "enabled": false,
+        "type": "object"
       },
       "jurisdiction": {
-        "type": "text",
         "fields": {
           "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "type": "keyword"
           }
-        }
+        },
+        "type": "text"
       },
       "last_modified": {
-        "type": "date",
-        "ignore_malformed": true
+        "ignore_malformed": true,
+        "type": "date"
+      },
+      "last_state_modified_date": {
+        "ignore_malformed": true,
+        "type": "date"
       },
       "reference": {
-        "type": "text",
         "fields": {
           "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "type": "keyword"
           }
-        }
+        },
+        "type": "text"
       },
       "security_classification": {
         "type": "keyword"
       },
       "state": {
-        "type": "text",
         "fields": {
           "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "type": "keyword"
           }
-        }
+        },
+        "type": "text"
       }
     }
   }
