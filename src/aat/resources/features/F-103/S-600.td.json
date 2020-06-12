@@ -15,6 +15,7 @@
   ],
   "request": {
     "queryParams": {
+      "case_ids": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F103_Case_Data_Create_C2][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F103_Case_Data_Create_C3][testData][actualResponse][body][id]}",
       "user_ids": ""
     }
   },

@@ -23,7 +23,8 @@
       "message": "Access to other user's case role assignments not granted",
       "details" : null,
       "callbackErrors" : null,
-      "callbackWarnings" : null
+      "callbackWarnings" : null,
+      "exception": null
     }
   }
 }
