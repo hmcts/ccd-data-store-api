@@ -103,7 +103,7 @@ class CreateCaseTest extends BaseTest {
             .get()
             .given()
             .body(supplier.get())
-            .contentType(ContentType.JSON)
+            .contentType(V2.MediaType.CREATE_CASE)
             .log().all()
             .pathParam("caseTypeId", caseTypeId)
             .accept(V2.MediaType.CREATE_CASE)
