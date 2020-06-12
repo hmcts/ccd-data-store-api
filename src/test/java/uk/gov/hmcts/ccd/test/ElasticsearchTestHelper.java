@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.ElasticsearchBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
@@ -58,6 +59,8 @@ public class ElasticsearchTestHelper {
     public static final String AUTOTEST1_RESTRICTED = "caseworker-autotest1-restricted";
     public static final String AUTOTEST1_PRIVATE = "caseworker-autotest1-private";
 
+    private ElasticsearchTestHelper() { }
+
     public static String caseData(String fieldPath) {
         return DATA_PREFIX + fieldPath;
     }
@@ -72,7 +75,7 @@ public class ElasticsearchTestHelper {
             () -> assertThat(caseDetails.getCaseTypeId(), is(CASE_TYPE_A)),
             () -> assertThat(caseDetails.getCreatedDate().toString(), is("2020-05-07T15:53:40.974")),
             () -> assertThat(caseDetails.getLastModified().toString(), is("2020-06-09T13:17:06.542")),
-//            () -> assertThat(caseDetails.getLastStateModifiedDate().toString(), is("TBC")), // TODO: After RDM-8552 available
+            // () -> assertThat(caseDetails.getLastStateModifiedDate().toString(), is("TBC")), // TODO: After RDM-8552 available
             () -> assertThat(caseDetails.getReference(), is(1588866820969121L)),
             () -> assertThat(caseDetails.getState(), is(STATE_VALUE)),
             () -> assertThat(caseDetails.getSecurityClassification(), is(SecurityClassification.PUBLIC))
