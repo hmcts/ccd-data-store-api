@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd;
 
+import com.hazelcast.config.EvictionPolicy;
+import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
@@ -8,10 +12,6 @@ import java.util.Base64;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-
-import com.hazelcast.config.EvictionPolicy;
-import org.springframework.beans.factory.annotation.Value;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Named
 @Singleton
@@ -200,7 +200,7 @@ public class ApplicationParams {
     }
 
     public String displayWizardPageCollection(final String caseTypeId, final String eventId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventId);
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + eventId;
     }
 
     public String jurisdictionDefURL() {
