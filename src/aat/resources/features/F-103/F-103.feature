@@ -65,8 +65,8 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And a successful call [by Jamal to assign Dil a few case roles to access C2] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C2],
     And a successful call [by Jamal to assign Dil a few case roles to access C3] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C3],
     And a successful call [by Jamal to assign Steve a few case roles to access C1] as in [F-103_Jamal_Assign_Steve_Case_Role_To_C1],
-    And a successful call [by Jamal to assign Steve a few case roles to access C2] as in [F-103_Test_Case_Access_Base_Steve_C2],
-    And a successful call [by Jamal to assign Steve a few case roles to access C3] as in [F-103_Test_Case_Access_Base_Steve_C3],
+    And a successful call [by Jamal to assign Steve a few case roles to access C2] as in [F-103_Jamal_Assign_Steve_Case_Role_To_C2],
+    And a successful call [by Jamal to assign Steve a few case roles to access C3] as in [F-103_Jamal_Assign_Steve_Case_Role_To_C3],
     When a request is prepared with appropriate values,
     And the request [is made by Jamal with Case IDs of C1, C2 & C3 & no User ID]
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],

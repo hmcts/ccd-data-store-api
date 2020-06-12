@@ -20,7 +20,7 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "body": {
-      "message": "Access Denied"
+      "message": "Access to other user's case role assignments not granted"
     }
   }
 }
