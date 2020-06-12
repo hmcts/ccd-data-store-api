@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.caseaccess;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -83,19 +84,21 @@ public class CaseAccessOperation {
 
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {
-        List<Long> caseIds = caseReferences.stream()
+        Map<String, Long> caseReferenceAndIds = caseReferences.stream()
             .map(caseReference -> {
-               Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(null, caseReference);
-               return caseDetails.isPresent() ? Long.valueOf(caseDetails.get().getId()) : null;
-            }).filter(caseId -> caseId != null).collect(Collectors.toList());
+                Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(null, caseReference);
+                return caseDetails.isPresent() ? caseDetails.get() : null;
+            }).filter(caseDetails -> caseDetails != null)
+            .collect(Collectors.toMap(CaseDetails::getId, CaseDetails::getReference));
 
-        if (caseIds.isEmpty()) {
+        if (caseReferenceAndIds.isEmpty()) {
             return Lists.newArrayList();
         }
-        List<CaseUserEntity>  caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
+        List<Long> caseIds = caseReferenceAndIds.keySet().stream().map(key -> Long.valueOf(key)).collect(Collectors.toList());
+        List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
         return caseUserEntities.stream()
             .map(cue -> new CaseAssignedUserRole(
-                String.valueOf(cue.getCasePrimaryKey().getCaseDataId()),
+                String.valueOf(caseReferenceAndIds.get(String.valueOf(cue.getCasePrimaryKey().getCaseDataId()))),
                 cue.getCasePrimaryKey().getUserId(),
                 cue.getCasePrimaryKey().getCaseRole()))
             .collect(Collectors.toCollection(ArrayList::new));
@@ -128,5 +131,11 @@ public class CaseAccessOperation {
                         .forEach(currentRole -> caseUserRepository.revokeAccess(caseId,
                                                                                 userId,
                                                                                 currentRole));
+    }
+
+    private class CaseReferenceAndId {
+        CaseReferenceAndId(String caseReference, String id) {
+
+        }
     }
 }

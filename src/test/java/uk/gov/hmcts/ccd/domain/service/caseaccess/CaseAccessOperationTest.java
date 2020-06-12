@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -274,11 +273,11 @@ class CaseAccessOperationTest {
     private void configureCaseUserRepository() {
         when(caseUserRepository.findCaseRoles(CASE_ID,
                                               USER_ID)).thenReturn(Collections.singletonList(CASE_ROLE_GRANTED));
-        CaseUserEntity caseUserEntity = new CaseUserEntity();
         CaseUserEntity.CasePrimaryKey primaryKey = new CaseUserEntity.CasePrimaryKey();
         primaryKey.setCaseDataId(456L);
         primaryKey.setCaseRole(CASE_ROLE);
         primaryKey.setUserId(USER_ID);
+        CaseUserEntity caseUserEntity = new CaseUserEntity();
         caseUserEntity.setCasePrimaryKey(primaryKey);
         when(caseUserRepository.findCaseUserRoles(anyList(), anyList())).thenReturn(Collections.singletonList(caseUserEntity));
     }
