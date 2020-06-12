@@ -48,6 +48,15 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     }
 
     @Test
+    @DisplayName("Can access self case user roles even same user id passed more than once")
+    void canAccessSelfUserCaseRolesWhenSelfUserIdPassedMoreThanOnce() {
+        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
+        when(userRepository.getUserId()).thenReturn("1234567");
+        boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList("1234567", "1234567"));
+        assertTrue(canAccess);
+    }
+
+    @Test
     @DisplayName("Can not access other user case roles")
     void canNotAccessOtherUserCaseRolesWhenMoreUserIdsPassedOtherThanSelf() {
         when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));

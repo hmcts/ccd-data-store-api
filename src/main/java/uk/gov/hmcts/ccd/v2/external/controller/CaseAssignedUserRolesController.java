@@ -41,7 +41,7 @@ public class CaseAssignedUserRolesController {
         path = "/case-users"
     )
     @ApiOperation(
-        value = "Retrieve Case user roles by Case ID and User ID"
+        value = "Get Case-Assigned Users and Roles"
     )
     @ApiResponses({
         @ApiResponse(
