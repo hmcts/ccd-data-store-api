@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,6 +89,9 @@ public class CaseAccessOperation {
                return caseDetails.isPresent() ? Long.valueOf(caseDetails.get().getId()) : null;
             }).filter(caseId -> caseId != null).collect(Collectors.toList());
 
+        if (caseIds.isEmpty()) {
+            return Lists.newArrayList();
+        }
         List<CaseUserEntity>  caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
         return caseUserEntities.stream()
             .map(cue -> new CaseAssignedUserRole(

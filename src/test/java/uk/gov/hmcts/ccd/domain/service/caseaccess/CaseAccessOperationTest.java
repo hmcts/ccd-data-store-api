@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -226,17 +227,28 @@ class CaseAccessOperationTest {
 
         @Test
         @DisplayName("should find case assigned user roles")
-        void shouldGrantAccessForCaseRoleCreator() {
+        void shouldGetCaseAssignedUserRoles() {
             final CaseDetails caseDetails = new CaseDetails();
             caseDetails.setId(String.valueOf(CASE_ID));
             caseDetails.setReference(CASE_REFERENCE);
-            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(anyString(), anyString());
-            List<Long> caseReferences = Lists.newArrayList(1234567L);
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(null, CASE_REFERENCE);
+            List<Long> caseReferences = Lists.newArrayList(CASE_REFERENCE);
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences, Lists.newArrayList());
 
             assertNotNull(caseAssignedUserRoles);
             assertEquals(1, caseAssignedUserRoles.size());
             assertEquals(CASE_ROLE, caseAssignedUserRoles.get(0).getCaseRole());
+        }
+
+        @Test
+        @DisplayName("should return empty result for non existing cases")
+        void shouldReturnEmptyResultOnNonExistingCases() {
+            doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(anyString(), anyLong());
+            List<Long> caseReferences = Lists.newArrayList(1234567L);
+            List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences, Lists.newArrayList());
+
+            assertNotNull(caseAssignedUserRoles);
+            assertEquals(0, caseAssignedUserRoles.size());
         }
     }
 
