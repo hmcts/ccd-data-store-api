@@ -8,7 +8,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
   Scenario: when a specific User ID is supplied for a specific case ID, then the case roles relating only to the User ID for that specific Case ID must be returned
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
-    And a successful call [by Richard to create a case - C1] as in [F103_Case_Data_Create]
+    And a case that has just been created as in [F103_Case_Data_Create]
     And a user [Dil - with an active profile],
     And a user [Jamal -  who is a privileged user with permissions to access the case assignments of other users],
     And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],

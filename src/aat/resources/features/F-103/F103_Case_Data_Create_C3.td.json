@@ -6,7 +6,7 @@
   ],
   "request": {
     "body": {
-      "event_token":  "${[scenarioContext][parentContext][childContexts][F103_Case_Data_Create_C3_Token_Creation][testData][actualResponse][body][token]}"
+      "event_token":  "${[scenarioContext][siblingContexts][F103_Case_Data_Create_C3_Token_Creation][testData][actualResponse][body][token]}"
     }
   }
 }
