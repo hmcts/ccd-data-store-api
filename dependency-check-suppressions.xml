@@ -5,7 +5,7 @@
         <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258</notes>
         <cve>CVE-2018-1258</cve>
     </suppress>
-  
+
     <!-- THIS CVEs should not be removed until the elastic search client is updated to 7.
     Before updating the elastic client make sure that the server has been updated to 7 -->
 
@@ -286,4 +286,12 @@
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
    <cve>CVE-2020-10683</cve>
 </suppress>
+    <!-- FIXME : RDM-8724 -->
+    <suppress>
+        <notes><![CDATA[
+   file name: postgresql-42.2.5.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
+        <cve>CVE-2020-13692</cve>
+    </suppress>
 </suppressions>
