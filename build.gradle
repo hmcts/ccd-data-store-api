@@ -585,16 +585,6 @@ configurations {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        eachDependency { details ->
-            if (details.requested.group == 'com.github.ben-manes.caffeine' && details.requested.name == 'caffeine') {
-                details.useVersion '2.8.7'
-            }
-        }
-    }
-}
-
 compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
