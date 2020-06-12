@@ -34,7 +34,7 @@ VALUES (7578590391163133, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBL
          },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353529',
+       '7578590391163133',
        '2016-06-22 20:44:52.824',
        '2016-06-24 20:44:52.824',
        '2016-06-24 20:44:52.824'
@@ -68,7 +68,7 @@ VALUES (6375837333991692, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBL
           },
           "D8Document": "PUBLIC"
         }',
-        '1504259907353545',
+        '6375837333991692',
         '2016-08-22 20:44:52.824',
         '2016-08-24 20:44:52.824',
         '2016-08-24 20:44:52.824'
@@ -101,7 +101,7 @@ VALUES (1983927457663329, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBL
             }
           }
         }',
-        '1504259907353537',
+        '1983927457663329',
         '2016-08-22 20:44:53.824',
         '2016-08-24 20:44:53.824',
         '2016-08-24 20:44:53.824'
@@ -120,7 +120,7 @@ VALUES (4909408736740613, 'TestAddressBookCase', 'PROBATE', 'Invalid', 'PUBLIC',
             "Postcode": "SE1 4EE"
           }
         }',
-        '1504259907353552'
+        '4909408736740613'
 );
 
 
@@ -152,7 +152,7 @@ VALUES (0812226188793136, 'bookcase-default-post-state', 'PROBATE', 'CaseCreated
           },
           "D8Document": "PUBLIC"
         }',
-        '1557845948403939',
+        '0812226188793136',
         '2016-08-22 20:44:52.824',
         '2016-08-24 20:44:52.824',
         '2016-08-24 20:44:52.824'
@@ -186,7 +186,7 @@ VALUES (8936117598299935, 'bookcase-default-pre-state-test', 'PROBATE', 'CaseCre
           },
           "D8Document": "PUBLIC"
         }',
-        '1557850043804031',
+        '8936117598299935',
         '2016-08-22 20:44:52.824',
         '2016-08-24 20:44:52.824',
         '2016-08-24 20:44:52.824'
@@ -219,7 +219,7 @@ VALUES (6820370635029103, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PRIV
             }
           }
         }',
-        '1504259907353598',
+        '6820370635029103',
         '2016-08-22 20:44:54.824',
         '2016-08-24 20:44:54.824',
         '2016-08-24 20:44:54.824'
@@ -252,7 +252,7 @@ VALUES (2406747416264390, 'TestAddressBookCase', 'PROBATE', 'some-state', 'PRIVA
             }
           }
         }',
-        '3504259907353518',
+        '2406747416264390',
         '2019-08-22 20:44:54.824',
         '2019-08-24 20:44:54.824',--=
         '2019-08-24 20:44:54.824'
@@ -291,7 +291,7 @@ VALUES (0382067683780388, 'TestAddressBookCaseNoUpdateCaseAccess', 'PROBATE', 'C
          },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353578'
+       '0382067683780388'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
@@ -327,7 +327,7 @@ VALUES (8669769515614407, 'TestAddressBookCaseNoCreateEventAccess', 'PROBATE', '
          },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353586'
+       '8669769515614407'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
@@ -363,7 +363,7 @@ VALUES (7878572516474410, 'TestAddressBookCaseNoCreateFieldAccess', 'PROBATE', '
          },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353594'
+       '7878572516474410'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
@@ -399,7 +399,7 @@ VALUES (1435318436872880, 'TestAddressBookCaseNoCreateFieldAccess', 'PROBATE', '
          },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353602'
+       '1435318436872880'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
@@ -435,7 +435,7 @@ VALUES (5778924340534288, 'TestAddressBookCaseNoReadCaseTypeAccess', 'PROBATE', 
          },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353610'
+       '5778924340534288'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
@@ -471,7 +471,7 @@ VALUES (9407256414121846, 'TestAddressBookCaseNoReadFieldAccess', 'PROBATE', 'Ca
          },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353628'
+       '9407256414121846'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
@@ -507,7 +507,7 @@ VALUES (6224186984843239, 'TestAddressBookCaseNoReadEventAccess', 'PROBATE', 'Ca
           },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353636'
+       '6224186984843239'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
@@ -543,7 +543,7 @@ VALUES (9558893805689374, 'TestAddressBookCaseNoReadCaseTypeAccess', 'PROBATE', 
          },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353643'
+       '9558893805689374'
 );
 
 
@@ -580,7 +580,7 @@ VALUES (2924382960536937, 'TestAddressBookCaseNoReadFieldAccess', 'PROBATE', 'Ca
          },
          "D8Document": "PUBLIC"
        }',
-       '1504259907353651'
+       '2924382960536937'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
@@ -593,7 +593,7 @@ VALUES (7083640672772496, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBL
           "PersonFirstName": "PUBLIC",
           "PersonLastName": "PUBLIC"
         }',
-        '1504254784737847',
+        '7083640672772496',
         '2019-08-22 20:44:53.824',
         '2019-08-24 20:44:53.824',
         '2019-08-24 20:44:53.824'
