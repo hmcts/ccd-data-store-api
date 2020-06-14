@@ -7,12 +7,18 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.v2.external.controller.DocumentController;
 
+@AllArgsConstructor
 @NoArgsConstructor
+@Setter
+@Getter
 public class DocumentsResource extends RepresentationModel<RepresentationModel<?>> {
 
     List<Document> documentResources;
