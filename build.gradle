@@ -271,7 +271,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '2.16.0-isolate-reused-test-data.2'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '2.17.0-add-dsl-with-case-spec.2'
 
 }
 // end::dependencies[]
