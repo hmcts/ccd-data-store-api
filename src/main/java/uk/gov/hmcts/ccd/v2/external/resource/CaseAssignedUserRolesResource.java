@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class CaseAssignedUserRolesResource extends RepresentationModel<CaseAssignedUserRolesResource> {
+public class CaseAssignedUserRolesResource extends RepresentationModel<RepresentationModel<?>> {
 
     @JsonProperty("case_users")
     private List<CaseAssignedUserRole> caseAssignedUserRoles;
