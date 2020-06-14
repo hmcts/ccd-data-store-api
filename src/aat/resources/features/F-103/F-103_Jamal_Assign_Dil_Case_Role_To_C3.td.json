@@ -12,8 +12,8 @@
   },
 	"request": {
 		"pathVariables": {
-			"cid": "${[scenarioContext][parentContext][childContexts][F103_Case_Data_Create_C3][testData][actualResponse][body][id]}",
-			"uid": "${[scenarioContext][testData][users][userDil][id]}"
+			"case_id": "${[scenarioContext][siblingContexts][F103_Case_Data_Create_C3][testData][actualResponse][body][id]}",
+			"user_id": "${[scenarioContext][testData][users][userDil][id]}"
 		},
     "body": {
       "case_roles": [
