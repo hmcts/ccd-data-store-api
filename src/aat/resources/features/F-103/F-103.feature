@@ -17,7 +17,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil, as per above],
-    And the response has all the details as expected.
+    And the response has all other details as expected.
 
   @S-598
   Scenario: when the invoking user is not a privileged user but the request includes his/her own User ID, then the invoker's case roles for the case should be returned
@@ -32,7 +32,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil, as per above],
-    And the response has all the details as expected.
+    And the response has all other details as expected.
 
   @S-599
   Scenario: when no User ID is supplied for a specific case ID, then the case roles relating to all  users with access to that case must be returned
@@ -49,7 +49,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil & Steve, as per above],
-    And the response has all the details as expected.
+    And the response has all other details as expected.
 
   @S-600
   Scenario: when no User ID is supplied for a list of Case IDs, then the case roles relating to all users with access to all listed cases must be returned
@@ -72,7 +72,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil & Steve for C1, C2 & C3, as per above],
-    And the response has all the details as expected.
+    And the response has all other details as expected.
 
   @S-601
   Scenario: must return an error response for a missing Case ID
@@ -83,7 +83,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And the request [is made by Jamal with no Case ID & Dil's User ID]
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
     Then a negative response is received,
-    And the response has all the details as expected.
+    And the response has all other details as expected.
 
 
   @S-602
@@ -95,7 +95,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And the request [is made by Jamal with a malformed Case ID & Dil's User ID],
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
     Then a negative response is received,
-    And the response has all the details as expected.
+    And the response has all other details as expected.
 
   @S-603
   Scenario: must return an error response for a malformed User ID List (e.g. user1,user2,,user4)
@@ -107,7 +107,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And the request [is made by Jamal with the Case ID of C1 & a malformed User ID list],
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
     Then a negative response is received,
-    And the response has all the details as expected.
+    And the response has all other details as expected.
 
   @S-604
   Scenario: must return an error response when the invoker does not have the required IDAM role(s) to query the role assignments for users listed in the query
@@ -120,5 +120,5 @@ Feature: F-103: Get Case-Assigned Users and Roles
     And the request [is made by Steve with the Case ID of C1 & Dil's User ID],
     And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
     Then a negative response is received,
-    And the response has all the details as expected.
+    And the response has all other details as expected.
 
