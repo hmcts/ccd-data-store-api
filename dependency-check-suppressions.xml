@@ -288,6 +288,6 @@
 </suppress>
     <!-- Temporarily suppress to unblock development -->
     <suppress>
-        <cve>CVE-2017-18365</cve>
-    </suppress>
+      <cve>CVE-2017-18365</cve>
+     </suppress>
 </suppressions>
