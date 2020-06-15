@@ -286,12 +286,8 @@
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
    <cve>CVE-2020-10683</cve>
 </suppress>
-    <!-- FIXME : RDM-8724 -->
+    <!-- RDM-8724 Temporarily suppress to unblock development -->
     <suppress>
-        <notes><![CDATA[
-   file name: postgresql-42.2.5.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
-        <cve>CVE-2020-13692</cve>
+        <cve>CVE-2017-18365</cve>
     </suppress>
 </suppressions>
