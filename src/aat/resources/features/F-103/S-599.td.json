@@ -27,22 +27,22 @@
 		"body": {
 			"case_users": [
 				{
-					"case_id": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]}",
+					"case_id": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
 					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
 					"case_role": "[DEFENDANT]"
 				},
 				{
-					"case_id": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]}",
+					"case_id": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
 					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
 					"case_role": "[COLLABORATOR]"
 				},
 				{
-					"case_id": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]}",
+					"case_id": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
 					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
 					"case_role": "[DEFENDANT]"
 				},
 				{
-					"case_id": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]}",
+					"case_id": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
 					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
 					"case_role": "[CLAIMANT]"
 				}

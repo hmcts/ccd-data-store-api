@@ -26,7 +26,7 @@
 	"request": {
 		"_extends_": "Common_Request",
 		"queryParams": {
-			"case_ids": "${[scenarioContext][childContexts][F103_Case_Data_Create][testData][actualResponse][body][id]}",
+			"case_ids": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
 			"user_ids": "${[scenarioContext][testData][users][userDil][id]}"
 		}
 	},
