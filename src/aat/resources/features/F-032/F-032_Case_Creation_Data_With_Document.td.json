@@ -4,7 +4,23 @@
 	"request": {
 		"body": {
 			"data": {
-				"_extends_": "Standard_Full_Case_Data_With_Document"
+				"_extends_": "Standard_Full_Case_Data_With_Document",
+				"CollectionField": [
+					"__befta_replace__",
+					{
+						"id": "CollectionField1",
+						"value": "Alias 1"
+					},
+					{
+						"id": "CollectionField2",
+						"value": "Alias 2"
+					}
+				],
+				"MultiSelectListField": [
+					"__befta_replace__",
+					"OPTION2",
+					"OPTION4"
+				]
 			}
 		}
 	},
@@ -26,6 +42,11 @@
 						"id": "CollectionField2",
 						"value": "Alias 2"
 					}
+				],
+				"MultiSelectListField": [
+					"__befta_replace__",
+					"OPTION2",
+					"OPTION4"
 				]
 			},
 			"data_classification": {
