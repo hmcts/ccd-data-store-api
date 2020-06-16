@@ -28,6 +28,7 @@
 		"body": {
 			"case_users": [
 				{
+					"__ordering__": "UNORDERED",
 					"__elementId__": "case_id,user_id,case_role"
 				},
 				{
