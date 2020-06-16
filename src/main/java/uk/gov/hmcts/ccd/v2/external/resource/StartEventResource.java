@@ -3,12 +3,14 @@ package uk.gov.hmcts.ccd.v2.external.resource;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.springframework.hateoas.RepresentationModel;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.v2.external.controller.StartEventController;
@@ -16,7 +18,7 @@ import uk.gov.hmcts.ccd.v2.external.controller.StartEventController;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class StartEventResource extends RepresentationModel {
+public class StartEventResource extends RepresentationModel<RepresentationModel<?>> {
 
     @JsonProperty("case_details")
     private CaseDetails caseDetails;

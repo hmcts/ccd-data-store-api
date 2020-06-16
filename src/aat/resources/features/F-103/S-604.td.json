@@ -1,0 +1,29 @@
+{
+	"title": "must return an error response when the invoker does not have the required IDAM role(s) to query the role assignments for users listed in the query",
+	"_guid_": "S-604",
+	"productName": "CCD Data Store api",
+	"operationName": "Get Case-Assigned Users and Roles",
+	"_extends_": "F-103_Case_Assigned_User_Roles_Base",
+	"specs": [
+		"Richard - who can create a case",
+		"Dil - with an active profile",
+		"Steve -  who is not a privileged user and does not have permissions to access the case assignments of other users",
+		"is made by Steve with the Case ID of C1 & Dil's User ID"
+	],
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.2.solicitor.1@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"body": {
+			"message": "Access to other user's case role assignments not granted",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null,
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException"
+		}
+	}
+}

@@ -295,10 +295,13 @@ public class DefinitionsCachingIT {
     @Test
     public void testBannersCached() {
         List<String> jurisdictionIds = new ArrayList<>();
+        jurisdictionIds.add("123");
         BannersResult bannersResult = new BannersResult(bannersList);
         doReturn(bannersResult).when(this.httpUIDefinitionGateway).getBanners(jurisdictionIds);
 
         uiDefinitionRepository.getBanners(jurisdictionIds);
+        jurisdictionIds = new ArrayList<>();
+        jurisdictionIds.add("123");
         uiDefinitionRepository.getBanners(jurisdictionIds);
         uiDefinitionRepository.getBanners(jurisdictionIds);
 
