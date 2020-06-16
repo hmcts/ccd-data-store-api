@@ -21,6 +21,9 @@
 		"body": {
 			"case_users": [
 				{
+					"__elementId__": "case_id,user_id,case_role"
+				},
+				{
 					"case_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][case_id]}",
 					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
 					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_roles][1]}"
