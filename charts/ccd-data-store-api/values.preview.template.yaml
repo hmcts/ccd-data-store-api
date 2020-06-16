@@ -10,7 +10,7 @@ java:
         - ccd-data-s2s-secret
         - ccd-ELASTIC-SEARCH-URL
         - ccd-ELASTIC-SEARCH-DATA-NODES-URL
-        - ccd-ELASTIC-SEARCH-PASSWORD
+        - ccd-ELASTIC-SEARCH-PASSWORD        
   environment:
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
     DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
@@ -22,7 +22,9 @@ java:
 #    USER_PROFILE_HOST: http://ccd-user-profile-api-pr-224.service.core-compute-preview.internal/
 
     ENABLE_DB_MIGRATE: true
-    ELASTIC_SEARCH_ENABLED: false
+    ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
+    ELASTIC_SEARCH_HOSTS: http://ccd-test-stubs-service-aat.service.core-compute-aat.internal
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: http://ccd-test-stubs-service-aat.service.core-compute-aat.internal
   postgresql:
     enabled: true
