@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import java.io.IOException;
 import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,9 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItems;
@@ -81,6 +85,18 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        String userJson = "{\n"
+            + "          \"sub\": \"Cloud.Strife@test.com\",\n"
+            + "          \"uid\": \"89000\",\n"
+            + "          \"roles\": [\n"
+            + "            \"caseworker\",\n"
+            + "            \"caseworker-probate-public\"\n"
+            + "          ],\n"
+            + "          \"name\": \"Cloud Strife\"\n"
+            + "        }";
+        stubFor(WireMock.get(urlMatching("/o/userinfo"))
+            .willReturn(okJson(userJson).withStatus(200)));
     }
 
     // AC-1
@@ -114,7 +130,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_case_users_valid_case_ids.sql"
     })
     public void shouldGetSelfCaseUserRolesAssigned() throws Exception {
-        MockUtils.setSecurityAuthorities("89000", authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
