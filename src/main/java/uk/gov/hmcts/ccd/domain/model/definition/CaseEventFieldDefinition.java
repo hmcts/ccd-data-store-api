@@ -21,6 +21,7 @@ public class CaseEventFieldDefinition implements Serializable {
     private Integer showSummaryContentOption = null;
     private String label = null;
     private String hintText = null;
+    private String defaultValue;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
 
     @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
@@ -117,6 +118,16 @@ public class CaseEventFieldDefinition implements Serializable {
 
     public void setCaseEventFieldComplexDefinitions(List<CaseEventFieldComplexDefinition> eventComplexTypeEntities) {
         this.caseEventFieldComplexDefinitions = eventComplexTypeEntities;
+    }
+
+    @ApiModelProperty(value = "Default value coming from the Event that overwrites complex fields.")
+    @JsonProperty("defaultValue")
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 
 }
