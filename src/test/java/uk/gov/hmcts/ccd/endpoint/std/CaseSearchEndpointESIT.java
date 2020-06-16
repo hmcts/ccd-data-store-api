@@ -16,10 +16,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.ElasticsearchBaseTest;
 import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.hamcrest.CoreMatchers.is;
@@ -178,7 +180,7 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
                     .must(matchQuery(caseData(PHONE_FIELD), PHONE_VALUE)) // ES Phone
                     .must(matchQuery(caseData(COUNTRY_FIELD), COUNTRY_VALUE)) // Complex
                     .must(matchQuery(caseData(COLLECTION_FIELD) + VALUE_SUFFIX, COLLECTION_VALUE)) // Collection
-                    .must(matchQuery(STATE, STATE_VALUE))) // Metadata
+                    .must(matchQuery(STATE, STATE_VALUE)))
                 .build().toJsonString();
 
             MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
@@ -218,6 +220,55 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(exceptionNode.get("message").asText(),
                     startsWith("Resource not found when getting case type definition for INVALID"))
+            );
+        }
+
+        public void assertExampleCaseMetadata(CaseDetails caseDetails) {
+            assertAll(
+                () -> assertThat(caseDetails.getJurisdiction(), is("AUTOTEST1")),
+                () -> assertThat(caseDetails.getCaseTypeId(), is(CASE_TYPE_A)),
+                () -> assertThat(caseDetails.getCreatedDate().toString(), is("2020-05-07T15:53:40.974")),
+                () -> assertThat(caseDetails.getLastModified().toString(), is("2020-06-09T13:17:06.542")),
+                // () -> assertThat(caseDetails.getLastStateModifiedDate().toString(), is("TBC")), // TODO: After RDM-8552 available
+                () -> assertThat(caseDetails.getReference(), is(1588866820969121L)),
+                () -> assertThat(caseDetails.getState(), is(STATE_VALUE)),
+                () -> assertThat(caseDetails.getSecurityClassification(), is(SecurityClassification.PUBLIC))
+            );
+        }
+
+        public void assertExampleCaseData(CaseDetails caseDetails) {
+            Map<String, JsonNode> data = caseDetails.getData();
+            assertAll(
+                () -> assertThat(data.get("AddressUKField").toString(),
+                    is("{\"AddressLine1\":\"StreetValue\","
+                       + "\"AddressLine2\":\"AddressLine2Value\","
+                       + "\"AddressLine3\":\"AddressLine3Value\","
+                       + "\"Country\":\"CountryValue\","
+                       + "\"County\":\"CountyValue\","
+                       + "\"PostCode\":\"PST CDE\","
+                       + "\"PostTown\":\"TownValue\"}")),
+                () -> assertThat(data.get(COLLECTION_FIELD).toString(),
+                    is("[{\"id\":\"2c6da07c-1dfb-4765-88f6-96cd5d5f33b1\",\"value\":\"CollectionTextValue2\"},"
+                       + "{\"id\":\"f7d67f03-172d-4adb-85e5-ca958ad442ce\",\"value\":\"CollectionTextValue1\"}]")),
+                () -> assertThat(data.get("ComplexField").toString(),
+                    is("{\"ComplexFixedListField\":\"VALUE3\""
+                       + ",\"ComplexNestedField\":{\"NestedCollectionTextField\":"
+                       + "[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\",\"value\":\"NestedCollectionTextValue1\"},"
+                       + "{\"id\":\"95f337e8-5f17-4b25-a795-b7f84f4b2855\",\"value\":\"NestedCollectionTextValue2\"}],"
+                       + "\"NestedNumberField\":\"567\"},"
+                       + "\"ComplexTextField\":\"ComplexTextValue\"}")),
+                () -> assertThat(data.get(DATE_FIELD).asText(), is(DATE_VALUE)),
+                () -> assertThat(data.get(DATE_TIME_FIELD).asText(), is(DATE_TIME_VALUE)),
+                () -> assertThat(data.get(EMAIL_FIELD).asText(), is(EMAIL_VALUE)),
+                () -> assertThat(data.get(FIXED_LIST_FIELD).asText(), is(FIXED_LIST_VALUE)),
+                () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD).isNull(), is(true)),
+                () -> assertThat(data.get(MONEY_FIELD).asText(), is(MONEY_VALUE)),
+                () -> assertThat(data.get(MULTI_SELECT_LIST_FIELD).toString(), is("[\"OPTION2\",\"OPTION4\"]")),
+                () -> assertThat(data.get(NUMBER_FIELD).asText(), is(NUMBER_VALUE)),
+                () -> assertThat(data.get(PHONE_FIELD).asText(), is(PHONE_VALUE)),
+                () -> assertThat(data.get(TEXT_AREA_FIELD).asText(), is(TEXT_AREA_VALUE)),
+                () -> assertThat(data.get(TEXT_FIELD).asText(), is(TEXT_VALUE)),
+                () -> assertThat(data.get(YES_OR_NO_FIELD).asText(), is(YES_OR_NO_VALUE))
             );
         }
     }

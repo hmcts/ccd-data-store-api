@@ -129,7 +129,7 @@ public class UICaseSearchController {
         String useCaseUppercase = Strings.isNullOrEmpty(useCase) ? null : useCase.toUpperCase();
 
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
-        elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCase);
+        elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCaseUppercase);
 
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(Collections.singletonList(caseTypeId))
