@@ -71,7 +71,7 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
             MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
                 .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, "AAT,MAPPER")
+                .param(CASE_TYPE_ID_PARAM, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B))
                 .content(searchRequest))
                 .andExpect(status().is(200))
                 .andReturn();
@@ -99,7 +99,7 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
             MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
                 .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, "AAT,MAPPER")
+                .param(CASE_TYPE_ID_PARAM, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B))
                 .content(searchRequest))
                 .andExpect(status().is(200))
                 .andReturn();
@@ -128,7 +128,7 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
             MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
                 .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, "AAT,MAPPER")
+                .param(CASE_TYPE_ID_PARAM, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B))
                 .content(searchRequest))
                 .andExpect(status().is(200))
                 .andReturn();
@@ -150,7 +150,7 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
             MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
                 .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, "AAT,MAPPER")
+                .param(CASE_TYPE_ID_PARAM, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B))
                 .content(searchRequest))
                 .andExpect(status().is(200))
                 .andReturn();
@@ -239,7 +239,7 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
         public void assertExampleCaseData(CaseDetails caseDetails) {
             Map<String, JsonNode> data = caseDetails.getData();
             assertAll(
-                () -> assertThat(data.get("AddressUKField").toString(),
+                () -> assertThat(data.get(ADDRESS_FIELD).toString(),
                     is("{\"AddressLine1\":\"StreetValue\","
                        + "\"AddressLine2\":\"AddressLine2Value\","
                        + "\"AddressLine3\":\"AddressLine3Value\","
@@ -250,7 +250,7 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
                 () -> assertThat(data.get(COLLECTION_FIELD).toString(),
                     is("[{\"id\":\"2c6da07c-1dfb-4765-88f6-96cd5d5f33b1\",\"value\":\"CollectionTextValue2\"},"
                        + "{\"id\":\"f7d67f03-172d-4adb-85e5-ca958ad442ce\",\"value\":\"CollectionTextValue1\"}]")),
-                () -> assertThat(data.get("ComplexField").toString(),
+                () -> assertThat(data.get(COMPLEX_FIELD).toString(),
                     is("{\"ComplexFixedListField\":\"VALUE3\""
                        + ",\"ComplexNestedField\":{\"NestedCollectionTextField\":"
                        + "[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\",\"value\":\"NestedCollectionTextValue1\"},"

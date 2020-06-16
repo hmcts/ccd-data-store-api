@@ -64,7 +64,7 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
             .contentType(MediaType.APPLICATION_JSON)
-            .param(CASE_TYPE_ID_PARAM, "AAT,MAPPER,SECURITY")
+            .param(CASE_TYPE_ID_PARAM, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B, CASE_TYPE_C))
             .content(searchRequest))
             .andExpect(status().is(200))
             .andReturn();
@@ -176,7 +176,7 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
             () -> assertThat(caseSearchResult.getTotal(), is(2L)),
             () -> assertThat(caseSearchResult.getCases().get(0).getData().size(), is(2)),
             () -> assertThat(caseSearchResult.getCases().get(0).getData().get(PHONE_FIELD), is(notNullValue())),
-            () -> assertThat(caseSearchResult.getCases().get(0).getData().get("AddressUKField"), is(notNullValue()))
+            () -> assertThat(caseSearchResult.getCases().get(0).getData().get(ADDRESS_FIELD), is(notNullValue()))
         );
     }
 
@@ -201,7 +201,7 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
         assertAll(
             () -> assertThat(caseSearchResult.getTotal(), is(1L)),
             () -> assertThat(caseSearchResult.getCases().get(0).getData().size(), is(14)),
-            () -> assertThat(caseSearchResult.getCases().get(0).getData().get("AddressUKField"), is(nullValue()))
+            () -> assertThat(caseSearchResult.getCases().get(0).getData().get(ADDRESS_FIELD), is(nullValue()))
         );
     }
 

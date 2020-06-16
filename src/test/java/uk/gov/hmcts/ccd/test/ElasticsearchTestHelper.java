@@ -25,6 +25,21 @@ public class ElasticsearchTestHelper {
     public static final String TEXT_AREA_FIELD = "TextAreaField";
     public static final String ADDRESS_FIELD = "AddressUKField";
     public static final String COMPLEX_FIELD = "ComplexField";
+    public static final String POST_CODE_FIELD = "PostCode";
+    public static final String COUNTY_FIELD = "County";
+    public static final String COUNTRY_NESTED_FIELD = "Country";
+    public static final String NESTED_COLLECTION_TEXT_FIELD = "NestedCollectionTextField";
+    public static final String COMPLEX_NESTED_FIELD = "ComplexNestedField";
+    public static final String COMPLEX_TEXT_FIELD = "ComplexTextField";
+    public static final String NESTED_NUMBER_FIELD = "NestedNumberField";
+    public static final String COMPLEX_FIXED_LIST_FIELD = "ComplexFixedListField";
+    public static final String HISTORY_COMPONENT_FIELD = "HistoryComponentField";
+    public static final String DOCUMENT_FIELD = "DocumentField";
+    public static final String ADDRESS_LINE_1 = "AddressLine1";
+    public static final String ADDRESS_LINE_2 = "AddressLine2";
+    public static final String ADDRESS_LINE_3 = "AddressLine3";
+    public static final String ADDRESS_LINE_3_VALUE = "AddressLine3Value";
+    public static final String TOWN_FIELD = "PostTown";
     public static final String STATE = "state";
     public static final String CREATED_DATE = "created_date";
     public static final String TEXT_ALIAS = "TextAlias";
@@ -45,6 +60,12 @@ public class ElasticsearchTestHelper {
     public static final String FIXED_LIST_VALUE = "VALUE2";
     public static final String MONEY_VALUE = "98700";
     public static final String TEXT_AREA_VALUE = "TextArea\nValue";
+    public static final String STREET_VALUE = "StreetValue";
+    public static final String COMPLEX_TEXT_VALUE = "ComplexTextValue";
+    public static final String COUNTY_VALUE = "CountyValue";
+    public static final String POST_CODE_VALUE = "PST CDE";
+    public static final String ADDRESS_LINE_2_VALUE = "AddressLine2Value";
+    public static final String TOWN_VALUE = "TownValue";
     public static final String IN_PROGRESS_STATE = "IN_PROGRESS";
 
     public static final String AUTOTEST1_PUBLIC = "caseworker-autotest1";
@@ -60,5 +81,9 @@ public class ElasticsearchTestHelper {
 
     public static String alias(String fieldPath) {
         return ALIAS_PREFIX + fieldPath;
+    }
+
+    public static String caseTypesParam(String... caseTypeIds) {
+        return String.join(",", caseTypeIds);
     }
 }
