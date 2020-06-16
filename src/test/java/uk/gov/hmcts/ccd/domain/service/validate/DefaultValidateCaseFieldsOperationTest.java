@@ -37,6 +37,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
@@ -142,7 +143,7 @@ class DefaultValidateCaseFieldsOperationTest {
         Map<String, JsonNode> result = validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
 
         assertAll(
-            () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+            () -> verify(caseDefinitionRepository, times(2)).getCaseType(CASE_TYPE_ID),
             () -> verify(caseTypeService).validateData(data, caseTypeDefinition),
             () -> assertThat(result, is(data))
         );
