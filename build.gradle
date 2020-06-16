@@ -236,7 +236,7 @@ dependencies {
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
-    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.13'
     runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
@@ -271,7 +271,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '2.11.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '2.19.0'
 
 }
 // end::dependencies[]
