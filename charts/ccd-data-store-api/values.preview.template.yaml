@@ -22,7 +22,27 @@ java:
 #    USER_PROFILE_HOST: http://ccd-user-profile-api-pr-224.service.core-compute-preview.internal/
 
     ENABLE_DB_MIGRATE: true
-    ELASTIC_SEARCH_ENABLED: false
-    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
+    ELASTIC_SEARCH_ENABLED: true
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
   postgresql:
     enabled: true
+
+
+elastic:
+  enabled: true
+
+elasticsearch:
+  clusterName: "{{ .Release.Name }}-elasticsearch"
+  replicas: 1
+  minimumMasterNodes: 1
+  antiAffinity: "soft"
+  esJavaOpts: "-Xmx512m -Xms512m"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512M"
+    limits:
+      cpu: "1000m"
+      memory: "512M"
+  persistence:
+    enabled: false

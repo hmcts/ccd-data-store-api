@@ -2,3 +2,7 @@ dependencies:
   - name: java
     version: ~2.17.0
     repository: '@hmctspublic'
+  - name: elastic/elasticsearch
+    version: 7.7.1
+    repository: https://helm.elastic.co
+    condition: elastic.enabled
