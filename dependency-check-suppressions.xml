@@ -215,6 +215,7 @@
         <cve>CVE-2020-5407</cve>
         <cve>CVE-2020-5408</cve>
         <cve>CVE-2020-9484</cve>
+        <cve>CVE-2020-13692</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
