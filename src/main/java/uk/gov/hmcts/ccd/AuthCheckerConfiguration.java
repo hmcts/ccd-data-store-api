@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ccd;
 
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -20,16 +18,8 @@ public class AuthCheckerConfiguration {
     @SuppressWarnings("squid:S3437")
     public static final String[] CITIZEN_ROLES = {"citizen", "letter-holder"};
 
-    @Value("#{'${casedatastore.authorised.services}'.split(',')}")
-    private List<String> authorisedServices;
-
     public static String[] getCitizenRoles() {
         return CITIZEN_ROLES;
-    }
-
-    @Bean
-    public Function<HttpServletRequest, Collection<String>> authorizedServicesExtractor() {
-        return request -> authorisedServices;
     }
 
     @Bean
