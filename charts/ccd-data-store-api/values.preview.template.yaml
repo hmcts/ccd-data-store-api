@@ -27,12 +27,11 @@ java:
   postgresql:
     enabled: true
 
-
 elastic:
   enabled: true
 
 elasticsearch:
-  clusterName: "{{ .Release.Name }}-elasticsearch"
+  clusterName: "pr-elasticsearch"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
