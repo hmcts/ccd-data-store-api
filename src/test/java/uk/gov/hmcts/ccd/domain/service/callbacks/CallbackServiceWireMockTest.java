@@ -34,49 +34,24 @@ import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 
-@ActiveProfiles("test")
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties =
     {
         "ccd.callback.timeouts=1,2,3"
     })
-@AutoConfigureWireMock(port = 0)
-@DirtiesContext
-public class CallbackServiceWireMockTest {
+public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Inject
     private CallbackService callbackService;
-
-    @Value("${wiremock.server.port}")
-    protected Integer wiremockPort;
-
-    @Before
-    public void setUp() {
-        // IDAM
-        final SecurityUtils securityUtils = Mockito.mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
-        ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
-    }
 
     @Test
     public void happyPathWithNoErrorsOrWarnings() throws Exception {
