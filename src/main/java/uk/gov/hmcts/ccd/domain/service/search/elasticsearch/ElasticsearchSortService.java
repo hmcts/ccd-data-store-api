@@ -18,12 +18,13 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.CASE_DATA_PREFIX;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.COLLECTION_VALUE_SUFFIX;
+
 @Service
 @Slf4j
 public class ElasticsearchSortService {
 
-    private static final String CASE_DATA_PREFIX = "data.";
-    private static final String COLLECTION_VALUE_SUFFIX = ".value";
     private static final String KEYWORD_SUFFIX = ".keyword";
 
     private final ObjectMapper objectMapper;

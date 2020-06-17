@@ -175,7 +175,7 @@ public class CaseTypeDefinition implements Serializable {
     }
 
     @JsonIgnore
-    public Optional<CommonField> getComplexSubfieldDefinitionByPath(String path) {
+    public <T extends CommonField> Optional<T> getComplexSubfieldDefinitionByPath(String path) {
         return CaseFieldPathUtils.getFieldDefinitionByPath(this, path);
     }
 

@@ -2,10 +2,12 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
@@ -24,9 +26,12 @@ import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getPathElements;
+import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getPathElementsTailAsString;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
+@Slf4j
 public class SearchQueryOperation {
     protected static final String NO_ERROR = null;
     public static final String WORKBASKET = "WORKBASKET";
@@ -68,7 +73,7 @@ public class SearchQueryOperation {
         }
 
         final SearchResult searchResult = getSearchResultDefinition(caseType.get(),
-            Strings.isNullOrEmpty(view) ? SEARCH : view);
+            Strings.isNullOrEmpty(view) ? SEARCH : view, Collections.emptyList());
 
         addSortOrderFields(metadata, searchResult);
 
@@ -90,10 +95,10 @@ public class SearchQueryOperation {
         return mergeDataToSearchResultOperation.execute(caseType.get(), searchResult, draftsAndCases, draftResultError);
     }
 
-    public SearchResult getSearchResultDefinition(final CaseTypeDefinition caseTypeDefinition, final String useCase) {
-        final String caseTypeId = caseTypeDefinition.getId();
+    public SearchResult getSearchResultDefinition(CaseTypeDefinition caseTypeDefinition, String useCase, List<String> requestedFields) {
+        String caseTypeId = caseTypeDefinition.getId();
         if (Strings.isNullOrEmpty(useCase)) {
-            return buildSearchResultDefinitionFromCaseFields(caseTypeDefinition);
+            return buildSearchResultDefinitionFromCaseFields(caseTypeDefinition, requestedFields);
         }
         // TODO: Once all *ResultFields tabs are merged, remove switch statement and always call default method
         switch (useCase) {
@@ -107,7 +112,7 @@ public class SearchQueryOperation {
     }
 
     public List<SortOrderField> getSortOrders(CaseTypeDefinition caseType, String useCase) {
-        return getSortOrders(getSearchResultDefinition(caseType, useCase));
+        return getSortOrders(getSearchResultDefinition(caseType, useCase, Collections.emptyList()));
     }
 
     private List<SortOrderField> getSortOrders(SearchResult searchResult) {
@@ -119,18 +124,33 @@ public class SearchQueryOperation {
             .collect(Collectors.toList());
     }
 
-    private SearchResult buildSearchResultDefinitionFromCaseFields(final CaseTypeDefinition caseTypeDefinition) {
+    private SearchResultField buildSearchResultField(CaseFieldDefinition caseFieldDefinition, String caseFieldId, String caseFieldPath) {
+        SearchResultField searchResultField = new SearchResultField();
+        searchResultField.setCaseFieldId(caseFieldDefinition.getId());
+        searchResultField.setCaseTypeId(caseFieldDefinition.getCaseTypeId());
+        searchResultField.setLabel(caseFieldDefinition.getLabel());
+        searchResultField.setMetadata(caseFieldDefinition.isMetadata());
+        searchResultField.setCaseFieldId(caseFieldId);
+        searchResultField.setCaseFieldPath(caseFieldPath);
+        return searchResultField;
+    }
+
+    private SearchResult buildSearchResultDefinitionFromCaseFields(CaseTypeDefinition caseTypeDefinition, List<String> requestedFields) {
         SearchResult searchResult = new SearchResult();
         List<SearchResultField> searchResultFields = new ArrayList<>();
 
-        caseTypeDefinition.getCaseFieldDefinitions().forEach(field -> {
-            SearchResultField searchResultField = new SearchResultField();
-            searchResultField.setCaseFieldId(field.getId());
-            searchResultField.setCaseTypeId(field.getCaseTypeId());
-            searchResultField.setLabel(field.getLabel());
-            searchResultField.setMetadata(field.isMetadata());
-            searchResultFields.add(searchResultField);
-        });
+        if (CollectionUtils.isEmpty(requestedFields)) {
+            caseTypeDefinition.getCaseFieldDefinitions().forEach(field ->
+                searchResultFields.add(buildSearchResultField(field, field.getId(), null)));
+        } else {
+            requestedFields.forEach(requestedFieldId -> {
+                caseTypeDefinition.getComplexSubfieldDefinitionByPath(requestedFieldId).ifPresent(field -> {
+                    List<String> pathElements = getPathElements(requestedFieldId);
+                    searchResultFields.add(buildSearchResultField((CaseFieldDefinition) field, pathElements.get(0),
+                        pathElements.size() > 1 ? getPathElementsTailAsString(pathElements) : null));
+                });
+            });
+        }
 
         searchResult.setFields(searchResultFields.toArray(new SearchResultField[0]));
         return searchResult;

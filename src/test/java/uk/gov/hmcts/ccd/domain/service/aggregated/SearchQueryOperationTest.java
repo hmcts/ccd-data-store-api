@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -335,7 +337,7 @@ public class SearchQueryOperationTest {
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
 
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, WORKBASKET);
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, WORKBASKET, Collections.emptyList());
 
         verify(uiDefinitionRepository).getWorkBasketResult(eq(CASE_TYPE_ID));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -351,7 +353,7 @@ public class SearchQueryOperationTest {
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
 
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, SEARCH);
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, SEARCH, Collections.emptyList());
 
         verify(uiDefinitionRepository).getSearchResult(eq(CASE_TYPE_ID));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -367,7 +369,7 @@ public class SearchQueryOperationTest {
             .build();
         doReturn(searchResult).when(uiDefinitionRepository).getSearchCasesResult(CASE_TYPE_ID, ORG_CASES);
 
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, ORG_CASES);
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, ORG_CASES, Collections.emptyList());
 
         verify(uiDefinitionRepository).getSearchCasesResult(eq(CASE_TYPE_ID), eq(ORG_CASES));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -389,7 +391,7 @@ public class SearchQueryOperationTest {
             .withField(caseField)
             .build();
 
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, "");
+        final SearchResult result = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, "", Collections.emptyList());
 
         verifyNoMoreInteractions(uiDefinitionRepository);
         assertAll(
