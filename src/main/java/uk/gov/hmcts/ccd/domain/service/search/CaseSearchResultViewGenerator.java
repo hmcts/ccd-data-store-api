@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -27,25 +28,40 @@ public class CaseSearchResultViewGenerator {
     private final UserRepository userRepository;
     private final CaseTypeService caseTypeService;
     private final SearchResultDefinitionService searchResultDefinitionService;
+    private final SearchResultProcessor searchResultProcessor;
 
     public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                          CaseTypeService caseTypeService,
-                                         SearchResultDefinitionService searchResultDefinitionService) {
+                                         SearchResultDefinitionService searchResultDefinitionService,
+                                         SearchResultProcessor searchResultProcessor) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
         this.searchResultDefinitionService = searchResultDefinitionService;
+        this.searchResultProcessor = searchResultProcessor;
     }
 
     public CaseSearchResultView execute(String caseTypeId,
                                         CaseSearchResult caseSearchResult,
                                         String useCase,
                                         List<String> requestedFields) {
+        List<SearchResultViewHeaderGroup> headerGroups = buildHeaders(caseTypeId, useCase, caseSearchResult, requestedFields);
+        List<SearchResultViewItem> items = buildItems(useCase, caseSearchResult, caseTypeId, requestedFields);
+
+        if (itemsRequireFormatting(headerGroups)) {
+            items = searchResultProcessor.execute(headerGroups.get(0).getFields(), items);
+        }
+
         // TODO: Filter out fields from result that haven't been requested before returning (RDM-8556)
         return new CaseSearchResultView(
-            buildHeaders(caseTypeId, useCase, caseSearchResult, requestedFields),
-            buildItems(useCase, caseSearchResult, caseTypeId, requestedFields),
+            headerGroups,
+            items,
             caseSearchResult.getTotal()
         );
+    }
+
+    private boolean itemsRequireFormatting(List<SearchResultViewHeaderGroup> headerGroups) {
+        return headerGroups.size() == 1
+               && headerGroups.get(0).getFields().stream().anyMatch(field -> field.getDisplayContextParameter() != null);
     }
 
     private List<SearchResultViewItem> buildItems(String useCase, CaseSearchResult caseSearchResult, String caseTypeId, List<String> requestedFields) {

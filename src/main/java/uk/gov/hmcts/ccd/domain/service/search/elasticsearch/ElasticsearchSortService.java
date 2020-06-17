@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.CASE_DATA_PREFIX;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.COLLECTION_VALUE_SUFFIX;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
 
 @Service
 @Slf4j
@@ -44,17 +45,21 @@ public class ElasticsearchSortService {
     }
 
     public void applyConfiguredSort(ElasticsearchRequest searchRequest, String caseTypeId, String useCase) {
-        if (!searchRequest.isSorted() && useCase != null) {
-            ArrayNode appliedSortsNode = buildSortNode(caseTypeId, useCase);
-            if (appliedSortsNode.size() > 0) {
-                searchRequest.setSort(appliedSortsNode);
-            }
-        }
+        ArrayNode appliedSortsNode = buildSortNode(searchRequest, caseTypeId, useCase);
+        searchRequest.setSort(appliedSortsNode);
     }
 
-    private ArrayNode buildSortNode(String caseTypeId, String useCase) {
-        ArrayNode sortNode = objectMapper.createArrayNode();
-        addCaseTypeSorts(caseTypeId, useCase, sortNode);
+    private ArrayNode buildSortNode(ElasticsearchRequest searchRequest, String caseTypeId, String useCase) {
+        ArrayNode sortNode = searchRequest.isSorted() && searchRequest.getSort().isArray()
+            ? (ArrayNode) searchRequest.getSort()
+            : objectMapper.createArrayNode();
+
+        if (sortNode.isEmpty() && useCase != null) {
+            addCaseTypeSorts(caseTypeId, useCase, sortNode);
+        }
+
+        // Always add created_date as the final sort (ES defaults to ascending when direction is not specified)
+        sortNode.add(new TextNode(CREATED_DATE.getDbColumnName()));
         return sortNode;
     }
 

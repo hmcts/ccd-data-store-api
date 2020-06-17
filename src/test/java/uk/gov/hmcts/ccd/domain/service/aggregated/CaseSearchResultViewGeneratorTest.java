@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -96,6 +97,9 @@ class CaseSearchResultViewGeneratorTest {
     @Mock
     private SearchResultDefinitionService searchResultDefinitionService;
 
+    @Mock
+    private SearchResultProcessor searchResultProcessor;
+
     private CaseSearchResultViewGenerator classUnderTest;
 
     private Map<String, JsonNode> dataMap;
@@ -167,8 +171,9 @@ class CaseSearchResultViewGeneratorTest {
                 buildSearchResultField(CASE_TYPE_ID_2, CASE_FIELD_4, "", CASE_FIELD_4, ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(),any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
+        doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(any(), any());
 
-        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchResultDefinitionService);
+        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchResultDefinitionService, searchResultProcessor);
     }
 
     @Test
@@ -326,7 +331,7 @@ class CaseSearchResultViewGeneratorTest {
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
+        CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
         assertAll(
             () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(0),
@@ -338,6 +343,32 @@ class CaseSearchResultViewGeneratorTest {
             () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
                     .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asText(), is(POSTCODE_VALUE))
         );
+    }
+
+    @Test
+    void shouldInvokeSearchProcessorDCPIsProvided() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "#DCP"))
+            .build();
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+
+        classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
+
+        verify(searchResultProcessor).execute(any(), any());
+    }
+
+    @Test
+    void shouldNotInvokeSearchProcessorWhenNoDCPProvided() {
+        SearchResult searchResult = searchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, null))
+            .build();
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+
+        classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
+
+        verifyNoMoreInteractions(searchResultProcessor);
     }
 
     @Test

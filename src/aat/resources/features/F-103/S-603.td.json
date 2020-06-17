@@ -1,0 +1,28 @@
+{
+	"title": "must return an error response for a malformed User ID List (e.g. user1,user2,,user4)",
+	"_guid_": "S-603",
+	"productName": "CCD Data Store api",
+	"operationName": "Get Case-Assigned Users and Roles",
+	"_extends_": "F-103_Case_Assigned_User_Roles_Base",
+	"specs": [
+		"Richard - who can create a case",
+		"Jamal -  who is a privileged user with permissions to access the case assignments of other users",
+		"is made by Jamal with the Case ID of C1 & a malformed User ID list"
+	],
+	"request": {
+		"queryParams": {
+			"user_ids": "${[scenarioContext][testData][users][userDil][id]},,${[scenarioContext][testData][users][userRichard][id]}"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_400_Response",
+		"body": {
+			"_extends_": "Common_400_Response_Body",
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+			"message": "Invalid data provided for the following inputs to the request:\nUser ID is not valid",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
+}

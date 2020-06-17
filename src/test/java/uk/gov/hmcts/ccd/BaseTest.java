@@ -9,16 +9,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -61,8 +65,8 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -110,14 +114,17 @@ public abstract class BaseTest {
     private DocumentManagementRestClient documentManagementRestClient;
     @Inject
     private DocumentsOperation documentsOperation;
+    @Inject
+    protected SecurityUtils securityUtils;
+
+    @Mock
+    protected Authentication authentication;
+    @Mock
+    protected SecurityContext securityContext;
 
     @Before
     public void initMock() throws IOException {
-
-        // IDAM
-        final SecurityUtils securityUtils = mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
-        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
+        MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
@@ -131,6 +138,10 @@ public abstract class BaseTest {
         ReflectionTestUtils.setField(BaseType.class, "caseDefinitionRepository", caseDefinitionRepository);
 
         setupUIDService();
+
+        doReturn(authentication).when(securityContext).getAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_TEST_PUBLIC);
     }
 
     private void setupUIDService() {

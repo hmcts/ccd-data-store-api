@@ -21,7 +21,7 @@ public abstract class WireMockBaseTest extends BaseTest {
     protected Integer wiremockPort;
 
     @Inject
-    private ApplicationParams applicationParams;
+    protected ApplicationParams applicationParams;
 
     @Before
     public void initMock() throws IOException {
@@ -32,7 +32,6 @@ public abstract class WireMockBaseTest extends BaseTest {
 
         ReflectionTestUtils.setField(applicationParams, "caseDefinitionHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "uiDefinitionHost", hostUrl);
-        ReflectionTestUtils.setField(applicationParams, "idamHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "userProfileHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "draftHost", hostUrl);
     }

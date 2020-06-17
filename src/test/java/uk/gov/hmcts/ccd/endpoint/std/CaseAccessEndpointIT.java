@@ -5,12 +5,8 @@ import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -29,8 +25,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class CaseAccessEndpointIT extends WireMockBaseTest {
@@ -43,25 +42,13 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
-
     @SpyBean
     private AuditRepository auditRepository;
 
     @Before
     public void setUp() throws IOException {
         super.initMock();
-
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, "caseworker-probate");
-
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
@@ -129,7 +116,7 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
         MatcherAssert.assertThat(captor.getValue().getCaseId(), is(CASE_ID));
         MatcherAssert.assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
         MatcherAssert.assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        MatcherAssert.assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        MatcherAssert.assertThat(captor.getValue().getInvokingService(), is("ccd_gw"));
         MatcherAssert.assertThat(captor.getValue().getHttpStatus(), is(201));
         MatcherAssert.assertThat(captor.getValue().getTargetIdamId(), is(USER_ID));
     }
@@ -163,7 +150,7 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
         MatcherAssert.assertThat(auditEntry.get(1).getCaseId(), is(CASE_ID));
         MatcherAssert.assertThat(auditEntry.get(1).getJurisdiction(), is(JURISDICTION));
         MatcherAssert.assertThat(auditEntry.get(1).getIdamId(), is("Cloud.Strife@test.com"));
-        MatcherAssert.assertThat(auditEntry.get(1).getInvokingService(), is("ccd-data"));
+        MatcherAssert.assertThat(auditEntry.get(1).getInvokingService(), is("ccd_gw"));
         MatcherAssert.assertThat(auditEntry.get(1).getHttpStatus(), is(204));
         MatcherAssert.assertThat(auditEntry.get(1).getTargetIdamId(), is(USER_ID));
     }
