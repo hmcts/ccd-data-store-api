@@ -53,9 +53,6 @@ public class ApplicationParams {
     @Value("${ccd.ui-definition.host}")
     private String uiDefinitionHost;
 
-    @Value("${auth.idam.client.baseUrl}")
-    private String idamHost;
-
     @Value("${ccd.case.search.wildcards.allowed}")
     private boolean wildcardSearchAllowed;
 
@@ -229,10 +226,6 @@ public class ApplicationParams {
 
     public String baseTypesURL() {
         return caseDefinitionHost + "/api/base-types";
-    }
-
-    public String idamUserProfileURL() {
-        return idamHost + "/details";
     }
 
     public String caseRolesURL() {

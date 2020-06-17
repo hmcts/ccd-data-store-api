@@ -2,12 +2,7 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -23,14 +18,18 @@ import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 import javax.inject.Inject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.MockUtils.*;
+import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_CREATE;
+import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_DELETE;
+import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_READ;
+import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_UPDATE;
 
 public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
@@ -40,22 +39,10 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
 
     @Inject
     private WebApplicationContext wac;
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
-
     private MockMvc mockMvc;
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 

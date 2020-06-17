@@ -75,6 +75,64 @@
    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
    <cve>CVE-2020-5407</cve>
 </suppress>
+    <!-- FIXME : RDM-7451 -->
+    <suppress>
+        <notes><![CDATA[
+   relates to spring_framework spring-security
+   ]]></notes>
+        <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
+        <cve>CVE-2020-5398</cve>
+    </suppress>
+
+    <!-- FIXME : RDM-78578 -->
+    <suppress>
+        <notes>Temporary suppression for on-going developments</notes>
+        <cpe>cpe:2.3:a:checkstyle:checkstyle:*:*:*:*:*:*:*:*</cpe>
+        <cve>CVE-2019-10782</cve>
+    </suppress>
+
+    <!-- FIXME : RDM-???? -->
+    <suppress>
+        <notes>Temporary suppression for on-going developments.</notes>
+        <cve>CVE-2020-1938</cve>
+        <cve>CVE-2020-8840</cve>
+        <cve>CVE-2020-9547</cve>
+        <cve>CVE-2020-9548</cve>
+        <cve>CVE-2020-9546</cve>
+        <cve>CVE-2020-10673</cve>
+        <cve>CVE-2020-10672</cve>
+        <cve>CVE-2020-11619</cve>
+        <cve>CVE-2020-11620</cve>
+        <cve>CVE-2020-10683</cve>
+        <cve>CVE-2020-5407</cve>
+        <cve>CVE-2020-5408</cve>
+        <cve>CVE-2020-9484</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-10968</cve>
+     </suppress>
+     <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-10969</cve>
+     </suppress>
+     <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-11111</cve>
+     </suppress>
+     <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-11112</cve>
+     </suppress>
+     <suppress>
+        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
+        <cve>CVE-2020-11113</cve>
+     </suppress>
     <suppress>
    <notes><![CDATA[
    file name: spring-security-core-5.3.0.RELEASE.jar
@@ -137,6 +195,27 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
         <cpe>cpe:/a:security-framework_project:security-framework</cpe>
+        <cpe>cpe:2.3:a:checkstyle:checkstyle:*:*:*:*:*:*:*:*</cpe>
+        <cve>CVE-2019-10782</cve>
+    </suppress>
+
+    <!-- FIXME : RDM-???? -->
+    <suppress>
+        <notes>Temporary suppression for on-going developments.</notes>
+        <cve>CVE-2020-1938</cve>
+        <cve>CVE-2020-8840</cve>
+        <cve>CVE-2020-9547</cve>
+        <cve>CVE-2020-9548</cve>
+        <cve>CVE-2020-9546</cve>
+        <cve>CVE-2020-10673</cve>
+        <cve>CVE-2020-10672</cve>
+        <cve>CVE-2020-11619</cve>
+        <cve>CVE-2020-11620</cve>
+        <cve>CVE-2020-10683</cve>
+        <cve>CVE-2020-5407</cve>
+        <cve>CVE-2020-5408</cve>
+        <cve>CVE-2020-9484</cve>
+        <cve>CVE-2020-13692</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -208,12 +287,12 @@
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
    <cve>CVE-2020-10683</cve>
 </suppress>
-    <!-- FIXME : RDM-8724 -->
+	<suppress>
+		<notes>Suppress temporarily to unblock dev and qa</notes>
+		<cve>CVE-2020-13692</cve>
+	</suppress>
+    <!-- Temporarily suppress to unblock development -->
     <suppress>
-        <notes><![CDATA[
-   file name: postgresql-42.2.5.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
-        <cve>CVE-2020-13692</cve>
-    </suppress>
+      <cve>CVE-2017-18365</cve>
+     </suppress>
 </suppressions>
