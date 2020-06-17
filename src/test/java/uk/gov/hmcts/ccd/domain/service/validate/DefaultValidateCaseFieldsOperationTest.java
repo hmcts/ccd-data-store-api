@@ -98,9 +98,9 @@ class DefaultValidateCaseFieldsOperationTest {
     @Test
     void shouldValidate_when_organisation_has_correct_roles() throws Exception {
 
-        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseTypeWithTwoDefaultValues("default_role1","default_role2"));
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseTypeWithTwoDefaultValues("default_role1", "default_role2"));
 
-        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1","default_role2");
+        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
         final Map<String, JsonNode> result = validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
@@ -295,12 +295,12 @@ class DefaultValidateCaseFieldsOperationTest {
     }
 
 
-        private CaseTypeDefinition buildCaseTypeWithTwoDefaultValues(String defaultValue1,
-                                                                     String defaultValue2,
-                                                                     String reference1,
-                                                                     String reference2,
-                                                                     String caseFieldId1,
-                                                                     String caseFieldId2) {
+    private CaseTypeDefinition buildCaseTypeWithTwoDefaultValues(String defaultValue1,
+                                                                 String defaultValue2,
+                                                                 String reference1,
+                                                                 String reference2,
+                                                                 String caseFieldId1,
+                                                                 String caseFieldId2) {
         final List<CaseEventDefinition> caseEventDefinitions = new ArrayList();
         final List<CaseEventFieldDefinition> caseEventFieldDefinitions = new ArrayList<>();
         final List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions1 = new ArrayList<>();
@@ -355,7 +355,7 @@ class DefaultValidateCaseFieldsOperationTest {
     }
 
     private Map<String, JsonNode> buildJsonNodeDataWithTwoOrganisationPolicyRole(String organisationPolicyRole1,
-                                                                                  String organisationPolicyRole2) throws IOException {
+                                                                                 String organisationPolicyRole2) throws IOException {
         final JsonNode node = new ObjectMapper().readTree("{\n"
             + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole1 + "\",\n"
             + "  \"OrgPolicyReference\": \"" + organisationPolicyRole1 + "\",\n"
