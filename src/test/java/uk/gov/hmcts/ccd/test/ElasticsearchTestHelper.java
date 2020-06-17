@@ -67,6 +67,9 @@ public class ElasticsearchTestHelper {
     public static final String ADDRESS_LINE_2_VALUE = "AddressLine2Value";
     public static final String TOWN_VALUE = "TownValue";
     public static final String IN_PROGRESS_STATE = "IN_PROGRESS";
+    public static final String CREATED_DATE_VALUE = "2020-05-07T15:53:40.974";
+    public static final String LAST_STATE_MODIFIED_DATE_VALUE = "2020-05-07T17:42:00.527";
+    public static final String LAST_MODIFIED_DATE_VALUE = "2020-06-09T13:17:06.542";
 
     public static final String AUTOTEST1_PUBLIC = "caseworker-autotest1";
     public static final String AUTOTEST2_PUBLIC = "caseworker-autotest2";

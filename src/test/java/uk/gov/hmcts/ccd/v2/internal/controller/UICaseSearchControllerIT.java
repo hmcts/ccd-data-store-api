@@ -97,8 +97,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
-            () -> assertExampleCaseData(caseDetails.getFields()),
-            () -> assertExampleCaseMetadata(caseDetails.getFields())
+            () -> assertExampleCaseData(caseDetails.getFields(), false),
+            () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
         );
     }
 
@@ -168,8 +168,10 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
-            () -> assertExampleCaseData(caseDetails.getFieldsFormatted()), // TODO: After RDM-8460, update assertions for formatted dates
-            () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted()) // TODO: After RDM-8460, update assertions for formatted dates
+            () -> assertExampleCaseData(caseDetails.getFields(), false),
+            () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
+            () -> assertExampleCaseData(caseDetails.getFieldsFormatted(), true),
+            () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), true)
         );
     }
 
@@ -209,7 +211,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         );
     }
 
-    private void assertExampleCaseData(Map<String, Object> data) {
+    private void assertExampleCaseData(Map<String, Object> data, boolean formatted) {
         // TODO: After ACA-17, remove case data that should no longer be returned
         assertAll(
             () -> assertThat(asMap(data.get(ADDRESS_FIELD)).get(ADDRESS_LINE_1), is(STREET_VALUE)),
@@ -228,8 +230,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 .get(NESTED_COLLECTION_TEXT_FIELD)).get(0).get(VALUE), is("NestedCollectionTextValue1")),
             () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
                 .get(NESTED_COLLECTION_TEXT_FIELD)).get(1).get(VALUE), is("NestedCollectionTextValue2")),
-            () -> assertThat(data.get(DATE_FIELD), is(DATE_VALUE)),
-            () -> assertThat(data.get(DATE_TIME_FIELD), is(DATE_TIME_VALUE)),
+            () -> assertThat(data.get(DATE_FIELD), is(formatted ? "12/2007" : DATE_VALUE)),
+            () -> assertThat(data.get(DATE_TIME_FIELD), is(formatted ? "Saturday, 1 February 2003" : DATE_TIME_VALUE)),
             () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
             () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
             () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD), is(nullValue())),
@@ -245,13 +247,13 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         );
     }
 
-    public static void assertExampleCaseMetadata(Map<String, Object> data) {
+    public static void assertExampleCaseMetadata(Map<String, Object> data, boolean formatted) {
         assertAll(
             () -> assertThat(data.get(MetaData.CaseField.JURISDICTION.getReference()), is(AUTOTEST_1)),
             () -> assertThat(data.get(MetaData.CaseField.CASE_TYPE.getReference()), is(CASE_TYPE_A)),
-            () -> assertThat(data.get(MetaData.CaseField.CREATED_DATE.getReference()), is("2020-05-07T15:53:40.974")),
-            () -> assertThat(data.get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()), is("2020-06-09T13:17:06.542")),
-            // () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()), is("TBC")), // TODO: After RDM-8552 available
+            () -> assertThat(data.get(MetaData.CaseField.CREATED_DATE.getReference()), is(formatted ? "07 05 2020" : CREATED_DATE_VALUE)),
+            () -> assertThat(data.get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()), is(LAST_MODIFIED_DATE_VALUE)),
+            () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()), is(LAST_STATE_MODIFIED_DATE_VALUE)),
             () -> assertThat(data.get(MetaData.CaseField.CASE_REFERENCE.getReference()), is(Long.parseLong(DEFAULT_CASE_REFERENCE))),
             () -> assertThat(data.get(MetaData.CaseField.STATE.getReference()), is(STATE_VALUE)),
             () -> assertThat(data.get(MetaData.CaseField.SECURITY_CLASSIFICATION.getReference()), is(SecurityClassification.PUBLIC.name()))

@@ -227,9 +227,9 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(caseDetails.getJurisdiction(), is("AUTOTEST1")),
                 () -> assertThat(caseDetails.getCaseTypeId(), is(CASE_TYPE_A)),
-                () -> assertThat(caseDetails.getCreatedDate().toString(), is("2020-05-07T15:53:40.974")),
-                () -> assertThat(caseDetails.getLastModified().toString(), is("2020-06-09T13:17:06.542")),
-                // () -> assertThat(caseDetails.getLastStateModifiedDate().toString(), is("TBC")), // TODO: After RDM-8552 available
+                () -> assertThat(caseDetails.getCreatedDate().toString(), is(CREATED_DATE_VALUE)),
+                () -> assertThat(caseDetails.getLastModified().toString(), is(LAST_MODIFIED_DATE_VALUE)),
+                () -> assertThat(caseDetails.getLastStateModifiedDate().toString(), is(LAST_STATE_MODIFIED_DATE_VALUE)),
                 () -> assertThat(caseDetails.getReference(), is(1588866820969121L)),
                 () -> assertThat(caseDetails.getState(), is(STATE_VALUE)),
                 () -> assertThat(caseDetails.getSecurityClassification(), is(SecurityClassification.PUBLIC))
