@@ -137,7 +137,8 @@ class SearchResultDefinitionServiceTest {
 
     @Test
     public void shouldGetSearchResultDefinitionForDefaultUseCaseWithRequestedFields() {
-        SearchResult result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, CASE_FIELD_ID_1_3 + "." + CASE_FIELD_ID_1_3_NESTED));
+        SearchResult result = searchResultDefinitionService
+            .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, CASE_FIELD_ID_1_3 + "." + CASE_FIELD_ID_1_3_NESTED));
 
         verifyNoMoreInteractions(uiDefinitionRepository);
         assertAll(
@@ -157,7 +158,8 @@ class SearchResultDefinitionServiceTest {
 
     @Test
     public void shouldIgnoreRequestedFieldsThatDoNotExist() {
-        SearchResult result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, "INVALID"));
+        SearchResult result = searchResultDefinitionService
+            .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, "INVALID"));
 
         verifyNoMoreInteractions(uiDefinitionRepository);
         assertAll(
