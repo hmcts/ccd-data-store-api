@@ -54,7 +54,11 @@ public class MergeDataToSearchResultOperation {
             .map(caseData -> buildSearchResultViewItem(caseData, caseTypeDefinition, searchResult))
             .collect(Collectors.toList());
 
-        return searchResultProcessor.execute(viewColumns, viewItems, resultError);
+        return new SearchResultView(
+            viewColumns,
+            searchResultProcessor.execute(viewColumns, viewItems),
+            resultError
+        );
     }
 
     private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseTypeDefinition caseTypeDefinition,
