@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
+import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -93,7 +94,7 @@ class CaseSearchResultViewGeneratorTest {
     private CaseTypeService caseTypeService;
 
     @Mock
-    private SearchQueryOperation searchQueryOperation;
+    private SearchResultDefinitionService searchResultDefinitionService;
 
     private CaseSearchResultViewGenerator classUnderTest;
 
@@ -165,9 +166,9 @@ class CaseSearchResultViewGeneratorTest {
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_2, CASE_FIELD_4, "", CASE_FIELD_4, ""))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any(),any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(),any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
 
-        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchQueryOperation);
+        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchResultDefinitionService);
     }
 
     @Test
@@ -225,7 +226,7 @@ class CaseSearchResultViewGeneratorTest {
                 buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME, ""),
                 buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME, ""))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -263,7 +264,7 @@ class CaseSearchResultViewGeneratorTest {
                 searchResultFieldWithInvalidRole)
             .build();
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
-        when(searchQueryOperation.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1));
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
@@ -304,7 +305,7 @@ class CaseSearchResultViewGeneratorTest {
             .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
             .build();
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
-        when(searchQueryOperation.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
@@ -323,7 +324,7 @@ class CaseSearchResultViewGeneratorTest {
             buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FAMILY_DETAILS_PATH, FAMILY_DETAILS, ""),
             buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FAMILY_DETAILS_PATH_NESTED, FAMILY_DETAILS, ""))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -346,7 +347,7 @@ class CaseSearchResultViewGeneratorTest {
                 FAMILY_DETAILS, "InvalidElement",
                 FAMILY_DETAILS, ""))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
             () -> classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList()));
@@ -365,7 +366,7 @@ class CaseSearchResultViewGeneratorTest {
             .build();
         CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID_1).withJurisdiction(jurisdiction)
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()).build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeWithoutCaseFieldDefinition);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1,
@@ -382,7 +383,7 @@ class CaseSearchResultViewGeneratorTest {
     @Test
     void shouldThrowBadSearchRequestExceptionWhenUseCaseDoesNotExist() {
         SearchResult searchResult = searchResult().withSearchResultFields().build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
         final BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
             classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, "INVALID", Collections.emptyList()));

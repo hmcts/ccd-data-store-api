@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +16,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
@@ -87,13 +86,13 @@ public class SearchQueryOperationTest {
     private GetDraftsOperation getDraftsOperation;
 
     @Mock
-    private UIDefinitionRepository uiDefinitionRepository;
-
-    @Mock
     private UserRepository userRepository;
 
     @Mock
     private SearchInputProcessor searchInputProcessor;
+
+    @Mock
+    private SearchResultDefinitionService searchResultDefinitionService;
 
     private SearchQueryOperation searchQueryOperation;
     private MetaData metadata;
@@ -122,13 +121,13 @@ public class SearchQueryOperationTest {
         searchQueryOperation = new SearchQueryOperation(searchOperation,
                                                         mergeDataToSearchResultOperation,
                                                         getCaseTypeOperation,
-                                                        getDraftsOperation, uiDefinitionRepository, userRepository,
+                                                        getDraftsOperation, searchResultDefinitionService, userRepository,
                                                         searchInputProcessor);
         SearchResult searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, ""))
             .build();
-        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
-        doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(SEARCH), any());
         doAnswer(i -> i.getArgument(2)).when(searchInputProcessor).executeQueryParams(Mockito.any(), Mockito.any(), Mockito.any());
         doAnswer(i -> i.getArgument(1)).when(searchInputProcessor).executeMetadata(Mockito.any(), Mockito.any());
 
@@ -246,7 +245,7 @@ public class SearchQueryOperationTest {
         SearchResult searchResult = searchResult()
              .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, ""))
              .build();
-        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -262,7 +261,7 @@ public class SearchQueryOperationTest {
         SearchResult searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, ""))
             .build();
-        doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(SEARCH), any());
 
         searchQueryOperation.execute(SEARCH_VIEW, metadata, criteria);
 
@@ -281,7 +280,7 @@ public class SearchQueryOperationTest {
             .withSearchResultFields(nonSortField, sortField)
             .build();
 
-        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -300,7 +299,7 @@ public class SearchQueryOperationTest {
             .withSearchResultFields(sortField1, sortField2)
             .build();
 
-        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -320,7 +319,7 @@ public class SearchQueryOperationTest {
             .withSearchResultFields(sortField1, sortField2)
             .build();
 
-        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
         doReturn(Sets.newHashSet(USER_ROLE_2)).when(userRepository).getUserRoles();
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
@@ -329,80 +328,7 @@ public class SearchQueryOperationTest {
         assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_ID_1_2 + "." + CASE_FIELD_PATH));
         assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC));
     }
-
-    @Test
-    public void shouldGetSearchResultDefinitionForWorkbasket() {
-        SearchResult searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
-            .build();
-        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
-
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, WORKBASKET, Collections.emptyList());
-
-        verify(uiDefinitionRepository).getWorkBasketResult(eq(CASE_TYPE_ID));
-        verifyNoMoreInteractions(uiDefinitionRepository);
-        assertAll(
-            () -> assertThat(result, is(searchResult))
-        );
-    }
-
-    @Test
-    public void shouldGetSearchResultDefinitionForSearch() {
-        SearchResult searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
-            .build();
-        doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
-
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, SEARCH, Collections.emptyList());
-
-        verify(uiDefinitionRepository).getSearchResult(eq(CASE_TYPE_ID));
-        verifyNoMoreInteractions(uiDefinitionRepository);
-        assertAll(
-            () -> assertThat(result, is(searchResult))
-        );
-    }
-
-    @Test
-    public void shouldGetSearchResultDefinitionForOrgCases() {
-        SearchResult searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
-            .build();
-        doReturn(searchResult).when(uiDefinitionRepository).getSearchCasesResult(CASE_TYPE_ID, ORG_CASES);
-
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(testCaseTypeDefinition, ORG_CASES, Collections.emptyList());
-
-        verify(uiDefinitionRepository).getSearchCasesResult(eq(CASE_TYPE_ID), eq(ORG_CASES));
-        verifyNoMoreInteractions(uiDefinitionRepository);
-        assertAll(
-            () -> assertThat(result, is(searchResult))
-        );
-    }
-
-    @Test
-    public void shouldGetSearchResultDefinitionForDefaultUseCase() {
-        CaseFieldDefinition caseField = newCaseField()
-            .withId(CASE_FIELD_ID_1_1)
-            .withCaseTypeId(CASE_TYPE_ID)
-            .withFieldLabelText("Label")
-            .withMetadata(true)
-            .build();
-        CaseTypeDefinition caseTypeDefinition = newCaseType()
-            .withId(CASE_TYPE_ID)
-            .withField(caseField)
-            .build();
-
-        final SearchResult result = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, "", Collections.emptyList());
-
-        verifyNoMoreInteractions(uiDefinitionRepository);
-        assertAll(
-            () -> assertThat(result.getFields().length, is(1)),
-            () -> assertThat(result.getFields()[0].getCaseFieldId(), is(CASE_FIELD_ID_1_1)),
-            () -> assertThat(result.getFields()[0].getCaseTypeId(), is(CASE_TYPE_ID)),
-            () -> assertThat(result.getFields()[0].getLabel(), is("Label")),
-            () -> assertThat(result.getFields()[0].isMetadata(), is(true))
-        );
-    }
-
+    
     private static SearchResultField buildSortResultField(String caseFieldId,
                                                     String caseFieldPath,
                                                     String role,

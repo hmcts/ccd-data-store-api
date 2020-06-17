@@ -11,7 +11,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
-import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -27,14 +26,14 @@ public class CaseSearchResultViewGenerator {
 
     private final UserRepository userRepository;
     private final CaseTypeService caseTypeService;
-    private final SearchQueryOperation searchQueryOperation;
+    private final SearchResultDefinitionService searchResultDefinitionService;
 
     public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                          CaseTypeService caseTypeService,
-                                         SearchQueryOperation searchQueryOperation) {
+                                         SearchResultDefinitionService searchResultDefinitionService) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
-        this.searchQueryOperation = searchQueryOperation;
+        this.searchResultDefinitionService = searchResultDefinitionService;
     }
 
     public CaseSearchResultView execute(String caseTypeId,
@@ -51,7 +50,7 @@ public class CaseSearchResultViewGenerator {
 
     private List<SearchResultViewItem> buildItems(String useCase, CaseSearchResult caseSearchResult, String caseTypeId, List<String> requestedFields) {
         CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
-        SearchResult searchResultDefinition = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
+        SearchResult searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
 
         List<SearchResultViewItem> items = new ArrayList<>();
         // Only one case type is currently supported so we can reuse the same definitions for building all items
@@ -81,7 +80,7 @@ public class CaseSearchResultViewGenerator {
                                                     String caseTypeId,
                                                     CaseTypeDefinition caseType,
                                                     List<String> requestedFields) {
-        SearchResult searchResult = searchQueryOperation.getSearchResultDefinition(caseType, useCase, requestedFields);
+        SearchResult searchResult = searchResultDefinitionService.getSearchResultDefinition(caseType, useCase, requestedFields);
         if (searchResult.getFields().length == 0) {
             throw new BadSearchRequest(String.format("The provided use case '%s' is unsupported for case type '%s'.",
                 useCase, caseType.getId()));
