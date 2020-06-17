@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -14,18 +14,17 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 @Qualifier("default")
 public class DefaultCaseAssignedUserRoleValidator implements CaseAssignedUserRoleValidator {
 
-
-    @Value("#{'${casedatastore.authorised.services.add_caseassigned_user_roles}'.split(',')}")
-    private List<String> authorisedAddServices;
-
     private final String roleCaseWorkerCaa = "caseworker-caa";
 
-    private UserRepository userRepository;
-    private SecurityUtils securityUtils;
+    private final ApplicationParams applicationParams;
+    private final UserRepository userRepository;
+    private final SecurityUtils securityUtils;
 
     @Autowired
-    public DefaultCaseAssignedUserRoleValidator(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+    public DefaultCaseAssignedUserRoleValidator(ApplicationParams applicationParams,
+                                                @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                                 SecurityUtils securityUtils) {
+        this.applicationParams = applicationParams;
         this.userRepository = userRepository;
         this.securityUtils = securityUtils;
     }
@@ -40,7 +39,7 @@ public class DefaultCaseAssignedUserRoleValidator implements CaseAssignedUserRol
     }
 
     public boolean canAddUserCaseRoles() {
-        return authorisedAddServices.contains(securityUtils.getServiceName());
+        return applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(securityUtils.getServiceName());
     }
 
 }

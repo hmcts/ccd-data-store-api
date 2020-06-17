@@ -120,11 +120,11 @@ public class CaseAssignedUserRolesController {
     public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids") List<String> caseIds,
                                                                           @RequestParam(value = "user_ids", required = false)
                                                                               Optional<List<String>> optionalUserIds) {
-        List<String> userIds = optionalUserIds.orElseGet(() -> Lists.newArrayList());
+        List<String> userIds = optionalUserIds.orElseGet(Lists::newArrayList);
         validateRequestParams(caseIds, userIds);
         List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
             .stream()
-            .map(caseId -> Long.valueOf(caseId))
+            .map(Long::valueOf)
             .collect(Collectors.toCollection(ArrayList::new)), userIds);
         return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
     }
@@ -148,13 +148,13 @@ public class CaseAssignedUserRolesController {
         });
 
         if (errorMessages.size() > 1) {
-            String message = errorMessages.stream().collect(Collectors.joining("\n"));
+            String message = String.join("\n", errorMessages);
             throw new BadRequestException(message);
         }
     }
 
     private void validateRequestParams(CaseAssignedUserRolesResource caseAssignedUserRoles) {
-        final Pattern caseRolePattern = Pattern.compile("^\\[.+\\]$");
+        final Pattern caseRolePattern = Pattern.compile("^\\[.+]$");
 
         List<String> errorMessages = Lists.newArrayList("Invalid data provided for the following inputs to the request:");
 
@@ -182,28 +182,28 @@ public class CaseAssignedUserRolesController {
         }
 
         if (errorMessages.size() > 1) {
-            String message = errorMessages.stream().collect(Collectors.joining("\n"));
+            String message = String.join("\n", errorMessages);
             throw new BadRequestException(message);
         }
     }
 
     public static String buildCaseIds(CaseAssignedUserRolesResource caseAssignedUserRoles) {
         return caseAssignedUserRolesToStream(caseAssignedUserRoles).limit(MAX_CASE_IDS_LIST)
-            .map(c -> c.getCaseDataId())
+            .map(CaseAssignedUserRole::getCaseDataId)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
     public static String buildCaseRoles(CaseAssignedUserRolesResource caseAssignedUserRoles) {
         // NB: match Case ID list size and separator configuration
         return caseAssignedUserRolesToStream(caseAssignedUserRoles).limit(MAX_CASE_IDS_LIST)
-            .map(c -> c.getCaseRole())
+            .map(CaseAssignedUserRole::getCaseRole)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
     public static String buildUserIds(CaseAssignedUserRolesResource caseAssignedUserRoles) {
         // NB: match Case ID list size and separator configuration
         return caseAssignedUserRolesToStream(caseAssignedUserRoles).limit(MAX_CASE_IDS_LIST)
-            .map(c -> c.getUserId())
+            .map(CaseAssignedUserRole::getUserId)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 

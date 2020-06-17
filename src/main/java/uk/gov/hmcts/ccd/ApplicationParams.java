@@ -17,6 +17,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Singleton
 public class ApplicationParams {
 
+    @Value("#{'${casedatastore.authorised.services.add_caseassigned_user_roles}'.split(',')}")
+    private List<String> authorisedServicesForAddUserCaseRoles;
+
     @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")
     private List<String> writeToCCDCaseTypesOnly;
 
@@ -145,6 +148,10 @@ public class ApplicationParams {
         } catch (UnsupportedEncodingException e) {
             throw new ServiceException(e.getMessage());
         }
+    }
+
+    public List<String> getAuthorisedServicesForAddUserCaseRoles() {
+        return authorisedServicesForAddUserCaseRoles;
     }
 
     public boolean isWildcardSearchAllowed() {

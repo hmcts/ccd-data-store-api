@@ -11,6 +11,8 @@ import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 class DefaultCaseAssignedUserRolesOperationTest {
@@ -25,11 +27,25 @@ class DefaultCaseAssignedUserRolesOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseAssignedUserRolesOperation = new DefaultCaseAssignedUserRolesOperation(caseAccessOperation);
-        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(createCaseAssignedUserRoles());
+    }
+
+    @Test
+    void addCaseUserRoles() {
+        // ARRANGE
+        List<CaseAssignedUserRole> caseAssignedUserRoles = createCaseAssignedUserRoles();
+
+        // ACT
+        caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles);
+
+        // ASSERT
+        verify(caseAccessOperation).addCaseUserRoles(caseAssignedUserRoles);
+        verifyNoMoreInteractions(caseAccessOperation);
     }
 
     @Test
     void findCaseUserRoles() {
+        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(createCaseAssignedUserRoles());
+
         List<CaseAssignedUserRole> caseAssignedUserRoles = caseAssignedUserRolesOperation
             .findCaseUserRoles(Lists.newArrayList(), Lists.newArrayList());
 
