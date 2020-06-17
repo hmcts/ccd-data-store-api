@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE;
 
 class DefaultValidateCaseFieldsOperationTest {
 
@@ -105,6 +107,37 @@ class DefaultValidateCaseFieldsOperationTest {
 
         assertAll(
             () -> assertThat(result, is(organisationPolicyData))
+        );
+    }
+
+    @Test
+    void shouldValidate_when_organisation_has_correct_roles_complex() throws Exception {
+
+        String orgPolicyReference1 = ORGANISATIONPOLICYFIELD_1 + "." + ORGANISATION_POLICY_ROLE;
+        String orgPolicyReference2 = ORGANISATIONPOLICYFIELD_2 + "." + ORGANISATION_POLICY_ROLE;
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseTypeWithTwoDefaultValues(
+            "default_role1",
+            "default_role2",
+            orgPolicyReference1,
+            orgPolicyReference2,
+            "Class",
+            "Class"));
+
+        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
+
+        ObjectNode classNode = new ObjectMapper().createObjectNode();
+        organisationPolicyData.keySet().forEach(key -> classNode.set(key, organisationPolicyData.get(key)));
+
+        ObjectNode parentNode = new ObjectMapper().createObjectNode();
+        parentNode.set("Class", classNode);
+        Map<String, JsonNode> parentData = new HashMap<>();
+        parentData.put("ParentNode", parentNode);
+        doReturn(parentData).when(caseDataContent).getData();
+
+        final Map<String, JsonNode> result = validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
+
+        assertAll(
+            () -> assertThat(result, is(parentData))
         );
     }
 
@@ -234,7 +267,7 @@ class DefaultValidateCaseFieldsOperationTest {
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition.setDefaultValue(defaultValue);
-        caseEventFieldComplexDefinition.setReference(DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE);
+        caseEventFieldComplexDefinition.setReference(ORGANISATION_POLICY_ROLE);
 
         caseEventFieldComplexDefinitions.add(caseEventFieldComplexDefinition);
         caseEventFieldDefinitions.add(caseEventFieldDefinition);
@@ -252,8 +285,22 @@ class DefaultValidateCaseFieldsOperationTest {
         return caseTypeDefinition;
     }
 
+    private CaseTypeDefinition buildCaseTypeWithTwoDefaultValues(String defaultValue1, String defaultValue2) {
+        return buildCaseTypeWithTwoDefaultValues(defaultValue1,
+            defaultValue2,
+            ORGANISATION_POLICY_ROLE,
+            ORGANISATION_POLICY_ROLE,
+            ORGANISATIONPOLICYFIELD_1,
+            ORGANISATIONPOLICYFIELD_2);
+    }
 
-    private static CaseTypeDefinition buildCaseTypeWithTwoDefaultValues(String defaultValue1, String defaultValue2) {
+
+        private CaseTypeDefinition buildCaseTypeWithTwoDefaultValues(String defaultValue1,
+                                                                     String defaultValue2,
+                                                                     String reference1,
+                                                                     String reference2,
+                                                                     String caseFieldId1,
+                                                                     String caseFieldId2) {
         final List<CaseEventDefinition> caseEventDefinitions = new ArrayList();
         final List<CaseEventFieldDefinition> caseEventFieldDefinitions = new ArrayList<>();
         final List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions1 = new ArrayList<>();
@@ -264,13 +311,13 @@ class DefaultValidateCaseFieldsOperationTest {
 
         //---1 ---/
         final CaseEventFieldDefinition caseEventFieldDefinition1 = new CaseEventFieldDefinition();
-        caseEventFieldDefinition1.setCaseFieldId(ORGANISATIONPOLICYFIELD_1);
+        caseEventFieldDefinition1.setCaseFieldId(caseFieldId1);
 
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
 
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition1 = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition1.setDefaultValue(defaultValue1);
-        caseEventFieldComplexDefinition1.setReference(DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE);
+        caseEventFieldComplexDefinition1.setReference(reference1);
 
         caseEventFieldComplexDefinitions1.add(caseEventFieldComplexDefinition1);
         caseEventFieldDefinition1.setCaseEventFieldComplexDefinitions(caseEventFieldComplexDefinitions1);
@@ -280,11 +327,11 @@ class DefaultValidateCaseFieldsOperationTest {
         final List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions2 = new ArrayList<>();
 
         final CaseEventFieldDefinition caseEventFieldDefinition2 = new CaseEventFieldDefinition();
-        caseEventFieldDefinition2.setCaseFieldId(ORGANISATIONPOLICYFIELD_2);
+        caseEventFieldDefinition2.setCaseFieldId(caseFieldId2);
 
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition2 = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition2.setDefaultValue(defaultValue2);
-        caseEventFieldComplexDefinition2.setReference(DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE);
+        caseEventFieldComplexDefinition2.setReference(reference2);
         caseEventFieldComplexDefinitions2.add(caseEventFieldComplexDefinition2);
         caseEventFieldDefinition2.setCaseEventFieldComplexDefinitions(caseEventFieldComplexDefinitions2);
         caseEventFieldDefinitions.add(caseEventFieldDefinition2);
