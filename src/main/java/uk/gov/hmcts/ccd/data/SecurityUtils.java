@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -74,6 +76,7 @@ public class SecurityUtils {
 
     public String getServiceName() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return jwt.getClaim(AUD_CLAIM);
+        List<String> claims = jwt.getClaimAsStringList(AUD_CLAIM);
+        return CollectionUtils.isNotEmpty(claims) ? claims.get(0) : null;
     }
 }
