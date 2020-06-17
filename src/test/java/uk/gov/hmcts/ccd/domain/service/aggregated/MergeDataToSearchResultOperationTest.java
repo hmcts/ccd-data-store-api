@@ -160,8 +160,7 @@ class MergeDataToSearchResultOperationTest {
             .withField(labelField)
             .build();
         doReturn(Collections.emptySet()).when(userRepository).getUserRoles();
-        doAnswer(i -> new SearchResultView(i.getArgument(0), i.getArgument(1), i.getArgument(2)))
-            .when(searchResultProcessor).execute(Mockito.any(), Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(Mockito.any(), Mockito.any());
 
         classUnderTest = new MergeDataToSearchResultOperation(userRepository, searchResultProcessor);
     }
@@ -179,16 +178,16 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields(),
-                is(not(sameInstance(searchResultView.getSearchResultViewItems().get(0).getCaseFieldsFormatted())))),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields(),
-                is(not(sameInstance(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted())))),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFieldsFormatted().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted().get(STATE.getReference()), is("state2")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()),
-                is(searchResultView.getSearchResultViewItems().get(1).getCaseFieldsFormatted().get(STATE.getReference()))),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields(),
+                is(not(sameInstance(searchResultView.getSearchResultViewItems().get(0).getFieldsFormatted())))),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields(),
+                is(not(sameInstance(searchResultView.getSearchResultViewItems().get(1).getFieldsFormatted())))),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFieldsFormatted().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFieldsFormatted().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()),
+                is(searchResultView.getSearchResultViewItems().get(1).getFieldsFormatted().get(STATE.getReference()))),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
         );
     }
@@ -234,8 +233,8 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()), is("state2")),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
@@ -270,8 +269,8 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()), is("state2")),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
@@ -305,8 +304,8 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()), is("state2")),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
@@ -331,10 +330,10 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
             () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0)
-                .getCaseFields()
+                .getFields()
                 .get(LABEL_ID)).asText(), is(LABEL_TEXT)),
             () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1)
-                .getCaseFields()
+                .getFields()
                 .get(LABEL_ID)).asText(), is(LABEL_TEXT)));
     }
 
@@ -387,9 +386,9 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getCaseFields()
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getFields()
                 .get(LABEL_ID)).asText(), is(LABEL_TEXT)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getCaseFields()
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getFields()
                 .get(LABEL_ID)).asText(), is(LABEL_TEXT)))
         ;
     }
@@ -411,9 +410,9 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getCaseFields()
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getFields()
                 .get("FamilyDetails.FatherName")).asText(), is(FATHER_NAME_VALUE)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getCaseFields()
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getFields()
                 .get("FamilyDetails.FatherName")).asText(), is(FATHER_NAME_VALUE)))
         ;
     }
@@ -435,9 +434,9 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getCaseFields()
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getFields()
                 .get("FamilyDetails.FamilyAddress.PostCode")).asText(), is(POSTCODE_VALUE)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getCaseFields()
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getFields()
                 .get("FamilyDetails.FamilyAddress.PostCode")).asText(), is(POSTCODE_VALUE)))
         ;
     }
@@ -477,9 +476,9 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(0)),
-            () -> assertNull(searchResultView.getSearchResultViewItems().get(0).getCaseFields()
+            () -> assertNull(searchResultView.getSearchResultViewItems().get(0).getFields()
                 .get("InvalidElementPath")),
-            () -> assertNull(searchResultView.getSearchResultViewItems().get(1).getCaseFields()
+            () -> assertNull(searchResultView.getSearchResultViewItems().get(1).getFields()
                 .get("InvalidElementPath")));
     }
 
