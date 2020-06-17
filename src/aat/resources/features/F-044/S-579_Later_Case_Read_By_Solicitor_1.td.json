@@ -72,11 +72,6 @@
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311/binary"
         },
         "NumberField": "111111222222",
-        "MultiSelectListField": [
-          "OPTION5",
-          "OPTION4",
-          "OPTION3"
-        ],
         "YesOrNoField": "Yes",
         "EmailField": "testemail@gmail.com",
         "TextField": "sometextfield",

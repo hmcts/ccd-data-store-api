@@ -1,20 +1,32 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
@@ -22,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -44,6 +57,10 @@ class DefaultValidateCaseFieldsOperationTest {
     private String eventId = "eventId";
     private Map<String, JsonNode> data = Maps.newHashMap();
 
+    private static final String JURISDICTION_ID = "jid";
+    private static final String ORGANISATIONPOLICYFIELD_1 = "OrganisationPolicyField1";
+    private static final String ORGANISATIONPOLICYFIELD_2 = "OrganisationPolicyField2";
+
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
 
     @BeforeEach
@@ -58,6 +75,66 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(eventId).when(caseDataContent).getEventId();
 
         validateCaseFieldsOperation = new DefaultValidateCaseFieldsOperation(caseDefinitionRepository, caseTypeService, fieldProcessorService);
+    }
+
+    @Test
+    void shouldValidate_when_organisation_has_correct_role() throws Exception {
+
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseType("default_role"));
+
+        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole("default_role");
+        doReturn(organisationPolicyData).when(caseDataContent).getData();
+
+        final Map<String, JsonNode> result = validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
+
+        assertAll(
+            () -> assertThat(result, is(organisationPolicyData))
+        );
+    }
+
+    @Test
+    void shouldValidate_when_organisation_has_correct_roles() throws Exception {
+
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseTypeWithTwoDefaultValues("default_role1","default_role2"));
+
+        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1","default_role2");
+        doReturn(organisationPolicyData).when(caseDataContent).getData();
+
+        final Map<String, JsonNode> result = validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
+
+        assertAll(
+            () -> assertThat(result, is(organisationPolicyData))
+        );
+    }
+
+    @Test
+    void should_fail_validate_when_organisation_has_null_role() throws Exception {
+
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseType("default_role"));
+
+        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole(null);
+        doReturn(organisationPolicyData).when(caseDataContent).getData();
+
+        ValidationException exception =
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+
+        assertThat(exception.getMessage(),
+            containsString("has an incorrect value"));
+    }
+
+    @Test
+    void should_fail_validate_when_organisation_has_incorrect_role() throws Exception {
+
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseType("default_role"));
+
+        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
+        doReturn(organisationPolicyData).when(caseDataContent).getData();
+
+        ValidationException exception =
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+
+        assertThat(exception.getMessage(),
+            containsString("incorrect value"));
     }
 
     @Test
@@ -127,5 +204,131 @@ class DefaultValidateCaseFieldsOperationTest {
             startsWith("Cannot validate case field because of event otherEvent is not found in case type definition"));
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(caseTypeService, never()).validateData(anyMap(), any());
+    }
+
+    private Map<String, JsonNode> buildJsonNodeDataWithOrganisationPolicyRole(String organisationPolicyRole) throws IOException {
+        final JsonNode node = new ObjectMapper().readTree("{\n"
+            + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole + "\",\n"
+            + "  \"OrgPolicyReference\": \"" + organisationPolicyRole + "\",\n"
+            + "  \"Organisation\": {\n"
+            + "    \"OrganisationID\": \"OrganisationID\",\n"
+            + "    \"OrganisationName\": " + "\"OrganisationName\"\n"
+            + "  }\n"
+            + "}\n");
+        final Map<String, JsonNode> map = new HashMap<>();
+        map.put("OrganisationPolicyField", node);
+        return map;
+    }
+
+    private static CaseTypeDefinition buildCaseType(String defaultValue) {
+        final List<CaseEventDefinition> CaseEventDefinitions = new ArrayList();
+        final List<CaseEventFieldDefinition> caseEventFieldDefinitions = new ArrayList<>();
+        final List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
+        final JurisdictionDefinition j = buildJurisdiction();
+        final Version version = new Version();
+        version.setNumber(67);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        final CaseEventFieldDefinition caseEventFieldDefinition = new CaseEventFieldDefinition();
+        caseEventFieldDefinition.setCaseFieldId("OrganisationPolicyField");
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition = new CaseEventFieldComplexDefinition();
+        caseEventFieldComplexDefinition.setDefaultValue(defaultValue);
+        caseEventFieldComplexDefinition.setReference(DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE);
+
+        caseEventFieldComplexDefinitions.add(caseEventFieldComplexDefinition);
+        caseEventFieldDefinitions.add(caseEventFieldDefinition);
+        caseEventFieldDefinition.setCaseEventFieldComplexDefinitions(caseEventFieldComplexDefinitions);
+
+        caseEventDefinition.setId("eventId");
+        caseEventDefinition.setCaseFields(caseEventFieldDefinitions);
+
+        caseTypeDefinition.setId("caseTypeId");
+        caseTypeDefinition.setName("case type name");
+        caseTypeDefinition.setJurisdictionDefinition(j);
+        caseTypeDefinition.setVersion(version);
+        CaseEventDefinitions.add(caseEventDefinition);
+        caseTypeDefinition.setEvents(CaseEventDefinitions);
+        return caseTypeDefinition;
+    }
+
+
+    private static CaseTypeDefinition buildCaseTypeWithTwoDefaultValues(String defaultValue1, String defaultValue2) {
+        final List<CaseEventDefinition> caseEventDefinitions = new ArrayList();
+        final List<CaseEventFieldDefinition> caseEventFieldDefinitions = new ArrayList<>();
+        final List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions1 = new ArrayList<>();
+        final JurisdictionDefinition j = buildJurisdiction();
+        final Version version = new Version();
+        version.setNumber(67);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+
+        //---1 ---/
+        final CaseEventFieldDefinition caseEventFieldDefinition1 = new CaseEventFieldDefinition();
+        caseEventFieldDefinition1.setCaseFieldId(ORGANISATIONPOLICYFIELD_1);
+
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+
+        final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition1 = new CaseEventFieldComplexDefinition();
+        caseEventFieldComplexDefinition1.setDefaultValue(defaultValue1);
+        caseEventFieldComplexDefinition1.setReference(DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE);
+
+        caseEventFieldComplexDefinitions1.add(caseEventFieldComplexDefinition1);
+        caseEventFieldDefinition1.setCaseEventFieldComplexDefinitions(caseEventFieldComplexDefinitions1);
+        caseEventFieldDefinitions.add(caseEventFieldDefinition1);
+
+        //----2 ----/
+        final List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions2 = new ArrayList<>();
+
+        final CaseEventFieldDefinition caseEventFieldDefinition2 = new CaseEventFieldDefinition();
+        caseEventFieldDefinition2.setCaseFieldId(ORGANISATIONPOLICYFIELD_2);
+
+        final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition2 = new CaseEventFieldComplexDefinition();
+        caseEventFieldComplexDefinition2.setDefaultValue(defaultValue2);
+        caseEventFieldComplexDefinition2.setReference(DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE);
+        caseEventFieldComplexDefinitions2.add(caseEventFieldComplexDefinition2);
+        caseEventFieldDefinition2.setCaseEventFieldComplexDefinitions(caseEventFieldComplexDefinitions2);
+        caseEventFieldDefinitions.add(caseEventFieldDefinition2);
+
+        //---General ---/
+        caseEventDefinition.setId("eventId");
+        caseEventDefinition.setCaseFields(caseEventFieldDefinitions);
+        caseTypeDefinition.setId("caseTypeId");
+        caseTypeDefinition.setName("case type name");
+        caseTypeDefinition.setJurisdictionDefinition(j);
+        caseTypeDefinition.setVersion(version);
+        caseEventDefinitions.add(caseEventDefinition);
+        caseTypeDefinition.setEvents(caseEventDefinitions);
+        return caseTypeDefinition;
+    }
+
+    private static JurisdictionDefinition buildJurisdiction() {
+        final JurisdictionDefinition j = new JurisdictionDefinition();
+        j.setId(JURISDICTION_ID);
+        return j;
+    }
+
+    private Map<String, JsonNode> buildJsonNodeDataWithTwoOrganisationPolicyRole(String organisationPolicyRole1,
+                                                                                  String organisationPolicyRole2) throws IOException {
+        final JsonNode node = new ObjectMapper().readTree("{\n"
+            + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole1 + "\",\n"
+            + "  \"OrgPolicyReference\": \"" + organisationPolicyRole1 + "\",\n"
+            + "  \"Organisation\": {\n"
+            + "    \"OrganisationID\": \"OrganisationID\",\n"
+            + "    \"OrganisationName\": " + "\"OrganisationName\"\n"
+            + "  }\n"
+            + "}\n");
+
+        final JsonNode node1 = new ObjectMapper().readTree("{\n"
+            + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole2 + "\",\n"
+            + "  \"OrgPolicyReference\": \"" + organisationPolicyRole2 + "\",\n"
+            + "  \"Organisation\": {\n"
+            + "    \"OrganisationID\": \"OrganisationID\",\n"
+            + "    \"OrganisationName\": " + "\"OrganisationName\"\n"
+            + "  }\n"
+            + "}\n");
+
+        final Map<String, JsonNode> map = new HashMap<>();
+        map.put(ORGANISATIONPOLICYFIELD_1, node);
+        map.put(ORGANISATIONPOLICYFIELD_2, node1);
+        return map;
     }
 }

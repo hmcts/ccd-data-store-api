@@ -11,7 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Transactional
-public class DefaultCaseDetailsRepositoryTest extends BaseTest {
+public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     private static final long CASE_REFERENCE = 999999L;
     private static final String JURISDICTION_ID = "JeyOne";
