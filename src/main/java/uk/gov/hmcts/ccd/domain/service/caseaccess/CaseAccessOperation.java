@@ -82,6 +82,13 @@ public class CaseAccessOperation {
         revokeRemovedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
     }
 
+    @Transactional
+    public void addCaseUserRoles(List<CaseAssignedUserRole> caseUserRoles) {
+        caseUserRoles.stream().forEach(caseUserRole -> {
+            final Long caseId = new Long(caseUserRole.getCaseDataId());
+            caseUserRepository.grantAccess(caseId, caseUserRole.getUserId(), caseUserRole.getCaseRole());
+        });
+    }
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {
         Map<String, Long> caseReferenceAndIds = caseReferences.stream()

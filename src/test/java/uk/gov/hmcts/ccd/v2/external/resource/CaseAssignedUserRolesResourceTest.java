@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -26,7 +26,19 @@ class CaseAssignedUserRolesResourceTest {
         CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource(caseAssignedUserRoles);
 
         assertAll(
-            () -> assertThat(resource.getCaseAssignedUserRoles().size(), equalTo(2))
+            () -> assertThat(resource.getCaseAssignedUserRoles(), hasSize(2))
+        );
+    }
+
+    @Test
+    @DisplayName("should have no links")
+    public void shouldHaveNoLinks() {
+        List<CaseAssignedUserRole> caseAssignedUserRoles = createCaseAssignedUserRoles();
+
+        CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource(caseAssignedUserRoles);
+
+        assertAll(
+            () -> assertThat(resource.getLinks().toList(), hasSize(0))
         );
     }
 
