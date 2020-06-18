@@ -102,8 +102,8 @@ class SecurityUtilsTest {
     }
 
     @Test
-    @DisplayName("Get client name")
-    void shouldServiceName() {
+    @DisplayName("Get service name")
+    void shouldGetServiceName() {
         assertThat(securityUtils.getServiceName(), is("ccd_gateway"));
     }
 
