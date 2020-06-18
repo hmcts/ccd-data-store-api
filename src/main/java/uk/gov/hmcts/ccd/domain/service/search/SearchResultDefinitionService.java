@@ -52,13 +52,13 @@ public class SearchResultDefinitionService {
             caseTypeDefinition.getCaseFieldDefinitions().forEach(field ->
                 searchResultFields.add(buildSearchResultField(field, field.getId(), null)));
         } else {
-            requestedFields.forEach(requestedFieldId -> {
+            requestedFields.forEach(requestedFieldId ->
                 caseTypeDefinition.getComplexSubfieldDefinitionByPath(requestedFieldId).ifPresent(field -> {
                     List<String> pathElements = getPathElements(requestedFieldId);
                     searchResultFields.add(buildSearchResultField((CaseFieldDefinition) field, pathElements.get(0),
                         pathElements.size() > 1 ? getPathElementsTailAsString(pathElements) : null));
-                });
-            });
+                })
+            );
         }
 
         searchResult.setFields(searchResultFields.toArray(new SearchResultField[0]));

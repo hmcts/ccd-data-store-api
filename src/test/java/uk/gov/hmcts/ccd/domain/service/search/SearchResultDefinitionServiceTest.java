@@ -85,7 +85,7 @@ class SearchResultDefinitionServiceTest {
     }
 
     @Test
-    public void shouldGetSearchResultDefinitionForSearch() {
+    void shouldGetSearchResultDefinitionForSearch() {
         SearchResult searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
             .build();
@@ -101,7 +101,7 @@ class SearchResultDefinitionServiceTest {
     }
 
     @Test
-    public void shouldGetSearchResultDefinitionForOrgCases() {
+    void shouldGetSearchResultDefinitionForOrgCases() {
         SearchResult searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
             .build();
@@ -117,7 +117,7 @@ class SearchResultDefinitionServiceTest {
     }
 
     @Test
-    public void shouldGetSearchResultDefinitionForDefaultUseCase() {
+    void shouldGetSearchResultDefinitionForDefaultUseCase() {
         CaseTypeDefinition caseTypeDefinition = newCaseType()
             .withId(CASE_TYPE_ID)
             .withField(CASE_FIELD_1_1)
@@ -136,7 +136,7 @@ class SearchResultDefinitionServiceTest {
     }
 
     @Test
-    public void shouldGetSearchResultDefinitionForDefaultUseCaseWithRequestedFields() {
+    void shouldGetSearchResultDefinitionForDefaultUseCaseWithRequestedFields() {
         SearchResult result = searchResultDefinitionService
             .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, CASE_FIELD_ID_1_3 + "." + CASE_FIELD_ID_1_3_NESTED));
 
@@ -157,7 +157,7 @@ class SearchResultDefinitionServiceTest {
     }
 
     @Test
-    public void shouldIgnoreRequestedFieldsThatDoNotExist() {
+    void shouldIgnoreRequestedFieldsThatDoNotExist() {
         SearchResult result = searchResultDefinitionService
             .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, "INVALID"));
 
