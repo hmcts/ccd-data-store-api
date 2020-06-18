@@ -75,6 +75,7 @@ public class ElasticsearchTestHelper {
     public static final String AUTOTEST2_PUBLIC = "caseworker-autotest2";
     public static final String AUTOTEST1_RESTRICTED = "caseworker-autotest1-restricted";
     public static final String AUTOTEST1_PRIVATE = "caseworker-autotest1-private";
+    public static final String AUTOTEST1_SOLICITOR = "caseworker-autotest1-solicitor";
 
     private ElasticsearchTestHelper() { }
 

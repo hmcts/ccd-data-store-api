@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -249,6 +250,31 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
         assertAll(
             () -> assertThat(caseSearchResult.getTotal(), is(0L))
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
+    void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, AUTOTEST1_SOLICITOR);
+
+        String searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchAllQuery())
+            .build().toJsonString();
+
+        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
+            .contentType(MediaType.APPLICATION_JSON)
+            .param(CASE_TYPE_ID_PARAM, CASE_TYPE_C)
+            .content(searchRequest))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        CaseSearchResult caseSearchResult = mapper.readValue(responseAsString, CaseSearchResult.class);
+
+        assertAll(
+            () -> assertThat(caseSearchResult.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResult.getCases().get(0).getReference(), is(1589460125872336L))
         );
     }
 }

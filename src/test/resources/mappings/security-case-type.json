@@ -737,6 +737,13 @@
               "read": true,
               "update": true,
               "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-solicitor",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
             }
           ]
         },
@@ -749,6 +756,13 @@
           "acls": [
             {
               "role": "caseworker-autotest1-restricted",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-solicitor",
               "create": true,
               "read": true,
               "update": true,
@@ -783,6 +797,13 @@
               "read": true,
               "update": true,
               "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-solicitor",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
             }
           ]
         }
@@ -811,6 +832,13 @@
         },
         {
           "role": "caseworker-autotest1-restricted",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-autotest1-solicitor",
           "create": true,
           "read": true,
           "update": true,
