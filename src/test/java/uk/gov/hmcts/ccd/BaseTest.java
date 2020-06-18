@@ -8,6 +8,9 @@ import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -123,6 +126,7 @@ public abstract class BaseTest {
     protected SecurityContext securityContext;
 
     @Before
+    @BeforeEach
     public void initMock() throws IOException {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
@@ -153,6 +157,7 @@ public abstract class BaseTest {
     }
 
     @BeforeClass
+    @BeforeAll
     public static void init() {
         mapper.registerModule(new JavaTimeModule());
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -162,6 +167,7 @@ public abstract class BaseTest {
     }
 
     @After
+    @AfterEach
     public void clearDownData() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         List<String> tables = determineTables(jdbcTemplate);

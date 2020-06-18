@@ -1,0 +1,119 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/display/search-cases-result-fields/AAT?usecase=ORGCASES&version=33"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "fields": [
+        {
+          "metadata": false,
+          "case_field_id": "TextField",
+          "case_field_element_path": null,
+          "label": "`Text` field",
+          "order": 1,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "EmailField",
+          "case_field_element_path": null,
+          "label": "`Email` field",
+          "order": 2,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "FixedListField",
+          "case_field_element_path": null,
+          "label": "Fixed List",
+          "order": 3,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "CollectionField",
+          "case_field_element_path": null,
+          "label": "`Collection` field",
+          "order": 3,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "ComplexField",
+          "case_field_element_path": null,
+          "label": "`Complex` field",
+          "order": 4,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "ComplexField",
+          "case_field_element_path": "ComplexTextField",
+          "label": "`Complex Nested` field",
+          "order": 4,
+          "role": null,
+          "sort_order": {
+            "direction": "ASC",
+            "priority": 1
+          },
+          "display_context_parameter": null
+        },
+        {
+          "metadata": true,
+          "case_field_id": "[STATE]",
+          "case_field_element_path": null,
+          "label": "State",
+          "order": 5,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": true,
+          "case_field_id": "[CREATED_DATE]",
+          "case_field_element_path": null,
+          "label": "Created Date",
+          "order": 6,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": "#DATETIMEDISPLAY(dd MM yyyy)"
+        },
+        {
+          "metadata": false,
+          "case_field_id": "DateField",
+          "case_field_element_path": null,
+          "label": "`Date` field",
+          "order": 7,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": "#DATETIMEDISPLAY(MM/yyyy)"
+        },
+        {
+          "metadata": false,
+          "case_field_id": "DateTimeField",
+          "case_field_element_path": null,
+          "label": "`DateTime` field",
+          "order": 8,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": "#DATETIMEDISPLAY(EEEE, d MMMM yyyy)"
+        }
+      ]
+    }
+  }
+}
