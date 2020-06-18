@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Singleton
 public class ApplicationParams {
 
-    @Value("#{'${casedatastore.authorised.services.add_caseassigned_user_roles}'.split(',')}")
+    @Value("#{'${ccd.s2s-authorised.services.add_case_user_roles}'.split(',')}")
     private List<String> authorisedServicesForAddUserCaseRoles;
 
     @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")

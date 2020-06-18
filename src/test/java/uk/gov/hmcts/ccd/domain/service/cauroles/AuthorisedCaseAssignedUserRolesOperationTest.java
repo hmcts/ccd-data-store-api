@@ -14,8 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 class AuthorisedCaseAssignedUserRolesOperationTest {
@@ -38,31 +36,15 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
     }
 
     @Test
-    void shouldCallDefaultAddCaseUserRolesWhenAuthorised() {
+    void shouldCallDefaultAddCaseUserRoles() {
         // ARRANGE
         List<CaseAssignedUserRole> caseAssignedUserRoles = createCaseAssignedUserRoles();
-        when(caseAssignedUserRoleValidator.canAddUserCaseRoles()).thenReturn(true);
 
         // ACT
         authorisedCaseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles);
 
         // ASSERT
         verify(defaultCaseAssignedUserRolesOperation).addCaseUserRoles(caseAssignedUserRoles);
-        verifyNoMoreInteractions(defaultCaseAssignedUserRolesOperation);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenNotAuthorisedToAddCaseUserRoles() {
-        // ARRANGE
-        List<CaseAssignedUserRole> caseAssignedUserRoles = createCaseAssignedUserRoles();
-        when(caseAssignedUserRoleValidator.canAddUserCaseRoles()).thenReturn(false);
-
-        // ACT / ASSERT
-        assertThrows(
-            CaseRoleAccessException.class,
-            () -> authorisedCaseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles)
-        );
-        verifyZeroInteractions(defaultCaseAssignedUserRolesOperation);
     }
 
     @Test

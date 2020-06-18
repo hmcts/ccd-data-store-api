@@ -5,8 +5,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 
@@ -16,17 +14,11 @@ public class DefaultCaseAssignedUserRoleValidator implements CaseAssignedUserRol
 
     private final String roleCaseWorkerCaa = "caseworker-caa";
 
-    private final ApplicationParams applicationParams;
-    private final UserRepository userRepository;
-    private final SecurityUtils securityUtils;
+    private UserRepository userRepository;
 
     @Autowired
-    public DefaultCaseAssignedUserRoleValidator(ApplicationParams applicationParams,
-                                                @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                                                SecurityUtils securityUtils) {
-        this.applicationParams = applicationParams;
+    public DefaultCaseAssignedUserRoleValidator(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.securityUtils = securityUtils;
     }
 
     public boolean canAccessUserCaseRoles(List<String> userIds) {
@@ -37,9 +29,4 @@ public class DefaultCaseAssignedUserRoleValidator implements CaseAssignedUserRol
         }
         return canAccess;
     }
-
-    public boolean canAddUserCaseRoles() {
-        return applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(securityUtils.getServiceName());
-    }
-
 }

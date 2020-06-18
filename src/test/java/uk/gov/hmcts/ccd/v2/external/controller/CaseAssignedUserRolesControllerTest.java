@@ -10,10 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
@@ -26,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
@@ -37,10 +41,16 @@ class CaseAssignedUserRolesControllerTest {
     private static final String CASE_ID_BAD = "1234";
 
     @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
     private UIDService caseReferenceService;
 
     @Mock
     private CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
+
+    @Mock
+    private SecurityUtils securityUtils;
 
     private CaseAssignedUserRolesController controller;
 
@@ -51,17 +61,37 @@ class CaseAssignedUserRolesControllerTest {
         when(caseReferenceService.validateUID(CASE_ID_GOOD)).thenReturn(true);
         when(caseReferenceService.validateUID(CASE_ID_BAD)).thenReturn(false);
 
-        controller = new CaseAssignedUserRolesController(caseReferenceService, caseAssignedUserRolesOperation);
+        controller = new CaseAssignedUserRolesController(
+            applicationParams,
+            caseReferenceService,
+            caseAssignedUserRolesOperation,
+            securityUtils
+        );
     }
 
     @Nested
     @DisplayName("POST /case-users")
     class AddCaseUserRoles {
 
+        private static final String ADD_SERVICE_GOOD = "ADD_SERVICE_GOOD";
+        private static final String ADD_SERVICE_BAD = "ADD_SERVICE_BAD";
+
+        private static final String CLIENT_S2S_TOKEN_GOOD = "good_s2s_token";
+        private static final String CLIENT_S2S_TOKEN_BAD = "bad_s2s_token";
+
         private static final String CASE_ROLE_GOOD = "[CASE_ROLE_GOOD]";
         private static final String CASE_ROLE_BAD = "CASE_ROLE_BAD";
         private static final String USER_ID_1 = "123";
         private static final String USER_ID_2 = "321";
+
+        @BeforeEach
+        void setUp() {
+            // setup happy authorised s2s service path
+            when(applicationParams.getAuthorisedServicesForAddUserCaseRoles()).thenReturn(
+                Lists.newArrayList(ADD_SERVICE_GOOD)
+            );
+            doReturn(ADD_SERVICE_GOOD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_GOOD);
+        }
 
         @Test
         void addCaseUserRoles_shouldCallAddWhenValidSingleGoodCaseUserRoleSupplied() {
@@ -72,7 +102,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT
             ResponseEntity<AddCaseAssignedUserRolesResponse> response =
-                controller.addCaseUserRoles(new CaseAssignedUserRolesResource(caseUserRoles));
+                controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles));
 
             // ASSERT
             assertNotNull(response);
@@ -92,7 +122,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT
             ResponseEntity<AddCaseAssignedUserRolesResponse> response =
-                controller.addCaseUserRoles(new CaseAssignedUserRolesResource(caseUserRoles));
+                controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles));
 
             // ASSERT
             assertNotNull(response);
@@ -102,12 +132,27 @@ class CaseAssignedUserRolesControllerTest {
         }
 
         @Test
+        void addCaseUserRoles_throwsExceptionWhenClientServiceNotAuthorised() {
+            // ARRANGE
+            doReturn(ADD_SERVICE_BAD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_BAD);
+
+            // ACT / ASSERT
+            CaseRoleAccessException exception = assertThrows(CaseRoleAccessException.class,
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_BAD, null));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                    containsString(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION))
+            );
+        }
+
+        @Test
         void addCaseUserRoles_throwsExceptionWhenNullPassed() {
             // ARRANGE
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(null));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, null));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -121,7 +166,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(new CaseAssignedUserRolesResource(null)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(null)));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -136,7 +181,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -154,7 +199,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -172,7 +217,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -190,7 +235,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -212,7 +257,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),

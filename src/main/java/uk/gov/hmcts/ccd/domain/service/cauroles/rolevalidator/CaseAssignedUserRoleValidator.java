@@ -5,7 +5,4 @@ import java.util.List;
 public interface CaseAssignedUserRoleValidator {
 
     boolean canAccessUserCaseRoles(List<String> userIds);
-
-    boolean canAddUserCaseRoles();
-
 }

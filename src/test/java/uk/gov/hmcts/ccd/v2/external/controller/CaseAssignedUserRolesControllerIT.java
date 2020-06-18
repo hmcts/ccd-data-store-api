@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
@@ -58,6 +59,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.ccd.v2.V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.ADD_SUCCESS_MESSAGE;
 
@@ -67,6 +69,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     private static final String AUTHORISED_ADD_SERVICE_1 = "ADD_SERVICE_1";
     private static final String AUTHORISED_ADD_SERVICE_2 = "ADD_SERVICE_2";
+    private static final String UNAUTHORISED_ADD_SERVICE = "UNAUTHORISED_ADD_SERVICE";
 
     private static final String CASE_ID_1 = "7578590391163133";
     private static final String CASE_ID_2 = "6375837333991692";
@@ -86,9 +89,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     private static final String USER_IDS = USER_IDS_1 + "," + USER_IDS_2;
 
     private static final String INVALID_USER_IDS = USER_IDS_1 + ", ," + USER_IDS_2;
-
-    @SuppressWarnings("SpellCheckingInspection")
-    private static final String SERVICE_NAME = "servicename";
 
     private final String caseworkerCaa = "caseworker-caa";
     private final String getCaseAssignedUserRoles = "/case-users";
@@ -157,7 +157,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldAddCaseUserRoleForAuthorisedApp() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_1, CASE_ROLE_1);
@@ -191,7 +190,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenCaseIDNotPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
@@ -222,7 +220,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenInvalidCaseIDPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
@@ -253,7 +250,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenUserIDNotPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
@@ -284,7 +280,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenInvalidUserIDPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
@@ -315,7 +310,10 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenCalledFromUnauthorisedApp() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, "UNAUTHORISED_ADD_SERVICE");
+
+        // override s2s token in HTTP headers
+        HttpHeaders httpHeaders = createHttpHeaders();
+        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, "Bearer " + MockUtils.generateDummyS2SToken(UNAUTHORISED_ADD_SERVICE));
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
@@ -325,7 +323,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
-            .headers(createHttpHeaders()))
+            .headers(httpHeaders))
             .andExpect(status().is(403))
             .andReturn().getResolvedException();
 
@@ -344,7 +342,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenInvalidCaseRolePassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
@@ -375,7 +372,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenCaseRoleNotPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
@@ -406,7 +402,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenNullListPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
@@ -427,7 +422,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenEmptyListPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
 
@@ -450,7 +444,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldAddSingleCaseUserRoleWhenDuplicatePassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_2, CASE_ROLE_1);
@@ -486,7 +479,10 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldAddMultipleCaseUserRoles() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
+
+        // override s2s token in HTTP headers to check it also supports S2S token without bearer
+        HttpHeaders httpHeaders = createHttpHeaders();
+        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_2));
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_3, CASE_ROLE_1);
@@ -498,7 +494,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         final MvcResult result = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
-            .headers(createHttpHeaders()))
+            .headers(httpHeaders))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -523,7 +519,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldCreateLogAuditWhenCalled() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
-        ReflectionTestUtils.setField(authentication.getPrincipal(), SERVICE_NAME, AUTHORISED_ADD_SERVICE_1);
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
         CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_4, CASE_ROLE_1);
@@ -547,7 +542,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(captor.getValue().getCaseId(), is(CASE_ID_ADD_SUCCESS + "," + CASE_ID_ADD_SUCCESS));
         assertThat(captor.getValue().getTargetCaseRoles(), is(Lists.newArrayList(CASE_ROLE_1, CASE_ROLE_2)));
         assertThat(captor.getValue().getTargetIdamId(), is(USER_IDS_4 + "," + USER_IDS_4));
-        assertThat(captor.getValue().getInvokingService(), is(AUTHORISED_ADD_SERVICE_1));
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getPath(), is(postCaseAssignedUserRoles));
         assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.POST.name()));
@@ -776,7 +770,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     private HttpHeaders createHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
-        headers.add("ServiceAuthorization", "Bearer service1");
+        String s2SToken = MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_1);
+        headers.add(SERVICE_AUTHORIZATION, "Bearer " + s2SToken);
         return headers;
     }
 

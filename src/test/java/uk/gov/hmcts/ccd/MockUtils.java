@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.TextCodec;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -7,6 +10,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,6 +32,14 @@ public class MockUtils {
     public static final String CASE_ROLE_CAN_READ = "[CAN_READ]";
     public static final String CASE_ROLE_CAN_UPDATE = "[CAN_UPDATE]";
     public static final String CASE_ROLE_CAN_DELETE = "[CAN_DELETE]";
+
+    public static String generateDummyS2SToken(String serviceName) {
+        return Jwts.builder()
+            .setSubject(serviceName)
+            .setIssuedAt(new Date())
+            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+            .compact();
+    }
 
     public static final void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
         setSecurityAuthorities("aJwtToken", authenticationMock, authorities);

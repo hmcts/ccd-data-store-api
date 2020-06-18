@@ -21,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -97,6 +98,34 @@ class SecurityUtilsTest {
     @DisplayName("Get user token")
     void shouldReturnUserToken() {
         assertThat(securityUtils.getUserToken(), is(USER_JWT));
+    }
+
+    @Test
+    @DisplayName("Get service name from token supplied with bearer")
+    void getServiceNameFromS2SToken_shouldReturnNameFromTokenWithBearer() {
+        // ARRANGE
+        String serviceName = "my-service";
+        String s2STokenWithBearer = "Bearer " + MockUtils.generateDummyS2SToken(serviceName);
+
+        // ACT
+        String result = securityUtils.getServiceNameFromS2SToken(s2STokenWithBearer);
+
+        // ASSERT
+        assertThat(result, is(serviceName));
+    }
+
+    @Test
+    @DisplayName("Get service name from token supplied without bearer")
+    void getServiceNameFromS2SToken_shouldReturnNameFromTokenWithoutBearer() {
+        // ARRANGE
+        String serviceName = "my-service";
+        String s2SToken = MockUtils.generateDummyS2SToken(serviceName);
+
+        // ACT
+        String result = securityUtils.getServiceNameFromS2SToken(s2SToken);
+
+        // ASSERT
+        assertThat(result, is(serviceName));
     }
 
     private void assertHeader(HttpHeaders headers, String name, String value) {

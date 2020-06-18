@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 class DefaultCaseAssignedUserRolesOperationTest {
@@ -39,7 +38,6 @@ class DefaultCaseAssignedUserRolesOperationTest {
 
         // ASSERT
         verify(caseAccessOperation).addCaseUserRoles(caseAssignedUserRoles);
-        verifyNoMoreInteractions(caseAccessOperation);
     }
 
     @Test

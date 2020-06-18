@@ -19,14 +19,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
@@ -34,6 +38,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
+import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @RestController
 @RequestMapping(path = "/")
@@ -41,14 +46,20 @@ public class CaseAssignedUserRolesController {
 
     public static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
 
+    private final ApplicationParams applicationParams;
     private final UIDService caseReferenceService;
     private final CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
+    private final SecurityUtils securityUtils;
 
     @Autowired
-    public CaseAssignedUserRolesController(UIDService caseReferenceService,
-                                           @Qualifier("authorised") CaseAssignedUserRolesOperation caseAssignedUserRolesOperation) {
+    public CaseAssignedUserRolesController(ApplicationParams applicationParams,
+                                           UIDService caseReferenceService,
+                                           @Qualifier("authorised") CaseAssignedUserRolesOperation caseAssignedUserRolesOperation,
+                                           SecurityUtils securityUtils) {
+        this.applicationParams = applicationParams;
         this.caseReferenceService = caseReferenceService;
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
+        this.securityUtils = securityUtils;
     }
 
     @PostMapping(
@@ -82,10 +93,18 @@ public class CaseAssignedUserRolesController {
         targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildUserIds(#caseAssignedUserRoles)",
         targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseRoles(#caseAssignedUserRoles)"
     )
-    public ResponseEntity<AddCaseAssignedUserRolesResponse> addCaseUserRoles(@RequestBody CaseAssignedUserRolesResource caseAssignedUserRoles) {
-        validateRequestParams(caseAssignedUserRoles);
-        this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles.getCaseAssignedUserRoles());
-        return ResponseEntity.ok(new AddCaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
+    public ResponseEntity<AddCaseAssignedUserRolesResponse> addCaseUserRoles(
+        @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
+        @RequestBody CaseAssignedUserRolesResource caseAssignedUserRoles
+    ) {
+        String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
+        if (applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(clientServiceName)) {
+            validateRequestParams(caseAssignedUserRoles);
+            this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles.getCaseAssignedUserRoles());
+            return ResponseEntity.ok(new AddCaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
+        } else {
+            throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
+        }
     }
 
     @GetMapping(
