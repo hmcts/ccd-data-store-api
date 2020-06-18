@@ -175,6 +175,91 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         );
     }
 
+    @Test
+    void shouldOnlyReturnSpecifiedFieldsInResponse() throws Exception {
+        String nestedFieldId = COMPLEX_FIELD + "." + COMPLEX_NESTED_FIELD + "." + NESTED_NUMBER_FIELD;
+        String searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .source(caseData(TEXT_FIELD))
+            .source(caseData(nestedFieldId))
+            .source(MetaData.CaseField.CASE_REFERENCE.getDbColumnName())
+            .source("INVALID")
+            .build().toJsonString();
+
+        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
+            .contentType(MediaType.APPLICATION_JSON)
+            .param(CASE_TYPE_ID_PARAM, CASE_TYPE_A)
+            .content(searchRequest))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        CaseSearchResultViewResource caseSearchResultViewResource = mapper.readValue(responseAsString, CaseSearchResultViewResource.class);
+
+        SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(3)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(TEXT_FIELD)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(nestedFieldId)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
+                is(MetaData.CaseField.CASE_REFERENCE.getReference())),
+            () -> assertThat(caseDetails.getFields().size(), is(11)),
+            () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
+            () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
+            () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
+            () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
+            () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
+            () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
+            () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
+            () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
+            () -> assertThat(caseDetails.getFieldsFormatted().containsKey(COMPLEX_FIELD), is(true))
+        );
+    }
+
+    @Test
+    void shouldTreatUseCaseRequestWithSourceAsStandardRequest() throws Exception {
+        String nestedFieldId = COMPLEX_FIELD + "." + COMPLEX_NESTED_FIELD + "." + NESTED_NUMBER_FIELD;
+        String searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .source(caseData(TEXT_FIELD))
+            .source(caseData(nestedFieldId))
+            .source(MetaData.CaseField.CASE_REFERENCE.getDbColumnName())
+            .source("INVALID")
+            .build().toJsonString();
+
+        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
+            .contentType(MediaType.APPLICATION_JSON)
+            .param(CASE_TYPE_ID_PARAM, CASE_TYPE_A)
+            .param(USE_CASE_PARAM, "SEARCH")
+            .content(searchRequest))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        CaseSearchResultViewResource caseSearchResultViewResource = mapper.readValue(responseAsString, CaseSearchResultViewResource.class);
+
+        SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(3)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(TEXT_FIELD)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(nestedFieldId)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
+                is(MetaData.CaseField.CASE_REFERENCE.getReference())),
+            () -> assertThat(caseDetails.getFields().size(), is(11)),
+            () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
+            () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
+            () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
+            () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
+            () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
+            () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
+            () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
+            () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
+            () -> assertThat(caseDetails.getFieldsFormatted().containsKey(COMPLEX_FIELD), is(true))
+        );
+    }
+
     private void assertDefaultUseCaseHeaders(List<SearchResultViewHeaderGroup> headers) {
         List<String> expectedFields = Arrays.asList(HISTORY_COMPONENT_FIELD, FIXED_RADIO_LIST_FIELD, DOCUMENT_FIELD, ADDRESS_FIELD, COMPLEX_FIELD,
             COLLECTION_FIELD, MULTI_SELECT_LIST_FIELD, FIXED_LIST_FIELD, TEXT_AREA_FIELD, DATE_TIME_FIELD, DATE_FIELD,
@@ -224,7 +309,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(0).get(VALUE), is(COLLECTION_VALUE)),
             () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE), is("CollectionTextValue1")),
             () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_FIXED_LIST_FIELD), is("VALUE3")),
-            () -> assertThat(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD)).get(NESTED_NUMBER_FIELD), is("567")),
+            () -> assertThat(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD)).get(NESTED_NUMBER_FIELD), is(NESTED_NUMBER_FIELD_VALUE)),
             () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_TEXT_FIELD), is(COMPLEX_TEXT_VALUE)),
             () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
                 .get(NESTED_COLLECTION_TEXT_FIELD)).get(0).get(VALUE), is("NestedCollectionTextValue1")),
