@@ -1,0 +1,38 @@
+name: Publish Swagger Specs
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-
+      - name: Set up JDK 8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Run Swagger Publisher
+        run: ./gradlew test --tests uk.gov.hmcts.ccd.swagger.SwaggerGeneratorTest
+      - name: Commit to repository
+        run: |
+          mkdir swagger-staging
+          cd swagger-staging
+          git init
+          git config user.email "github-actions@users.noreply.github.com"
+          git config user.name "GitHub action"
+          git remote add upstream "https://jenkins-reform-hmcts:${{ secrets.GH_TOKEN }}@github.com/hmcts/reform-api-docs.git"
+          git pull upstream master
+          repo=`echo "$GITHUB_REPOSITORY" | cut -f2- -d/`
+          echo "$(cat /tmp/ccd-data-store-api.v1.json)" > "docs/specs/ccd-data-store-api.v1.json"
+          echo "$(cat /tmp/ccd-data-store-api.v2.json)" > "docs/specs/ccd-data-store-api.v2.json"
+          git add "docs/specs/ccd-data-store-api.v1.json"
+          git add "docs/specs/ccd-data-store-api.v2.json"
+          # Only commit and push if we have changes.
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update spec for $repo#${GITHUB_SHA:7}"; git push --set-upstream upstream master)

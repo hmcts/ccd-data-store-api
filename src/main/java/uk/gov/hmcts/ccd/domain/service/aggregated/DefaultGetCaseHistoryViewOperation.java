@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
@@ -36,9 +37,17 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
         UIDService uidService,
         DefaultObjectMapperService defaultObjectMapperService,
-        CompoundFieldOrderService compoundFieldOrderService) {
+        CompoundFieldOrderService compoundFieldOrderService,
+        FieldProcessorService fieldProcessorService) {
 
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService, compoundFieldOrderService);
+        super(getCaseOperation,
+            uiDefinitionRepository,
+            caseTypeService,
+            uidService,
+            defaultObjectMapperService,
+            compoundFieldOrderService,
+            fieldProcessorService);
+
         this.getEventsOperation = getEventsOperation;
     }
 
@@ -49,18 +58,18 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         CaseDetails caseDetails = getCaseDetails(caseReference);
         String jurisdictionId = caseDetails.getJurisdiction();
         String caseTypeId = caseDetails.getCaseTypeId();
-        CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
+        CaseTypeDefinition caseTypeDefinition = getCaseType(jurisdictionId, caseTypeId);
 
         AuditEvent event = getEventsOperation.getEvent(jurisdictionId, caseTypeId, eventId).orElseThrow(
             () -> new ResourceNotFoundException(EVENT_NOT_FOUND));
 
-        return merge(caseDetails, event, caseType);
+        return merge(caseDetails, event, caseTypeDefinition);
     }
 
-    private CaseHistoryView merge(CaseDetails caseDetails, AuditEvent event, CaseType caseType) {
+    private CaseHistoryView merge(CaseDetails caseDetails, AuditEvent event, CaseTypeDefinition caseTypeDefinition) {
         CaseHistoryView caseHistoryView = new CaseHistoryView();
         caseHistoryView.setCaseId(String.valueOf(caseDetails.getReference()));
-        caseHistoryView.setCaseType(CaseViewType.createFrom(caseType));
+        caseHistoryView.setCaseType(CaseViewType.createFrom(caseTypeDefinition));
         caseHistoryView.setTabs(getTabs(caseDetails, event.getData()));
         caseHistoryView.setEvent(CaseViewEvent.createFrom(event));
 

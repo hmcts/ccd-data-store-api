@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +32,7 @@ class TextValidatorTest {
     private CaseDefinitionRepository definitionRepository;
 
     private TextValidator validator;
-    private CaseField caseField;
+    private CaseFieldDefinition caseFieldDefinition;
 
     @BeforeEach
     void setUp() {
@@ -47,7 +47,7 @@ class TextValidatorTest {
 
         validator = new TextValidator();
 
-        caseField = caseField().withMin(5)
+        caseFieldDefinition = caseField().withMin(5)
                                .withMax(10)
                                .build();
     }
@@ -56,7 +56,7 @@ class TextValidatorTest {
     @DisplayName("should be valid when text length between min and max")
     void textFieldWithValidMinMax() {
         final JsonNode DATA = NODE_FACTORY.textNode("5 & 10");
-        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, DATA, caseField);
+        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, DATA, caseFieldDefinition);
 
         assertThat(validMinMaxResults.toString(), validMinMaxResults, hasSize(0));
     }
@@ -64,11 +64,11 @@ class TextValidatorTest {
     @Test
     @DisplayName("should NOT be valid when text length outside of min and max")
     void textFieldWithInvalidMinMax() {
-        final JsonNode INVALID_MIN = NODE_FACTORY.textNode("Test");
-        final List<ValidationResult> validMinResults = validator.validate(FIELD_ID, INVALID_MIN, caseField);
+        final JsonNode invalidMin = NODE_FACTORY.textNode("Test");
+        final List<ValidationResult> validMinResults = validator.validate(FIELD_ID, invalidMin, caseFieldDefinition);
 
-        final JsonNode INVALID_MAX = NODE_FACTORY.textNode("Test Test Test");
-        final List<ValidationResult> validMaxResults = validator.validate(FIELD_ID, INVALID_MAX, caseField);
+        final JsonNode invalidMax = NODE_FACTORY.textNode("Test Test Test");
+        final List<ValidationResult> validMaxResults = validator.validate(FIELD_ID, invalidMax, caseFieldDefinition);
 
         assertAll(
             () -> assertThat("Min not catched", validMinResults, hasSize(1)),
@@ -85,28 +85,28 @@ class TextValidatorTest {
     @Test
     @DisplayName("should be valid when no min and max defined")
     void textFieldWithNoMinMax() {
-        final CaseField caseField = caseField().build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().build();
         final JsonNode value = NODE_FACTORY.textNode("Test");
-        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, value, caseField);
+        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, value, caseFieldDefinition);
         assertThat(validMinMaxResults.toString(), validMinMaxResults, hasSize(0));
     }
 
     @Test
     @DisplayName("should test exact length when min and max are equal")
     void textFieldWithSameMinMax() {
-        final CaseField caseField = caseField().withMin(5)
+        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
                                                .withMax(5)
                                                .build();
         final JsonNode valid_value = NODE_FACTORY.textNode("12345");
-        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, valid_value, caseField);
+        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, valid_value, caseFieldDefinition);
 
         // Test value over
         final JsonNode over_value = NODE_FACTORY.textNode("123456");
-        final List<ValidationResult> overMinMaxResults = validator.validate(FIELD_ID, over_value, caseField);
+        final List<ValidationResult> overMinMaxResults = validator.validate(FIELD_ID, over_value, caseFieldDefinition);
 
         // Test value under
         final JsonNode under_value = NODE_FACTORY.textNode("1234");
-        final List<ValidationResult> underMinMaxResults = validator.validate(FIELD_ID, under_value, caseField);
+        final List<ValidationResult> underMinMaxResults = validator.validate(FIELD_ID, under_value, caseFieldDefinition);
 
         assertAll(
             () -> assertThat("Expected valid input", validMinMaxResults, hasSize(0)),
@@ -118,12 +118,12 @@ class TextValidatorTest {
     @Test
     @DisplayName("should test against regular expression")
     void textRegex() {
-        final CaseField caseField = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
         final JsonNode validValue = NODE_FACTORY.textNode("1234-56-78");
-        final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseField);
+        final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
 
         final JsonNode invalidValue = NODE_FACTORY.textNode("aa-56-78");
-        final List<ValidationResult> invalidResult = validator.validate(FIELD_ID, invalidValue, caseField);
+        final List<ValidationResult> invalidResult = validator.validate(FIELD_ID, invalidValue, caseFieldDefinition);
 
         assertAll(
             () -> assertThat("Expected input to be valid", validResult, hasSize(0)),
@@ -140,18 +140,18 @@ class TextValidatorTest {
     @Test
     @DisplayName("should be valid when input is null value")
     void nullValue() {
-        final List<ValidationResult> validationResult = validator.validate(FIELD_ID, null, caseField);
+        final List<ValidationResult> validationResult = validator.validate(FIELD_ID, null, caseFieldDefinition);
         assertThat(validationResult, hasSize(0));
     }
 
     @Test
     @DisplayName("should be valid when input is null text node")
     void nullTextValue() {
-        final List<ValidationResult> validationResult = validator.validate(FIELD_ID, new TextNode(null), caseField);
+        final List<ValidationResult> validationResult = validator.validate(FIELD_ID, new TextNode(null), caseFieldDefinition);
         assertThat(validationResult, hasSize(0));
     }
 
-    private CaseFieldBuilder caseField() {
-        return new CaseFieldBuilder(FIELD_ID).withType(TextValidator.TYPE_ID);
+    private CaseFieldDefinitionBuilder caseField() {
+        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(TextValidator.TYPE_ID);
     }
 }

@@ -20,9 +20,9 @@ public class UIDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
         final ServiceException
             exception =
             assertThrows(ServiceException.class,
-                         () -> uiDefinitionRepository.getWorkBasketResult("TestAddressBookCase"));
+                () -> uiDefinitionRepository.getWorkBasketResult("TestAddressBookCase"));
         assertThat(exception.getMessage(),
-                   startsWith(
-                       "Problem getting WorkBasketResult definition for case type: TestAddressBookCase because of "));
+            startsWith(
+                "Problem getting WorkBasketResult definition for case type: TestAddressBookCase because of "));
     }
 }

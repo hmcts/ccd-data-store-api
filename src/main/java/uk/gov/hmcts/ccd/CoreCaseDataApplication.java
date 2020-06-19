@@ -14,7 +14,7 @@ import java.time.Clock;
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
-@ComponentScan("uk.gov.hmcts.ccd")
+@ComponentScan({ "uk.gov.hmcts.ccd", "springfox" })
 @EnableCaching
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 public class CoreCaseDataApplication {
@@ -25,6 +25,7 @@ public class CoreCaseDataApplication {
     protected CoreCaseDataApplication() {
     }
 
+    @SuppressWarnings("checkstyle:CommentsIndentation") // commented out config predates
     public static void main(String[] args) {
 
         if (System.getProperty(LOGGING_LEVEL_CCD) != null) {

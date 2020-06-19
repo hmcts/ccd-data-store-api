@@ -12,9 +12,12 @@ import uk.gov.hmcts.befta.BeftaMain;
 @RunWith(Cucumber.class)
 @CucumberOptions(plugin = "json:target/cucumber.json",
     glue = "uk.gov.hmcts.befta.player",
-    features = {"classpath:features"},
-    tags = "not @Ignore and @focus")
+        features = { "classpath:features" }, tags = { "not @Ignore" })
 public class DataStoreBeftaRunner {
+
+    private DataStoreBeftaRunner() {
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
+    }
 
     @BeforeClass
     public static void setUp() {

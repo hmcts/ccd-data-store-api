@@ -13,9 +13,9 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.hamcrest.Matchers.everyItem;
@@ -36,10 +36,13 @@ class AuthorisedGetUserProfileOperationTest {
     private final JurisdictionDisplayProperties test2JurisdictionDisplayProperties = new JurisdictionDisplayProperties();
 
     private Set<String> userRoles = Sets.newHashSet("role1", "role2", "role3");
-    private List<CaseState> caseStates = Arrays.asList(new CaseState(), new CaseState(), new CaseState());
-    private List<CaseEvent> caseEvents = Arrays.asList(new CaseEvent(), new CaseEvent(), new CaseEvent(), new CaseEvent());
+    private List<CaseStateDefinition> caseStateDefinitions = Arrays.asList(new CaseStateDefinition(), new CaseStateDefinition(), new CaseStateDefinition());
+    private List<CaseEventDefinition> caseEventDefinitions = Arrays.asList(new CaseEventDefinition(),
+        new CaseEventDefinition(),
+        new CaseEventDefinition(),
+        new CaseEventDefinition());
 
-    private CaseType notAllowedCaseType = new CaseType();
+    private CaseTypeDefinition notAllowedCaseTypeDefinition = new CaseTypeDefinition();
 
     @Mock
     private UserRepository userRepository;
@@ -58,11 +61,11 @@ class AuthorisedGetUserProfileOperationTest {
         userProfile.setUser(user);
         userProfile.setJurisdictions(new JurisdictionDisplayProperties[]{test1JurisdictionDisplayProperties, test2JurisdictionDisplayProperties});
 
-        List<CaseType> caseTypes1 = Arrays.asList(notAllowedCaseType, new CaseType());
-        List<CaseType> caseTypes2 = Arrays.asList(new CaseType(), notAllowedCaseType, new CaseType());
+        List<CaseTypeDefinition> caseTypes1Definition = Arrays.asList(notAllowedCaseTypeDefinition, new CaseTypeDefinition());
+        List<CaseTypeDefinition> caseTypes2Definition = Arrays.asList(new CaseTypeDefinition(), notAllowedCaseTypeDefinition, new CaseTypeDefinition());
 
-        test1JurisdictionDisplayProperties.setCaseTypes(caseTypes1);
-        test2JurisdictionDisplayProperties.setCaseTypes(caseTypes2);
+        test1JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes1Definition);
+        test2JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes2Definition);
 
         doReturn(userRoles).when(userRepository).getUserRoles();
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
@@ -73,19 +76,19 @@ class AuthorisedGetUserProfileOperationTest {
     @Test
     @DisplayName("should return only caseTypes the user is allowed to access")
     public void execute() {
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseType), eq(userRoles), eq(CAN_READ));
-        doReturn(caseStates).when(accessControlService).filterCaseStatesByAccess(any(), eq(userRoles), eq(CAN_READ));
-        doReturn(caseEvents).when(accessControlService).filterCaseEventsByAccess(any(), eq(userRoles), eq(CAN_READ));
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseTypeDefinition), eq(userRoles), eq(CAN_READ));
+        doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(userRoles), eq(CAN_READ));
+        doReturn(caseEventDefinitions).when(accessControlService).filterCaseEventsByAccess(any(), eq(userRoles), eq(CAN_READ));
 
         UserProfile userProfile = classUnderTest.execute(CAN_READ);
 
         assertAll(
-            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().size(), is(1)),
-            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypes().size(), is(2)),
-            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes(), everyItem(not(isIn(Arrays.asList(notAllowedCaseType))))),
-            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypes(), everyItem(not(isIn(Arrays.asList(notAllowedCaseType))))),
-            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().get(0).getStates().size(), is(3)),
-            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().get(0).getEvents().size(), is(4))
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().size(), is(1)),
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions().size(), is(2)),
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays.asList(notAllowedCaseTypeDefinition))))),
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays.asList(notAllowedCaseTypeDefinition))))),
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getStates().size(), is(3)),
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(4))
         );
     }
 
@@ -97,8 +100,8 @@ class AuthorisedGetUserProfileOperationTest {
         UserProfile userProfile = classUnderTest.execute(CAN_READ);
 
         assertAll(
-            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().size(), is(0)),
-            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypes().size(), is(0))
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().size(), is(0)),
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions().size(), is(0))
         );
     }
 

@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,15 +15,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -202,6 +211,46 @@ class CaseAccessOperationTest {
         }
     }
 
+    @Nested()
+    @DisplayName("findCaseUserRoles(caseReferences, userIds)")
+    class GetCaseAssignUserRoles {
+        private CaseDetails caseDetails;
+
+        @BeforeEach
+        void setUp() {
+            caseDetails = new CaseDetails();
+            caseDetails.setId(CASE_ID.toString());
+            caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        }
+
+
+        @Test
+        @DisplayName("should find case assigned user roles")
+        void shouldGetCaseAssignedUserRoles() {
+            final CaseDetails caseDetails = new CaseDetails();
+            caseDetails.setId(String.valueOf(CASE_ID));
+            caseDetails.setReference(CASE_REFERENCE);
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(null, CASE_REFERENCE);
+            List<Long> caseReferences = Lists.newArrayList(CASE_REFERENCE);
+            List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences, Lists.newArrayList());
+
+            assertNotNull(caseAssignedUserRoles);
+            assertEquals(1, caseAssignedUserRoles.size());
+            assertEquals(CASE_ROLE, caseAssignedUserRoles.get(0).getCaseRole());
+        }
+
+        @Test
+        @DisplayName("should return empty result for non existing cases")
+        void shouldReturnEmptyResultOnNonExistingCases() {
+            doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(anyString(), anyLong());
+            List<Long> caseReferences = Lists.newArrayList(1234567L);
+            List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences, Lists.newArrayList());
+
+            assertNotNull(caseAssignedUserRoles);
+            assertEquals(0, caseAssignedUserRoles.size());
+        }
+    }
+
     private void configureCaseRepository() {
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setId(String.valueOf(CASE_ID));
@@ -224,9 +273,16 @@ class CaseAccessOperationTest {
     private void configureCaseUserRepository() {
         when(caseUserRepository.findCaseRoles(CASE_ID,
                                               USER_ID)).thenReturn(Collections.singletonList(CASE_ROLE_GRANTED));
+        CaseUserEntity.CasePrimaryKey primaryKey = new CaseUserEntity.CasePrimaryKey();
+        primaryKey.setCaseDataId(456L);
+        primaryKey.setCaseRole(CASE_ROLE);
+        primaryKey.setUserId(USER_ID);
+        CaseUserEntity caseUserEntity = new CaseUserEntity();
+        caseUserEntity.setCasePrimaryKey(primaryKey);
+        when(caseUserRepository.findCaseUserRoles(anyList(), anyList())).thenReturn(Collections.singletonList(caseUserEntity));
     }
 
-    private CaseUser caseUser(String ...caseRoles) {
+    private CaseUser caseUser(String...caseRoles) {
         final CaseUser caseUser = new CaseUser();
         caseUser.setUserId(USER_ID);
         caseUser.getCaseRoles().addAll(Arrays.asList(caseRoles));

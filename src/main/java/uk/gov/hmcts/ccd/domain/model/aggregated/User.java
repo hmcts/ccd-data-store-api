@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class User {
 
     @JsonProperty("idam")
-    private IDAMProperties idamProperties;
+    private IdamProperties idamProperties;
 
-    public IDAMProperties getIdamProperties() {
+    public IdamProperties getIdamProperties() {
         return idamProperties;
     }
 
-    public void setIdamProperties(IDAMProperties idamProperties) {
+    public void setIdamProperties(IdamProperties idamProperties) {
         this.idamProperties = idamProperties;
     }
 }

@@ -12,7 +12,7 @@
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
-      "uid": "[[DYNAMIC]]",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_JURISDICTION_2",
       "ctid": "BEFTA_CASETYPE_2_1"
     }
@@ -72,11 +72,6 @@
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311/binary"
         },
         "NumberField": "111111222222",
-        "MultiSelectListField": [
-          "OPTION5",
-          "OPTION4",
-          "OPTION3"
-        ],
         "YesOrNoField": "Yes",
         "EmailField": "testemail@gmail.com",
         "TextField": "sometextfield",

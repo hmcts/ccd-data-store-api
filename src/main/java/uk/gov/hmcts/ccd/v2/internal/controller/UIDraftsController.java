@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
-
-import static org.springframework.http.ResponseEntity.status;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -25,8 +19,14 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOpe
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIDraftResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.DraftViewResource;
+
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping(path = "/internal")
@@ -66,13 +66,13 @@ public class UIDraftsController {
         @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
-    public ResponseEntity<UIDraftResource> saveDraft(
+    public ResponseEntity<DraftViewResource> saveDraft(
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @RequestBody final CaseDataContent caseDataContent) {
 
         ResponseEntity.BodyBuilder builder = status(HttpStatus.CREATED);
-        return builder.body(new UIDraftResource(upsertDraftOperation.executeSave(caseTypeId, caseDataContent), caseTypeId));
+        return builder.body(new DraftViewResource(upsertDraftOperation.executeSave(caseTypeId, caseDataContent), caseTypeId));
     }
 
     @PutMapping(
@@ -93,12 +93,12 @@ public class UIDraftsController {
         @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
-    public ResponseEntity<UIDraftResource> updateDraft(
+    public ResponseEntity<DraftViewResource> updateDraft(
         @PathVariable("ctid") final String caseTypeId,
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return ResponseEntity.ok(new UIDraftResource(upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent), caseTypeId));
+        return ResponseEntity.ok(new DraftViewResource(upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent), caseTypeId));
     }
 
     @Transactional
@@ -116,12 +116,12 @@ public class UIDraftsController {
         @ApiResponse(code = 200, message = "A displayable draft"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
-    public ResponseEntity<UICaseViewResource> findDraft(@PathVariable("did") final String did) {
+    public ResponseEntity<CaseViewResource> findDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
         CaseView caseView = getDraftViewOperation.execute(did);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("findDraft has been completed in {} millisecs...", between.toMillis());
-        return ResponseEntity.ok(new UICaseViewResource(caseView));
+        return ResponseEntity.ok(new CaseViewResource(caseView));
     }
 
     @Transactional

@@ -1,16 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import java.util.Map;
 
 /**
  * Common Object mapper service for serialising/de-serialising objects.
@@ -19,7 +18,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 public class DefaultObjectMapperService implements ObjectMapperService {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -53,8 +51,7 @@ public class DefaultObjectMapperService implements ObjectMapperService {
     @Override
     public Map<String, JsonNode> convertJsonNodeToMap(JsonNode node) {
         try {
-            TypeReference typeReference = new TypeReference<HashMap<String, JsonNode>>() {};
-            return objectMapper.convertValue(node, typeReference);
+            return objectMapper.convertValue(node, JacksonUtils.getHashMapTypeReference());
         } catch (IllegalArgumentException e) {
             throw new ServiceException("Unable to convert JSON node to map", e);
         }

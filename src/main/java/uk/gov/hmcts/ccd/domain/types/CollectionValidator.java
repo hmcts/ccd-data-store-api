@@ -4,12 +4,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.*;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 @Named
 @Singleton
@@ -26,7 +26,7 @@ public class CollectionValidator implements BaseTypeValidator {
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
-                                           final CaseField caseFieldDefinition) {
+                                           final CaseFieldDefinition caseFieldDefinition) {
 
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
@@ -38,12 +38,12 @@ public class CollectionValidator implements BaseTypeValidator {
 
         final ArrayNode arrayValue = (ArrayNode) dataValue;
         final Integer collectionSize = arrayValue.size();
-        final FieldType fieldType = caseFieldDefinition.getFieldType();
+        final FieldTypeDefinition fieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition();
 
         final ArrayList<ValidationResult> validationResults = new ArrayList<>();
 
-        if (null != fieldType.getMin()) {
-            final Long min = fieldType.getMin().longValue();
+        if (null != fieldTypeDefinition.getMin()) {
+            final Long min = fieldTypeDefinition.getMin().longValue();
 
             if (min.compareTo(collectionSize.longValue()) > 0) {
                 final ValidationResult result = new ValidationResult(
@@ -53,8 +53,8 @@ public class CollectionValidator implements BaseTypeValidator {
             }
         }
 
-        if (null != fieldType.getMax()) {
-            final Long max = fieldType.getMax().longValue();
+        if (null != fieldTypeDefinition.getMax()) {
+            final Long max = fieldTypeDefinition.getMax().longValue();
 
             if (max.compareTo(collectionSize.longValue()) < 0) {
                 final ValidationResult result = new ValidationResult(

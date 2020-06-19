@@ -12,7 +12,6 @@
 		"_extends_": "Common_200_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {

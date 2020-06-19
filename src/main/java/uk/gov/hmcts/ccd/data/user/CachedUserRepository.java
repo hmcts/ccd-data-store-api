@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 
@@ -25,7 +25,7 @@ public class CachedUserRepository implements UserRepository {
 
     private final UserRepository userRepository;
     private final Map<String, Set<SecurityClassification>> jurisdictionToUserClassifications = newHashMap();
-    private final Map<String, IDAMProperties> userDetails = newHashMap();
+    private final Map<String, IdamProperties> userDetails = newHashMap();
     private final Map<String, Set<String>> userRoles = newHashMap();
     private final Map<String, SecurityClassification> userHighestSecurityClassification = newHashMap();
     private Optional<String> userName = Optional.empty();
@@ -36,7 +36,7 @@ public class CachedUserRepository implements UserRepository {
     }
 
     @Override
-    public IDAMProperties getUserDetails() {
+    public IdamProperties getUserDetails() {
         return userDetails.computeIfAbsent("userDetails", e -> userRepository.getUserDetails());
     }
 

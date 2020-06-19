@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.config;
 
-import java.util.Arrays;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Arrays;
+
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.ParameterBuilder;
+import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
@@ -22,18 +24,27 @@ import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
 public class SwaggerConfiguration {
 
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-            .groupName("v1")
-            .select()
-            .apis(RequestHandlerSelectors.basePackage(CaseDetailsEndpoint.class.getPackage().getName()))
-            .build()
-            .useDefaultResponseMessages(false)
-            .apiInfo(apiInfo())
-            .host("case-data-app.dev.ccd.reform.hmcts.net:4451");
+    public Docket apiV1() {
+        return getNewDocketForPackageOf(CaseDetailsEndpoint.class, "v1", apiV1Info());
     }
 
-    private ApiInfo apiInfo() {
+    @Bean
+    public Docket apiV2() {
+        return getNewDocketForPackageOf(CaseController.class, "v2", apiV2Info());
+    }
+
+    private Docket getNewDocketForPackageOf(Class<?> klazz, String groupName, ApiInfo apiInfo) {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName(groupName)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage(klazz.getPackage().getName()))
+                .paths(PathSelectors.any())
+                .build().useDefaultResponseMessages(false)
+                .apiInfo(apiInfo)
+                .globalOperationParameters(Arrays.asList(headerAuthorization(), headerServiceAuthorization()));
+    }
+
+    private ApiInfo apiV1Info() {
         return new ApiInfoBuilder()
             .title("Core Case Data - Data store API")
             .description("Create, modify, retrieve and search cases")
@@ -47,20 +58,17 @@ public class SwaggerConfiguration {
             .build();
     }
 
-    @Bean
-    public Docket apiV2() {
-        return new Docket(DocumentationType.SWAGGER_2)
-            .groupName("v2")
-            .select()
-            .apis(RequestHandlerSelectors.basePackage(CaseController.class.getPackage().getName()))
-            .build()
-            .useDefaultResponseMessages(false)
-            .apiInfo(apiV2Info())
-            .host("localhost:4452")
-            .globalOperationParameters(Arrays.asList(
-                headerAuthorization(),
-                headerServiceAuthorization()
-            ));
+    private ApiInfo apiV2Info() {
+        return new ApiInfoBuilder()
+            .title("CCD Data Store API")
+            .description("Create, modify, retrieve and search cases")
+            .license("MIT")
+            .licenseUrl("https://opensource.org/licenses/MIT")
+            .version("2-beta")
+            .contact(new Contact("CCD",
+                                 "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
+                                 "corecasedatateam@hmcts.net"))
+            .build();
     }
 
     private Parameter headerAuthorization() {
@@ -80,19 +88,6 @@ public class SwaggerConfiguration {
             .modelRef(new ModelRef("string"))
             .parameterType("header")
             .required(true)
-            .build();
-    }
-
-    private ApiInfo apiV2Info() {
-        return new ApiInfoBuilder()
-            .title("CCD Data Store API")
-            .description("Create, modify, retrieve and search cases")
-            .license("MIT")
-            .licenseUrl("https://opensource.org/licenses/MIT")
-            .version("2-beta")
-            .contact(new Contact("CCD",
-                                 "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
-                                 "corecasedatateam@hmcts.net"))
             .build();
     }
 }

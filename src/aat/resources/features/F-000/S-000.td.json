@@ -18,7 +18,7 @@
 	},
 	"request": {
 		"pathVariables": {
-			"uid": "[[DYNAMIC]]"
+			"uid": "[[DEFAULT_AUTO_VALUE]]"
 		}
 	},
 	"expectedResponse": {
@@ -36,7 +36,8 @@
 			"Date": "[[ANYTHING_PRESENT]]",
 			"Content-Type": "[[ANYTHING_PRESENT]]",
 			"Content-Length": "[[ANYTHING_PRESENT]]",
-			"Strict-Transport-Security": "max-age=31536000 ; includeSubDomains"
+			"Strict-Transport-Security": "max-age=31536000 ; includeSubDomains",
+			"Request-Context": "[[ANY_STRING_NULLABLE]]"
 		},
 		"body": {
 			"user": "[[ANYTHING_PRESENT]]",
