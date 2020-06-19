@@ -75,9 +75,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     private static final String CASE_ID_2 = "6375837333991692";
     private static final String CASE_IDS = CASE_ID_1 + "," + CASE_ID_2;
 
-    private static final String CASE_ID_ADD_SUCCESS = "1111222233334444";
-    private static final String CASE_ID_ADD_FAILURE = "4444333322221111";
-
     private static final String CASE_ROLE_1 = "[case-role-1]";
     private static final String CASE_ROLE_2 = "[case-role-2]";
     private static final String INVALID_CASE_ROLE = "bad-role";
@@ -85,7 +82,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     private static final String USER_IDS_1 = "89000";
     private static final String USER_IDS_2 = "89001";
     private static final String USER_IDS_3 = "89002";
-    private static final String USER_IDS_4 = "89003";
     private static final String USER_IDS = USER_IDS_1 + "," + USER_IDS_2;
 
     private static final String INVALID_USER_IDS = USER_IDS_1 + ", ," + USER_IDS_2;
@@ -151,15 +147,19 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     // RDM-8606: AC-1
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
     @DisplayName(
         "addCaseUserRoles: AC-1: must successfully assign a user and case role for a specific case by a user calling through/from an authorised application"
     )
     public void addCaseUserRoles_shouldAddCaseUserRoleForAuthorisedApp() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "10001"; // don't need the users to exist in the repository but want unique for each AC
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_1, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
         caseUserRoles.add(caseUserRole1);
 
         // ACT
@@ -167,7 +167,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(200))
+            .andExpect(status().isOk())
             .andReturn();
 
         // ASSERT
@@ -179,7 +179,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals("Success message should be returned", ADD_SUCCESS_MESSAGE, response.getStatus());
 
         // check data has been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_SUCCESS), USER_IDS_1);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(1, caseRoles.size());
         assertThat(caseRoles, hasItems(CASE_ROLE_1));
     }
@@ -190,10 +190,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenCaseIDNotPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "10002"; // don't need the users to exist in the repository but want unique for each AC
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(null, USER_IDS_1, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(null, userId, CASE_ROLE_1);
         caseUserRoles.add(caseUserRole1);
         caseUserRoles.add(caseUserRole2);
 
@@ -202,7 +203,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         // ASSERT
@@ -210,7 +211,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ID_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_FAILURE), USER_IDS_1);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
     }
 
@@ -220,10 +221,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenInvalidCaseIDPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "10003"; // don't need the users to exist in the repository but want unique for each AC
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(INVALID_CASE_ID.toString(), USER_IDS_1, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(INVALID_CASE_ID.toString(), userId, CASE_ROLE_1);
         caseUserRoles.add(caseUserRole1);
         caseUserRoles.add(caseUserRole2);
 
@@ -232,7 +234,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         // ASSERT
@@ -240,7 +242,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ID_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_FAILURE), USER_IDS_2);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
     }
 
@@ -250,10 +252,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenUserIDNotPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "10004"; // don't need the users to exist in the repository but want unique for each AC
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, null, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, null, CASE_ROLE_1);
         caseUserRoles.add(caseUserRole1);
         caseUserRoles.add(caseUserRole2);
 
@@ -262,7 +265,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         // ASSERT
@@ -270,7 +273,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), containsString(V2.Error.USER_ID_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_FAILURE), USER_IDS_1);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
     }
 
@@ -280,10 +283,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenInvalidUserIDPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "10005"; // don't need the users to exist in the repository but want unique for each AC
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, "", CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, "", CASE_ROLE_1);
         caseUserRoles.add(caseUserRole1);
         caseUserRoles.add(caseUserRole2);
 
@@ -292,7 +296,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         // ASSERT
@@ -300,7 +304,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), containsString(V2.Error.USER_ID_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_FAILURE), USER_IDS_1);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
     }
 
@@ -310,13 +314,14 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenCalledFromUnauthorisedApp() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "10006"; // don't need the users to exist in the repository but want unique for each AC
 
         // override s2s token in HTTP headers
         HttpHeaders httpHeaders = createHttpHeaders();
         httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, "Bearer " + MockUtils.generateDummyS2SToken(UNAUTHORISED_ADD_SERVICE));
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
         caseUserRoles.add(caseUserRole1);
 
         // ACT
@@ -324,7 +329,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(httpHeaders))
-            .andExpect(status().is(403))
+            .andExpect(status().isForbidden())
             .andReturn().getResolvedException();
 
         // ASSERT
@@ -332,7 +337,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), containsString(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_FAILURE), USER_IDS_1);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
     }
 
@@ -342,10 +347,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenInvalidCaseRolePassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "10007"; // don't need the users to exist in the repository but want unique for each AC
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, INVALID_CASE_ROLE);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, userId, INVALID_CASE_ROLE);
         caseUserRoles.add(caseUserRole1);
         caseUserRoles.add(caseUserRole2);
 
@@ -354,7 +360,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         // ASSERT
@@ -362,7 +368,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ROLE_FORMAT_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_FAILURE), USER_IDS_1);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
     }
 
@@ -372,10 +378,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     public void addCaseUserRoles_shouldThrowExceptionWhenCaseRoleNotPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "10008"; // don't need the users to exist in the repository but want unique for each AC
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_ADD_FAILURE, USER_IDS_1, null);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, userId, null);
         caseUserRoles.add(caseUserRole1);
         caseUserRoles.add(caseUserRole2);
 
@@ -384,7 +391,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         // ASSERT
@@ -392,11 +399,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ROLE_FORMAT_INVALID));
 
         // check data has not been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_FAILURE), USER_IDS_1);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
     }
 
-    // RDM-8606: null
+    // RDM-8606: null list
     @Test
     @DisplayName("addCaseUserRoles: null: should throw exception")
     public void addCaseUserRoles_shouldThrowExceptionWhenNullListPassed() throws Exception {
@@ -408,7 +415,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(null)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         // ASSERT
@@ -430,7 +437,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         // ASSERT
@@ -438,16 +445,46 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST));
     }
 
+    // RDM-8606: case not found
+    @Test
+    @DisplayName("addCaseUserRoles: case not found: should throw exception")
+    public void addCaseUserRoles_shouldThrowExceptionWhenCaseNotFound() throws Exception {
+        // ARRANGE
+        MockUtils.setSecurityAuthorities(authentication);
+        String userId = "1111"; // don't need the users to exist in the repository but want unique for each AC
+        String caseReferenceValidButNonExistent = "1111222233334444";
+
+        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(caseReferenceValidButNonExistent, userId, CASE_ROLE_1);
+        caseUserRoles.add(caseUserRole1);
+
+        // ACT
+        Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isNotFound())
+            .andReturn().getResolvedException();
+
+        // ASSERT
+        assertNotNull(exception);
+        assertThat(exception.getMessage(), containsString("No case found for reference: 1111222233334444"));
+    }
+
     // RDM-8606: duplicate
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
     @DisplayName("addCaseUserRoles: duplicate: should not generate duplicates")
     public void addCaseUserRoles_shouldAddSingleCaseUserRoleWhenDuplicatePassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "2222"; // don't need the users to exist in the repository but want unique for each test
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_2, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_2, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
         caseUserRoles.add(caseUserRole1);
         caseUserRoles.add(caseUserRole2);
 
@@ -456,7 +493,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(200))
+            .andExpect(status().isOk())
             .andReturn();
 
         // ASSERT
@@ -468,25 +505,29 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals("Success message should be returned", ADD_SUCCESS_MESSAGE, response.getStatus());
 
         // check data has been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_SUCCESS), USER_IDS_2);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(1, caseRoles.size());
         assertThat(caseRoles, hasItems(CASE_ROLE_1));
     }
 
     // RDM-8606: multiple
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
     @DisplayName("addCaseUserRoles: multiple: should allow multiple CaseUserRoles to be added in single call")
     public void addCaseUserRoles_shouldAddMultipleCaseUserRoles() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId = "3333"; // don't need the users to exist in the repository but want unique for each test
 
         // override s2s token in HTTP headers to check it also supports S2S token without bearer
         HttpHeaders httpHeaders = createHttpHeaders();
         httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_2));
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_3, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_3, CASE_ROLE_2);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_2);
         caseUserRoles.add(caseUserRole1);
         caseUserRoles.add(caseUserRole2);
 
@@ -495,7 +536,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(httpHeaders))
-            .andExpect(status().is(200))
+            .andExpect(status().isOk())
             .andReturn();
 
         // ASSERT
@@ -507,7 +548,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals("Success message should be returned", ADD_SUCCESS_MESSAGE, response.getStatus());
 
         // check data has been saved
-        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_ADD_SUCCESS), USER_IDS_3);
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(2, caseRoles.size());
         assertThat(caseRoles, hasItems(CASE_ROLE_1));
         assertThat(caseRoles, hasItems(CASE_ROLE_2));
@@ -515,14 +556,19 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     // RDM-8606: log-audit
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
     @DisplayName("addCaseUserRoles: log-audit: should allow multiple CaseUserRoles to be added in single call")
     public void addCaseUserRoles_shouldCreateLogAuditWhenCalled() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
+        String userId1 = "4444"; // don't need the users to exist in the repository but want unique for each test
+        String userId2 = "5555"; // don't need the users to exist in the repository but want unique for each test
 
         List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_4, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_ADD_SUCCESS, USER_IDS_4, CASE_ROLE_2);
+        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId1, CASE_ROLE_1);
+        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_2, userId2, CASE_ROLE_2);
         caseUserRoles.add(caseUserRole1);
         caseUserRoles.add(caseUserRole2);
 
@@ -531,7 +577,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().is(200))
+            .andExpect(status().isOk())
             .andReturn();
 
         // ASSERT
@@ -539,9 +585,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         verify(auditRepository).save(captor.capture());
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is(CASE_ID_ADD_SUCCESS + "," + CASE_ID_ADD_SUCCESS));
+        assertThat(captor.getValue().getCaseId(), is(CASE_ID_1 + "," + CASE_ID_2));
         assertThat(captor.getValue().getTargetCaseRoles(), is(Lists.newArrayList(CASE_ROLE_1, CASE_ROLE_2)));
-        assertThat(captor.getValue().getTargetIdamId(), is(USER_IDS_4 + "," + USER_IDS_4));
+        assertThat(captor.getValue().getTargetIdamId(), is(userId1 + "," + userId2));
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getPath(), is(postCaseAssignedUserRoles));
         assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.POST.name()));
@@ -561,7 +607,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, USER_IDS)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(200))
+            .andExpect(status().isOk())
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
@@ -585,7 +631,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, USER_IDS_1)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(200))
+            .andExpect(status().isOk())
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
@@ -612,7 +658,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_ID_2)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(200))
+            .andExpect(status().isOk())
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
@@ -650,7 +696,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_IDS)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(200))
+            .andExpect(status().isOk())
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
@@ -681,7 +727,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .param(PARAM_CASE_IDS, "")
             .param(PARAM_USER_IDS, USER_IDS)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         assertNotNull(exception);
@@ -696,7 +742,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_USER_IDS, USER_IDS)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn();
     }
 
@@ -710,7 +756,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .param(PARAM_CASE_IDS, INVALID_CASE_ID.toString())
             .param(PARAM_USER_IDS, USER_IDS)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         assertNotNull(exception);
@@ -727,7 +773,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, INVALID_USER_IDS)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(400))
+            .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
 
         assertNotNull(exception);
@@ -744,7 +790,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, USER_IDS)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(403))
+            .andExpect(status().isForbidden())
             .andReturn().getResolvedException();
 
         assertNotNull(exception);
@@ -760,7 +806,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .param(PARAM_CASE_IDS, CASE_IDS)
             .param(PARAM_USER_IDS, USER_IDS)
             .headers(createHttpHeaders()))
-            .andExpect(status().is(403))
+            .andExpect(status().isForbidden())
             .andReturn().getResolvedException();
 
         assertNotNull(exception);

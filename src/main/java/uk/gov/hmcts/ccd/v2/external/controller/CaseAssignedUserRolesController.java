@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.ArrayList;
@@ -94,7 +95,9 @@ public class CaseAssignedUserRolesController {
         targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseRoles(#caseAssignedUserRoles)"
     )
     public ResponseEntity<AddCaseAssignedUserRolesResponse> addCaseUserRoles(
+        @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
         @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
+        @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
         @RequestBody CaseAssignedUserRolesResource caseAssignedUserRoles
     ) {
         String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
