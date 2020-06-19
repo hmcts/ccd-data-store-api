@@ -9,7 +9,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure")
+@Library("Infrastructure@java-version-nagger")
 
 def type = "java"
 def product = "ccd"
