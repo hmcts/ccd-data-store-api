@@ -2,26 +2,31 @@ package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.base.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.*;
+import uk.gov.hmcts.ccd.data.definition.*;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
-import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.aggregated.*;
+import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 @Service
 public class CaseSearchResultViewGenerator {
@@ -30,28 +35,36 @@ public class CaseSearchResultViewGenerator {
     private final CaseTypeService caseTypeService;
     private final SearchQueryOperation searchQueryOperation;
     private final SearchResultProcessor searchResultProcessor;
+    private final SecurityClassificationService securityClassificationService;
+    private final AccessControlService accessControlService;
+    private final UIDefinitionRepository uiDefinitionRepository;
 
     public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                          CaseTypeService caseTypeService,
                                          SearchQueryOperation searchQueryOperation,
-                                         SearchResultProcessor searchResultProcessor) {
+                                         SearchResultProcessor searchResultProcessor,
+                                         SecurityClassificationService securityClassificationService,
+                                         AccessControlService accessControlService,
+                                         UIDefinitionRepository uiDefinitionRepository) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
         this.searchQueryOperation = searchQueryOperation;
         this.searchResultProcessor = searchResultProcessor;
+        this.securityClassificationService = securityClassificationService;
+        this.accessControlService = accessControlService;
+        this.uiDefinitionRepository = uiDefinitionRepository;
     }
 
     public CaseSearchResultView execute(String caseTypeId,
                                         CaseSearchResult caseSearchResult,
                                         String useCase) {
+        caseSearchResult = filterResultsByAuthorisation(useCase, caseSearchResult, caseTypeId);
         List<SearchResultViewHeaderGroup> headerGroups = buildHeaders(caseTypeId, useCase, caseSearchResult);
         List<SearchResultViewItem> items = buildItems(useCase, caseSearchResult, caseTypeId);
 
         if (itemsRequireFormatting(headerGroups)) {
             items = searchResultProcessor.execute(headerGroups.get(0).getFields(), items);
         }
-
-        // TODO: Filter out fields from result that haven't been requested before returning (RDM-8556)
         return new CaseSearchResultView(
             headerGroups,
             items,
@@ -61,7 +74,7 @@ public class CaseSearchResultViewGenerator {
 
     private boolean itemsRequireFormatting(List<SearchResultViewHeaderGroup> headerGroups) {
         return headerGroups.size() == 1
-               && headerGroups.get(0).getFields().stream().anyMatch(field -> field.getDisplayContextParameter() != null);
+            && headerGroups.get(0).getFields().stream().anyMatch(field -> field.getDisplayContextParameter() != null);
     }
 
     private List<SearchResultViewItem> buildItems(String useCase, CaseSearchResult caseSearchResult, String caseTypeId) {
@@ -76,7 +89,44 @@ public class CaseSearchResultViewGenerator {
         return items;
     }
 
-    private List<SearchResultViewHeaderGroup> buildHeaders(String caseTypeId, String useCase, CaseSearchResult caseSearchResult) {
+    private CaseSearchResult filterResultsByAuthorisation(String useCase, CaseSearchResult caseSearchResult, String caseTypeId) {
+        Set<String> roles = userRepository.getUserRoles();
+        CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
+        SearchResult searchResultDefinition = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, useCase);
+
+        caseSearchResult.getCases().forEach(caseDetails -> {
+            caseDetails.getData().keySet().forEach(item -> {
+                if (securityClassificationService.userHasEnoughSecurityClassificationForField(caseTypeDefinition.getJurisdictionId(), caseTypeDefinition, item)) {
+                    if (accessControlService.canAccessCaseFieldsWithCriteria(
+                        JacksonUtils.convertValueJsonNode(item),
+                        caseTypeDefinition.getCaseFieldDefinitions(),
+                        roles,
+                        CAN_READ)) {
+                        for (SearchResultField searchResultField : searchResultDefinition.getFields()) {
+                            if (searchResultDefinition.getFields().equals(item)) {
+                                for (String role : roles) {
+                                    if (searchResultField.getRole() == null || searchResultField.getRole().equals(role)) {
+                                    } else {
+                                        caseDetails.getData().remove(item);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        caseDetails.getData().remove(item);
+                    }
+                } else {
+                    caseDetails.getData().remove(item);
+                }
+
+            });
+        });
+        return caseSearchResult;
+    }
+
+
+    private List<SearchResultViewHeaderGroup> buildHeaders(String caseTypeId, String useCase, CaseSearchResult
+        caseSearchResult) {
         List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
         SearchResultViewHeaderGroup caseSearchHeader = buildHeader(useCase, caseSearchResult, caseTypeId, getCaseTypeDefinition(caseTypeId));
         headers.add(caseSearchHeader);
