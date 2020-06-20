@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-597",
+  "_guid_": "S-606",
   "_extends_": "F-105_Test_Data_Base",
   "title": "Get jurisdictions available to the user",
   "specs": [
@@ -24,7 +24,6 @@
           "description": "Content for the Test Jurisdiction.",
           "caseTypes":[
             {
-              "__operator__": "equivalent",
               "__ordering__": "unordered"
             },
             {
