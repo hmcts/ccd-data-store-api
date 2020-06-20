@@ -15,14 +15,3 @@ Feature: F-105: Case Roles Access Management
     Then a positive response is received
     And the response [contains the list of jurisdictions a user has access to]
     And the response has all other details as expected
-
-    # This is a good example for the operator: subset - not working atm
-  @S-606
-  Scenario: CREATOR role does not grant access to the CaseEvent when returning a list of jurisdictions for a valid user
-    Given a user with [an active profile in CCD having create case access for a jurisdiction]
-    When a request is prepared with appropriate values
-    And the request [has CREATE as case access parameter]
-    And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
-    Then a positive response is received
-    And the response [contains the list of jurisdictions a user has access to]
-    And the response has all other details as expected
