@@ -350,6 +350,51 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_B))
             );
         }
+
+        @Test
+        void shouldMergePermissionsOfMultipleRolesForCaseData() throws Exception {
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(matchAllQuery())
+                .sort(CREATED_DATE)
+                .build();
+
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC, AUTOTEST1_PRIVATE, AUTOTEST1_RESTRICTED);
+
+            Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
+            // Comments for assertions below describe some example scenarios for which a given role would usually NOT allow
+            // data/cases to be returned if a user conducting the search ONLY had that role - expressed in the form "<Scenario> (<role>)"
+            assertAll(
+                () -> assertThat(caseSearchResult.getTotal(), is(3L)),
+                () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(),
+                    is(SecurityClassification.PRIVATE)), // Case SC (caseworker-autotest1)
+                () -> assertThat(caseSearchResult.getCases().get(2).getState(),
+                    is(IN_PROGRESS_STATE)), // State CRUD (caseworker-autotest1)
+                () -> assertThat(data.get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD),
+                    is(true)), // Complex nested field CRUD (caseworker-autotest1-restricted)
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).has(NESTED_COLLECTION_TEXT_FIELD),
+                    is(true)), // Complex nested field SC (caseworker-autotest1)
+                () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD),
+                    is(true)) // Case field SC (caseworker-autotest1) & Case field CRUD (caseworker-autotest1-private)
+            );
+        }
+
+        @Test
+        void shouldMergePermissionsOfMultipleRolesForCases() throws Exception {
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(matchAllQuery())
+                .sort(CREATED_DATE)
+                .build();
+
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B, CASE_TYPE_C), AUTOTEST1_PUBLIC, AUTOTEST2_PUBLIC);
+
+            assertAll(
+                () -> assertThat(caseSearchResult.getTotal(), is(2L)),
+                () -> assertThat(caseSearchResult.getCases().get(0).getJurisdiction(), is(AUTOTEST_2)),
+                () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_B)),
+                () -> assertThat(caseSearchResult.getCases().get(1).getJurisdiction(), is(AUTOTEST_1)),
+                () -> assertThat(caseSearchResult.getCases().get(1).getCaseTypeId(), is(CASE_TYPE_C))
+            );
+        }
     }
 
     // The following tests require the Spring @SQL annotation, which does not work in @Nested classes (see SPR-15366)

@@ -58,6 +58,7 @@ public class ElasticsearchTestHelper {
     public static final String FIXED_LIST_ALIAS = "FixedListAlias";
 
     public static final String AUTOTEST_1 = "AUTOTEST1";
+    public static final String AUTOTEST_2 = "AUTOTEST2";
     public static final String DEFAULT_CASE_REFERENCE = "1588866820969121";
     public static final String YES_OR_NO_VALUE = "No";
     public static final String NUMBER_VALUE = "12345";
