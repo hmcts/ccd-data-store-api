@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -59,14 +58,13 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
 
     private void validateOrganisationPolicy(String caseTypeId, CaseDataContent content) {
         final List<String> errorList = new ArrayList<>();
-        caseDefinitionRepository.getCaseType(caseTypeId).getEvents().stream()
-            .filter(event -> event.getId().equals(content.getEventId()))
-            .forEach(caseEventDefinition -> caseEventDefinition.getCaseFields()
+        caseDefinitionRepository.getCaseType(caseTypeId)
+            .findCaseEvent(content.getEventId())
+            .ifPresent(caseEventDefinition -> caseEventDefinition.getCaseFields()
                 .stream()
                 .forEach(eventFieldDefinition -> eventFieldDefinition.getCaseEventFieldComplexDefinitions().stream()
                     .filter(cefcDefinition -> isOrgPolicyCaseAssignedRole(cefcDefinition.getReference()))
                     .forEach(cefcDefinition -> {
-                        //get extract the default value  from the content for the current eventFieldDefinition
                         String reference = cefcDefinition.getReference();
                         validateContent(content, eventFieldDefinition.getCaseFieldId(),
                             reference,
@@ -78,29 +76,33 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         }
     }
 
+    private String[] convertReference(String reference) {
+        return reference.split(Pattern.quote("."));
+    }
+
     private boolean isOrgPolicyCaseAssignedRole(String reference) {
-        String[] referenceArray = reference.split(Pattern.quote("."));
+        String[] referenceArray = convertReference(reference);
         return ORGANISATION_POLICY_ROLE.equals(referenceArray[referenceArray.length - 1]);
     }
 
     private void validateContent(final CaseDataContent content,
-                                 final String caseFiledID,
+                                 final String caseFiledId,
                                  final String reference,
                                  final String defaultValue,
                                  final List<String> errorList) {
         final JsonNode existingData = new ObjectMapper().convertValue(content.getData(), JsonNode.class);
-        Optional<JsonNode> caseFieldNode = Optional.of(existingData.findPath(caseFiledID));
-        if (caseFieldNode.isPresent()) {
-            String[] referenceArray = reference.split(Pattern.quote("."));
+        JsonNode caseFieldNode = existingData.findPath(caseFiledId);
+        if (caseFieldNode != null) {
+            String[] referenceArray = convertReference(reference);
             int length = referenceArray.length;
             String nodeReference = length > 1 ? referenceArray[length - 2] : referenceArray[length - 1];
-            List<JsonNode> parentNodes = caseFieldNode.get().findParents(nodeReference);
+            List<JsonNode> parentNodes = caseFieldNode.findParents(nodeReference);
             parentNodes.stream().forEach(parentNode -> {
                 JsonNode orgPolicyNode = findOrgPolicyNode(nodeReference, parentNode, length);
                 if (orgPolicyNode.isNull()) {
-                    errorList.add(caseFiledID + " cannot have an empty value.");
+                    errorList.add(caseFiledId + " cannot have an empty value.");
                 } else if (!defaultValue.equalsIgnoreCase(orgPolicyNode.textValue())) {
-                    errorList.add(caseFiledID + " has an incorrect value " + orgPolicyNode.textValue());
+                    errorList.add(caseFiledId + " has an incorrect value " + orgPolicyNode.textValue());
                 }
             });
         }
