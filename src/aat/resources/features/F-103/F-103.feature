@@ -1,4 +1,4 @@
-@F-103
+@F-103 @elasticsearch
 Feature: Elasticsearch external endpoint
 
   Background: Load test data for the scenario

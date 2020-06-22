@@ -7,13 +7,17 @@ import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
+import static java.util.Optional.ofNullable;
+
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
     @Override
     public void doLoadTestData() {
-        new ElasticsearchTestDataLoaderExtension().close();
+        if (elasticSearchEnabled()){
+            new ElasticsearchTestDataLoaderExtension().close();
+        }
         loader.addCcdRoles();
         loader.importDefinitions();
     }
@@ -29,5 +33,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             }
         }
         return super.calculateCustomValue(scenarioContext, key);
+    }
+
+    private boolean elasticSearchEnabled(){
+        return ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
     }
 }

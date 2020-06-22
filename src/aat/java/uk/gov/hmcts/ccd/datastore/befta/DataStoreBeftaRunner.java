@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoad
 
 @RunWith(Cucumber.class)
 @CucumberOptions(plugin = "json:target/cucumber.json",
-    glue = {"uk.gov.hmcts.befta.player", "uk.gov.hmcts.ccd.datastore.befta"}, features = { "classpath:features" }, tags = { "not @Ignore" })
+    glue = {"uk.gov.hmcts.befta.player", "uk.gov.hmcts.ccd.datastore.befta"}, features = { "classpath:features" }, tags = { "(not @Ignore) or (not @elasticsearch)" })
 public class DataStoreBeftaRunner {
 
     private DataStoreBeftaRunner() {
