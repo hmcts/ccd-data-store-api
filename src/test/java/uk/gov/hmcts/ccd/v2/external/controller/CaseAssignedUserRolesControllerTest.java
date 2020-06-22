@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -454,6 +456,58 @@ class CaseAssignedUserRolesControllerTest {
             assertEquals("1,2,3,4,5,6,7,8,9,10", resultBuildCaseIds); // test data is: count up
             assertEquals("1,4,9,16,25,36,49,64,81,100", resultBuildUserIds); // test data is: square
             assertEquals("11,10,9,8,7,6,5,4,3,2", resultBuildCaseRoles); // test data is: count down
+        }
+
+        @Test
+        void buildOptionalIds_shouldReturnEmptyStringWhenEmptyPassed() {
+            // ACT
+            String resultBuildOptionalIds = CaseAssignedUserRolesController.buildOptionalIds(Optional.empty());
+
+            // ASSERT
+            assertEquals("", resultBuildOptionalIds);
+        }
+
+        @Test
+        void buildOptionalIds_shouldReturnEmptyStringWhenEmptyListPassed() {
+            // ACT
+            String resultBuildOptionalIds =
+                CaseAssignedUserRolesController.buildOptionalIds(Optional.of(new ArrayList<>()));
+
+            // ASSERT
+            assertEquals("", resultBuildOptionalIds);
+        }
+
+        @Test
+        void buildOptionalIds_shouldReturnSimpleStringWhenSingleListItemPassed() {
+            // ACT
+            String resultBuildOptionalIds =
+                CaseAssignedUserRolesController.buildOptionalIds(Optional.of(Lists.newArrayList("1")));
+
+            // ASSERT
+            assertEquals("1", resultBuildOptionalIds);
+        }
+
+        @Test
+        void buildOptionalIds_shouldReturnCsvStringWhenManyListItemsPassed() {
+            // ACT
+            String resultBuildOptionalIds =
+                CaseAssignedUserRolesController.buildOptionalIds(Optional.of(
+                    Lists.newArrayList("1", "2", "3")));
+
+            // ASSERT
+            assertEquals("1,2,3", resultBuildOptionalIds);
+        }
+
+        @Test
+        void buildOptionalIds_shouldReturnMaxCsvListWhenTooManyListItemsPassed() {
+            // ACT
+            // NB: max list size is 10 (u.g.h.c.a.a.AuditContext.MAX_CASE_IDS_LIST)
+            String resultBuildOptionalIds =
+                CaseAssignedUserRolesController.buildOptionalIds(Optional.of(
+                    Lists.newArrayList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")));
+
+            // ASSERT
+            assertEquals("1,2,3,4,5,6,7,8,9,10", resultBuildOptionalIds);
         }
 
         private CaseAssignedUserRolesResource createCaseUserRolesList(int numberRequired) {

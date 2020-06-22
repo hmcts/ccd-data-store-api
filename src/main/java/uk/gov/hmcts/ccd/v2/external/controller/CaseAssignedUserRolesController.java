@@ -37,6 +37,7 @@ import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.GET_CASE_ASSIGNED_USER_ROLES;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
@@ -139,6 +140,11 @@ public class CaseAssignedUserRolesController {
             message = V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED
         )
     })
+    @LogAudit(
+        operationType = GET_CASE_ASSIGNED_USER_ROLES,
+        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildOptionalIds(#caseIds)",
+        targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildOptionalIds(#optionalUserIds)"
+    )
     public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids") List<String> caseIds,
                                                                           @RequestParam(value = "user_ids", required = false)
                                                                               Optional<List<String>> optionalUserIds) {
@@ -226,6 +232,13 @@ public class CaseAssignedUserRolesController {
         // NB: match Case ID list size and separator configuration
         return caseAssignedUserRolesToStream(caseAssignedUserRoles).limit(MAX_CASE_IDS_LIST)
             .map(CaseAssignedUserRole::getUserId)
+            .collect(Collectors.joining(CASE_ID_SEPARATOR));
+    }
+
+    public static String buildOptionalIds(Optional<List<String>> optionalIds) {
+        List<String> userIds = optionalIds.orElseGet(Lists::newArrayList);
+        // NB: match Case ID list size and separator configuration
+        return userIds.stream().limit(MAX_CASE_IDS_LIST)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 

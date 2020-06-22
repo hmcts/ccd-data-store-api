@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,7 +41,9 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -59,6 +63,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.ccd.v2.V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.ADD_SUCCESS_MESSAGE;
@@ -128,6 +133,12 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             "authorisedServicesForAddUserCaseRoles",
             Lists.newArrayList(AUTHORISED_ADD_SERVICE_1, AUTHORISED_ADD_SERVICE_2)
         );
+        // disable suppression of audit logs
+        ReflectionTestUtils.setField(
+            applicationParams,
+            "auditLogIgnoreStatuses",
+            Lists.newArrayList()
+        );
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -182,6 +193,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(1, caseRoles.size());
         assertThat(caseRoles, hasItems(CASE_ROLE_1));
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.OK, caseUserRoles);
     }
 
     // RDM-8606: AC-2
@@ -213,6 +226,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // check data has not been saved
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
     }
 
     // RDM-8606: AC-3
@@ -244,6 +259,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // check data has not been saved
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
     }
 
     // RDM-8606: AC-4
@@ -275,6 +292,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // check data has not been saved
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
     }
 
     // RDM-8606: AC-5
@@ -306,6 +325,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // check data has not been saved
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
     }
 
     // RDM-8606: AC-6
@@ -339,6 +360,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // check data has not been saved
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.FORBIDDEN, caseUserRoles);
     }
 
     // RDM-8606: AC-7
@@ -370,6 +393,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // check data has not been saved
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
     }
 
     // RDM-8606: AC-8
@@ -401,6 +426,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // check data has not been saved
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
     }
 
     // RDM-8606: null list
@@ -421,6 +448,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ASSERT
         assertNotNull(exception);
         assertThat(exception.getMessage(), containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST));
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, null);
     }
 
     // RDM-8606: empty-list
@@ -443,6 +472,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ASSERT
         assertNotNull(exception);
         assertThat(exception.getMessage(), containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST));
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
     }
 
     // RDM-8606: case not found
@@ -469,6 +500,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ASSERT
         assertNotNull(exception);
         assertThat(exception.getMessage(), containsString("No case found for reference: 1111222233334444"));
+
+        // NB: usually audit for HttpStatus.NOT_FOUND will be suppressed by applicationParams.auditLogIgnoreStatuses
+        verifyAuditForAddCaseUserRoles(HttpStatus.NOT_FOUND, caseUserRoles);
     }
 
     // RDM-8606: duplicate
@@ -508,6 +542,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(1, caseRoles.size());
         assertThat(caseRoles, hasItems(CASE_ROLE_1));
+
+        verifyAuditForAddCaseUserRoles(HttpStatus.OK, caseUserRoles);
     }
 
     // RDM-8606: multiple
@@ -552,45 +588,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals(2, caseRoles.size());
         assertThat(caseRoles, hasItems(CASE_ROLE_1));
         assertThat(caseRoles, hasItems(CASE_ROLE_2));
-    }
 
-    // RDM-8606: log-audit
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases_with_valid_case_ids.sql"
-    })
-    @DisplayName("addCaseUserRoles: log-audit: should allow multiple CaseUserRoles to be added in single call")
-    public void addCaseUserRoles_shouldCreateLogAuditWhenCalled() throws Exception {
-        // ARRANGE
-        MockUtils.setSecurityAuthorities(authentication);
-        String userId1 = "4444"; // don't need the users to exist in the repository but want unique for each test
-        String userId2 = "5555"; // don't need the users to exist in the repository but want unique for each test
-
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId1, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_2, userId2, CASE_ROLE_2);
-        caseUserRoles.add(caseUserRole1);
-        caseUserRoles.add(caseUserRole2);
-
-        // ACT
-        mockMvc.perform(post(postCaseAssignedUserRoles)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
-            .headers(createHttpHeaders()))
-            .andExpect(status().isOk())
-            .andReturn();
-
-        // ASSERT
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is(CASE_ID_1 + "," + CASE_ID_2));
-        assertThat(captor.getValue().getTargetCaseRoles(), is(Lists.newArrayList(CASE_ROLE_1, CASE_ROLE_2)));
-        assertThat(captor.getValue().getTargetIdamId(), is(userId1 + "," + userId2));
-        assertThat(captor.getValue().getHttpStatus(), is(200));
-        assertThat(captor.getValue().getPath(), is(postCaseAssignedUserRoles));
-        assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.POST.name()));
+        verifyAuditForAddCaseUserRoles(HttpStatus.OK, caseUserRoles);
     }
 
     // AC-1
@@ -615,6 +614,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertNotNull("Content Should not be null", content);
         CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content, CaseAssignedUserRolesResource.class);
         assertNotNull("Case Assigned User Roles should not be null", caseAssignedUserRolesResource);
+
+        verifyAuditForGetCaseUserRoles(HttpStatus.OK, CASE_IDS, USER_IDS);
     }
 
     // AC-2
@@ -643,6 +644,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals("7578590391163133", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getCaseDataId());
         assertEquals("89000", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getUserId());
         assertEquals("[CREATOR]", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getCaseRole());
+
+        verifyAuditForGetCaseUserRoles(HttpStatus.OK, CASE_IDS, USER_IDS_1);
     }
 
     // AC-3
@@ -681,6 +684,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
                 hasItems(allOf(hasProperty("caseDataId", Matchers.is(CASE_ID_2)),
                     hasProperty("userId", Matchers.is(USER_IDS_3)),
                     hasProperty("caseRole", Matchers.is("[DEFENDANT]"))))));
+
+        verifyAuditForGetCaseUserRoles(HttpStatus.OK, CASE_ID_2, null);
     }
 
     // AC-4
@@ -715,6 +720,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
                 hasItems(allOf(hasProperty("caseDataId", Matchers.is(CASE_ID_2)),
                     hasProperty("userId", Matchers.is(USER_IDS_2)),
                     hasProperty("caseRole", Matchers.is("[DEFENDANT]"))))));
+
+        verifyAuditForGetCaseUserRoles(HttpStatus.OK, CASE_IDS, null);
     }
 
     // AC-5
@@ -732,6 +739,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
         assertNotNull(exception);
         assertThat(exception.getMessage(), containsString(V2.Error.EMPTY_CASE_ID_LIST));
+
+        verifyAuditForGetCaseUserRoles(HttpStatus.BAD_REQUEST, null, USER_IDS);
     }
 
     @Test
@@ -761,6 +770,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
         assertNotNull(exception);
         assertThat(exception.getMessage(), containsString(V2.Error.CASE_ID_INVALID));
+
+        verifyAuditForGetCaseUserRoles(HttpStatus.BAD_REQUEST, INVALID_CASE_ID.toString(), USER_IDS);
     }
 
     // AC-7
@@ -778,6 +789,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
         assertNotNull(exception);
         assertThat(exception.getMessage(), containsString(V2.Error.USER_ID_INVALID));
+
+        verifyAuditForGetCaseUserRoles(HttpStatus.BAD_REQUEST, CASE_IDS, INVALID_USER_IDS);
     }
 
     // AC-8
@@ -795,6 +808,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
         assertNotNull(exception);
         assertThat(exception.getMessage(), containsString(OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED));
+
+        verifyAuditForGetCaseUserRoles(HttpStatus.FORBIDDEN, CASE_IDS, USER_IDS.replace(" ", ""));
     }
 
     @Test
@@ -811,6 +826,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
         assertNotNull(exception);
         assertThat(exception.getMessage(), containsString(OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED));
+
+        verifyAuditForGetCaseUserRoles(HttpStatus.FORBIDDEN, CASE_IDS, USER_IDS);
     }
 
     private HttpHeaders createHttpHeaders() {
@@ -819,6 +836,52 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         String s2SToken = MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_1);
         headers.add(SERVICE_AUTHORIZATION, "Bearer " + s2SToken);
         return headers;
+    }
+
+    private void verifyAuditForAddCaseUserRoles(HttpStatus status, List<CaseAssignedUserRole> caseUserRoles) {
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES.getLabel()));
+        assertThat(captor.getValue().getHttpStatus(), is(status.value()));
+        assertThat(captor.getValue().getPath(), is(postCaseAssignedUserRoles));
+        assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.POST.name()));
+
+        if (caseUserRoles != null) {
+            String caseIds = caseUserRoles.stream().map(CaseAssignedUserRole::getCaseDataId)
+                .collect(Collectors.joining(CASE_ID_SEPARATOR));
+            String caseRoles = caseUserRoles.stream().map(CaseAssignedUserRole::getCaseRole)
+                .collect(Collectors.joining(CASE_ID_SEPARATOR));
+            String userIds = caseUserRoles.stream().map(CaseAssignedUserRole::getUserId)
+                .collect(Collectors.joining(CASE_ID_SEPARATOR));
+
+            assertThat(captor.getValue().getCaseId(), is(caseIds));
+            assertThat(StringUtils.join(captor.getValue().getTargetCaseRoles(), CASE_ID_SEPARATOR), is(caseRoles));
+            assertThat(captor.getValue().getTargetIdamId(), is(userIds));
+        }
+    }
+
+    private void verifyAuditForGetCaseUserRoles(HttpStatus status, String caseIds, String userIds) {
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.GET_CASE_ASSIGNED_USER_ROLES.getLabel()));
+        assertThat(captor.getValue().getHttpStatus(), is(status.value()));
+        assertThat(captor.getValue().getPath(), is(getCaseAssignedUserRoles));
+        assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.GET.name()));
+
+        if (caseIds != null) {
+            assertThat(captor.getValue().getCaseId(), is(trimSpacesFromCsvValues(caseIds)));
+        }
+        if (userIds != null) {
+            assertThat(captor.getValue().getTargetIdamId(), is(trimSpacesFromCsvValues(userIds)));
+        }
+    }
+
+    private String trimSpacesFromCsvValues(String csvInput) {
+        return Arrays.stream(csvInput.split(CASE_ID_SEPARATOR))
+            .map(String::trim)
+            .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
 }
