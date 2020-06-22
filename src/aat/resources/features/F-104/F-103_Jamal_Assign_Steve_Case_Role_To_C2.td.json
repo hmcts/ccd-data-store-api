@@ -1,0 +1,24 @@
+{
+	"_guid_": "F-103_Jamal_Assign_Steve_Case_Role_To_C2",
+	"_extends_": "F-103_Case_Role_Assign_Base",
+	"specs": [
+		"by Jamal to assign Steve a few case roles to access C2"
+	],
+	"users": {
+		"userSteve": {
+			"username": "befta.caseworker.2.solicitor.1@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+		}
+	},
+	"request": {
+		"pathVariables": {
+			"case_id": "${[scenarioContext][siblingContexts][F103_Case_Data_Create_C2][testData][actualResponse][body][id]}",
+			"user_id": "${[scenarioContext][testData][users][userSteve][id]}"
+		},
+		"body": {
+			"case_roles": [
+				"[COLLABORATOR]"
+			]
+		}
+	}
+}

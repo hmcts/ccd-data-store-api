@@ -11,7 +11,8 @@ import java.util.stream.Collectors;
  * </ul>
  */
 public enum GlobalCaseRole {
-    CREATOR("[CREATOR]");
+    CREATOR("[CREATOR]"),
+    COLLABORATOR("[COLLABORATOR]");
 
     private final String role;
 

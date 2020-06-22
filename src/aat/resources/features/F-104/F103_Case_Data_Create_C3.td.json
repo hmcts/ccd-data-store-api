@@ -1,0 +1,12 @@
+{
+	"_guid_": "F103_Case_Data_Create_C3",
+	"_extends_": "F103_Case_Data_Create",
+	"specs": [
+		"C3, which has just been"
+	],
+	"request": {
+		"body": {
+			"event_token": "${[scenarioContext][siblingContexts][F103_Case_Data_Create_C3_Token_Creation][testData][actualResponse][body][token]}"
+		}
+	}
+}

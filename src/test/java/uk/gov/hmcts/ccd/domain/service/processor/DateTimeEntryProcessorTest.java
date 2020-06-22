@@ -272,7 +272,7 @@ class DateTimeEntryProcessorTest {
     }
 
     private FieldTypeDefinition fieldType(String fieldType) {
-        return fieldType("DateTime", "DateTime", Collections.emptyList(), null);
+        return fieldType(fieldType, fieldType, Collections.emptyList(), null);
     }
 
     private void setUpBaseTypes() {
