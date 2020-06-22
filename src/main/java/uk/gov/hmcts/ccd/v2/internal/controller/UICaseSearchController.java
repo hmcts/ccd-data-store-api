@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.*;
 
 import java.time.*;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
@@ -123,10 +124,10 @@ public class UICaseSearchController {
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 
-        String useCaseUppercase = Strings.isNullOrEmpty(useCase) ? null : useCase.toUpperCase();
-
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
+        String useCaseUppercase = Strings.isNullOrEmpty(useCase) || searchRequest.hasSource() ? null : useCase.toUpperCase();
         elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCaseUppercase);
+        List<String> requestedFields = searchRequest.getRequestedFields();
 
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(Collections.singletonList(caseTypeId))
@@ -134,7 +135,8 @@ public class UICaseSearchController {
             .build();
 
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(request);
-        CaseSearchResultView caseSearchResultView = caseSearchResultViewGenerator.execute(caseTypeId, caseSearchResult, useCaseUppercase);
+        CaseSearchResultView caseSearchResultView = caseSearchResultViewGenerator
+            .execute(caseTypeId, caseSearchResult, useCaseUppercase, requestedFields);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("Internal searchCases execution completed in {} millisecs...", between.toMillis());

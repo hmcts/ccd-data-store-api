@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
+import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -94,7 +95,7 @@ class CaseSearchResultViewGeneratorTest {
     private CaseTypeService caseTypeService;
 
     @Mock
-    private SearchQueryOperation searchQueryOperation;
+    private SearchResultDefinitionService searchResultDefinitionService;
 
     @Mock
     private SearchResultProcessor searchResultProcessor;
@@ -169,15 +170,15 @@ class CaseSearchResultViewGeneratorTest {
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_2, CASE_FIELD_4, "", CASE_FIELD_4, ""))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(),any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
         doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(any(), any());
 
-        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchQueryOperation, searchResultProcessor);
+        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchResultDefinitionService, searchResultProcessor);
     }
 
     @Test
     void shouldBuildCaseSearchResultHeaders() {
-        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
         assertAll(
             () -> assertThat(caseSearchResultView.getHeaders().size(), is(1)),
@@ -190,7 +191,7 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldBuildCaseSearchResultCases() {
-        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, "ORGCASES");
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, "ORGCASES", Collections.emptyList());
 
         Map<String, Object> caseDataDifferences = Maps.difference(caseSearchResultView.getCases().get(0).getFields(),
             dataMap).entriesOnlyOnRight();
@@ -215,7 +216,7 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldBuildCaseSearchResultTotal() {
-        final CaseSearchResultView searchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView searchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
         assertAll(
             () -> assertThat(searchResultView.getTotal(), is(3L))
@@ -230,9 +231,9 @@ class CaseSearchResultViewGeneratorTest {
                 buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME, ""),
                 buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME, ""))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
         assertAll(
             () -> assertThat(caseSearchResultView.getHeaders().size(), is(1)),
@@ -268,10 +269,10 @@ class CaseSearchResultViewGeneratorTest {
                 searchResultFieldWithInvalidRole)
             .build();
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1));
 
-        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
         assertAll(
             () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(3)),
@@ -309,10 +310,10 @@ class CaseSearchResultViewGeneratorTest {
             .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
             .build();
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
 
-        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
         assertAll(
             () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(3)),
@@ -328,9 +329,9 @@ class CaseSearchResultViewGeneratorTest {
             buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FAMILY_DETAILS_PATH, FAMILY_DETAILS, ""),
             buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FAMILY_DETAILS_PATH_NESTED, FAMILY_DETAILS, ""))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
         assertAll(
             () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(0),
@@ -350,9 +351,9 @@ class CaseSearchResultViewGeneratorTest {
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "#DCP"))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
         verify(searchResultProcessor).execute(any(), any());
     }
@@ -363,9 +364,9 @@ class CaseSearchResultViewGeneratorTest {
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, null))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET);
+        classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
         verifyNoMoreInteractions(searchResultProcessor);
     }
@@ -377,10 +378,10 @@ class CaseSearchResultViewGeneratorTest {
                 FAMILY_DETAILS, "InvalidElement",
                 FAMILY_DETAILS, ""))
             .build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
-            () -> classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET));
+            () -> classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList()));
 
         assertAll(
             () -> assertThat(exception.getMessage(), is("CaseField FamilyDetails has no nested elements with code InvalidElement."))
@@ -396,11 +397,11 @@ class CaseSearchResultViewGeneratorTest {
             .build();
         CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID_1).withJurisdiction(jurisdiction)
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()).build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeWithoutCaseFieldDefinition);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1,
-            caseSearchResult, WORKBASKET);
+            caseSearchResult, WORKBASKET, Collections.emptyList());
 
         assertAll(
             () -> assertThat(caseSearchResultView.getCases().size(), is(3)),
@@ -413,10 +414,10 @@ class CaseSearchResultViewGeneratorTest {
     @Test
     void shouldThrowBadSearchRequestExceptionWhenUseCaseDoesNotExist() {
         SearchResult searchResult = searchResult().withSearchResultFields().build();
-        when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(searchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
         final BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
-            classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, "INVALID"));
+            classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, "INVALID", Collections.emptyList()));
 
         assertAll(
             () -> assertThat(exception.getMessage(), is("The provided use case 'INVALID' is unsupported for case type 'CASE_TYPE_1'."))
