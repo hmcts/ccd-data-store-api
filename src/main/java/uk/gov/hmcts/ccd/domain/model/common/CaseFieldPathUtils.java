@@ -27,7 +27,7 @@ public class CaseFieldPathUtils {
      * @param path The full stop (".") separated path
      * @return The case field; empty if no such field exists
      */
-    public static Optional<CommonField> getFieldDefinitionByPath(CaseTypeDefinition caseTypeDefinition, String path) {
+    public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(CaseTypeDefinition caseTypeDefinition, String path) {
         if (StringUtils.isBlank(path)) {
             return Optional.empty();
         }
@@ -35,7 +35,7 @@ public class CaseFieldPathUtils {
 
         Optional<CaseFieldDefinition> topLevelCaseField = caseTypeDefinition.getCaseField(pathElements.get(0));
 
-        return topLevelCaseField.flatMap(field -> getFieldDefinitionByPath(field, getPathElementsTailAsString(pathElements)));
+        return topLevelCaseField.flatMap(field -> getFieldDefinitionByPath((T) field, getPathElementsTailAsString(pathElements)));
     }
 
     /**
@@ -46,7 +46,7 @@ public class CaseFieldPathUtils {
      * @return The nested field. The case field passed in is returned if the path is empty;
      *         empty if no such field exists
      */
-    public static Optional<CommonField> getFieldDefinitionByPath(CommonField caseFieldDefinition, String path) {
+    public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(T caseFieldDefinition, String path) {
         if (StringUtils.isBlank(path)) {
             return Optional.of(caseFieldDefinition);
         }
@@ -65,7 +65,7 @@ public class CaseFieldPathUtils {
      *                           would simply be for ChildField
      * @return The nested field; empty if no such field exists
      */
-    public static Optional<CommonField> getFieldDefinitionByPath(FieldTypeDefinition fieldTypeDefinition,
+    public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(FieldTypeDefinition fieldTypeDefinition,
                                                                  String path,
                                                                  boolean pathIncludesParent) {
         if (StringUtils.isBlank(path) || fieldTypeDefinition.getChildren().isEmpty() || (pathIncludesParent && splitPath(path).length == 1)) {
@@ -73,7 +73,7 @@ public class CaseFieldPathUtils {
         }
         List<String> pathElements = getPathElements(path);
 
-        return reduce(fieldTypeDefinition.getChildren(), pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
+        return reduce((List<T>)fieldTypeDefinition.getChildren(), pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
     }
 
     /**
@@ -89,7 +89,7 @@ public class CaseFieldPathUtils {
         return reduce(node, pathElements);
     }
 
-    private static List<String> getPathElements(String path) {
+    public static List<String> getPathElements(String path) {
         return Arrays.stream(splitPath(path)).collect(toList());
     }
 
@@ -97,7 +97,7 @@ public class CaseFieldPathUtils {
         return path.trim().split(SEPARATOR_REGEX);
     }
 
-    private static Optional<CommonField> reduce(List<CaseFieldDefinition> caseFields, List<String> pathElements) {
+    private static <T extends CommonField> Optional<T> reduce(List<T> caseFields, List<String> pathElements) {
         return caseFields.stream()
             .filter(e -> e.getId().equals(pathElements.get(0)))
             .findFirst()
@@ -105,7 +105,7 @@ public class CaseFieldPathUtils {
                 if (pathElements.size() == 1) {
                     return Optional.of(caseField);
                 } else {
-                    List<CaseFieldDefinition> newCaseFields = caseField.getFieldTypeDefinition().getChildren();
+                    List<T> newCaseFields = (List<T>) caseField.getFieldTypeDefinition().getChildren();
                     return reduce(newCaseFields, getPathElementsTail(pathElements));
                 }
             });
@@ -123,11 +123,11 @@ public class CaseFieldPathUtils {
         }
     }
 
-    private static List<String> getPathElementsTail(List<String> pathElements) {
+    public static List<String> getPathElementsTail(List<String> pathElements) {
         return pathElements.subList(1, pathElements.size());
     }
 
-    private static String getPathElementsTailAsString(List<String> pathElements) {
+    public static String getPathElementsTailAsString(List<String> pathElements) {
         return StringUtils.join(getPathElementsTail(pathElements), SEPARATOR);
     }
 }

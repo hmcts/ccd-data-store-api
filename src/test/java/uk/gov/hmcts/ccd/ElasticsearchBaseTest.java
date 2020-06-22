@@ -16,11 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
 import java.io.IOException;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDEX_TYPE;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDICES;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.*;
@@ -51,6 +54,18 @@ public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
         }
     }
 
+    public ElasticsearchTestRequest caseReferenceRequest(String caseReference) {
+        return ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), caseReference))
+            .build();
+    }
+
+    public ElasticsearchTestRequest matchAllRequest() {
+        return ElasticsearchTestRequest.builder()
+            .query(matchAllQuery())
+            .build();
+    }
+
     @Builder
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class ElasticsearchTestRequest {
@@ -71,7 +86,7 @@ public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
 
         @JsonRawValue
         public String getQuery() {
-            return Strings.toString(query);
+            return query == null ? null : Strings.toString(query);
         }
 
         public String toJsonString() throws JsonProcessingException {

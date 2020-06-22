@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortSer
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -66,7 +67,7 @@ class UICaseSearchControllerTest {
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(caseSearchResult);
-        when(caseSearchResultViewGenerator.execute(any(), any(), any())).thenReturn(caseSearchResultView);
+        when(caseSearchResultViewGenerator.execute(any(), any(), any(), any())).thenReturn(caseSearchResultView);
 
         final ResponseEntity<CaseSearchResultViewResource> response = controller
             .searchCases(CASE_TYPE_ID, WORKBASKET, searchRequest);
@@ -80,7 +81,7 @@ class UICaseSearchControllerTest {
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
         }));
-        verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET));
+        verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET), eq(Collections.emptyList()));
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
             () -> assertThat(response.getBody().getHeaders(), is(caseSearchResultView.getHeaders())),

@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.aggregated.*;
 import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
@@ -33,31 +34,34 @@ public class CaseSearchResultViewGenerator {
 
     private final UserRepository userRepository;
     private final CaseTypeService caseTypeService;
-    private final SearchQueryOperation searchQueryOperation;
+    private final SearchResultDefinitionService searchResultDefinitionService;
     private final SearchResultProcessor searchResultProcessor;
     private final AccessControlService accessControlService;
 
     public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                          CaseTypeService caseTypeService,
-                                         SearchQueryOperation searchQueryOperation,
+                                         SearchResultDefinitionService searchResultDefinitionService,
                                          SearchResultProcessor searchResultProcessor,
                                          AccessControlService accessControlService) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
-        this.searchQueryOperation = searchQueryOperation;
+        this.searchResultDefinitionService = searchResultDefinitionService;
         this.searchResultProcessor = searchResultProcessor;
         this.accessControlService = accessControlService;
     }
 
     public CaseSearchResultView execute(String caseTypeId,
                                         CaseSearchResult caseSearchResult,
-                                        String useCase) {
-        List<SearchResultViewHeaderGroup> headerGroups = buildHeaders(caseTypeId, useCase, caseSearchResult);
-        List<SearchResultViewItem> items = buildItems(useCase, caseSearchResult, caseTypeId);
+                                        String useCase,
+                                        List<String> requestedFields) {
+        List<SearchResultViewHeaderGroup> headerGroups = buildHeaders(caseTypeId, useCase, caseSearchResult, requestedFields);
+        List<SearchResultViewItem> items = buildItems(useCase, caseSearchResult, caseTypeId, requestedFields);
 
         if (itemsRequireFormatting(headerGroups)) {
             items = searchResultProcessor.execute(headerGroups.get(0).getFields(), items);
         }
+
+        // TODO: Filter out fields from result that haven't been requested before returning (RDM-8556)
         return new CaseSearchResultView(
             headerGroups,
             items,
@@ -67,15 +71,17 @@ public class CaseSearchResultViewGenerator {
 
     private boolean itemsRequireFormatting(List<SearchResultViewHeaderGroup> headerGroups) {
         return headerGroups.size() == 1
-            && headerGroups.get(0).getFields().stream().anyMatch(field -> field.getDisplayContextParameter() != null);
+               && headerGroups.get(0).getFields().stream().anyMatch(field -> field.getDisplayContextParameter() != null);
     }
 
-    private List<SearchResultViewItem> buildItems(String useCase, CaseSearchResult caseSearchResult, String caseTypeId) {
+    private List<SearchResultViewItem> buildItems(String useCase, CaseSearchResult caseSearchResult, String caseTypeId, List<String> requestedFields) {
         CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
-        SearchResult searchResultDefinition = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, useCase);
+        SearchResult searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
 
         List<SearchResultViewItem> items = new ArrayList<>();
         // Only one case type is currently supported so we can reuse the same definitions for building all items
+        caseSearchResult.getCases().forEach(caseDetails ->
+            items.add(buildSearchResultViewItem(caseDetails, caseTypeDefinition, searchResultDefinition)));
 
         caseSearchResult.getCases().forEach(caseDetails -> {
             filterResultsByAuthorisation(useCase, caseDetails, caseTypeId);
@@ -124,9 +130,9 @@ public class CaseSearchResultViewGenerator {
 
 
     private List<SearchResultViewHeaderGroup> buildHeaders(String caseTypeId, String useCase, CaseSearchResult
-        caseSearchResult) {
+        caseSearchResult, List<String> requestedFields) {
         List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
-        SearchResultViewHeaderGroup caseSearchHeader = buildHeader(useCase, caseSearchResult, caseTypeId, getCaseTypeDefinition(caseTypeId));
+        SearchResultViewHeaderGroup caseSearchHeader = buildHeader(useCase, caseSearchResult, caseTypeId, getCaseTypeDefinition(caseTypeId), requestedFields);
         headers.add(caseSearchHeader);
 
         return headers;
@@ -136,8 +142,12 @@ public class CaseSearchResultViewGenerator {
         return caseTypeService.getCaseType(caseTypeId);
     }
 
-    private SearchResultViewHeaderGroup buildHeader(String useCase, CaseSearchResult caseSearchResult, String caseTypeId, CaseTypeDefinition caseType) {
-        SearchResult searchResult = searchQueryOperation.getSearchResultDefinition(caseType, useCase);
+    private SearchResultViewHeaderGroup buildHeader(String useCase,
+                                                    CaseSearchResult caseSearchResult,
+                                                    String caseTypeId,
+                                                    CaseTypeDefinition caseType,
+                                                    List<String> requestedFields) {
+        SearchResult searchResult = searchResultDefinitionService.getSearchResultDefinition(caseType, useCase, requestedFields);
         if (searchResult.getFields().length == 0) {
             throw new BadSearchRequest(String.format("The provided use case '%s' is unsupported for case type '%s'.",
                 useCase, caseType.getId()));
