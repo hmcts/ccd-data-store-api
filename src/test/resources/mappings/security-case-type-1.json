@@ -737,6 +737,13 @@
               "read": true,
               "update": true,
               "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-solicitor",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
             }
           ]
         },
@@ -751,6 +758,20 @@
               "role": "caseworker-autotest1-restricted",
               "create": true,
               "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-solicitor",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1",
+              "create": true,
+              "read": false,
               "update": true,
               "delete": false
             }
@@ -783,6 +804,13 @@
               "read": true,
               "update": true,
               "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-solicitor",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
             }
           ]
         }
@@ -811,6 +839,13 @@
         },
         {
           "role": "caseworker-autotest1-restricted",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-autotest1-solicitor",
           "create": true,
           "read": true,
           "update": true,
@@ -1168,7 +1203,7 @@
                   "collection_field_type": null
                 },
                 "hidden": null,
-                "security_classification": "PUBLIC",
+                "security_classification": "PRIVATE",
                 "live_from": null,
                 "live_until": null,
                 "acls": null,
@@ -1300,7 +1335,7 @@
                   "collection_field_type": null
                 },
                 "hidden": false,
-                "security_classification": "PUBLIC",
+                "security_classification": "PRIVATE",
                 "live_from": null,
                 "live_until": null,
                 "acls": null,
@@ -1339,7 +1374,7 @@
                         "collection_field_type": null
                       },
                       "hidden": false,
-                      "security_classification": "PUBLIC",
+                      "security_classification": "PRIVATE",
                       "live_from": null,
                       "live_until": null,
                       "acls": null,
@@ -1373,7 +1408,7 @@
                         }
                       },
                       "hidden": false,
-                      "security_classification": "PUBLIC",
+                      "security_classification": "RESTRICTED",
                       "live_from": null,
                       "live_until": null,
                       "acls": null,
@@ -1403,6 +1438,20 @@
           "acls": [
             {
               "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-restricted",
               "create": true,
               "read": true,
               "update": true,
@@ -1440,6 +1489,14 @@
               "update": true,
               "delete": false,
               "listElementCode": "ComplexNestedField"
+            },
+            {
+              "role": "caseworker-autotest1-restricted",
+              "create": true,
+              "read": false,
+              "update": true,
+              "delete": false,
+              "listElementCode": "ComplexTextField"
             }
           ],
           "order": null,
@@ -1537,12 +1594,19 @@
             "collection_field_type": null
           },
           "hidden": false,
-          "security_classification": "PUBLIC",
+          "security_classification": "RESTRICTED",
           "live_from": "2017-01-01",
           "live_until": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-restricted",
               "create": true,
               "read": true,
               "update": true,
@@ -1680,7 +1744,7 @@
             {
               "role": "caseworker-autotest1",
               "create": true,
-              "read": true,
+              "read": false,
               "update": true,
               "delete": false
             },
@@ -1719,6 +1783,13 @@
           "acls": [
             {
               "role": "caseworker-autotest1",
+              "create": true,
+              "read": false,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-autotest1-restricted",
               "create": true,
               "read": true,
               "update": true,
@@ -1760,7 +1831,7 @@
             {
               "role": "caseworker-autotest1",
               "create": true,
-              "read": true,
+              "read": false,
               "update": true,
               "delete": false
             },
@@ -1833,7 +1904,7 @@
             "collection_field_type": null
           },
           "hidden": false,
-          "security_classification": "PUBLIC",
+          "security_classification": "PRIVATE",
           "live_from": "2017-01-01",
           "live_until": null,
           "acls": [
@@ -1894,7 +1965,7 @@
             {
               "role": "caseworker-autotest1",
               "create": true,
-              "read": true,
+              "read": false,
               "update": true,
               "delete": false
             },

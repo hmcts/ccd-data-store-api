@@ -6,12 +6,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.ElasticsearchBaseTest;
@@ -19,6 +18,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.test.ElasticsearchTestHelper;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -29,14 +29,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
 
 class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
     private static final String POST_SEARCH_CASES = "/searchCases";
-    private static final String CASE_TYPE_ID_PARAM = "ctid";
 
     @Inject
     private WebApplicationContext wac;
@@ -65,19 +62,9 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
         @Test // Note that cross case type searches do NOT return case data
         void shouldReturnAllCasesForAllSpecifiedCaseTypes() throws Exception {
-            String searchRequest = ElasticsearchTestRequest.builder()
-                .query(matchAllQuery())
-                .build().toJsonString();
+            ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-            MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B))
-                .content(searchRequest))
-                .andExpect(status().is(200))
-                .andReturn();
-
-            String responseAsString = result.getResponse().getContentAsString();
-            CaseSearchResult caseSearchResult = mapper.readValue(responseAsString, CaseSearchResult.class);
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B));
 
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(3L)),
@@ -91,21 +78,13 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
         @Test
         void shouldReturnRequestedAliasSource() throws Exception {
-            String searchRequest = ElasticsearchTestRequest.builder()
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(matchAllQuery())
                 .source(alias(TEXT_ALIAS))
                 .sort(CREATED_DATE)
-                .build().toJsonString();
+                .build();
 
-            MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B))
-                .content(searchRequest))
-                .andExpect(status().is(200))
-                .andReturn();
-
-            String responseAsString = result.getResponse().getContentAsString();
-            CaseSearchResult caseSearchResult = mapper.readValue(responseAsString, CaseSearchResult.class);
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B));
 
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(3L)),
@@ -120,21 +99,13 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
         @Test // Note that the size and sort is applied to each separate case type then results combined
         void shouldReturnPaginatedResults() throws Exception {
-            String searchRequest = ElasticsearchTestRequest.builder()
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(matchAllQuery())
                 .sort(CREATED_DATE)
                 .size(1)
-                .build().toJsonString();
+                .build();
 
-            MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B))
-                .content(searchRequest))
-                .andExpect(status().is(200))
-                .andReturn();
-
-            String responseAsString = result.getResponse().getContentAsString();
-            CaseSearchResult caseSearchResult = mapper.readValue(responseAsString, CaseSearchResult.class);
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B));
 
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(3L)),
@@ -144,19 +115,11 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
         @Test
         void shouldQueryOnAliasField() throws Exception {
-            String searchRequest = ElasticsearchTestRequest.builder()
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(matchQuery(alias(FIXED_LIST_ALIAS), FIXED_LIST_VALUE))
-                .build().toJsonString();
+                .build();
 
-            MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B))
-                .content(searchRequest))
-                .andExpect(status().is(200))
-                .andReturn();
-
-            String responseAsString = result.getResponse().getContentAsString();
-            CaseSearchResult caseSearchResult = mapper.readValue(responseAsString, CaseSearchResult.class);
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B));
 
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(2L)),
@@ -171,7 +134,7 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
         @Test
         void shouldReturnAllCaseDetails() throws Exception {
-            String searchRequest = ElasticsearchTestRequest.builder()
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(boolQuery()
                     .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
                     .must(matchQuery(caseData(YES_OR_NO_FIELD), YES_OR_NO_VALUE)) // ES Keyword
@@ -180,18 +143,10 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
                     .must(matchQuery(caseData(PHONE_FIELD), PHONE_VALUE)) // ES Phone
                     .must(matchQuery(caseData(COUNTRY_FIELD), COUNTRY_VALUE)) // Complex
                     .must(matchQuery(caseData(COLLECTION_FIELD) + VALUE_SUFFIX, COLLECTION_VALUE)) // Collection
-                    .must(matchQuery(STATE, STATE_VALUE)))
-                .build().toJsonString();
+                    .must(matchQuery(STATE, STATE_VALUE))) // Metadata
+                .build();
 
-            MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, CASE_TYPE_A)
-                .content(searchRequest))
-                .andExpect(status().is(200))
-                .andReturn();
-
-            String responseAsString = result.getResponse().getContentAsString();
-            CaseSearchResult caseSearchResult = mapper.readValue(responseAsString, CaseSearchResult.class);
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_A);
 
             CaseDetails caseDetails = caseSearchResult.getCases().get(0);
             assertAll(
@@ -203,19 +158,9 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
         @Test
         void shouldErrorWhenInvalidCaseTypeIsProvided() throws Exception {
-            String searchRequest = ElasticsearchTestRequest.builder()
-                .query(matchAllQuery())
-                .build().toJsonString();
+            ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-            MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param(CASE_TYPE_ID_PARAM, "INVALID")
-                .content(searchRequest))
-                .andExpect(status().is(404))
-                .andReturn();
-
-            String responseAsString = result.getResponse().getContentAsString();
-            JsonNode exceptionNode = mapper.readTree(responseAsString);
+            JsonNode exceptionNode = executeErrorRequest(searchRequest, "INVALID", 404);
 
             assertAll(
                 () -> assertThat(exceptionNode.get("message").asText(),
@@ -271,5 +216,19 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
                 () -> assertThat(data.get(YES_OR_NO_FIELD).asText(), is(YES_OR_NO_VALUE))
             );
         }
+    }
+
+    private CaseSearchResult executeRequest(ElasticsearchTestRequest searchRequest, String caseTypeParam) throws Exception {
+        MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, null);
+
+        return ElasticsearchTestHelper.executeRequest(postRequest, 200, mapper, mockMvc, CaseSearchResult.class);
+    }
+
+    private JsonNode executeErrorRequest(ElasticsearchTestRequest searchRequest,
+                                         String caseTypeParam,
+                                         int expectedErrorCode) throws Exception {
+        MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, null);
+
+        return ElasticsearchTestHelper.executeRequest(postRequest, expectedErrorCode, mapper, mockMvc, JsonNode.class);
     }
 }

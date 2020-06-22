@@ -1,5 +1,16 @@
 package uk.gov.hmcts.ccd.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import uk.gov.hmcts.ccd.ElasticsearchBaseTest;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 public class ElasticsearchTestHelper {
 
     public static final String DATA_PREFIX = "data.";
@@ -8,6 +19,7 @@ public class ElasticsearchTestHelper {
     public static final String CASE_TYPE_A = "AAT";
     public static final String CASE_TYPE_B = "MAPPER";
     public static final String CASE_TYPE_C = "SECURITY";
+    public static final String CASE_TYPE_D = "RESTRICTED_SECURITY";
 
     public static final String NUMBER_FIELD = "NumberField";
     public static final String YES_OR_NO_FIELD = "YesOrNoField";
@@ -46,6 +58,7 @@ public class ElasticsearchTestHelper {
     public static final String FIXED_LIST_ALIAS = "FixedListAlias";
 
     public static final String AUTOTEST_1 = "AUTOTEST1";
+    public static final String AUTOTEST_2 = "AUTOTEST2";
     public static final String DEFAULT_CASE_REFERENCE = "1588866820969121";
     public static final String YES_OR_NO_VALUE = "No";
     public static final String NUMBER_VALUE = "12345";
@@ -76,6 +89,10 @@ public class ElasticsearchTestHelper {
     public static final String AUTOTEST2_PUBLIC = "caseworker-autotest2";
     public static final String AUTOTEST1_RESTRICTED = "caseworker-autotest1-restricted";
     public static final String AUTOTEST1_PRIVATE = "caseworker-autotest1-private";
+    public static final String AUTOTEST1_SOLICITOR = "caseworker-autotest1-solicitor";
+
+    private static final String CASE_TYPE_ID_PARAM = "ctid";
+    private static final String USE_CASE_PARAM = "usecase";
 
     private ElasticsearchTestHelper() { }
 
@@ -89,5 +106,34 @@ public class ElasticsearchTestHelper {
 
     public static String caseTypesParam(String... caseTypeIds) {
         return String.join(",", caseTypeIds);
+    }
+
+    public static MockHttpServletRequestBuilder createPostRequest(String url,
+                                                                  ElasticsearchBaseTest.ElasticsearchTestRequest searchRequest,
+                                                                  String caseTypeParam,
+                                                                  String useCase) throws Exception {
+        MockHttpServletRequestBuilder postRequest = post(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(searchRequest.toJsonString())
+            .param(CASE_TYPE_ID_PARAM, caseTypeParam);
+
+        if (!Strings.isNullOrEmpty(useCase)) {
+            postRequest.param(USE_CASE_PARAM, useCase);
+        }
+
+        return postRequest;
+    }
+
+    public static <T> T executeRequest(MockHttpServletRequestBuilder postRequest,
+                                       int expectedResponse,
+                                       ObjectMapper mapper,
+                                       MockMvc mockMvc,
+                                       Class<T> returnType) throws Exception {
+        MvcResult result = mockMvc.perform(postRequest)
+            .andExpect(status().is(expectedResponse))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        return mapper.readValue(responseAsString, returnType);
     }
 }
