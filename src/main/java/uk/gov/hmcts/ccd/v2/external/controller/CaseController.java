@@ -3,15 +3,24 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.List;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -19,16 +28,17 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
-
-import javax.transaction.Transactional;
-import java.util.List;
+import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
 import static org.springframework.http.ResponseEntity.status;
-import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.*;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CREATE_CASE;
+import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 
 @RestController
 @RequestMapping(path = "/")
@@ -38,6 +48,7 @@ public class CaseController {
     private final CreateCaseOperation createCaseOperation;
     private final UIDService caseReferenceService;
     private final GetEventsOperation getEventsOperation;
+    private final SupplementaryDataOperation supplementaryDataOperation;
 
     @Autowired
     public CaseController(
@@ -45,13 +56,15 @@ public class CaseController {
         @Qualifier("authorised") final CreateEventOperation createEventOperation,
         @Qualifier("authorised") final CreateCaseOperation createCaseOperation,
         UIDService caseReferenceService,
-        @Qualifier("authorised") GetEventsOperation getEventsOperation
+        @Qualifier("authorised") GetEventsOperation getEventsOperation,
+        @Qualifier("authorised") SupplementaryDataOperation supplementaryDataOperation
     ) {
         this.getCaseOperation = getCaseOperation;
         this.createEventOperation = createEventOperation;
         this.createCaseOperation = createCaseOperation;
         this.caseReferenceService = caseReferenceService;
         this.getEventsOperation = getEventsOperation;
+        this.supplementaryDataOperation = supplementaryDataOperation;
     }
 
     @GetMapping(
@@ -266,5 +279,38 @@ public class CaseController {
         final List<AuditEvent> auditEvents = getEventsOperation.getEvents(caseId);
 
         return ResponseEntity.ok(new CaseEventsResource(caseId, auditEvents));
+    }
+
+
+    @Transactional
+    @PostMapping(
+        path = "/cases/{caseId}/supplementary-data"
+    )
+    @ApiOperation(
+        value = "Update Case Supplementary Data"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Updated",
+            response = SupplementaryDataResource.class
+        ),
+        @ApiResponse(
+            code = 404,
+            message = V2.Error.CASE_NOT_FOUND
+        ),
+        @ApiResponse(
+            code = 403,
+            message = V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA
+        )
+    })
+    public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
+                                                                                 @RequestBody final SupplementaryData supplementaryData) {
+
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+        }
+        supplementaryDataOperation.updateCaseSupplementaryData(supplementaryData);
+        return status(HttpStatus.OK).body(new SupplementaryDataResource(caseId, supplementaryData, supplementaryData));
     }
 }

@@ -73,5 +73,6 @@ public final class V2 {
         public static final String EMPTY_CASE_ID_LIST = "Case ID list is empty";
         public static final String USER_ID_INVALID = "User ID is not valid";
         public static final String OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED = "Access to other user's case role assignments not granted";
+        public static final String NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA = "Not authorised to update case supplementary data";
     }
 }
