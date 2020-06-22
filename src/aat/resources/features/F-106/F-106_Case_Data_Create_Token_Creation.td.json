@@ -1,0 +1,28 @@
+{
+	"_guid_": "F-106_Case_Data_Create_Token_Creation",
+	"_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+	"specs": [
+		"to create a token for case creation"
+	],
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.caa@gmail.com",
+			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+		}
+	},
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_OrganisationPolicy",
+      "etid": "createCase"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "event_id" : "createCase"
+    }
+  }
+}
