@@ -1,27 +1,27 @@
 {
 	"_guid_": "F-106_Case_Data_Create",
-  "TextField": "textField1",
-  "TextAreaField": "textAreaField1",
-  "AddressField": {
-    "AddressLine1": "102 Petty France",
-    "AddressLine2": "CCD",
-    "AddressLine3": "c/o HMCTS Reform",
-    "Country": "UK"
-  },
-  "OrganisationPolicyField1": {
-    "OrgPolicyCaseAssignedRole": "[Claimant]",
-    "OrgPolicyReference": "ref",
-    "Organisation": {
-      "OrganisationID": null,
-      "OrganisationName": null
-    }
-  },
-  "OrganisationPolicyField2": {
-    "OrgPolicyCaseAssignedRole": "[Defendant]",
-    "OrgPolicyReference": "ref",
-    "Organisation": {
-      "OrganisationID": null,
-      "OrganisationName": null
-    }
-  }
+	"TextField": "textField1",
+	"TextAreaField": "textAreaField1",
+	"AddressField": {
+		"AddressLine1": "102 Petty France",
+		"AddressLine2": "CCD",
+		"AddressLine3": "c/o HMCTS Reform",
+		"Country": "UK"
+	},
+	"OrganisationPolicyField1": {
+		"OrgPolicyCaseAssignedRole": "[Claimant]",
+		"OrgPolicyReference": "ref",
+		"Organisation": {
+			"OrganisationID": null,
+			"OrganisationName": null
+		}
+	},
+	"OrganisationPolicyField2": {
+		"OrgPolicyCaseAssignedRole": "[Defendant]",
+		"OrgPolicyReference": "ref",
+		"Organisation": {
+			"OrganisationID": null,
+			"OrganisationName": null
+		}
+	}
 }
