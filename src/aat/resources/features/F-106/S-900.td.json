@@ -6,7 +6,8 @@
 
 	"specs": [
 		"an active profile in CCD",
-    "submit case creation as caseworker"
+    "submit case creation as caseworker",
+    "contains some OrganisationPolicy fields with all correct values"
 	],
 
   "expectedResponse": {
