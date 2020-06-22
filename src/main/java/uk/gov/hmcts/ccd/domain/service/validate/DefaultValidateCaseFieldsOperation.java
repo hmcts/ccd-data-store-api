@@ -86,12 +86,12 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     }
 
     private void validateContent(final CaseDataContent content,
-                                 final String caseFiledId,
+                                 final String caseFieldId,
                                  final String reference,
                                  final String defaultValue,
                                  final List<String> errorList) {
         final JsonNode existingData = new ObjectMapper().convertValue(content.getData(), JsonNode.class);
-        JsonNode caseFieldNode = existingData.findPath(caseFiledId);
+        JsonNode caseFieldNode = existingData.findPath(caseFieldId);
         if (caseFieldNode != null) {
             String[] referenceArray = convertReference(reference);
             int length = referenceArray.length;
@@ -100,9 +100,9 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
             parentNodes.stream().forEach(parentNode -> {
                 JsonNode orgPolicyNode = findOrgPolicyNode(nodeReference, parentNode, length);
                 if (orgPolicyNode.isNull()) {
-                    errorList.add(caseFiledId + " cannot have an empty value.");
+                    errorList.add(caseFieldId + " cannot have an empty value.");
                 } else if (!defaultValue.equalsIgnoreCase(orgPolicyNode.textValue())) {
-                    errorList.add(caseFiledId + " has an incorrect value " + orgPolicyNode.textValue());
+                    errorList.add(caseFieldId + " has an incorrect value " + orgPolicyNode.textValue());
                 }
             });
         }
