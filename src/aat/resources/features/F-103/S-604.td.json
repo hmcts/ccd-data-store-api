@@ -1,35 +1,4 @@
 {
-<<<<<<< HEAD
-  "_guid_": "S-604",
-  "_extends_": "F-103_Test_Data_Base",
-  "specs": [
-    "a role with no read access to the case state",
-    "is configured to search for the previously created case via exact match",
-    "contains no cases"
-  ],
-
-  "user" : {
-    "username": "[[$CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL]]",
-    "password": "[[$CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD]]"
-  },
-
-  "request": {
-    "body": {
-      "query": {
-        "match": {
-          "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
-        }
-      }
-    }
-  },
-
-  "expectedResponse": {
-    "body": {
-      "total": 0,
-      "cases": []
-    }
-  }
-=======
 	"title": "must return an error response when the invoker does not have the required IDAM role(s) to query the role assignments for users listed in the query",
 	"_guid_": "S-604",
 	"productName": "CCD Data Store api",
@@ -57,5 +26,4 @@
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException"
 		}
 	}
->>>>>>> refs/heads/develop
 }
