@@ -164,7 +164,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     @DisplayName(
         "addCaseUserRoles: AC-1: must successfully assign a user and case role for a specific case by a user calling through/from an authorised application"
     )
-    public void addCaseUserRoles_shouldAddCaseUserRoleForAuthorisedApp() throws Exception {
+    void addCaseUserRoles_shouldAddCaseUserRoleForAuthorisedApp() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10001"; // don't need the users to exist in the repository but want unique for each AC
@@ -200,7 +200,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: AC-2
     @Test
     @DisplayName("addCaseUserRoles: AC-2: Must return an error response for a missing Case ID")
-    public void addCaseUserRoles_shouldThrowExceptionWhenCaseIDNotPassed() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenCaseIDNotPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10002"; // don't need the users to exist in the repository but want unique for each AC
@@ -233,7 +233,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: AC-3
     @Test
     @DisplayName("addCaseUserRoles: AC-3: Must return an error response for a malformed Case ID")
-    public void addCaseUserRoles_shouldThrowExceptionWhenInvalidCaseIDPassed() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenInvalidCaseIDPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10003"; // don't need the users to exist in the repository but want unique for each AC
@@ -266,7 +266,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: AC-4
     @Test
     @DisplayName("addCaseUserRoles: AC-4: Must return an error response for a missing User ID")
-    public void addCaseUserRoles_shouldThrowExceptionWhenUserIDNotPassed() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenUserIDNotPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10004"; // don't need the users to exist in the repository but want unique for each AC
@@ -299,7 +299,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: AC-5
     @Test
     @DisplayName("addCaseUserRoles: AC-5: Must return an error response for a malformed User ID Provided")
-    public void addCaseUserRoles_shouldThrowExceptionWhenInvalidUserIDPassed() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenInvalidUserIDPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10005"; // don't need the users to exist in the repository but want unique for each AC
@@ -332,7 +332,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: AC-6
     @Test
     @DisplayName("addCaseUserRoles: AC-6: must return an error response when the request is made from an un-authorised application")
-    public void addCaseUserRoles_shouldThrowExceptionWhenCalledFromUnauthorisedApp() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenCalledFromUnauthorisedApp() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10006"; // don't need the users to exist in the repository but want unique for each AC
@@ -367,7 +367,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: AC-7
     @Test
     @DisplayName("addCaseUserRoles: AC-7: Must return an error response for a malformed Case Role provided")
-    public void addCaseUserRoles_shouldThrowExceptionWhenInvalidCaseRolePassed() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenInvalidCaseRolePassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10007"; // don't need the users to exist in the repository but want unique for each AC
@@ -400,7 +400,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: AC-8
     @Test
     @DisplayName("addCaseUserRoles: AC-8: Must return an error response for a missing Case Role")
-    public void addCaseUserRoles_shouldThrowExceptionWhenCaseRoleNotPassed() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenCaseRoleNotPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10008"; // don't need the users to exist in the repository but want unique for each AC
@@ -433,7 +433,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: null list
     @Test
     @DisplayName("addCaseUserRoles: null: should throw exception")
-    public void addCaseUserRoles_shouldThrowExceptionWhenNullListPassed() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenNullListPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
 
@@ -455,7 +455,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: empty-list
     @Test
     @DisplayName("addCaseUserRoles: empty-list: should throw exception")
-    public void addCaseUserRoles_shouldThrowExceptionWhenEmptyListPassed() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenEmptyListPassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
 
@@ -479,7 +479,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     // RDM-8606: case not found
     @Test
     @DisplayName("addCaseUserRoles: case not found: should throw exception")
-    public void addCaseUserRoles_shouldThrowExceptionWhenCaseNotFound() throws Exception {
+    void addCaseUserRoles_shouldThrowExceptionWhenCaseNotFound() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "1111"; // don't need the users to exist in the repository but want unique for each AC
@@ -511,7 +511,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_cases_with_valid_case_ids.sql"
     })
     @DisplayName("addCaseUserRoles: duplicate: should not generate duplicates")
-    public void addCaseUserRoles_shouldAddSingleCaseUserRoleWhenDuplicatePassed() throws Exception {
+    void addCaseUserRoles_shouldAddSingleCaseUserRoleWhenDuplicatePassed() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "2222"; // don't need the users to exist in the repository but want unique for each test
@@ -552,7 +552,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_cases_with_valid_case_ids.sql"
     })
     @DisplayName("addCaseUserRoles: multiple: should allow multiple CaseUserRoles to be added in single call")
-    public void addCaseUserRoles_shouldAddMultipleCaseUserRoles() throws Exception {
+    void addCaseUserRoles_shouldAddMultipleCaseUserRoles() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "3333"; // don't need the users to exist in the repository but want unique for each test
@@ -598,7 +598,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_cases_with_valid_case_ids.sql",
         "classpath:sql/insert_case_users_valid_case_ids.sql"
     })
-    public void getUserCaseRolesAssignedToUser() throws Exception {
+    void getUserCaseRolesAssignedToUser() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
@@ -624,7 +624,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_cases_with_valid_case_ids.sql",
         "classpath:sql/insert_case_users_valid_case_ids.sql"
     })
-    public void shouldGetSelfCaseUserRolesAssigned() throws Exception {
+    void shouldGetSelfCaseUserRolesAssigned() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
@@ -654,7 +654,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_cases_with_valid_case_ids.sql",
         "classpath:sql/insert_case_users_valid_case_ids.sql"
     })
-    public void shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForPassedCaseId() throws Exception {
+    void shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForPassedCaseId() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
@@ -694,7 +694,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         "classpath:sql/insert_cases_with_valid_case_ids.sql",
         "classpath:sql/insert_case_users_valid_case_ids.sql"
     })
-    public void shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForListOfCaseIds() throws Exception {
+    void shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForListOfCaseIds() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
@@ -726,7 +726,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     // AC-5
     @Test
-    public void shouldThrowExceptionWhenEmptyCaseIDListPassed() throws Exception {
+    void shouldThrowExceptionWhenEmptyCaseIDListPassed() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
         Exception exception = mockMvc.perform(get(getCaseAssignedUserRoles)
@@ -744,7 +744,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenCaseIDNotPassed() throws Exception {
+    void shouldThrowExceptionWhenCaseIDNotPassed() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
         mockMvc.perform(get(getCaseAssignedUserRoles)
@@ -757,7 +757,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     // AC-6
     @Test
-    public void shouldThrowExceptionWhenInvalidCaseIDIsPassed() throws Exception {
+    void shouldThrowExceptionWhenInvalidCaseIDIsPassed() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
         Exception exception = mockMvc.perform(get(getCaseAssignedUserRoles)
@@ -795,7 +795,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     // AC-8
     @Test
-    public void shouldThrowExceptionWhenInvokingUserHasNoPrivileges() throws Exception {
+    void shouldThrowExceptionWhenInvokingUserHasNoPrivileges() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         Exception exception = mockMvc.perform(get(getCaseAssignedUserRoles)
@@ -813,7 +813,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenUserRequestedForSelfCaseRoleAccessAlongWithOtherUsers() throws Exception {
+    void shouldThrowExceptionWhenUserRequestedForSelfCaseRoleAccessAlongWithOtherUsers() throws Exception {
         MockUtils.setSecurityAuthorities("89000", authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         Exception exception = mockMvc.perform(get(getCaseAssignedUserRoles)

@@ -102,9 +102,11 @@ class CaseAssignedUserRolesControllerTest {
             CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD);
             caseUserRoles.add(caseUserRole1);
 
+            CaseAssignedUserRolesResource caseAssignedUserRoles = new CaseAssignedUserRolesResource(caseUserRoles);
+
             // ACT
             ResponseEntity<AddCaseAssignedUserRolesResponse> response =
-                controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles));
+                controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, caseAssignedUserRoles);
 
             // ASSERT
             assertNotNull(response);
@@ -122,9 +124,11 @@ class CaseAssignedUserRolesControllerTest {
             caseUserRoles.add(caseUserRole1);
             caseUserRoles.add(caseUserRole2);
 
+            CaseAssignedUserRolesResource caseAssignedUserRoles = new CaseAssignedUserRolesResource(caseUserRoles);
+
             // ACT
             ResponseEntity<AddCaseAssignedUserRolesResponse> response =
-                controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles));
+                controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, caseAssignedUserRoles);
 
             // ASSERT
             assertNotNull(response);
@@ -165,10 +169,11 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void addCaseUserRoles_throwsExceptionWhenNullCaseUserRolesListPassed() {
             // ARRANGE
+            CaseAssignedUserRolesResource caseAssignedUserRoles = new CaseAssignedUserRolesResource(null);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(null)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, caseAssignedUserRoles));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -181,9 +186,11 @@ class CaseAssignedUserRolesControllerTest {
             // ARRANGE
             List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
 
+            CaseAssignedUserRolesResource caseAssignedUserRoles = new CaseAssignedUserRolesResource(caseUserRoles);
+
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, caseAssignedUserRoles));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -199,9 +206,11 @@ class CaseAssignedUserRolesControllerTest {
             CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_BAD, USER_ID_1, CASE_ROLE_GOOD);
             caseUserRoles.add(caseUserRole1);
 
+            CaseAssignedUserRolesResource caseAssignedUserRoles = new CaseAssignedUserRolesResource(caseUserRoles);
+
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, caseAssignedUserRoles));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -217,9 +226,11 @@ class CaseAssignedUserRolesControllerTest {
             CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_GOOD, "", CASE_ROLE_GOOD);
             caseUserRoles.add(caseUserRole1);
 
+            CaseAssignedUserRolesResource caseAssignedUserRoles = new CaseAssignedUserRolesResource(caseUserRoles);
+
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, caseAssignedUserRoles));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -235,9 +246,11 @@ class CaseAssignedUserRolesControllerTest {
             CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_GOOD, "", CASE_ROLE_BAD);
             caseUserRoles.add(caseUserRole1);
 
+            CaseAssignedUserRolesResource caseAssignedUserRoles = new CaseAssignedUserRolesResource(caseUserRoles);
+
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, caseAssignedUserRoles));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -257,9 +270,11 @@ class CaseAssignedUserRolesControllerTest {
             caseUserRoles.add(caseUserRole1);
             caseUserRoles.add(caseUserRole2);
 
+            CaseAssignedUserRolesResource caseAssignedUserRoles = new CaseAssignedUserRolesResource(caseUserRoles);
+
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, new CaseAssignedUserRolesResource(caseUserRoles)));
+                () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, caseAssignedUserRoles));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -291,8 +306,10 @@ class CaseAssignedUserRolesControllerTest {
 
         @Test
         void getCaseUserRoles_throwsExceptionWhenNullCaseIdListPassed() {
+            Optional<List<String>> optionalUserIds = Optional.of(Lists.newArrayList());
+
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.getCaseUserRoles(null, Optional.of(Lists.newArrayList())));
+                () -> controller.getCaseUserRoles(null, optionalUserIds));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -302,9 +319,11 @@ class CaseAssignedUserRolesControllerTest {
 
         @Test
         void getCaseUserRoles_throwsExceptionWhenEmptyCaseIdListPassed() {
+            List<String> caseIds = Lists.newArrayList();
+            Optional<List<String>> optionalUserIds = Optional.of(Lists.newArrayList());
+
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.getCaseUserRoles(Lists.newArrayList(),
-                    Optional.of(Lists.newArrayList())));
+                () -> controller.getCaseUserRoles(caseIds, optionalUserIds));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -314,9 +333,11 @@ class CaseAssignedUserRolesControllerTest {
 
         @Test
         void getCaseUserRoles_throwsExceptionWhenEmptyCaseIdListContainsInvalidCaseId() {
+            List<String> caseIds = Lists.newArrayList(CASE_ID_BAD);
+            Optional<List<String>> optionalUserIds = Optional.of(Lists.newArrayList());
+
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.getCaseUserRoles(Lists.newArrayList(CASE_ID_BAD),
-                    Optional.of(Lists.newArrayList())));
+                () -> controller.getCaseUserRoles(caseIds, optionalUserIds));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),
@@ -326,9 +347,11 @@ class CaseAssignedUserRolesControllerTest {
 
         @Test
         void getCaseUserRoles_throwsExceptionWhenInvalidUserIdListPassed() {
+            List<String> caseIds = Lists.newArrayList(CASE_ID_GOOD);
+            Optional<List<String>> optionalUserIds = Optional.of(Lists.newArrayList("8900", "", "89002"));
+
             BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> controller.getCaseUserRoles(Lists.newArrayList(CASE_ID_GOOD),
-                    Optional.of(Lists.newArrayList("8900", "", "89002"))));
+                () -> controller.getCaseUserRoles(caseIds, optionalUserIds));
 
             assertAll(
                 () -> assertThat(exception.getMessage(),

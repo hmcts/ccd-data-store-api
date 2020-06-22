@@ -49,18 +49,30 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
 
     @Test
     void shouldReturnCaseAssignedUserRoles() {
+        // ARRANGE
+        List<Long> caseIds = Lists.newArrayList(123456L);
+        List<String> userIds = Lists.newArrayList("234567");
         when(caseAssignedUserRoleValidator.canAccessUserCaseRoles(anyList())).thenReturn(true);
+
+        // ACT
         List<CaseAssignedUserRole> caseAssignedUserRoles = authorisedCaseAssignedUserRolesOperation
-            .findCaseUserRoles(Lists.newArrayList(123456L), Lists.newArrayList("234567"));
+            .findCaseUserRoles(caseIds, userIds);
+
+        // ASSERT
         assertEquals(2, caseAssignedUserRoles.size());
     }
 
     @Test
     void shouldThrowExceptionWhenUserHasNotPermissions() {
+        // ARRANGE
+        List<Long> caseIds = Lists.newArrayList(123456L);
+        List<String> userIds = Lists.newArrayList("234567");
         when(caseAssignedUserRoleValidator.canAccessUserCaseRoles(anyList())).thenReturn(false);
+
+        // ACT / ASSERT
         assertThrows(
             CaseRoleAccessException.class, () -> authorisedCaseAssignedUserRolesOperation
-                .findCaseUserRoles(Lists.newArrayList(123456L), Lists.newArrayList("234567"))
+                .findCaseUserRoles(caseIds, userIds)
         );
     }
 

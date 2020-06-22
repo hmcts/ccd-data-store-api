@@ -87,6 +87,10 @@ public class CaseAssignedUserRolesController {
         @ApiResponse(
             code = 403,
             message = V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION
+        ),
+        @ApiResponse(
+            code = 404,
+            message = V2.Error.CASE_NOT_FOUND
         )
     })
     @LogAudit(

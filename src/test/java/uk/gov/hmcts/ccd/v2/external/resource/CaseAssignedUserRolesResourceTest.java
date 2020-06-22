@@ -20,7 +20,7 @@ class CaseAssignedUserRolesResourceTest {
 
     @Test
     @DisplayName("should copy case assigned user role data")
-    public void shouldCopyCaseAssignedUserRoleContent() {
+    void shouldCopyCaseAssignedUserRoleContent() {
         List<CaseAssignedUserRole> caseAssignedUserRoles = createCaseAssignedUserRoles();
 
         CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource(caseAssignedUserRoles);
@@ -32,7 +32,7 @@ class CaseAssignedUserRolesResourceTest {
 
     @Test
     @DisplayName("should have no links")
-    public void shouldHaveNoLinks() {
+    void shouldHaveNoLinks() {
         List<CaseAssignedUserRole> caseAssignedUserRoles = createCaseAssignedUserRoles();
 
         CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource(caseAssignedUserRoles);
