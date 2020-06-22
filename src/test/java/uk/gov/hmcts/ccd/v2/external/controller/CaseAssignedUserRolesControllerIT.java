@@ -776,7 +776,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     // AC-7
     @Test
-    public void shouldThrowExceptionWhenInvalidUserIdDataPassed() throws Exception {
+    void shouldThrowExceptionWhenInvalidUserIdDataPassed() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
         Exception exception = mockMvc.perform(get(getCaseAssignedUserRoles)
