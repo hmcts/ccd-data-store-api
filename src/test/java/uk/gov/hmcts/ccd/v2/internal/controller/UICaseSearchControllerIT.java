@@ -124,6 +124,75 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         );
     }
 
+
+    @Test
+    void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserRoleColumnIsPopulated() throws Exception {
+        String searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .build().toJsonString();
+
+        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
+            .contentType(MediaType.APPLICATION_JSON)
+            .param(CASE_TYPE_ID_PARAM, CASE_TYPE_A)
+            .content(searchRequest))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        CaseSearchResultViewResource caseSearchResultViewResource = mapper.readValue(responseAsString, CaseSearchResultViewResource.class);
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertDefaultUseCaseHeaders(caseSearchResultViewResource.getHeaders())
+        );
+    }
+
+
+    @Test
+    void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserHasSomeAuthorisationOnCaseFields() throws Exception {
+        String searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .build().toJsonString();
+
+        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
+            .contentType(MediaType.APPLICATION_JSON)
+            .param(CASE_TYPE_ID_PARAM, CASE_TYPE_A)
+            .content(searchRequest))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        CaseSearchResultViewResource caseSearchResultViewResource = mapper.readValue(responseAsString, CaseSearchResultViewResource.class);
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertDefaultUseCaseHeaders(caseSearchResultViewResource.getHeaders())
+        );
+    }
+
+
+    @Test
+    void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUseHaveNoAuthorisationOnCaseField() throws Exception {
+        String searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .build().toJsonString();
+
+        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
+            .contentType(MediaType.APPLICATION_JSON)
+            .param(CASE_TYPE_ID_PARAM, CASE_TYPE_A)
+            .content(searchRequest))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        CaseSearchResultViewResource caseSearchResultViewResource = mapper.readValue(responseAsString, CaseSearchResultViewResource.class);
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertDefaultUseCaseHeaders(caseSearchResultViewResource.getHeaders())
+        );
+    }
+
     @Test
     void shouldReturnAllHeaderInfoForSpecifiedUseCase() throws Exception {
         String searchRequest = ElasticsearchTestRequest.builder()
@@ -240,10 +309,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(((List<String>)data.get(MULTI_SELECT_LIST_FIELD)).get(0), is("OPTION2")),
             () -> assertThat(((List<String>)data.get(MULTI_SELECT_LIST_FIELD)).get(1), is("OPTION4")),
             () -> assertThat(data.get(NUMBER_FIELD), is(NUMBER_VALUE)),
-            () -> assertThat(data.get(PHONE_FIELD), is(PHONE_VALUE)),
             () -> assertThat(data.get(TEXT_AREA_FIELD), is(TEXT_AREA_VALUE)),
-            () -> assertThat(data.get(TEXT_FIELD), is(TEXT_VALUE)),
-            () -> assertThat(data.get(YES_OR_NO_FIELD), is(YES_OR_NO_VALUE))
+            () -> assertThat(data.get(TEXT_FIELD), is(TEXT_VALUE))
         );
     }
 

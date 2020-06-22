@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -97,6 +97,9 @@ class CaseSearchResultViewGeneratorTest {
     private SearchQueryOperation searchQueryOperation;
 
     @Mock
+    private AccessControlService accessControlService;
+
+    @Mock
     private SearchResultProcessor searchResultProcessor;
 
     private CaseSearchResultViewGenerator classUnderTest;
@@ -172,7 +175,7 @@ class CaseSearchResultViewGeneratorTest {
         when(searchQueryOperation.getSearchResultDefinition(any(), any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
         doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(any(), any());
 
-        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchQueryOperation, searchResultProcessor);
+        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchQueryOperation, searchResultProcessor, accessControlService);
     }
 
     @Test

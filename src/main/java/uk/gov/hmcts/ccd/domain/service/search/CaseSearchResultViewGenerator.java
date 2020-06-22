@@ -35,30 +35,23 @@ public class CaseSearchResultViewGenerator {
     private final CaseTypeService caseTypeService;
     private final SearchQueryOperation searchQueryOperation;
     private final SearchResultProcessor searchResultProcessor;
-    private final SecurityClassificationService securityClassificationService;
     private final AccessControlService accessControlService;
-    private final UIDefinitionRepository uiDefinitionRepository;
 
     public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                          CaseTypeService caseTypeService,
                                          SearchQueryOperation searchQueryOperation,
                                          SearchResultProcessor searchResultProcessor,
-                                         SecurityClassificationService securityClassificationService,
-                                         AccessControlService accessControlService,
-                                         UIDefinitionRepository uiDefinitionRepository) {
+                                         AccessControlService accessControlService) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
         this.searchQueryOperation = searchQueryOperation;
         this.searchResultProcessor = searchResultProcessor;
-        this.securityClassificationService = securityClassificationService;
         this.accessControlService = accessControlService;
-        this.uiDefinitionRepository = uiDefinitionRepository;
     }
 
     public CaseSearchResultView execute(String caseTypeId,
                                         CaseSearchResult caseSearchResult,
                                         String useCase) {
-        caseSearchResult = filterResultsByAuthorisation(useCase, caseSearchResult, caseTypeId);
         List<SearchResultViewHeaderGroup> headerGroups = buildHeaders(caseTypeId, useCase, caseSearchResult);
         List<SearchResultViewItem> items = buildItems(useCase, caseSearchResult, caseTypeId);
 
@@ -83,45 +76,50 @@ public class CaseSearchResultViewGenerator {
 
         List<SearchResultViewItem> items = new ArrayList<>();
         // Only one case type is currently supported so we can reuse the same definitions for building all items
-        caseSearchResult.getCases().forEach(caseDetails ->
-            items.add(buildSearchResultViewItem(caseDetails, caseTypeDefinition, searchResultDefinition)));
 
+        caseSearchResult.getCases().forEach(caseDetails -> {
+            filterResultsByAuthorisation(useCase, caseDetails, caseTypeId);
+            items.add(buildSearchResultViewItem(caseDetails, caseTypeDefinition, searchResultDefinition));
+        });
         return items;
     }
 
-    private CaseSearchResult filterResultsByAuthorisation(String useCase, CaseSearchResult caseSearchResult, String caseTypeId) {
+    private CaseDetails filterResultsByAuthorisation(String useCase, CaseDetails caseDetails, String caseTypeId) {
         Set<String> roles = userRepository.getUserRoles();
         CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
         SearchResult searchResultDefinition = searchQueryOperation.getSearchResultDefinition(caseTypeDefinition, useCase);
+        HashMap<String, String> searchFields = getSearchResultDefinitionFieldUserRoleAndField(searchResultDefinition);
 
-        caseSearchResult.getCases().forEach(caseDetails -> {
-            caseDetails.getData().keySet().forEach(item -> {
-                if (securityClassificationService.userHasEnoughSecurityClassificationForField(caseTypeDefinition.getJurisdictionId(), caseTypeDefinition, item)) {
-                    if (accessControlService.canAccessCaseFieldsWithCriteria(
-                        JacksonUtils.convertValueJsonNode(item),
-                        caseTypeDefinition.getCaseFieldDefinitions(),
-                        roles,
-                        CAN_READ)) {
-                        for (SearchResultField searchResultField : searchResultDefinition.getFields()) {
-                            if (searchResultDefinition.getFields().equals(item)) {
-                                for (String role : roles) {
-                                    if (searchResultField.getRole() == null || searchResultField.getRole().equals(role)) {
-                                    } else {
-                                        caseDetails.getData().remove(item);
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        caseDetails.getData().remove(item);
-                    }
-                } else {
-                    caseDetails.getData().remove(item);
+        Iterator caseFields = caseDetails.getData().keySet().iterator();
+        while (caseFields.hasNext()) {
+            if (useCase != null) {
+                if (!searchFields.containsKey(caseFields.next())) {
+                    caseFields.remove();
                 }
+                String role = searchFields.get(caseFields.next());
+                if (role !=null){
+                    if (!roles.contains(role)) {
+                        caseFields.remove();
+                    }
+                }
+            }
+            if (!accessControlService.canAccessCaseFieldsWithCriteria(
+                JacksonUtils.convertValueJsonNode(caseFields.next()),
+                caseTypeDefinition.getCaseFieldDefinitions(),
+                roles,
+                CAN_READ)) {
+                caseFields.remove();
+            }
+        }
+        return caseDetails;
+    }
 
-            });
-        });
-        return caseSearchResult;
+    private HashMap<String, String> getSearchResultDefinitionFieldUserRoleAndField(SearchResult searchResultDefinition) {
+        HashMap<String, String> fields = new HashMap<>();
+        for (SearchResultField srf : searchResultDefinition.getFields()) {
+            fields.put(srf.getCaseFieldId(), srf.getRole());
+        }
+        return fields;
     }
 
 
