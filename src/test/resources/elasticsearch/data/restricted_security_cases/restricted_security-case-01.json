@@ -1,5 +1,5 @@
 {
-  "case_type_id": "SECURITY",
+  "case_type_id": "RESTRICTED_SECURITY",
   "created_date": "2020-05-07T23:53:04.394Z",
   "data": {
     "AddressUKField": {
@@ -123,7 +123,7 @@
   "jurisdiction": "AUTOTEST1",
   "last_modified": "2020-06-09T13:17:06.542Z",
   "last_state_modified_date": "2020-05-07T15:53:40.974Z",
-  "reference": 1589460125872336,
+  "reference": 1589781123682092,
   "security_classification": "PUBLIC",
   "state": "TODO"
 }

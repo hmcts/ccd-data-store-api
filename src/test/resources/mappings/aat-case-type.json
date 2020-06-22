@@ -773,6 +773,13 @@
                     "read": true,
                     "update": true,
                     "delete": false
+                },
+                {
+                    "role": "caseworker-autotest1-private",
+                    "create": true,
+                    "read": false,
+                    "update": true,
+                    "delete": false
                 }
             ],
             "searchAliasFields": [
