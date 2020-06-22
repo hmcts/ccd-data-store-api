@@ -1,13 +1,17 @@
 {
 	"_guid_": "F-106_Test_Data_Base",
+
 	"productName": "CCD Data Store",
-	"operationName": "Submit Case Creation With Organisation Policy",
+	"operationName": "Submit Case Creation as Caseworker",
+
 	"method": "POST",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
 	"user": {
 		"username": "befta.caseworker.caa@gmail.com",
 		"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
 	},
+
 	"request": {
 		"headers": {
 			"_extends_": "Common_Request_Headers"
