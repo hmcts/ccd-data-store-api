@@ -92,9 +92,13 @@ public class CaseAccessService {
 
 
     private Boolean accessGranted(CaseDetails caseDetails) {
+        return accessGranted(caseDetails.getId());
+    }
+
+    public Boolean accessGranted(String caseId) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
-        if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
+        if (null != grantedCases && grantedCases.contains(caseId)) {
             return Boolean.TRUE;
         }
 

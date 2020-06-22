@@ -21,8 +21,8 @@ public class SupplementaryDataResource extends RepresentationModel<Representatio
 
     public SupplementaryDataResource(final String caseId,
                                      final SupplementaryData requestSupplementaryData,
-                                     final SupplementaryData supplementaryData) {
-        this.supplementaryData = supplementaryData;
+                                     final SupplementaryData supplementaryDataUpdated) {
+        this.supplementaryData = supplementaryDataUpdated;
         add(linkTo(methodOn(CaseController.class).updateCaseSupplementaryData(caseId, requestSupplementaryData)).withSelfRel());
     }
 }
