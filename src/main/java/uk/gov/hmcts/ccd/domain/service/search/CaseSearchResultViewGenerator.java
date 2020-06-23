@@ -168,6 +168,11 @@ public class CaseSearchResultViewGenerator {
             throw new BadSearchRequest(String.format("The provided use case '%s' is unsupported for case type '%s'.",
                 useCase, caseType.getId()));
         }
+
+        caseSearchResult.getCases().forEach(caseDetails -> {
+            filterResultsByAuthorisationReadAccess(caseDetails, caseTypeId);
+        });
+
         return new SearchResultViewHeaderGroup(
             new HeaderGroupMetadata(caseType.getJurisdictionId(), caseTypeId),
             buildSearchResultViewColumns(caseType, searchResult),
@@ -179,11 +184,11 @@ public class CaseSearchResultViewGenerator {
                                                                       SearchResult searchResult) {
         HashSet<String> addedFields = new HashSet<>();
 
+        // Only one case type is currently supported so we can reuse the same definitions for building all items
         return Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseTypeDefinition.getCaseFieldDefinitions().stream()
                 .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                 .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
-                .filter(caseField -> filterDistinctFieldsByAuthorisationReadAccess(caseField, caseTypeDefinition.getId()))
                 .map(caseField -> buildSearchResultViewColumn(searchResultField, caseField))
             )
             .collect(Collectors.toList());
@@ -214,18 +219,6 @@ public class CaseSearchResultViewGenerator {
             }
         }
     }
-
-    private boolean filterDistinctFieldsByAuthorisationReadAccess(CaseFieldDefinition caseField, String caseTypeId) {
-        Set<String> roles = userRepository.getUserRoles();
-        CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
-
-        return accessControlService.canAccessCaseFieldsWithCriteria(
-            JacksonUtils.convertValueJsonNode(caseField.getId()),
-            caseTypeDefinition.getCaseFieldDefinitions(),
-            roles,
-            CAN_READ);
-    }
-
 
     private CommonField commonField(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {
         return caseFieldDefinition.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
