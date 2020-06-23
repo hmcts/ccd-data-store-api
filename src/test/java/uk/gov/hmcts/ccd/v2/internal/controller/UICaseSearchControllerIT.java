@@ -6,10 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -33,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
 
@@ -105,69 +107,59 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
 
     @Test
     void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserRoleColumnIsPopulated() throws Exception {
-        String searchRequest = ElasticsearchTestRequest.builder()
-            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
-            .build().toJsonString();
+        ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
-        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-            .contentType(MediaType.APPLICATION_JSON)
-            .param(CASE_TYPE_ID_PARAM, CASE_TYPE_A)
-            .content(searchRequest))
-            .andExpect(status().is(200))
-            .andReturn();
-
-        String responseAsString = result.getResponse().getContentAsString();
-        CaseSearchResultViewResource caseSearchResultViewResource = mapper.readValue(responseAsString, CaseSearchResultViewResource.class);
-
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "TEST");
+        SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-            () -> assertDefaultUseCaseHeaders(caseSearchResultViewResource.getHeaders())
+            () -> assertUseCaseHeadersUserRole(caseSearchResultViewResource.getHeaders()),
+            () -> assertExampleCaseDataForUserRole(caseDetails.getFields(), false),
+            () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
         );
     }
 
 
     @Test
     void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserHasSomeAuthorisationOnCaseFields() throws Exception {
-        String searchRequest = ElasticsearchTestRequest.builder()
-            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
-            .build().toJsonString();
+        ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
-        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-            .contentType(MediaType.APPLICATION_JSON)
-            .param(CASE_TYPE_ID_PARAM, CASE_TYPE_A)
-            .content(searchRequest))
-            .andExpect(status().is(200))
-            .andReturn();
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782");
+        SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
 
-        String responseAsString = result.getResponse().getContentAsString();
-        CaseSearchResultViewResource caseSearchResultViewResource = mapper.readValue(responseAsString, CaseSearchResultViewResource.class);
-
+        List<String> expectedFields = Arrays.asList(EMAIL_FIELD);
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-            () -> assertDefaultUseCaseHeaders(caseSearchResultViewResource.getHeaders())
+            () -> assertThat(caseSearchResultViewResource.getHeaders().size(), is(1)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getJurisdiction(), is(AUTOTEST_1)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(1)),
+            () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID, is(f))))),
+
+            () -> assertThat(caseDetails.getFields().get(EMAIL_FIELD), is(EMAIL_VALUE)),
+            () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
         );
     }
 
 
     @Test
     void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUseHaveNoAuthorisationOnCaseField() throws Exception {
-        String searchRequest = ElasticsearchTestRequest.builder()
-            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
-            .build().toJsonString();
+        ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
-        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-            .contentType(MediaType.APPLICATION_JSON)
-            .param(CASE_TYPE_ID_PARAM, CASE_TYPE_A)
-            .content(searchRequest))
-            .andExpect(status().is(200))
-            .andReturn();
-
-        String responseAsString = result.getResponse().getContentAsString();
-        CaseSearchResultViewResource caseSearchResultViewResource = mapper.readValue(responseAsString, CaseSearchResultViewResource.class);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782NOACCESS");
+        SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
 
         assertAll(
-            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-            () -> assertDefaultUseCaseHeaders(caseSearchResultViewResource.getHeaders())
+            () -> assertThat(caseSearchResultViewResource.getHeaders().size(), is(1)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getJurisdiction(), is(AUTOTEST_1)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
+            () -> assertThat(caseDetails.getFields().size(), is (8)),
+            () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
         );
     }
 
@@ -327,6 +319,21 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         );
     }
 
+    private void assertUseCaseHeadersUserRole(List<SearchResultViewHeaderGroup> headers) {
+        List<String> expectedFields = Arrays.asList(COLLECTION_FIELD, EMAIL_FIELD, FIXED_LIST_FIELD,
+            TEXT_FIELD, MetaData.CaseField.STATE.getReference());
+
+        assertAll(
+            () -> assertThat(headers.size(), is(1)),
+            () -> assertThat(headers.get(0).getMetadata().getJurisdiction(), is(AUTOTEST_1)),
+            () -> assertThat(headers.get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
+            () -> assertThat(headers.get(0).getCases().size(), is(1)),
+            () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
+            () -> assertThat(headers.get(0).getFields().size(), is(5)),
+            () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
+        );
+    }
+
     private void assertOrgCasesUseCaseHeaders(List<SearchResultViewHeaderGroup> headers) {
         List<String> expectedFields = Arrays.asList(TEXT_FIELD, EMAIL_FIELD, FIXED_LIST_FIELD, COLLECTION_FIELD, COMPLEX_FIELD, DATE_FIELD,
             DATE_TIME_FIELD, COMPLEX_FIELD + ".ComplexTextField", MetaData.CaseField.CREATED_DATE.getReference(),
@@ -368,12 +375,22 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
             () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD), is(nullValue())),
             () -> assertThat(data.get(MONEY_FIELD), is(MONEY_VALUE)),
-            () -> assertThat(((List<String>)data.get(MULTI_SELECT_LIST_FIELD)).size(), is(2)),
-            () -> assertThat(((List<String>)data.get(MULTI_SELECT_LIST_FIELD)).get(0), is("OPTION2")),
-            () -> assertThat(((List<String>)data.get(MULTI_SELECT_LIST_FIELD)).get(1), is("OPTION4")),
+            () -> assertThat(((List<String>) data.get(MULTI_SELECT_LIST_FIELD)).size(), is(2)),
+            () -> assertThat(((List<String>) data.get(MULTI_SELECT_LIST_FIELD)).get(0), is("OPTION2")),
+            () -> assertThat(((List<String>) data.get(MULTI_SELECT_LIST_FIELD)).get(1), is("OPTION4")),
             () -> assertThat(data.get(NUMBER_FIELD), is(NUMBER_VALUE)),
             () -> assertThat(data.get(TEXT_AREA_FIELD), is(TEXT_AREA_VALUE)),
             () -> assertThat(data.get(TEXT_FIELD), is(TEXT_VALUE))
+        );
+    }
+
+    private void assertExampleCaseDataForUserRole(Map<String, Object> data, boolean formatted) {
+        assertAll(
+            () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
+            () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
+            () -> assertThat(data.get(TEXT_FIELD), is(TEXT_VALUE)),
+            () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(0).get(VALUE), is(COLLECTION_VALUE)),
+            () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE), is("CollectionTextValue1"))
         );
     }
 
@@ -391,11 +408,11 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     }
 
     private Map<String, Object> asMap(Object obj) {
-        return (Map<String, Object>)obj;
+        return (Map<String, Object>) obj;
     }
 
     private List<Map<String, Object>> asCollection(Object obj) {
-        return (List<Map<String, Object>>)obj;
+        return (List<Map<String, Object>>) obj;
     }
 
     private CaseSearchResultViewResource executeRequest(ElasticsearchTestRequest searchRequest, String caseTypeParam, String useCase) throws Exception {
