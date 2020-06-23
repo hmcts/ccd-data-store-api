@@ -207,7 +207,6 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
                 () -> assertThat(data.get(EMAIL_FIELD).asText(), is(EMAIL_VALUE)),
                 () -> assertThat(data.get(FIXED_LIST_FIELD).asText(), is(FIXED_LIST_VALUE)),
                 () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD).isNull(), is(true)),
-                () -> assertThat(data.get(MONEY_FIELD).asText(), is(MONEY_VALUE)),
                 () -> assertThat(data.get(MULTI_SELECT_LIST_FIELD).toString(), is("[\"OPTION2\",\"OPTION4\"]")),
                 () -> assertThat(data.get(NUMBER_FIELD).asText(), is(NUMBER_VALUE)),
                 () -> assertThat(data.get(PHONE_FIELD).asText(), is(PHONE_VALUE)),
