@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,15 +61,15 @@ class CaseSearchResultViewGeneratorTest {
     private static final String MOTHER_NAME_VALUE = "Hanna";
     private static final String POSTCODE_VALUE = "SW1P 4ER";
     private static final String FAMILY_DETAILS_VALUE = "{\"FatherName\":\"" + FATHER_NAME_VALUE + "\","
-                                                       + "\"MotherName\":\"" + MOTHER_NAME_VALUE + "\","
-                                                       + "\"FamilyAddress\":{"
-                                                       + "\"County\":\"\","
-                                                       + "\"Country\":\"United Kingdom\","
-                                                       + "\"PostCode\":\"" + POSTCODE_VALUE + "\","
-                                                       + "\"PostTown\":\"London\","
-                                                       + "\"AddressLine1\":\"40 Edric House\","
-                                                       + "\"AddressLine2\":\"\",\"AddressLine3\":\"\"}"
-                                                       + "}";
+        + "\"MotherName\":\"" + MOTHER_NAME_VALUE + "\","
+        + "\"FamilyAddress\":{"
+        + "\"County\":\"\","
+        + "\"Country\":\"United Kingdom\","
+        + "\"PostCode\":\"" + POSTCODE_VALUE + "\","
+        + "\"PostTown\":\"London\","
+        + "\"AddressLine1\":\"40 Edric House\","
+        + "\"AddressLine2\":\"\",\"AddressLine3\":\"\"}"
+        + "}";
     private static final String FAMILY_DETAILS_PATH = "FatherName";
     private static final String FAMILY_DETAILS_PATH_NESTED = "FamilyAddress.PostCode";
     private static final String FAMILY = "FamilyDetails";
@@ -173,10 +172,11 @@ class CaseSearchResultViewGeneratorTest {
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_2, CASE_FIELD_4, "", CASE_FIELD_4, ""))
             .build();
-        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(),any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
         doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(any(), any());
 
-        classUnderTest = new CaseSearchResultViewGenerator(userRepository, caseTypeService, searchResultDefinitionService, searchResultProcessor, accessControlService);
+        classUnderTest = new CaseSearchResultViewGenerator(userRepository,
+            caseTypeService, searchResultDefinitionService, searchResultProcessor, accessControlService);
     }
 
     @Test
@@ -260,7 +260,7 @@ class CaseSearchResultViewGeneratorTest {
             .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).build())
             .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).build())
             .build();
-        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_4, "",   CASE_FIELD_4, "");
+        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_4, "", CASE_FIELD_4, "");
         searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
         SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_5, "", CASE_FIELD_5, "");
         searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
@@ -341,10 +341,10 @@ class CaseSearchResultViewGeneratorTest {
                 FAMILY + SEPARATOR + FATHER_NAME, FAMILY_DETAILS, TEXT_TYPE),
             () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(1),
                 FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED, FAMILY_DETAILS, TEXT_TYPE)
-//            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
-//                    .get(FAMILY + SEPARATOR + FATHER_NAME)).asText(), is(FATHER_NAME_VALUE)),
-//            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
-//                    .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asText(), is(POSTCODE_VALUE))
+        //            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
+        //                    .get(FAMILY + SEPARATOR + FATHER_NAME)).asText(), is(FATHER_NAME_VALUE)),
+        //            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
+        //                    .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asText(), is(POSTCODE_VALUE))
         );
     }
 

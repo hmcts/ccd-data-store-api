@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +33,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
 
@@ -136,7 +134,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(1)),
-            () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID, is(f))))),
+            () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields(),
+                hasItem(hasProperty(CASE_FIELD_ID, is(f))))),
 
             () -> assertThat(caseDetails.getFields().get(EMAIL_FIELD), is(EMAIL_VALUE)),
             () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
@@ -158,7 +157,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
-            () -> assertThat(caseDetails.getFields().size(), is (8)),
+            () -> assertThat(caseDetails.getFields().size(), is(8)),
             () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
         );
     }
