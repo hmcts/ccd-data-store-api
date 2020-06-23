@@ -132,7 +132,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(2)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(1)),
             () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields(),
                 hasItem(hasProperty(CASE_FIELD_ID, is(f))))),
 
@@ -155,7 +155,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
-            //() -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
             () -> assertThat(caseDetails.getFields().size(), is(8)),
             () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
         );
@@ -300,7 +300,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     private void assertDefaultUseCaseHeaders(List<SearchResultViewHeaderGroup> headers) {
         List<String> expectedFields = Arrays.asList(HISTORY_COMPONENT_FIELD, FIXED_RADIO_LIST_FIELD, DOCUMENT_FIELD, ADDRESS_FIELD, COMPLEX_FIELD,
             COLLECTION_FIELD, MULTI_SELECT_LIST_FIELD, FIXED_LIST_FIELD, TEXT_AREA_FIELD, DATE_TIME_FIELD, DATE_FIELD,
-            MONEY_FIELD, EMAIL_FIELD, PHONE_FIELD, YES_OR_NO_FIELD, NUMBER_FIELD, TEXT_FIELD,
+            EMAIL_FIELD, PHONE_FIELD, YES_OR_NO_FIELD, NUMBER_FIELD, TEXT_FIELD,
             MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference(), MetaData.CaseField.LAST_MODIFIED_DATE.getReference(),
             MetaData.CaseField.CREATED_DATE.getReference(), MetaData.CaseField.JURISDICTION.getReference(),
             MetaData.CaseField.CASE_TYPE.getReference(), MetaData.CaseField.SECURITY_CLASSIFICATION.getReference(),
@@ -312,7 +312,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(headers.get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
             () -> assertThat(headers.get(0).getCases().size(), is(1)),
             () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
-            () -> assertThat(headers.get(0).getFields().size(), is(25)),
+            () -> assertThat(headers.get(0).getFields().size(), is(24)),
             () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
         );
     }
@@ -349,15 +349,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     }
 
     private void assertExampleCaseData(Map<String, Object> data, boolean formatted) {
-        // TODO: After ACA-17, remove case data that should no longer be returned
         assertAll(
-            () -> assertThat(asMap(data.get(ADDRESS_FIELD)).get(ADDRESS_LINE_1), is(STREET_VALUE)),
-            () -> assertThat(asMap(data.get(ADDRESS_FIELD)).get(ADDRESS_LINE_2), is(ADDRESS_LINE_2_VALUE)),
-            () -> assertThat(asMap(data.get(ADDRESS_FIELD)).get(ADDRESS_LINE_3), is(ADDRESS_LINE_3_VALUE)),
-            () -> assertThat(asMap(data.get(ADDRESS_FIELD)).get(COUNTRY_NESTED_FIELD), is(COUNTRY_VALUE)),
-            () -> assertThat(asMap(data.get(ADDRESS_FIELD)).get(COUNTY_FIELD), is(COUNTY_VALUE)),
-            () -> assertThat(asMap(data.get(ADDRESS_FIELD)).get(POST_CODE_FIELD), is(POST_CODE_VALUE)),
-            () -> assertThat(asMap(data.get(ADDRESS_FIELD)).get(TOWN_FIELD), is(TOWN_VALUE)),
             () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(0).get(VALUE), is(COLLECTION_VALUE)),
             () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE), is("CollectionTextValue1")),
             () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_FIXED_LIST_FIELD), is("VALUE3")),
@@ -372,12 +364,6 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
             () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
             () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD), is(nullValue())),
-            () -> assertThat(data.get(MONEY_FIELD), is(MONEY_VALUE)),
-            () -> assertThat(((List<String>) data.get(MULTI_SELECT_LIST_FIELD)).size(), is(2)),
-            () -> assertThat(((List<String>) data.get(MULTI_SELECT_LIST_FIELD)).get(0), is("OPTION2")),
-            () -> assertThat(((List<String>) data.get(MULTI_SELECT_LIST_FIELD)).get(1), is("OPTION4")),
-            () -> assertThat(data.get(NUMBER_FIELD), is(NUMBER_VALUE)),
-            () -> assertThat(data.get(TEXT_AREA_FIELD), is(TEXT_AREA_VALUE)),
             () -> assertThat(data.get(TEXT_FIELD), is(TEXT_VALUE))
         );
     }
