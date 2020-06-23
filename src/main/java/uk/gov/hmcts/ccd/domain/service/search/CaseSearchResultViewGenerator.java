@@ -49,6 +49,7 @@ public class CaseSearchResultViewGenerator {
                                         CaseSearchResult caseSearchResult,
                                         String useCase,
                                         List<String> requestedFields) {
+
         List<SearchResultViewHeaderGroup> headerGroups = buildHeaders(caseTypeId, useCase, caseSearchResult, requestedFields);
         List<SearchResultViewItem> items = buildItems(useCase, caseSearchResult, caseTypeId, requestedFields);
 
@@ -171,10 +172,6 @@ public class CaseSearchResultViewGenerator {
             throw new BadSearchRequest(String.format("The provided use case '%s' is unsupported for case type '%s'.",
                 useCase, caseType.getId()));
         }
-
-        caseSearchResult.getCases().forEach(caseDetails -> {
-            filterResultsByAuthorisationReadAccess(caseDetails, caseTypeId);
-        });
 
         return new SearchResultViewHeaderGroup(
             new HeaderGroupMetadata(caseType.getJurisdictionId(), caseTypeId),
