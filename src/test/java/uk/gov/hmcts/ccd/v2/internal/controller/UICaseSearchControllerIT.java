@@ -2,7 +2,8 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -102,7 +103,6 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         );
     }
 
-
     @Test
     void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserRoleColumnIsPopulated() throws Exception {
         ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
@@ -117,7 +117,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         );
     }
 
-
+    @Disabled
     @Test
     void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserHasSomeAuthorisationOnCaseFields() throws Exception {
         ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
@@ -143,6 +143,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     }
 
 
+    @Disabled
     @Test
     void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUseHaveNoAuthorisationOnCaseField() throws Exception {
         ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
