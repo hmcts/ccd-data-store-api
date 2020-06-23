@@ -116,7 +116,10 @@ public class CaseSearchResultViewGenerator {
         return caseDetails;
     }
 
-    private CaseDetails filterResultsByUserRoleInSearchResultDefinition(String useCase, CaseDetails caseDetails, String caseTypeId, List<String> requestedFields) {
+    private CaseDetails filterResultsByUserRoleInSearchResultDefinition(String useCase,
+                                                                        CaseDetails caseDetails,
+                                                                        String caseTypeId,
+                                                                        List<String> requestedFields) {
         Set<String> roles = userRepository.getUserRoles();
         CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
         SearchResult searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
