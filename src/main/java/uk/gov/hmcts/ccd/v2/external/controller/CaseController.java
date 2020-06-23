@@ -310,7 +310,7 @@ public class CaseController {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
-        SupplementaryData supplementaryDataUpdated = supplementaryDataOperation.updateCaseSupplementaryData(caseId, supplementaryData);
+        SupplementaryData supplementaryDataUpdated = supplementaryDataOperation.updateSupplementaryData(caseId, supplementaryData);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(caseId, supplementaryData, supplementaryDataUpdated));
     }
 }

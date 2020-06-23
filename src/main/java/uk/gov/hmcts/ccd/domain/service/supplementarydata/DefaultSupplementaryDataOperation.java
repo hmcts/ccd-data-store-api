@@ -16,7 +16,7 @@ public class DefaultSupplementaryDataOperation implements SupplementaryDataOpera
     }
 
     @Override
-    public SupplementaryData updateCaseSupplementaryData(String caseId, SupplementaryData supplementaryData) {
-        return this.supplementaryDataRepository.upsert(caseId, supplementaryData);
+    public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryData supplementaryData) {
+        return this.supplementaryDataRepository.upsert(caseReference, supplementaryData);
     }
 }
