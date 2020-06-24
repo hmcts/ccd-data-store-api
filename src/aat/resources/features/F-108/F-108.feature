@@ -1,10 +1,10 @@
-@F-108
+@F-108 @elasticsearch
 Feature: Elasticsearch external endpoint
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-600 @elasticsearch
+  @S-600
   Scenario: should return the case for a role with same security classification as case type classification and read access on case type
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data]
     And logstash has finished indexing case data
