@@ -126,19 +126,22 @@ public class CaseSearchResultViewGenerator {
     }
 
     private Boolean filterResultsByAuthorisationAccess(Optional<CaseFieldDefinition> caseFieldDefinition) {
-        List<AccessControlList> accessControlLists = caseFieldDefinition.get().getAccessControlLists();
-        Set<String> roles = userRepository.getUserRoles();
-        if (!caseFieldDefinition.get().isMetadata()) {
-            for (AccessControlList accessControlList : accessControlLists) {
-                for (String role : roles) {
-                    if (accessControlList.getRole().equals(role)) {
-                        return accessControlList.isRead();
+        if (caseFieldDefinition.isPresent()) {
+            List<AccessControlList> accessControlLists = caseFieldDefinition.get().getAccessControlLists();
+            Set<String> roles = userRepository.getUserRoles();
+            if (!caseFieldDefinition.get().isMetadata()) {
+                for (AccessControlList accessControlList : accessControlLists) {
+                    for (String role : roles) {
+                        if (accessControlList.getRole().equals(role)) {
+                            return accessControlList.isRead();
+                        }
                     }
                 }
+                return false;
             }
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     private HashMap<String, String> getSearchResultDefinitionFieldUserRoleAndField(SearchResult searchResultDefinition) {
