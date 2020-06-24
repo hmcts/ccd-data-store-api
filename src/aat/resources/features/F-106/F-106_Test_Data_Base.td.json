@@ -30,7 +30,7 @@
 				"summary": "",
 				"description": ""
 			},
-			"event_token": "${[scenarioContext][siblingContexts][F-106_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
+			"event_token": "${[scenarioContext][parentContext][childContexts][F-106_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
 			"ignore_warning": false,
 			"draft_id": null
 		}
