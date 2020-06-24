@@ -31,17 +31,18 @@ elastic:
   enabled: true
 
 elasticsearch:
-  clusterName: "pr-elasticsearch"
-  replicas: 1
-  minimumMasterNodes: 1
-  antiAffinity: "soft"
-  esJavaOpts: "-Xmx512m -Xms512m"
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "512M"
-    limits:
-      cpu: "1000m"
-      memory: "512M"
-  persistence:
-    enabled: false
+  nameOverride: es
+  cluster:
+    env: {MINIMUM_MASTER_NODES: "1"}
+  master:
+    replicas: 1
+    persistence:
+      enabled: false
+  client:
+    replicas: 1
+    persistence:
+      enabled: false
+  data:
+    replicas: 1
+    persistence:
+      enabled: false
