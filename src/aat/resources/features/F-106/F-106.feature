@@ -4,7 +4,7 @@ Feature: F-106: Organisation Policies on Cases
     Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-    @S-900 @Ignore
+    @S-900
     Scenario: must successfully create a case with a case type containing some OrganisationPolicy fields
       Given a user with [an active profile in CCD]
       And a successful call [to create a token for case creation] as in [F-106_Case_Data_Create_Token_Creation]

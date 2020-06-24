@@ -14,7 +14,7 @@
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
 			"jid": "BEFTA_MASTER",
-			"ctid": "FT_OrganisationPolicy",
+			"ctid": "FT_MasterCaseType",
 			"etid": "createCase"
 		}
 	},
