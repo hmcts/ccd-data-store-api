@@ -97,21 +97,17 @@ public class CaseSearchResultViewGenerator {
                     caseField = null;
                 }
                 String role = searchFields.get(caseField);
-                if (role != null) {
-                    if (!roles.contains(role)) {
-                        caseFieldsUseCase.remove();
-                        caseField = null;
-                    }
+                if (role != null && !roles.contains(role)) {
+                    caseFieldsUseCase.remove();
+                    caseField = null;
                 }
             }
-            if (caseField != null) {
-                if (!accessControlService.canAccessCaseFieldsWithCriteria(
-                    JacksonUtils.convertValueJsonNode(caseField),
-                    caseTypeDefinition.getCaseFieldDefinitions(),
-                    roles,
-                    CAN_READ)) {
-                    caseFieldsUseCase.remove();
-                }
+            if (caseField != null && !accessControlService.canAccessCaseFieldsWithCriteria(
+                JacksonUtils.convertValueJsonNode(caseField),
+                caseTypeDefinition.getCaseFieldDefinitions(),
+                roles,
+                CAN_READ)) {
+                caseFieldsUseCase.remove();
             }
         }
         return caseDetails;

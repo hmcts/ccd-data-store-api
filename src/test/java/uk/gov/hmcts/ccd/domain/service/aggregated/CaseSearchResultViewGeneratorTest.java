@@ -126,14 +126,29 @@ class CaseSearchResultViewGeneratorTest {
 
         caseSearchResult = new CaseSearchResult(3L, Arrays.asList(caseDetails1, caseDetails2, caseDetails3));
 
-        final CaseFieldDefinition fatherName = newCaseField().withId(FATHER_NAME).withFieldType(textFieldType()).build();
-        final CaseFieldDefinition motherName = newCaseField().withId(MOTHER_NAME).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition fatherName = newCaseField().withId(FATHER_NAME).withFieldType(textFieldType()).withAcl(anAcl()
+            .withRole(ROLE_IN_USER_ROLE_1)
+            .withRead(true)
+            .build()).build();
+        final CaseFieldDefinition motherName = newCaseField().withId(MOTHER_NAME).withFieldType(textFieldType()).withAcl(anAcl()
+            .withRole(ROLE_IN_USER_ROLE_1)
+            .withRead(true)
+            .build()).build();
 
-        final CaseFieldDefinition addressLine1 = newCaseField().withId(ADDRESS_LINE_1).withFieldType(textFieldType()).build();
-        final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition addressLine1 = newCaseField().withId(ADDRESS_LINE_1).withFieldType(textFieldType()).withAcl(anAcl()
+            .withRole(ROLE_IN_USER_ROLE_1)
+            .withRead(true)
+            .build()).build();
+        final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE).withFieldType(textFieldType()).withAcl(anAcl()
+            .withRole(ROLE_IN_USER_ROLE_1)
+            .withRead(true)
+            .build()).build();
         final FieldTypeDefinition addressFieldTypeDefinition = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
             .withComplexField(addressLine1).withComplexField(postCode).build();
-        final CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition).build();
+        final CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition).withAcl(anAcl()
+            .withRole(ROLE_IN_USER_ROLE_1)
+            .withRead(true)
+            .build()).build();
 
         final FieldTypeDefinition familyDetailsFieldTypeDefinition =
             aFieldType().withId(FAMILY).withType(COMPLEX)
