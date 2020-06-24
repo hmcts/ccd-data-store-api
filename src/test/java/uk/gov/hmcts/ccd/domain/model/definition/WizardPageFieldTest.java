@@ -24,6 +24,7 @@ class WizardPageFieldTest {
     void shouldFindComplexFieldOverrideByPath() {
         WizardPageComplexFieldOverride override1 = override("LABEL1", "ComplexField.NestedField1");
         WizardPageComplexFieldOverride override2 = override("LABEL2", "ComplexField.NestedField2.SubNestedField");
+        // TODO: Add more fields/columns for coverage
         wizardPageField.setComplexFieldOverrides(Arrays.asList(override1, override2));
 
         Optional<WizardPageComplexFieldOverride> result = wizardPageField.getComplexFieldOverride("ComplexField.NestedField2.SubNestedField");

@@ -14,6 +14,7 @@ public class WizardPageComplexFieldOverride implements Serializable {
     private String hintText;
     private String showCondition;
     private String defaultValue;
+    private Integer order;
 
     @JsonProperty("complex_field_element_id")
     public String getComplexFieldElementId() {
@@ -74,5 +75,14 @@ public class WizardPageComplexFieldOverride implements Serializable {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    @JsonProperty("display_order")
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 }
