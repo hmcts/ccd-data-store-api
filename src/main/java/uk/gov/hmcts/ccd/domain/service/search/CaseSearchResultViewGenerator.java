@@ -88,7 +88,7 @@ public class CaseSearchResultViewGenerator {
         SearchResult searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
         HashMap<String, String> searchFields = getSearchResultDefinitionFieldUserRoleAndField(searchResultDefinition);
 
-        Iterator caseFieldsUseCase = caseDetails.getData().keySet().iterator();
+        Iterator<String> caseFieldsUseCase = caseDetails.getData().keySet().iterator();
         while (caseFieldsUseCase.hasNext()) {
             Object caseField = caseFieldsUseCase.next();
             if (useCase != null) {
@@ -97,20 +97,50 @@ public class CaseSearchResultViewGenerator {
                     caseField = null;
                 }
                 String role = searchFields.get(caseField);
-                if (role != null && !roles.contains(role)) {
-                    caseFieldsUseCase.remove();
-                    caseField = null;
+                if (role != null) {
+                    if (!roles.contains(role)) {
+                        caseFieldsUseCase.remove();
+                        caseField = null;
+                    }
+
                 }
             }
-            if (caseField != null && !accessControlService.canAccessCaseFieldsWithCriteria(
-                JacksonUtils.convertValueJsonNode(caseField),
-                caseTypeDefinition.getCaseFieldDefinitions(),
-                roles,
-                CAN_READ)) {
-                caseFieldsUseCase.remove();
+            if (caseField != null) {
+                Optional<CaseFieldDefinition> caseFieldDefinition = caseTypeDefinition.getCaseField(caseField.toString());
+                if (caseFieldDefinition.isPresent() && caseFieldDefinition.get().isComplexFieldType()) {
+                    if (!filterResultsByAuthorisationAccess(caseFieldDefinition)) {
+                        caseFieldsUseCase.remove();
+                    }
+                } else {
+                    if (!accessControlService.canAccessCaseFieldsWithCriteria(
+                        JacksonUtils.convertValueJsonNode(caseField),
+                        caseTypeDefinition.getCaseFieldDefinitions(),
+                        roles,
+                        CAN_READ)) {
+                        caseFieldsUseCase.remove();
+                    }
+                }
+
             }
+
         }
         return caseDetails;
+    }
+
+    private Boolean filterResultsByAuthorisationAccess(Optional<CaseFieldDefinition> caseFieldDefinition) {
+        List<AccessControlList> accessControlLists = caseFieldDefinition.get().getAccessControlLists();
+        Set<String> roles = userRepository.getUserRoles();
+        if (!caseFieldDefinition.get().isMetadata()) {
+            for (AccessControlList accessControlList : accessControlLists) {
+                for (String role : roles) {
+                    if (accessControlList.getRole().equals(role)) {
+                        return accessControlList.isRead();
+                    }
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     private HashMap<String, String> getSearchResultDefinitionFieldUserRoleAndField(SearchResult searchResultDefinition) {

@@ -40,6 +40,7 @@ import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildS
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class CaseSearchResultViewGeneratorTest {
@@ -178,16 +179,16 @@ class CaseSearchResultViewGeneratorTest {
                 .withRead(true)
                 .build()).build())
             .withField(newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition)
-                //                .withAcl(anAcl()
-                //                    .withRole(ROLE_IN_USER_ROLE_1)
-                //                    .withRead(true)
-                //                    .build())
-                //                .withComplexACL(aComplexACL()
-                //                    .withListElementCode("Line1")
-                //                    .withRole(ROLE_IN_USER_ROLE_1)
-                //                    .withRead(true)
-                //                    .withUpdate(false)
-                //                    .build())
+                                .withAcl(anAcl()
+                                    .withRole(ROLE_IN_USER_ROLE_1)
+                                    .withRead(true)
+                                    .build())
+                                .withComplexACL(aComplexACL()
+                                    .withListElementCode("Line1")
+                                    .withRole(ROLE_IN_USER_ROLE_1)
+                                    .withRead(true)
+                                    .withUpdate(false)
+                                    .build())
                 .build())
             .build();
 
@@ -274,7 +275,6 @@ class CaseSearchResultViewGeneratorTest {
         );
     }
 
-    @Disabled
     @Test
     void shouldBuildHeaderFieldsWithComplexFields() {
         SearchResult searchResult = searchResult()
@@ -402,7 +402,6 @@ class CaseSearchResultViewGeneratorTest {
         );
     }
 
-    @Disabled
     @Test
     void shouldBuildResultsWithComplexNestedElements() {
         SearchResultField searchResultFieldWithValidRole =
@@ -463,7 +462,6 @@ class CaseSearchResultViewGeneratorTest {
         verifyNoMoreInteractions(searchResultProcessor);
     }
 
-    @Disabled
     @Test
     void shouldThrowBadRequestExceptionWhenNoNestedElementFoundForPath() {
         SearchResult searchResult = searchResult()
@@ -490,7 +488,10 @@ class CaseSearchResultViewGeneratorTest {
                 FAMILY_DETAILS, ""))
             .build();
         CaseTypeDefinition caseTypeWithoutCaseFieldDefinition = newCaseType().withCaseTypeId(CASE_TYPE_ID_1).withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).build()).build();
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).withAcl(anAcl()
+                .withRole(ROLE_IN_USER_ROLE_1)
+                .withRead(true)
+                .build()).build()).build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeWithoutCaseFieldDefinition);
 
