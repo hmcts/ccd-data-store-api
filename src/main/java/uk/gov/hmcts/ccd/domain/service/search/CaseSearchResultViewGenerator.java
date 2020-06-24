@@ -97,11 +97,9 @@ public class CaseSearchResultViewGenerator {
                     caseField = null;
                 }
                 String role = searchFields.get(caseField);
-                if (role != null) {
-                    if (!roles.contains(role)) {
-                        caseFieldsUseCase.remove();
-                        caseField = null;
-                    }
+                if (role != null && !roles.contains(role)) {
+                    caseFieldsUseCase.remove();
+                    caseField = null;
 
                 }
             }
