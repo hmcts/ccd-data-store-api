@@ -46,3 +46,21 @@ elasticsearch:
     replicas: 1
     persistence:
       enabled: false
+
+logstash:
+  image:
+    repository: hmcts/ccd-logstash
+    tag: latest
+    pullPolicy: IfNotPresent
+  logstashJavaOpts: -Xmx1g -Xms512M
+  persistence:
+    enabled: false
+  elasticsearch:
+    host: "{{ .Release.Name }}-es-master"
+    port: 9200
+  configTpl:
+    xpack.monitoring.enabled: "false"
+    db.url: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/javadatabase?stringtype=unspecified"
+    db.user: "javapostgres"
+    db.pwd: "javapassword"
+    es.data.nodes.url: "http://{{ .Release.Name }}-es-master:9200"
