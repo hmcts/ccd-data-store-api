@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -47,7 +47,7 @@ public class DocumentManagementRestClient {
         } catch (Exception e) {
             LOG.error("Cannot sanitize document for the Case Field Type:{}, Case Field Type Id:{} because of unreachable url",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId(), e);
-            throw new ServiceException(String.format("Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of %s",
+            throw new ApiException(String.format("Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of %s",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId(), e));
         }
 
