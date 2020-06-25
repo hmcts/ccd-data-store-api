@@ -43,7 +43,8 @@ public class SearchResultUtil {
                                                            String caseFieldId,
                                                            String caseFieldPath,
                                                            String label,
-                                                           String displayContextParameter) {
+                                                           String displayContextParameter,
+                                                           String role) {
         SearchResultField searchResultField = new SearchResultField();
         searchResultField.setCaseFieldId(caseFieldId);
         searchResultField.setCaseFieldPath(caseFieldPath);
@@ -51,6 +52,7 @@ public class SearchResultUtil {
         searchResultField.setLabel(label);
         searchResultField.setDisplayOrder(1);
         searchResultField.setDisplayContextParameter(displayContextParameter);
+        searchResultField.setRole(role);
         return searchResultField;
     }
 

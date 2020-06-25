@@ -71,7 +71,7 @@ class SearchResultDefinitionServiceTest {
     @Test
     void shouldGetSearchResultDefinitionForWorkbasket() {
         SearchResult searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "", ""))
             .build();
         when(uiDefinitionRepository.getWorkBasketResult(CASE_TYPE_ID)).thenReturn(searchResult);
 
@@ -87,7 +87,7 @@ class SearchResultDefinitionServiceTest {
     @Test
     void shouldGetSearchResultDefinitionForSearch() {
         SearchResult searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "", ""))
             .build();
         when(uiDefinitionRepository.getSearchResult(CASE_TYPE_ID)).thenReturn(searchResult);
 
@@ -103,7 +103,7 @@ class SearchResultDefinitionServiceTest {
     @Test
     void shouldGetSearchResultDefinitionForOrgCases() {
         SearchResult searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, ""))
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "", ""))
             .build();
         when(uiDefinitionRepository.getSearchCasesResult(CASE_TYPE_ID, ORG_CASES)).thenReturn(searchResult);
 

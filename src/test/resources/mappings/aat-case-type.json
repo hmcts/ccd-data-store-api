@@ -34,6 +34,7 @@
           "case_fields": [
             {
               "case_field_id": "TextField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -45,6 +46,7 @@
             },
             {
               "case_field_id": "NumberField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -56,6 +58,7 @@
             },
             {
               "case_field_id": "YesOrNoField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -67,6 +70,7 @@
             },
             {
               "case_field_id": "PhoneUKField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -78,6 +82,7 @@
             },
             {
               "case_field_id": "EmailField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -89,6 +94,7 @@
             },
             {
               "case_field_id": "MoneyGBPField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -100,6 +106,7 @@
             },
             {
               "case_field_id": "DateField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -111,6 +118,7 @@
             },
             {
               "case_field_id": "DateTimeField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -122,6 +130,7 @@
             },
             {
               "case_field_id": "TextAreaField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -133,6 +142,7 @@
             },
             {
               "case_field_id": "FixedListField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -144,6 +154,7 @@
             },
             {
               "case_field_id": "FixedRadioListField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -155,6 +166,7 @@
             },
             {
               "case_field_id": "MultiSelectListField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -166,6 +178,7 @@
             },
             {
               "case_field_id": "ComplexField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -177,6 +190,7 @@
             },
             {
               "case_field_id": "CollectionField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -188,6 +202,7 @@
             },
             {
               "case_field_id": "AddressUKField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,
@@ -199,6 +214,7 @@
             },
             {
               "case_field_id": "DocumentField",
+              "security_classification": "PUBLIC",
               "display_context": "OPTIONAL",
               "display_context_parameter": null,
               "show_condition": null,

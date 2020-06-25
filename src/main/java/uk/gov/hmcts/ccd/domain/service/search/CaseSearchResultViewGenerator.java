@@ -32,17 +32,20 @@ public class CaseSearchResultViewGenerator {
     private final SearchResultDefinitionService searchResultDefinitionService;
     private final SearchResultProcessor searchResultProcessor;
     private final AccessControlService accessControlService;
+    private final SecurityClassificationService securityClassificationService;
 
     public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                          CaseTypeService caseTypeService,
                                          SearchResultDefinitionService searchResultDefinitionService,
                                          SearchResultProcessor searchResultProcessor,
-                                         AccessControlService accessControlService) {
+                                         AccessControlService accessControlService,
+                                         SecurityClassificationService securityClassificationService) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
         this.searchResultDefinitionService = searchResultDefinitionService;
         this.searchResultProcessor = searchResultProcessor;
         this.accessControlService = accessControlService;
+        this.securityClassificationService = securityClassificationService;
     }
 
     public CaseSearchResultView execute(String caseTypeId,
@@ -144,6 +147,14 @@ public class CaseSearchResultViewGenerator {
         return false;
     }
 
+    private Boolean filterResultsBySecurityClassification(CaseFieldDefinition caseFieldDefinition,
+                                                          CaseTypeDefinition caseTypeDefinition) {
+        return securityClassificationService.userHasEnoughSecurityClassificationForField(caseTypeDefinition.getJurisdictionId(),
+            caseTypeDefinition,
+            caseFieldDefinition.getId());
+
+    }
+
     private HashMap<String, String> getSearchResultDefinitionFieldUserRoleAndField(SearchResult searchResultDefinition) {
         HashMap<String, String> fields = new HashMap<>();
         for (SearchResultField srf : searchResultDefinition.getFields()) {
@@ -194,6 +205,7 @@ public class CaseSearchResultViewGenerator {
                 .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                 .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
                 .filter(caseField -> filterResultsByAuthorisation(caseField))
+                .filter(caseField -> filterResultsBySecurityClassification(caseField, caseTypeDefinition))
                 .map(caseField -> buildSearchResultViewColumn(searchResultField, caseField))
             )
             .collect(Collectors.toList());
