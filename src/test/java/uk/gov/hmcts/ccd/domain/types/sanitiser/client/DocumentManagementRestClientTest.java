@@ -25,7 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document._links;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -127,7 +127,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
                 withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
     }
 
-    @Test(expected = ServiceException.class)
+    @Test(expected = ApiException.class)
     @NeedsServer
     public void shouldFailToSanitizeIfUnauthorized() throws Exception {
 
@@ -142,7 +142,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
 
     }
 
-    @Test(expected = ServiceException.class)
+    @Test(expected = ApiException.class)
     @NeedsServer
     public void shouldFailToSanitizeIfServiceUnavailable() throws Exception {
 
@@ -159,7 +159,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL));
     }
 
-    @Test(expected = ServiceException.class)
+    @Test(expected = ApiException.class)
     @NeedsServer
     public void shouldFailToSanitizeIfBadGateway() throws Exception {
 
@@ -176,7 +176,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         subject.getDocument(DOCUMENT_FIELD_TYPE, formatURL(DOCUMENT_URL));
     }
 
-    @Test(expected = ServiceException.class)
+    @Test(expected = ApiException.class)
     @NeedsServer
     public void shouldFailToSanitizeIfInternalServerError() throws Exception {
 
