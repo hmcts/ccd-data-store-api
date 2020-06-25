@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,7 +73,7 @@ public class CaseAssignedUserRolesController {
     )
     @ApiResponses({
         @ApiResponse(
-            code = 200,
+            code = 201,
             message = ADD_SUCCESS_MESSAGE,
             response = AddCaseAssignedUserRolesResponse.class
         ),
@@ -115,7 +116,7 @@ public class CaseAssignedUserRolesController {
         if (applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(clientServiceName)) {
             validateRequestParams(caseAssignedUserRoles);
             this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles.getCaseAssignedUserRoles());
-            return ResponseEntity.ok(new AddCaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new AddCaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
         } else {
             throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
         }

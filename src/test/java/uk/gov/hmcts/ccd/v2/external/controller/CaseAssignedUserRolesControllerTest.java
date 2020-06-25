@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -110,6 +111,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ASSERT
             assertNotNull(response);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
             assertNotNull(response.getBody());
             assertEquals(ADD_SUCCESS_MESSAGE, response.getBody().getStatus());
             verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoles);
@@ -132,6 +134,7 @@ class CaseAssignedUserRolesControllerTest {
 
             // ASSERT
             assertNotNull(response);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
             assertNotNull(response.getBody());
             assertEquals(ADD_SUCCESS_MESSAGE, response.getBody().getStatus());
             verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoles);

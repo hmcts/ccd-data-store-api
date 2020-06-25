@@ -178,11 +178,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn();
 
         // ASSERT
-        assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
+        assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
         AddCaseAssignedUserRolesResponse response = mapper.readValue(content, AddCaseAssignedUserRolesResponse.class);
@@ -194,7 +194,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals(1, caseRoles.size());
         assertThat(caseRoles, hasItems(CASE_ROLE_1));
 
-        verifyAuditForAddCaseUserRoles(HttpStatus.OK, caseUserRoles);
+        verifyAuditForAddCaseUserRoles(HttpStatus.CREATED, caseUserRoles);
     }
 
     // RDM-8606: AC-2
@@ -527,11 +527,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(createHttpHeaders()))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn();
 
         // ASSERT
-        assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
+        assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
         AddCaseAssignedUserRolesResponse response = mapper.readValue(content, AddCaseAssignedUserRolesResponse.class);
@@ -543,7 +543,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals(1, caseRoles.size());
         assertThat(caseRoles, hasItems(CASE_ROLE_1));
 
-        verifyAuditForAddCaseUserRoles(HttpStatus.OK, caseUserRoles);
+        verifyAuditForAddCaseUserRoles(HttpStatus.CREATED, caseUserRoles);
     }
 
     // RDM-8606: multiple
@@ -572,11 +572,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
             .headers(httpHeaders))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn();
 
         // ASSERT
-        assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
+        assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
         AddCaseAssignedUserRolesResponse response = mapper.readValue(content, AddCaseAssignedUserRolesResponse.class);
@@ -589,7 +589,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(caseRoles, hasItems(CASE_ROLE_1));
         assertThat(caseRoles, hasItems(CASE_ROLE_2));
 
-        verifyAuditForAddCaseUserRoles(HttpStatus.OK, caseUserRoles);
+        verifyAuditForAddCaseUserRoles(HttpStatus.CREATED, caseUserRoles);
     }
 
     // AC-1
