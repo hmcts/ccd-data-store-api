@@ -85,8 +85,14 @@ public class CaseAssignedUserRolesController {
                 + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + "."
         ),
         @ApiResponse(
+            code = 401,
+            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+        ),
+        @ApiResponse(
             code = 403,
-            message = V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION
+            message = "One of the following reasons:\n"
+                + "1. Unauthorised S2S service \n"
+                + "2. " + V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
         ),
         @ApiResponse(
             code = 404,
