@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import java.util.HashMap;
+import java.util.Map;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -17,9 +21,9 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
-
-import javax.inject.Inject;
+import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -218,6 +222,51 @@ public class CaseControllerTestIT extends WireMockBaseTest {
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andExpect(status().is(404))
             .andReturn();
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldSetSupplementaryData() throws Exception {
+        String caseId = "1504259907353529";
+        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(supplementaryDataRequest))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
+        assertNotNull("updated supplementary data resource", supplementaryDataResource);
+    }
+
+    private SupplementaryDataRequest createSupplementaryDataSetRequest() throws JsonProcessingException {
+        String jsonRequest = "{\n"
+            + "\t\"orgs_assigned_users\": {\n"
+            + "\t\t\"organisationB\": 3\n"
+            + "\t}\n"
+            + "}";
+
+        Map<String, Object> requestData = mapper.readValue(jsonRequest, Map.class);
+        Map<String, Map<String, Object>> request = new HashMap<>();
+        request.put("$set", requestData);
+        return new SupplementaryDataRequest(request);
+    }
+
+    private SupplementaryDataRequest createSupplementaryDataIncrementRequest() throws JsonProcessingException {
+        String jsonRequest = "{\n"
+            + "\t\"orgs_assigned_users\": {\n"
+            + "\t\t\"organisationB\": 3\n"
+            + "\t}\n"
+            + "}";
+
+        Map<String, Object> requestData = mapper.readValue(jsonRequest, Map.class);
+        Map<String, Map<String, Object>> request = new HashMap<>();
+        request.put("$set", requestData);
+        return new SupplementaryDataRequest(request);
     }
 
 }

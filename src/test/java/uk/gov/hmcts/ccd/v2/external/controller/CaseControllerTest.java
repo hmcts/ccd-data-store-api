@@ -2,18 +2,10 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.google.common.collect.Lists;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,15 +18,33 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
+import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 @DisplayName("CaseController")
 class CaseControllerTest {
@@ -58,6 +68,9 @@ class CaseControllerTest {
 
     @Mock
     private GetEventsOperation getEventsOperation;
+
+    @Mock
+    private SupplementaryDataOperation supplementaryDataOperation;
 
     @InjectMocks
     private CaseController caseController;
@@ -214,5 +227,41 @@ class CaseControllerTest {
             assertThrows(Exception.class,
                 () -> caseController.getCaseEvents(CASE_REFERENCE));
         }
+    }
+
+
+    @Nested
+    @DisplayName("POST /cases/{caseId}/supplementary-data")
+    class UpdateSupplementaryData {
+
+        @Test
+        @DisplayName("should return 200 when supplementary data updated")
+        void shouldUpdateSupplementaryData() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
+            Map<String, Object> data = new HashMap<>();
+            Map<String, Object> child = new HashMap<>();
+            child.put("testchild", 123);
+            data.put("test", child);
+            SupplementaryData supplementaryData = new SupplementaryData(data);
+            when(supplementaryDataOperation.updateSupplementaryData(anyString(), anyObject())).thenReturn(supplementaryData);
+
+            final ResponseEntity<SupplementaryDataResource> response = caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataRequest());
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getBody().getSupplementaryData().getSupplementaryData().size(), equalTo(1)),
+                () -> assertThat(response.getBody().getSupplementaryData().getSupplementaryData(), is(data))
+            );
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when case reference not valid")
+        void caseReferenceNotValid() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataRequest()));
+        }
+
     }
 }

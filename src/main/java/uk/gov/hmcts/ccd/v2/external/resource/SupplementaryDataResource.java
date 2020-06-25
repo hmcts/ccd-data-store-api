@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -20,7 +21,7 @@ public class SupplementaryDataResource extends RepresentationModel<Representatio
     private SupplementaryData supplementaryData;
 
     public SupplementaryDataResource(final String caseId,
-                                     final SupplementaryData requestSupplementaryData,
+                                     final SupplementaryDataRequest requestSupplementaryData,
                                      final SupplementaryData supplementaryDataUpdated) {
         this.supplementaryData = supplementaryDataUpdated;
         add(linkTo(methodOn(CaseController.class).updateCaseSupplementaryData(caseId, requestSupplementaryData)).withSelfRel());
