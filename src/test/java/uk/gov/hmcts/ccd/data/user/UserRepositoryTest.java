@@ -81,7 +81,7 @@ public class UserRepositoryTest {
             Set<String> userRoles = userRepository.getUserRoles();
 
             verify(securityContext, times(1)).getAuthentication();
-            verify(authentication, times(1)).getPrincipal();
+            verify(authentication, times(1)).getAuthorities();
             assertThat(userRoles, hasItems(CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2, CASEWORKER_DIVORCE));
         }
 
