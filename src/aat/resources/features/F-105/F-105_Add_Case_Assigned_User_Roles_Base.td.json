@@ -1,0 +1,19 @@
+{
+  "_guid_": "F-105_Add_Case_Assigned_User_Roles_Base",
+  "title": "Add Case-Assigned Users and Roles",
+  "method": "POST",
+  "uri": "/case-users",
+
+  "request": {
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse": {
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
