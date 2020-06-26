@@ -98,9 +98,6 @@ class CaseSearchResultViewGeneratorTest {
     private SearchResultDefinitionService searchResultDefinitionService;
 
     @Mock
-    private AccessControlService accessControlService;
-
-    @Mock
     private SecurityClassificationService securityClassificationService;
 
     @Mock
@@ -262,7 +259,7 @@ class CaseSearchResultViewGeneratorTest {
         doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(any(), any());
 
         classUnderTest = new CaseSearchResultViewGenerator(userRepository,
-            caseTypeService, searchResultDefinitionService, searchResultProcessor, accessControlService, securityClassificationService);
+            caseTypeService, searchResultDefinitionService, searchResultProcessor, securityClassificationService);
     }
 
     @Test
@@ -507,7 +504,6 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
-        when(accessControlService.canAccessCaseFieldsWithCriteria(any(), any(), any(), any())).thenReturn(true);
         when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
@@ -537,7 +533,6 @@ class CaseSearchResultViewGeneratorTest {
 
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
-        when(accessControlService.canAccessCaseFieldsWithCriteria(any(), any(), any(), any())).thenReturn(false);
         when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());

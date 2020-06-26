@@ -29,20 +29,17 @@ public class CaseSearchResultViewGenerator {
     private final CaseTypeService caseTypeService;
     private final SearchResultDefinitionService searchResultDefinitionService;
     private final SearchResultProcessor searchResultProcessor;
-    private final AccessControlService accessControlService;
     private final SecurityClassificationService securityClassificationService;
 
     public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                          CaseTypeService caseTypeService,
                                          SearchResultDefinitionService searchResultDefinitionService,
                                          SearchResultProcessor searchResultProcessor,
-                                         AccessControlService accessControlService,
                                          SecurityClassificationService securityClassificationService) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
         this.searchResultDefinitionService = searchResultDefinitionService;
         this.searchResultProcessor = searchResultProcessor;
-        this.accessControlService = accessControlService;
         this.securityClassificationService = securityClassificationService;
     }
 
@@ -83,11 +80,10 @@ public class CaseSearchResultViewGenerator {
     }
 
     private CaseDetails filterResultsByAuthorisationAndUserRole(String useCase, CaseDetails caseDetails, String caseTypeId, List<String> requestedFields) {
+        CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
         caseDetails.getData().entrySet().removeIf(
             caseField -> {
-                CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
                 Optional<CaseFieldDefinition> caseFieldDefinition = caseTypeDefinition.getCaseField(caseField.getKey());
-
                 return !filterResultsBySearchResultsDefinition(useCase, caseTypeId, requestedFields, caseField.getKey())
                     || !filterResultsByAuthorisationAccessOnField(caseFieldDefinition.get());
             });
