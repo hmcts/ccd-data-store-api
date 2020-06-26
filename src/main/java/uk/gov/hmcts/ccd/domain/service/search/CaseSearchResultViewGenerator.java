@@ -18,9 +18,9 @@ import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -77,7 +77,6 @@ public class CaseSearchResultViewGenerator {
         SearchResult searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
 
         List<SearchResultViewItem> items = new ArrayList<>();
-        // Only one case type is currently supported so we can reuse the same definitions for building all items
         caseSearchResult.getCases().forEach(caseDetails -> {
             filterResultsByAuthorisationAndUserRole(useCase, caseDetails, caseTypeId, requestedFields);
             items.add(buildSearchResultViewItem(caseDetails, caseTypeDefinition, searchResultDefinition));
@@ -86,65 +85,42 @@ public class CaseSearchResultViewGenerator {
     }
 
     private CaseDetails filterResultsByAuthorisationAndUserRole(String useCase, CaseDetails caseDetails, String caseTypeId, List<String> requestedFields) {
+        caseDetails.getData().entrySet().removeIf(
+            caseField -> {
+                CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
+                Optional<CaseFieldDefinition> caseFieldDefinition = caseTypeDefinition.getCaseField(caseField.getKey());
+
+                return !filterResultsBySearchResultsDefinition(useCase, caseTypeId, requestedFields, caseField.getKey())
+                    || !filterResultsByAuthorisationAccessOnField(caseFieldDefinition.get());
+            });
+        return caseDetails;
+    }
+
+
+    private Boolean filterResultsBySearchResultsDefinition(String useCase, String caseTypeId, List<String> requestedFields, String caseFieldId) {
         Set<String> roles = userRepository.getUserRoles();
         CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
         SearchResult searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
         HashMap<String, String> searchFields = getSearchResultDefinitionFieldUserRoleAndField(searchResultDefinition);
 
-        Iterator<String> caseFieldsUseCase = caseDetails.getData().keySet().iterator();
-        while (caseFieldsUseCase.hasNext()) {
-            Object caseField = caseFieldsUseCase.next();
-            if (useCase != null) {
-                if (!searchFields.containsKey(caseField)) {
-                    caseFieldsUseCase.remove();
-                    caseField = null;
-                }
-                String role = searchFields.get(caseField);
-                if (role != null && !roles.contains(role)) {
-                    caseFieldsUseCase.remove();
-                    caseField = null;
-
-                }
-            }
-            if (caseField != null) {
-                Optional<CaseFieldDefinition> caseFieldDefinition = caseTypeDefinition.getCaseField(caseField.toString());
-                if (caseFieldDefinition.isPresent() && caseFieldDefinition.get().isComplexFieldType()) {
-                    if (!filterResultsByAuthorisationAccess(caseFieldDefinition)) {
-                        caseFieldsUseCase.remove();
-                    }
-                } else {
-                    if (!accessControlService.canAccessCaseFieldsWithCriteria(
-                        JacksonUtils.convertValueJsonNode(caseField),
-                        caseTypeDefinition.getCaseFieldDefinitions(),
-                        roles,
-                        CAN_READ)) {
-                        caseFieldsUseCase.remove();
-                    }
-                }
-
-            }
-
-        }
-        return caseDetails;
-    }
-
-    private Boolean filterResultsByAuthorisationAccess(Optional<CaseFieldDefinition> caseFieldDefinition) {
-        if (caseFieldDefinition.isPresent()) {
-            List<AccessControlList> accessControlLists = caseFieldDefinition.get().getAccessControlLists();
-            Set<String> roles = userRepository.getUserRoles();
-            if (!caseFieldDefinition.get().isMetadata()) {
-                for (AccessControlList accessControlList : accessControlLists) {
-                    for (String role : roles) {
-                        if (accessControlList.getRole().equals(role)) {
-                            return accessControlList.isRead();
-                        }
-                    }
-                }
+        if (useCase != null) {
+            if (!searchFields.containsKey(caseFieldId)) {
                 return false;
             }
-            return true;
+            String role = searchFields.get(caseFieldId);
+            if (role != null && !roles.contains(role)) {
+                return false;
+            }
         }
-        return false;
+        return true;
+    }
+
+    private Boolean filterResultsByAuthorisationAccessOnField(CaseFieldDefinition caseFieldDefinition) {
+        if (!caseFieldDefinition.isMetadata()) {
+            return userRepository.getUserRoles().stream()
+                .anyMatch(role -> caseFieldDefinition.getAccessControlListByRole(role).map(AccessControlList::isRead).orElse(false));
+        }
+        return true;
     }
 
     private Boolean filterResultsBySecurityClassification(CaseFieldDefinition caseFieldDefinition,
@@ -204,27 +180,11 @@ public class CaseSearchResultViewGenerator {
             .flatMap(searchResultField -> caseTypeDefinition.getCaseFieldDefinitions().stream()
                 .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                 .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
-                .filter(caseField -> filterResultsByAuthorisation(caseField))
+                .filter(caseField -> filterResultsByAuthorisationAccessOnField(caseField))
                 .filter(caseField -> filterResultsBySecurityClassification(caseField, caseTypeDefinition))
                 .map(caseField -> buildSearchResultViewColumn(searchResultField, caseField))
             )
-            .collect(Collectors.toList());
-    }
-
-    private Boolean filterResultsByAuthorisation(CaseFieldDefinition caseFieldDefinition) {
-        List<AccessControlList> accessControlLists = caseFieldDefinition.getAccessControlLists();
-        Set<String> roles = userRepository.getUserRoles();
-        if (!caseFieldDefinition.isMetadata()) {
-            for (AccessControlList accessControlList : accessControlLists) {
-                for (String role : roles) {
-                    if (accessControlList.getRole().equals(role)) {
-                        return accessControlList.isRead();
-                    }
-                }
-            }
-            return false;
-        }
-        return true;
+            .collect(toList());
     }
 
     private SearchResultViewHeader buildSearchResultViewColumn(SearchResultField searchResultField,
