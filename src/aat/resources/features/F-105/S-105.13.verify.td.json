@@ -7,7 +7,7 @@
   ],
 
   "users": {
-    "_extends_": "F-105_Users"    
+    "_extends_": "F-105_Users"
   },
 
   "expectedResponse": {

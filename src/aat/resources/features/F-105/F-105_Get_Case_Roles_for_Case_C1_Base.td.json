@@ -6,10 +6,6 @@
   "method": "GET",
   "uri": "/case-users",
 
-  "specs": [
-    "to verify Olawale's reception of the role CR-1 over the case C1"
-  ],
-
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.caa@gmail.com",
@@ -31,9 +27,6 @@
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "[[ANYTHING_PRESENT]]"
-    },
-    "body": {
-      "case_users": []
     }
   }
 }
