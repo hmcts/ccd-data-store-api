@@ -15,7 +15,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale and a proper Case Role CR-1],
-    And it is submitted to call the [Add Case-Assigned User and Role] operation of [CCD Data Store Api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a positive response is received,
     And the response has all the details as expected,
     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
