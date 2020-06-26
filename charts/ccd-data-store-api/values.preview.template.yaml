@@ -33,7 +33,7 @@ elastic:
 elasticsearch:
   nameOverride: es
   cluster:
-    env: {MINIMUM_MASTER_NODES: "2"}
+    env: {MINIMUM_MASTER_NODES: "1"}
   master:
     replicas: 1
     persistence:
