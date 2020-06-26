@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data;
 
+import com.auth0.jwt.JWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,7 +17,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class SecurityUtils {
+    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
     private static final String AUD_CLAIM = "aud";
+    private static final String BEARER = "Bearer ";
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
 
@@ -28,7 +32,7 @@ public class SecurityUtils {
 
     public HttpHeaders authorizationHeaders() {
         final HttpHeaders headers = new HttpHeaders();
-        headers.add("ServiceAuthorization", authTokenGenerator.generate());
+        headers.add(SERVICE_AUTHORIZATION, authTokenGenerator.generate());
         headers.add("user-id", getUserId());
         headers.add("user-roles", getUserRolesHeader());
 
@@ -62,7 +66,7 @@ public class SecurityUtils {
     }
 
     private String getUserBearerToken() {
-        return "Bearer " + getUserToken();
+        return BEARER + getUserToken();
     }
 
     public String getUserRolesHeader() {
@@ -75,5 +79,19 @@ public class SecurityUtils {
     public String getServiceName() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return jwt.getClaim(AUD_CLAIM);
+    }
+
+    public String getServiceNameFromS2SToken(String serviceAuthenticationToken) {
+        // NB: this grabs the servce name straight from the token under the assumption
+        // that the S2S token has already been verified elsewhere
+        return JWT.decode(removeBearerFromToken(serviceAuthenticationToken)).getSubject();
+    }
+
+    private String removeBearerFromToken(String token) {
+        if (!token.startsWith(BEARER)) {
+            return token;
+        } else {
+            return token.substring(BEARER.length());
+        }
     }
 }

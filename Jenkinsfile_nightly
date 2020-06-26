@@ -45,7 +45,8 @@ def secrets = [
         secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD')
     ],
     's2s-${env}': [
-        secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET')
+        secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
+        secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
     ]
 ]
 
