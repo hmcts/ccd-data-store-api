@@ -15,7 +15,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale and a proper Case Role CR-1],
-    And it is submitted to call the [Add Case-Assigned User and Role] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned User and Role] operation of [CCD Data Store Api],
     Then a positive response is received,
     And the response has all the details as expected,
     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
@@ -32,7 +32,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1]
     And the request [contains the Case ID of C1 in one entry but no case ID in the other]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.2_Get_Case_Roles_for_Case_C1].
@@ -49,7 +49,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1]
     And the request [contains the Case ID of C1 in one entry and a malformed case ID in the other]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.3_Get_Case_Roles_for_Case_C1].
@@ -66,7 +66,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing the Case ID of C1 and a proper Case Role CR-1]
     And the request [contains the User ID of Olawale in one entry but no User ID in the other]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.4_Get_Case_Roles_for_Case_C1].
@@ -83,7 +83,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing the Case ID of C1 and a proper Case Role CR-1]
     And the request [contains the User ID of Olawale in one entry and a malformed User ID in the other]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.5_Get_Case_Roles_for_Case_C1].
@@ -99,7 +99,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Olawale - who is not a privileged user and is calling from an un-authorised application],
     When a request is prepared with appropriate values,
     And the request [is made by Olawale with the Case ID of C1 & Dil's User ID and a proper Case Role CR-1],
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
     And a call [to verify that Dil hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.6_Get_Case_Roles_for_Case_C1].
@@ -116,7 +116,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application by Dil, for 2 assignments each containing the Case ID of C1 and User ID of Olawale],
     And the request [contains a proper Case Role CR-1 in one entry and an improper Case Role in the other]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.7_Get_Case_Roles_for_Case_C1].
@@ -133,7 +133,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application by Dil, for 2 assignments each containing the Case ID of C1 and User ID of Olawale],
     And the request [contains a proper Case Role CR-1 in one entry and no Case Role in the other]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.8_Get_Case_Roles_for_Case_C1].
@@ -145,7 +145,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Dil - who is to add some case role assignment for a case],
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application by Dil, with no case_users supplied]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
 
@@ -156,7 +156,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Dil - who is to add some case role assignment for a case],
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application by Dil, with an empty list of case_users supplied]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
 
@@ -172,7 +172,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1]
     And the request [contains the Case ID of C1 in one entry and a well formed but non-existant case ID in the other]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a negative response is received,
     And the response has all the details as expected.
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.11_Get_Case_Roles_for_Case_C1].
@@ -189,7 +189,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing the Case ID of C1, User ID of Olawale and a proper Case Role CR-1]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a positive response is received,
     And the response has all the details as expected.
     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.12_Get_Case_Roles_for_Case_C1].
@@ -206,7 +206,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application by Dil, for 2 assignments each containing the Case ID of C1 and User ID of Olawale],
     And the request [contains a proper Case Role CR-1 in one entry and a proper Case Role CR-2 in the other]
-    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a positive response is received,
     And the response has all the details as expected.
     And a call [to verify Olawale's reception of the role CR-1 and CR-2 over the case C1] will get the expected response as in [S-105.13_Get_Case_Roles_for_Case_C1].
