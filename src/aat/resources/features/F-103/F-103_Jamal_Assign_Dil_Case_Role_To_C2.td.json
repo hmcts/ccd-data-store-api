@@ -12,7 +12,7 @@
 	},
 	"request": {
 		"pathVariables": {
-			"case_id": "${[scenarioContext][siblingContexts][F103_Case_Data_Create_C2][testData][actualResponse][body][id]}",
+			"case_id": "${[scenarioContext][siblingContexts][F103_Case_Data_Create_C2][testData][actualResponse][body][id]}{{}}",
 			"user_id": "${[scenarioContext][testData][users][userDil][id]}"
 		},
 		"body": {

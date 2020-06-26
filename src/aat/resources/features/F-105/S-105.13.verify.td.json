@@ -18,12 +18,12 @@
           "__elementId__": "case_id,user_id,case_role"
         },
         {
-          "case_id": "${[scenarioContext][siblingContexts][F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "case_id": "${{{}}[scenarioContext][siblingContexts][F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
           "case_role": "[CR-1]"
         },
         {
-          "case_id": "${[scenarioContext][siblingContexts][F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "case_id": "${{{}}[scenarioContext][siblingContexts][F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
           "case_role": "[CR-2]"
         }

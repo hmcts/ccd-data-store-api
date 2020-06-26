@@ -275,7 +275,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '3.2.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '3.3.0-RDM-8806.1'
 
 }
 // end::dependencies[]
