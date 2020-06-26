@@ -7,7 +7,7 @@ dependencies:
     repository: '@stable'
     condition: elastic.enabled
   - name: logstash
-    version: ~2.1.0
+    version: ~2.4.1
     repository: '@hmctspublic'
 #  - name: logstash
 #    version: ~7.7.1
