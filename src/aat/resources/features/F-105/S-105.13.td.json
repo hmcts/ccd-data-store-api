@@ -2,9 +2,6 @@
   "title": "Must successfully assign multiple user and case roles for a specific case by a user calling through/from an authorised application",
   "_guid_": "S-105.13",
   "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
-  "productName": "CCD Data Store api",
-  "operationName": "Add Case-Assigned Users and Roles",
-  "s2sClientId": "aac_manage_case_assignment",
 
   "specs": [
     "Richard - who can create a case",

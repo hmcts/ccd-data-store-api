@@ -2,9 +2,6 @@
   "title": "Must return an error response for empty case_users list",
   "_guid_": "S-105.10",
   "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
-  "productName": "CCD Data Store api",
-  "operationName": "Add Case-Assigned Users and Roles",
-  "s2sClientId": "aac_manage_case_assignment",
 
   "specs": [
     "Dil - who is to add some case role assignment for a case",
