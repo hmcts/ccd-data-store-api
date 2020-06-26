@@ -3,13 +3,9 @@ dependencies:
     version: ~2.17.0
     repository: '@hmctspublic'
   - name: elasticsearch
-    version: ~1.32.4
-    repository: '@stable'
+    version: 7.7.1
+    repository: https://helm.elastic.co
     condition: elastic.enabled
   - name: logstash
     version: ~2.4.1
     repository: '@hmctspublic'
-#  - name: logstash
-#    version: ~7.7.1
-#    repository: https://helm.elastic.co
-#    condition: elastic.enabled

@@ -1,6 +1,4 @@
 java:
-  image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_FQDN}
   keyVaults:
     ccd:
       resourceGroup: ccd-shared
@@ -31,21 +29,13 @@ elastic:
   enabled: true
 
 elasticsearch:
-  nameOverride: es
-  cluster:
-    env: {MINIMUM_MASTER_NODES: "1"}
-  master:
-    replicas: 1
-    persistence:
-      enabled: false
-  client:
-    replicas: 1
-    persistence:
-      enabled: false
-  data:
-    replicas: 1
-    persistence:
-      enabled: false
+  clusterName: "elasticsearch"
+  replicas: 1
+  minimumMasterNodes: 1
+  antiAffinity: "soft"
+  esJavaOpts: "-Xmx1g -Xms512m"
+  persistence:
+    enabled: false
 
 logstash:
   image:
@@ -56,11 +46,11 @@ logstash:
   persistence:
     enabled: false
   elasticsearch:
-    host: "{{ .Release.Name }}-es-client"
+    host: "elasticsearch-master"
     port: 9200
   configTpl:
     xpack.monitoring.enabled: "false"
     db.url: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/javadatabase?stringtype=unspecified"
     db.user: "javapostgres"
     db.pwd: "javapassword"
-    es.data.nodes.url: "http://{{ .Release.Name }}-es-master:9200"
+    es.data.nodes.url: "http://elasticsearch-master:9200"
