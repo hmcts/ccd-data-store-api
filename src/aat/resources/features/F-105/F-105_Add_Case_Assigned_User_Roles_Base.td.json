@@ -2,7 +2,7 @@
   "_guid_": "F-105_Add_Case_Assigned_User_Roles_Base",
 
   "productName": "CCD Data Store",
-  "title": "Add Case-Assigned Users and Roles",
+  "operationName": "Add Case-Assigned Users and Roles",
 
   "method": "POST",
   "uri": "/case-users",
