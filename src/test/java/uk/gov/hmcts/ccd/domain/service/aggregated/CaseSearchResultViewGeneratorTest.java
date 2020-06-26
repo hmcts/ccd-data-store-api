@@ -324,7 +324,7 @@ class CaseSearchResultViewGeneratorTest {
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
-                .withRead(true)
+                .withRead(false)
                 .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).withAcl(anAcl()
@@ -368,7 +368,8 @@ class CaseSearchResultViewGeneratorTest {
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_REFERENCE]"), is(999L)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[SECURITY_CLASSIFICATION]"), is(SECURITY_CLASSIFICATION)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_TYPE]"), is(CASE_TYPE_ID_1)),
-            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[LAST_MODIFIED_DATE]"), is(LAST_MODIFIED_DATE))
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[LAST_MODIFIED_DATE]"), is(LAST_MODIFIED_DATE)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().size(), is(8))
         );
     }
 
