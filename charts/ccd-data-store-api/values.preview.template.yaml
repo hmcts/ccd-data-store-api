@@ -56,7 +56,7 @@ logstash:
   persistence:
     enabled: false
   elasticsearch:
-    host: "{{ .Release.Name }}-es-master"
+    host: "{{ .Release.Name }}-es-client"
     port: 9200
   configTpl:
     xpack.monitoring.enabled: "false"
