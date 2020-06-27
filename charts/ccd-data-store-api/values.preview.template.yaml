@@ -16,12 +16,15 @@ java:
     DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
     DATA_STORE_DB_MAX_POOL_SIZE: 10
-    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-619.service.core-compute-preview.internal/
-#    USER_PROFILE_HOST: http://ccd-user-profile-api-pr-224.service.core-compute-preview.internal/
+    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal/
+    USER_PROFILE_HOST: http://ccd-user-profile-api-pr-224.service.core-compute-preview.internal/
 
     ENABLE_DB_MIGRATE: true
+
     ELASTIC_SEARCH_ENABLED: true
-    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
+    ELASTIC_SEARCH_HOSTS: elasticsearch-master:9200
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://elasticsearch-master:9200"
   postgresql:
     enabled: true
 
@@ -33,7 +36,7 @@ elasticsearch:
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
-  esJavaOpts: "-Xmx1g -Xms512m"
+  esJavaOpts: "-Xmx512m -Xms512m"
   persistence:
     enabled: false
 
