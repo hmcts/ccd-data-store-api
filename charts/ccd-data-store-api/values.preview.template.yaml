@@ -50,6 +50,9 @@ logstash:
   logstashJavaOpts: -Xmx1g -Xms512M
   persistence:
     enabled: false
+  volumeMounts:
+    - name: pipeline
+      mountPath: /usr/share/logstash/files # hack to prevent override of default pipeline in the custom image hmcts/ccd-logstash
   elasticsearch:
     host: "elasticsearch-master"
     port: 9200
