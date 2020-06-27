@@ -1,13 +1,31 @@
 {
-  "request": {
-    "method": "GET",
-    "url": "/s2s/details"
-  },
-  "response": {
-    "status": 200,
-    "headers": {
-      "Content-Type": "application/json"
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "url": "/s2s/details"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "ccd_gw"
+      }
     },
-    "body": "ccd_gw"
-  }
+    {
+      "request": {
+        "method": "POST",
+        "url": "/s2s/lease"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODI2MDAyMzN9.Lz467pTdzRF0MGQye8QDzoLLY_cxk79ZB3OOYdOR-0PGYK5sVay4lxOvhIa-1VnfizaaDDZUwmPdMwQOUBfpBQ"
+      }
+    }
+  ]
 }
+

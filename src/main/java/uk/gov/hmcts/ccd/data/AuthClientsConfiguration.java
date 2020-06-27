@@ -8,11 +8,15 @@ import org.springframework.context.annotation.Lazy;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
+import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
+import uk.gov.hmcts.reform.authorisation.validators.ServiceAuthTokenValidator;
+
+import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 @Configuration
 @Lazy
-@EnableFeignClients(basePackageClasses = ServiceAuthorisationApi.class)
-public class ServiceTokenGeneratorConfiguration {
+@EnableFeignClients(basePackageClasses = {IdamApi.class, ServiceAuthorisationApi.class})
+public class AuthClientsConfiguration {
 
     @Bean
     public AuthTokenGenerator authTokenGenerator(
@@ -21,6 +25,11 @@ public class ServiceTokenGeneratorConfiguration {
         final ServiceAuthorisationApi serviceAuthorisationApi
     ) {
         return AuthTokenGeneratorFactory.createDefaultGenerator(secret, microService, serviceAuthorisationApi);
+    }
+
+    @Bean
+    public AuthTokenValidator authTokenValidator(ServiceAuthorisationApi serviceAuthorisationApi) {
+        return new ServiceAuthTokenValidator(serviceAuthorisationApi);
     }
 
 }

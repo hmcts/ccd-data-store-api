@@ -7,15 +7,12 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,10 +21,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -45,12 +42,23 @@ import java.util.stream.Collectors;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.hamcrest.core.Every.everyItem;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -101,12 +109,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @SpyBean
     private AuditRepository auditRepository;
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
 
     private static final String REFERENCE_2 = "1504259907353545";
 
@@ -694,7 +696,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
         assertTrue("Incorrect Case Reference", uidService.validateUID(captor.getValue().getCaseId()));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
@@ -721,7 +723,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
         assertTrue("Incorrect Case Reference", uidService.validateUID(captor.getValue().getCaseId()));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
@@ -1051,7 +1053,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
@@ -1166,7 +1168,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
@@ -1946,7 +1948,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(caseReference));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
@@ -1991,7 +1993,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(caseReference));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
-        assertThat(captor.getValue().getInvokingService(), is("ccd-data"));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
