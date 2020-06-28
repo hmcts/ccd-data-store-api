@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +36,7 @@ class MultiSelectListValidatorTest {
     @Mock
     private CaseDefinitionRepository definitionRepository;
 
-    private CaseField caseField;
+    private CaseFieldDefinition caseFieldDefinition;
 
     private MultiSelectListValidator validator;
 
@@ -53,19 +53,19 @@ class MultiSelectListValidatorTest {
 
         validator = new MultiSelectListValidator();
 
-        caseField = caseField().build();
+        caseFieldDefinition = caseField().build();
     }
 
     @Test
     void validate_shouldBeValidWhenNull() {
-        final List<ValidationResult> results = validator.validate(FIELD_ID, null, caseField);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, null, caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
 
     @Test
     void validate_shouldBeValidWhenNullNode() {
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.nullNode(), caseField);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.nullNode(), caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
@@ -76,7 +76,7 @@ class MultiSelectListValidatorTest {
                                              .add(OPTION_1)
                                              .add(OPTION_2);
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseField);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
@@ -85,7 +85,7 @@ class MultiSelectListValidatorTest {
     void validate_shouldNOTBeValidWhenValueIsNotAnArray() {
         final JsonNode value = NODE_FACTORY.textNode("Nayab was here, 24/07/2017");
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, value, caseField);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, value, caseFieldDefinition);
 
         assertThat(results, hasSize(1));
     }
@@ -96,7 +96,7 @@ class MultiSelectListValidatorTest {
                                              .add(OPTION_1)
                                              .add(OPTION_UNKNOWN);
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseField);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
         assertThat(results, hasSize(1));
     }
@@ -107,19 +107,19 @@ class MultiSelectListValidatorTest {
                                              .add(OPTION_1)
                                              .add(OPTION_1);
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseField);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
         assertThat(results, hasSize(1));
     }
 
     @Test
     void validate_shouldNOTBeValidWhenBelowMin() {
-        final CaseField caseField = caseField().withMin(2).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().withMin(2).build();
 
         final ArrayNode values = NODE_FACTORY.arrayNode()
                                              .add(OPTION_1);
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseField);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getErrorMessage(), equalTo("Select at least 2 options"));
@@ -127,20 +127,20 @@ class MultiSelectListValidatorTest {
 
     @Test
     void validate_shouldNOTBeValidWhenAboveMax() {
-        final CaseField caseField = caseField().withMax(ONE).build();
+        final CaseFieldDefinition caseFieldDefinition = caseField().withMax(ONE).build();
 
         final ArrayNode values = NODE_FACTORY.arrayNode()
                                              .add(OPTION_1)
                                              .add(OPTION_2);
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseField);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getErrorMessage(), equalTo("Cannot select more than 1 option"));
     }
 
-    private CaseFieldBuilder caseField() {
-        return new CaseFieldBuilder(FIELD_ID).withType(MultiSelectListValidator.TYPE_ID)
+    private CaseFieldDefinitionBuilder caseField() {
+        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(MultiSelectListValidator.TYPE_ID)
                                              .withFixedListItem(OPTION_1)
                                              .withFixedListItem(OPTION_2)
                                              .withFixedListItem(OPTION_3);

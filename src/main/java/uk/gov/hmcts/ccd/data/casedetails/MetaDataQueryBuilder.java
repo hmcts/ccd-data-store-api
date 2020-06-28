@@ -18,6 +18,6 @@ public class MetaDataQueryBuilder {
         query.setParameter(CaseDetailsEntity.JURISDICTION_ID_PARAM, jurisdiction == null ? "%" : jurisdiction);
         query.setParameter(CaseDetailsEntity.CASE_TYPE_PARAM, caseType == null ? "%" : caseType);
         query.setParameter(CaseDetailsEntity.STATE_PARAM, state == null ? "%" : state);
-       return query; 
+        return query;
     }
 }

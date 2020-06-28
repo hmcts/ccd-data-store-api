@@ -1,19 +1,18 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
-import java.util.List;
-import java.util.Optional;
-
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public interface CommonField {
 
-    FieldType getFieldType();
+    FieldTypeDefinition getFieldTypeDefinition();
 
     String getId();
 
@@ -33,12 +32,12 @@ public interface CommonField {
 
     @JsonIgnore
     default boolean isCollectionFieldType() {
-        return FieldType.COLLECTION.equalsIgnoreCase(getFieldType().getType());
+        return FieldTypeDefinition.COLLECTION.equalsIgnoreCase(getFieldTypeDefinition().getType());
     }
 
     @JsonIgnore
     default boolean isComplexFieldType() {
-        return COMPLEX.equalsIgnoreCase(getFieldType().getType());
+        return COMPLEX.equalsIgnoreCase(getFieldTypeDefinition().getType());
     }
 
     @JsonIgnore
@@ -64,6 +63,7 @@ public interface CommonField {
         if (StringUtils.isBlank(path)) {
             return Optional.of(this);
         }
-        return this.getFieldType().getNestedField(path, false);
+        return this.getFieldTypeDefinition().getNestedField(path, false);
     }
+
 }

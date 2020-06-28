@@ -63,7 +63,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "[LAST_STATE_MODIFIED_DATE]",
@@ -73,8 +74,8 @@
           "metadata": true,
           "hint_text": null,
           "field_type": {
-            "id": "Date",
-            "type": "Date",
+            "id": "DateTime",
+            "type": "DateTime",
             "min": null,
             "max": null,
             "regular_expression": null,
@@ -97,7 +98,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "[JURISDICTION]",
@@ -131,7 +133,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "[CASE_TYPE]",
@@ -165,7 +168,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "[SECURITY_CLASSIFICATION]",
@@ -199,7 +203,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "[CASE_REFERENCE]",
@@ -233,7 +238,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "[CREATED_DATE]",
@@ -243,8 +249,8 @@
           "metadata": true,
           "hint_text": null,
           "field_type": {
-            "id": "Date",
-            "type": "Date",
+            "id": "DateTime",
+            "type": "DateTime",
             "min": null,
             "max": null,
             "regular_expression": null,
@@ -267,7 +273,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "[LAST_MODIFIED_DATE]",
@@ -277,8 +284,8 @@
           "metadata": true,
           "hint_text": null,
           "field_type": {
-            "id": "Date",
-            "type": "Date",
+            "id": "DateTime",
+            "type": "DateTime",
             "min": null,
             "max": null,
             "regular_expression": null,
@@ -301,7 +308,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value": null
         }
       ],
       "state": "[[ANYTHING_PRESENT]]",

@@ -16,8 +16,8 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -70,8 +70,8 @@ class AuthorisedSearchOperationTest {
 
     private MetaData metaData;
     private HashMap<String, String> criteria;
-    private CaseType caseType;
-    private final List<CaseField> caseFields = Lists.newArrayList();
+    private CaseTypeDefinition caseType;
+    private final List<CaseFieldDefinition> caseFields = Lists.newArrayList();
 
     private JsonNode classifiedDataNode1;
     private JsonNode classifiedDataClassificationNode1;
@@ -91,8 +91,8 @@ class AuthorisedSearchOperationTest {
 
         metaData = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
-        caseType = new CaseType();
-        caseType.setCaseFields(caseFields);
+        caseType = new CaseTypeDefinition();
+        caseType.setCaseFieldDefinitions(caseFields);
 
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(userRepository.getUserRoles()).thenReturn(USER_ROLES);
@@ -169,10 +169,10 @@ class AuthorisedSearchOperationTest {
             caseDefinitionRepository, accessControlService, userRepository);
     }
 
-    private List<CaseField> getCaseFieldsWithIds(String... dataTestFields) {
+    private List<CaseFieldDefinition> getCaseFieldsWithIds(String... dataTestFields) {
         return Stream.of(dataTestFields)
             .map(field -> {
-                CaseField caseField = new CaseField();
+                CaseFieldDefinition caseField = new CaseFieldDefinition();
                 caseField.setId(field);
                 return caseField;
             })
@@ -277,7 +277,8 @@ class AuthorisedSearchOperationTest {
         assertAll(
             () -> assertThat(output, is(notNullValue())),
             () -> assertThat(output, hasSize(0)),
-            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
+            () -> verify(accessControlService, never())
+                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
         );
     }
 }

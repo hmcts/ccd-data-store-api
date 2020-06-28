@@ -37,6 +37,12 @@ public class CaseDetailsMapper {
         return caseDetails;
     }
 
+    public List<CaseDetails> entityToModel(final List<CaseDetailsEntity> caseDataEntities) {
+        return caseDataEntities.stream()
+            .map(this::entityToModel)
+            .collect(Collectors.toList());
+    }
+
     public CaseDetailsEntity modelToEntity(final CaseDetails caseDetails) {
         if (caseDetails == null) {
             return null;
@@ -64,11 +70,5 @@ public class CaseDetailsMapper {
     private Long getLongId(CaseDetails caseDetails) {
         String id = caseDetails.getId();
         return id == null ? null : Long.valueOf(id);
-    }
-
-    public List<CaseDetails> entityToModel(final List<CaseDetailsEntity> caseDataEntities) {
-        return caseDataEntities.stream()
-            .map(this::entityToModel)
-            .collect(Collectors.toList());
     }
 }

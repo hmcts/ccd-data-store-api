@@ -48,6 +48,12 @@ public class CaseAuditEventMapper {
         return auditEvent;
     }
 
+    public List<AuditEvent> entityToModel(final List<CaseAuditEventEntity> caseEventEntities) {
+        return caseEventEntities.stream()
+            .map(this::entityToModel)
+            .collect(Collectors.toList());
+    }
+
     public CaseAuditEventEntity modelToEntity(final AuditEvent auditEvent) {
         final CaseAuditEventEntity newCaseAuditEventEntity = new CaseAuditEventEntity();
         final SignificantItemEntity significantItemEntity = new SignificantItemEntity();
@@ -82,11 +88,5 @@ public class CaseAuditEventMapper {
             newCaseAuditEventEntity.setSignificantItemEntity(significantItemEntity);
         }
         return newCaseAuditEventEntity;
-    }
-
-    public List<AuditEvent> entityToModel(final List<CaseAuditEventEntity> caseEventEntities) {
-        return caseEventEntities.stream()
-            .map(this::entityToModel)
-            .collect(Collectors.toList());
     }
 }

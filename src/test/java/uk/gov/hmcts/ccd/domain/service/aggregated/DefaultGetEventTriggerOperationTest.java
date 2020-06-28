@@ -14,9 +14,9 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseUpdateViewEventBuilder.newCaseUpdateViewEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventTriggerBuilder.newStartEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventResultBuilder.newStartEventTrigger;
 
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,11 +28,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEventBuilder;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -53,12 +54,12 @@ class DefaultGetEventTriggerOperationTest {
     private static final String CASE_TYPE_ID = "Grant";
     private static final Boolean IGNORE = Boolean.TRUE;
     private static final String TOKEN = "testToken";
-    private final DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withEventTriggerId(EVENT_TRIGGER_ID).build()).build();
+    private final DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withEventId(EVENT_TRIGGER_ID).build()).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
-    private final CaseEvent caseEvent = new CaseEvent();
-    private final List<CaseEventField> eventFields = Lists.newArrayList();
-    private final StartEventTrigger startEventTrigger = newStartEventTrigger().withEventToken(TOKEN).withCaseDetails(caseDetails).build();
-    private final CaseEventTrigger caseEventTrigger = newCaseEventTrigger().build();
+    private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+    private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
+    private final StartEventResult startEventResult = newStartEventTrigger().withEventToken(TOKEN).withCaseDetails(caseDetails).build();
+    private final CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent().build();
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -73,7 +74,7 @@ class DefaultGetEventTriggerOperationTest {
     private DraftGateway draftGateway;
 
     @Mock
-    private CaseEventTriggerBuilder caseEventTriggerBuilder;
+    private CaseUpdateViewEventBuilder caseUpdateViewEventBuilder;
 
     private DefaultGetEventTriggerOperation defaultGetEventTriggerOperation;
 
@@ -86,31 +87,31 @@ class DefaultGetEventTriggerOperationTest {
             uidService,
             startEventOperation,
             draftGateway,
-            caseEventTriggerBuilder);
+            caseUpdateViewEventBuilder);
 
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                          EVENT_TRIGGER_ID,
-                                                         IGNORE)).thenReturn(startEventTrigger);
+                                                         IGNORE)).thenReturn(startEventResult);
         when(startEventOperation.triggerStartForCase(CASE_REFERENCE,
                                                      EVENT_TRIGGER_ID,
-                                                     IGNORE)).thenReturn(startEventTrigger);
+                                                     IGNORE)).thenReturn(startEventResult);
         when(startEventOperation.triggerStartForDraft(DRAFT_ID,
-                                                      IGNORE)).thenReturn(startEventTrigger);
-        when(caseEventTriggerBuilder.build(startEventTrigger,
+                                                      IGNORE)).thenReturn(startEventResult);
+        when(caseUpdateViewEventBuilder.build(startEventResult,
                                            CASE_TYPE_ID,
                                            EVENT_TRIGGER_ID,
-                                           null)).thenReturn(caseEventTrigger);
-        when(caseEventTriggerBuilder.build(startEventTrigger,
+                                           null)).thenReturn(caseUpdateViewEvent);
+        when(caseUpdateViewEventBuilder.build(startEventResult,
                                            CASE_TYPE_ID,
                                            EVENT_TRIGGER_ID,
-                                           CASE_REFERENCE)).thenReturn(caseEventTrigger);
-        when(caseEventTriggerBuilder.build(startEventTrigger,
+                                           CASE_REFERENCE)).thenReturn(caseUpdateViewEvent);
+        when(caseUpdateViewEventBuilder.build(startEventResult,
                                            CASE_TYPE_ID,
                                            EVENT_TRIGGER_ID,
-                                           DRAFT_ID)).thenReturn(caseEventTrigger);
+                                           DRAFT_ID)).thenReturn(caseUpdateViewEvent);
     }
 
     @Nested
@@ -120,16 +121,16 @@ class DefaultGetEventTriggerOperationTest {
         @Test
         @DisplayName("should get trigger with all data set")
         void shouldGetTriggerWithAllDataSet() {
-            CaseEventTrigger result = defaultGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
+            CaseUpdateViewEvent result = defaultGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                                                                                          EVENT_TRIGGER_ID,
                                                                                          IGNORE);
             InOrder inOrder = inOrder(startEventOperation,
-                                      caseEventTriggerBuilder);
+                caseUpdateViewEventBuilder);
 
             assertAll(
-                () -> assertThat(result, sameInstance(caseEventTrigger)),
+                () -> assertThat(result, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE),
-                () -> inOrder.verify(caseEventTriggerBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, null)
+                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventResult, CASE_TYPE_ID, EVENT_TRIGGER_ID, null)
             );
         }
     }
@@ -166,28 +167,28 @@ class DefaultGetEventTriggerOperationTest {
         @Test
         @DisplayName("should get trigger with all data set")
         void shouldGetTriggerWithAllDataSet() {
-            caseEvent.setId(EVENT_TRIGGER_ID);
-            caseEvent.setName(EVENT_TRIGGER_NAME);
-            caseEvent.setDescription(EVENT_TRIGGER_DESCRIPTION);
-            caseEvent.setShowSummary(EVENT_TRIGGER_SHOW_SUMMARY);
-            caseEvent.setShowEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES);
+            caseEventDefinition.setId(EVENT_TRIGGER_ID);
+            caseEventDefinition.setName(EVENT_TRIGGER_NAME);
+            caseEventDefinition.setDescription(EVENT_TRIGGER_DESCRIPTION);
+            caseEventDefinition.setShowSummary(EVENT_TRIGGER_SHOW_SUMMARY);
+            caseEventDefinition.setShowEventNotes(EVENT_TRIGGER_SHOW_EVENT_NOTES);
 
-            caseEvent.setCaseFields(eventFields);
+            caseEventDefinition.setCaseFields(eventFields);
 
-            CaseEventTrigger result = defaultGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
+            CaseUpdateViewEvent result = defaultGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                      EVENT_TRIGGER_ID,
                                                                                      IGNORE);
 
             InOrder inOrder = inOrder(caseDetailsRepository,
                                       startEventOperation,
                                       uidService,
-                                      caseEventTriggerBuilder);
+                caseUpdateViewEventBuilder);
             assertAll(
-                () -> assertThat(result, sameInstance(caseEventTrigger)),
+                () -> assertThat(result, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(uidService).validateUID(CASE_REFERENCE),
                 () -> inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE),
                 () -> inOrder.verify(startEventOperation).triggerStartForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE),
-                () -> inOrder.verify(caseEventTriggerBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, CASE_REFERENCE),
+                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventResult, CASE_TYPE_ID, EVENT_TRIGGER_ID, CASE_REFERENCE),
                 () -> inOrder.verifyNoMoreInteractions()
             );
         }
@@ -225,19 +226,19 @@ class DefaultGetEventTriggerOperationTest {
         @Test
         @DisplayName("should get trigger")
         void shouldGetTrigger() {
-            CaseEventTrigger result = defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
+            CaseUpdateViewEvent result = defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
                                                                                       IGNORE);
 
             InOrder inOrder = inOrder(draftGateway,
                                       startEventOperation,
                                       uidService,
-                                      caseEventTriggerBuilder);
+                caseUpdateViewEventBuilder);
 
             assertAll(
-                () -> assertThat(result, sameInstance(caseEventTrigger)),
+                () -> assertThat(result, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(draftGateway).getCaseDetails(Draft.stripId(DRAFT_ID)),
                 () -> inOrder.verify(startEventOperation).triggerStartForDraft(DRAFT_ID, IGNORE),
-                () -> inOrder.verify(caseEventTriggerBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, DRAFT_ID)
+                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventResult, CASE_TYPE_ID, EVENT_TRIGGER_ID, DRAFT_ID)
             );
         }
     }

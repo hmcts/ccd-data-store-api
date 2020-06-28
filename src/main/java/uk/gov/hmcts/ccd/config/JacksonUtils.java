@@ -11,7 +11,11 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.util.HashMap;
 
 
-public class JacksonUtils {
+public final class JacksonUtils {
+
+    private JacksonUtils(){
+
+    }
 
     public static final JsonFactory jsonFactory = JsonFactory.builder()
         // Change per-factory setting to prevent use of `String.intern()` on symbols

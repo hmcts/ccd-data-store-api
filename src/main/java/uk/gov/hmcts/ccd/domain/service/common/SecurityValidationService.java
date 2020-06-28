@@ -95,8 +95,8 @@ public class SecurityValidationService {
     }
 
     private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
-        return defaultDataClassification != null && callbackDataClassification != null &&
-            defaultDataClassification.size() == callbackDataClassification.size();
+        return defaultDataClassification != null && callbackDataClassification != null
+            && defaultDataClassification.size() == callbackDataClassification.size();
     }
 
 

@@ -32,8 +32,8 @@ public class FieldProcessorService {
     }
 
     public List<CaseViewField> processCaseViewFields(final List<CaseViewField> fields,
-                                                     final CaseType caseType,
-                                                     final CaseEvent event) {
+                                                     final CaseTypeDefinition caseType,
+                                                     final CaseEventDefinition event) {
         return fields.stream()
             .map(field -> processCaseViewField(field, getWizardPageFields(caseType.getId(), event.getId())))
             .collect(Collectors.toList());
@@ -47,20 +47,29 @@ public class FieldProcessorService {
         return result;
     }
 
+    private CaseViewField processCaseViewField(final CaseViewField field,
+                                               final List<WizardPageField> wizardPageFields) {
+        CaseViewField result = field;
+        for (CaseViewFieldProcessor processor : caseViewFieldProcessors) {
+            result = processor.execute(result, wizardPageField(wizardPageFields, field.getId()));
+        }
+        return result;
+    }
+
     public Map<String, JsonNode> processData(final Map<String, JsonNode> data,
-                                             final CaseType caseType,
-                                             final CaseEvent event) {
+                                             final CaseTypeDefinition caseTypeDefinition,
+                                             final CaseEventDefinition caseEventDefinition) {
         if (MapUtils.isEmpty(data)) {
             return data;
         }
 
-        final List<WizardPageField> wizardPageFields = getWizardPageFields(caseType.getId(), event.getId());
+        final List<WizardPageField> wizardPageFields = getWizardPageFields(caseTypeDefinition.getId(), caseEventDefinition.getId());
 
         Map<String, JsonNode> processedData = new HashMap<>();
 
         data.entrySet().stream().forEach(entry -> {
-            final Optional<CaseField> caseField = caseType.getCaseField(entry.getKey());
-            final Optional<CaseEventField> caseEventField = event.getCaseEventField(entry.getKey());
+            final Optional<CaseFieldDefinition> caseField = caseTypeDefinition.getCaseField(entry.getKey());
+            final Optional<CaseEventFieldDefinition> caseEventField = caseEventDefinition.getCaseEventField(entry.getKey());
 
             JsonNode result = entry.getValue();
             if (!isNullOrEmpty(result) && caseField.isPresent() && caseEventField.isPresent()) {
@@ -76,18 +85,9 @@ public class FieldProcessorService {
     }
 
     public Map<String, JsonNode> processData(final Map<String, JsonNode> data,
-                                             final CaseType caseType,
+                                             final CaseTypeDefinition caseTypeDefinition,
                                              final String eventId) {
-        return processData(data, caseType, eventTriggerService.findCaseEvent(caseType, eventId));
-    }
-
-    private CaseViewField processCaseViewField(final CaseViewField field,
-                                               final List<WizardPageField> wizardPageFields) {
-        CaseViewField result = field;
-        for (CaseViewFieldProcessor processor : caseViewFieldProcessors) {
-            result = processor.execute(result, wizardPageField(wizardPageFields, field.getId()));
-        }
-        return result;
+        return processData(data, caseTypeDefinition, eventTriggerService.findCaseEvent(caseTypeDefinition, eventId));
     }
 
     private List<WizardPageField> getWizardPageFields(String caseTypeId, String eventId) {

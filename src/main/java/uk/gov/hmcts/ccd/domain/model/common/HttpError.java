@@ -28,13 +28,13 @@ public class HttpError<T extends Serializable> implements Serializable {
 
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
-        this.status = getStatus(responseStatus);
+        this.status = getStatusFromResponseStatus(responseStatus);
         this.error = getErrorReason(responseStatus);
         this.message = exception.getMessage();
         this.path = request.getRequestURI();
     }
 
-    private Integer getStatus(ResponseStatus responseStatus) {
+    private Integer getStatusFromResponseStatus(ResponseStatus responseStatus) {
         if (null != responseStatus) {
             final HttpStatus httpStatus = getHttpStatus(responseStatus);
             if (null != httpStatus) {

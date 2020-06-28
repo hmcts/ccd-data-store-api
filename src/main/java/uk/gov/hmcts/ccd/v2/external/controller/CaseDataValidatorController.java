@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 
 @RestController
 @RequestMapping(path = "/case-types")
@@ -53,7 +53,7 @@ public class CaseDataValidatorController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UICaseViewResource.class
+            response = CaseViewResource.class
         ),
         @ApiResponse(
             code = 404,

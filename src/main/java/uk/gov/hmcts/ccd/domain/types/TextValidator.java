@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,7 +22,7 @@ public class TextValidator implements BaseTypeValidator {
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
-                                           final CaseField caseFieldDefinition) {
+                                           final CaseFieldDefinition caseFieldDefinition) {
 
         // Empty text should still check against MIN - MIN may or may not be 0
         if (isNullOrEmpty(dataValue)) {
@@ -36,15 +36,19 @@ public class TextValidator implements BaseTypeValidator {
 
         final String value = dataValue.textValue();
 
-        if (!checkMax(caseFieldDefinition.getFieldType().getMax(), value)) {
-            return Collections.singletonList(new ValidationResult(value + " exceed maximum length " + caseFieldDefinition.getFieldType().getMax(), dataFieldId));
+        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
+            return Collections.singletonList(
+                new ValidationResult(value + " exceed maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
+            );
         }
 
-        if (!checkMin(caseFieldDefinition.getFieldType().getMin(), value)) {
-            return Collections.singletonList(new ValidationResult(value + " require minimum length " + caseFieldDefinition.getFieldType().getMin(), dataFieldId));
+        if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
+            return Collections.singletonList(
+                new ValidationResult(value + " require minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId)
+            );
         }
 
-        if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), value)) {
+        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
 

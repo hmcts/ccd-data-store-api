@@ -1,0 +1,27 @@
+{
+	"_guid_": "F-103_Case_Role_Assign_Base",
+	"method": "PUT",
+	"productName": "CCD Data Store",
+	"operationName": "Grant access to a case",
+	"uri": "/cases/{case_id}/users/{user_id}",
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.caa@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_CAA_PWD]]"
+		}
+	},
+	"request": {
+		"_extends_": "Common_Request",
+		"body": {
+			"case_roles": [
+				"[DEFENDANT]"
+			]
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_204_Response",
+		"headers": {
+			"Content-Type": "[[ANY_STRING_NULLABLE]]"
+		}
+	}
+}

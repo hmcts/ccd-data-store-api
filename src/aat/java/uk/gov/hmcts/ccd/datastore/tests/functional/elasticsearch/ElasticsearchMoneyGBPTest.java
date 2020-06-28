@@ -23,29 +23,28 @@ public class ElasticsearchMoneyGBPTest extends ElasticsearchBaseTest {
         assertElasticsearchEnabled();
     }
 
+    @Nested
+    @DisplayName("Tests to verify cases on Money GBP Field")
+    class DateTimeField {
 
-        @Nested
-        @DisplayName("Tests to verify cases on Money GBP Field")
-        class DateTimeField {
-
-            @Test
-            @DisplayName("should return case for exact match on a Money GBP field")
-            void shouldReturnCaseForExactMatchOnDateTimeField() {
-                searchCaseForExactMatchAndVerifyResponse("MoneyGBPField", MONEY_GBP);
-            }
+        @Test
+        @DisplayName("should return case for exact match on a Money GBP field")
+        void shouldReturnCaseForExactMatchOnDateTimeField() {
+            searchCaseForExactMatchAndVerifyResponse("MoneyGBPField", MONEY_GBP);
         }
-
-        private void searchCaseForExactMatchAndVerifyResponse(String field, String value) {
-            String jsonSearchRequest = ElasticsearchSearchRequest.exactMatch(CASE_DATA_FIELD_PREFIX + field, value);
-
-            ValidatableResponse response = searchCase(asPrivateCaseworker(false), jsonSearchRequest);
-
-            assertSingleCaseReturned(response);
-            assertField(response, RESPONSE_CASE_DATA_FIELDS_PREFIX + field, value);
-            assertField(response, CASE_ID, testData.get(EXACT_MATCH_TEST_REFERENCE));
-        }
-
     }
+
+    private void searchCaseForExactMatchAndVerifyResponse(String field, String value) {
+        String jsonSearchRequest = ElasticsearchSearchRequest.exactMatch(CASE_DATA_FIELD_PREFIX + field, value);
+
+        ValidatableResponse response = searchCase(asPrivateCaseworker(false), jsonSearchRequest);
+
+        assertSingleCaseReturned(response);
+        assertField(response, RESPONSE_CASE_DATA_FIELDS_PREFIX + field, value);
+        assertField(response, CASE_ID, testData.get(EXACT_MATCH_TEST_REFERENCE));
+    }
+
+}
 
 
 
