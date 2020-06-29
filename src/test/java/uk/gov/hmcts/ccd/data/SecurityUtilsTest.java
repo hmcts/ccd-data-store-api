@@ -138,12 +138,6 @@ class SecurityUtilsTest {
         assertThat(result, is(serviceName));
     }
 
-    @Test
-    @DisplayName("Get service name")
-    void shouldGetServiceName() {
-        assertThat(securityUtils.getServiceName(), is("ccd_gateway"));
-    }
-
     private void assertHeader(HttpHeaders headers, String name, String value) {
         assertThat(headers.get(name), hasSize(1));
         assertThat(headers.get(name).get(0), equalTo(value));
