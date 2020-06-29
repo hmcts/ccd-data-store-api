@@ -8,8 +8,6 @@ java:
         - data-store-api-draftStoreEncryptionSecret
         - data-store-api-draft-key
         - ccd-data-s2s-secret
-        - ccd-ELASTIC-SEARCH-URL
-        - ccd-ELASTIC-SEARCH-DATA-NODES-URL
         - ccd-ELASTIC-SEARCH-PASSWORD
   environment:
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
