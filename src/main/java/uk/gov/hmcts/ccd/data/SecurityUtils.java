@@ -23,6 +23,7 @@ public class SecurityUtils {
 
     private static final String AUD_CLAIM = "aud";
     private static final String BEARER = "Bearer ";
+
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
 
@@ -68,7 +69,11 @@ public class SecurityUtils {
     }
 
     private String getUserBearerToken() {
+<<<<<<< HEAD
         return BEARER + getUserToken();
+=======
+        return "Bearer " + getUserToken();
+>>>>>>> refs/heads/master
     }
 
     public String getUserRolesHeader() {
@@ -83,6 +88,7 @@ public class SecurityUtils {
         List<String> claims = jwt.getClaimAsStringList(AUD_CLAIM);
         return CollectionUtils.isNotEmpty(claims) ? claims.get(0) : null;
     }
+<<<<<<< HEAD
 
     public String getServiceNameFromS2SToken(String serviceAuthenticationToken) {
         // NB: this grabs the servce name straight from the token under the assumption
@@ -97,4 +103,6 @@ public class SecurityUtils {
             return token.substring(BEARER.length());
         }
     }
+=======
+>>>>>>> refs/heads/master
 }

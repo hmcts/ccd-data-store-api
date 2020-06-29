@@ -1,11 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
+<<<<<<< HEAD
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+=======
+import java.util.Map;
+>>>>>>> refs/heads/master
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -51,7 +55,6 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         }
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, content.getEventId()));
         caseTypeService.validateData(content.getData(), caseTypeDefinition);
-
         validateOrganisationPolicy(caseTypeId, content);
         return content.getData();
     }

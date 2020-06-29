@@ -1,32 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Maps;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Version;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -42,6 +15,35 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Maps;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 class DefaultValidateCaseFieldsOperationTest {
 
