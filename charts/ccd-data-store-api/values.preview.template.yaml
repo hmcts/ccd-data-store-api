@@ -33,6 +33,7 @@ elastic:
 
 elasticsearch:
   clusterName: "elasticsearch"
+  imageTag: "6.4.2"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
