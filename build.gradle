@@ -78,7 +78,7 @@ dependencyCheck {
         // Disable scanning of .NET related binaries
         assemblyEnabled = false
     }
-    // These are non-runtime configurations used during the build.
+    // These are non-runtime configurations used during the build
     skipConfigurations = ['codacy', 'spotbugs', 'checkstyle']
 }
 
