@@ -123,7 +123,7 @@ public class SearchQueryOperationTest {
                                                         getCaseTypeOperation,
                                                         getDraftsOperation, searchResultDefinitionService, userRepository,
                                                         searchInputProcessor);
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
@@ -242,7 +242,7 @@ public class SearchQueryOperationTest {
     @Test
     @DisplayName("should get workBasketResult and pass to mergeDataToSearchResultOperation")
     public void shouldGetWorkBasketResultAndMerge() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
              .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
              .build();
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
@@ -258,7 +258,7 @@ public class SearchQueryOperationTest {
     @Test
     @DisplayName("should get searchResult and pass to mergeDataToSearchResultOperation")
     public void shouldGetSearchResultsAndMerge() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(SEARCH), any());
@@ -276,7 +276,7 @@ public class SearchQueryOperationTest {
     public void shouldBuildSortOrderFieldsFromSortResultsFieldsOnly() {
         SearchResultField nonSortField = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", "");
         SearchResultField sortField = buildSortResultField(CASE_FIELD_2, "", null, ASC, 1);
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(nonSortField, sortField)
             .build();
 
@@ -295,7 +295,7 @@ public class SearchQueryOperationTest {
     public void shouldBuildSortOrderFieldsInTheOrderOfPriority() {
         SearchResultField sortField1 = buildSortResultField(CASE_FIELD_ID_1_1, "", null, ASC, 2);
         SearchResultField sortField2 = buildSortResultField(CASE_FIELD_ID_1_2, "", null, DESC, 1);
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(sortField1, sortField2)
             .build();
 
@@ -315,7 +315,7 @@ public class SearchQueryOperationTest {
     public void shouldFilterSortOrderFieldsBasedOnUserRole() {
         SearchResultField sortField1 = buildSortResultField(CASE_FIELD_ID_1_1, "", USER_ROLE_1, ASC, 2);
         SearchResultField sortField2 = buildSortResultField(CASE_FIELD_ID_1_2, CASE_FIELD_PATH, USER_ROLE_2, DESC, 1);
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(sortField1, sortField2)
             .build();
 

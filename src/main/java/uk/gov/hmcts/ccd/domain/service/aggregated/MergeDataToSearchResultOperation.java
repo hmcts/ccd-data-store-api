@@ -7,11 +7,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
@@ -44,7 +41,7 @@ public class MergeDataToSearchResultOperation {
     }
 
     public SearchResultView execute(final CaseTypeDefinition caseTypeDefinition,
-                                    final SearchResult searchResult,
+                                    final SearchResultDefinition searchResult,
                                     final List<CaseDetails> caseDetails,
                                     final String resultError) {
 
@@ -62,7 +59,7 @@ public class MergeDataToSearchResultOperation {
     }
 
     private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseTypeDefinition caseTypeDefinition,
-                                                                    SearchResult searchResult) {
+                                                                    SearchResultDefinition searchResult) {
         final HashSet<String> addedFields = new HashSet<>();
 
         return Arrays.stream(searchResult.getFields())
@@ -116,7 +113,7 @@ public class MergeDataToSearchResultOperation {
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
                                                            final CaseTypeDefinition caseTypeDefinition,
-                                                           final SearchResult searchResult) {
+                                                           final SearchResultDefinition searchResult) {
         Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
         Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
         Map<String, TextNode> labels = caseTypeDefinition.getLabelsFromCaseFields();
@@ -126,7 +123,7 @@ public class MergeDataToSearchResultOperation {
         return new SearchResultViewItem(caseId, caseFields, new HashMap<>(caseFields));
     }
 
-    private Map<String, Object> prepareData(SearchResult searchResult,
+    private Map<String, Object> prepareData(SearchResultDefinition searchResult,
                                             Map<String, JsonNode> caseData,
                                             Map<String, Object> metadata,
                                             Map<String, TextNode> labels) {

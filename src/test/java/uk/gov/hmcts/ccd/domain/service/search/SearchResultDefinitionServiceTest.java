@@ -70,12 +70,12 @@ class SearchResultDefinitionServiceTest {
 
     @Test
     void shouldGetSearchResultDefinitionForWorkbasket() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "", ""))
             .build();
         when(uiDefinitionRepository.getWorkBasketResult(CASE_TYPE_ID)).thenReturn(searchResult);
 
-        SearchResult result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, WORKBASKET, Collections.emptyList());
+        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, WORKBASKET, Collections.emptyList());
 
         verify(uiDefinitionRepository).getWorkBasketResult(eq(CASE_TYPE_ID));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -86,12 +86,12 @@ class SearchResultDefinitionServiceTest {
 
     @Test
     void shouldGetSearchResultDefinitionForSearch() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "", ""))
             .build();
         when(uiDefinitionRepository.getSearchResult(CASE_TYPE_ID)).thenReturn(searchResult);
 
-        SearchResult result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, SEARCH, Collections.emptyList());
+        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, SEARCH, Collections.emptyList());
 
         verify(uiDefinitionRepository).getSearchResult(eq(CASE_TYPE_ID));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -102,12 +102,12 @@ class SearchResultDefinitionServiceTest {
 
     @Test
     void shouldGetSearchResultDefinitionForOrgCases() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "", ""))
             .build();
         when(uiDefinitionRepository.getSearchCasesResult(CASE_TYPE_ID, ORG_CASES)).thenReturn(searchResult);
 
-        SearchResult result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, ORG_CASES, Collections.emptyList());
+        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, ORG_CASES, Collections.emptyList());
 
         verify(uiDefinitionRepository).getSearchCasesResult(eq(CASE_TYPE_ID), eq(ORG_CASES));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -123,7 +123,7 @@ class SearchResultDefinitionServiceTest {
             .withField(CASE_FIELD_1_1)
             .build();
 
-        SearchResult result = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, "", Collections.emptyList());
+        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, "", Collections.emptyList());
 
         verifyNoMoreInteractions(uiDefinitionRepository);
         assertAll(
@@ -137,7 +137,7 @@ class SearchResultDefinitionServiceTest {
 
     @Test
     void shouldGetSearchResultDefinitionForDefaultUseCaseWithRequestedFields() {
-        SearchResult result = searchResultDefinitionService
+        SearchResultDefinition result = searchResultDefinitionService
             .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, CASE_FIELD_ID_1_3 + "." + CASE_FIELD_ID_1_3_NESTED));
 
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -158,7 +158,7 @@ class SearchResultDefinitionServiceTest {
 
     @Test
     void shouldIgnoreRequestedFieldsThatDoNotExist() {
-        SearchResult result = searchResultDefinitionService
+        SearchResultDefinition result = searchResultDefinitionService
             .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, "INVALID"));
 
         verifyNoMoreInteractions(uiDefinitionRepository);

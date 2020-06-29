@@ -17,8 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
-import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
-import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
+import uk.gov.hmcts.ccd.domain.service.search.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -100,6 +99,8 @@ class CaseSearchResultViewGeneratorTest {
     @Mock
     private SecurityClassificationService securityClassificationService;
 
+
+    private CaseSearchesViewAccessControl caseSearchesViewAccessControl;
     @Mock
     private SearchResultProcessor searchResultProcessor;
 
@@ -112,6 +113,8 @@ class CaseSearchResultViewGeneratorTest {
     @BeforeEach
     void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
+        caseSearchesViewAccessControl = new CaseSearchesViewAccessControl(userRepository,
+            caseTypeService, searchResultDefinitionService, securityClassificationService);
 
         dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3, CASE_FIELD_4, CASE_FIELD_5);
         ObjectNode familyDetails = (ObjectNode) new ObjectMapper().readTree(FAMILY_DETAILS_VALUE);
@@ -246,26 +249,26 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition1);
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_2))).thenReturn(caseTypeDefinition2);
 
-        SearchResult caseType1SearchResult = searchResult()
+        SearchResultDefinition caseType1SearchResult = searchResult()
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
-        SearchResult caseType2SearchResult = searchResult()
+        SearchResultDefinition caseType2SearchResult = searchResult()
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_2, CASE_FIELD_4, "", CASE_FIELD_4, "", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
         doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(any(), any());
+        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         classUnderTest = new CaseSearchResultViewGenerator(userRepository,
-            caseTypeService, searchResultDefinitionService, searchResultProcessor, securityClassificationService);
+            caseTypeService, searchResultDefinitionService, searchResultProcessor, caseSearchesViewAccessControl);
     }
 
     @Test
     void shouldBuildCaseSearchResultHeaders() {
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -334,7 +337,7 @@ class CaseSearchResultViewGeneratorTest {
         searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
         SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_5, "", CASE_FIELD_5, "", "");
         searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_2, "", CASE_FIELD_2, "", ""),
@@ -344,7 +347,6 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1));
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, "ORGCASES", Collections.emptyList());
 
@@ -381,7 +383,7 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldBuildHeaderFieldsWithComplexFields() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
                 buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME, "", ""),
@@ -389,7 +391,6 @@ class CaseSearchResultViewGeneratorTest {
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -435,7 +436,7 @@ class CaseSearchResultViewGeneratorTest {
         searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
         SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_5, "", CASE_FIELD_5, "", "");
         searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_2, "", CASE_FIELD_2, "", ""),
@@ -445,7 +446,6 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1));
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -465,7 +465,7 @@ class CaseSearchResultViewGeneratorTest {
         searchResultFieldWithValidRole2.setRole(ROLE_IN_USER_ROLE_2);
         SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_5, "", CASE_FIELD_5, "", "");
         searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
@@ -504,7 +504,6 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -525,7 +524,7 @@ class CaseSearchResultViewGeneratorTest {
             buildSearchResultField(CASE_TYPE_ID_1, FAMILY_DETAILS, FAMILY_DETAILS_PATH_NESTED, FAMILY_DETAILS, "", "");
         searchResultFieldWithValidRoleNested.setRole(ROLE_IN_USER_ROLE_1);
 
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
                 searchResultFieldWithValidRole,
                 searchResultFieldWithValidRoleNested)
@@ -533,7 +532,6 @@ class CaseSearchResultViewGeneratorTest {
 
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -551,13 +549,12 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldInvokeSearchProcessorDCPIsProvided() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, "#DCP", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -566,7 +563,7 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldNotInvokeSearchProcessorWhenNoDCPProvided() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_1, "", CASE_FIELD_1, null, ""))
             .build();
@@ -579,14 +576,13 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldThrowBadRequestExceptionWhenNoNestedElementFoundForPath() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID_1,
                 FAMILY_DETAILS, "InvalidElement",
                 FAMILY_DETAILS, "", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
             () -> classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList()));
@@ -598,7 +594,7 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldNotNotReturnHeaderFieldsWhenNoNestedElementFoundForPath() {
-        SearchResult searchResult = searchResult()
+        SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID_1,
                 FAMILY_DETAILS, "InvalidElementPath",
                 FAMILY_DETAILS, "", ""))
@@ -611,7 +607,6 @@ class CaseSearchResultViewGeneratorTest {
             .withSecurityClassification(SecurityClassification.PUBLIC).build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeWithoutCaseFieldDefinition);
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1,
             caseSearchResult, WORKBASKET, Collections.emptyList());
@@ -626,7 +621,7 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldThrowBadSearchRequestExceptionWhenUseCaseDoesNotExist() {
-        SearchResult searchResult = searchResult().withSearchResultFields().build();
+        SearchResultDefinition searchResult = searchResult().withSearchResultFields().build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
         final BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->

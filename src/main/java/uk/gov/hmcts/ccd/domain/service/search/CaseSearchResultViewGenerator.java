@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.*;
 
@@ -29,18 +28,18 @@ public class CaseSearchResultViewGenerator {
     private final CaseTypeService caseTypeService;
     private final SearchResultDefinitionService searchResultDefinitionService;
     private final SearchResultProcessor searchResultProcessor;
-    private final SecurityClassificationService securityClassificationService;
+    private final CaseSearchesViewAccessControl caseSearchesViewAccessControl;
 
     public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                          CaseTypeService caseTypeService,
                                          SearchResultDefinitionService searchResultDefinitionService,
                                          SearchResultProcessor searchResultProcessor,
-                                         SecurityClassificationService securityClassificationService) {
+                                         CaseSearchesViewAccessControl caseSearchesViewAccessControl) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
         this.searchResultDefinitionService = searchResultDefinitionService;
         this.searchResultProcessor = searchResultProcessor;
-        this.securityClassificationService = securityClassificationService;
+        this.caseSearchesViewAccessControl = caseSearchesViewAccessControl;
     }
 
     public CaseSearchResultView execute(String caseTypeId,
@@ -62,6 +61,17 @@ public class CaseSearchResultViewGenerator {
         );
     }
 
+    public CaseDetails filterUnauthorisedFieldsByUseCaseAndUserRole(String useCase, CaseDetails caseDetails, String caseTypeId, List<String> requestedFields) {
+        CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
+        caseDetails.getData().entrySet().removeIf(
+            caseField -> {
+                Optional<CaseFieldDefinition> caseFieldDefinition = caseTypeDefinition.getCaseField(caseField.getKey());
+                return !caseSearchesViewAccessControl.filterResultsBySearchResultsDefinition(useCase, caseTypeId, requestedFields, caseField.getKey())
+                    || !caseSearchesViewAccessControl.filterFieldByAuthorisationAccessOnField(caseFieldDefinition.get());
+            });
+        return caseDetails;
+    }
+
     private boolean itemsRequireFormatting(List<SearchResultViewHeaderGroup> headerGroups) {
         return headerGroups.size() == 1
             && headerGroups.get(0).getFields().stream().anyMatch(field -> field.getDisplayContextParameter() != null);
@@ -69,70 +79,15 @@ public class CaseSearchResultViewGenerator {
 
     private List<SearchResultViewItem> buildItems(String useCase, CaseSearchResult caseSearchResult, String caseTypeId, List<String> requestedFields) {
         CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
-        SearchResult searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
+        SearchResultDefinition searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
 
         List<SearchResultViewItem> items = new ArrayList<>();
         caseSearchResult.getCases().forEach(caseDetails -> {
-            filterResultsByAuthorisationAndUserRole(useCase, caseDetails, caseTypeId, requestedFields);
+            filterUnauthorisedFieldsByUseCaseAndUserRole(useCase, caseDetails, caseTypeId, requestedFields);
             items.add(buildSearchResultViewItem(caseDetails, caseTypeDefinition, searchResultDefinition));
         });
         return items;
     }
-
-    private CaseDetails filterResultsByAuthorisationAndUserRole(String useCase, CaseDetails caseDetails, String caseTypeId, List<String> requestedFields) {
-        CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
-        caseDetails.getData().entrySet().removeIf(
-            caseField -> {
-                Optional<CaseFieldDefinition> caseFieldDefinition = caseTypeDefinition.getCaseField(caseField.getKey());
-                return !filterResultsBySearchResultsDefinition(useCase, caseTypeId, requestedFields, caseField.getKey())
-                    || !filterResultsByAuthorisationAccessOnField(caseFieldDefinition.get());
-            });
-        return caseDetails;
-    }
-
-
-    private Boolean filterResultsBySearchResultsDefinition(String useCase, String caseTypeId, List<String> requestedFields, String caseFieldId) {
-        Set<String> roles = userRepository.getUserRoles();
-        CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
-        SearchResult searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
-        HashMap<String, String> searchFields = getSearchResultDefinitionFieldUserRoleAndField(searchResultDefinition);
-
-        if (useCase != null) {
-            if (!searchFields.containsKey(caseFieldId)) {
-                return false;
-            }
-            String role = searchFields.get(caseFieldId);
-            if (role != null && !roles.contains(role)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private Boolean filterResultsByAuthorisationAccessOnField(CaseFieldDefinition caseFieldDefinition) {
-        if (!caseFieldDefinition.isMetadata()) {
-            return userRepository.getUserRoles().stream()
-                .anyMatch(role -> caseFieldDefinition.getAccessControlListByRole(role).map(AccessControlList::isRead).orElse(false));
-        }
-        return true;
-    }
-
-    private Boolean filterResultsBySecurityClassification(CaseFieldDefinition caseFieldDefinition,
-                                                          CaseTypeDefinition caseTypeDefinition) {
-        return securityClassificationService.userHasEnoughSecurityClassificationForField(caseTypeDefinition.getJurisdictionId(),
-            caseTypeDefinition,
-            caseFieldDefinition.getId());
-
-    }
-
-    private HashMap<String, String> getSearchResultDefinitionFieldUserRoleAndField(SearchResult searchResultDefinition) {
-        HashMap<String, String> fields = new HashMap<>();
-        for (SearchResultField srf : searchResultDefinition.getFields()) {
-            fields.put(srf.getCaseFieldId(), srf.getRole());
-        }
-        return fields;
-    }
-
 
     private List<SearchResultViewHeaderGroup> buildHeaders(String caseTypeId, String useCase, CaseSearchResult
         caseSearchResult, List<String> requestedFields) {
@@ -152,7 +107,7 @@ public class CaseSearchResultViewGenerator {
                                                     String caseTypeId,
                                                     CaseTypeDefinition caseType,
                                                     List<String> requestedFields) {
-        SearchResult searchResult = searchResultDefinitionService.getSearchResultDefinition(caseType, useCase, requestedFields);
+        SearchResultDefinition searchResult = searchResultDefinitionService.getSearchResultDefinition(caseType, useCase, requestedFields);
         if (searchResult.getFields().length == 0) {
             throw new BadSearchRequest(String.format("The provided use case '%s' is unsupported for case type '%s'.",
                 useCase, caseType.getId()));
@@ -166,7 +121,7 @@ public class CaseSearchResultViewGenerator {
     }
 
     private List<SearchResultViewHeader> buildSearchResultViewColumns(CaseTypeDefinition caseTypeDefinition,
-                                                                      SearchResult searchResult) {
+                                                                      SearchResultDefinition searchResult) {
         HashSet<String> addedFields = new HashSet<>();
 
         // Only one case type is currently supported so we can reuse the same definitions for building all items
@@ -174,8 +129,8 @@ public class CaseSearchResultViewGenerator {
             .flatMap(searchResultField -> caseTypeDefinition.getCaseFieldDefinitions().stream()
                 .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                 .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
-                .filter(caseField -> filterResultsByAuthorisationAccessOnField(caseField))
-                .filter(caseField -> filterResultsBySecurityClassification(caseField, caseTypeDefinition))
+                .filter(caseField -> caseSearchesViewAccessControl.filterFieldByAuthorisationAccessOnField(caseField))
+                .filter(caseField -> caseSearchesViewAccessControl.filterResultsBySecurityClassification(caseField, caseTypeDefinition))
                 .map(caseField -> buildSearchResultViewColumn(searchResultField, caseField))
             )
             .collect(toList());
@@ -222,7 +177,7 @@ public class CaseSearchResultViewGenerator {
 
     private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseDetails,
                                                            CaseTypeDefinition caseTypeDefinition,
-                                                           SearchResult searchResult) {
+                                                           SearchResultDefinition searchResult) {
         Map<String, Object> caseFields = prepareData(
             searchResult,
             caseDetails.getData(),
@@ -233,7 +188,7 @@ public class CaseSearchResultViewGenerator {
         return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields));
     }
 
-    private Map<String, Object> prepareData(SearchResult searchResult,
+    private Map<String, Object> prepareData(SearchResultDefinition searchResult,
                                             Map<String, JsonNode> caseData,
                                             Map<String, Object> metadata,
                                             Map<String, TextNode> labels) {
