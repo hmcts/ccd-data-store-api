@@ -1,27 +1,23 @@
 package uk.gov.hmcts.ccd;
 
-<<<<<<< HEAD
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
-=======
->>>>>>> refs/heads/master
-import com.google.common.collect.Lists;
+import static org.mockito.Mockito.when;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.Collection;
-<<<<<<< HEAD
 import java.util.Date;
-=======
->>>>>>> refs/heads/master
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.when;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.TextCodec;
 
 public class MockUtils {
 
