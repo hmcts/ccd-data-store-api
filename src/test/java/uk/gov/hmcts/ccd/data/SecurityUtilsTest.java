@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,7 @@ class SecurityUtilsTest {
 
         Jwt jwt =   Jwt.withTokenValue(USER_JWT)
             .claim("aClaim", "aClaim")
+            .claim("aud", Lists.newArrayList("ccd_gateway"))
             .header("aHeader", "aHeader")
             .build();
         Collection<? extends GrantedAuthority> authorityCollection = Stream.of("role1", "role2")

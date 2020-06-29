@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
+import com.google.common.collect.Lists;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -49,7 +50,7 @@ public class MockUtils {
 
         Jwt jwt =   Jwt.withTokenValue(jwtToken)
             .claim("aClaim", "aClaim")
-            .claim("aud", CCD_GW)
+            .claim("aud", Lists.newArrayList(CCD_GW))
             .header("aHeader", "aHeader")
             .build();
         when(authenticationMock.getPrincipal()).thenReturn(jwt);
