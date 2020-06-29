@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.data;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataProcessor;
 
@@ -10,10 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SupplementaryDataProcessorTest {
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void accessLeafNodes() {

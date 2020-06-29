@@ -297,6 +297,10 @@ public class CaseController {
             response = SupplementaryDataResource.class
         ),
         @ApiResponse(
+            code = 400,
+            message = V2.Error.CASE_ID_INVALID
+        ),
+        @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
         ),
