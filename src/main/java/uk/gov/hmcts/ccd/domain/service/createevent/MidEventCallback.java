@@ -16,8 +16,8 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -53,8 +53,8 @@ public class MidEventCallback {
                            String pageId) {
         if (!isBlank(pageId)) {
             Event event = content.getEvent();
-            final CaseType caseType = getCaseType(caseTypeId);
-            final CaseEvent caseEvent = getCaseEvent(event, caseType);
+            final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
+            final CaseEventDefinition caseEventDefinition = getCaseEvent(event, caseTypeDefinition);
 
             Optional<WizardPage> wizardPageOptional = uiDefinitionRepository
                 .getWizardPageCollection(caseTypeId, event.getEventId())
@@ -67,19 +67,19 @@ public class MidEventCallback {
                 CaseDetails caseDetailsBefore = null;
                 CaseDetails currentOrNewCaseDetails;
                 if (StringUtils.isNotEmpty(content.getCaseReference())) {
-                    CaseDetails caseDetails = caseService.getCaseDetails(caseType.getJurisdictionId(), content.getCaseReference());
+                    CaseDetails caseDetails = caseService.getCaseDetails(caseTypeDefinition.getJurisdictionId(), content.getCaseReference());
                     caseDetailsBefore = caseService.clone(caseDetails);
                     currentOrNewCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content,
                         caseDetails);
 
                 } else {
-                    currentOrNewCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
+                    currentOrNewCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(),
                         content.getEventData() == null ? content.getData() : content.getEventData());
                 }
 
                 CaseDetails caseDetailsFromMidEventCallback = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
-                    caseType,
-                    caseEvent,
+                    caseTypeDefinition,
+                        caseEventDefinition,
                     caseDetailsBefore,
                     currentOrNewCaseDetails,
                     content.getIgnoreWarning());
@@ -97,19 +97,19 @@ public class MidEventCallback {
         return objectNode;
     }
 
-    private CaseType getCaseType(String caseTypeId) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+    private CaseTypeDefinition getCaseType(String caseTypeId) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
-        return caseType;
+        return caseTypeDefinition;
     }
 
-    private CaseEvent getCaseEvent(Event event, CaseType caseType) {
-        final CaseEvent caseEvent = eventTriggerService.findCaseEvent(caseType, event.getEventId());
-        if (caseEvent == null) {
-            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseType.getId());
+    private CaseEventDefinition getCaseEvent(Event event, CaseTypeDefinition caseTypeDefinition) {
+        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
+        if (caseEventDefinition == null) {
+            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeDefinition.getId());
         }
-        return caseEvent;
+        return caseEventDefinition;
     }
 }

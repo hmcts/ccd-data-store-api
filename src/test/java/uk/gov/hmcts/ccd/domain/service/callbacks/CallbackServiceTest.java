@@ -14,12 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,14 +47,14 @@ class CallbackServiceTest {
     private SecurityContext securityContext;
 
     @Mock
-    private ServiceAndUserDetails principal;
+    private Jwt principal;
 
     @Captor
     private ArgumentCaptor<HttpEntity> argument;
 
     private CallbackService callbackService;
 
-    private CaseEvent caseEvent = new CaseEvent();
+    private CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
     private CaseDetails caseDetails = new CaseDetails();
     private CallbackResponse callbackResponse = new CallbackResponse();
 
@@ -63,7 +63,7 @@ class CallbackServiceTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseEvent.setId("TEST-EVENT");
+        caseEventDefinition.setId("TEST-EVENT");
 
         caseDetails.setState("test state");
         caseDetails.setCaseTypeId("test case type");
@@ -82,7 +82,7 @@ class CallbackServiceTest {
     @Test
     @DisplayName("Should set ignore warning flag in callback request if set by client")
     public void shouldSetIgnoreWarningsFlagInCallbackRequestIfSetByClient() throws Exception {
-        callbackService.send(URL, caseEvent, null, caseDetails, true);
+        callbackService.send(URL, caseEventDefinition, null, caseDetails, true);
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
         assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", is(true)));
@@ -91,7 +91,7 @@ class CallbackServiceTest {
     @Test
     @DisplayName("Should not set ignore warning flag in callback request if not set by client")
     public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNotSetByClient() throws Exception {
-        callbackService.send(URL, caseEvent, null, caseDetails, false);
+        callbackService.send(URL, caseEventDefinition, null, caseDetails, false);
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
         assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", is(false)));
@@ -100,7 +100,7 @@ class CallbackServiceTest {
     @Test
     @DisplayName("Should not set ignore warning flag in callback request if null set by client")
     public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNullSetByClient() throws Exception {
-        callbackService.send(URL, caseEvent, null, caseDetails, (Boolean)null);
+        callbackService.send(URL, caseEventDefinition, null, caseDetails, (Boolean)null);
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
         assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", nullValue()));

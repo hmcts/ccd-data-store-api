@@ -115,7 +115,7 @@ public abstract class CaseDetailsQueryBuilder<T> {
         metadata.getState().ifPresent(this::whereState);
         metadata.getCaseReference().ifPresent(this::whereReference);
         metadata.getCreatedDate().ifPresent(this::whereCreatedDate);
-        metadata.getLastModified().ifPresent(this::whereLastModified);
+        metadata.getLastModifiedDate().ifPresent(this::whereLastModified);
         metadata.getSecurityClassification().ifPresent(this::whereSecurityClassification);
 
         return this;

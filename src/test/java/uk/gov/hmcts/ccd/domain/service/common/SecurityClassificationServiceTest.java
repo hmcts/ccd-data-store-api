@@ -16,9 +16,9 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.io.IOException;
@@ -50,6 +50,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTE
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
+
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class SecurityClassificationServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -80,17 +82,17 @@ public class SecurityClassificationServiceTest {
     @Nested
     @DisplayName("Check security classification for a field")
     class CheckSecurityClassificationForField {
-        private final String CASE_TYPE_ONE = "CaseTypeOne";
-        private final String SC_PUBLIC = "PUBLIC";
-        private final String SC_RESTRICTED = "RESTRICTED";
-        private final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
-        private final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
-        private final CaseField CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
-        private final CaseField CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
-        private final CaseType testCaseType = newCaseType()
+        private static final String CASE_TYPE_ONE = "CaseTypeOne";
+        private static final String SC_PUBLIC = "PUBLIC";
+        private static final String SC_RESTRICTED = "RESTRICTED";
+        private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
+        private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
+        private final CaseFieldDefinition testCaseField11 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
+        private final CaseFieldDefinition testCaseField12 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
+        private final CaseTypeDefinition testCaseTypeDefinition = newCaseType()
             .withId(CASE_TYPE_ONE)
-            .withField(CASE_FIELD_1_1)
-            .withField(CASE_FIELD_1_2)
+            .withField(testCaseField11)
+            .withField(testCaseField12)
             .build();
 
         @Test
@@ -98,7 +100,7 @@ public class SecurityClassificationServiceTest {
         void userHasEnoughSecurityClassificationForField() {
             doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
             assertTrue(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-                testCaseType,
+                testCaseTypeDefinition,
                 CASE_FIELD_ID_1_1));
         }
 
@@ -107,14 +109,14 @@ public class SecurityClassificationServiceTest {
         void userDoesNotHaveEnoughSecurityClassificationForField() {
             doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
             assertFalse(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
-                testCaseType,
+                testCaseTypeDefinition,
                 CASE_FIELD_ID_1_2));
         }
     }
 
     @Nested
     @DisplayName("getUserClassification()")
-    class getUserClassification {
+    class GetUserClassification {
 
         @Test
         @DisplayName("should retrieve user classifications from user repository")
@@ -278,28 +280,28 @@ public class SecurityClassificationServiceTest {
 
     @Nested
     @DisplayName("getClassificationForEvent()")
-    class getSecurityClassificationForEvent {
+    class GetSecurityClassificationForEvent {
 
-        private final CaseType caseType = new CaseType();
+        private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
         @BeforeEach
         void setUp() throws IOException {
-            CaseEvent createEvent = new CaseEvent();
+            CaseEventDefinition createEvent = new CaseEventDefinition();
             createEvent.setId("createEvent");
             createEvent.setSecurityClassification(RESTRICTED);
-            CaseEvent updateEvent = new CaseEvent();
+            CaseEventDefinition updateEvent = new CaseEventDefinition();
             updateEvent.setId("updateEvent");
             updateEvent.setSecurityClassification(PRIVATE);
-            List<CaseEvent> events = Arrays.asList(createEvent, updateEvent);
-            caseType.setEvents(events);
+            List<CaseEventDefinition> events = Arrays.asList(createEvent, updateEvent);
+            caseTypeDefinition.setEvents(events);
         }
 
         @Test
         @DisplayName("should return classification relevant for event")
         void shouldGetClassificationForEvent() {
-            CaseEvent eventTrigger = new CaseEvent();
+            CaseEventDefinition eventTrigger = new CaseEventDefinition();
             eventTrigger.setId("createEvent");
-            SecurityClassification result = securityClassificationService.getClassificationForEvent(caseType,
+            SecurityClassification result = securityClassificationService.getClassificationForEvent(caseTypeDefinition,
                 eventTrigger);
 
             assertThat(result, is(equalTo(RESTRICTED)));
@@ -308,11 +310,11 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should fail to return fields when event not found")
         void shouldThrowRuntimeExceptionIfEventNotFound() {
-            CaseEvent eventTrigger = new CaseEvent();
-            eventTrigger.setId("unknown");
+            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+            caseEventDefinition.setId("unknown");
 
             assertThrows(RuntimeException.class, () ->
-                securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
+                securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition));
         }
     }
 
@@ -325,7 +327,8 @@ public class SecurityClassificationServiceTest {
         private static final String VALUE = "value";
         private static final String ID = "id";
         private CaseDetails caseDetails;
-        private final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+
+        private final JsonNodeFactory jsonNodeFactory = new JsonNodeFactory(false);
 
         @BeforeEach
         void setUp() throws IOException {
@@ -432,7 +435,7 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
+            assertThat(resultNode, is(equalTo(jsonNodeFactory.objectNode())));
         }
 
         @Test
@@ -498,7 +501,7 @@ public class SecurityClassificationServiceTest {
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
-                () -> assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())))
+                () -> assertThat(resultNode, is(equalTo(jsonNodeFactory.objectNode())))
             );
         }
 
@@ -534,7 +537,7 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
+            assertThat(resultNode, is(equalTo(jsonNodeFactory.objectNode())));
         }
 
         @Test
@@ -641,7 +644,7 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
+            assertThat(resultNode, is(equalTo(jsonNodeFactory.objectNode())));
         }
 
         @Test
@@ -1273,9 +1276,9 @@ public class SecurityClassificationServiceTest {
             assertAll(
                 () -> assertThat(addresses.size(), equalTo(1)),
                 () -> assertThat(addresses.get(0).get(ID),
-                    is(equalTo(JSON_NODE_FACTORY.textNode(FIRST_CHILD_ID)))),
+                    is(equalTo(jsonNodeFactory.textNode(FIRST_CHILD_ID)))),
                 () -> assertThat(addresses.get(0).get(VALUE),
-                    equalTo(JSON_NODE_FACTORY.textNode("Address1")))
+                    equalTo(jsonNodeFactory.textNode("Address1")))
             );
         }
 
@@ -1491,7 +1494,7 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.nullNode())));
+            assertThat(resultNode, is(equalTo(jsonNodeFactory.nullNode())));
         }
 
         @Test
@@ -1510,7 +1513,7 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
+            assertThat(resultNode, is(equalTo(jsonNodeFactory.objectNode())));
         }
 
         @Test
@@ -1529,7 +1532,7 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
+            assertThat(resultNode, is(equalTo(jsonNodeFactory.objectNode())));
         }
 
         @Test
@@ -1548,7 +1551,7 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
-            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
+            assertThat(resultNode, is(equalTo(jsonNodeFactory.objectNode())));
         }
 
         @Test
@@ -1573,7 +1576,7 @@ public class SecurityClassificationServiceTest {
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Note1"), is(false)),
-                () -> assertThat(resultNode.get("Note2"), is(equalTo(JSON_NODE_FACTORY.numberNode(56))))
+                () -> assertThat(resultNode.get("Note2"), is(equalTo(jsonNodeFactory.numberNode(56))))
             );
         }
 
@@ -1599,7 +1602,7 @@ public class SecurityClassificationServiceTest {
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.has("Note1"), is(false)),
-                () -> assertThat(resultNode.get("Note2"), is(equalTo(JSON_NODE_FACTORY.booleanNode(false))))
+                () -> assertThat(resultNode.get("Note2"), is(equalTo(jsonNodeFactory.booleanNode(false))))
             );
         }
 
@@ -1634,11 +1637,11 @@ public class SecurityClassificationServiceTest {
             assertAll(
                 () -> assertThat(resultNode.has("Document1"), is(false)),
                 () -> assertThat(resultNode.get("Document2").get("document_url"),
-                    is(equalTo(JSON_NODE_FACTORY.textNode("https://em/doc2")))),
+                    is(equalTo(jsonNodeFactory.textNode("https://em/doc2")))),
                 () -> assertThat(resultNode.get("Document2").get("document_binary_url"),
-                    is(equalTo(JSON_NODE_FACTORY.textNode("https://em/doc2/bin.pdf")))),
+                    is(equalTo(jsonNodeFactory.textNode("https://em/doc2/bin.pdf")))),
                 () -> assertThat(resultNode.get("Document2").get("document_filename"),
-                    is(equalTo(JSON_NODE_FACTORY.textNode("Document 2"))))
+                    is(equalTo(jsonNodeFactory.textNode("Document 2"))))
             );
         }
     }

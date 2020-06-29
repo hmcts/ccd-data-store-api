@@ -14,8 +14,8 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.util.ArrayList;
@@ -92,20 +92,20 @@ public class SecurityClassificationService {
         return classifiedEvents;
     }
 
-    public SecurityClassification getClassificationForEvent(CaseType caseType, CaseEvent eventTrigger) {
-        return caseType
+    public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition, CaseEventDefinition caseEventDefinition) {
+        return caseTypeDefinition
             .getEvents()
             .stream()
-            .filter(e -> e.getId().equals(eventTrigger.getId()))
+            .filter(e -> e.getId().equals(caseEventDefinition.getId()))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("EventId %s not found", eventTrigger.getId())))
+            .orElseThrow(() -> new RuntimeException(String.format("EventId %s not found", caseEventDefinition.getId())))
             .getSecurityClassification();
     }
 
-    public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId, CaseType caseType, String fieldId) {
+    public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId, CaseTypeDefinition caseTypeDefinition, String fieldId) {
         final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
-        return userClassification.map(securityClassification -> securityClassification.higherOrEqualTo(
-            caseType.getClassificationForField(fieldId))).orElse(false);
+        return userClassification.map(securityClassification ->
+            securityClassification.higherOrEqualTo(caseTypeDefinition.getClassificationForField(fieldId))).orElse(false);
     }
 
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification, SecurityClassification userClassification) {
@@ -141,7 +141,8 @@ public class SecurityClassificationService {
 
     private void filterCollection(SecurityClassification userClassification,
                                   Iterator<Map.Entry<String, JsonNode>> dataIterator,
-                                  JsonNode dataClassificationElement, JsonNode dataElementValue) {
+                                  JsonNode dataClassificationElement,
+                                  JsonNode dataElementValue) {
         // Apply collection-level classification
         filterSimpleField(userClassification,
             dataIterator,
@@ -187,7 +188,8 @@ public class SecurityClassificationService {
 
     private void filterObject(SecurityClassification userClassification,
                               Iterator<Map.Entry<String, JsonNode>> dataIterator,
-                              JsonNode dataClassificationParent, JsonNode dataElementValue) {
+                              JsonNode dataClassificationParent,
+                              JsonNode dataElementValue) {
         filterNestedObject(dataElementValue,
             dataClassificationParent.get(VALUE),
             userClassification);

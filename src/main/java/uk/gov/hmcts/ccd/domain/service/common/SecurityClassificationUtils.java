@@ -36,8 +36,7 @@ public class SecurityClassificationUtils {
         SecurityClassification securityClassification;
         try {
             securityClassification = valueOf(dataNode.textValue());
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             LOG.error("Unable to parse security classification for {}", dataNode, e);
             return Optional.empty();
         }

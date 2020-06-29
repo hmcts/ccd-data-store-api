@@ -10,9 +10,9 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -41,50 +41,52 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
         return startEventOperation.triggerStartForCaseType(caseTypeId,
-                                                           eventTriggerId,
+                                                           eventId,
                                                            ignoreWarning);
     }
 
     @Override
-    public StartEventTrigger triggerStartForCase(String caseReference, String eventTriggerId, Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
         return applyClassificationIfCaseDetailsExist(startEventOperation.triggerStartForCase(caseReference,
-                                                                                             eventTriggerId,
+                                                                                             eventId,
                                                                                              ignoreWarning));
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String draftReference,
-                                                  Boolean ignoreWarning) {
+    public StartEventResult triggerStartForDraft(String draftReference,
+                                                 Boolean ignoreWarning) {
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         return applyClassificationIfCaseDetailsExist(deduceDefaultClassificationsForDraft(startEventOperation.triggerStartForDraft(draftReference,
                                                                                                                                    ignoreWarning),
                                                                                           caseDetails.getCaseTypeId()));
     }
 
-    private StartEventTrigger deduceDefaultClassificationsForDraft(StartEventTrigger startEventTrigger, String caseTypeId) {
-        CaseDetails caseDetails = startEventTrigger.getCaseDetails();
+    private StartEventResult deduceDefaultClassificationsForDraft(StartEventResult startEventResult, String caseTypeId) {
+        CaseDetails caseDetails = startEventResult.getCaseDetails();
         deduceDefaultClassificationIfCaseDetailsPresent(caseTypeId, caseDetails);
-        return startEventTrigger;
+        return startEventResult;
     }
 
     private void deduceDefaultClassificationIfCaseDetailsPresent(String caseTypeId, CaseDetails caseDetails) {
         if (null != caseDetails) {
-            final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-            if (caseType == null) {
+            final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+            if (caseTypeDefinition == null) {
                 throw new ValidationException("Cannot find case type definition for " + caseTypeId);
             }
-            caseDetails.setSecurityClassification(caseType.getSecurityClassification());
-            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
+            caseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
+            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
+                caseDetails.getData(),
+                EMPTY_DATA_CLASSIFICATION));
         }
     }
 
-    private StartEventTrigger applyClassificationIfCaseDetailsExist(StartEventTrigger startEventTrigger) {
-        CaseDetails caseDetails = startEventTrigger.getCaseDetails();
+    private StartEventResult applyClassificationIfCaseDetailsExist(StartEventResult startEventResult) {
+        CaseDetails caseDetails = startEventResult.getCaseDetails();
         if (null != caseDetails) {
-            startEventTrigger.setCaseDetails(classificationService.applyClassification(caseDetails).orElse(null));
+            startEventResult.setCaseDetails(classificationService.applyClassification(caseDetails).orElse(null));
         }
-        return startEventTrigger;
+        return startEventResult;
     }
 }

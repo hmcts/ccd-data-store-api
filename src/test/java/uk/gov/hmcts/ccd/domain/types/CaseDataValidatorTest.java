@@ -10,7 +10,7 @@ import org.junit.Test;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private static final String CASE_FIELD_JSON = "/tests/CaseDataValidator_CaseField.json";
@@ -29,10 +30,10 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
     @Inject
     private CaseDataValidator caseDataValidator;
-    private List<CaseField> caseFields;
+    private List<CaseFieldDefinition> caseFields;
 
     @BeforeClass
-    public static void setUpClass() throws IOException {
+    public static void setUpClass() {
         CASE_FIELDS_STRING = BaseTest.getResourceAsString(CASE_FIELD_JSON);
     }
 
@@ -142,14 +143,14 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     public void unknownType() throws Exception {
         final String unknownType =
             "[\n" +
-                "  {\n" +
-                "    \"id\": \"Person\",\n" +
-                "    \"field_type\": {\n" +
-                "      \"type\": \"Unknown\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "]\n";
-        final List<CaseField> caseFields = BaseTest.getCaseFieldsFromJson(unknownType);
+            "  {\n" +
+            "    \"id\": \"Person\",\n" +
+            "    \"field_type\": {\n" +
+            "      \"type\": \"Unknown\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "]\n";
+        final List<CaseFieldDefinition> caseFields = BaseTest.getCaseFieldsFromJson(unknownType);
         final String data =
             "{\n" +
                 "  \"Person\" : {\n" +
@@ -341,16 +342,17 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     public void textFieldWithMaxMin() throws Exception {
         final String caseFieldString =
             "[{\n" +
-                "  \"id\": \"PersonFirstName\",\n" +
-                "  \"case_type_id\": \"TestAddressBookCase\",\n" +
-                "  \"label\": \"First name\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"Text\",\n" +
-                "    \"max\": 100,\n" +
-                "    \"min\": 10\n" +
-                "  }\n" +
-                "}]";
-        final List<CaseField> caseFields = MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+            "  \"id\": \"PersonFirstName\",\n" +
+            "  \"case_type_id\": \"TestAddressBookCase\",\n" +
+            "  \"label\": \"First name\",\n" +
+            "  \"field_type\": {\n" +
+            "    \"type\": \"Text\",\n" +
+            "    \"max\": 100,\n" +
+            "    \"min\": 10\n" +
+            "  }\n" +
+            "}]";
+        final List<CaseFieldDefinition> caseFields =
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
@@ -359,28 +361,29 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     }
 
     /**
-     * This test is only meant to ensure that validators are invoked and not to test the TextValidator which has it own test
+     * This test is only meant to ensure that validators are invoked and not to test the TextValidator which has it own test.
      */
     public void textFieldWithInvalidMaxMin() throws Exception {
         final String caseFieldString =
             "[{\n" +
-                "  \"id\": \"PersonFirstName\",\n" +
-                "  \"case_type_id\": \"TestAddressBookCase\",\n" +
-                "  \"label\": \"First name\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"Text\",\n" +
-                "    \"max\": 10,\n" +
-                "    \"min\": 5\n" +
-                "  }\n" +
-                "}]";
-        final List<CaseField> caseFields = MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+            "  \"id\": \"PersonFirstName\",\n" +
+            "  \"case_type_id\": \"TestAddressBookCase\",\n" +
+            "  \"label\": \"First name\",\n" +
+            "  \"field_type\": {\n" +
+            "    \"type\": \"Text\",\n" +
+            "    \"max\": 10,\n" +
+            "    \"min\": 5\n" +
+            "  }\n" +
+            "}]";
+        final List<CaseFieldDefinition> caseFields =
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
 
-        final Map<String, JsonNode> invalidMaxVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}", new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        final Map<String, JsonNode> invalidMaxVal =
+            MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}", new TypeReference<HashMap<String, JsonNode>>() {});
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(invalidMaxVal, caseFields).size());
 
-        final Map<String, JsonNode> invalidMinVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test\"}", new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        final Map<String, JsonNode> invalidMinVal =
+            MAPPER.readValue("{\"PersonFirstName\" : \"Test\"}", new TypeReference<HashMap<String, JsonNode>>() {});
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(invalidMinVal, caseFields).size());
     }
 }

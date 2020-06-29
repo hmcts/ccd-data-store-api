@@ -22,12 +22,12 @@ public class FieldDataCriterion extends Criterion {
     private String convertFieldName(String field) {
         return Optional.of(field)
             .map(this::removeFieldNameFilterPrefix)
-            .map(this::convertFieldNameToJSONBsqlFormat)
+            .map(this::convertFieldNameToJsonbSqlFormat)
             .map(this::makeCaseInsensitive)
             .orElseThrow(() -> new IllegalArgumentException("Field not found"));
     }
 
-    private String convertFieldNameToJSONBsqlFormat(final String in) {
+    private String convertFieldNameToJsonbSqlFormat(final String in) {
         return DATA_FIELD + " #>> '{" + StringUtils.replace(in, ".", ",") + "}'";
     }
 

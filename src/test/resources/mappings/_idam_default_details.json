@@ -1,21 +1,45 @@
 {
-  "priority": 10,
-  "request": {
-    "method": "GET",
-    "url": "/idam/details"
-  },
-  "response": {
-    "status": 200,
-    "headers": {
-      "Content-Type": "application/json"
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "url": "/o/.well-known/openid-configuration"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "issuer": "http://localhost:{{request.requestLine.port}}/o",
+          "jwks_uri": "http://localhost:{{request.requestLine.port}}/jwks"
+        },
+        "transformers": ["response-template"]
+      }
     },
-    "jsonBody": {
-      "id": "123",
-      "email" : "Cloud.Strife@test.com",
-      "forename" : "Cloud",
-      "surname": "Strife",
-      "roles" : [ "caseworker", "caseworker-test" ],
-      "defaultService" : "ccd"
+    {
+      "request": {
+        "method": "GET",
+        "url": "/o/userinfo"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "sub": "Cloud.Strife@test.com",
+          "uid": "123",
+          "roles": [
+            "caseworker",
+            "caseworker-test",
+            "caseworker-PROBATE-public", "caseworker-PROBATE", "caseworker-DIVORCE", "caseworker-SSCS"
+          ],
+          "name": "Cloud Strife",
+          "given_name": "Cloud",
+          "family_name": "Strife"
+        }
+      }
     }
-  }
+  ]
 }

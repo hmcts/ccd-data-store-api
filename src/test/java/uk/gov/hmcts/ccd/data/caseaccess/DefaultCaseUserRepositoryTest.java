@@ -10,7 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,7 +18,7 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 import static org.mockito.Mockito.verify;
 
 @Transactional
-public class DefaultCaseUserRepositoryTest extends BaseTest {
+public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
 
     private static final String COUNT_CASE_USERS = "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
 
@@ -108,12 +108,12 @@ public class DefaultCaseUserRepositoryTest extends BaseTest {
     })
     public void shouldFindCaseRolesUserPerformsForCase() {
 
-        List<String> caseRoles = repository.findCaseRoles(CASE_ID , USER_ID);
+        List<String> caseRoles = repository.findCaseRoles(CASE_ID, USER_ID);
 
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_CREATOR));
 
-        caseRoles = repository.findCaseRoles(CASE_ID_GRANTED , USER_ID_GRANTED);
+        caseRoles = repository.findCaseRoles(CASE_ID_GRANTED, USER_ID_GRANTED);
 
         assertThat(caseRoles.size(), equalTo(2));
         assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
