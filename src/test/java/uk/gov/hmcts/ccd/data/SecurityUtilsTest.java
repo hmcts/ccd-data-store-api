@@ -101,6 +101,12 @@ class SecurityUtilsTest {
     void shouldReturnUserToken() {
         assertThat(securityUtils.getUserToken(), is(USER_JWT));
     }
+    
+    @Test
+    @DisplayName("Get service name")
+    void shouldGetServiceName() {
+        assertThat(securityUtils.getServiceName(), is("ccd_gateway"));
+    }
 
     @Test
     @DisplayName("Get service name from token supplied with bearer")
