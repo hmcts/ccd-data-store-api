@@ -2,11 +2,15 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import java.util.HashMap;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import java.util.Map;
 import javax.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.jdbc.Sql;
@@ -25,10 +29,14 @@ import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,6 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.v2.V2.EXPERIMENTAL_HEADER;
+import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_ID_INVALID;
+import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_NOT_FOUND;
+import static uk.gov.hmcts.ccd.v2.V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA;
 
 public class CaseControllerTestIT extends WireMockBaseTest {
 
@@ -47,6 +58,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
     private static final String REQUEST_ID = "request-id";
     private static final String REQUEST_ID_VALUE = "1234567898765432";
+    public static final String ROLE_PROBATE_SOLICITOR = "caseworker-probate-solicitor";
 
     @Inject
     private WebApplicationContext wac;
@@ -243,30 +255,139 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertNotNull("updated supplementary data resource", supplementaryDataResource);
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldIncrementSupplementaryData() throws Exception {
+        String caseId = "1504259907353529";
+        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataIncrementRequest();
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(supplementaryDataRequest))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
+        assertNotNull("updated supplementary data resource", supplementaryDataResource);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldCreateSupplementaryDataWhenNotExists() throws Exception {
+        String caseId = "1504259907353545";
+        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(supplementaryDataRequest))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
+        assertNotNull(supplementaryDataResource);
+        assertEquals(1, supplementaryDataResource.getSupplementaryData().getSupplementaryData().size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldThrowExceptionWhenCaseNotFound() throws Exception {
+        String caseId = "1504259907353586";
+        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+
+        final String message = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(supplementaryDataRequest))
+        ).andExpect(status().is(404))
+            .andReturn().getResolvedException().getMessage();
+
+        assertTrue(StringUtils.contains(message, CASE_NOT_FOUND));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldThrowExceptionWhenCaseIsNotValid() throws Exception {
+        String caseId = "12233";
+        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+
+        final String message = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(supplementaryDataRequest))
+        ).andExpect(status().is(400))
+            .andReturn().getResolvedException().getMessage();
+
+        assertTrue(StringUtils.contains(message, CASE_ID_INVALID));
+    }
+
+    @Nested
+    @DisplayName("GET /cases/{caseId}/supplementary-data")
+    private class UserRoleValidation {
+
+        @BeforeEach
+        public void setup() {
+            String userJson = "{\n"
+                + "          \"sub\": \"Cloud.Strife@test.com\",\n"
+                + "          \"uid\": \"1234\",\n"
+                + "          \"roles\": [\n"
+                + "            \"caseworker\",\n"
+                + "            \"caseworker-test\"\n"
+                + "          ],\n"
+                + "          \"name\": \"Cloud Strife\"\n"
+                + "        }";
+            stubFor(WireMock.get(urlMatching("/o/userinfo"))
+                .willReturn(okJson(userJson).withStatus(200)));
+        }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+        public void shouldThrowExceptionWhenSolicitorRoleWithNoCasesAssignedToTheUser() throws Exception {
+
+            MockUtils.setSecurityAuthorities(authentication, ROLE_PROBATE_SOLICITOR);
+            String caseId = "1504259907353545";
+            final String URL =  "/cases/" + caseId + "/supplementary-data";
+            SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+
+            final String message = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsString(supplementaryDataRequest))
+            ).andExpect(status().is(403))
+                .andReturn().getResolvedException().getMessage();
+
+            assertTrue(StringUtils.contains(message, NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA));
+        }
+    }
+
     private SupplementaryDataRequest createSupplementaryDataSetRequest() throws JsonProcessingException {
         String jsonRequest = "{\n"
-            + "\t\"orgs_assigned_users\": {\n"
-            + "\t\t\"organisationB\": 3\n"
+            + "\t\"$set\": {\n"
+            + "\t\t\"orgs_assigned_users\": {\n"
+            + "\t\t\t\"organisationA\": 10\n"
+            + "\t\t}\n"
             + "\t}\n"
             + "}";
 
-        Map<String, Object> requestData = mapper.readValue(jsonRequest, Map.class);
-        Map<String, Map<String, Object>> request = new HashMap<>();
-        request.put("$set", requestData);
-        return new SupplementaryDataRequest(request);
+        Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
+        return new SupplementaryDataRequest(requestData);
     }
 
     private SupplementaryDataRequest createSupplementaryDataIncrementRequest() throws JsonProcessingException {
         String jsonRequest = "{\n"
-            + "\t\"orgs_assigned_users\": {\n"
-            + "\t\t\"organisationB\": 3\n"
+            + "\t\"$inc\": {\n"
+            + "\t\t\"orgs_assigned_users\": {\n"
+            + "\t\t\t\"organisationA\": 3\n"
+            + "\t\t}\n"
             + "\t}\n"
             + "}";
 
-        Map<String, Object> requestData = mapper.readValue(jsonRequest, Map.class);
-        Map<String, Map<String, Object>> request = new HashMap<>();
-        request.put("$set", requestData);
-        return new SupplementaryDataRequest(request);
+        Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
+        return new SupplementaryDataRequest(requestData);
     }
 
 }

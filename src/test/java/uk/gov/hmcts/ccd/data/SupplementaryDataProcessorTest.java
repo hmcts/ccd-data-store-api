@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataProcessor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SupplementaryDataProcessorTest {
@@ -28,6 +30,8 @@ class SupplementaryDataProcessorTest {
         Map<String, Object> childChildMap = new HashMap<>();
         childChildMap.put("testcc1", "Test Value cc1");
         childChildMap.put("testcc2", "Test Value cc2");
+        childChildMap.put("testcc3", true);
+        childChildMap.put("testcc4", 44);
         childMap.put("childchild", childChildMap);
 
         Map<String, Object> leafNodes = new SupplementaryDataProcessor().accessLeafNodes(rootMap);
@@ -37,7 +41,13 @@ class SupplementaryDataProcessorTest {
         assertTrue(leafNodes.containsKey("child1,testc1"));
         assertTrue(leafNodes.containsKey("child1,testc2"));
         assertTrue(leafNodes.containsKey("child1,childchild,testcc1"));
+        assertEquals("Test Value cc1", leafNodes.get("child1,childchild,testcc1"));
         assertTrue(leafNodes.containsKey("child1,childchild,testcc2"));
+        assertEquals("Test Value cc2", leafNodes.get("child1,childchild,testcc2"));
+        assertTrue(leafNodes.containsKey("child1,childchild,testcc3"));
+        assertEquals(true, leafNodes.get("child1,childchild,testcc3"));
+        assertTrue(leafNodes.containsKey("child1,childchild,testcc4"));
+        assertEquals(44, leafNodes.get("child1,childchild,testcc4"));
     }
 
     @Test

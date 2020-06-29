@@ -1,8 +1,9 @@
-package uk.gov.hmcts.ccd.domain.service.supplementarydata;
+package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
 public enum Operation {
     INC("$inc"),
-    SET("$set");
+    SET("$set"),
+    FIND("$find");
 
     private String operationName;
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data;
+package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,11 +26,7 @@ public class SupplementaryDataProcessor {
                 return jsonNode.intValue();
             } else if (jsonNode.isBoolean()) {
                 return jsonNode.booleanValue();
-            } else if (jsonNode.isDouble()) {
-                return jsonNode.doubleValue();
-            } else if (jsonNode.isFloat()) {
-                return jsonNode.floatValue();
-            } else if (jsonNode.isTextual()) {
+            } else {
                 return jsonNode.textValue();
             }
         }

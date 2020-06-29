@@ -122,3 +122,42 @@ VALUES (1003, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         }',
         '2020-06-24 15:15:52.824'
 );
+
+
+
+
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data, supplementary_data_last_modified)
+VALUES (1004, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
+'{
+  "PersonFirstName": "George",
+  "PersonLastName": "Roof",
+  "PersonAddress": {
+    "AddressLine1": "Flat 9",
+    "AddressLine2": "2 Hubble Avenue",
+    "AddressLine3": "ButtonVillie",
+    "Country": "Wales",
+    "Postcode": "W11 5DF"
+  }
+}',
+'{
+  "PersonFirstName": "PUBLIC",
+  "PersonLastName": "PUBLIC",
+  "PersonAddress": {
+    "classification" : "PUBLIC",
+    "value" : {
+      "AddressLine1": "PUBLIC",
+      "AddressLine2": "PUBLIC",
+      "AddressLine3": "PUBLIC",
+      "Country": "PUBLIC",
+      "Postcode": "PUBLIC"
+    }
+  },
+  "D8Document": "PUBLIC"
+}',
+'1504259907353552',
+'2016-08-22 20:44:52.824',
+'2016-08-24 20:44:52.824',
+'2016-08-24 20:44:52.824',
+ NULL,
+ NULL
+);

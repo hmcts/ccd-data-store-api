@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -35,12 +37,12 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -234,24 +236,25 @@ class CaseControllerTest {
     @DisplayName("POST /cases/{caseId}/supplementary-data")
     class UpdateSupplementaryData {
 
+        private ObjectMapper mapper = new ObjectMapper();
+
         @Test
         @DisplayName("should return 200 when supplementary data updated")
         void shouldUpdateSupplementaryData() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
-            Map<String, Object> data = new HashMap<>();
-            Map<String, Object> child = new HashMap<>();
-            child.put("testchild", 123);
-            data.put("test", child);
+            Map<String, Object> data = createResponseData();
             SupplementaryData supplementaryData = new SupplementaryData(data);
             when(supplementaryDataOperation.updateSupplementaryData(anyString(), anyObject())).thenReturn(supplementaryData);
 
-            final ResponseEntity<SupplementaryDataResource> response = caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataRequest());
+            final ResponseEntity<SupplementaryDataResource> response = caseController.updateCaseSupplementaryData(CASE_REFERENCE,
+                new SupplementaryDataRequest());
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> assertThat(response.getBody().getSupplementaryData().getSupplementaryData().size(), equalTo(1)),
                 () -> assertThat(response.getBody().getSupplementaryData().getSupplementaryData(), is(data))
             );
+            validateResponseData(response.getBody().getSupplementaryData().getSupplementaryData(), "organisationA", 32);
         }
 
         @Test
@@ -261,6 +264,31 @@ class CaseControllerTest {
 
             assertThrows(BadRequestException.class,
                 () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataRequest()));
+        }
+
+        private Map<String, Object> createResponseData() {
+            String jsonRequest = "{\n"
+                + "\t\"orgs_assigned_users\": {\n"
+                + "\t\t\"organisationA\": 32\n"
+                + "\t}\n"
+                + "}";
+            return convertData(jsonRequest);
+        }
+
+        private Map<String, Object> convertData(String jsonRequest) {
+            Map<String, Object> requestData;
+            try {
+                requestData = mapper.readValue(jsonRequest, Map.class);
+            } catch (JsonProcessingException e) {
+                requestData = new HashMap<>();
+            }
+            return requestData;
+        }
+
+        private void validateResponseData(Map<String, Object> response, String expectedKey, Object expectedValue) {
+            Map<String, Object> childMap = (Map<String, Object> ) response.get("orgs_assigned_users");
+            assertTrue(childMap.containsKey(expectedKey));
+            assertEquals(expectedValue, childMap.get(expectedKey));
         }
 
     }

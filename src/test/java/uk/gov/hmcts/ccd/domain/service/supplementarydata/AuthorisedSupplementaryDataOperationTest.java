@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 class AuthorisedSupplementaryDataOperationTest {
 
-    private String CASE_REFERENCE = "12345677";
+    private static final String CASE_REFERENCE = "12345677";
 
     private AuthorisedSupplementaryDataOperation supplementaryDataOperation;
 

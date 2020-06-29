@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 @Qualifier("default")
 public class DefaultUserRoleValidator implements UserRoleValidator {
 
-    private final String roleCaseWorkerCaa = "caseworker-caa";
+    private static final String ROLE_CASE_WORKER_CAA = "caseworker-caa";
 
     private final UserRepository userRepository;
     private final JurisdictionsResolver jurisdictionsResolver;
@@ -31,12 +31,13 @@ public class DefaultUserRoleValidator implements UserRoleValidator {
 
     @Override
     public boolean canUpdateSupplementaryData(CaseDetails caseDetails) {
-        boolean canAccess = this.caseAccessService.canUserAccess(caseDetails);
+        boolean canAccess = this.userRepository.getUserRoles().contains(ROLE_CASE_WORKER_CAA);
 
-        canAccess = canAccess || this.jurisdictionsResolver
+        canAccess = canAccess || this.caseAccessService.canUserAccess(caseDetails);
+
+        return canAccess || this.jurisdictionsResolver
             .getJurisdictions()
             .stream()
             .anyMatch(caseDetails.getJurisdiction()::equalsIgnoreCase);
-        return canAccess || this.userRepository.getUserRoles().contains(roleCaseWorkerCaa);
     }
 }

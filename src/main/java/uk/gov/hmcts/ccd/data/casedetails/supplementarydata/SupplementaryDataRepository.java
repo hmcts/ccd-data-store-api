@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.casedetails;
+package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
 import java.util.Map;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;

@@ -30,7 +30,7 @@ public class AuthorisedSupplementaryDataOperation implements SupplementaryDataOp
                                                 final @Qualifier("default") UserRoleValidator roleValidator) {
         this.supplementaryDataOperation = supplementaryDataOperation;
         this.roleValidator = roleValidator;
-        this.caseDetailsRepository =caseDetailsRepository;
+        this.caseDetailsRepository = caseDetailsRepository;
     }
 
     @Override
