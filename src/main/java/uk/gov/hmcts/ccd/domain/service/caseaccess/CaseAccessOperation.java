@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -82,13 +83,30 @@ public class CaseAccessOperation {
         revokeRemovedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
     }
 
+    @Transactional
+    public void addCaseUserRoles(List<CaseAssignedUserRole> caseUserRoles) {
+        List<Long> caseReferences = caseUserRoles.stream()
+            .map(CaseAssignedUserRole::getCaseDataId)
+            .distinct()
+            .map(Long::parseLong)
+            .collect(Collectors.toCollection(ArrayList::new));
+
+        Map<Long, String> caseIdAndReferences = getCaseDetailsList(caseReferences).stream()
+            .collect(Collectors.toMap(CaseDetails::getReference, CaseDetails::getId));
+
+        caseUserRoles.forEach(caseUserRole -> {
+            final Long caseReference = Long.parseLong(caseUserRole.getCaseDataId());
+            if (caseIdAndReferences.containsKey(caseReference)) {
+                final Long caseId = Long.parseLong(caseIdAndReferences.get(caseReference));
+                caseUserRepository.grantAccess(caseId, caseUserRole.getUserId(), caseUserRole.getCaseRole());
+            } else {
+                throw new CaseNotFoundException(caseReference.toString());
+            }
+        });
+    }
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {
-        Map<String, Long> caseReferenceAndIds = caseReferences.stream()
-            .map(caseReference -> {
-                Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(null, caseReference);
-                return caseDetails.isPresent() ? caseDetails.get() : null;
-            }).filter(caseDetails -> caseDetails != null)
+        Map<String, Long> caseReferenceAndIds = getCaseDetailsList(caseReferences).stream()
             .collect(Collectors.toMap(CaseDetails::getId, CaseDetails::getReference));
 
         if (caseReferenceAndIds.isEmpty()) {
@@ -101,6 +119,15 @@ public class CaseAccessOperation {
                 String.valueOf(caseReferenceAndIds.get(String.valueOf(cue.getCasePrimaryKey().getCaseDataId()))),
                 cue.getCasePrimaryKey().getUserId(),
                 cue.getCasePrimaryKey().getCaseRole()))
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private List<CaseDetails> getCaseDetailsList(List<Long> caseReferences) {
+        return caseReferences.stream()
+            .map(caseReference -> {
+                Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(null, caseReference);
+                return caseDetails.isPresent() ? caseDetails.get() : null;
+            }).filter(Objects::nonNull)
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -131,11 +158,5 @@ public class CaseAccessOperation {
                         .forEach(currentRole -> caseUserRepository.revokeAccess(caseId,
                                                                                 userId,
                                                                                 currentRole));
-    }
-
-    private class CaseReferenceAndId {
-        CaseReferenceAndId(String caseReference, String id) {
-
-        }
     }
 }
