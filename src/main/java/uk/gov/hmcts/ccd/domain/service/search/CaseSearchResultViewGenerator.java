@@ -62,13 +62,8 @@ public class CaseSearchResultViewGenerator {
     }
 
     public CaseDetails filterUnauthorisedFieldsByUseCaseAndUserRole(String useCase, CaseDetails caseDetails, String caseTypeId, List<String> requestedFields) {
-        CaseTypeDefinition caseTypeDefinition = getCaseTypeDefinition(caseTypeId);
         caseDetails.getData().entrySet().removeIf(
-            caseField -> {
-                Optional<CaseFieldDefinition> caseFieldDefinition = caseTypeDefinition.getCaseField(caseField.getKey());
-                return !caseSearchesViewAccessControl.filterResultsBySearchResultsDefinition(useCase, caseTypeId, requestedFields, caseField.getKey())
-                    || !caseSearchesViewAccessControl.filterFieldByAuthorisationAccessOnField(caseFieldDefinition.get());
-            });
+            caseField -> !caseSearchesViewAccessControl.filterResultsBySearchResultsDefinition(useCase, caseTypeId, requestedFields, caseField.getKey()));
         return caseDetails;
     }
 
