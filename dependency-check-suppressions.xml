@@ -75,18 +75,68 @@
    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
    <cve>CVE-2020-5407</cve>
 </suppress>
-    <!-- FIXME : RDM-7451 -->
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-security-core-5.3.0.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+   <cve>CVE-2020-5407</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-security-crypto-5.3.0.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
+   <cve>CVE-2020-5407</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: dom4j-2.1.1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
+   <cve>CVE-2020-10683</cve>
+</suppress>
     <suppress>
         <notes><![CDATA[
-   relates to spring_framework spring-security
+   file name: spring-security-config-5.2.1.RELEASE.jar
    ]]></notes>
-        <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
-        <cve>CVE-2020-5398</cve>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     </suppress>
-
-    <!-- FIXME : RDM-78578 -->
     <suppress>
-        <notes>Temporary suppression for on-going developments</notes>
+        <notes><![CDATA[
+   file name: spring-security-config-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
+        <cpe>cpe:/a:security-framework_project:security-framework</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-web-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-web-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
+        <cpe>cpe:/a:security-framework_project:security-framework</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-core-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-core-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+        <cpe>cpe:/a:security-framework_project:security-framework</cpe>
         <cpe>cpe:2.3:a:checkstyle:checkstyle:*:*:*:*:*:*:*:*</cpe>
         <cve>CVE-2019-10782</cve>
     </suppress>
@@ -107,45 +157,77 @@
         <cve>CVE-2020-5407</cve>
         <cve>CVE-2020-5408</cve>
         <cve>CVE-2020-9484</cve>
+        <cve>CVE-2020-13692</cve>
     </suppress>
     <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-10968</cve>
-     </suppress>
-     <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-10969</cve>
-     </suppress>
-     <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-11111</cve>
-     </suppress>
-     <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-11112</cve>
-     </suppress>
-     <suppress>
-        <notes><![CDATA[file name: jackson-databind-2.9.10.3.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-11113</cve>
-     </suppress>
+        <notes><![CDATA[
+   file name: spring-security-crypto-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-crypto-5.2.1.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
+        <cpe>cpe:/a:security-framework_project:security-framework</cpe>
+    </suppress>
     <suppress>
    <notes><![CDATA[
-   file name: spring-security-core-5.3.0.RELEASE.jar
+   file name: spring-security-config-5.3.2.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
-   <cve>CVE-2020-5407</cve>
+   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
+   <cve>CVE-2018-1258</cve>
 </suppress>
     <suppress>
    <notes><![CDATA[
-   file name: spring-security-crypto-5.3.0.RELEASE.jar
+   file name: spring-security-web-5.3.2.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
+   <cve>CVE-2018-1258</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-security-core-5.3.2.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+   <cve>CVE-2018-1258</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-security-crypto-5.3.2.RELEASE.jar
    ]]></notes>
    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
-   <cve>CVE-2020-5407</cve>
+   <cve>CVE-2018-1258</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: elasticsearch-6.4.2.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
+   <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: elasticsearch-6.4.2.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
+   <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: elasticsearch-6.4.2.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
+   <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: dom4j-2.1.1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
+   <cve>CVE-2020-10683</cve>
 </suppress>
     <suppress>
    <notes><![CDATA[

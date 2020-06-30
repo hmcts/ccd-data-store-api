@@ -23,6 +23,12 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
         this.cauRoleValidator = cauRoleValidator;
     }
 
+    public void addCaseUserRoles(List<CaseAssignedUserRole> caseUserRoles) {
+        // NB: Although there are no user based authorisation steps performed here ...
+        // ... there are additional s2s authorisation steps performed in the controller.
+        this.cauRolesOperation.addCaseUserRoles(caseUserRoles);
+    }
+
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
         if (this.cauRoleValidator.canAccessUserCaseRoles(userIds)) {
             return this.cauRolesOperation.findCaseUserRoles(caseIds, userIds);
