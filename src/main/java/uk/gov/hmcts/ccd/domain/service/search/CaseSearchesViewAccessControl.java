@@ -32,8 +32,8 @@ public class CaseSearchesViewAccessControl {
         SearchResultDefinition searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
 
         if (useCase != null) {
-            return searchResultDefinition.fieldExists(caseFieldId, searchResultDefinition)
-                && searchResultDefinition.fieldHasRole(caseFieldId, searchResultDefinition, roles);
+            return searchResultDefinition.fieldExists(caseFieldId)
+                && searchResultDefinition.fieldHasRole(caseFieldId, roles);
         }
         return true;
     }
