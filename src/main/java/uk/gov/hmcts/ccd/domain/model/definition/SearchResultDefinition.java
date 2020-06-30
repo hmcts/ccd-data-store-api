@@ -25,7 +25,7 @@ public class SearchResultDefinition implements Serializable {
 
     public Map<String, String> getFieldsUserRoles() {
         Map<String, String> fields = new HashMap<>();
-        for (SearchResultField srf : getFields()) {
+        for (SearchResultField srf : this.fields) {
             fields.put(srf.getCaseFieldId(), srf.getRole());
         }
         return fields;
@@ -33,12 +33,15 @@ public class SearchResultDefinition implements Serializable {
 
     public boolean fieldExists(String caseFieldId) {
         Map<String, String> fields = getFieldsUserRoles();
-        return !fields.containsKey(caseFieldId);
+        return fields.containsKey(caseFieldId);
     }
 
     public boolean fieldHasRole(String caseFieldId, Set<String> roles) {
         Map<String, String> fields = getFieldsUserRoles();
         String role = fields.get(caseFieldId);
-        return (role != null && !roles.contains(role));
+        if (role != null && !roles.contains(role)) {
+            return false;
+        }
+        return true;
     }
 }
