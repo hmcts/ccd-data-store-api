@@ -30,8 +30,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_PAYMENT_HISTORY_VIEWER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
-@SuppressWarnings("checkstyle:SummaryJavadoc")
-// partial javadoc attributes added prior to checkstyle implementation in module
+@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
@@ -102,12 +101,6 @@ public class CaseDetails implements Cloneable {
     @JsonProperty("delete_draft_response_status")
     private String deleteDraftResponseStatus;
 
-    @JsonProperty("supplementary_data")
-    @ApiModelProperty("supplementary_data . See `docs/api/case-data.md` for data structure.")
-    private Map<String, JsonNode> supplementaryData;
-
-    @JsonProperty("supplementary_data_last_modified")
-    private LocalDateTime supplementaryDataLastModified;
 
     @JsonIgnore
     private final Map<String, Object> metadata = new HashMap<>();
@@ -215,22 +208,6 @@ public class CaseDetails implements Cloneable {
         this.lastStateModifiedDate = lastStateModifiedDate;
     }
 
-    public Map<String, JsonNode> getSupplementaryData() {
-        return supplementaryData;
-    }
-
-    public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
-        this.supplementaryData = supplementaryData;
-    }
-
-    public LocalDateTime getSupplementaryDataLastModified() {
-        return supplementaryDataLastModified;
-    }
-
-    public void setSupplementaryDataLastModified(LocalDateTime supplementaryDataLastModified) {
-        this.supplementaryDataLastModified = supplementaryDataLastModified;
-    }
-
     /**
      * @deprecated Will be removed in version 2.x. Use {@link CaseDetails#dataClassification} instead.
      */
@@ -285,19 +262,19 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     public void setDeleteDraftResponseEntity(final String draftId, final ResponseEntity<Void>
-        draftResponse) {
+                                                         draftResponse) {
         if (SC_OK == draftResponse.getStatusCodeValue()) {
             setDeleteDraftResponseEntity();
         } else {
             LOG.warn("Incomplete delete draft response for draft={}, statusCode={}",
-                draftId,
-                draftResponse.getStatusCodeValue());
+                     draftId,
+                     draftResponse.getStatusCodeValue());
             setIncompleteDeleteDraftResponse();
         }
     }
 
     private void setDeleteDraftResponseEntity() {
-        this.deleteDraftResponseStatusCode = SC_OK;
+        this.deleteDraftResponseStatusCode =  SC_OK;
         this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
     }
 
@@ -308,10 +285,10 @@ public class CaseDetails implements Cloneable {
             setAfterSubmitCallbackResponseEntity(callBackResponse.getBody());
         } else {
             LOG.warn("Incomplete call back response for case {} (db id={}); status code {}, body {}",
-                reference,
-                id,
-                callBackResponse.getStatusCodeValue(),
-                callBackResponse.getBody().toJson());
+                     reference,
+                     id,
+                     callBackResponse.getStatusCodeValue(),
+                     callBackResponse.getBody().toJson());
             setIncompleteCallbackResponse();
         }
     }
