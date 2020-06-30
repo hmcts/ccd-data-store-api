@@ -11,7 +11,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a role with security classification of PRIVATE]
     When the request [is configured to search for the previously created case via exact match]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains the previously created case data]
     And the response [does not contain fields with RESTRICTED security classification]
@@ -25,7 +25,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a role with security classification of PUBLIC]
     When the request [is configured to search for the previously created case via exact match]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains no cases]
     And the response has all other details as expected
@@ -38,7 +38,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a role with read access to the case state]
     When the request [is configured to search for the previously created case via exact match]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains the previously created case data]
     And the response has all other details as expected
@@ -51,7 +51,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a role with no read access to the case state]
     When the request [is configured to search for the previously created case via exact match]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains no cases]
     And the response has all other details as expected
@@ -64,7 +64,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a role with security classification of RESTRICTED]
     When the request [is configured to search for the previously created case via exact match]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains the RESTRICTED email field value]
     And the response has all other details as expected
@@ -79,7 +79,7 @@ Feature: Elasticsearch external endpoint
     And a user with [private access to AUTOTEST1 jurisdiction only]
     When the request [is configured to search for both the previously created cases]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains only 1 case]
     And the response has all other details as expected
@@ -92,7 +92,7 @@ Feature: Elasticsearch external endpoint
     And a user with [public security classification access]
     When the request [is configured to search for both the previously created cases]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains no cases]
     And the response has all other details as expected
@@ -105,7 +105,7 @@ Feature: Elasticsearch external endpoint
     And a user with [private multi jurisdiction access]
     When the request [is configured to search for both the previously created cases]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains details of 2 previously created cases]
     And the response [does not return the case field where user role has lower security classification than case field]
@@ -119,7 +119,7 @@ Feature: Elasticsearch external endpoint
     And a user with [no read access to the case state]
     When the request [is configured to search for both the previously created cases]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains no cases]
     And the response has all other details as expected
@@ -132,7 +132,7 @@ Feature: Elasticsearch external endpoint
     And a user with [restricted security classification]
     When the request [is configured to search for both the previously created cases]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains details of the restricted email field for the 2 previously created cases]
     And the response has all other details as expected
@@ -144,7 +144,7 @@ Feature: Elasticsearch external endpoint
     And a user with [multi jurisdiction access]
     When the request [is configured without a source filter]
     And a request is prepared with appropriate values
-    And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
     And the response [contains meta data of 2 previously created cases]
     And the response [does not return any case data]
@@ -160,7 +160,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a valid profile]
     And the request [is configured to search for exact date time from previously created case]
     And a request is prepared with appropriate values
-    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then the response [contains the previoulsy created case]
     And the response has all other details as expected
 
@@ -172,7 +172,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a valid profile]
     And the request [is configured to search for exact date from previously created case]
     And a request is prepared with appropriate values
-    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then the response [contains the previoulsy created case]
     And the response has all other details as expected
 
@@ -183,7 +183,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a valid profile]
     And the request [is configured to search for exact email from previously created case]
     And a request is prepared with appropriate values
-    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then the response [contains the previoulsy created case]
     And the response has all other details as expected
 
@@ -194,7 +194,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a valid profile]
     And the request [is configured to search for exact fixed list value from previously created case]
     And a request is prepared with appropriate values
-    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then the response [contains the previoulsy created case]
     And the response has all other details as expected
 
@@ -205,7 +205,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a valid profile]
     And the request [is configured to search for exact money field value from previously created case]
     And a request is prepared with appropriate values
-    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
@@ -216,7 +216,7 @@ Feature: Elasticsearch external endpoint
       And a user with [a valid profile]
       And the request [is configured to search for exact number field value from previously created case]
       And a request is prepared with appropriate values
-      When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+      When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
       Then the response [contains the previously created case]
       And the response has all other details as expected
 
@@ -227,7 +227,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a valid profile]
     And the request [is configured to search for exact PhoneUK value from previously created case]
     And a request is prepared with appropriate values
-    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
@@ -238,7 +238,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a valid profile]
     And the request [is configured to search for exact Text Area field value from previously created case]
     And a request is prepared with appropriate values
-    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
@@ -250,7 +250,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a valid profile]
     And the request [is configured to search for exact Text field value from previously created case]
     And a request is prepared with appropriate values
-    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
@@ -262,7 +262,7 @@ Feature: Elasticsearch external endpoint
     And a user with [a valid profile]
     And the request [is configured to search for exact YesNo field value from previously created case]
     And a request is prepared with appropriate values
-    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
     Then the response [contains the previously created case]
     And the response has all other details as expected
-    
+
