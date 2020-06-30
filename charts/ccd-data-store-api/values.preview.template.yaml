@@ -8,7 +8,6 @@ java:
         - data-store-api-draftStoreEncryptionSecret
         - data-store-api-draft-key
         - ccd-data-s2s-secret
-        - ccd-ELASTIC-SEARCH-PASSWORD
   environment:
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
     DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
@@ -40,7 +39,13 @@ elasticsearch:
   esJavaOpts: "-Xmx512m -Xms512m"
   persistence:
     enabled: false
-
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik
+    path: /
+    hosts:
+      - es-${SERVICE_FQDN}
 logstash:
   image:
     repository: hmcts/ccd-logstash
