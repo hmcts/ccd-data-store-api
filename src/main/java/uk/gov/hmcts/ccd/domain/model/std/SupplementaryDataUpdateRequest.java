@@ -10,7 +10,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class SupplementaryDataRequest {
+public class SupplementaryDataUpdateRequest {
 
     private Map<String, Map<String, Object>> requestData;
 }

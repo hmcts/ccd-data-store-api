@@ -9,7 +9,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.rolevalidator.UserRoleValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
@@ -53,7 +53,7 @@ class AuthorisedSupplementaryDataOperationTest {
         when(caseDetailsRepository.findByReference(anyString())).thenReturn(Optional.empty());
         assertThrows(
             CaseNotFoundException.class, () -> supplementaryDataOperation
-                .updateSupplementaryData(CASE_REFERENCE, new SupplementaryDataRequest())
+                .updateSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest())
         );
     }
 
@@ -62,14 +62,14 @@ class AuthorisedSupplementaryDataOperationTest {
         when(userRoleValidator.canUpdateSupplementaryData(any())).thenReturn(false);
         assertThrows(
             CaseRoleAccessException.class, () -> supplementaryDataOperation
-                .updateSupplementaryData(CASE_REFERENCE, new SupplementaryDataRequest())
+                .updateSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest())
         );
     }
 
     @Test
     void shouldInvokeRepositoryWhenCaseFoundAndUserAuthorised() {
         when(userRoleValidator.canUpdateSupplementaryData(any())).thenReturn(true);
-        SupplementaryDataRequest request = new SupplementaryDataRequest();
+        SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
         SupplementaryData responseExpected = new SupplementaryData(new HashMap<>());
         when(defaultSupplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request)).thenReturn(responseExpected);
         SupplementaryData supplementaryData = supplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request);

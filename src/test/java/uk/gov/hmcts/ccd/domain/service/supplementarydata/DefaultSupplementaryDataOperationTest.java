@@ -11,7 +11,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.Operation;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -43,7 +43,7 @@ class DefaultSupplementaryDataOperationTest {
     @Test
     void shouldNotInvokeRepository() {
         Map<String, Map<String, Object>> supplementaryDataRequest = new HashMap<>();
-        SupplementaryDataRequest request = new SupplementaryDataRequest(supplementaryDataRequest);
+        SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest(supplementaryDataRequest);
         this.defaultSupplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request);
 
         assertAll(
@@ -67,7 +67,7 @@ class DefaultSupplementaryDataOperationTest {
         Map<String, Map<String, Object>> supplementaryDataRequest = new HashMap<>();
         supplementaryDataRequest.putAll(setMap);
         supplementaryDataRequest.putAll(incMap);
-        SupplementaryDataRequest request = new SupplementaryDataRequest(supplementaryDataRequest);
+        SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest(supplementaryDataRequest);
         SupplementaryData response = this.defaultSupplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request);
 
         assertAll(

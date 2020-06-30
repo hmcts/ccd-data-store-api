@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
+import uk.gov.hmcts.ccd.data.user.JurisdictionsResolver;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -28,7 +30,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -51,6 +55,9 @@ class CaseAccessServiceTest {
 
     @Mock
     private CaseUserRepository caseUserRepository;
+
+    @Mock
+    private JurisdictionsResolver jurisdictionsResolver;
 
     @InjectMocks
     private CaseAccessService caseAccessService;
@@ -528,6 +535,30 @@ class CaseAccessServiceTest {
             doReturn(null).when(userRepository).getUserRoles();
 
             assertThrows(ValidationException.class, () -> caseAccessService.getCaseCreationRoles());
+        }
+    }
+
+    @Nested
+    @DisplayName("jurisdiction access validation")
+    class JurisdictionAccessTest {
+
+        @BeforeEach
+        void setUp() {
+            doReturn(Lists.newArrayList("PROBATE", "DIVORCE")).when(jurisdictionsResolver).getJurisdictions();
+        }
+
+        @Test
+        @DisplayName("should return true when user has access to jurisdiction")
+        void shouldReturnTrueWhenUserHasAccess() {
+            boolean canAccess = caseAccessService.isJurisdictionAccessAllowed("probate");
+            assertTrue(canAccess);
+        }
+
+        @Test
+        @DisplayName("should return false when user has no access to jurisdiction")
+        void shouldReturnFalseWhenUserHasAccess() {
+            boolean canAccess = caseAccessService.isJurisdictionAccessAllowed("autotest1");
+            assertFalse(canAccess);
         }
     }
 

@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.rolevalidator.UserRoleValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
@@ -34,7 +34,7 @@ public class AuthorisedSupplementaryDataOperation implements SupplementaryDataOp
     }
 
     @Override
-    public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataRequest supplementaryData) {
+    public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
         Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(caseReference);
         if (caseDetails.isPresent()) {
             if (this.roleValidator.canUpdateSupplementaryData(caseDetails.get())) {

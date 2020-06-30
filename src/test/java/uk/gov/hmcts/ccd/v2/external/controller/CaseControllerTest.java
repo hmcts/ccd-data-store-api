@@ -21,7 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -247,7 +247,7 @@ class CaseControllerTest {
             when(supplementaryDataOperation.updateSupplementaryData(anyString(), anyObject())).thenReturn(supplementaryData);
 
             final ResponseEntity<SupplementaryDataResource> response = caseController.updateCaseSupplementaryData(CASE_REFERENCE,
-                new SupplementaryDataRequest());
+                new SupplementaryDataUpdateRequest());
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -263,7 +263,7 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataRequest()));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest()));
         }
 
         private Map<String, Object> createResponseData() {

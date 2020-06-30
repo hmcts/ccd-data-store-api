@@ -25,7 +25,7 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
@@ -241,11 +241,11 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     public void shouldSetSupplementaryData() throws Exception {
         String caseId = "1504259907353529";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
-        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsString(supplementaryDataRequest))
+            .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
@@ -260,11 +260,11 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     public void shouldIncrementSupplementaryData() throws Exception {
         String caseId = "1504259907353529";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
-        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataIncrementRequest();
+        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataIncrementRequest();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsString(supplementaryDataRequest))
+            .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
@@ -279,11 +279,11 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     public void shouldCreateSupplementaryDataWhenNotExists() throws Exception {
         String caseId = "1504259907353545";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
-        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsString(supplementaryDataRequest))
+            .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
@@ -299,11 +299,11 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     public void shouldThrowExceptionWhenCaseNotFound() throws Exception {
         String caseId = "1504259907353586";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
-        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
         final String message = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsString(supplementaryDataRequest))
+            .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
         ).andExpect(status().is(404))
             .andReturn().getResolvedException().getMessage();
 
@@ -315,11 +315,11 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     public void shouldThrowExceptionWhenCaseIsNotValid() throws Exception {
         String caseId = "12233";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
-        SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
         final String message = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsString(supplementaryDataRequest))
+            .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
         ).andExpect(status().is(400))
             .andReturn().getResolvedException().getMessage();
 
@@ -352,11 +352,11 @@ public class CaseControllerTestIT extends WireMockBaseTest {
             MockUtils.setSecurityAuthorities(authentication, ROLE_PROBATE_SOLICITOR);
             String caseId = "1504259907353545";
             final String URL =  "/cases/" + caseId + "/supplementary-data";
-            SupplementaryDataRequest supplementaryDataRequest = createSupplementaryDataSetRequest();
+            SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
             final String message = mockMvc.perform(post(URL)
                 .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsString(supplementaryDataRequest))
+                .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
             ).andExpect(status().is(403))
                 .andReturn().getResolvedException().getMessage();
 
@@ -364,7 +364,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         }
     }
 
-    private SupplementaryDataRequest createSupplementaryDataSetRequest() throws JsonProcessingException {
+    private SupplementaryDataUpdateRequest createSupplementaryDataSetRequest() throws JsonProcessingException {
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
             + "\t\t\"orgs_assigned_users\": {\n"
@@ -374,10 +374,10 @@ public class CaseControllerTestIT extends WireMockBaseTest {
             + "}";
 
         Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
-        return new SupplementaryDataRequest(requestData);
+        return new SupplementaryDataUpdateRequest(requestData);
     }
 
-    private SupplementaryDataRequest createSupplementaryDataIncrementRequest() throws JsonProcessingException {
+    private SupplementaryDataUpdateRequest createSupplementaryDataIncrementRequest() throws JsonProcessingException {
         String jsonRequest = "{\n"
             + "\t\"$inc\": {\n"
             + "\t\t\"orgs_assigned_users\": {\n"
@@ -387,7 +387,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
             + "}";
 
         Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
-        return new SupplementaryDataRequest(requestData);
+        return new SupplementaryDataUpdateRequest(requestData);
     }
 
 }

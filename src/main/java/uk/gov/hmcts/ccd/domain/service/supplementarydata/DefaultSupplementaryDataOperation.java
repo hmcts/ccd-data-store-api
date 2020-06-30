@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.Operation;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataRequest;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 
 @Service
 @Qualifier("default")
@@ -21,20 +21,20 @@ public class DefaultSupplementaryDataOperation implements SupplementaryDataOpera
     }
 
     @Override
-    public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataRequest supplementaryData) {
+    public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
         incrementData(caseReference, supplementaryData);
         setData(caseReference, supplementaryData);
         return this.supplementaryDataRepository.findSupplementaryData(caseReference);
     }
 
-    private void incrementData(String caseReference, SupplementaryDataRequest supplementaryData) {
+    private void incrementData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
         Map<String, Object> incrementRequest = supplementaryData.getRequestData().get(Operation.INC.getOperationName());
         if (incrementRequest != null && incrementRequest.size() > 0) {
             this.supplementaryDataRepository.incrementSupplementaryData(caseReference, incrementRequest);
         }
     }
 
-    private void setData(String caseReference, SupplementaryDataRequest supplementaryData) {
+    private void setData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
         Map<String, Object> setRequest = supplementaryData.getRequestData().get(Operation.SET.getOperationName());
         if (setRequest !=  null && setRequest.size() > 0) {
             this.supplementaryDataRepository.setSupplementaryData(caseReference, setRequest);
