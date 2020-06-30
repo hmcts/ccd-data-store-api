@@ -42,9 +42,6 @@ public class SearchResultDefinition implements Serializable {
     public boolean fieldHasRole(String caseFieldId, Set<String> roles) {
         Map<String, String> fields = getFieldsUserRoles();
         String role = fields.get(caseFieldId);
-        if (role != null && !roles.contains(role)) {
-            return false;
-        }
-        return true;
+        return (role != null && !roles.contains(role));
     }
 }
