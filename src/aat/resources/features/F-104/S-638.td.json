@@ -28,6 +28,11 @@
           },
           "fields": [
             {
+              "__operator__": "equivalent",
+              "__ordering__": "unordered",
+              "__elementId__": "label"
+            },
+            {
               "label": "State",
               "order": null,
               "metadata": true,
@@ -121,7 +126,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   },
                   {
                     "id": "AddressLine2",
@@ -171,7 +177,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   },
                   {
                     "id": "AddressLine3",
@@ -221,7 +228,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   },
                   {
                     "id": "PostTown",
@@ -271,7 +279,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   },
                   {
                     "id": "County",
@@ -321,7 +330,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   },
                   {
                     "id": "PostCode",
@@ -371,7 +381,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   },
                   {
                     "id": "Country",
@@ -421,7 +432,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   }
                 ],
                 "collection_field_type": null
@@ -489,7 +501,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   },
                   {
                     "id": "ComplexFixedListField",
@@ -555,7 +568,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   },
                   {
                     "id": "ComplexNestedField",
@@ -621,7 +635,8 @@
                           "complexACLs": [],
                           "display_context": null,
                           "display_context_parameter": null,
-                          "formatted_value": null
+                          "formatted_value": null,
+                          "default_value" : null
                         },
                         {
                           "id": "NestedCollectionTextField",
@@ -632,7 +647,7 @@
                           "case_type_id": null,
                           "hint_text": null,
                           "field_type": {
-                            "id": "NestedCollectionTextField-bf85c678-5cbe-4879-92b6-9c52f0f319b4",
+                            "id": "[[ANYTHING_PRESENT]]",
                             "type": "Collection",
                             "min": null,
                             "max": null,
@@ -680,7 +695,8 @@
                           "complexACLs": [],
                           "display_context": null,
                           "display_context_parameter": null,
-                          "formatted_value": null
+                          "formatted_value": null,
+                          "default_value" : null
                         }
                       ],
                       "collection_field_type": null
@@ -715,7 +731,8 @@
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null
+                    "formatted_value": null,
+                    "default_value" : null
                   }
                 ],
                 "collection_field_type": null
@@ -728,7 +745,7 @@
               "metadata": false,
               "case_field_id": "CollectionField",
               "case_field_type": {
-                "id": "CollectionField-be95f8d0-e29e-408f-9d99-6a89e39924bf",
+                "id": "[[ANYTHING_PRESENT]]",
                 "type": "Collection",
                 "min": null,
                 "max": null,

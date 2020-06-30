@@ -5,7 +5,7 @@
     "body" : {
       "event_token": "${[scenarioContext][parentContext][childContexts][Private_Case_Creation_Autotest1_Data_Pagination2_Token_Creation][testData][actualResponse][body][token]}",
       "data" : {
-        "TextField": "Pagination Test",
+        "TextField": "${[scenarioContext][customValues][UniqueString]}",
         "NumberField" : "2"
       }
     }

@@ -50,16 +50,14 @@
               "display_context_parameter": null
             }
           ],
-          "cases": [
-            "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
-          ]
+          "cases": "[[ANYTHING_PRESENT]]"
         }
       ],
       "cases": [
         {
           "fields": {
             "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": null,
+            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
             "[STATE]": "TODO",
@@ -68,10 +66,10 @@
             "TextField": "text",
             "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
           },
-          "case_id": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}",
+          "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
           "fields_formatted": {
             "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": null,
+            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
             "[STATE]": "TODO",

@@ -16,7 +16,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     @Override
     public void doLoadTestData() {
         if (elasticSearchEnabled()){
-            new ElasticsearchTestDataLoaderExtension().close();
+            new ElasticsearchTestDataLoaderExtension().deleteIndexesIfPresent();
         }
         loader.addCcdRoles();
         loader.importDefinitions();
@@ -31,6 +31,16 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
+        } else if (key.toString().startsWith("caseIdAsStringFrom")){
+            String childContext = key.toString().replace("caseIdAsStringFrom_","");
+            try {
+                long longRef = (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
+                return Long.toString(longRef);
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem getting case id as long", e);
+            }
+        } else if (key.toString().equals("UniqueString")){
+            return ScenarioData.getUniqueString();
         }
         return super.calculateCustomValue(scenarioContext, key);
     }

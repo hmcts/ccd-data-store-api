@@ -118,7 +118,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 }, {
                   "id" : "AddressLine2",
                   "label" : "Address Line 2",
@@ -163,7 +164,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 }, {
                   "id" : "AddressLine3",
                   "label" : "Address Line 3",
@@ -208,7 +210,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 }, {
                   "id" : "PostTown",
                   "label" : "Town or City",
@@ -253,7 +256,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 }, {
                   "id" : "County",
                   "label" : "County",
@@ -298,7 +302,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 }, {
                   "id" : "PostCode",
                   "label" : "Postcode/Zipcode",
@@ -343,7 +348,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 }, {
                   "id" : "Country",
                   "label" : "Country",
@@ -388,7 +394,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 } ],
                 "collection_field_type" : null
               },
@@ -450,7 +457,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 }, {
                   "id" : "ComplexFixedListField",
                   "label" : "A `FixedList` field inside a complex",
@@ -507,7 +515,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 }, {
                   "id" : "ComplexNestedField",
                   "label" : "A `Complex` field inside a complex",
@@ -567,7 +576,8 @@
                       "complexACLs" : [ ],
                       "display_context" : null,
                       "display_context_parameter" : null,
-                      "formatted_value" : null
+                      "formatted_value" : null,
+                      "default_value" : null
                     }, {
                       "id" : "NestedCollectionTextField",
                       "label" : "A `Collection` field of `Text` inside a nested complex",
@@ -621,7 +631,8 @@
                       "complexACLs" : [ ],
                       "display_context" : null,
                       "display_context_parameter" : null,
-                      "formatted_value" : null
+                      "formatted_value" : null,
+                      "default_value" : null
                     } ],
                     "collection_field_type" : null
                   },
@@ -651,7 +662,8 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null
+                  "formatted_value" : null,
+                  "default_value" : null
                 } ],
                 "collection_field_type" : null
               },
@@ -1021,7 +1033,7 @@
             "AddressLine1" : "102 Petty France"
           },
           "[JURISDICTION]" : "AUTOTEST1",
-          "[LAST_STATE_MODIFIED_DATE]" : null,
+          "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
           "[CREATED_DATE]" : "[[ANYTHING_PRESENT]]",
           "ComplexField" : {
             "ComplexFixedListField" : "VALUE2",
@@ -1052,7 +1064,7 @@
             "value" : "collection text"
           } ]
         },
-        "case_id" : "[[ANYTHING_PRESENT]]",
+        "case_id" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
         "fields_formatted" : {
           "MoneyGBPField" : "1000",
           "FixedListField" : "VALUE1",
@@ -1066,7 +1078,7 @@
             "AddressLine1" : "102 Petty France"
           },
           "[JURISDICTION]" : "AUTOTEST1",
-          "[LAST_STATE_MODIFIED_DATE]" : null,
+          "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
           "[CREATED_DATE]" : "[[ANYTHING_PRESENT]]",
           "ComplexField" : {
             "ComplexFixedListField" : "VALUE2",
@@ -1098,8 +1110,7 @@
           } ]
         }
       } ],
-      "total" : 1,
-      "use_case" : null
+      "total" : 1
     }
   }
 }

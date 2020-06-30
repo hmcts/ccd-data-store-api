@@ -10,6 +10,9 @@
     "lists total cases as 0"
   ],
   "request": {
+    "queryParams": {
+      "usecase": "ORGCASES"
+    },
     "body": {
       "query": {
         "match": {
@@ -28,6 +31,11 @@
             "case_type_id": "AAT_PRIVATE"
           },
           "fields": [
+            {
+              "__operator__": "equivalent",
+              "__ordering__": "unordered",
+              "__elementId__": "label"
+            },
             {
               "label": "`FixedList` orgcases",
               "order": 1,

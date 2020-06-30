@@ -1,10 +1,8 @@
 @F-104 @elasticsearch
 Feature: Internal Search API
 
-
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
-
 
     #possitive request scenario of each type
   @S-625
@@ -109,7 +107,7 @@ Feature: Internal Search API
     And logstash has finished indexing case data
     And a user with [a caseworker-autotest1-senior role]
     When the request [is configured to search for the previously created case via exact match]
-    And the request [is using the query parameter usecase=orgcases]
+    And the request [is using the query parameter usecase=search]
     And a request is prepared with appropriate values
     And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received

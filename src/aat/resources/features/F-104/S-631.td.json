@@ -4,7 +4,7 @@
   "specs": [
     "a caseworker-autotest1-senior role",
     "is configured to search for the previously created case via exact match",
-    "is using the query parameter usecase=orgcases",
+    "is using the query parameter usecase=search",
     "contains headers only for fields the user has role access to",
     "contains data only for fields the user has role access to"
   ],
@@ -14,7 +14,7 @@
   },
   "request": {
     "queryParams": {
-      "usecase": "ORGCASES"
+      "usecase": "SEARCH"
     },
     "body": {
       "query": {
@@ -34,6 +34,11 @@
             "case_type_id": "AAT_PRIVATE"
           },
           "fields": [
+            {
+              "__operator__": "equivalent",
+              "__ordering__": "unordered",
+              "__elementId__": "label"
+            },
             {
               "label": "`Email` search",
               "order": 2,
@@ -69,16 +74,14 @@
               "display_context_parameter": null
             }
           ],
-          "cases": [
-            "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
-          ]
+          "cases": "[[ANYTHING_PRESENT]]"
         }
       ],
       "cases": [
         {
           "fields": {
             "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": null,
+            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
             "[STATE]": "TODO",
@@ -88,15 +91,14 @@
             "TextField": "text",
             "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
           },
-          "case_id": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}",
+          "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
           "fields_formatted": {
             "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": null,
+            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
             "[STATE]": "TODO",
             "[SECURITY_CLASSIFICATION]": "PRIVATE",
-            "YesOrNoField": "Yes",
             "[CASE_TYPE]": "AAT_PRIVATE",
             "EmailField": "fuctional@test.com",
             "TextField": "text",

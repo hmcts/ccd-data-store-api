@@ -8,18 +8,21 @@
     "contains the cases as per the request pagination criteria"
   ],
   "request": {
+    "queryParams": {
+      "usecase": "ORGCASES"
+    },
     "body": {
       "size": 2,
       "from": 2,
       "sort":[
         {
-          "created_date":"asc"
+          "created_date":"desc"
         }
       ],
       "query": {
 
         "match": {
-          "data.TextField": "Pagination Test"
+          "data.TextField.keyword": "${[scenarioContext][customValues][UniqueString]}"
         }
       }
     }
@@ -34,6 +37,11 @@
             "case_type_id": "AAT_PRIVATE"
           },
           "fields": [
+            {
+              "__operator__": "equivalent",
+              "__ordering__": "unordered",
+              "__elementId__": "label"
+            },
             {
               "label": "`FixedList` orgcases",
               "order": 1,
@@ -85,10 +93,7 @@
               "display_context_parameter": null
             }
           ],
-          "cases": [
-            "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data_Pagination2][testData][actualResponse][body][id]}",
-            "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data_Pagination1][testData][actualResponse][body][id]}"
-          ]
+          "cases": "[[ANYTHING_PRESENT]]"
         }
       ],
       "cases": [
@@ -96,7 +101,7 @@
           "fields": {
             "FixedListField": "VALUE1",
             "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": null,
+            "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Pagination2]}",
             "[STATE]": "TODO",
@@ -104,11 +109,11 @@
             "[CASE_TYPE]": "AAT_PRIVATE",
             "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
           },
-          "case_id": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data_Pagination2][testData][actualResponse][body][id]}",
+          "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination2]}",
           "fields_formatted": {
             "FixedListField": "VALUE1",
             "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": null,
+            "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Pagination2]}",
             "[STATE]": "TODO",
@@ -121,21 +126,21 @@
           "fields": {
             "FixedListField": "VALUE1",
             "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": null,
+            "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][Private_Case_Creation_Autotest1_Data_Pagination1]}",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Pagination1]}",
             "[STATE]": "TODO",
             "[SECURITY_CLASSIFICATION]": "PRIVATE",
             "[CASE_TYPE]": "AAT_PRIVATE",
             "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
           },
-          "case_id": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data_Pagination1][testData][actualResponse][body][id]}",
+          "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination1]}",
           "fields_formatted": {
             "FixedListField": "VALUE1",
             "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": null,
+            "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][Private_Case_Creation_Autotest1_Data_Pagination1]}",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Pagination1]}",
             "[STATE]": "TODO",
             "[SECURITY_CLASSIFICATION]": "PRIVATE",
             "[CASE_TYPE]": "AAT_PRIVATE",
@@ -143,7 +148,7 @@
           }
         }
       ],
-      "total": 2
+      "total": 4
     }
   }
 

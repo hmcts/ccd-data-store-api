@@ -1,6 +1,12 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
+import uk.gov.hmcts.befta.player.DefaultBackEndFunctionalTestScenarioPlayer;
+
+import java.io.IOException;
+import java.util.UUID;
 
 public class DataStoreSteps {
 
@@ -11,6 +17,12 @@ public class DataStoreSteps {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Before
+    public void createUID(){
+        String uniqueID = UUID.randomUUID().toString();
+        ScenarioData.setUniqueString( "string-"+uniqueID);
     }
 
 }
