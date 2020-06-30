@@ -48,9 +48,7 @@
 			"callback_response_status_code": null,
 			"callback_response_status": null,
 			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
-      "supplementary_data": "[[ANY_STRING_NULLABLE]]",
-      "supplementary_data_last_modified": "[[ANYTHING_PRESENT]]"
+			"delete_draft_response_status": null
 		}
 	}
 }
