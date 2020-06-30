@@ -33,10 +33,7 @@ public class SearchResultDefinition implements Serializable {
 
     public boolean fieldExists(String caseFieldId) {
         Map<String, String> fields = getFieldsUserRoles();
-        if (!fields.containsKey(caseFieldId)) {
-            return false;
-        }
-        return true;
+        return !fields.containsKey(caseFieldId);
     }
 
     public boolean fieldHasRole(String caseFieldId, Set<String> roles) {
