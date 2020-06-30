@@ -254,3 +254,15 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
+
+  @S-625
+  Scenario: Should return case for exact match on a YesNo field
+    Given a case that has just been created as in [S-625_Create_Case_Private_Autotest1]
+    And logstash has finished indexing case data
+    And a user with [a valid profile]
+    And the request [is configured to search for exact YesNo field value from previously created case]
+    And a request is prepared with appropriate values
+    When it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
+    Then the response [contains the previously created case]
+    And the response has all other details as expected
+    
