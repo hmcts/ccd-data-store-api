@@ -10,6 +10,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,15 +27,17 @@ class IncrementSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
 
     @Test
     void shouldReturnEmptyQueryList() {
-        List<Query> queryList = supplementaryDataQueryBuilder.buildQueries(em, CASE_REFERENCE, new HashMap<>());
+        List<Query> queryList = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em, CASE_REFERENCE,
+            new SupplementaryDataUpdateRequest(new HashMap<>()));
         assertNotNull(queryList);
         assertEquals(0, queryList.size());
     }
 
     @Test
     void shouldReturnQueryListWhenRequestDataPassed() {
-        Map<String, Object> requestData = createRequestData();
-        List<Query> queryList = supplementaryDataQueryBuilder.buildQueries(em, CASE_REFERENCE, requestData);
+        Map<String, Map<String, Object>> requestData = createRequestData();
+        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(requestData);
+        List<Query> queryList = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em, CASE_REFERENCE, updateRequest);
         assertNotNull(queryList);
         assertEquals(1, queryList.size());
         assertEquals(CASE_REFERENCE, queryList.get(0).getParameterValue("reference"));
@@ -44,38 +47,43 @@ class IncrementSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
 
     @Test
     void shouldReturnMoreThanOneQueryInListWhenRequestDataPassedWithMultipleLeafNodes() {
-        Map<String, Object> requestData = createRequestDataMultiple();
-        List<Query> queryList = supplementaryDataQueryBuilder.buildQueries(em, CASE_REFERENCE, requestData);
+        Map<String, Map<String, Object>> requestData = createRequestDataMultiple();
+        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(requestData);
+        List<Query> queryList = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em, CASE_REFERENCE, updateRequest);
         assertNotNull(queryList);
         assertEquals(2, queryList.size());
         assertEquals(CASE_REFERENCE, queryList.get(0).getParameterValue("reference"));
     }
 
-    private Map<String, Object> createRequestData() {
+    private Map<String, Map<String, Object>> createRequestData() {
         String jsonRequest = "{\n"
-            + "\t\"orgs_assigned_users\": {\n"
+            + "\t\"$inc\": {\n"
+            + "\t\t\"orgs_assigned_users\": {\n"
             + "\t\t\"organisationA\": 32\n"
+            + "\t\t}\n"
             + "\t}\n"
             + "}";
 
         return convertData(jsonRequest);
     }
 
-    private Map<String, Object> createRequestDataMultiple() {
+    private Map<String, Map<String, Object>>  createRequestDataMultiple() {
         String jsonRequest = "{\n"
-            + "\t\"orgs_assigned_users\": {\n"
+            + "\t\"$inc\": {\n"
+            + "\t\t\"orgs_assigned_users\": {\n"
             + "\t\t\"organisationA\": 32,\n"
             + "\t\t\"organisationB\": 33\n"
+            + "\t\t}\n"
             + "\t}\n"
             + "}";
 
         return convertData(jsonRequest);
     }
 
-    private Map<String, Object> convertData(String jsonRequest) {
-        Map<String, Object> requestData;
+    private Map<String, Map<String, Object>> convertData(String jsonRquest) {
+        Map<String, Map<String, Object>> requestData;
         try {
-            requestData = mapper.readValue(jsonRequest, Map.class);
+            requestData = mapper.readValue(jsonRquest, Map.class);
         } catch (JsonProcessingException e) {
             requestData = new HashMap<>();
         }

@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
-import uk.gov.hmcts.ccd.domain.service.supplementarydata.rolevalidator.UserRoleValidator;
+import uk.gov.hmcts.ccd.domain.service.common.EndpointAuthorisationService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,28 +22,28 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class AuthorisedSupplementaryDataOperationTest {
+class AuthorisedSupplementaryDataUpdateOperationTest {
 
     private static final String CASE_REFERENCE = "12345677";
 
-    private AuthorisedSupplementaryDataOperation supplementaryDataOperation;
+    private AuthorisedSupplementaryDataUpdateOperation supplementaryDataOperation;
 
     @Mock
-    private DefaultSupplementaryDataOperation defaultSupplementaryDataOperation;
+    private DefaultSupplementaryDataUpdateOperation defaultSupplementaryDataOperation;
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
     @Mock
-    private UserRoleValidator userRoleValidator;
+    private EndpointAuthorisationService endpointAuthorisationService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        supplementaryDataOperation = new AuthorisedSupplementaryDataOperation(defaultSupplementaryDataOperation,
+        supplementaryDataOperation = new AuthorisedSupplementaryDataUpdateOperation(defaultSupplementaryDataOperation,
             caseDetailsRepository,
-            userRoleValidator);
+            endpointAuthorisationService);
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(caseDetailsRepository.findByReference(anyString())).thenReturn(Optional.of(caseDetails));
     }
@@ -59,7 +59,7 @@ class AuthorisedSupplementaryDataOperationTest {
 
     @Test
     void shouldThrowRoleValidationExceptionWhenUserNotAuthorised() {
-        when(userRoleValidator.canUpdateSupplementaryData(any())).thenReturn(false);
+        when(endpointAuthorisationService.isAccessAllowed(any())).thenReturn(false);
         assertThrows(
             CaseRoleAccessException.class, () -> supplementaryDataOperation
                 .updateSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest())
@@ -68,14 +68,14 @@ class AuthorisedSupplementaryDataOperationTest {
 
     @Test
     void shouldInvokeRepositoryWhenCaseFoundAndUserAuthorised() {
-        when(userRoleValidator.canUpdateSupplementaryData(any())).thenReturn(true);
+        when(endpointAuthorisationService.isAccessAllowed(any())).thenReturn(true);
         SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
         SupplementaryData responseExpected = new SupplementaryData(new HashMap<>());
         when(defaultSupplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request)).thenReturn(responseExpected);
         SupplementaryData supplementaryData = supplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request);
         assertNotNull(supplementaryData);
         assertEquals(responseExpected, supplementaryData);
-        assertEquals(responseExpected.getSupplementaryData().size(), supplementaryData.getSupplementaryData().size());
+        assertEquals(responseExpected.getResponse().size(), supplementaryData.getResponse().size());
     }
 
 }

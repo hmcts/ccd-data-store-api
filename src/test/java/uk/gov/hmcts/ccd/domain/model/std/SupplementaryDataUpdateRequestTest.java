@@ -1,14 +1,14 @@
-package uk.gov.hmcts.ccd.data;
+package uk.gov.hmcts.ccd.domain.model.std;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataProcessor;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SupplementaryDataProcessorTest {
+class SupplementaryDataUpdateRequestTest {
 
     @Test
     void accessLeafNodes() {
@@ -29,7 +29,11 @@ class SupplementaryDataProcessorTest {
         childChildMap.put("testcc4", 44);
         childMap.put("childchild", childChildMap);
 
-        Map<String, Object> leafNodes = new SupplementaryDataProcessor().accessLeafNodes(rootMap);
+        Map<String, Map<String, Object>> requestMap = new HashMap<>();
+        requestMap.put(SupplementaryDataOperation.SET.getOperationName(), rootMap);
+        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(requestMap);
+
+        Map<String, Object> leafNodes = updateRequest.getUpdateOperationProperties(SupplementaryDataOperation.SET);
 
         assertTrue(leafNodes.containsKey("test2"));
         assertTrue(leafNodes.containsKey("test1"));
@@ -47,15 +51,10 @@ class SupplementaryDataProcessorTest {
 
     @Test
     void shouldReturnEmptyWhenRequestDataEmpty() {
-        Map<String, Object> rootMap = new HashMap<>();
+        Map<String, Map<String, Object>> rootMap = new HashMap<>();
 
-        Map<String, Object> leafNodes = new SupplementaryDataProcessor().accessLeafNodes(rootMap);
-        assertTrue(leafNodes.size() == 0);
-    }
-
-    @Test
-    void shouldReturnEmptyWhenRequestDataNull() {
-        Map<String, Object> leafNodes = new SupplementaryDataProcessor().accessLeafNodes(null);
+        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(rootMap);
+        Map<String, Object> leafNodes = updateRequest.getUpdateOperationProperties(SupplementaryDataOperation.SET);
         assertTrue(leafNodes.size() == 0);
     }
 }

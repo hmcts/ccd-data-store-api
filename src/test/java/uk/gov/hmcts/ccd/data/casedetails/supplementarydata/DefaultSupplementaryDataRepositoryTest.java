@@ -13,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -36,12 +37,11 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldReplaceExistingSupplementaryData() {
         assumeDataInitialised();
-        Map<String, Object> organizationData = createRequestDataOrgA();
-        supplementaryDataRepository.setSupplementaryData("1504259907353529", organizationData);
+        supplementaryDataRepository.setSupplementaryData("1504259907353529", createRequestDataOrgA());
 
         SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData("1504259907353529");
         assertNotNull(supplementaryData);
-        Map<String, Object> response = supplementaryData.getSupplementaryData();
+        Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users"));
         validateResponseData(response, "organisationA", 32);
     }
@@ -50,12 +50,11 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetSupplementaryDataWhenSupplementaryDataColumnEmpty() {
         assumeDataInitialised();
-        Map<String, Object> organizationData = createRequestData();
-        supplementaryDataRepository.setSupplementaryData("1504259907353545", organizationData);
+        supplementaryDataRepository.setSupplementaryData("1504259907353545", createRequestData("$set"));
 
         SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData("1504259907353545");
         assertNotNull(supplementaryData);
-        Map<String, Object> response = supplementaryData.getSupplementaryData();
+        Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users"));
         validateResponseData(response, "organisationB", 3);
     }
@@ -64,12 +63,11 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetNewSupplementaryDataWhenSupplementaryDataHasSameParent() {
         assumeDataInitialised();
-        Map<String, Object> organizationData = createRequestData();
-        supplementaryDataRepository.setSupplementaryData("1504259907353529", organizationData);
+        supplementaryDataRepository.setSupplementaryData("1504259907353529", createRequestData("$set"));
 
         SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData("1504259907353529");
         assertNotNull(supplementaryData);
-        Map<String, Object> response = supplementaryData.getSupplementaryData();
+        Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users"));
         validateResponseData(response, "organisationA", 10);
         validateResponseData(response, "organisationB", 3);
@@ -79,12 +77,11 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetMultipleEntrySupplementaryDataWhenSupplementaryDataHasSameParent() {
         assumeDataInitialised();
-        Map<String, Object> organizationData = createRequestWithMultipleEntries();
-        supplementaryDataRepository.setSupplementaryData("1504259907353529", organizationData);
+        supplementaryDataRepository.setSupplementaryData("1504259907353529", createRequestWithMultipleEntries());
 
         SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData("1504259907353529");
         assertNotNull(supplementaryData);
-        Map<String, Object> response = supplementaryData.getSupplementaryData();
+        Map<String, Object> response = supplementaryData.getResponse();
         assertTrue(response.keySet().contains("orgs_assigned_users"));
         validateResponseData(response, "organisationA", 10);
         validateResponseData(response, "organisationB", 3);
@@ -95,13 +92,12 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void incrementSupplementaryData() {
         assumeDataInitialised();
-        Map<String, Object> organizationData = createIncrementRequest(3);
 
-        supplementaryDataRepository.incrementSupplementaryData("1504259907353529", organizationData);
+        supplementaryDataRepository.incrementSupplementaryData("1504259907353529", createIncrementRequest(3));
 
         SupplementaryData response = supplementaryDataRepository.findSupplementaryData("1504259907353529");
         assertNotNull(response);
-        Map<String, Object> responseMap = response.getSupplementaryData();
+        Map<String, Object> responseMap = response.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users"));
         validateResponseData(responseMap, "organisationA", 13);
     }
@@ -110,13 +106,12 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void decrementSupplementaryData() {
         assumeDataInitialised();
-        Map<String, Object> organizationData = createIncrementRequest(-11);
 
-        supplementaryDataRepository.incrementSupplementaryData("1504259907353529", organizationData);
+        supplementaryDataRepository.incrementSupplementaryData("1504259907353529", createIncrementRequest(-11));
 
         SupplementaryData response = supplementaryDataRepository.findSupplementaryData("1504259907353529");
         assertNotNull(response);
-        Map<String, Object> responseMap = response.getSupplementaryData();
+        Map<String, Object> responseMap = response.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users"));
         validateResponseData(responseMap, "organisationA", 0);
     }
@@ -126,13 +121,12 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldAddDataWhenIncrementCalledWhenSupplementaryDataEmpty() {
         assumeDataInitialised();
-        Map<String, Object> organizationData = createRequestData();
 
-        supplementaryDataRepository.incrementSupplementaryData("1504259907353552", organizationData);
+        supplementaryDataRepository.incrementSupplementaryData("1504259907353552", createRequestData("$inc"));
 
         SupplementaryData response = supplementaryDataRepository.findSupplementaryData("1504259907353552");
         assertNotNull(response);
-        Map<String, Object> responseMap = response.getSupplementaryData();
+        Map<String, Object> responseMap = response.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users"));
         validateResponseData(responseMap, "organisationB", 3);
     }
@@ -141,13 +135,12 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldAddNewDataWhenIncrementCalledWhenParentPathExists() {
         assumeDataInitialised();
-        Map<String, Object> organizationData = createRequestData();
 
-        supplementaryDataRepository.incrementSupplementaryData("1504259907353529", organizationData);
+        supplementaryDataRepository.incrementSupplementaryData("1504259907353529",  createRequestData("$inc"));
 
         SupplementaryData response = supplementaryDataRepository.findSupplementaryData("1504259907353529");
         assertNotNull(response);
-        Map<String, Object> responseMap = response.getSupplementaryData();
+        Map<String, Object> responseMap = response.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users"));
         validateResponseData(responseMap, "organisationA", 10);
         validateResponseData(responseMap, "organisationB", 3);
@@ -159,7 +152,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assumeDataInitialised();
         final SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData("1504259907353529");
         assertNotNull(supplementaryData);
-        Map<String, Object> responseMap = supplementaryData.getSupplementaryData();
+        Map<String, Object> responseMap = supplementaryData.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users"));
         validateResponseData(responseMap, "organisationA", 10);
     }
@@ -169,25 +162,29 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
     }
 
-    private Map<String, Object> createRequestData() {
+    private SupplementaryDataUpdateRequest createRequestData(String operationName) {
         String jsonRequest = "{\n"
-            + "\t\"orgs_assigned_users\": {\n"
+            + "\t\"" + operationName + "\": {\n"
+            + "\t\t\"orgs_assigned_users\": {\n"
             + "\t\t\"organisationB\": 3\n"
+            + "\t\t}\n"
             + "\t}\n"
             + "}";
 
-        return convertData(jsonRequest);
+        return new SupplementaryDataUpdateRequest(convertData(jsonRequest));
     }
 
-    private Map<String, Object> createRequestWithMultipleEntries() {
+    private SupplementaryDataUpdateRequest createRequestWithMultipleEntries() {
         String jsonRequest = "{\n"
-            + "\t\"orgs_assigned_users\": {\n"
+            + "\t\"$set\": {\n"
+            + "\t\t\"orgs_assigned_users\": {\n"
             + "\t\t\"organisationB\": 3,\n"
             + "\t\t\"organisationC\": 23\n"
+            + "\t\t}\n"
             + "\t}\n"
             + "}";
 
-        return convertData(jsonRequest);
+        return new SupplementaryDataUpdateRequest(convertData(jsonRequest));
     }
 
     private void validateResponseData(Map<String, Object> response, String expectedKey, Object expectedValue) {
@@ -196,34 +193,36 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertEquals(expectedValue, childMap.get(expectedKey));
     }
 
-    private Map<String, Object> createIncrementRequest(int value) {
+    private SupplementaryDataUpdateRequest createIncrementRequest(int value) {
         String jsonRequest = "{\n"
-            + "\t\"orgs_assigned_users\": {\n"
+            + "\t\"$inc\": {\n"
+            + "\t\t\"orgs_assigned_users\": {\n"
             + "\t\t\"organisationA\": " + value + "\n"
+            + "\t\t}\n"
             + "\t}\n"
             + "}";
 
-        return convertData(jsonRequest);
+        return new SupplementaryDataUpdateRequest(convertData(jsonRequest));
     }
 
-    private Map<String, Object> createRequestDataOrgA() {
+    private SupplementaryDataUpdateRequest createRequestDataOrgA() {
         String jsonRequest = "{\n"
-            + "\t\"orgs_assigned_users\": {\n"
+            + "\t\"$set\": {\n"
+            + "\t\t\"orgs_assigned_users\": {\n"
             + "\t\t\"organisationA\": 32\n"
+            + "\t\t}\n"
             + "\t}\n"
             + "}";
-
-        return convertData(jsonRequest);
+        return new SupplementaryDataUpdateRequest(convertData(jsonRequest));
     }
 
-    private Map<String, Object> convertData(String jsonRequest) {
-        Map<String, Object> requestData;
+    private Map<String, Map<String, Object>> convertData(String jsonRquest) {
+        Map<String, Map<String, Object>> requestData;
         try {
-            requestData = mapper.readValue(jsonRequest, Map.class);
+            requestData = mapper.readValue(jsonRquest, Map.class);
         } catch (JsonProcessingException e) {
             requestData = new HashMap<>();
         }
         return requestData;
     }
-
 }

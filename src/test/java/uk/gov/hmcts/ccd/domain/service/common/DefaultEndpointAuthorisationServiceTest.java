@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.supplementarydata.rolevalidator;
+package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,7 +14,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class DefaultUserRoleValidatorTest {
+class DefaultEndpointAuthorisationServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -23,12 +22,12 @@ class DefaultUserRoleValidatorTest {
     @Mock
     private CaseAccessService caseAccessService;
 
-    private DefaultUserRoleValidator userRoleValidator;
+    private DefaultEndpointAuthorisationService userRoleValidator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        userRoleValidator = new DefaultUserRoleValidator(userRepository,
+        userRoleValidator = new DefaultEndpointAuthorisationService(userRepository,
             caseAccessService);
     }
 
@@ -36,7 +35,7 @@ class DefaultUserRoleValidatorTest {
     void shouldReturnTrueWhenLoggedInUserHasCAARole() {
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-caa"));
-        boolean canAccess = this.userRoleValidator.canUpdateSupplementaryData(caseDetails);
+        boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertTrue(canAccess);
     }
 
@@ -45,7 +44,7 @@ class DefaultUserRoleValidatorTest {
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
         when(this.caseAccessService.canUserAccess(caseDetails)).thenReturn(true);
-        boolean canAccess = this.userRoleValidator.canUpdateSupplementaryData(caseDetails);
+        boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertTrue(canAccess);
     }
 
@@ -56,7 +55,7 @@ class DefaultUserRoleValidatorTest {
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
         when(this.caseAccessService.canUserAccess(caseDetails)).thenReturn(false);
         when(this.caseAccessService.isJurisdictionAccessAllowed(anyString())).thenReturn(true);
-        boolean canAccess = this.userRoleValidator.canUpdateSupplementaryData(caseDetails);
+        boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertTrue(canAccess);
     }
 
@@ -67,7 +66,7 @@ class DefaultUserRoleValidatorTest {
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
         when(this.caseAccessService.canUserAccess(caseDetails)).thenReturn(false);
         when(this.caseAccessService.isJurisdictionAccessAllowed(anyString())).thenReturn(false);
-        boolean canAccess = this.userRoleValidator.canUpdateSupplementaryData(caseDetails);
+        boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertFalse(canAccess);
     }
 }

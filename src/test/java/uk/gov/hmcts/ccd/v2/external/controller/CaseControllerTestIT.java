@@ -291,7 +291,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         String content = mvcResult.getResponse().getContentAsString();
         SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
         assertNotNull(supplementaryDataResource);
-        assertEquals(1, supplementaryDataResource.getSupplementaryData().getSupplementaryData().size());
+        assertEquals(1, supplementaryDataResource.getSupplementaryData().getResponse().size());
     }
 
     @Test

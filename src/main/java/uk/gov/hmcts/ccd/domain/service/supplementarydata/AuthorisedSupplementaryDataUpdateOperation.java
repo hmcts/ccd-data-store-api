@@ -10,26 +10,26 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
-import uk.gov.hmcts.ccd.domain.service.supplementarydata.rolevalidator.UserRoleValidator;
+import uk.gov.hmcts.ccd.domain.service.common.EndpointAuthorisationService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
 
 @Service
 @Qualifier("authorised")
-public class AuthorisedSupplementaryDataOperation implements SupplementaryDataOperation {
+public class AuthorisedSupplementaryDataUpdateOperation implements SupplementaryDataUpdateOperation {
 
-    private SupplementaryDataOperation supplementaryDataOperation;
+    private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
 
-    private UserRoleValidator roleValidator;
+    private EndpointAuthorisationService authorisationService;
 
     private final CaseDetailsRepository caseDetailsRepository;
 
     @Autowired
-    public AuthorisedSupplementaryDataOperation(final @Qualifier("default") SupplementaryDataOperation supplementaryDataOperation,
-                                                final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
-                                                final @Qualifier("default") UserRoleValidator roleValidator) {
-        this.supplementaryDataOperation = supplementaryDataOperation;
-        this.roleValidator = roleValidator;
+    public AuthorisedSupplementaryDataUpdateOperation(final @Qualifier("default") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
+                                                      final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
+                                                      final @Qualifier("default") EndpointAuthorisationService authorisationService) {
+        this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
+        this.authorisationService = authorisationService;
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
@@ -37,8 +37,8 @@ public class AuthorisedSupplementaryDataOperation implements SupplementaryDataOp
     public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
         Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(caseReference);
         if (caseDetails.isPresent()) {
-            if (this.roleValidator.canUpdateSupplementaryData(caseDetails.get())) {
-                return this.supplementaryDataOperation.updateSupplementaryData(caseReference, supplementaryData);
+            if (this.authorisationService.isAccessAllowed(caseDetails.get())) {
+                return this.supplementaryDataUpdateOperation.updateSupplementaryData(caseReference, supplementaryData);
             }
             throw new CaseRoleAccessException(V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA);
         }

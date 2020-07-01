@@ -77,5 +77,6 @@ public final class V2 {
         public static final String OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED = "Access to other user's case role assignments not granted";
         public static final String NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA = "Not authorised to update case supplementary data";
         public static final String CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION = "Client service not authorised to perform operation";
+        public static final String SUPPLEMENTARY_DATA_INVALID = "Supplementary Data Invalid";
     }
 }

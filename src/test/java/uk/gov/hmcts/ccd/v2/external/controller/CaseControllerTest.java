@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
-import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataOperation;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
@@ -72,7 +72,7 @@ class CaseControllerTest {
     private GetEventsOperation getEventsOperation;
 
     @Mock
-    private SupplementaryDataOperation supplementaryDataOperation;
+    private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
 
     @InjectMocks
     private CaseController caseController;
@@ -244,17 +244,16 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
             Map<String, Object> data = createResponseData();
             SupplementaryData supplementaryData = new SupplementaryData(data);
-            when(supplementaryDataOperation.updateSupplementaryData(anyString(), anyObject())).thenReturn(supplementaryData);
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject())).thenReturn(supplementaryData);
 
-            final ResponseEntity<SupplementaryDataResource> response = caseController.updateCaseSupplementaryData(CASE_REFERENCE,
-                new SupplementaryDataUpdateRequest());
+            final ResponseEntity<SupplementaryDataResource> response = caseController.updateCaseSupplementaryData(CASE_REFERENCE, createRequestDataOrgA());
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getSupplementaryData().getSupplementaryData().size(), equalTo(1)),
-                () -> assertThat(response.getBody().getSupplementaryData().getSupplementaryData(), is(data))
+                () -> assertThat(response.getBody().getSupplementaryData().getResponse().size(), equalTo(1)),
+                () -> assertThat(response.getBody().getSupplementaryData().getResponse(), is(data))
             );
-            validateResponseData(response.getBody().getSupplementaryData().getSupplementaryData(), "organisationA", 32);
+            validateResponseData(response.getBody().getSupplementaryData().getResponse(), "organisationA", 32);
         }
 
         @Test
@@ -272,13 +271,34 @@ class CaseControllerTest {
                 + "\t\t\"organisationA\": 32\n"
                 + "\t}\n"
                 + "}";
-            return convertData(jsonRequest);
+            return convertResponseData(jsonRequest);
         }
 
-        private Map<String, Object> convertData(String jsonRequest) {
+        private Map<String, Object> convertResponseData(String jsonRequest) {
             Map<String, Object> requestData;
             try {
                 requestData = mapper.readValue(jsonRequest, Map.class);
+            } catch (JsonProcessingException e) {
+                requestData = new HashMap<>();
+            }
+            return requestData;
+        }
+
+        private SupplementaryDataUpdateRequest createRequestDataOrgA() {
+            String jsonRequest = "{\n"
+                + "\t\"$set\": {\n"
+                + "\t\t\"orgs_assigned_users\": {\n"
+                + "\t\t\"organisationA\": 32\n"
+                + "\t\t}\n"
+                + "\t}\n"
+                + "}";
+            return new SupplementaryDataUpdateRequest(convertData(jsonRequest));
+        }
+
+        private Map<String, Map<String, Object>> convertData(String jsonRquest) {
+            Map<String, Map<String, Object>> requestData;
+            try {
+                requestData = mapper.readValue(jsonRquest, Map.class);
             } catch (JsonProcessingException e) {
                 requestData = new HashMap<>();
             }
