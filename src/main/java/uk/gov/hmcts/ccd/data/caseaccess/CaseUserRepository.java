@@ -10,4 +10,6 @@ public interface CaseUserRepository {
     List<Long> findCasesUserIdHasAccessTo(String userId);
 
     List<String> findCaseRoles(Long caseId, String userId);
+
+    List<CaseUserEntity> findCaseUserRoles(final List<Long> caseIds, final List<String> userIds);
 }

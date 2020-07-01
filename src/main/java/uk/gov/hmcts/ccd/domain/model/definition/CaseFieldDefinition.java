@@ -3,6 +3,9 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
+import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,8 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.ToString;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -52,6 +53,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private String displayContextParameter;
     @JsonProperty("formatted_value")
     private Object formattedValue;
+    @JsonProperty("default_value")
+    private String defaultValue;
 
     public String getId() {
         return id;
@@ -139,6 +142,14 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     public void setShowConditon(String showConditon) {
         this.showConditon = showConditon;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 
     public List<AccessControlList> getAccessControlLists() {
@@ -280,7 +291,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     }
 
     @JsonIgnore
-    Optional<AccessControlList> getAccessControlListByRole(String role) {
+    public Optional<AccessControlList> getAccessControlListByRole(String role) {
         return this.accessControlLists.stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
     }
 

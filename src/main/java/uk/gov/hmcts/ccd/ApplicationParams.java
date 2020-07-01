@@ -53,9 +53,6 @@ public class ApplicationParams {
     @Value("${ccd.ui-definition.host}")
     private String uiDefinitionHost;
 
-    @Value("${auth.idam.client.baseUrl}")
-    private String idamHost;
-
     @Value("${ccd.case.search.wildcards.allowed}")
     private boolean wildcardSearchAllowed;
 
@@ -195,6 +192,10 @@ public class ApplicationParams {
         return uiDefinitionHost + "/api/display/search-result-definition/" + encode(caseTypeId);
     }
 
+    public String displaySearchCasesResultDefURL(final String caseTypeId, final String useCase) {
+        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?usecase=" + useCase;
+    }
+
     public String displayCaseTabCollection(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/tab-structure/" + encode(caseTypeId);
     }
@@ -225,10 +226,6 @@ public class ApplicationParams {
 
     public String baseTypesURL() {
         return caseDefinitionHost + "/api/base-types";
-    }
-
-    public String idamUserProfileURL() {
-        return idamHost + "/details";
     }
 
     public String caseRolesURL() {

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Sets;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +20,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -89,7 +90,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -122,7 +123,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -155,7 +156,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give ALL access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
             assertThat(accessLevel, equalTo(AccessLevel.ALL));
         }
     }
@@ -189,7 +190,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -231,7 +232,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -264,7 +265,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -297,7 +298,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give GRANTED access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
     }
@@ -334,7 +335,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should give ALL access level")
         void accessLevel() {
-            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(roles));
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
             assertThat(accessLevel, equalTo(AccessLevel.ALL));
         }
     }
@@ -579,8 +580,10 @@ class CaseAccessServiceTest {
         when(userRepository.getUserRoles()).thenReturn(new HashSet<>(asList(roles)));
     }
 
-    private ServiceAndUserDetails serviceAndUserDetails(String[] roles) {
-        return new ServiceAndUserDetails("id", "password", asList(roles), "service");
+    private UserInfo userInfo(String[] roles) {
+        return UserInfo.builder()
+            .roles(Arrays.asList(roles))
+            .build();
     }
 
 }
