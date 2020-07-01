@@ -26,7 +26,7 @@ public class DataStoreBeftaRunner {
 
     @AfterClass
     public static void tearDown() {
-        new ElasticsearchTestDataLoaderExtension().close();
+        BeftaMain.tearDown();
     }
 
 }

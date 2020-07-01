@@ -1,10 +1,10 @@
 {
-  "_guid_": "F-104_Test_Data_Base",
+  "_guid_": "F-108_Test_Data_Base",
   "title": "External Elastic Search Endpoint",
   "productName": "CCD Data Store Elastic Search API",
-  "operationName": "external search query",
+  "operationName": "internal search query",
   "method": "POST",
-  "uri": "/internal/searchCases",
+  "uri": "/searchCases",
   "user" : {
     "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
     "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"

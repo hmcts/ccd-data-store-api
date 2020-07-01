@@ -15,7 +15,7 @@
   },
   "request": {
     "body": {
-      "_source" : ["reference", "data.MoneyGBPField", "data.NumberField"],
+      "_source" : ["reference", "data.MoneyGBPField", "data.TextAreaField"],
       "query": {
         "match": {
           "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"

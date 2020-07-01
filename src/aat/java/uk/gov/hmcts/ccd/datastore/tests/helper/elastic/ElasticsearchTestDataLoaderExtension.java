@@ -56,9 +56,6 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
 
     @Override
     public void close() {
-        System.out.println("##### CLOSING");
-        LOG.info("##### CLOSING");
-        LOG.info("Deleting index and alias");
         deleteIndexAndAlias(AAT_PRIVATE_INDEX_NAME, AAT_PRIVATE_INDEX_ALIAS);
         deleteIndexAndAlias(AAT_PRIVATE2_INDEX_NAME, AAT_PRIVATE2_INDEX_ALIAS);
     }
