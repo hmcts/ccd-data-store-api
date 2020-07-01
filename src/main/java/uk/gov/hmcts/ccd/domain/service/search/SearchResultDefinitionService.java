@@ -5,10 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,7 @@ public class SearchResultDefinitionService {
         this.uiDefinitionRepository = uiDefinitionRepository;
     }
 
-    public SearchResult getSearchResultDefinition(CaseTypeDefinition caseTypeDefinition, String useCase, List<String> requestedFields) {
+    public SearchResultDefinition getSearchResultDefinition(CaseTypeDefinition caseTypeDefinition, String useCase, List<String> requestedFields) {
         String caseTypeId = caseTypeDefinition.getId();
         if (Strings.isNullOrEmpty(useCase)) {
             return buildSearchResultDefinitionFromCaseFields(caseTypeDefinition, requestedFields);
@@ -44,8 +42,8 @@ public class SearchResultDefinitionService {
         }
     }
 
-    private SearchResult buildSearchResultDefinitionFromCaseFields(CaseTypeDefinition caseTypeDefinition, List<String> requestedFields) {
-        SearchResult searchResult = new SearchResult();
+    private SearchResultDefinition buildSearchResultDefinitionFromCaseFields(CaseTypeDefinition caseTypeDefinition, List<String> requestedFields) {
+        SearchResultDefinition searchResult = new SearchResultDefinition();
         List<SearchResultField> searchResultFields = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(requestedFields)) {

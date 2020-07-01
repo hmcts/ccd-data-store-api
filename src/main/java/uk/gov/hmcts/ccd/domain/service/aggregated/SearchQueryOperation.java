@@ -69,7 +69,7 @@ public class SearchQueryOperation {
             return new SearchResultView(Collections.emptyList(), Collections.emptyList(), NO_ERROR);
         }
 
-        final SearchResult searchResult = searchResultDefinitionService.getSearchResultDefinition(caseType.get(),
+        final SearchResultDefinition searchResult = searchResultDefinitionService.getSearchResultDefinition(caseType.get(),
             Strings.isNullOrEmpty(view) ? SEARCH : view, Collections.emptyList());
 
         addSortOrderFields(metadata, searchResult);
@@ -96,7 +96,7 @@ public class SearchQueryOperation {
         return getSortOrders(searchResultDefinitionService.getSearchResultDefinition(caseType, useCase, Collections.emptyList()));
     }
 
-    private List<SortOrderField> getSortOrders(SearchResult searchResult) {
+    private List<SortOrderField> getSortOrders(SearchResultDefinition searchResult) {
         return Arrays.stream(searchResult.getFields())
             .filter(this::hasSortField)
             .filter(this::filterByRole)
@@ -105,7 +105,7 @@ public class SearchQueryOperation {
             .collect(Collectors.toList());
     }
 
-    private void addSortOrderFields(MetaData metadata, SearchResult searchResult) {
+    private void addSortOrderFields(MetaData metadata, SearchResultDefinition searchResult) {
         List<SortOrderField> sortOrders = getSortOrders(searchResult);
         metadata.setSortOrderFields(sortOrders);
     }
