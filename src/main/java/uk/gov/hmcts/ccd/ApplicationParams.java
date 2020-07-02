@@ -199,6 +199,10 @@ public class ApplicationParams {
         return uiDefinitionHost + "/api/display/search-result-definition/" + encode(caseTypeId);
     }
 
+    public String displaySearchCasesResultDefURL(final String caseTypeId, final String useCase) {
+        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?usecase=" + useCase;
+    }
+
     public String displayCaseTabCollection(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/tab-structure/" + encode(caseTypeId);
     }

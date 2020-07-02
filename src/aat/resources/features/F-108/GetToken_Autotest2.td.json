@@ -1,0 +1,65 @@
+{
+  "_guid_": "Private_Case_Creation_Autotest2_Data_Token_Creation",
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Case worker",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+
+  "specs": [
+    "a case that has just been created as in Private_Case_Creation_Data",
+    "a case that has just been created as in [Private_Case_Creation_Data]",
+    "to create a full case",
+    "to create a token for case creation"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "[[$CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_EMAIL]]",
+      "password": "[[$CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_PASSWORD]]"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT_PRIVATE",
+      "etid": "CREATE"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
+      "VaRy": "aCCept-EncodIng"
+    },
+    "body" : {
+      "token" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "case_details" : {
+        "id": null,
+        "jurisdiction": "${[scenarioContext][testData][request][pathVariables][jid]}",
+        "state": null,
+        "version": null,
+        "case_type_id": "${[scenarioContext][testData][request][pathVariables][ctid]}",
+        "created_date": null,
+        "last_modified": null,
+        "last_state_modified_date": null,
+        "security_classification": null,
+        "case_data": {},
+        "data_classification": {},
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": {}
+      },
+      "event_id" : "CREATE"
+    }
+  }
+
+}

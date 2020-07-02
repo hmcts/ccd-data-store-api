@@ -301,7 +301,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     }
 
     @JsonIgnore
-    Optional<AccessControlList> getAccessControlListByRole(String role) {
+    public Optional<AccessControlList> getAccessControlListByRole(String role) {
         return this.accessControlLists.stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
     }
 

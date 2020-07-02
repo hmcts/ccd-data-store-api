@@ -6,6 +6,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -69,6 +70,13 @@ public class MetaData {
 
         public static CaseField valueOfReference(String reference) {
             return valueOf(reference.replace("[", "").replace("]", ""));
+        }
+
+        public static CaseField valueOfColumnName(String dbColumnName) {
+            return Arrays.stream(values())
+                .filter(v -> v.getDbColumnName().equals(dbColumnName))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("No MetaData field exists with column name '%s'", dbColumnName)));
         }
     }
 
