@@ -29,10 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -44,8 +43,10 @@ class CaseAccessOperationTest {
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final String CASE_TYPE_ID = "Application";
     private static final Long CASE_REFERENCE = 1234123412341236L;
+    private static final Long CASE_REFERENCE_OTHER = 1111222233334444L;
     private static final String USER_ID = "123";
     private static final Long CASE_ID = 456L;
+    private static final Long CASE_ID_OTHER = 1234L;
     private static final Long CASE_NOT_FOUND = 9999999999999999L;
     private static final String NOT_CASE_ROLE = "NotACaseRole";
     private static final String CASE_ROLE = "[DEFENDANT]";
@@ -69,7 +70,7 @@ class CaseAccessOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        configureCaseRepository();
+        configureCaseRepository(JURISDICTION);
         configureCaseRoleRepository();
         configureCaseUserRepository();
     }
@@ -212,25 +213,98 @@ class CaseAccessOperationTest {
     }
 
     @Nested()
-    @DisplayName("findCaseUserRoles(caseReferences, userIds)")
-    class GetCaseAssignUserRoles {
-        private CaseDetails caseDetails;
+    @DisplayName("addCaseUserRoles(caseUserRoles)")
+    class AddCaseAssignUserRoles {
 
         @BeforeEach
         void setUp() {
-            caseDetails = new CaseDetails();
-            caseDetails.setId(CASE_ID.toString());
-            caseDetails.setCaseTypeId(CASE_TYPE_ID);
+            configureCaseRepository(null);
         }
 
+        @Test
+        @DisplayName("should add single case user role")
+        void shouldAddSingleCaseUserRole() {
+            // ARRANGE
+            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+        }
+
+        @Test
+        @DisplayName("should add multiple case user roles")
+        void shouldAddMultipleCaseUserRoles() {
+            // ARRANGE
+            final CaseDetails caseDetailsOther = new CaseDetails();
+            caseDetailsOther.setId(String.valueOf(CASE_ID_OTHER));
+            caseDetailsOther.setReference(CASE_REFERENCE_OTHER);
+            doReturn(Optional.of(caseDetailsOther)).when(caseDetailsRepository).findByReference(null, CASE_REFERENCE_OTHER);
+
+            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
+                new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
+            );
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID_OTHER, USER_ID, CASE_ROLE);
+        }
+
+        @Test
+        @DisplayName("should add multiple case user roles but lookup case details once per case")
+        void shouldAddMultipleCaseUserRolesButLoadCaseDetailsOncePerCase() {
+            // ARRANGE
+            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER) // NB: repeat case reference
+            );
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            // NB: only one lookup per case reference
+            verify(caseDetailsRepository, times(1)).findByReference(null, CASE_REFERENCE);
+            // standard grant access check for all case user roles
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE_OTHER);
+        }
+
+        @Test
+        @DisplayName("should throw not found exception when case not found")
+        void shouldThrowNotFound() {
+            // ARRANGE
+            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRole(CASE_NOT_FOUND.toString(), USER_ID, CASE_ROLE)
+            );
+
+            // ACT / ASSERT
+            assertThrows(CaseNotFoundException.class, () -> {
+                caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            });
+        }
+    }
+
+    @Nested()
+    @DisplayName("findCaseUserRoles(caseReferences, userIds)")
+    class GetCaseAssignUserRoles {
+
+        @BeforeEach
+        void setUp() {
+            configureCaseRepository(null);
+        }
 
         @Test
         @DisplayName("should find case assigned user roles")
         void shouldGetCaseAssignedUserRoles() {
-            final CaseDetails caseDetails = new CaseDetails();
-            caseDetails.setId(String.valueOf(CASE_ID));
-            caseDetails.setReference(CASE_REFERENCE);
-            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(null, CASE_REFERENCE);
             List<Long> caseReferences = Lists.newArrayList(CASE_REFERENCE);
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences, Lists.newArrayList());
 
@@ -242,8 +316,7 @@ class CaseAccessOperationTest {
         @Test
         @DisplayName("should return empty result for non existing cases")
         void shouldReturnEmptyResultOnNonExistingCases() {
-            doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(anyString(), anyLong());
-            List<Long> caseReferences = Lists.newArrayList(1234567L);
+            List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences, Lists.newArrayList());
 
             assertNotNull(caseAssignedUserRoles);
@@ -251,15 +324,15 @@ class CaseAccessOperationTest {
         }
     }
 
-    private void configureCaseRepository() {
+    private void configureCaseRepository(String jurisdiction) {
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setId(String.valueOf(CASE_ID));
         caseDetails.setReference(CASE_REFERENCE);
 
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
-                                          .findByReference(JURISDICTION, CASE_REFERENCE);
+                                          .findByReference(jurisdiction, CASE_REFERENCE);
         doReturn(Optional.empty()).when(caseDetailsRepository)
-                                  .findByReference(JURISDICTION, CASE_NOT_FOUND);
+                                  .findByReference(jurisdiction, CASE_NOT_FOUND);
         doReturn(Optional.empty()).when(caseDetailsRepository)
                                   .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
     }
