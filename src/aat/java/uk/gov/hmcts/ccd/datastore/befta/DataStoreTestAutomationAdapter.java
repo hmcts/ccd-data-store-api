@@ -15,7 +15,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public void doLoadTestData() {
-        if (elasticSearchEnabled()){
+        if (elasticSearchEnabled()) {
             new ElasticsearchTestDataLoaderExtension().deleteIndexesIfPresent();
         }
         loader.addCcdRoles();
@@ -31,21 +31,22 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
-        } else if (key.toString().startsWith("caseIdAsStringFrom")){
+        } else if (key.toString().startsWith("caseIdAsStringFrom")) {
             String childContext = key.toString().replace("caseIdAsStringFrom_","");
             try {
-                long longRef = (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
+                long longRef = (long) ReflectionUtils.deepGetFieldInObject(
+                    scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
                 return Long.toString(longRef);
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
-        } else if (key.toString().equals("UniqueString")){
+        } else if (key.toString().equals("UniqueString")) {
             return ScenarioData.getUniqueString();
         }
         return super.calculateCustomValue(scenarioContext, key);
     }
 
-    private boolean elasticSearchEnabled(){
+    private boolean elasticSearchEnabled() {
         return ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
     }
 }

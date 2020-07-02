@@ -8,7 +8,7 @@ import java.util.UUID;
 public class DataStoreSteps {
 
     @Before
-    public void createUID(){
+    public void createUID() {
         String uniqueID = UUID.randomUUID().toString();
         ScenarioData.setUniqueString("string-" + uniqueID);
     }
