@@ -58,9 +58,7 @@ class IncrementSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
     private Map<String, Map<String, Object>> createRequestData() {
         String jsonRequest = "{\n"
             + "\t\"$inc\": {\n"
-            + "\t\t\"orgs_assigned_users\": {\n"
-            + "\t\t\"organisationA\": 32\n"
-            + "\t\t}\n"
+            + "\t\t\"orgs_assigned_users.organisationA\": 32\n"
             + "\t}\n"
             + "}";
 
@@ -70,10 +68,8 @@ class IncrementSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
     private Map<String, Map<String, Object>>  createRequestDataMultiple() {
         String jsonRequest = "{\n"
             + "\t\"$inc\": {\n"
-            + "\t\t\"orgs_assigned_users\": {\n"
-            + "\t\t\"organisationA\": 32,\n"
-            + "\t\t\"organisationB\": 33\n"
-            + "\t\t}\n"
+            + "\t\t\"orgs_assigned_users.organisationA\": 32,\n"
+            + "\t\t\"orgs_assigned_users.organisationB\": 33\n"
             + "\t}\n"
             + "}";
 

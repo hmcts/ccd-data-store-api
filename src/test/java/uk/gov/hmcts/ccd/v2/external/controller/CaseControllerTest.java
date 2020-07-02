@@ -314,9 +314,7 @@ class CaseControllerTest {
         private SupplementaryDataUpdateRequest createRequestDataOrgA() {
             String jsonRequest = "{\n"
                 + "\t\"$set\": {\n"
-                + "\t\t\"orgs_assigned_users\": {\n"
-                + "\t\t\"organisationA\": 32\n"
-                + "\t\t}\n"
+                + "\t\t\"orgs_assigned_users.organisationA\": 32\n"
                 + "\t}\n"
                 + "}";
             return new SupplementaryDataUpdateRequest(convertData(jsonRequest));

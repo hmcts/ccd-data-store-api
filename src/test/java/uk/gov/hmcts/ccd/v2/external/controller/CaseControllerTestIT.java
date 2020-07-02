@@ -241,7 +241,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     public void shouldSetSupplementaryData() throws Exception {
         String caseId = "1504259907353529";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
-        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
+        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequestOrgB();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -252,7 +252,40 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
         SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
-        assertNotNull("updated supplementary data resource", supplementaryDataResource);
+        assertNotNull(supplementaryDataResource);
+        assertNotNull(supplementaryDataResource.getSupplementaryData());
+        assertNotNull(supplementaryDataResource.getSupplementaryData().getResponse());
+        Map<String, Object> response = supplementaryDataResource.getSupplementaryData().getResponse();
+        assertEquals(1, response.size());
+        assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
+        assertEquals(23, response.get("orgs_assigned_users.organisationB"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldSetSupplementaryDataMultipleUpdate() throws Exception {
+        String caseId = "1504259907353529";
+        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequestMultiple();
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
+        assertNotNull(supplementaryDataResource);
+        assertNotNull(supplementaryDataResource.getSupplementaryData());
+        assertNotNull(supplementaryDataResource.getSupplementaryData().getResponse());
+        Map<String, Object> response = supplementaryDataResource.getSupplementaryData().getResponse();
+        assertEquals(2, response.size());
+        assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
+        assertEquals(23, response.get("orgs_assigned_users.organisationB"));
+        assertTrue(response.containsKey("orgs_assigned_users.organisationA"));
+        assertEquals(25, response.get("orgs_assigned_users.organisationA"));
     }
 
     @Test
@@ -364,12 +397,33 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         }
     }
 
+    private SupplementaryDataUpdateRequest createSupplementaryDataSetRequestMultiple() throws JsonProcessingException {
+        String jsonRequest = "{\n"
+            + "\t\"$set\": {\n"
+            + "\t\t\"orgs_assigned_users.organisationA\": 25,\n"
+            + "\t\t\"orgs_assigned_users.organisationB\": 23\n"
+            + "\t}\n"
+            + "}";
+
+        Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
+        return new SupplementaryDataUpdateRequest(requestData);
+    }
+
+    private SupplementaryDataUpdateRequest createSupplementaryDataSetRequestOrgB() throws JsonProcessingException {
+        String jsonRequest = "{\n"
+            + "\t\"$set\": {\n"
+            + "\t\t\"orgs_assigned_users.organisationB\": 23\n"
+            + "\t}\n"
+            + "}";
+
+        Map<String, Map<String, Object>> requestData = mapper.readValue(jsonRequest, Map.class);
+        return new SupplementaryDataUpdateRequest(requestData);
+    }
+
     private SupplementaryDataUpdateRequest createSupplementaryDataSetRequest() throws JsonProcessingException {
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
-            + "\t\t\"orgs_assigned_users\": {\n"
-            + "\t\t\t\"organisationA\": 10\n"
-            + "\t\t}\n"
+            + "\t\t\"orgs_assigned_users.organisationA\": 22\n"
             + "\t}\n"
             + "}";
 
@@ -380,9 +434,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     private SupplementaryDataUpdateRequest createSupplementaryDataIncrementRequest() throws JsonProcessingException {
         String jsonRequest = "{\n"
             + "\t\"$inc\": {\n"
-            + "\t\t\"orgs_assigned_users\": {\n"
-            + "\t\t\t\"organisationA\": 3\n"
-            + "\t\t}\n"
+            + "\t\t\"orgs_assigned_users.organisationA\": 3\n"
             + "\t}\n"
             + "}";
 

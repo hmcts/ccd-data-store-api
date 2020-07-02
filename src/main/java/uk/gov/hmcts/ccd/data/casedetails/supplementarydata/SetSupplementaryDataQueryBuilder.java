@@ -49,8 +49,9 @@ public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryB
                 Query query = entityManager.createNativeQuery(SET_UPDATE_QUERY);
                 setCommonProperties(query, caseReference, entry.getKey(), entry.getValue());
                 String parentKey = entry.getKey().split(",")[0];
-                query.setParameter("json_value", defaultObjectMapperService.convertObjectToString(requestData.get()));
-                query.setParameter("json_value_insert", defaultObjectMapperService.convertObjectToString(requestData.get().get(parentKey)));
+                Map<String, Object>  convertedData = updateRequest.convertRequestData(operationType());
+                query.setParameter("json_value", defaultObjectMapperService.convertObjectToString(convertedData));
+                query.setParameter("json_value_insert", defaultObjectMapperService.convertObjectToString(convertedData.get(parentKey)));
                 query.setParameter("parent_path", Arrays.asList(parentKey));
                 query.setParameter("parent_key", "{" + parentKey + "}");
                 return query;

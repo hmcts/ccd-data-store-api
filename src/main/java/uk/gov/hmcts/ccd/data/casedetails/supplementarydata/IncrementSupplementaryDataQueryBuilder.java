@@ -49,7 +49,8 @@ public class IncrementSupplementaryDataQueryBuilder implements SupplementaryData
             return leafNodes.entrySet().stream().map(entry -> {
                 Query query = entityManager.createNativeQuery(INC_UPDATE_QUERY);
                 setCommonProperties(query, caseReference, entry.getKey(), entry.getValue());
-                query.setParameter("json_value", defaultObjectMapperService.convertObjectToString(requestData.get()));
+                Map<String, Object>  convertedData = updateRequest.convertRequestData(operationType());
+                query.setParameter("json_value", defaultObjectMapperService.convertObjectToString(convertedData));
                 query.setParameter("node_path", Arrays.asList(entry.getKey().split(",")));
                 return query;
             }).collect(Collectors.toCollection(LinkedList::new));

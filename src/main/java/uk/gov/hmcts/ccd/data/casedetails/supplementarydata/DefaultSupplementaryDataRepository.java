@@ -1,6 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -11,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 
 @Service
 @Qualifier("default")
@@ -27,10 +32,13 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
     private EntityManager em;
 
     private List<SupplementaryDataQueryBuilder> queryBuilders;
+    private DefaultObjectMapperService defaultObjectMapperService;
 
     @Autowired
-    public DefaultSupplementaryDataRepository(final List<SupplementaryDataQueryBuilder> queryBuilders) {
+    public DefaultSupplementaryDataRepository(final List<SupplementaryDataQueryBuilder> queryBuilders,
+                                              DefaultObjectMapperService defaultObjectMapperService) {
         this.queryBuilders = queryBuilders;
+        this.defaultObjectMapperService = defaultObjectMapperService;
     }
 
     @Override
@@ -41,17 +49,32 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
     }
 
     @Override
-    public void incrementSupplementaryData(final String caseReference,SupplementaryDataUpdateRequest updateRequest) {
+    public void incrementSupplementaryData(final String caseReference, SupplementaryDataUpdateRequest updateRequest) {
         LOG.debug("Insert supplementary data");
         List<Query> queryList = queryBuilder(SupplementaryDataOperation.INC).buildQueryForEachSupplementaryDataProperty(em, caseReference, updateRequest);
         queryList.stream().forEach(query -> query.executeUpdate());
     }
 
     @Override
-    public SupplementaryData findSupplementaryData(final String caseReference) {
+    public SupplementaryData findSupplementaryData(final String caseReference, SupplementaryDataUpdateRequest updateRequest) {
         LOG.debug("Find supplementary data");
-        List<Query> queryList = queryBuilder(SupplementaryDataOperation.FIND).buildQueryForEachSupplementaryDataProperty(em, caseReference, null);
-        return new SupplementaryData(JacksonUtils.convertJsonNode(queryList.get(0).getSingleResult()));
+        List<Query> queryList = queryBuilder(SupplementaryDataOperation.FIND).buildQueryForEachSupplementaryDataProperty(em, caseReference, updateRequest);
+        JsonNode responseNode = (JsonNode) queryList.get(0).getSingleResult();
+        return getSupplementaryData(updateRequest, responseNode);
+    }
+
+    private SupplementaryData getSupplementaryData(SupplementaryDataUpdateRequest updateRequest, JsonNode responseNode) {
+        if (updateRequest != null) {
+            DocumentContext context = JsonPath.parse(defaultObjectMapperService.convertObjectToString(responseNode));
+            Map<String, Object> updatedResponse = new HashMap<>();
+            updateRequest.getRequestDataKeys().stream().forEach(key -> {
+                Object value = context.read("$." + key, Object.class);
+                updatedResponse.put(key, value);
+            });
+
+            return new SupplementaryData(updatedResponse);
+        }
+        return new SupplementaryData(responseNode);
     }
 
     private SupplementaryDataQueryBuilder queryBuilder(final SupplementaryDataOperation supplementaryDataOperation) {

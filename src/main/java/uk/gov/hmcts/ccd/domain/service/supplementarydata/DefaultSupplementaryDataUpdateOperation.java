@@ -37,6 +37,6 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
                     .accept(caseReference, supplementaryData);
             }
         });
-        return this.supplementaryDataRepository.findSupplementaryData(caseReference);
+        return this.supplementaryDataRepository.findSupplementaryData(caseReference, supplementaryData);
     }
 }

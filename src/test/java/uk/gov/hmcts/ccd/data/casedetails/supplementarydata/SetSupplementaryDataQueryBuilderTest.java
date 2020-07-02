@@ -59,9 +59,7 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
     private Map<String, Map<String, Object>> createRequestData() {
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
-            + "\t\t\"orgs_assigned_users\": {\n"
-            + "\t\t\"organisationA\": 32\n"
-            + "\t\t}\n"
+            + "\t\t\"orgs_assigned_users.organisationA\": 32\n"
             + "\t}\n"
             + "}";
 
@@ -71,10 +69,8 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
     private Map<String, Map<String, Object>>  createRequestDataMultiple() {
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
-            + "\t\t\"orgs_assigned_users\": {\n"
-            + "\t\t\"organisationA\": 32,\n"
-            + "\t\t\"organisationB\": 36\n"
-            + "\t\t}\n"
+            + "\t\t\"orgs_assigned_users.organisationA\": 32,\n"
+            + "\t\t\"orgs_assigned_users.organisationB\": 36\n"
             + "\t}\n"
             + "}";
 

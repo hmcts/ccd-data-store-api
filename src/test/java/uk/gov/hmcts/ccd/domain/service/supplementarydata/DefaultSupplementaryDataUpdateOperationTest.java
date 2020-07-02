@@ -49,7 +49,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
         assertAll(
             () -> verify(supplementaryDataRepository, times(0)).setSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)),
             () -> verify(supplementaryDataRepository, times(0)).incrementSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)),
-            () -> verify(supplementaryDataRepository, times(1)).findSupplementaryData(anyString())
+            () -> verify(supplementaryDataRepository, times(1)).findSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class))
         );
     }
 
@@ -62,7 +62,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
         resultMap.putAll(incMap.get(SupplementaryDataOperation.INC.getOperationName()));
         resultMap.putAll(setMap.get(SupplementaryDataOperation.SET.getOperationName()));
         SupplementaryData supplementaryData = new SupplementaryData(resultMap);
-        when(this.supplementaryDataRepository.findSupplementaryData(anyString())).thenReturn(supplementaryData);
+        when(this.supplementaryDataRepository.findSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class))).thenReturn(supplementaryData);
 
         Map<String, Map<String, Object>> supplementaryDataRequest = new HashMap<>();
         supplementaryDataRequest.putAll(setMap);
@@ -73,7 +73,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
         assertAll(
             () -> verify(supplementaryDataRepository, times(1)).setSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)),
             () -> verify(supplementaryDataRepository, times(1)).incrementSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)),
-            () -> verify(supplementaryDataRepository, times(1)).findSupplementaryData(anyString()),
+            () -> verify(supplementaryDataRepository, times(1)).findSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class)),
             () -> assertThat(response.getResponse(), is(resultMap))
         );
     }
@@ -81,9 +81,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
     private Map<String, Map<String, Object>> createSupplementaryDataSetRequest() {
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
-            + "\t\t\"orgs_assigned_users\": {\n"
-            + "\t\t\t\"organisationA\": 10\n"
-            + "\t\t}\n"
+            + "\t\t\"orgs_assigned_users.organisationA\": 10\n"
             + "\t}\n"
             + "}";
 
@@ -93,9 +91,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
     private Map<String, Map<String, Object>> createSupplementaryDataIncrementRequest() {
         String jsonRequest = "{\n"
             + "\t\"$inc\": {\n"
-            + "\t\t\"orgs_assigned_users\": {\n"
-            + "\t\t\t\"organisationB\": 3\n"
-            + "\t\t}\n"
+            + "\t\t\"orgs_assigned_users.organisationB\": 3\n"
             + "\t}\n"
             + "}";
 

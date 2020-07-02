@@ -9,5 +9,5 @@ public interface SupplementaryDataRepository {
 
     void incrementSupplementaryData(String caseReference, SupplementaryDataUpdateRequest updateRequest);
 
-    SupplementaryData findSupplementaryData(String caseReference);
+    SupplementaryData findSupplementaryData(String caseReference, SupplementaryDataUpdateRequest updateRequest);
 }
