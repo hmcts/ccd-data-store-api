@@ -258,6 +258,33 @@ class CaseControllerTest {
 
         @Test
         @DisplayName("should propagate BadRequestException when case reference not valid")
+        void invalidSupplementaryDataUpdateRequest() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest()));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when case reference not valid")
+        void shouldThrowBadReqeuestExceptionWhenSupplementaryDataNull() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, null));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when case reference not valid")
+        void shouldThrowBadReqeuestExceptionWhenSupplementaryDataHasNoData() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest(new HashMap<>())));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when case reference not valid")
         void caseReferenceNotValid() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
