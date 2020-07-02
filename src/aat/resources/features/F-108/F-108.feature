@@ -4,7 +4,7 @@ Feature: Elasticsearch external endpoint
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-600
+  @S-900
   Scenario: should return the case for a role with same security classification as case type classification and read access on case type
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
@@ -18,7 +18,7 @@ Feature: Elasticsearch external endpoint
     And the response has all other details as expected
 
 
-    @S-601
+    @S-901
   Scenario: should NOT return the case for a role with read access on case type and lower security classification than then case type
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
@@ -31,7 +31,7 @@ Feature: Elasticsearch external endpoint
     And the response has all other details as expected
 
 
-    @S-603
+    @S-903
   Scenario: should return the case for a role with read access to the case state
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
@@ -44,7 +44,7 @@ Feature: Elasticsearch external endpoint
     And the response has all other details as expected
 
 
-    @S-604
+    @S-904
   Scenario: should NOT return the case for a role with no read access to a case state
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
@@ -57,7 +57,7 @@ Feature: Elasticsearch external endpoint
     And the response has all other details as expected
 
 
-    @S-605
+    @S-905
   Scenario: should return the case field where user role matches ACL and security classification
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
@@ -70,21 +70,21 @@ Feature: Elasticsearch external endpoint
     And the response has all other details as expected
 
   ### CrossCaseTypeSearch
-    @S-610
+    @S-910
   Scenario: should return cases only for case types the user has access to - the user role can read case type and has same security classification "
   + "as case type
-    Given a case that has just been created as in [S-610_Create_Case_Private_Autotest1]
-    And a case that has just been created as in [S-610_Create_Case_Private_Autotest2]
+    Given a case that has just been created as in [S-910_Create_Case_Private_Autotest1]
+    And a case that has just been created as in [S-910_Create_Case_Private_Autotest2]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [private access to AUTOTEST1 jurisdiction only]
     When the request [is configured to search for both the previously created cases]
     And a request is prepared with appropriate values
     And it is submitted to call the [internal search query] operation of [CCD Data Store Elastic Search API]
     Then a positive response is received
-    And the response [contains only S-610_Create_Case_Private_Autotest1]
+    And the response [contains only S-910_Create_Case_Private_Autotest1]
     And the response has all other details as expected
 
-    @S-611
+    @S-911
   Scenario: should NOT return any cases for a role with read access on case types but lower security classification than the case types
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data]
     And a case that has just been created as in [Private_Case_Creation_Autotest2_Data]
@@ -97,10 +97,10 @@ Feature: Elasticsearch external endpoint
     And the response [contains no cases]
     And the response has all other details as expected
 
-    @S-612
+    @S-912
   Scenario: should return the cases for cross case type search for a role with read access to the case states
-    Given a case that has just been created as in [S-612_Create_Case_Private_Autotest1]
-    And a case that has just been created as in [S-612_Create_Case_Private_Autotest2]
+    Given a case that has just been created as in [S-912_Create_Case_Private_Autotest1]
+    And a case that has just been created as in [S-912_Create_Case_Private_Autotest2]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [private multi jurisdiction access]
     When the request [is configured to search for both the previously created cases]
@@ -111,7 +111,7 @@ Feature: Elasticsearch external endpoint
     And the response [does not return the case field where user role has lower security classification than case field]
     And the response has all other details as expected
 
-    @S-613
+    @S-913
   Scenario: should NOT return any cases for cross case type search for a role with no read access to a case state
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data]
     And a case that has just been created as in [Private_Case_Creation_Autotest2_Data]
@@ -124,10 +124,10 @@ Feature: Elasticsearch external endpoint
     And the response [contains no cases]
     And the response has all other details as expected
 
-    @S-614
+    @S-914
   Scenario: should return the case field where user role matches ACL and security classification
-    Given a case that has just been created as in [S-614_Create_Case_Private_Autotest1]
-    And a case that has just been created as in [S-614_Create_Case_Private_Autotest2]
+    Given a case that has just been created as in [S-914_Create_Case_Private_Autotest1]
+    And a case that has just been created as in [S-914_Create_Case_Private_Autotest2]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [restricted security classification]
     When the request [is configured to search for both the previously created cases]
@@ -137,7 +137,7 @@ Feature: Elasticsearch external endpoint
     And the response [contains details of the restricted email field for the 2 previously created cases]
     And the response has all other details as expected
 
-    @S-615
+    @S-915
   Scenario: cross case type search should return metadata only when source filter is not requested
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
@@ -153,9 +153,9 @@ Feature: Elasticsearch external endpoint
 
   ### Field Search Tests
 
-    @S-616
+    @S-916
   Scenario: Should return case for exact match in a date timefield
-    Given a case that has just been created as in [S-616_Create_Case_Private_Autotest1]
+    Given a case that has just been created as in [S-916_Create_Case_Private_Autotest1]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [a valid profile]
     And the request [is configured to search for exact date time from previously created case]
@@ -165,9 +165,9 @@ Feature: Elasticsearch external endpoint
     And the response has all other details as expected
 
 
-    @S-617
+    @S-917
   Scenario: Should return case for exact match on a date field
-    Given a case that has just been created as in [S-617_Create_Case_Private_Autotest1]
+    Given a case that has just been created as in [S-917_Create_Case_Private_Autotest1]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [a valid profile]
     And the request [is configured to search for exact date from previously created case]
@@ -176,9 +176,9 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previoulsy created case]
     And the response has all other details as expected
 
-    @S-618
+    @S-918
   Scenario: Should return case for exact match on a Email field
-    Given a case that has just been created as in [S-618_Create_Case_Private_Autotest1]
+    Given a case that has just been created as in [S-918_Create_Case_Private_Autotest1]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [a valid profile]
     And the request [is configured to search for exact email from previously created case]
@@ -187,9 +187,9 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previoulsy created case]
     And the response has all other details as expected
 
-    @S-619
+    @S-919
   Scenario: Should return case for exact match on a Fixed List field
-    Given a case that has just been created as in [S-619_Create_Case_Private_Autotest1]
+    Given a case that has just been created as in [S-919_Create_Case_Private_Autotest1]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [a valid profile]
     And the request [is configured to search for exact fixed list value from previously created case]
@@ -198,9 +198,9 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previoulsy created case]
     And the response has all other details as expected
 
-    @S-620
+    @S-920
   Scenario: Should return case for exact match on a Money field
-    Given a case that has just been created as in [S-620_Create_Case_Private_Autotest1]
+    Given a case that has just been created as in [S-920_Create_Case_Private_Autotest1]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [a valid profile]
     And the request [is configured to search for exact money field value from previously created case]
@@ -209,9 +209,9 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
-    @S-621
+    @S-921
   Scenario: Should return case for exact match on a Number field
-      Given a case that has just been created as in [S-621_Create_Case_Private_Autotest1]
+      Given a case that has just been created as in [S-921_Create_Case_Private_Autotest1]
       And a wait time of 5 seconds [to allow for Logstash to index the case just created]
       And a user with [a valid profile]
       And the request [is configured to search for exact number field value from previously created case]
@@ -220,9 +220,9 @@ Feature: Elasticsearch external endpoint
       Then the response [contains the previously created case]
       And the response has all other details as expected
 
-    @S-622
+    @S-922
   Scenario: Should return case for exact match on a PhoneUK field
-    Given a case that has just been created as in [S-622_Create_Case_Private_Autotest1]
+    Given a case that has just been created as in [S-922_Create_Case_Private_Autotest1]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [a valid profile]
     And the request [is configured to search for exact PhoneUK value from previously created case]
@@ -231,9 +231,9 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
-    @S-623
+    @S-923
   Scenario: Should return case for exact match on a Text Area field
-    Given a case that has just been created as in [S-623_Create_Case_Private_Autotest1]
+    Given a case that has just been created as in [S-923_Create_Case_Private_Autotest1]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [a valid profile]
     And the request [is configured to search for exact Text Area field value from previously created case]
@@ -242,9 +242,9 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
-  @S-641
+  @S-941
   Scenario: Should return case for exact match on a Text field
-    Given a case that has just been created as in [S-641_Create_Case_Private_Autotest1]
+    Given a case that has just been created as in [S-941_Create_Case_Private_Autotest1]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [a valid profile]
     And the request [is configured to search for exact YesNo field value from previously created case]
@@ -253,9 +253,9 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
-  @S-624
+  @S-924
   Scenario: Should return case for exact match on a Text field
-    Given a case that has just been created as in [S-624_Create_Case_Private_Autotest1]
+    Given a case that has just been created as in [S-924_Create_Case_Private_Autotest1]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
     And a user with [a valid profile]
     And the request [is configured to search for exact Text field value from previously created case]

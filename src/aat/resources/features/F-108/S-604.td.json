@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-604",
+  "_guid_": "S-904",
   "_extends_": "F-108_Test_Data_Base",
   "specs": [
     "a role with no read access to the case state",

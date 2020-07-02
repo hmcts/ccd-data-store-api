@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-622",
+  "_guid_": "S-922",
   "_extends_": "F-108_Test_Data_Base",
   "specs": [
     "is configured to search for exact PhoneUK value from previously created case",
@@ -22,7 +22,7 @@
     "body": {
       "total": 1,
       "cases": [{
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-622_Create_Case_Private_Autotest1]}",
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-922_Create_Case_Private_Autotest1]}",
         "jurisdiction": "AUTOTEST1",
         "state": "TODO",
         "version": null,

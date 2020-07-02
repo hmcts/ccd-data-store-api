@@ -1,10 +1,10 @@
 {
-  "_guid_": "S-610",
+  "_guid_": "S-910",
   "_extends_": "F-108_Test_Data_Base",
   "specs": [
     "private access to AUTOTEST1 jurisdiction only",
     "is configured to search for both the previously created cases",
-    "contains only S-610_Create_Case_Private_Autotest1"
+    "contains only S-910_Create_Case_Private_Autotest1"
   ],
 
   "request": {
@@ -29,7 +29,7 @@
     "body": {
       "total": 1,
       "cases": [{
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-610_Create_Case_Private_Autotest1]}",
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-910_Create_Case_Private_Autotest1]}",
         "jurisdiction": "AUTOTEST1",
         "state": "TODO",
         "version": null,

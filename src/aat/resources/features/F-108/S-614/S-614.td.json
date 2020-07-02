@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-614",
+  "_guid_": "S-914",
   "_extends_": "F-108_Test_Data_Base",
   "specs": [
     "restricted security classification",
@@ -34,7 +34,7 @@
     "body": {
       "total": 2,
       "cases": [{
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-614_Create_Case_Private_Autotest1]}",
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-914_Create_Case_Private_Autotest1]}",
         "jurisdiction": "AUTOTEST1",
         "state": "TODO",
         "version": null,
@@ -55,7 +55,7 @@
         "delete_draft_response_status": null,
         "security_classifications": "[[ANYTHING_PRESENT]]"
       },{
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-614_Create_Case_Private_Autotest2]}",
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-914_Create_Case_Private_Autotest2]}",
         "jurisdiction": "AUTOTEST2",
         "state": "TODO",
         "version": null,

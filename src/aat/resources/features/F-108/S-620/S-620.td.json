@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-620",
+  "_guid_": "S-920",
   "_extends_": "F-108_Test_Data_Base",
   "specs": [
     "is configured to search for exact money field value from previously created case",
@@ -22,7 +22,7 @@
     "body": {
       "total": 1,
       "cases": [{
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-620_Create_Case_Private_Autotest1]}",
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-920_Create_Case_Private_Autotest1]}",
         "jurisdiction": "AUTOTEST1",
         "state": "TODO",
         "version": null,
