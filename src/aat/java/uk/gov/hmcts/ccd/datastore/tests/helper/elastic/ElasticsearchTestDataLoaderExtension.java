@@ -46,7 +46,7 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
         createCases();
     }
 
-    public void deleteIndexesIfPresent(){
+    public void deleteIndexesIfPresent() {
         asElasticsearchApiUser().when().delete(getCaseIndexAliasApi(AAT_PRIVATE_INDEX_NAME, AAT_PRIVATE_INDEX_ALIAS));
         asElasticsearchApiUser().when().delete(AAT_PRIVATE_INDEX_NAME);
 
