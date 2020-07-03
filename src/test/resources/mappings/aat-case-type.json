@@ -717,6 +717,13 @@
               "read": true,
               "update": true,
               "delete": false
+            },
+            {
+              "role": "caseworker-caa",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
             }
           ],
           "show_summary": false,
@@ -739,6 +746,13 @@
               "read": true,
               "update": true,
               "delete": false
+            },
+            {
+              "role": "caseworker-caa",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
             }
           ]
         },
@@ -755,6 +769,13 @@
               "read": true,
               "update": true,
               "delete": false
+            },
+            {
+              "role": "caseworker-caa",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
             }
           ]
         },
@@ -767,6 +788,13 @@
           "acls": [
             {
               "role": "caseworker-autotest1",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-caa",
               "create": true,
               "read": true,
               "update": true,
