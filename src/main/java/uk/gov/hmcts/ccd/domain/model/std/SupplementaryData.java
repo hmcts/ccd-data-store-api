@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Getter
 public class SupplementaryData {
 
+    @JsonIgnore
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private Map<String, Object> response;
