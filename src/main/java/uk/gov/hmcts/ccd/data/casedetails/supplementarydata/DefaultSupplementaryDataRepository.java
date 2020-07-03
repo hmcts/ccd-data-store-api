@@ -1,11 +1,9 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import java.util.HashMap;
+import com.google.common.collect.Sets;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -60,21 +58,8 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
         LOG.debug("Find supplementary data");
         List<Query> queryList = queryBuilder(SupplementaryDataOperation.FIND).buildQueryForEachSupplementaryDataProperty(em, caseReference, updateRequest);
         JsonNode responseNode = (JsonNode) queryList.get(0).getSingleResult();
-        return getSupplementaryData(updateRequest, responseNode);
-    }
-
-    private SupplementaryData getSupplementaryData(SupplementaryDataUpdateRequest updateRequest, JsonNode responseNode) {
-        if (updateRequest != null) {
-            DocumentContext context = JsonPath.parse(defaultObjectMapperService.convertObjectToString(responseNode));
-            Map<String, Object> updatedResponse = new HashMap<>();
-            updateRequest.getRequestDataKeys().stream().forEach(key -> {
-                Object value = context.read("$." + key, Object.class);
-                updatedResponse.put(key, value);
-            });
-
-            return new SupplementaryData(updatedResponse);
-        }
-        return new SupplementaryData(responseNode);
+        Set<String> requestedKeys = updateRequest == null ? Sets.newHashSet() : updateRequest.getRequestDataKeys();
+        return new SupplementaryData(responseNode, requestedKeys);
     }
 
     private SupplementaryDataQueryBuilder queryBuilder(final SupplementaryDataOperation supplementaryDataOperation) {

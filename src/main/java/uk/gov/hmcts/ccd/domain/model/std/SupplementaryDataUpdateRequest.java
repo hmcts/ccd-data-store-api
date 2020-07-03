@@ -1,18 +1,24 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import pl.jalokim.propertiestojson.util.PropertiesToJsonConverter;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @ToString
 @AllArgsConstructor
@@ -22,6 +28,9 @@ public class SupplementaryDataUpdateRequest {
 
     @JsonIgnore
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @JsonIgnore
+    private final PropertiesToJsonConverter propertiesMapper = new PropertiesToJsonConverter();
 
     private Map<String, Map<String, Object>> requestData;
 
@@ -43,16 +52,29 @@ public class SupplementaryDataUpdateRequest {
     }
 
     @JsonIgnore
-    public Map<String, Object> convertRequestData(SupplementaryDataOperation operation) {
+    public String requestedDataToJson(SupplementaryDataOperation operation) {
         Map<String, Object> supplementaryData = this.requestData.get(operation.getOperationName());
-        Map<String, Object> changedKeysAndValues = new HashMap<>();
+        String jsonValue = "";
         if (supplementaryData != null) {
+            Properties properties = new Properties();
             supplementaryData.entrySet().stream().forEach(entry -> {
-                Map<String, Object> nestedMap = generateNestedMap(entry.getKey(), entry.getValue());
-                deepMerge(changedKeysAndValues, nestedMap);
+                properties.put(entry.getKey(), entry.getValue());
             });
+            jsonValue = propertiesMapper.convertToJson(properties);
         }
-        return changedKeysAndValues;
+        return jsonValue;
+    }
+
+    @JsonIgnore
+    public String requestedDataJsonOfPath(SupplementaryDataOperation operation, String path) {
+        String jsonString = requestedDataToJson(operation);
+        DocumentContext context = JsonPath.parse(jsonString);
+        Object value = context.read("$." + path, Object.class);
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new ServiceException("Unable to map object to JSON string", e);
+        }
     }
 
     @JsonIgnore
@@ -65,37 +87,6 @@ public class SupplementaryDataUpdateRequest {
             });
         }
         return keys;
-    }
-
-    private Map<String, Object> generateNestedMap(String path, Object value) {
-        final int indexOfDot = path.indexOf('.');
-        if (indexOfDot == -1) {
-            Map<String, Object> tmpMap = new HashMap<>();
-            tmpMap.put(path, value);
-            return tmpMap;
-        } else {
-            Map<String, Object> tmpMap = new HashMap<>();
-            tmpMap.put(path.split(Pattern.quote("."))[0],
-                generateNestedMap(path.substring(indexOfDot + 1), value));
-            return tmpMap;
-        }
-    }
-
-    private void deepMerge(Map<String, Object> target, Map<String, Object> source) {
-        for (Map.Entry<String, Object> entry : source.entrySet()) {
-            Object value2 = entry.getValue();
-            String key = entry.getKey();
-            if (target.containsKey(key)) {
-                Object value1 = target.get(key);
-                if (value1 instanceof Map && value2 instanceof Map) {
-                    deepMerge((Map<String, Object>) value1, (Map<String, Object>) value2);
-                } else {
-                    target.put(key, value2);
-                }
-            } else {
-                target.put(key, value2);
-            }
-        }
     }
 
 }

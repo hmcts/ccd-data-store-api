@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.std;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashSet;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -22,7 +23,7 @@ class SupplementaryDataTest {
             + "\t}\n"
             + "}";
         Map<String, JsonNode> value = JacksonUtils.convertValue(mapper.readTree(jsonRequest));
-        SupplementaryData supplementaryData = new SupplementaryData(value.get("$set"));
+        SupplementaryData supplementaryData = new SupplementaryData(value.get("$set"), new HashSet<>());
         assertNotNull(supplementaryData);
         assertNotNull(supplementaryData.getResponse());
     }

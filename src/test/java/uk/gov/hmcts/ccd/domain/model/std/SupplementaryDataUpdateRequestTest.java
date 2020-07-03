@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SupplementaryDataUpdateRequestTest {
@@ -28,12 +29,10 @@ class SupplementaryDataUpdateRequestTest {
         assertTrue(leafNodes.containsKey("testc1,testchild2"));
         assertEquals("Test Value c2", leafNodes.get("testc1,testchild2"));
 
-        Map<String, Object> convertedData = updateRequest.convertRequestData(SupplementaryDataOperation.SET);
-        assertTrue(convertedData.containsKey("testc1"));
-        Map<String, Object> childMapResponse = (Map<String, Object>) convertedData.get("testc1");
-        assertTrue(childMapResponse.containsKey("testchild1"));
-        assertEquals("Test Value c2", childMapResponse.get("testchild2"));
-        assertEquals("Test Value c1", childMapResponse.get("testchild1"));
+        String jsonString = updateRequest.requestedDataToJson(SupplementaryDataOperation.SET);
+        String parentKeyJson = updateRequest.requestedDataJsonOfPath(SupplementaryDataOperation.SET, "testc1");
+        assertNotNull(jsonString);
+        assertNotNull(parentKeyJson);
     }
 
     @Test
