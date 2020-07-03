@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.IdamJurisdictionsResolver;
-import uk.gov.hmcts.ccd.data.user.JurisdictionsResolver;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -48,7 +46,7 @@ public class CaseAccessService {
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
-        if (canOnlyViewGrantedCases()) {
+        if (canOnlyViewExplicitlyGrantedCases()) {
             return isExplicitAccessGranted(caseDetails);
         } else {
             return true;
@@ -65,7 +63,7 @@ public class CaseAccessService {
     }
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
-        if (canOnlyViewGrantedCases()) {
+        if (canOnlyViewExplicitlyGrantedCases()) {
             return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
         }
 
@@ -114,7 +112,7 @@ public class CaseAccessService {
         return Boolean.FALSE;
     }
 
-    public Boolean canOnlyViewGrantedCases() {
+    public Boolean canOnlyViewExplicitlyGrantedCases() {
         return userRepository.getUserRoles()
             .stream()
             .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
