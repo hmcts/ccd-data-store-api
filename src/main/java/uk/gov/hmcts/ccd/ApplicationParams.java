@@ -128,6 +128,9 @@ public class ApplicationParams {
     @Value("#{'${audit.log.ignore.statues}'.split(',')}")
     private List<Integer> auditLogIgnoreStatuses;
 
+    @Value("#{'${ccd.role.whitelist}'.split(',')}")
+    private List<String> ccdRoleWhitelist;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -362,4 +365,9 @@ public class ApplicationParams {
     public boolean isAuditLogEnabled() {
         return auditLogEnabled;
     }
+
+    public List<String> getCcdRoleWhitelist() {
+        return ccdRoleWhitelist;
+    }
+
 }

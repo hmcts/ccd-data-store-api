@@ -151,7 +151,7 @@ class DefaultUserRepositoryTest {
             @DisplayName("should only consider roles for given jurisdiction")
             void shouldOnlyConsiderRolesForJurisdiction() {
                 asCaseworkerCaa();
-
+                when(applicationParams.getCcdRoleWhitelist()).thenReturn(Arrays.asList(ROLE_CASEWORKER_CAA));
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(

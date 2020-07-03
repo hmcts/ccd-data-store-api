@@ -160,7 +160,7 @@ public class DefaultUserRepository implements UserRepository {
 
     private boolean filterRole(final String jurisdictionId, final String role) {
         return startsWithIgnoreCase(role, String.format(RELEVANT_ROLES, jurisdictionId))
-            || ArrayUtils.contains(AuthCheckerConfiguration.getCitizenRoles(), role) || Arrays.asList(ROLE_WHITELIST).contains(role);
+            || ArrayUtils.contains(AuthCheckerConfiguration.getCitizenRoles(), role) || applicationParams.getCcdRoleWhitelist().contains(role);
     }
 
     private IdamProperties toIdamProperties(UserInfo userInfo) {
