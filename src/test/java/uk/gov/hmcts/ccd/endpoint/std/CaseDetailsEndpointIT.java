@@ -1450,10 +1450,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("CaseCreated", initialCaseDetails.getState());
         assertNotNull(initialCaseDetails.getLastStateModifiedDate());
 
-        final MvcResult mvcResult = mockMvc.perform(post(url)
+        mockMvc.perform(post(url)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(caseDetailsToSave))
-        ).andExpect(status().is(201))
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .andExpect(status().is(201))
             .andReturn();
 
         final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = " + caseReference, this::mapCaseData);

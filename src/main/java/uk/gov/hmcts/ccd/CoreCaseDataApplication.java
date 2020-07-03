@@ -17,6 +17,7 @@ import java.time.Clock;
 @ComponentScan({ "uk.gov.hmcts.ccd", "springfox" })
 @EnableCaching
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
+@SuppressWarnings({"PMD.UncommentedEmptyConstructor", "PMD.EmptyIfStmt"})
 public class CoreCaseDataApplication {
 
     public static final String LOGGING_LEVEL_SPRINGFRAMEWORK = "logging.level.org.springframework.web";

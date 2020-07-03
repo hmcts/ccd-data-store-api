@@ -2,7 +2,8 @@ package uk.gov.hmcts.ccd.datastore.tests;
 
 import org.apache.commons.lang3.Validate;
 
-public class Env {
+@SuppressWarnings("PMD.ClassNamingConventions")
+public final class Env {
 
     private Env() {}
 

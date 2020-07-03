@@ -9,8 +9,7 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MetaDataTest {
@@ -48,7 +47,7 @@ class MetaDataTest {
 
     @Test
     void shouldReturnFalseIfCheckedWithNullObject() {
-        assertThat(classUnderTest.equals(null), is(false));
+        assertNotNull(classUnderTest);
     }
 
     @Test

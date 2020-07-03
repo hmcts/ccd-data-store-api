@@ -7,6 +7,7 @@ public class EmptySmokeTest {
 
     @Tag("smoke")
     @Test
+    @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
     public void shouldRetrieveWhenExists() {
 
     }

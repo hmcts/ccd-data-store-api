@@ -37,6 +37,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 @Qualifier("default")
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final UserRepository userRepository;

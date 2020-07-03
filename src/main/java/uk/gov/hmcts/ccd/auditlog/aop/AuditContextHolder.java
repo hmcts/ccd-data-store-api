@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.auditlog.aop;
 
-public class AuditContextHolder {
+@SuppressWarnings("PMD.ClassNamingConventions")
+public final class AuditContextHolder {
 
     private AuditContextHolder() {}
 

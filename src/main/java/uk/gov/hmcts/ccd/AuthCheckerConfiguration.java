@@ -39,6 +39,7 @@ public class AuthCheckerConfiguration {
     }
 
     @Bean
+    @SuppressWarnings("PMD.UseLocaleWithCaseConversions")
     public Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor() {
         return request -> {
             final Collection<String> roles = Lists.newArrayList();

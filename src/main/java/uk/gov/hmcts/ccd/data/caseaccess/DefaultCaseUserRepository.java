@@ -24,11 +24,13 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         this.auditRepo = caseUserAuditRepository;
     }
 
+    @Override
     public void grantAccess(Long caseId, String userId, String caseRole) {
         em.merge(new CaseUserEntity(caseId, userId, caseRole));
         auditRepo.auditGrant(caseId, userId, caseRole);
     }
 
+    @Override
     public void revokeAccess(Long caseId, String userId, String caseRole) {
         CaseUserEntity primaryKey = new CaseUserEntity(caseId, userId, caseRole);
         CaseUserEntity caseUser = em.find(CaseUserEntity.class, primaryKey.getCasePrimaryKey());
@@ -39,6 +41,7 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         }
     }
 
+    @Override
     public List<Long> findCasesUserIdHasAccessTo(final String userId) {
         TypedQuery<Long> namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASES_USER_HAS_ACCESS_TO, Long.class);
         namedQuery.setParameter("userId", userId);
@@ -46,6 +49,7 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         return namedQuery.getResultList();
     }
 
+    @Override
     public List<String> findCaseRoles(final Long caseId, final String userId) {
         TypedQuery<String> namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE, String.class);
         namedQuery.setParameter("userId", userId);
@@ -54,9 +58,10 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         return namedQuery.getResultList();
     }
 
+    @Override
     public List<CaseUserEntity> findCaseUserRoles(final List<Long> caseIds, final List<String> userIds) {
         TypedQuery<CaseUserEntity> namedQuery = null;
-        if (userIds.size() == 0) {
+        if (userIds.isEmpty()) {
             namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_BY_CASE_IDS, CaseUserEntity.class);
         } else {
             namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES, CaseUserEntity.class);

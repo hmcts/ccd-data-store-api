@@ -323,7 +323,6 @@ class DateTimeValueFormatterTest {
             ArrayNode value = collectionValue();
             CaseViewField caseViewField = caseViewField(ID, "#DATETIMEDISPLAY(dd/MM/yyyy)",
                 fieldType(COLLECTION_FIELD_TYPE, fieldType(DATE_FIELD_TYPE)), value, DisplayContext.READONLY.name());
-            WizardPageField wizardPageField = wizardPageField(ID, Collections.emptyList());
             when(dateTimeFormatParser.convertIso8601ToDate(TEST_FORMAT, TEST_DATE)).thenReturn("13/03/2020");
             when(dateTimeFormatParser.convertIso8601ToDate(TEST_FORMAT, "2010-10-30")).thenReturn("30/10/2010");
 

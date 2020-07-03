@@ -131,6 +131,7 @@ public class ApplicationParams {
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -139,6 +140,7 @@ public class ApplicationParams {
         }
     }
 
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public static String encodeBase64(final String stringToEncode) {
         try {
             return Base64.getEncoder().encodeToString(stringToEncode.getBytes("UTF-8"));

@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
+@SuppressWarnings("PMD.UnusedPrivateField")
 public abstract class AbstractDefaultGetCaseViewOperation {
 
     public static final String QUALIFIER = "default";

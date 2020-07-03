@@ -124,7 +124,7 @@ class ClassifiedGetEventsOperationTest {
     @Test
     @DisplayName("should apply security classifications when case reference is received")
     void shouldApplySecurityClassificationsForCaseReference() {
-        final List<AuditEvent> outputs = classifiedOperation.getEvents(CASE_REFERENCE);
+        classifiedOperation.getEvents(CASE_REFERENCE);
 
         InOrder inOrder = inOrder(getEventsOperation, classificationService, getCaseOperation);
 

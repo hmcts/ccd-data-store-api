@@ -2,7 +2,8 @@ package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
 import com.google.common.annotations.VisibleForTesting;
 
-class ElasticsearchSearchRequest {
+@SuppressWarnings("PMD.ClassNamingConventions")
+final class ElasticsearchSearchRequest {
 
     private ElasticsearchSearchRequest() {
         // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)

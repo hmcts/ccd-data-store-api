@@ -82,6 +82,7 @@ public class ElasticSearchTextFieldTest extends ElasticsearchBaseTest {
 
             @Test
             @DisplayName("should return case matching wildcard expression on a text field")
+            @SuppressWarnings("PMD.UseLocaleWithCaseConversions")
             void shouldReturnCaseForWildcardMatchOnTextField() {
                 String wildcardExpr = TEXT.substring(0, 3).toLowerCase() + "*";
                 searchCaseByWildcardAndVerifyResponse("TextField", wildcardExpr, TEXT);

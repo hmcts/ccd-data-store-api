@@ -65,6 +65,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     // @Test FIXME: flakey one need some investigation - RDM-7504
+    @SuppressWarnings("PMD.DetachedTestCase")
     public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))

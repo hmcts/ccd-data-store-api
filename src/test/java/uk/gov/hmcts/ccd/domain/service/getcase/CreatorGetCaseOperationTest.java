@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.getcase;
 
 import java.util.Optional;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
@@ -108,7 +107,7 @@ class CreatorGetCaseOperationTest {
         assertEquals(isPresent, result.isPresent());
 
         if (isPresent) {
-            assertTrue(result.get() == caseDetails);
+            assertEquals(caseDetails, result.get());
         }
 
         if (args.length == 1) {

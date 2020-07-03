@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
 
 @ToString
+@SuppressWarnings("PMD.AvoidFieldNameMatchingTypeName")
 public class Draft {
     public static final String DRAFT = "DRAFT";
 

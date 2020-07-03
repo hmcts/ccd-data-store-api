@@ -2,8 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class UIDServiceTest {
 
@@ -34,7 +33,7 @@ public class UIDServiceTest {
     public void shouldGenerateValid16digitUID() throws Exception {
         String uid = uidService.generateUID();
 
-        assertTrue(uid.length() == 16);
+        assertEquals(16, uid.length());
     }
 
     @Test

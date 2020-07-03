@@ -6,7 +6,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 /**
  * Groups common code used in ValidatorTest.
  */
+@SuppressWarnings("PMD.ConstantsInInterface")
 interface IVallidatorTest {
-    static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
+    ObjectMapper MAPPER = new ObjectMapper();
 }

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class TestData {
+public final class TestData {
 
     private static final TestData TEST_DATA_LOADER = new TestData();
     private final Map<String, Object> data = new HashMap<>();

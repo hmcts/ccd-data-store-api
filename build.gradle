@@ -3,7 +3,7 @@ buildscript {
         springBootVersion = '2.2.5.RELEASE'
     }
     dependencies {
-        classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
+        classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.0.2'
     }
     dependencies {
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
@@ -26,11 +26,12 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.7'
     id 'org.owasp.dependencycheck' version '5.1.0'
-    id 'com.github.spotbugs' version '1.6.9'
+    id 'com.github.spotbugs' version '4.4.4'
     id 'net.ltgt.apt' version '0.21'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.14'
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
+    id "io.freefair.lombok" version "5.1.0"
 }
 
 apply plugin: 'java'
@@ -53,7 +54,9 @@ apply plugin: 'org.owasp.dependencycheck'
 apply from: 'liquibase.gradle'
 
 pmd {
-    toolVersion = '6.11.0'
+    toolVersion = '6.21.0'
+    ruleSetFiles = files("pmd.xml")
+    ruleSets = []
 }
 
 dependencyUpdates.resolutionStrategy = {
@@ -99,7 +102,6 @@ repositories {
 ext {
     junitJupiterVersion = '5.5.2'
     junitVintageVersion = '5.5.2'
-    hibernateVersion = '5.2.18.Final'
     powermockVersion = '2.0.0-beta.5'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
@@ -129,8 +131,8 @@ bootJar {
 }
 
 // tag::dependencies[]
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 configurations {
     providedRuntime
@@ -151,7 +153,7 @@ checkstyle {
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
     reports {
         xml.enabled = false
         html.enabled = true
@@ -173,21 +175,13 @@ dependencies {
 
     compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
     compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.5'
-    compile 'org.projectlombok:lombok:1.18.4'
     implementation 'org.mapstruct:mapstruct-jdk8:1.3.0.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
     testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
 
-//     Needs to explicitly bring in a different hibernate version as in pom.xml
-    compile "org.hibernate:hibernate-core:${hibernateVersion}"
-    compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
-
     compile('org.springframework.boot:spring-boot-starter-actuator')
 
-    compile("org.springframework.boot:spring-boot-starter-data-jpa") {
-        exclude group: 'org.hibernate', module: 'hibernate-core'
-        exclude group: 'org.hibernate', module: 'hibernate-entitymanager'
-    }
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile('org.springframework.boot:spring-boot-starter-hateoas')
     compile group: 'org.springframework.plugin', name: 'spring-plugin-core', version: '2.0.0.RELEASE'
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
@@ -257,7 +251,7 @@ dependencies {
     testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
     testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
     testCompile 'pl.allegro.tech:embedded-elasticsearch:2.7.0'
@@ -300,6 +294,15 @@ dependencyManagement {
         dependencySet(group: 'commons-beanutils', version: '1.9.4') {
             entry 'commons-beanutils'
         }
+
+        // Remove once BEFTA rest-assured is updated
+        dependencySet(group: 'io.rest-assured', version: '4.3.0') {
+            entry 'json-path'
+            entry 'xml-path'
+        }
+
+        // Required for Embedded ES with Java 11
+        dependency 'org.rauschig:jarchivelib:1.0.0'
     }
 }
 
@@ -539,14 +542,11 @@ jsonSchema2Pojo {
     // Whether to make the generated types Serializable
     serializable = false
 
-    // Whether to include getters/setters or to omit these accessor methods and create public fields instead.
-    includeAccessors = true
-
     // Whether to include getters or to omit these accessor methods and create public fields instead.
-    includeGetters = false
+    includeGetters = true
 
     // Whether to include setters or to omit these accessor methods and create public fields instead.
-    includeSetters = false
+    includeSetters = true
 
     // Whether to include dynamic getters, setters, and builders or to omit these methods.
     includeDynamicAccessors = false
@@ -565,10 +565,6 @@ jsonSchema2Pojo {
 
     // What type to use instead of string when adding string properties of format "date-time" to Java types
     dateTimeType = "java.time.LocalDateTime"
-}
-
-jacoco {
-    toolVersion = "0.8.0"
 }
 
 sonarqube {
@@ -616,12 +612,12 @@ jacocoTestReport {
     }
 
     afterEvaluate {
-        classDirectories = files(classDirectories.files.collect {
+        classDirectories.setFrom((classDirectories.files.collect {
             fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**',
                                         '**/service/doclink/**',
                                         '**/domain/model/definition/CaseEventFieldComplex**',
                                         '**/domain/model/definition/DisplayContext**'])
-        })
+        }))
     }
 
     doLast {
@@ -802,9 +798,4 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 cucumberReports {
     outputDir = file("${projectDir}/target/cucumber")
     reports = files("${projectDir}/target/cucumber.json")
-}
-
-task installDist(overwrite: true) {
-    // This task must be overwritten to do as it's breaking JAR packaging and it's a mandatory step of swagger
-    // documentation publication.
 }

@@ -67,7 +67,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     }
 
     private List<AuditEvent> secureEvents(List<AuditEvent> events) {
-        if (events == null || events.size() == 0) {
+        if (events == null || events.isEmpty()) {
             return Lists.newArrayList();
         }
         return secureEvents(events.get(0).getCaseTypeId(), events.get(0).getCaseDataId(),  events);

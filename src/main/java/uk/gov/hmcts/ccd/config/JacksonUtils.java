@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 public final class JacksonUtils {
@@ -28,8 +29,7 @@ public final class JacksonUtils {
         .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
         .build();
 
-
-    public static HashMap<String, JsonNode> convertValue(Object from) {
+    public static Map<String, JsonNode> convertValue(Object from) {
         return MAPPER.convertValue(from, new TypeReference<HashMap<String, JsonNode>>() {
         });
     }
@@ -38,7 +38,7 @@ public final class JacksonUtils {
         return MAPPER.convertValue(from, JsonNode.class);
     }
 
-    public static final TypeReference<HashMap<String, JsonNode>> getHashMapTypeReference() {
+    public static TypeReference<HashMap<String, JsonNode>> getHashMapTypeReference() {
         return new TypeReference<HashMap<String, JsonNode>>() {
         };
     }

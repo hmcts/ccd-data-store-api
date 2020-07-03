@@ -53,7 +53,7 @@ public class CaseAuditEventRepository {
         query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()));
         List<CaseAuditEventEntity> auditEvents = query.getResultList();
 
-        return (auditEvents == null || auditEvents.size() == 0)
+        return auditEvents == null || auditEvents.isEmpty()
               ? Optional.empty()
               : Optional.of(caseAuditEventMapper.entityToModel(auditEvents.get(0)));
     }

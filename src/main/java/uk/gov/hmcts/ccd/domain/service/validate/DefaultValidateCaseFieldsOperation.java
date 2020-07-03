@@ -74,7 +74,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
                             cefcDefinition.getDefaultValue(),
                             errorList);
                     })));
-        if (errorList.size() != 0) {
+        if (!errorList.isEmpty()) {
             throw new ValidationException("Roles validation error: " + String.join(", ", errorList));
         }
     }
