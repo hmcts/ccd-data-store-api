@@ -67,7 +67,7 @@ class DateTimeFormatParserTest {
         final String result = dateTimeFormatParser.convertIso8601ToDateTime(dateTimeFormat, value);
 
         assertAll(
-            () -> assertThat(result, is("20 Oct 00 12:30 pm"))
+            () -> assertThat(result, is("20 Oct 00 12:30 PM"))
         );
     }
 
