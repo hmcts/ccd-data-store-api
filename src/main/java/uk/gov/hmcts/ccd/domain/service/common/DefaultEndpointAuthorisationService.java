@@ -25,16 +25,15 @@ public class DefaultEndpointAuthorisationService implements EndpointAuthorisatio
 
     @Override
     public boolean isAccessAllowed(CaseDetails caseDetails) {
-        boolean canAccess = this.userRepository.getUserRoles().contains(ROLE_CASE_WORKER_CAA);
 
-        if (!canAccess) {
-            canAccess = this.caseAccessService.canUserAccess(caseDetails);
+        if (this.userRepository.getUserRoles().contains(ROLE_CASE_WORKER_CAA)) {
+            return true;
         }
 
-        if (!canAccess && Boolean.FALSE.equals(this.caseAccessService.canOnlyViewGrantedCases())) {
-            canAccess = this.caseAccessService.isJurisdictionAccessAllowed(caseDetails.getJurisdiction());
+        if (this.caseAccessService.canOnlyViewGrantedCases()) {
+            return this.caseAccessService.isExplicitAccessGranted(caseDetails);
         }
 
-        return canAccess;
+        return this.caseAccessService.isJurisdictionAccessAllowed(caseDetails.getJurisdiction());
     }
 }

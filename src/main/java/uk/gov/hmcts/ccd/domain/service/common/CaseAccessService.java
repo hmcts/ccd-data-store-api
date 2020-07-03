@@ -37,17 +37,14 @@ public class CaseAccessService {
 
     private final UserRepository userRepository;
     private final CaseUserRepository caseUserRepository;
-    private final JurisdictionsResolver jurisdictionsResolver;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
         = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-.+-localAuthority$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                             @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository,
-                             @Qualifier(IdamJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
+                             @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository) {
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
-        this.jurisdictionsResolver = jurisdictionsResolver;
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
@@ -100,14 +97,14 @@ public class CaseAccessService {
     }
 
     public boolean isJurisdictionAccessAllowed(String jurisdiction) {
-        return this.jurisdictionsResolver
-            .getJurisdictions()
+        return this.userRepository
+            .getUserRolesJurisdictions()
             .stream()
             .anyMatch(jurisdiction::equalsIgnoreCase);
     }
 
 
-    private Boolean isExplicitAccessGranted(CaseDetails caseDetails) {
+    public Boolean isExplicitAccessGranted(CaseDetails caseDetails) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
         if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {

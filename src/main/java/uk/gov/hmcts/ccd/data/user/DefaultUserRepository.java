@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.user;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -143,6 +144,17 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public String getUserId() {
         return securityUtils.getUserId();
+    }
+
+    @Override
+    public List<String> getUserRolesJurisdictions() {
+        String[] roles = this.getUserDetails().getRoles();
+
+        return Arrays.stream(roles).map(role ->  role.split("-"))
+            .filter(array -> array.length >= 2)
+            .map(element -> element[1])
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     private Set<SecurityClassification> getClassificationsForUserRoles(List<String> roles) {
