@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.user;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +56,10 @@ public class DefaultUserRepository implements UserRepository {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
+
+    private static final String[] ROLE_WHITELIST = {
+        "caseworker-caa"
+    };
 
     @Autowired
     public DefaultUserRepository(ApplicationParams applicationParams,
@@ -155,7 +160,7 @@ public class DefaultUserRepository implements UserRepository {
 
     private boolean filterRole(final String jurisdictionId, final String role) {
         return startsWithIgnoreCase(role, String.format(RELEVANT_ROLES, jurisdictionId))
-            || ArrayUtils.contains(AuthCheckerConfiguration.getCitizenRoles(), role);
+            || ArrayUtils.contains(AuthCheckerConfiguration.getCitizenRoles(), role) || Arrays.asList(ROLE_WHITELIST).contains(role);
     }
 
     private IdamProperties toIdamProperties(UserInfo userInfo) {

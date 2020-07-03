@@ -68,6 +68,7 @@ class DefaultUserRepositoryTest {
     private static final String ROLE_CASEWORKER = "caseworker";
     private static final String ROLE_CASEWORKER_TEST = "caseworker-test";
     private static final String ROLE_CASEWORKER_CMC = "caseworker-cmc";
+    private static final String ROLE_CASEWORKER_CAA = "caseworker-caa";
     private static final String JURISDICTION_ID = "CMC";
     private static final String CITIZEN = "citizen";
     private static final String PROBATE_PRIVATE_BETA = "probate-private-beta";
@@ -137,6 +138,25 @@ class DefaultUserRepositoryTest {
                 assertAll(
                     () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(
                         singletonList(ROLE_CASEWORKER_CMC)),
+                    () -> verifyNoMoreInteractions(caseDefinitionRepository)
+                );
+            }
+        }
+
+        @Nested
+        @DisplayName("when caseworker-caa")
+        class WhenCaseworkerCaa {
+
+            @Test
+            @DisplayName("should only consider roles for given jurisdiction")
+            void shouldOnlyConsiderRolesForJurisdiction() {
+                asCaseworkerCaa();
+
+                userRepository.getUserClassifications(JURISDICTION_ID);
+
+                assertAll(
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(
+                        singletonList(ROLE_CASEWORKER_CAA)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }
@@ -373,6 +393,12 @@ class DefaultUserRepositoryTest {
     private void asCaseworker() {
         doReturn(newAuthorities(ROLE_CASEWORKER, ROLE_CASEWORKER_TEST, ROLE_CASEWORKER_CMC)).when(authentication)
                                                                                             .getAuthorities();
+    }
+
+
+    private void asCaseworkerCaa() {
+        doReturn(newAuthorities(ROLE_CASEWORKER_CAA)).when(authentication)
+            .getAuthorities();
     }
 
     private void asOtherRoles() {
