@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.IdamJurisdictionsResolver;
-import uk.gov.hmcts.ccd.data.user.JurisdictionsResolver;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -37,21 +35,22 @@ public class CaseAccessService {
 
     private final UserRepository userRepository;
     private final CaseUserRepository caseUserRepository;
-    private final JurisdictionsResolver jurisdictionsResolver;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
         = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-.+-localAuthority$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                             @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository,
-                             @Qualifier(IdamJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
+                             @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository) {
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
-        this.jurisdictionsResolver = jurisdictionsResolver;
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
-        return !canOnlyViewGrantedCases() || accessGranted(caseDetails);
+        if (canOnlyViewExplicitlyGrantedCases()) {
+            return isExplicitAccessGranted(caseDetails);
+        } else {
+            return true;
+        }
     }
 
     public AccessLevel getAccessLevel(UserInfo userInfo) {
@@ -64,7 +63,7 @@ public class CaseAccessService {
     }
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
-        if (canOnlyViewGrantedCases()) {
+        if (canOnlyViewExplicitlyGrantedCases()) {
             return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
         }
 
@@ -96,14 +95,14 @@ public class CaseAccessService {
     }
 
     public boolean isJurisdictionAccessAllowed(String jurisdiction) {
-        return this.jurisdictionsResolver
-            .getJurisdictions()
+        return this.userRepository
+            .getUserRolesJurisdictions()
             .stream()
             .anyMatch(jurisdiction::equalsIgnoreCase);
     }
 
 
-    private Boolean accessGranted(CaseDetails caseDetails) {
+    public Boolean isExplicitAccessGranted(CaseDetails caseDetails) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
         if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
@@ -113,7 +112,7 @@ public class CaseAccessService {
         return Boolean.FALSE;
     }
 
-    public Boolean canOnlyViewGrantedCases() {
+    public Boolean canOnlyViewExplicitlyGrantedCases() {
         return userRepository.getUserRoles()
             .stream()
             .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());

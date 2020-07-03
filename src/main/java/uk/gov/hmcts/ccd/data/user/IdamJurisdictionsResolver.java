@@ -25,11 +25,6 @@ public class IdamJurisdictionsResolver implements JurisdictionsResolver {
 
     @Override
     public List<String> getJurisdictions() {
-        String[] roles = this.userRepository.getUserDetails().getRoles();
-        return Arrays.stream(roles).map(role ->  role.split("-"))
-                .filter(array -> array.length >= 2)
-            .map(element -> element[1])
-            .distinct()
-            .collect(Collectors.toList());
+        return this.userRepository.getUserRolesJurisdictions();
     }
 }

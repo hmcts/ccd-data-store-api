@@ -56,9 +56,6 @@ class CaseAccessServiceTest {
     @Mock
     private CaseUserRepository caseUserRepository;
 
-    @Mock
-    private JurisdictionsResolver jurisdictionsResolver;
-
     @InjectMocks
     private CaseAccessService caseAccessService;
 
@@ -544,7 +541,7 @@ class CaseAccessServiceTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(Lists.newArrayList("PROBATE", "DIVORCE")).when(jurisdictionsResolver).getJurisdictions();
+            doReturn(Lists.newArrayList("PROBATE", "DIVORCE")).when(userRepository).getUserRolesJurisdictions();
         }
 
         @Test

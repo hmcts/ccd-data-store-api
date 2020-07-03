@@ -3,12 +3,14 @@ package uk.gov.hmcts.ccd.data.user;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.util.Lists.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -357,6 +359,86 @@ class DefaultUserRepositoryTest {
             IdamUser result = userRepository.getUser();
 
             assertThat(result.getId(), is(userId));
+        }
+    }
+
+    @Nested
+    @DisplayName("getUserRolesJurisdictions()")
+    class GetUserRolesJurisdictions {
+
+        @Test
+        @DisplayName("test empty list of jurisdictions")
+        void shouldRetrieveNoJurisdictionsWhenNotPresent() {
+            List<String> roles = newArrayList(
+                "caseworker", "citizen");
+
+            String userId = "userId";
+            UserInfo userInfo = UserInfo.builder()
+                .uid(userId)
+                .roles(roles)
+                .build();
+            when(securityUtils.getUserInfo()).thenReturn(userInfo);
+
+            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+
+            assertAll(
+                () -> assertThat(jurisdictions, hasSize(0))
+            );
+        }
+
+        @Test
+        @DisplayName("It should retrieve caseworkers jurisdictions")
+        void shouldRetrieveCaseworkersJurisdictions() {
+            List<String> roles = newArrayList(
+                "caseworker",
+                "caseworker-autotest1",
+                "caseworker-autotest1-solicitor",
+                "caseworker-autotest1-private",
+                "caseworker-autotest1-senior",
+                "caseworker-autotest2",
+                "caseworker-autotest2-solicitor",
+                "caseworker-autotest2-private",
+                "caseworker-autotest2-senior");
+
+            String userId = "userId";
+            UserInfo userInfo = UserInfo.builder()
+                .uid(userId)
+                .roles(roles)
+                .build();
+            when(securityUtils.getUserInfo()).thenReturn(userInfo);
+
+            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+
+            assertAll(
+                () -> assertThat(jurisdictions, hasSize(2)),
+                () -> assertThat(jurisdictions, hasItems("autotest1", "autotest2"))
+            );
+        }
+
+        @Test
+        @DisplayName("It should retrieve all roles jurisdictions")
+        void shouldRetrieveAllRolesJurisdictions() {
+            List<String> roles = newArrayList(
+                "caseworker",
+                "citizen",
+                "caseworker-autotest1",
+                "caseworker-autotest2",
+                "otherRole-autotest1",
+                "otherRole-autotest2");
+
+            String userId = "userId";
+            UserInfo userInfo = UserInfo.builder()
+                .uid(userId)
+                .roles(roles)
+                .build();
+            when(securityUtils.getUserInfo()).thenReturn(userInfo);
+
+            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+
+            assertAll(
+                () -> assertThat(jurisdictions, hasSize(2)),
+                () -> assertThat(jurisdictions, hasItems("autotest1", "autotest2"))
+            );
         }
     }
 
