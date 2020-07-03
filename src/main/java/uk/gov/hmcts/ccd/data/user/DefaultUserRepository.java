@@ -57,10 +57,6 @@ public class DefaultUserRepository implements UserRepository {
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
 
-    private static final String[] ROLE_WHITELIST = {
-        "caseworker-caa"
-    };
-
     @Autowired
     public DefaultUserRepository(ApplicationParams applicationParams,
                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
