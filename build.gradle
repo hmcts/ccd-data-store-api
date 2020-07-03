@@ -103,8 +103,7 @@ ext {
     junitJupiterVersion = '5.5.2'
     junitVintageVersion = '5.5.2'
     powermockVersion = '2.0.0-beta.5'
-    reformLogging = '5.1.0'
-    appInsightsVersion = '2.4.1'
+    reformLogging = '5.1.5'
     swagger2Version = '3.0.0-SNAPSHOT'
     limits = [
             'instruction': 90,
@@ -114,7 +113,6 @@ ext {
             'method'     : 90,
             'class'      : 98
     ]
-    appInsights = '2.0.1'
     springCloudVersion = 'Hoxton.RELEASE'
 }
 
@@ -168,11 +166,6 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging', version: reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: reformLogging
 
-    // redefining with version 2.4.1 as applicationinsights-agent-2.5.0 has an open issue
-    // https://github.com/glowroot/instrumentation/issues/1
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
-
     compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
     compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.5'
     implementation 'org.mapstruct:mapstruct-jdk8:1.3.0.Final'
@@ -191,8 +184,8 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-openfeign')
     compile('org.springframework.retry:spring-retry')
     compile('org.springframework.boot:spring-boot-starter-cache')
-    compile group: 'com.hazelcast', name: 'hazelcast'
-    compile group: 'com.hazelcast', name: 'hazelcast-spring'
+    compile('com.hazelcast:hazelcast:4.0.1')
+    compile('com.hazelcast:hazelcast-spring:4.0.1')
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
@@ -295,14 +288,19 @@ dependencyManagement {
             entry 'commons-beanutils'
         }
 
+        // Required for Embedded ES with Java 11
+        dependency 'org.rauschig:jarchivelib:1.0.0'
+
         // Remove once BEFTA rest-assured is updated
         dependencySet(group: 'io.rest-assured', version: '4.3.0') {
             entry 'json-path'
             entry 'xml-path'
         }
-
-        // Required for Embedded ES with Java 11
-        dependency 'org.rauschig:jarchivelib:1.0.0'
+        dependencySet(group: 'org.codehaus.groovy', version: '3.0.2') {
+            entry 'groovy'
+            entry 'groovy-xml'
+            entry 'groovy-json'
+        }
     }
 }
 

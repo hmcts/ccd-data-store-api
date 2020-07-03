@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.google.common.base.Strings;
-import com.hazelcast.util.*;
 
 import java.util.*;
 
@@ -33,7 +32,7 @@ public class DisplayContextParameter {
         List<DisplayContextParameter> displayContextParameterTypeList = new ArrayList<>();
         List<String> displayContextParameters = new ArrayList();
 
-        displayContextParameter = (StringUtil.isNullOrEmpty(displayContextParameter)) ? "" : displayContextParameter;
+        displayContextParameter = (Strings.isNullOrEmpty(displayContextParameter)) ? "" : displayContextParameter;
 
         while (displayContextParameter.contains(MULTIPLE_PARAMETERS_STRING)) {
             displayContextParameters.add(displayContextParameter.substring(0, (displayContextParameter.indexOf(MULTIPLE_PARAMETERS_STRING) + 1)));
