@@ -51,7 +51,11 @@ public class CaseAccessService {
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
-        return !canOnlyViewGrantedCases() || accessGranted(caseDetails);
+        if (canOnlyViewGrantedCases()) {
+            return isExplicitAccessGranted(caseDetails);
+        } else {
+            return true;
+        }
     }
 
     public AccessLevel getAccessLevel(UserInfo userInfo) {
@@ -103,7 +107,7 @@ public class CaseAccessService {
     }
 
 
-    private Boolean accessGranted(CaseDetails caseDetails) {
+    private Boolean isExplicitAccessGranted(CaseDetails caseDetails) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
         if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
