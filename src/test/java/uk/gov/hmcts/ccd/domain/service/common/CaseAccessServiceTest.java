@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
-import uk.gov.hmcts.ccd.data.user.JurisdictionsResolver;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;

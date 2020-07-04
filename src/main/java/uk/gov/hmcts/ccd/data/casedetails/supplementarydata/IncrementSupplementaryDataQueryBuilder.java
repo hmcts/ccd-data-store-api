@@ -1,19 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
-import com.google.common.collect.Lists;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
-import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 
 @Component
 @Qualifier("increment")
@@ -32,30 +24,17 @@ public class IncrementSupplementaryDataQueryBuilder implements SupplementaryData
         + "supplementary_data_last_modified = :current_time "
         + "WHERE reference = :reference";
 
-    private DefaultObjectMapperService defaultObjectMapperService;
-
-    @Autowired
-    public IncrementSupplementaryDataQueryBuilder(DefaultObjectMapperService defaultObjectMapperService) {
-        this.defaultObjectMapperService = defaultObjectMapperService;
-    }
-
     @Override
-    public List<Query> buildQueryForEachSupplementaryDataProperty(EntityManager entityManager,
-                                                                  String caseReference,
-                                                                  SupplementaryDataUpdateRequest updateRequest) {
-        Optional<Map<String, Object>> requestData = updateRequest.getOperationData(operationType());
-        if (requestData.isPresent()) {
-            Map<String, Object> leafNodes = updateRequest.getUpdateOperationProperties(operationType());
-            return leafNodes.entrySet().stream().map(entry -> {
-                Query query = entityManager.createNativeQuery(INC_UPDATE_QUERY);
-                setCommonProperties(query, caseReference, entry.getKey(), entry.getValue());
-                String jsonValue = updateRequest.requestedDataToJson(operationType());
-                query.setParameter("json_value", jsonValue);
-                query.setParameter("node_path", Arrays.asList(entry.getKey().split(",")));
-                return query;
-            }).collect(Collectors.toCollection(LinkedList::new));
-        }
-        return Lists.newArrayList();
+    public Query buildQueryForEachSupplementaryDataProperty(EntityManager entityManager,
+                                                            String caseReference,
+                                                            String fieldPath,
+                                                            Object fieldValue) {
+        Query query = entityManager.createNativeQuery(INC_UPDATE_QUERY);
+        setCommonProperties(query, caseReference, fieldPath, fieldValue);
+        String jsonValue = requestedDataToJson(fieldPath, fieldValue);
+        query.setParameter("json_value", jsonValue);
+        query.setParameter("node_path", Arrays.asList(fieldPath.split(Pattern.quote("."))));
+        return query;
     }
 
     @Override

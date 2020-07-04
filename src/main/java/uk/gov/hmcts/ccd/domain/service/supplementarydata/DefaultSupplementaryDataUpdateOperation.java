@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.supplementarydata;
 
 import java.util.EnumMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,9 @@ import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOper
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+
+import static uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation.INC;
+import static uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation.SET;
 
 @Service
 @Qualifier("default")
@@ -23,8 +27,24 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
     @Autowired
     public DefaultSupplementaryDataUpdateOperation(final @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository) {
         this.supplementaryDataRepository = supplementaryDataRepository;
-        supplementaryFunctions.put(SupplementaryDataOperation.SET, this.supplementaryDataRepository::setSupplementaryData);
-        supplementaryFunctions.put(SupplementaryDataOperation.INC, this.supplementaryDataRepository::incrementSupplementaryData);
+        supplementaryFunctions.put(SET, (caseReference, updateRequest) -> {
+            Map<String, Object> requestedData = updateRequest.getOperationProperties(SET);
+            requestedData
+                .entrySet()
+                .stream()
+                .forEach(entry -> this.supplementaryDataRepository.setSupplementaryData(caseReference,
+                    entry.getKey(),
+                    entry.getValue()));
+        });
+        supplementaryFunctions.put(INC, (caseReference, updateRequest) -> {
+            Map<String, Object> requestedData = updateRequest.getOperationProperties(INC);
+            requestedData
+                .entrySet()
+                .stream()
+                .forEach(entry -> this.supplementaryDataRepository.incrementSupplementaryData(caseReference,
+                    entry.getKey(),
+                    entry.getValue()));
+        });
     }
 
     @Override
@@ -37,6 +57,6 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
                     .accept(caseReference, supplementaryData);
             }
         });
-        return this.supplementaryDataRepository.findSupplementaryData(caseReference, supplementaryData);
+        return this.supplementaryDataRepository.findSupplementaryData(caseReference, supplementaryData.getRequestDataKeys());
     }
 }

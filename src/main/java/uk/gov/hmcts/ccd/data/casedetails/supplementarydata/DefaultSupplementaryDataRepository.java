@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Singleton;
@@ -15,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
-import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
-import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 
 @Service
 @Qualifier("default")
@@ -30,36 +27,46 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
     private EntityManager em;
 
     private List<SupplementaryDataQueryBuilder> queryBuilders;
-    private DefaultObjectMapperService defaultObjectMapperService;
+
 
     @Autowired
-    public DefaultSupplementaryDataRepository(final List<SupplementaryDataQueryBuilder> queryBuilders,
-                                              DefaultObjectMapperService defaultObjectMapperService) {
+    public DefaultSupplementaryDataRepository(final List<SupplementaryDataQueryBuilder> queryBuilders) {
         this.queryBuilders = queryBuilders;
-        this.defaultObjectMapperService = defaultObjectMapperService;
     }
 
     @Override
-    public void setSupplementaryData(final String caseReference, final SupplementaryDataUpdateRequest updateRequest) {
+    public void setSupplementaryData(final String caseReference,
+                                     String fieldPath,
+                                     Object fieldValue) {
         LOG.debug("Set supplementary data");
-        List<Query> queryList = queryBuilder(SupplementaryDataOperation.SET).buildQueryForEachSupplementaryDataProperty(em, caseReference, updateRequest);
-        queryList.stream().forEach(query -> query.executeUpdate());
+        Query query = queryBuilder(SupplementaryDataOperation.SET).buildQueryForEachSupplementaryDataProperty(em,
+            caseReference,
+            fieldPath,
+            fieldValue);
+        query.executeUpdate();
     }
 
     @Override
-    public void incrementSupplementaryData(final String caseReference, SupplementaryDataUpdateRequest updateRequest) {
+    public void incrementSupplementaryData(final String caseReference,
+                                           String fieldPath,
+                                           Object fieldValue) {
         LOG.debug("Insert supplementary data");
-        List<Query> queryList = queryBuilder(SupplementaryDataOperation.INC).buildQueryForEachSupplementaryDataProperty(em, caseReference, updateRequest);
-        queryList.stream().forEach(query -> query.executeUpdate());
+        Query query = queryBuilder(SupplementaryDataOperation.INC).buildQueryForEachSupplementaryDataProperty(em,
+            caseReference,
+            fieldPath,
+            fieldValue);
+        query.executeUpdate();
     }
 
     @Override
-    public SupplementaryData findSupplementaryData(final String caseReference, SupplementaryDataUpdateRequest updateRequest) {
+    public SupplementaryData findSupplementaryData(final String caseReference, Set<String> filterFieldPaths) {
         LOG.debug("Find supplementary data");
-        List<Query> queryList = queryBuilder(SupplementaryDataOperation.FIND).buildQueryForEachSupplementaryDataProperty(em, caseReference, updateRequest);
-        JsonNode responseNode = (JsonNode) queryList.get(0).getSingleResult();
-        Set<String> requestedKeys = updateRequest == null ? Sets.newHashSet() : updateRequest.getRequestDataKeys();
-        return new SupplementaryData(responseNode, requestedKeys);
+        Query query = queryBuilder(SupplementaryDataOperation.FIND).buildQueryForEachSupplementaryDataProperty(em,
+            caseReference,
+            null,
+            null);
+        JsonNode responseNode = (JsonNode) query.getSingleResult();
+        return new SupplementaryData(responseNode, filterFieldPaths);
     }
 
     private SupplementaryDataQueryBuilder queryBuilder(final SupplementaryDataOperation supplementaryDataOperation) {

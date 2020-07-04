@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SupplementaryDataUpdateRequestTest {
@@ -22,17 +21,12 @@ class SupplementaryDataUpdateRequestTest {
 
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(rootMap);
 
-        Map<String, Object> leafNodes = updateRequest.getUpdateOperationProperties(SupplementaryDataOperation.SET);
+        Map<String, Object> leafNodes = updateRequest.getOperationProperties(SupplementaryDataOperation.SET);
 
-        assertTrue(leafNodes.containsKey("testc1,testchild1"));
-        assertEquals("Test Value c1", leafNodes.get("testc1,testchild1"));
-        assertTrue(leafNodes.containsKey("testc1,testchild2"));
-        assertEquals("Test Value c2", leafNodes.get("testc1,testchild2"));
-
-        String jsonString = updateRequest.requestedDataToJson(SupplementaryDataOperation.SET);
-        String parentKeyJson = updateRequest.requestedDataJsonOfPath(SupplementaryDataOperation.SET, "testc1");
-        assertNotNull(jsonString);
-        assertNotNull(parentKeyJson);
+        assertTrue(leafNodes.containsKey("testc1.testchild1"));
+        assertEquals("Test Value c1", leafNodes.get("testc1.testchild1"));
+        assertTrue(leafNodes.containsKey("testc1.testchild2"));
+        assertEquals("Test Value c2", leafNodes.get("testc1.testchild2"));
     }
 
     @Test
@@ -40,7 +34,7 @@ class SupplementaryDataUpdateRequestTest {
         Map<String, Map<String, Object>> rootMap = new HashMap<>();
 
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(rootMap);
-        Map<String, Object> leafNodes = updateRequest.getUpdateOperationProperties(SupplementaryDataOperation.SET);
+        Map<String, Object> leafNodes = updateRequest.getOperationProperties(SupplementaryDataOperation.SET);
         assertTrue(leafNodes.size() == 0);
     }
 }

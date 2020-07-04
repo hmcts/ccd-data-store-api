@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
-import java.util.List;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -23,9 +22,8 @@ class FindSupplementaryDataQueryBuilderTest  extends WireMockBaseTest {
 
     @Test
     void shouldBuildFindQuery() {
-        List<Query>  queryList = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em, CASE_REFERENCE, null);
-        assertNotNull(queryList);
-        assertEquals(1, queryList.size());
-        assertEquals(CASE_REFERENCE, queryList.get(0).getParameterValue("reference"));
+        Query  query = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em, CASE_REFERENCE, null, null);
+        assertNotNull(query);
+        assertEquals(CASE_REFERENCE, query.getParameterValue("reference"));
     }
 }

@@ -28,7 +28,7 @@ public class SupplementaryData {
     private Map<String, Object> response;
 
     public SupplementaryData(JsonNode data, Set<String> requestKeys) {
-        if (requestKeys.size() == 0) {
+        if (requestKeys == null || requestKeys.size() == 0) {
             this.response = JacksonUtils.convertJsonNode(data);
         } else {
             DocumentContext context = JsonPath.parse(jsonNodeToString(data));

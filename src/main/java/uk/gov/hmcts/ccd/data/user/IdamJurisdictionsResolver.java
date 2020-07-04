@@ -1,13 +1,10 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.util.List;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Qualifier(IdamJurisdictionsResolver.QUALIFIER)
