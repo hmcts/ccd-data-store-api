@@ -13,10 +13,13 @@
   },
 
   "request": {
+    "queryParams": {
+      "ctid": "AAT_PRIVATE_B"
+    },
     "body": {
       "query": {
         "match": {
-          "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
+          "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_AAT_PRIVATE_B_Data][testData][actualResponse][body][id]}"
         }
       }
     }
