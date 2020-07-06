@@ -29,14 +29,14 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
         this.supplementaryDataRepository = supplementaryDataRepository;
         supplementaryFunctions.put(SET, (caseReference, updateRequest) -> {
             Map<String, Object> requestedProperties = updateRequest.getOperationProperties(SET);
-            for (Map.Entry<String, Object> prop : requestedProperties.entrySet()) {
-                this.supplementaryDataRepository.setSupplementaryData(caseReference, prop.getKey(), prop.getValue());
+            for (Map.Entry<String, Object> pathValuePair : requestedProperties.entrySet()) {
+                this.supplementaryDataRepository.setSupplementaryData(caseReference, pathValuePair.getKey(), pathValuePair.getValue());
             }
         });
         supplementaryFunctions.put(INC, (caseReference, updateRequest) -> {
             Map<String, Object> requestedProperties = updateRequest.getOperationProperties(INC);
-            for (Map.Entry<String, Object> prop : requestedProperties.entrySet()) {
-                this.supplementaryDataRepository.incrementSupplementaryData(caseReference, prop.getKey(), prop.getValue());
+            for (Map.Entry<String, Object> pathValuePair : requestedProperties.entrySet()) {
+                this.supplementaryDataRepository.incrementSupplementaryData(caseReference, pathValuePair.getKey(), pathValuePair.getValue());
             }
         });
     }
