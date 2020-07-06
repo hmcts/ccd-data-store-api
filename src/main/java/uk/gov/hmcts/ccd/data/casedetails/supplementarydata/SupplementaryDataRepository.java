@@ -12,10 +12,10 @@ public interface SupplementaryDataRepository {
     /**
      * Returns Supplementary Data for the case reference requested.
      * @param caseReference         Case reference
-     * @param filterFieldPaths      if filterFieldPaths is empty or null then returns complete data from
+     * @param requestedProperties   if requestedProperties is empty or null then returns complete data from
      *                              supplementary_data column, otherwise returns only the fields passed
-     *                              in the filterFieldPaths
+     *                              in the requestedProperties
      * @return SupplementaryData
      */
-    SupplementaryData findSupplementaryData(String caseReference, Set<String> filterFieldPaths);
+    SupplementaryData findSupplementaryData(String caseReference, Set<String> requestedProperties);
 }

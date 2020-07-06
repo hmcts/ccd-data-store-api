@@ -59,14 +59,14 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
     }
 
     @Override
-    public SupplementaryData findSupplementaryData(final String caseReference, Set<String> filterFieldPaths) {
+    public SupplementaryData findSupplementaryData(final String caseReference, Set<String> requestedProperties) {
         LOG.debug("Find supplementary data");
         Query query = queryBuilder(SupplementaryDataOperation.FIND).build(em,
             caseReference,
             null,
             null);
         JsonNode responseNode = (JsonNode) query.getSingleResult();
-        return new SupplementaryData(responseNode, filterFieldPaths);
+        return new SupplementaryData(responseNode, requestedProperties);
     }
 
     private SupplementaryDataQueryBuilder queryBuilder(final SupplementaryDataOperation supplementaryDataOperation) {

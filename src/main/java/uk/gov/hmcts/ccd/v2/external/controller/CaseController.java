@@ -1,8 +1,11 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ExampleProperty;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -320,6 +323,24 @@ public class CaseController {
             code = 403,
             message = V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA
         )
+    })
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "supplementaryData",
+            dataType = "uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest",
+            examples = @io.swagger.annotations.Example(
+                value = {
+                    @ExampleProperty(value = "{\n"
+                        + "\t\"$inc\": {\n"
+                        + "\t\t\"orgs_assigned_users.OrgA\": 1,\n"
+                        + "\t\t\"orgs_assigned_users.OrgB\": -1\n"
+                        + "\t},\n"
+                        + "\t\"$set\": {\n"
+                        + "\t\t\"orgs_assigned_users.OrgA\": 34,\n"
+                        + "\t\t\"processed\": true\n"
+                        + "\t}\n"
+                        + "}", mediaType = "application/json")
+                }))
     })
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
                                                                                  @RequestBody final SupplementaryDataUpdateRequest supplementaryData) {
