@@ -36,4 +36,14 @@ public class SupplementaryDataUpdateRequest {
         return keys;
     }
 
+    @JsonIgnore
+    public Set<String> getSupplementaryDataOperations() {
+        return this.requestData.keySet();
+    }
+
+    @JsonIgnore
+    public boolean isValidRequestData() {
+        return this.requestData != null && this.requestData.size() > 0;
+    }
+
 }

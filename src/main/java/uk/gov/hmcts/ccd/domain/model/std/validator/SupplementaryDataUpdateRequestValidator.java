@@ -16,8 +16,7 @@ public class SupplementaryDataUpdateRequestValidator {
 
     public void validate(SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
         if (supplementaryDataUpdateRequest == null
-            || supplementaryDataUpdateRequest.getRequestData() == null
-            || supplementaryDataUpdateRequest.getRequestData().size() == 0) {
+            || !supplementaryDataUpdateRequest.isValidRequestData()) {
             throw new BadRequestException(SUPPLEMENTARY_DATA_INVALID);
         }
         validateAtMostOneLevelOfNesting(supplementaryDataUpdateRequest);
