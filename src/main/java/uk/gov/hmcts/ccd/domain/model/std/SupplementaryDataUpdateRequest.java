@@ -28,8 +28,8 @@ public class SupplementaryDataUpdateRequest {
     public Set<String> getPropertiesNames() {
         Set<String> keys = new HashSet<>();
         if (this.requestData != null) {
-            this.requestData.keySet().forEach(key -> {
-                Map<String, Object> operationData = this.requestData.get(key);
+            getPropertiesNames().forEach(property -> {
+                Map<String, Object> operationData = this.requestData.get(property);
                 keys.addAll(operationData.keySet());
             });
         }
