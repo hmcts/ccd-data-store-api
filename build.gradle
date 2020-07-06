@@ -760,16 +760,6 @@ def timestamp() {
     return date.format('yyyy-MM-dd HH:mm:ss')
 }
 
-//distributions {
-//    main {
-//        contents {
-//            from(file("$projectDir/src/main/resources/AI-Agent.xml")) {
-//                into "lib"
-//            }
-//        }
-//    }
-//}
-
 // for cnp pipeline
 task dependencyCheck(dependsOn: dependencyCheckAnalyze)
 
