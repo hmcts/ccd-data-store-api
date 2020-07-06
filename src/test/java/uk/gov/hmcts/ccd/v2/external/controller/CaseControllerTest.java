@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -43,8 +44,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -73,6 +76,9 @@ class CaseControllerTest {
 
     @Mock
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+
+    @Mock
+    private SupplementaryDataUpdateRequestValidator requestValidator;
 
     @InjectMocks
     private CaseController caseController;
@@ -257,7 +263,7 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should propagate BadRequestException when case reference not valid")
+        @DisplayName("should propagate BadRequestException when supplementary data not valid")
         void invalidSupplementaryDataUpdateRequest() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
@@ -266,8 +272,8 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should propagate BadRequestException when case reference not valid")
-        void shouldThrowBadReqeuestExceptionWhenSupplementaryDataNull() {
+        @DisplayName("should propagate BadRequestException when supplementary data null")
+        void shouldThrowBadRequestExceptionWhenSupplementaryDataNull() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
@@ -275,12 +281,21 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should propagate BadRequestException when case reference not valid")
-        void shouldThrowBadReqeuestExceptionWhenSupplementaryDataHasNoData() {
+        @DisplayName("should propagate BadRequestException when supplementary data has empty operation data")
+        void shouldThrowBadRequestExceptionWhenSupplementaryDataHasNoData() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
                 () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest(new HashMap<>())));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when supplementary data has more than one nested levels")
+        void shouldThrowBadRequestExceptionWhenSupplementaryDataHasNestedLevels() {
+            doCallRealMethod().when(requestValidator).validate(any(SupplementaryDataUpdateRequest.class));
+            SupplementaryDataUpdateRequest request = createRequestDataNested();
+            assertThrows(BadRequestException.class,
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, request));
         }
 
         @Test
@@ -315,6 +330,15 @@ class CaseControllerTest {
             String jsonRequest = "{\n"
                 + "\t\"$set\": {\n"
                 + "\t\t\"orgs_assigned_users.organisationA\": 32\n"
+                + "\t}\n"
+                + "}";
+            return new SupplementaryDataUpdateRequest(convertData(jsonRequest));
+        }
+
+        private SupplementaryDataUpdateRequest createRequestDataNested() {
+            String jsonRequest = "{\n"
+                + "\t\"$set\": {\n"
+                + "\t\t\"orgs_assigned_users.organisationA.organisationB\": 32\n"
                 + "\t}\n"
                 + "}";
             return new SupplementaryDataUpdateRequest(convertData(jsonRequest));

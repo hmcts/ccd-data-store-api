@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -50,6 +51,7 @@ public class CaseController {
     private final UIDService caseReferenceService;
     private final GetEventsOperation getEventsOperation;
     private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+    private final SupplementaryDataUpdateRequestValidator requestValidator;
 
     @Autowired
     public CaseController(
@@ -58,7 +60,8 @@ public class CaseController {
         @Qualifier("authorised") final CreateCaseOperation createCaseOperation,
         UIDService caseReferenceService,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
-        @Qualifier("authorised") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation
+        @Qualifier("authorised") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
+        SupplementaryDataUpdateRequestValidator requestValidator
     ) {
         this.getCaseOperation = getCaseOperation;
         this.createEventOperation = createEventOperation;
@@ -66,6 +69,7 @@ public class CaseController {
         this.caseReferenceService = caseReferenceService;
         this.getEventsOperation = getEventsOperation;
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
+        this.requestValidator = requestValidator;
     }
 
     @GetMapping(
@@ -305,6 +309,10 @@ public class CaseController {
             message = V2.Error.SUPPLEMENTARY_DATA_INVALID
         ),
         @ApiResponse(
+            code = 400,
+            message = V2.Error.MORE_THAN_ONE_NESTED_LEVEL
+        ),
+        @ApiResponse(
             code = 404,
             message = V2.Error.CASE_NOT_FOUND
         ),
@@ -316,19 +324,11 @@ public class CaseController {
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
                                                                                  @RequestBody final SupplementaryDataUpdateRequest supplementaryData) {
 
-        validateRequestData(supplementaryData);
+        this.requestValidator.validate(supplementaryData);
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
         SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId, supplementaryData);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
-    }
-
-    private void validateRequestData(SupplementaryDataUpdateRequest supplementaryData) {
-        if (supplementaryData == null
-            || supplementaryData.getRequestData() == null
-            || supplementaryData.getRequestData().size() == 0) {
-            throw new BadRequestException(V2.Error.SUPPLEMENTARY_DATA_INVALID);
-        }
     }
 }
