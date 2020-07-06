@@ -3,12 +3,10 @@ package uk.gov.hmcts.ccd.domain.model.std;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
