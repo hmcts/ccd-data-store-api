@@ -28,7 +28,7 @@ public class SupplementaryDataUpdateRequest {
     public Set<String> getPropertiesNames() {
         Set<String> keys = new HashSet<>();
         if (this.requestData != null) {
-            getPropertiesNames().forEach(property -> {
+            getSupplementaryDataOperations().forEach(property -> {
                 Map<String, Object> operationData = this.requestData.get(property);
                 keys.addAll(operationData.keySet());
             });
