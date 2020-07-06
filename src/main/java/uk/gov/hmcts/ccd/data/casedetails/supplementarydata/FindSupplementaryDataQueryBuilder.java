@@ -13,10 +13,10 @@ public class FindSupplementaryDataQueryBuilder implements SupplementaryDataQuery
     private static final String SUPPLEMENTARY_DATA_QUERY = "SELECT cd.supplementary_data FROM case_data cd WHERE cd.reference = :reference";
 
     @Override
-    public Query buildQueryForEachSupplementaryDataProperty(EntityManager entityManager,
-                                                            String caseReference,
-                                                            String fieldPath,
-                                                            Object fieldValue) {
+    public Query build(EntityManager entityManager,
+                       String caseReference,
+                       String fieldPath,
+                       Object fieldValue) {
         Query selectQuery = entityManager.createNativeQuery(SUPPLEMENTARY_DATA_QUERY);
         selectQuery.setParameter("reference", caseReference);
         selectQuery.unwrap(org.hibernate.query.NativeQuery.class)

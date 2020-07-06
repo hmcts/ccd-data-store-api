@@ -9,5 +9,13 @@ public interface SupplementaryDataRepository {
 
     void incrementSupplementaryData(String caseReference, String fieldPath, Object fieldValue);
 
+    /**
+     * Returns Supplementary Data for the case reference requested.
+     * @param caseReference         Case reference
+     * @param filterFieldPaths      if filterFieldPaths is empty or null then returns complete data from
+     *                              supplementary_data column, otherwise returns only the fields passed
+     *                              in the filterFieldPaths
+     * @return SupplementaryData
+     */
     SupplementaryData findSupplementaryData(String caseReference, Set<String> filterFieldPaths);
 }

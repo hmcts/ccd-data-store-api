@@ -20,10 +20,10 @@ public class SupplementaryDataUpdateRequestValidator {
             || supplementaryData.getRequestData().size() == 0) {
             throw new BadRequestException(SUPPLEMENTARY_DATA_INVALID);
         }
-        allowedNestedLevels(supplementaryData);
+        validateAtMostOneLevelOfNesting(supplementaryData);
     }
 
-    private void allowedNestedLevels(SupplementaryDataUpdateRequest supplementaryData) {
+    private void validateAtMostOneLevelOfNesting(SupplementaryDataUpdateRequest supplementaryData) {
         supplementaryData
             .getRequestData()
             .entrySet()
@@ -36,6 +36,6 @@ public class SupplementaryDataUpdateRequestValidator {
                         throw new BadRequestException(MORE_THAN_ONE_NESTED_LEVEL);
                     }
                 });
-        });
+            });
     }
 }

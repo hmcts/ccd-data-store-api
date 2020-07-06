@@ -22,7 +22,7 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
 
     @Test
     void shouldReturnQueryListWhenRequestDataPassed() {
-        Query query = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em,
+        Query query = supplementaryDataQueryBuilder.build(em,
             CASE_REFERENCE,
             "orgs_assigned_users.organisationA",
             32);
@@ -35,7 +35,7 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
 
     @Test
     void shouldReturnMoreThanOneQueryInTheListWhenRequestDataPassedWithMultipleValues() {
-        Query query = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em,
+        Query query = supplementaryDataQueryBuilder.build(em,
             CASE_REFERENCE,
             "orgs_assigned_users.organisationB",
             36);

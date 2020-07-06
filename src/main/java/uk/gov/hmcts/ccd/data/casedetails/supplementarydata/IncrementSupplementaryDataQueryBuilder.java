@@ -25,10 +25,10 @@ public class IncrementSupplementaryDataQueryBuilder implements SupplementaryData
         + "WHERE reference = :reference";
 
     @Override
-    public Query buildQueryForEachSupplementaryDataProperty(EntityManager entityManager,
-                                                            String caseReference,
-                                                            String fieldPath,
-                                                            Object fieldValue) {
+    public Query build(EntityManager entityManager,
+                       String caseReference,
+                       String fieldPath,
+                       Object fieldValue) {
         Query query = entityManager.createNativeQuery(INC_UPDATE_QUERY);
         setCommonProperties(query, caseReference, fieldPath, fieldValue);
         String jsonValue = requestedDataToJson(fieldPath, fieldValue);

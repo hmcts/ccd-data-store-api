@@ -25,7 +25,7 @@ public class SupplementaryDataUpdateRequest {
     }
 
     @JsonIgnore
-    public Set<String> getRequestDataKeys() {
+    public Set<String> getSupplementaryDataProperties() {
         Set<String> keys = new HashSet<>();
         if (this.requestData != null) {
             this.requestData.keySet().forEach(key -> {

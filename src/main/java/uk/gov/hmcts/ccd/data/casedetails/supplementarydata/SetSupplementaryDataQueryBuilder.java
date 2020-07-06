@@ -24,10 +24,10 @@ public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryB
         + "WHERE reference = :reference";
 
     @Override
-    public Query buildQueryForEachSupplementaryDataProperty(EntityManager entityManager,
-                                                            String caseReference,
-                                                            String fieldPath,
-                                                            Object fieldValue) {
+    public Query build(EntityManager entityManager,
+                       String caseReference,
+                       String fieldPath,
+                       Object fieldValue) {
         Query query = entityManager.createNativeQuery(SET_UPDATE_QUERY);
         setCommonProperties(query, caseReference, fieldPath, fieldValue);
         String parentKey = fieldPath.split(Pattern.quote("."))[0];

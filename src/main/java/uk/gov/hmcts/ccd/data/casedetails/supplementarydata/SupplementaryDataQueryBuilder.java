@@ -21,10 +21,10 @@ public interface SupplementaryDataQueryBuilder {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    Query buildQueryForEachSupplementaryDataProperty(EntityManager entityManager,
-                                                     String caseReference,
-                                                     String fieldPath,
-                                                     Object fieldValue);
+    Query build(EntityManager entityManager,
+                String caseReference,
+                String fieldPath,
+                Object fieldValue);
 
     SupplementaryDataOperation operationType();
 

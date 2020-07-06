@@ -22,7 +22,7 @@ class FindSupplementaryDataQueryBuilderTest  extends WireMockBaseTest {
 
     @Test
     void shouldBuildFindQuery() {
-        Query  query = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em, CASE_REFERENCE, null, null);
+        Query  query = supplementaryDataQueryBuilder.build(em, CASE_REFERENCE, null, null);
         assertNotNull(query);
         assertEquals(CASE_REFERENCE, query.getParameterValue("reference"));
     }

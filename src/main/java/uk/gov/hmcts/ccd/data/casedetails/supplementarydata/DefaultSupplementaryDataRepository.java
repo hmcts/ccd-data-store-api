@@ -39,7 +39,7 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
                                      String fieldPath,
                                      Object fieldValue) {
         LOG.debug("Set supplementary data");
-        Query query = queryBuilder(SupplementaryDataOperation.SET).buildQueryForEachSupplementaryDataProperty(em,
+        Query query = queryBuilder(SupplementaryDataOperation.SET).build(em,
             caseReference,
             fieldPath,
             fieldValue);
@@ -51,7 +51,7 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
                                            String fieldPath,
                                            Object fieldValue) {
         LOG.debug("Insert supplementary data");
-        Query query = queryBuilder(SupplementaryDataOperation.INC).buildQueryForEachSupplementaryDataProperty(em,
+        Query query = queryBuilder(SupplementaryDataOperation.INC).build(em,
             caseReference,
             fieldPath,
             fieldValue);
@@ -61,7 +61,7 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
     @Override
     public SupplementaryData findSupplementaryData(final String caseReference, Set<String> filterFieldPaths) {
         LOG.debug("Find supplementary data");
-        Query query = queryBuilder(SupplementaryDataOperation.FIND).buildQueryForEachSupplementaryDataProperty(em,
+        Query query = queryBuilder(SupplementaryDataOperation.FIND).build(em,
             caseReference,
             null,
             null);

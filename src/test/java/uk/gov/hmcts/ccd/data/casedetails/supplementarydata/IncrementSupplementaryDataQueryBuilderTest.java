@@ -22,7 +22,7 @@ class IncrementSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
 
     @Test
     void shouldReturnQueryListWhenRequestDataPassed() {
-        Query query = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em,
+        Query query = supplementaryDataQueryBuilder.build(em,
             CASE_REFERENCE,
             "orgs_assigned_users.organisationA",
             32);
@@ -34,7 +34,7 @@ class IncrementSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
 
     @Test
     void shouldReturnMoreThanOneQueryInListWhenRequestDataPassedWithMultipleLeafNodes() {
-        Query query = supplementaryDataQueryBuilder.buildQueryForEachSupplementaryDataProperty(em,
+        Query query = supplementaryDataQueryBuilder.build(em,
             CASE_REFERENCE,
             "orgs_assigned_users.organisationB",
             33);
