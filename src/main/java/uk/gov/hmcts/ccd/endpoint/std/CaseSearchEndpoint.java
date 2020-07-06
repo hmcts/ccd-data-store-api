@@ -1,22 +1,33 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,8 +78,9 @@ public class CaseSearchEndpoint {
         ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
 
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
-            .withCaseTypes(caseTypeIds)
+            .withCaseTypes(getCaseTypeIds(caseTypeIds))
             .withSearchRequest(elasticsearchRequest)
+            .withConsolidationQuery(isAConsolidationQuery(caseTypeIds))
             .build();
 
         CaseSearchResult result = caseSearchOperation.execute(request);
@@ -77,6 +89,17 @@ public class CaseSearchEndpoint {
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());
 
         return result;
+    }
+
+    private List<String> getCaseTypeIds(List<String> caseTypeIds) {
+        if (isAConsolidationQuery(caseTypeIds)) {
+            return Arrays.asList("FT_ComplexOrganisation","FT_Conditionals");
+        }
+        return caseTypeIds;
+    }
+
+    private boolean isAConsolidationQuery(List<String> caseTypeIds) {
+        return "*".equals(caseTypeIds.get(0));
     }
 
     public static String buildCaseIds(CaseSearchResult caseSearchResult) {

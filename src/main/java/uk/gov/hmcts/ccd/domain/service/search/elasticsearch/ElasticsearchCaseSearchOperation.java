@@ -1,13 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
@@ -23,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseFieldsAggregationResult;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
@@ -30,6 +23,14 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMa
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
@@ -62,7 +63,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     public CaseSearchResult execute(CrossCaseTypeSearchRequest request) {
         MultiSearchResult result = search(request);
         if (result.isSucceeded()) {
-            return toCaseDetailsSearchResult(result);
+            return toCaseDetailsSearchResult(result,request);
         } else {
             throw new BadSearchRequest(result.getErrorMessage());
         }
@@ -95,8 +96,12 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             .build();
     }
 
-    private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult) {
+    private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult,
+                                                       CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
+
         List<CaseDetails> caseDetails = new ArrayList<>();
+        List<CaseFieldsAggregationResult> caseFieldsAggregations = new ArrayList<>();
+
         long totalHits = 0L;
 
         for (MultiSearchResult.MultiSearchResponse response : multiSearchResult.getResponses()) {
@@ -110,13 +115,22 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 throw new BadSearchRequest(errMsg);
             }
             if (response.searchResult != null) {
+
+                String name = response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits")
+                    .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
+
+                caseFieldsAggregations.add(new CaseFieldsAggregationResult(name,response.searchResult.getTotal()));
+
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
                 totalHits += response.searchResult.getTotal();
             }
         }
-
+        if (crossCaseTypeSearchRequest.isConsolidationQuery()) {
+            return new CaseSearchResult(caseFieldsAggregations, totalHits);
+        }
         return new CaseSearchResult(totalHits, caseDetails);
     }
+
 
     private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
         List<String> casesAsString = searchResult.getSourceAsStringList();

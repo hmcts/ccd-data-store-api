@@ -43,13 +43,15 @@ public class CrossCaseTypeSearchRequest {
     private final ElasticsearchRequest elasticsearchRequest;
     private final boolean multiCaseTypeSearch;
     private final List<String> aliasFields = new ArrayList<>();
+    private boolean consolidationQuery;
 
     private CrossCaseTypeSearchRequest(List<String> caseTypeIds, ElasticsearchRequest elasticsearchRequest, boolean multiCaseTypeSearch,
-                                       List<String> aliasFields) {
+                                       List<String> aliasFields, boolean consolidationQuery) {
         this.caseTypeIds.addAll(caseTypeIds);
         this.elasticsearchRequest = elasticsearchRequest;
         this.multiCaseTypeSearch = multiCaseTypeSearch;
         this.aliasFields.addAll(aliasFields);
+        this.consolidationQuery = consolidationQuery;
         addMetadataSourceFields();
         validateJsonSearchRequest();
     }
@@ -84,6 +86,10 @@ public class CrossCaseTypeSearchRequest {
         return aliasFields.stream().anyMatch(aliasField -> aliasField.equalsIgnoreCase(searchAliasField.getId()));
     }
 
+    public boolean isConsolidationQuery() {
+        return consolidationQuery;
+    }
+
     private void addMetadataSourceFields() {
         if (elasticsearchRequest.hasSource()) {
             ArrayNode sourceNode = (ArrayNode) elasticsearchRequest.getSource();
@@ -99,6 +105,7 @@ public class CrossCaseTypeSearchRequest {
         private ElasticsearchRequest elasticsearchRequest;
         private boolean multiCaseTypeSearch;
         private final List<String> sourceFilterAliasFields = new ArrayList<>();
+        private boolean consolidationQuery;
 
         public Builder withCaseTypes(List<String> caseTypeIds) {
             if (caseTypeIds != null) {
@@ -122,6 +129,11 @@ public class CrossCaseTypeSearchRequest {
             if (sourceFilterAliasFields != null) {
                 this.sourceFilterAliasFields.addAll(sourceFilterAliasFields);
             }
+            return this;
+        }
+
+        public Builder withConsolidationQuery(boolean consolidationQuery) {
+            this.consolidationQuery = consolidationQuery;
             return this;
         }
 
@@ -149,7 +161,7 @@ public class CrossCaseTypeSearchRequest {
 
         public CrossCaseTypeSearchRequest build() {
             setSourceFilterAliasFields();
-            return new CrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, multiCaseTypeSearch, sourceFilterAliasFields);
+            return new CrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, multiCaseTypeSearch, sourceFilterAliasFields,consolidationQuery);
         }
 
     }
