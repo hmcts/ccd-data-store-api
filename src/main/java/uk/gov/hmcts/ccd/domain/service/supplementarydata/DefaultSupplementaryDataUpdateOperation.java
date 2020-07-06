@@ -49,7 +49,7 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
 
     @Override
     public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
-        supplementaryData.getRequestData().keySet().forEach(key -> {
+        supplementaryData.getSupplementaryDataOperations().forEach(key -> {
             Optional<SupplementaryDataOperation> operation = SupplementaryDataOperation.getOperation(key);
             if (operation.isPresent()) {
                 supplementaryFunctions

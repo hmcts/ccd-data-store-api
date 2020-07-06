@@ -36,4 +36,9 @@ public class SupplementaryDataUpdateRequest {
         return keys;
     }
 
+    @JsonIgnore
+    public Set<String> getSupplementaryDataOperations() {
+        return this.requestData.keySet();
+    }
+
 }
