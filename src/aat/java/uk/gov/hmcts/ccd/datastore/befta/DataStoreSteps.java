@@ -14,8 +14,6 @@ public class DataStoreSteps {
     public void createUID() {
         String uniqueID = UUID.randomUUID().toString();
         ScenarioData.setUniqueString("string-" + uniqueID);
-
-
     }
 
     @Before("@elasticsearch")

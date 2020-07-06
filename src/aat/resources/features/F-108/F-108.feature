@@ -276,7 +276,6 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previously created case]
     And the response has all other details as expected
 
-
   @S-926
   Scenario: should NOT return the case for a solicitor role if not granted access to the case
     Given a case that has just been created as in [S-926_Create_Case_Private_Autotest1]
