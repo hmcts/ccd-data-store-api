@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 
@@ -73,7 +71,7 @@ class SupplementaryDataUpdateRequestTest {
 
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(rootMap);
 
-        Set<String> propertiesNames = updateRequest.getSupplementaryDataOperations();
+        Set<String> propertiesNames = updateRequest.getOperations();
 
         assertThat(propertiesNames, hasSize(2));
         assertThat(propertiesNames, containsInAnyOrder("$set", "$inc"));

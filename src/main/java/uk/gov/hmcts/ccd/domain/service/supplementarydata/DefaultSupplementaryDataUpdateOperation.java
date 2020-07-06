@@ -43,7 +43,7 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
 
     @Override
     public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
-        supplementaryData.getSupplementaryDataOperations().forEach(operationID -> {
+        supplementaryData.getOperations().forEach(operationID -> {
             executeOperation(operationID, caseReference, supplementaryData);
         });
         return this.supplementaryDataRepository.findSupplementaryData(caseReference, supplementaryData.getPropertiesNames());
