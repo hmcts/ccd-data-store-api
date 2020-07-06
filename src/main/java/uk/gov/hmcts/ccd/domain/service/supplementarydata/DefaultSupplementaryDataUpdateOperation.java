@@ -49,14 +49,16 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
 
     @Override
     public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
-        supplementaryData.getSupplementaryDataOperations().forEach(key -> {
-            Optional<SupplementaryDataOperation> operation = SupplementaryDataOperation.getOperation(key);
-            if (operation.isPresent()) {
-                supplementaryFunctions
-                    .get(operation.get())
-                    .accept(caseReference, supplementaryData);
-            }
+        supplementaryData.getSupplementaryDataOperations().forEach(operationID -> {
+            executeOperation(operationID, caseReference, supplementaryData);
         });
         return this.supplementaryDataRepository.findSupplementaryData(caseReference, supplementaryData.getPropertiesNames());
+    }
+
+    private void executeOperation(String operationID, String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
+        Optional<SupplementaryDataOperation> operation = SupplementaryDataOperation.getOperation(operationID);
+        operation.ifPresent(op ->
+            supplementaryFunctions.get(operation.get()).accept(caseReference, supplementaryData
+        ));
     }
 }
