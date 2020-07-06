@@ -60,6 +60,26 @@ class SupplementaryDataUpdateRequestTest {
     }
 
     @Test
+    void testGetSupplementaryDataOperations() {
+        Map<String, Map<String, Object>> rootMap = new HashMap<>();
+
+        Map<String, Object> childMap = new HashMap<>();
+        childMap.put("testc1.testchild1", "Test Value c1");
+        rootMap.put("$set", childMap);
+
+        Map<String, Object> childMap2 = new HashMap<>();
+        childMap2.put("testc3", "Test Value c3");
+        rootMap.put("$inc", childMap2);
+
+        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(rootMap);
+
+        Set<String> propertiesNames = updateRequest.getSupplementaryDataOperations();
+
+        assertThat(propertiesNames, hasSize(2));
+        assertThat(propertiesNames, containsInAnyOrder("$set", "$inc"));
+    }
+
+    @Test
     void shouldReturnEmptyWhenRequestDataEmpty() {
         Map<String, Map<String, Object>> rootMap = new HashMap<>();
 

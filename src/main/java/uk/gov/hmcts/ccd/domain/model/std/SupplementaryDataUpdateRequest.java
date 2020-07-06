@@ -27,7 +27,7 @@ public class SupplementaryDataUpdateRequest {
     @JsonIgnore
     public Set<String> getPropertiesNames() {
         Set<String> allProperties = new HashSet<>();
-        if (this.requestData != null) {
+        if (isValidRequestData()) {
             for (Map<String, Object> propertyNameValuePair : requestData.values()) {
                 allProperties.addAll(propertyNameValuePair.keySet());
             }
