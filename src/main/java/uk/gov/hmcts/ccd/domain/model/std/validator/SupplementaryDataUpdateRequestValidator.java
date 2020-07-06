@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.std.validator;
 
-import java.util.Map;
 import java.util.regex.Pattern;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,18 +22,11 @@ public class SupplementaryDataUpdateRequestValidator {
     }
 
     private void validateAtMostOneLevelOfNesting(SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
-        supplementaryDataUpdateRequest
-            .getRequestData()
-            .entrySet()
-            .stream()
-            .forEach(entry -> {
-                Map<String, Object> operationData = entry.getValue();
-                operationData.keySet().stream().forEach(key -> {
-                    String[] keys = key.split(Pattern.quote("."));
-                    if (keys.length > 2) {
-                        throw new BadRequestException(MORE_THAN_ONE_NESTED_LEVEL);
-                    }
-                });
-            });
+        for (String name : supplementaryDataUpdateRequest.getPropertiesNames()) {
+            String[] keys = name.split(Pattern.quote("."));
+            if (keys.length > 2) {
+                throw new BadRequestException(MORE_THAN_ONE_NESTED_LEVEL);
+            }
+        }
     }
 }
