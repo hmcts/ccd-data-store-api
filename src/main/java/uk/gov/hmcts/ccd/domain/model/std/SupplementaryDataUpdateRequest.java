@@ -41,4 +41,9 @@ public class SupplementaryDataUpdateRequest {
         return this.requestData.keySet();
     }
 
+    @JsonIgnore
+    public boolean isValidRequestData() {
+        return this.requestData != null && this.requestData.size() > 0;
+    }
+
 }
