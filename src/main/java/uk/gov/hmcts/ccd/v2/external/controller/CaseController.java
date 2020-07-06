@@ -343,7 +343,7 @@ public class CaseController {
                 }))
     })
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
-                                                                                 @RequestBody final SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
+                                                                                 @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
 
         this.requestValidator.validate(supplementaryDataUpdateRequest);
         if (!caseReferenceService.validateUID(caseId)) {
