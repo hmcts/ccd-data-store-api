@@ -326,7 +326,7 @@ public class CaseController {
     })
     @ApiImplicitParams({
         @ApiImplicitParam(
-            name = "supplementaryData",
+            name = "supplementaryDataUpdateRequest",
             dataType = "uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest",
             examples = @io.swagger.annotations.Example(
                 value = {
@@ -336,20 +336,20 @@ public class CaseController {
                         + "\t\t\"orgs_assigned_users.OrgB\": -1\n"
                         + "\t},\n"
                         + "\t\"$set\": {\n"
-                        + "\t\t\"orgs_assigned_users.OrgA\": 34,\n"
+                        + "\t\t\"orgs_assigned_users.OrgZ\": 34,\n"
                         + "\t\t\"processed\": true\n"
                         + "\t}\n"
                         + "}", mediaType = "application/json")
                 }))
     })
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
-                                                                                 @RequestBody final SupplementaryDataUpdateRequest supplementaryData) {
+                                                                                 @RequestBody final SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
 
-        this.requestValidator.validate(supplementaryData);
+        this.requestValidator.validate(supplementaryDataUpdateRequest);
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
-        SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId, supplementaryData);
+        SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId, supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
     }
 }

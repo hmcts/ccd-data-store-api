@@ -14,17 +14,17 @@ import static uk.gov.hmcts.ccd.v2.V2.Error.SUPPLEMENTARY_DATA_INVALID;
 @Singleton
 public class SupplementaryDataUpdateRequestValidator {
 
-    public void validate(SupplementaryDataUpdateRequest supplementaryData) {
-        if (supplementaryData == null
-            || supplementaryData.getRequestData() == null
-            || supplementaryData.getRequestData().size() == 0) {
+    public void validate(SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
+        if (supplementaryDataUpdateRequest == null
+            || supplementaryDataUpdateRequest.getRequestData() == null
+            || supplementaryDataUpdateRequest.getRequestData().size() == 0) {
             throw new BadRequestException(SUPPLEMENTARY_DATA_INVALID);
         }
-        validateAtMostOneLevelOfNesting(supplementaryData);
+        validateAtMostOneLevelOfNesting(supplementaryDataUpdateRequest);
     }
 
-    private void validateAtMostOneLevelOfNesting(SupplementaryDataUpdateRequest supplementaryData) {
-        supplementaryData
+    private void validateAtMostOneLevelOfNesting(SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
+        supplementaryDataUpdateRequest
             .getRequestData()
             .entrySet()
             .stream()
