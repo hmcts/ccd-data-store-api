@@ -21,7 +21,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
@@ -89,18 +88,18 @@ class SearchResultProcessorTest {
         when(dateTimeFormatParser.convertIso8601ToDateTime("ddMMyyyy", "1985-12-30"))
             .thenReturn("30121985");
 
-        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
 
-        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        SearchResultViewItem itemResult = result.get(0);
         assertAll(
-            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
-            () -> assertThat(itemResult.getCaseFields().size(), is(3)),
-            () -> assertThat(((TextNode)itemResult.getCaseFieldsFormatted().get(DATE_FIELD)).asText(), is("01/10/2020")),
-            () -> assertThat(((TextNode)itemResult.getCaseFieldsFormatted().get(DATETIME_FIELD)).asText(), is("30121985")),
-            () -> assertThat(((TextNode)itemResult.getCaseFieldsFormatted().get(TEXT_FIELD)).asText(), is("Text Value")),
-            () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATE_FIELD)).asText(), is("2020-10-01")),
-            () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATETIME_FIELD)).asText(), is("1985-12-30")),
-            () -> assertThat(((TextNode)itemResult.getCaseFields().get(TEXT_FIELD)).asText(), is("Text Value"))
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(itemResult.getFields().size(), is(3)),
+            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(DATE_FIELD)).asText(), is("01/10/2020")),
+            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(DATETIME_FIELD)).asText(), is("30121985")),
+            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(TEXT_FIELD)).asText(), is("Text Value")),
+            () -> assertThat(((TextNode)itemResult.getFields().get(DATE_FIELD)).asText(), is("2020-10-01")),
+            () -> assertThat(((TextNode)itemResult.getFields().get(DATETIME_FIELD)).asText(), is("1985-12-30")),
+            () -> assertThat(((TextNode)itemResult.getFields().get(TEXT_FIELD)).asText(), is("Text Value"))
         );
     }
 
@@ -115,14 +114,14 @@ class SearchResultProcessorTest {
             .thenReturn("01/10/2020");
         viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
 
-        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
 
-        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        SearchResultViewItem itemResult = result.get(0);
         assertAll(
-            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
-            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
-            () -> assertThat(((TextNode)itemResult.getCaseFieldsFormatted().get(metadataField)).asText(), is("01/10/2020")),
-            () -> assertThat(itemResult.getCaseFields().get(metadataField), is(localDateTime))
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(itemResult.getFields().size(), is(4)),
+            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(metadataField)).asText(), is("01/10/2020")),
+            () -> assertThat(itemResult.getFields().get(metadataField), is(localDateTime))
         );
     }
 
@@ -137,14 +136,14 @@ class SearchResultProcessorTest {
 
         when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "2020-10-05")).thenReturn("10-2020");
 
-        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
 
-        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        SearchResultViewItem itemResult = result.get(0);
         assertAll(
-            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
-            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
-            () -> assertThat(((ObjectNode)itemResult.getCaseFieldsFormatted().get(COMPLEX_FIELD)).get("ComplexDateField").asText(), is("10-2020")),
-            () -> assertThat(((ObjectNode)itemResult.getCaseFields().get(COMPLEX_FIELD)).get("ComplexDateField").asText(), is("2020-10-05"))
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(itemResult.getFields().size(), is(4)),
+            () -> assertThat(((ObjectNode)itemResult.getFieldsFormatted().get(COMPLEX_FIELD)).get("ComplexDateField").asText(), is("10-2020")),
+            () -> assertThat(((ObjectNode)itemResult.getFields().get(COMPLEX_FIELD)).get("ComplexDateField").asText(), is("2020-10-05"))
         );
     }
 
@@ -162,22 +161,22 @@ class SearchResultProcessorTest {
         when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "1999-12-01"))
             .thenReturn("12-1999");
 
-        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
 
-        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        SearchResultViewItem itemResult = result.get(0);
         assertAll(
-            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
-            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(itemResult.getFields().size(), is(4)),
             () -> assertThat(
-                ((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(),
+                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(),
                 is("10-2020")
             ),
             () -> assertThat(
-                ((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(),
+                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(),
                 is("12-1999")
             ),
-            () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(), is("2020-10-05")),
-            () -> assertThat(((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(), is("1999-12-01"))
+            () -> assertThat(((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(), is("2020-10-05")),
+            () -> assertThat(((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(), is("1999-12-01"))
         );
     }
 
@@ -198,26 +197,26 @@ class SearchResultProcessorTest {
         when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "1992-07-30"))
             .thenReturn("07-1992");
 
-        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
 
-        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        SearchResultViewItem itemResult = result.get(0);
         assertAll(
-            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
-            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(itemResult.getFields().size(), is(4)),
             () -> assertThat(
-                ((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(),
                 is("10-2020")
             ),
             () -> assertThat(
-                ((ArrayNode)itemResult.getCaseFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(),
                 is("07-1992")
             ),
             () -> assertThat(
-                ((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                ((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(),
                 is("2020-10-05")
             ),
             () -> assertThat(
-                ((ArrayNode)itemResult.getCaseFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                ((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(),
                 is("1992-07-30")
             )
         );
@@ -232,14 +231,14 @@ class SearchResultProcessorTest {
         List<SearchResultViewColumn> columns = new ArrayList<>();
         columns.addAll(Arrays.asList(column1, column2));
 
-        final SearchResultView result = searchResultProcessor.execute(columns, viewItems, null);
+        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
 
-        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
+        SearchResultViewItem itemResult = result.get(0);
         assertAll(
-            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
-            () -> assertThat(itemResult.getCaseFields().size(), is(3)),
-            () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATE_FIELD)).asText(), is("2020-10-01")),
-            () -> assertThat(((TextNode)itemResult.getCaseFields().get(DATETIME_FIELD)).asText(), is("1985-12-30"))
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(itemResult.getFields().size(), is(3)),
+            () -> assertThat(((TextNode)itemResult.getFields().get(DATE_FIELD)).asText(), is("2020-10-01")),
+            () -> assertThat(((TextNode)itemResult.getFields().get(DATETIME_FIELD)).asText(), is("1985-12-30"))
         );
     }
 
@@ -255,14 +254,14 @@ class SearchResultProcessorTest {
         viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
         viewColumns.add(column1);
 
-        final SearchResultView result = searchResultProcessor.execute(viewColumns, viewItems, null);
+        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
 
-        final SearchResultViewItem itemResult = result.getSearchResultViewItems().get(0);
-        final ArrayNode multiSelectResult = (ArrayNode)itemResult.getCaseFields().get(multiSelectField);
-        final ArrayNode multiSelectResultFormatted = (ArrayNode)itemResult.getCaseFieldsFormatted().get(multiSelectField);
+        SearchResultViewItem itemResult = result.get(0);
+        ArrayNode multiSelectResult = (ArrayNode)itemResult.getFields().get(multiSelectField);
+        ArrayNode multiSelectResultFormatted = (ArrayNode)itemResult.getFieldsFormatted().get(multiSelectField);
         assertAll(
-            () -> assertThat(result.getSearchResultViewItems().size(), is(1)),
-            () -> assertThat(itemResult.getCaseFields().size(), is(4)),
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(itemResult.getFields().size(), is(4)),
             () -> assertThat(multiSelectResult.size(), is(2)),
             () -> assertThat(multiSelectResult.get(0).asText(), is("Value1")),
             () -> assertThat(multiSelectResult.get(1).asText(), is("Value2")),

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 /**
@@ -22,19 +22,17 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 @Slf4j
 public class CaseSearchRequest {
 
-    public static final String QUERY = "query";
-
     private final String caseTypeId;
-    private final JsonNode searchRequestJsonNode;
+    ElasticsearchRequest elasticsearchRequest;
 
-    public CaseSearchRequest(String caseTypeId, JsonNode searchRequestJsonNode) {
+    public CaseSearchRequest(String caseTypeId, ElasticsearchRequest elasticsearchRequest) {
         this.caseTypeId = caseTypeId;
-        this.searchRequestJsonNode = searchRequestJsonNode;
+        this.elasticsearchRequest = elasticsearchRequest;
         validateJsonSearchRequest();
     }
 
     private void validateJsonSearchRequest() {
-        if (!searchRequestJsonNode.has(QUERY)) {
+        if (!elasticsearchRequest.hasQuery()) {
             throw new BadSearchRequest("missing required field 'query'");
         }
     }
@@ -44,11 +42,11 @@ public class CaseSearchRequest {
     }
 
     public String getQueryValue() {
-        return searchRequestJsonNode.get(QUERY).toString();
+        return elasticsearchRequest.getQuery().toString();
     }
 
     public String toJsonString() {
-        String jsonString = searchRequestJsonNode.toString();
+        String jsonString = elasticsearchRequest.toJson();
         log.debug("json search request: {}", jsonString);
         return jsonString;
     }

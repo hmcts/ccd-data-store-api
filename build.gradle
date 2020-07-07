@@ -262,6 +262,7 @@ dependencies {
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
+    testCompile 'pl.allegro.tech:embedded-elasticsearch:2.7.0'
 
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
@@ -277,7 +278,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '3.3.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '3.4.0'
 
 }
 // end::dependencies[]
@@ -755,8 +756,8 @@ task functional(type: Test) {
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
-                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '(not @Ignore) and (not @elasticsearch)', '--glue', "uk.gov.hmcts.ccd.datastore.befta",
+                    '--glue','uk.gov.hmcts.befta.player', 'src/aat/resources/features']
         }
     }
 }

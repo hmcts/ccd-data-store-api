@@ -8,9 +8,6 @@ java:
         - data-store-api-draftStoreEncryptionSecret
         - data-store-api-draft-key
         - ccd-data-s2s-secret
-        - ccd-ELASTIC-SEARCH-URL
-        - ccd-ELASTIC-SEARCH-DATA-NODES-URL
-        - ccd-ELASTIC-SEARCH-PASSWORD
   environment:
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
     DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
@@ -20,9 +17,51 @@ java:
     DATA_STORE_DB_MAX_POOL_SIZE: 10
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal/
     USER_PROFILE_HOST: http://ccd-user-profile-api-pr-224.service.core-compute-preview.internal/
-
     ENABLE_DB_MIGRATE: true
-    ELASTIC_SEARCH_ENABLED: false
+
+    ELASTIC_SEARCH_ENABLED: false # enable whenever ES required on a particular PR
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
+    ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
   postgresql:
     enabled: true
+
+elastic:
+  enabled: false # enable whenever required on a particular PR
+
+elasticsearch:
+  clusterName: "es"
+  imageTag: "6.4.2"
+  replicas: 1
+  minimumMasterNodes: 1
+  antiAffinity: "soft"
+  esJavaOpts: "-Xmx512m -Xms512m"
+  persistence:
+    enabled: false
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik
+    path: /
+    hosts:
+      - es-${SERVICE_FQDN}
+logstash:
+  image:
+    repository: hmcts/ccd-logstash
+    tag: latest
+    pullPolicy: IfNotPresent
+  logstashJavaOpts: -Xmx1g -Xms512M
+  persistence:
+    enabled: false
+  volumeMounts:
+    - name: pipeline
+      mountPath: /usr/share/logstash/files # hack to prevent override of default pipeline in the custom image hmcts/ccd-logstash
+  elasticsearch:
+    host: "{{ .Release.Name }}-es-master"
+    port: 9200
+  configTpl:
+    xpack.monitoring.enabled: "false"
+    db.url: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/javadatabase?stringtype=unspecified"
+    db.user: "javapostgres"
+    db.pwd: "javapassword"
+    es.data.nodes.url: "http://{{ .Release.Name }}-es-master:9200"

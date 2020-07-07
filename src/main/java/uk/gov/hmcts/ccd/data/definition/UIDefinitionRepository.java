@@ -5,13 +5,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.springframework.beans.factory.annotation.Qualifier;
-import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 @Named
 @Singleton
@@ -28,14 +23,19 @@ public class UIDefinitionRepository {
         this.cachedUiDefinitionGateway = cachedUiDefinitionGateway;
     }
 
-    public SearchResult getWorkBasketResult(final String caseTypeId) {
+    public SearchResultDefinition getWorkBasketResult(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
         return cachedUiDefinitionGateway.getWorkBasketResult(version.getVersion(), caseTypeId);
     }
 
-    public SearchResult getSearchResult(final String caseTypeId) {
+    public SearchResultDefinition getSearchResult(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
         return cachedUiDefinitionGateway.getSearchResult(version.getVersion(), caseTypeId);
+    }
+
+    public SearchResultDefinition getSearchCasesResult(String caseTypeId, String useCase) {
+        CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
+        return cachedUiDefinitionGateway.getSearchCasesResultDefinition(version.getVersion(), caseTypeId, useCase);
     }
 
     public SearchInputFieldsDefinition getSearchInputFieldDefinitions(final String caseTypeId) {
