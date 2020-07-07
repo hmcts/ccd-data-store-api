@@ -1,6 +1,6 @@
 {
 	"title": "when a specific User ID is supplied for a specific case ID, then the case roles relating only to the User ID for that specific Case ID must be returned",
-	"_guid_": "S-605",
+	"_guid_": "S-606",
 	"productName": "CCD Data Store api",
 	"operationName": "Update Supplementary Data",
 	"_extends_": "F-106_Update_Supplementary_Data_Base",
