@@ -302,6 +302,7 @@ class CaseDataServiceTest {
             "}";
 
         JsonNode result = JacksonUtils.convertValueJsonNode(classifications);
+        System.out.println(result);
         assertEquals(expectedResult, result.toString(), false);
     }
 

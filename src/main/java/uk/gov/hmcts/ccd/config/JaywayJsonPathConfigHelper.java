@@ -10,7 +10,7 @@ import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 
-public final class JaywayJsonPathConfigHelper {
+public class JaywayJsonPathConfigHelper {
 
     private JaywayJsonPathConfigHelper() {
     }

@@ -86,6 +86,10 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
         assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
     }
 
+    private Integer countAccesses(Long caseId, String userId) {
+        return countAccesses(caseId, userId, GlobalCaseRole.CREATOR.getRole());
+    }
+
     private Integer countAccesses(Long caseId, String userId, String role) {
         em.flush();
 

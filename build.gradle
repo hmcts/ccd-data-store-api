@@ -54,9 +54,8 @@ apply plugin: 'org.owasp.dependencycheck'
 apply from: 'liquibase.gradle'
 
 pmd {
-    toolVersion = '6.21.0'
-    ruleSetFiles = files("pmd.xml")
-    ruleSets = []
+    toolVersion = '6.11.0'
+    maxFailures = 2908 // Failures need to be reviewed/fixed before removing this property
 }
 
 dependencyUpdates.resolutionStrategy = {
@@ -103,7 +102,7 @@ ext {
     junitJupiterVersion = '5.5.2'
     junitVintageVersion = '5.5.2'
     powermockVersion = '2.0.0-beta.5'
-    reformLogging = '5.1.5'
+    reformLogging = '5.1.0'
     swagger2Version = '3.0.0-SNAPSHOT'
     limits = [
             'instruction': 90,
@@ -184,8 +183,8 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-openfeign')
     compile('org.springframework.retry:spring-retry')
     compile('org.springframework.boot:spring-boot-starter-cache')
-    compile('com.hazelcast:hazelcast')
-    compile('com.hazelcast:hazelcast-spring')
+    compile group: 'com.hazelcast', name: 'hazelcast'
+    compile group: 'com.hazelcast', name: 'hazelcast-spring'
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'

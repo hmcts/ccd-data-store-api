@@ -34,7 +34,6 @@ public abstract class PersistenceIT {
         }
 
         @Bean
-        @SuppressWarnings("PMD.CloseResource")
         public DataSource dataSource() throws IOException, SQLException {
             final EmbeddedPostgres pg = embeddedPostgres();
 

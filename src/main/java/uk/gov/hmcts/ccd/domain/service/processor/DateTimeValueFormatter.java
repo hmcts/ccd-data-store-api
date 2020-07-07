@@ -95,6 +95,8 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
+                final JsonNode valueNode = item.get(CollectionValidator.VALUE);
+                final String valueToConvert = valueNode.isNull() ? null : valueNode.asText();
                 ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
                     isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
                         ? createNode(

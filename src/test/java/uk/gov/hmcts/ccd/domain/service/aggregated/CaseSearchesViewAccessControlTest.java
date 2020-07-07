@@ -8,26 +8,38 @@ import org.mockito.*;
 import uk.gov.hmcts.ccd.data.casedetails.*;
 import uk.gov.hmcts.ccd.data.user.*;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.search.*;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.service.processor.*;
 import uk.gov.hmcts.ccd.domain.service.search.*;
+import uk.gov.hmcts.ccd.endpoint.exceptions.*;
 
 import java.io.*;
+import java.time.*;
 import java.util.*;
+import java.util.stream.*;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.*;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil.CaseDetailsBuilder.*;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.*;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.*;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.*;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.*;
 
 class CaseSearchesViewAccessControlTest {
 
     private static final String CASE_TYPE_ID_1 = "CASE_TYPE_1";
+    private static final String CASE_TYPE_ID_2 = "CASE_TYPE_2";
     private static final String JURISDICTION = "JURISDICTION";
     private static final String CASE_FIELD_1 = "Case field 1";
     private static final String CASE_FIELD_2 = "Case field 2";
@@ -36,6 +48,7 @@ class CaseSearchesViewAccessControlTest {
     private static final String CASE_FIELD_5 = "Case field 5";
     private static final String ROLE_IN_USER_ROLE_1 = "Role 1";
     private static final String ROLE_IN_USER_ROLE_2 = "Role 2";
+    private static final String ROLE_NOT_IN_USER_ROLE = "Role X";
 
     private static final String FAMILY_DETAILS = "FamilyDetails";
     private static final String FATHER_NAME_VALUE = "Simmon";
@@ -51,10 +64,21 @@ class CaseSearchesViewAccessControlTest {
         + "\"AddressLine1\":\"40 Edric House\","
         + "\"AddressLine2\":\"\",\"AddressLine3\":\"\"}"
         + "}";
+    private static final String FAMILY_DETAILS_PATH = "FatherName";
+    private static final String FAMILY_DETAILS_PATH_NESTED = "FamilyAddress.PostCode";
+    private static final String FAMILY = "FamilyDetails";
+    private static final String FATHER_NAME = "FatherName";
+    private static final String MOTHER_NAME = "MotherName";
+    private static final String FAMILY_ADDRESS = "FamilyAddress";
+    private static final String ADDRESS_LINE_1 = "AddressLine1";
     private static final String POSTCODE = "PostCode";
 
     private static final String TEXT_TYPE = "Text";
+    private static final String SEPARATOR = ".";
 
+    private static final LocalDateTime CREATED_DATE = LocalDateTime.of(2000, 1, 2, 12, 0);
+    private static final LocalDateTime LAST_MODIFIED_DATE = LocalDateTime.of(1987, 12, 4, 17, 30);
+    private static final LocalDateTime LAST_STATE_MODIFIED_DATE = LocalDateTime.of(2015, 6, 17, 20, 45);
     private static final SecurityClassification SECURITY_CLASSIFICATION = SecurityClassification.PUBLIC;
 
     @Mock

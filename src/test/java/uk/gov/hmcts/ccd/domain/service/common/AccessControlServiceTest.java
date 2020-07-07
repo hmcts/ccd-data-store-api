@@ -2044,6 +2044,7 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
+            List<CaseFieldDefinition> caseFields = newArrayList();
             final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{} }\n"
             ));

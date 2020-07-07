@@ -400,14 +400,14 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
-        mockMvc.perform(get(GET_CASES)
-            .contentType(JSON_CONTENT_TYPE)
-            .param("case_type", TEST_CASE_TYPE)
-            .param("jurisdiction", TEST_JURISDICTION)
-            .param("case.PersonFirstName$", "JanetX")
-            .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(400))
-            .andReturn();
+        final MvcResult result = mockMvc.perform(get(GET_CASES)
+                                                     .contentType(JSON_CONTENT_TYPE)
+                                                     .param("case_type", TEST_CASE_TYPE)
+                                                     .param("jurisdiction", TEST_JURISDICTION)
+                                                     .param("case.PersonFirstName$", "JanetX")
+                                                     .header(AUTHORIZATION, "Bearer user1"))
+                                        .andExpect(status().is(400))
+                                        .andReturn();
 
     }
 

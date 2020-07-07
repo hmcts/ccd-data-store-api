@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.List;
 
-@SuppressWarnings("PMD.UnusedPrivateField")
 public class CaseValidationError implements Serializable {
 
     @JsonProperty("field_errors")

@@ -55,9 +55,10 @@ public class CachingConfiguration {
     }
 
     private MapConfig newMapConfig(final String name) {
-        return new MapConfig().setName(name)
+        MapConfig mapConfig = new MapConfig().setName(name)
                 .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
                 .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy());
+        return mapConfig;
     }
 
 }

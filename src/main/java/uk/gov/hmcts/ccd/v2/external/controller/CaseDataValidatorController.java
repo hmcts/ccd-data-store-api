@@ -23,7 +23,6 @@ import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 
 @RestController
 @RequestMapping(path = "/case-types")
-@SuppressWarnings("PMD.UnusedPrivateField")
 public class CaseDataValidatorController {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;

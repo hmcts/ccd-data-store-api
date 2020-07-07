@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 /**
  * Definition of case type AUTOTEST1/AAT as code.
  */
-@SuppressWarnings("PMD.ConstantsInInterface")
 public interface AATCaseType {
     String JURISDICTION = "AUTOTEST1";
     String JURISDICTION_AUTOTEST2 = "AUTOTEST2";

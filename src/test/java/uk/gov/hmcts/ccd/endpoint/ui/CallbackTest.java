@@ -119,6 +119,7 @@ public class CallbackTest extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_TEST_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        System.out.println(CallbackTestData.getTestDefinition(super.wiremockPort));
         stubFor(get(urlMatching("/api/data/case-type/CallbackCase"))
             .willReturn(okJson(CallbackTestData.getTestDefinition(super.wiremockPort)).withStatus(200)));
         stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))

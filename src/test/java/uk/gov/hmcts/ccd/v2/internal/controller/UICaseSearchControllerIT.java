@@ -111,7 +111,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertUseCaseHeadersUserRole(caseSearchResultViewResource.getHeaders()),
-            () -> assertExampleCaseDataForUserRole(caseDetails.getFields()),
+            () -> assertExampleCaseDataForUserRole(caseDetails.getFields(), false),
             () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
         );
     }
@@ -367,7 +367,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         );
     }
 
-    private void assertExampleCaseDataForUserRole(Map<String, Object> data) {
+    private void assertExampleCaseDataForUserRole(Map<String, Object> data, boolean formatted) {
         assertAll(
             () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
             () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),

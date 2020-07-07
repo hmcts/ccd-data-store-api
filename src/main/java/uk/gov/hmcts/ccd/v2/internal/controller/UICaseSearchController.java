@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.*;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.*;
 import uk.gov.hmcts.ccd.v2.internal.resource.*;
 
 import java.time.*;

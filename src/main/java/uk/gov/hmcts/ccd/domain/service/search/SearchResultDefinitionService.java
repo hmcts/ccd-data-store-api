@@ -42,7 +42,6 @@ public class SearchResultDefinitionService {
         }
     }
 
-    @SuppressWarnings("PMD.NullAssignment")
     private SearchResultDefinition buildSearchResultDefinitionFromCaseFields(CaseTypeDefinition caseTypeDefinition, List<String> requestedFields) {
         SearchResultDefinition searchResult = new SearchResultDefinition();
         List<SearchResultField> searchResultFields = new ArrayList<>();

@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.datastore.befta;
 
 import uk.gov.hmcts.befta.BeftaMain;
 
-public final class DataStoreBeftaMain {
+public class DataStoreBeftaMain {
 
     private DataStoreBeftaMain() {
         // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)

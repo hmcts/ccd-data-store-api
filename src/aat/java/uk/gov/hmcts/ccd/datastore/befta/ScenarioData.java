@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
-@SuppressWarnings("PMD.ClassNamingConventions")
-public final class ScenarioData {
+public class ScenarioData {
 
     private ScenarioData() {
         // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)

@@ -10,7 +10,6 @@ final class ElasticsearchHelper {
         return Env.require("ELASTIC_SEARCH_HOSTS");
     }
 
-    @SuppressWarnings("PMD.AvoidCatchingNPE")
     Long getLogstashReadDelay() {
         try {
             return Long.valueOf(Env.require("LOGSTASH_READ_DELAY_MILLIS"));

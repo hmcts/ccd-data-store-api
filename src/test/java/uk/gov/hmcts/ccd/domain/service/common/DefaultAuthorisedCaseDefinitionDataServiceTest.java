@@ -162,7 +162,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             verifyCalls();
         }
 
-        private void verifyCalls() {
+        void verifyCalls() {
             verify(caseTypeService).getCaseType(CASE_TYPE);
             verify(userRepository).getUserRoles();
             verify(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ);
