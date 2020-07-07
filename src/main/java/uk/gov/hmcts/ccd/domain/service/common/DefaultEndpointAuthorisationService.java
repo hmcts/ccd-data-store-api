@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -11,22 +12,23 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 @Qualifier("default")
 public class DefaultEndpointAuthorisationService implements EndpointAuthorisationService {
 
-    private static final String ROLE_CASE_WORKER_CAA = "caseworker-caa";
-
     private final UserRepository userRepository;
     private final CaseAccessService caseAccessService;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public DefaultEndpointAuthorisationService(final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                                               final CaseAccessService caseAccessService) {
+                                               final CaseAccessService caseAccessService,
+                                               final ApplicationParams applicationParams) {
         this.userRepository = userRepository;
         this.caseAccessService = caseAccessService;
+        this.applicationParams = applicationParams;
     }
 
     @Override
     public boolean isAccessAllowed(CaseDetails caseDetails) {
 
-        if (this.userRepository.getUserRoles().contains(ROLE_CASE_WORKER_CAA)) {
+        if (userRepository.getUserRoles().stream().anyMatch(applicationParams.getCcdAccessControlCrossJurisdictionRoles()::contains)) {
             return true;
         }
 

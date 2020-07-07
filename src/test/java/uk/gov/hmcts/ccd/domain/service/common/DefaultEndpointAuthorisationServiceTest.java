@@ -5,8 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,19 +25,23 @@ class DefaultEndpointAuthorisationServiceTest {
     @Mock
     private CaseAccessService caseAccessService;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
     private DefaultEndpointAuthorisationService userRoleValidator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         userRoleValidator = new DefaultEndpointAuthorisationService(userRepository,
-            caseAccessService);
+            caseAccessService, applicationParams);
     }
 
     @Test
     void shouldReturnTrueWhenLoggedInUserHasCAARole() {
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-caa"));
+        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(Arrays.asList("caseworker-caa"));
         boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertTrue(canAccess);
     }
