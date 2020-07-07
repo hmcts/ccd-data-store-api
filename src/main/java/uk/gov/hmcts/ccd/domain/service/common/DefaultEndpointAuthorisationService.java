@@ -28,7 +28,7 @@ public class DefaultEndpointAuthorisationService implements EndpointAuthorisatio
     @Override
     public boolean isAccessAllowed(CaseDetails caseDetails) {
 
-        if (userRepository.getUserRoles().stream().anyMatch(applicationParams.getCcdAccessControlCrossJurisdictionRoles()::contains)) {
+        if (userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles())) {
             return true;
         }
 

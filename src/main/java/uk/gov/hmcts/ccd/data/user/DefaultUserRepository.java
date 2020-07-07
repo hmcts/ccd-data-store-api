@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
@@ -172,6 +173,21 @@ public class DefaultUserRepository implements UserRepository {
             .map(element -> element[1])
             .distinct()
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean anyRoleEqualsAnyOf(List<String> userRoles) {
+        return getUserRoles().stream().anyMatch(userRoles::contains);
+    }
+
+    @Override
+    public boolean anyRoleEqualsTo(String userRole) {
+        return getUserRoles().contains(userRole);
+    }
+
+    @Override
+    public boolean anyRoleMatches(Pattern rolesPattern) {
+        return getUserRoles().stream().anyMatch(role -> rolesPattern.matcher(role).matches());
     }
 
     private Set<SecurityClassification> getClassificationsForUserRoles(List<String> roles) {

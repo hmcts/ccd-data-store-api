@@ -25,7 +25,7 @@ public class DefaultCaseAssignedUserRoleValidator implements CaseAssignedUserRol
     }
 
     public boolean canAccessUserCaseRoles(List<String> userIds) {
-        boolean canAccess = userRepository.getUserRoles().stream().anyMatch(applicationParams.getCcdAccessControlCrossJurisdictionRoles()::contains);
+        boolean canAccess = userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles());
         if (!canAccess) {
             userIds = userIds.stream().distinct().collect(Collectors.toList());
             canAccess = userIds.size() == 1 && userIds.contains(this.userRepository.getUserId());
