@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
@@ -17,7 +16,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -50,14 +49,13 @@ public class CaseAccessService {
         return !canOnlyViewGrantedCases() || accessGranted(caseDetails);
     }
 
-    public AccessLevel getAccessLevel(ServiceAndUserDetails serviceAndUserDetails) {
-        return serviceAndUserDetails.getAuthorities()
-                                    .stream()
-                                    .map(GrantedAuthority::getAuthority)
-                                    .filter(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches())
-                                    .findFirst()
-                                    .map(role -> AccessLevel.GRANTED)
-                                    .orElse(AccessLevel.ALL);
+    public AccessLevel getAccessLevel(UserInfo userInfo) {
+        return userInfo.getRoles()
+            .stream()
+            .filter(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches())
+            .findFirst()
+            .map(role -> AccessLevel.GRANTED)
+            .orElse(AccessLevel.ALL);
     }
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {

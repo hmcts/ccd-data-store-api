@@ -3,53 +3,41 @@ package uk.gov.hmcts.ccd.infrastructure.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.annotation.RequestScope;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Configuration
 public class UserAuthorisationConfiguration {
 
     private final CaseAccessService caseAccessService;
+    private final SecurityUtils securityUtils;
 
     @Autowired
-    public UserAuthorisationConfiguration(CaseAccessService caseAccessService) {
+    public UserAuthorisationConfiguration(CaseAccessService caseAccessService, SecurityUtils securityUtils) {
         this.caseAccessService = caseAccessService;
+        this.securityUtils = securityUtils;
     }
 
     @Bean
     @RequestScope
     public UserAuthorisation create() {
-        final ServiceAndUserDetails serviceAndUser = getServiceAndUserDetails();
-        return new UserAuthorisation(getUserId(serviceAndUser),
-                                     getAccessLevel(serviceAndUser),
-                                     getRoles(serviceAndUser));
+        UserInfo userInfo = securityUtils.getUserInfo();
+        return new UserAuthorisation(userInfo.getUid(),
+                                     getAccessLevel(userInfo),
+                                     getRoles(userInfo));
     }
 
-    private ServiceAndUserDetails getServiceAndUserDetails() {
-        return (ServiceAndUserDetails) SecurityContextHolder.getContext()
-                                                            .getAuthentication()
-                                                            .getPrincipal();
+    private AccessLevel getAccessLevel(UserInfo userInfo) {
+        return caseAccessService.getAccessLevel(userInfo);
     }
 
-    private String getUserId(ServiceAndUserDetails serviceAndUser) {
-        return serviceAndUser.getUsername();
-    }
-
-    private AccessLevel getAccessLevel(ServiceAndUserDetails serviceAndUser) {
-        return caseAccessService.getAccessLevel(serviceAndUser);
-    }
-
-    private Set<String> getRoles(ServiceAndUserDetails serviceAndUser) {
-        return serviceAndUser.getAuthorities()
-                             .stream()
-                             .map(GrantedAuthority::getAuthority)
-                             .collect(Collectors.toSet());
+    private Set<String> getRoles(UserInfo userInfo) {
+        return new HashSet<String>(userInfo.getRoles());
     }
 }

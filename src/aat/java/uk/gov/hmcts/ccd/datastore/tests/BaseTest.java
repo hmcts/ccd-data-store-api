@@ -58,12 +58,11 @@ public abstract class BaseTest {
     private Supplier<RequestSpecification> authenticateAndCreateRequestSpecification(String username, String password, Boolean withUserParam) {
         AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(username, password);
         String s2sToken = aat.getS2SHelper().getToken();
-        String bearer = "Bearer ";
 
         return () -> {
             RequestSpecification request = RestAssured.given()
-                .header("Authorization", bearer + caseworker.getAccessToken())
-                .header("ServiceAuthorization", bearer + s2sToken);
+                .header("Authorization", "Bearer " + caseworker.getAccessToken())
+                .header("ServiceAuthorization", s2sToken);
 
             return withUserParam ? request.pathParam("user", caseworker.getId()) : request;
         };

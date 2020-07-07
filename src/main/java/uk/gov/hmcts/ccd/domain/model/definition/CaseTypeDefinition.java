@@ -2,13 +2,18 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
 @ToString
 public class CaseTypeDefinition implements Serializable {
@@ -167,5 +172,18 @@ public class CaseTypeDefinition implements Serializable {
     @JsonIgnore
     public Optional<CaseFieldDefinition> getCaseField(String caseFieldId) {
         return caseFieldDefinitions.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
+    }
+
+    @JsonIgnore
+    public <T extends CommonField> Optional<T> getComplexSubfieldDefinitionByPath(String path) {
+        return CaseFieldPathUtils.getFieldDefinitionByPath(this, path);
+    }
+
+    @JsonIgnore
+    public Map<String, TextNode> getLabelsFromCaseFields() {
+        return getCaseFieldDefinitions()
+            .stream()
+            .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
+            .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField -> JsonNodeFactory.instance.textNode(caseField.getLabel())));
     }
 }

@@ -63,6 +63,7 @@ public final class V2 {
         public static final String CASE_ALTERED = "Case altered outside of transaction";
         public static final String CASE_ROLE_REQUIRED = "Case role missing";
         public static final String CASE_ROLE_INVALID = "Case role does not exist";
+        public static final String CASE_ROLE_FORMAT_INVALID = "Case role name format is invalid";
         public static final String GRANT_FORBIDDEN = "Grant action is reserved to users with entire jurisdiction access";
         public static final String CASE_FIELD_INVALID = "Cannot validate case field";
         public static final String CALLBACK_EXCEPTION = "Unsuccessful callback";
@@ -70,5 +71,10 @@ public final class V2 {
         public static final String ROLES_FOR_CASE_ID_NOT_FOUND = "Cannot find user roles or case roles for the case ID";
         public static final String CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID = "Cannot find case type definition for case ID";
         public static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+        public static final String EMPTY_CASE_ID_LIST = "Case ID list is empty";
+        public static final String USER_ID_INVALID = "User ID is not valid";
+        public static final String EMPTY_CASE_USER_ROLE_LIST = "Case user roles list is empty";
+        public static final String OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED = "Access to other user's case role assignments not granted";
+        public static final String CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION = "Client service not authorised to perform operation";
     }
 }
