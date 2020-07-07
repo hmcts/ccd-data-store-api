@@ -693,13 +693,13 @@ test {
     }
 
     jvmArgs = [
-        "--add-modules", "java.se", \
-        "--add-exports", "java.base/jdk.internal.ref=ALL-UNNAMED", \
-        "--add-opens", "java.base/java.lang=ALL-UNNAMED", \
-        "--add-opens", "java.base/java.nio=ALL-UNNAMED", \
-        "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED", \
-        "--add-opens", "java.management/sun.management=ALL-UNNAMED", \
-        "--add-opens", "jdk.management/com.sun.management.internal=ALL-UNNAMED"
+        '--add-modules', 'java.se',
+        '--add-exports', 'java.base/jdk.internal.ref=ALL-UNNAMED',
+        '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+        '--add-opens', 'java.base/java.nio=ALL-UNNAMED',
+        '--add-opens', 'java.base/sun.nio.ch=ALL-UNNAMED',
+        '--add-opens', 'java.management/sun.management=ALL-UNNAMED',
+        '--add-opens', 'jdk.management/com.sun.management.internal=ALL-UNNAMED'
     ]
 }
 
@@ -732,6 +732,7 @@ task smoke(type: Test) {
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '@Smoke', '--glue',
                     'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
+            jvmArgs = [ '--add-opens=java.base/java.lang.reflect', 'ALL-UNNAMED' ]
         }
     }
 
@@ -760,6 +761,7 @@ task functional(type: Test) {
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '(not @Ignore) and (not @elasticsearch)', '--glue', "uk.gov.hmcts.ccd.datastore.befta",
                     '--glue','uk.gov.hmcts.befta.player', 'src/aat/resources/features']
+            jvmArgs = [ '--add-opens=java.base/java.lang.reflect', 'ALL-UNNAMED' ]
         }
     }
 }
