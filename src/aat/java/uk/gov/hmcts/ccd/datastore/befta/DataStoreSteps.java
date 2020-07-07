@@ -18,7 +18,7 @@ public class DataStoreSteps {
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
-        if (!ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false)){
+        if (!ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false)) {
             throw new AssumptionViolatedException("Elastic Search not Enabled");
         }
     }
