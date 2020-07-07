@@ -4,7 +4,7 @@
 	"request": {
 		"_extends_": "Common_Request",
     "body": {
-      "supplementaryDataUpdateRequest": {
+      "requestData": {
         "$set": {
           "orgs_assigned_users.OrgA": 25
         }

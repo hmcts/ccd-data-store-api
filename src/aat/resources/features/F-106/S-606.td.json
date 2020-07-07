@@ -10,7 +10,7 @@
 	],
   "request": {
     "body": {
-      "supplementaryDataUpdateRequest": {
+      "requestData": {
         "$set": {
           "orgs_assigned_users.OrgA": 22,
           "orgs_assigned_users.OrgB": 25
