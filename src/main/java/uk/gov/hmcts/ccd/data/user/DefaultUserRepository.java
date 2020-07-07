@@ -43,6 +43,20 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparingInt;
+import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
+
 @Repository
 @Qualifier(DefaultUserRepository.QUALIFIER)
 public class DefaultUserRepository implements UserRepository {
@@ -56,16 +70,19 @@ public class DefaultUserRepository implements UserRepository {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
+    private final AuthCheckerConfiguration authCheckerConfiguration;
 
     @Autowired
     public DefaultUserRepository(ApplicationParams applicationParams,
                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
                                  SecurityUtils securityUtils,
-                                 @Qualifier("restTemplate") RestTemplate restTemplate) {
+                                 @Qualifier("restTemplate") RestTemplate restTemplate,
+                                 AuthCheckerConfiguration authCheckerConfiguration) {
         this.applicationParams = applicationParams;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
+        this.authCheckerConfiguration = authCheckerConfiguration;
     }
 
     @Override
@@ -167,7 +184,8 @@ public class DefaultUserRepository implements UserRepository {
 
     private boolean filterRole(final String jurisdictionId, final String role) {
         return startsWithIgnoreCase(role, String.format(RELEVANT_ROLES, jurisdictionId))
-            || ArrayUtils.contains(AuthCheckerConfiguration.getCitizenRoles(), role);
+                || ArrayUtils.contains(authCheckerConfiguration.getCitizenRoles(), role)
+                || applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role);
     }
 
     private IdamProperties toIdamProperties(UserInfo userInfo) {

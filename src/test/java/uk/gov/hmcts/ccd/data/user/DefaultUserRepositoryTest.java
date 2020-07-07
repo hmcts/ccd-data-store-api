@@ -53,6 +53,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -65,11 +66,42 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 class DefaultUserRepositoryTest {
 
     private static final String ROLE_CASEWORKER = "caseworker";
     private static final String ROLE_CASEWORKER_TEST = "caseworker-test";
     private static final String ROLE_CASEWORKER_CMC = "caseworker-cmc";
+    private static final String ROLE_CASEWORKER_CAA = "caseworker-caa";
     private static final String JURISDICTION_ID = "CMC";
     private static final String CITIZEN = "citizen";
     private static final String PROBATE_PRIVATE_BETA = "probate-private-beta";
@@ -89,6 +121,9 @@ class DefaultUserRepositoryTest {
 
     @Mock
     private Authentication authentication;
+
+    @Mock
+    private AuthCheckerConfiguration authCheckerConfiguration;
 
     @Mock
     private SecurityContext securityContext;
@@ -145,6 +180,25 @@ class DefaultUserRepositoryTest {
         }
 
         @Nested
+        @DisplayName("when caseworker-caa")
+        class WhenCaseworkerCaa {
+
+            @Test
+            @DisplayName("should only consider roles for given jurisdiction")
+            void shouldOnlyConsiderRolesForJurisdiction() {
+                asCaseworkerCaa();
+                when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(Arrays.asList(ROLE_CASEWORKER_CAA));
+                userRepository.getUserClassifications(JURISDICTION_ID);
+
+                assertAll(
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(
+                        singletonList(ROLE_CASEWORKER_CAA)),
+                    () -> verifyNoMoreInteractions(caseDefinitionRepository)
+                );
+            }
+        }
+
+        @Nested
         @DisplayName("when citizen")
         class WhenCitizen {
 
@@ -152,7 +206,10 @@ class DefaultUserRepositoryTest {
             @DisplayName("should consider `citizen` role")
             void shouldConsiderCitizen() {
                 asCitizen();
-
+                String[] roles = new String[2];
+                roles[0] = "citizen";
+                roles[1] = "letter-holder";
+                when(authCheckerConfiguration.getCitizenRoles()).thenReturn(roles);
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
@@ -166,6 +223,10 @@ class DefaultUserRepositoryTest {
             void shouldConsiderLetterHolder() {
                 asLetterHolderCitizen();
 
+                String[] roles = new String[2];
+                roles[0] = "citizen";
+                roles[1] = "letter-holder";
+                when(authCheckerConfiguration.getCitizenRoles()).thenReturn(roles);
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
@@ -319,7 +380,7 @@ class DefaultUserRepositoryTest {
         @DisplayName("should return highest security classification for user")
         void shouldReturnHighestClassification() {
             asCaseworker();
-
+            when(applicationParams.getCcdAccessControlCitizenRoles()).thenReturn(Arrays.asList("citizen", "letter-holder"));
             UserRole userRole1 = new UserRole();
             userRole1.setSecurityClassification(SecurityClassification.PRIVATE.name());
             UserRole userRole2 = new UserRole();
@@ -338,6 +399,7 @@ class DefaultUserRepositoryTest {
         @DisplayName("should throw exception when no user roles returned")
         void shouldThrowExceptionWhenNoUserRolesReturned() {
             asCaseworker();
+            when(applicationParams.getCcdAccessControlCitizenRoles()).thenReturn(emptyList());
             when(caseDefinitionRepository.getClassificationsForUserRoleList(anyList())).thenReturn(emptyList());
 
             assertThrows(ServiceException.class, () -> userRepository.getHighestUserClassification(JURISDICTION_ID));
@@ -455,6 +517,12 @@ class DefaultUserRepositoryTest {
     private void asCaseworker() {
         doReturn(newAuthorities(ROLE_CASEWORKER, ROLE_CASEWORKER_TEST, ROLE_CASEWORKER_CMC)).when(authentication)
                                                                                             .getAuthorities();
+    }
+
+
+    private void asCaseworkerCaa() {
+        doReturn(newAuthorities(ROLE_CASEWORKER_CAA)).when(authentication)
+            .getAuthorities();
     }
 
     private void asOtherRoles() {
