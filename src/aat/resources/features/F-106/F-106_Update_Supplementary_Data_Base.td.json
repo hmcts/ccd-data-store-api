@@ -25,8 +25,8 @@
 	},
 	"request": {
 		"_extends_": "Common_Request",
-		"queryParams": {
-			"case_ids": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+    "pathVariables": {
+			"caseId": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
 		}
 	},
 	"expectedResponse": {
