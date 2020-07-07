@@ -1,13 +1,17 @@
 package uk.gov.hmcts.ccd.domain.service.cauroles.rolevalidator;
 
 import com.google.common.collect.Lists;
-import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,19 +25,26 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
+    private AuthCheckerConfiguration authCheckerConfiguration;
+
     private DefaultCaseAssignedUserRoleValidator caseAssignedUserRoleValidator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseAssignedUserRoleValidator = new DefaultCaseAssignedUserRoleValidator(userRepository);
+        caseAssignedUserRoleValidator = new DefaultCaseAssignedUserRoleValidator(userRepository, applicationParams);
     }
 
     @Test
     @DisplayName("Can access case roles when user has caseworker-caa")
     void canAccessUserCaseRolesWhenUserRolesContainsValidAccessRole() {
         when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerCaa));
+        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(Arrays.asList(roleCaseworkerCaa));
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList());
         assertTrue(canAccess);
     }

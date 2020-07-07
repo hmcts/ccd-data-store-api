@@ -2,17 +2,18 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.*;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.ElasticsearchBaseTest;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -27,14 +28,65 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_PUBLIC;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST2_PUBLIC;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST_1;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASEWORKER_CAA;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_A;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COLLECTION_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_FIXED_LIST_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_NESTED_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_TEXT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_TEXT_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTRY_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_TIME_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DEFAULT_CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DOCUMENT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.EMAIL_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.EMAIL_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_LIST_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_LIST_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_RADIO_LIST_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.HISTORY_COMPONENT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.LAST_MODIFIED_DATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.LAST_STATE_MODIFIED_DATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.MULTI_SELECT_LIST_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_COLLECTION_TEXT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_NUMBER_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_NUMBER_FIELD_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_AREA_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.VALUE_SUFFIX;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseData;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
 
 class UICaseSearchControllerIT extends ElasticsearchBaseTest {
 
@@ -51,6 +103,9 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
 
     @Mock
     private SecurityContext securityContext;
+
+    @Inject
+    private ApplicationParams applicationParams;
 
     @BeforeEach
     void setUp() {
