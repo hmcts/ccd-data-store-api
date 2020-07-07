@@ -28,35 +28,29 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
     public DefaultSupplementaryDataUpdateOperation(final @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository) {
         this.supplementaryDataRepository = supplementaryDataRepository;
         supplementaryFunctions.put(SET, (caseReference, updateRequest) -> {
-            Map<String, Object> requestedData = updateRequest.getOperationProperties(SET);
-            requestedData
-                .entrySet()
-                .stream()
-                .forEach(entry -> this.supplementaryDataRepository.setSupplementaryData(caseReference,
-                    entry.getKey(),
-                    entry.getValue()));
+            Map<String, Object> requestedProperties = updateRequest.getOperationProperties(SET);
+            for (Map.Entry<String, Object> pathValuePair : requestedProperties.entrySet()) {
+                this.supplementaryDataRepository.setSupplementaryData(caseReference, pathValuePair.getKey(), pathValuePair.getValue());
+            }
         });
         supplementaryFunctions.put(INC, (caseReference, updateRequest) -> {
-            Map<String, Object> requestedData = updateRequest.getOperationProperties(INC);
-            requestedData
-                .entrySet()
-                .stream()
-                .forEach(entry -> this.supplementaryDataRepository.incrementSupplementaryData(caseReference,
-                    entry.getKey(),
-                    entry.getValue()));
+            Map<String, Object> requestedProperties = updateRequest.getOperationProperties(INC);
+            for (Map.Entry<String, Object> pathValuePair : requestedProperties.entrySet()) {
+                this.supplementaryDataRepository.incrementSupplementaryData(caseReference, pathValuePair.getKey(), pathValuePair.getValue());
+            }
         });
     }
 
     @Override
     public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
-        supplementaryData.getSupplementaryDataOperations().forEach(key -> {
-            Optional<SupplementaryDataOperation> operation = SupplementaryDataOperation.getOperation(key);
-            if (operation.isPresent()) {
-                supplementaryFunctions
-                    .get(operation.get())
-                    .accept(caseReference, supplementaryData);
-            }
-        });
+        supplementaryData.getOperations().forEach(operationID -> executeOperation(operationID, caseReference, supplementaryData));
         return this.supplementaryDataRepository.findSupplementaryData(caseReference, supplementaryData.getPropertiesNames());
+    }
+
+    private void executeOperation(String operationID, String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
+        Optional<SupplementaryDataOperation> operation = SupplementaryDataOperation.getOperation(operationID);
+        operation.ifPresent(op ->
+            supplementaryFunctions.get(operation.get()).accept(caseReference, supplementaryData
+        ));
     }
 }

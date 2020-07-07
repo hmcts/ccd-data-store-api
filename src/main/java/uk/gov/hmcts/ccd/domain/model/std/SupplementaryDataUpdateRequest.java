@@ -26,18 +26,17 @@ public class SupplementaryDataUpdateRequest {
 
     @JsonIgnore
     public Set<String> getPropertiesNames() {
-        Set<String> keys = new HashSet<>();
-        if (this.requestData != null) {
-            this.requestData.keySet().forEach(key -> {
-                Map<String, Object> operationData = this.requestData.get(key);
-                keys.addAll(operationData.keySet());
-            });
+        Set<String> allProperties = new HashSet<>();
+        if (isValidRequestData()) {
+            for (Map<String, Object> propertyNameValuePair : requestData.values()) {
+                allProperties.addAll(propertyNameValuePair.keySet());
+            }
         }
-        return keys;
+        return allProperties;
     }
 
     @JsonIgnore
-    public Set<String> getSupplementaryDataOperations() {
+    public Set<String> getOperations() {
         return this.requestData.keySet();
     }
 
