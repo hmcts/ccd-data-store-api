@@ -26,15 +26,8 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.Banner;
-import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -80,7 +73,7 @@ public class DefinitionsCachingIT {
     WorkbasketInputFieldsDefinition workbasketInputFieldsDefinition;
 
     @Mock
-    SearchResult searchResult;
+    SearchResultDefinition searchResult;
 
     @Mock
     CaseTypeTabsDefinition caseTypeTabsDefinition;

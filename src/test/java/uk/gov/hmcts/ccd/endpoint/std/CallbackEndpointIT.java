@@ -2,12 +2,8 @@ package uk.gov.hmcts.ccd.endpoint.std;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -28,7 +24,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,24 +36,13 @@ public class CallbackEndpointIT extends WireMockBaseTest {
     private WebApplicationContext wac;
     private MockMvc mockMvc;
 
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
-
     @SpyBean
     private AuditRepository auditRepository;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 

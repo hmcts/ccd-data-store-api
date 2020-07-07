@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class AuthorisedCaseAssignedUserRolesOperationTest {
@@ -35,19 +36,43 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
     }
 
     @Test
+    void shouldCallDefaultAddCaseUserRoles() {
+        // ARRANGE
+        List<CaseAssignedUserRole> caseAssignedUserRoles = createCaseAssignedUserRoles();
+
+        // ACT
+        authorisedCaseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles);
+
+        // ASSERT
+        verify(defaultCaseAssignedUserRolesOperation).addCaseUserRoles(caseAssignedUserRoles);
+    }
+
+    @Test
     void shouldReturnCaseAssignedUserRoles() {
+        // ARRANGE
+        List<Long> caseIds = Lists.newArrayList(123456L);
+        List<String> userIds = Lists.newArrayList("234567");
         when(caseAssignedUserRoleValidator.canAccessUserCaseRoles(anyList())).thenReturn(true);
+
+        // ACT
         List<CaseAssignedUserRole> caseAssignedUserRoles = authorisedCaseAssignedUserRolesOperation
-            .findCaseUserRoles(Lists.newArrayList(123456L), Lists.newArrayList("234567"));
+            .findCaseUserRoles(caseIds, userIds);
+
+        // ASSERT
         assertEquals(2, caseAssignedUserRoles.size());
     }
 
     @Test
     void shouldThrowExceptionWhenUserHasNotPermissions() {
+        // ARRANGE
+        List<Long> caseIds = Lists.newArrayList(123456L);
+        List<String> userIds = Lists.newArrayList("234567");
         when(caseAssignedUserRoleValidator.canAccessUserCaseRoles(anyList())).thenReturn(false);
+
+        // ACT / ASSERT
         assertThrows(
             CaseRoleAccessException.class, () -> authorisedCaseAssignedUserRolesOperation
-                .findCaseUserRoles(Lists.newArrayList(123456L), Lists.newArrayList("234567"))
+                .findCaseUserRoles(caseIds, userIds)
         );
     }
 

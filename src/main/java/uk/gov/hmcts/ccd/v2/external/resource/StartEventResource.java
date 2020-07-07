@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.v2.external.controller.StartEventController;
 @NoArgsConstructor
 public class StartEventResource extends RepresentationModel<RepresentationModel<?>> {
 
+
     @JsonProperty("case_details")
     private CaseDetails caseDetails;
     @JsonProperty("event_id")

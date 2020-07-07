@@ -8,13 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
-import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 @Named
 @Qualifier("Cache")
@@ -31,16 +26,23 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
 
     @Override
     @Cacheable("workBasketResultCache")
-    public SearchResult getWorkBasketResult(final int version, final String caseTypeId) {
+    public SearchResultDefinition getWorkBasketResult(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of workbasket result for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getWorkBasketResult(version, caseTypeId);
     }
 
     @Override
     @Cacheable("searchResultCache")
-    public SearchResult getSearchResult(final int version, final String caseTypeId) {
+    public SearchResultDefinition getSearchResult(final int version, final String caseTypeId) {
         LOG.debug("remote retrieving version {} of search result for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getSearchResult(version, caseTypeId);
+    }
+
+    @Override
+    @Cacheable("searchCasesResultCache")
+    public SearchResultDefinition getSearchCasesResultDefinition(int version, String caseTypeId, String useCase) {
+        LOG.debug("remote retrieving version {} of search cases result definition for {}", version, caseTypeId);
+        return httpUiDefinitionGateway.getSearchCasesResultDefinition(version, caseTypeId, useCase);
     }
 
     @Override
