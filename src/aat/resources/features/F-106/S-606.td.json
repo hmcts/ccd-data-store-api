@@ -1,0 +1,36 @@
+{
+	"title": "when a specific User ID is supplied for a specific case ID, then the case roles relating only to the User ID for that specific Case ID must be returned",
+	"_guid_": "S-605",
+	"productName": "CCD Data Store api",
+	"operationName": "Update Supplementary Data",
+	"_extends_": "F-106_Update_Supplementary_Data_Base",
+	"specs": [
+		"Dil - who can create a case",
+    "contains multiple updates to supplementary data in DataStore"
+	],
+  "request": {
+    "body": {
+      "supplementaryDataUpdateRequest": {
+        "$set": {
+          "orgs_assigned_users.OrgA": 22,
+          "orgs_assigned_users.OrgB": 25
+        }
+      }
+    }
+  },
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"case_users": [
+				{
+					"caseId": "${}${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+				}
+			]
+		}
+	}
+}

@@ -1,10 +1,10 @@
 {
-	"_guid_": "F-106_Case_Assigned_User_Roles_Base",
-	"title": "Get Case-Assigned Users and Roles",
+	"_guid_": "F-106_Update_Supplementary_Data_Base",
+	"title": "Update Supplementary Data Base",
 	"productName": "CCD Data Store",
-	"operationName": "Get Case-Assigned Users and Roles",
-	"method": "GET",
-	"uri": "/case-users",
+	"operationName": "Update Supplementary Data",
+	"method": "POST",
+	"uri": "/cases/{caseId}/supplementary-data",
 	"users": {
 		"invokingUser": {
 			"username": "befta.caseworker.caa@gmail.com",
@@ -26,8 +26,7 @@
 	"request": {
 		"_extends_": "Common_Request",
 		"queryParams": {
-			"case_ids": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}",
-			"user_ids": "${[scenarioContext][testData][users][userDil][id]}"
+			"case_ids": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
 		}
 	},
 	"expectedResponse": {
