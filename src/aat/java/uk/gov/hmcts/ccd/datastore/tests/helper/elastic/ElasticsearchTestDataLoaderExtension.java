@@ -51,7 +51,7 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
         asElasticsearchApiUser().when().delete(AAT_PRIVATE_INDEX_NAME);
 
         asElasticsearchApiUser().when().delete(getCaseIndexAliasApi(AAT_PRIVATE2_INDEX_NAME, AAT_PRIVATE2_INDEX_ALIAS));
-        asElasticsearchApiUser().when().delete(AAT_PRIVATE2_INDEX_ALIAS);
+        asElasticsearchApiUser().when().delete(AAT_PRIVATE2_INDEX_NAME);
     }
 
     @Override
