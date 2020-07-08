@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.std.validator;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -35,9 +36,10 @@ public class SupplementaryDataUpdateRequestValidator {
 
     private void validateRequestOperations(SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
         for (String operationName : supplementaryDataUpdateRequest.getOperations()) {
-            SupplementaryDataOperation
-                .getOperation(operationName)
-                .orElseThrow(() -> new BadRequestException(UNKNOWN_SUPPLEMENTARY_UPDATE_OPERATION + " " + operationName));
+            Optional<SupplementaryDataOperation> operation = SupplementaryDataOperation.getOperation(operationName);
+            if (!operation.isPresent()) {
+                throw new BadRequestException(UNKNOWN_SUPPLEMENTARY_UPDATE_OPERATION + " " + operationName);
+            }
         }
     }
 }
