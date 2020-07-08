@@ -229,4 +229,18 @@
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
    <cve>CVE-2020-10683</cve>
 </suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.35.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+   <cve>CVE-2020-11996</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.35.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+   <cve>CVE-2020-11996</cve>
+</suppress>
 </suppressions>
