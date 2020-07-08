@@ -256,10 +256,10 @@ class CaseControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getSupplementaryData().getResponse().size(), equalTo(1)),
-                () -> assertThat(response.getBody().getSupplementaryData().getResponse(), is(data))
+                () -> assertThat(response.getBody().getResponse().size(), equalTo(1)),
+                () -> assertThat(response.getBody().getResponse(), is(data))
             );
-            validateResponseData(response.getBody().getSupplementaryData().getResponse(), "organisationA", 32);
+            validateResponseData(response.getBody().getResponse(), "organisationA", 32);
         }
 
         @Test
