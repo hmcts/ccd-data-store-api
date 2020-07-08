@@ -5,7 +5,7 @@
     "by Dil to update supplementary_data"
   ],
 	"request": {
-    "_extends_": "Common_200_Response",
+    "_extends_": "Common_Request",
     "pathVariables": {
       "caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
     },
@@ -19,12 +19,12 @@
     }
 	},
 	"expectedResponse": {
-		"headers": {
-			"_extends_": "Common_Response_Headers",
-			"Content-Length": "[[ANYTHING_PRESENT]]",
-			"Content-Type": "[[ANYTHING_PRESENT]]",
-			"Content-Encoding": "[[ANYTHING_PRESENT]]"
-		},
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
     "body": {
       "supplementary_data": {
         "response" : {
