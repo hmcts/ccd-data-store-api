@@ -8,7 +8,7 @@
 		"_extends_": "Common_Request",
     "body": {
       "pathVariables": {
-        "caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+        "caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
       },
       "requestData": {
         "$set": {
