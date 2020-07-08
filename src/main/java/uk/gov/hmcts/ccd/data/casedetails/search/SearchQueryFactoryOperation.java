@@ -97,13 +97,13 @@ public class SearchQueryFactoryOperation {
         return "";
     }
 
-    private void addParameters(final Query query, List<Criterion> criterion) {
-        criterion.forEach(criteria -> query.setParameter(criteria.buildParameterId(), criteria.getSoughtValue()));
+    private void addParameters(final Query query, List<Criterion> criteria) {
+        criteria.forEach(criterion -> query.setParameter(criterion.buildParameterId(), criterion.getSoughtValue()));
     }
 
-    private String toClauses(final List<Criterion> criterion) {
-        return criterion.stream()
-            .map(criteria -> criteria.buildClauseString(getOperation()))
+    private String toClauses(final List<Criterion> criteria) {
+        return criteria.stream()
+            .map(criterion -> criterion.buildClauseString(getOperation()))
             .collect(Collectors.joining(AND));
     }
 
