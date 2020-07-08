@@ -11,7 +11,7 @@
   "request": {
     "body": {
       "requestData": {
-        "$set": {
+        "$inc": {
           "orgs_assigned_users.OrgA": 1,
           "orgs_assigned_users.OrgB": -1
         }

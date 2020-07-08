@@ -34,6 +34,6 @@ Feature: F-106: Update Supplementary Data
     And a successful call [by Dil to update supplementary_data] as in [F-106_Update_Supplementary_Data_C1],
     When a request is prepared with appropriate values,
     And the request [replaces the value of an existing supplementary_data property with the provided value],
-    And it is submitted to call the [Update Supplementary Data] operation of [CCD Data Store ap],
+    And it is submitted to call the [Update Supplementary Data] operation of [CCD Data Store api],
     Then a positive response is received,
     And the response has all the details as expected.
