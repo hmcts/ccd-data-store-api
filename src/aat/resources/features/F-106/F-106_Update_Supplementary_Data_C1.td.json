@@ -5,7 +5,7 @@
     "by Dil to update supplementary_data"
   ],
 	"request": {
-		"_extends_": "Common_Request",
+    "_extends_": "Common_200_Response",
     "pathVariables": {
       "caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
     },
