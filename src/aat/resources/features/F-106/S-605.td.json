@@ -1,5 +1,5 @@
 {
-	"title": "when a specific User ID is supplied for a specific case ID, then the case roles relating only to the User ID for that specific Case ID must be returned",
+	"title": "Must return the updated supplementary data values from Data store",
 	"_guid_": "S-605",
 	"productName": "CCD Data Store api",
 	"operationName": "Update Supplementary Data",

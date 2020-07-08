@@ -1,12 +1,16 @@
 {
 	"_guid_": "F-106_Update_Supplementary_Data_C1",
   "_extends_": "F-106_Update_Supplementary_Data_Base",
+  "specs": [
+    "by Dil to update supplementary_data"
+  ],
 	"request": {
 		"_extends_": "Common_Request",
     "body": {
       "requestData": {
         "$set": {
-          "orgs_assigned_users.OrgA": 25
+          "orgs_assigned_users.OrgA": 25,
+          "orgs_assigned_users.OrgB": 1
         }
       }
     }
