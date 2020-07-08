@@ -6,10 +6,10 @@
   ],
 	"request": {
 		"_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+    },
     "body": {
-      "pathVariables": {
-        "caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
-      },
       "requestData": {
         "$set": {
           "orgs_assigned_users.OrgA": 25,
@@ -24,6 +24,14 @@
 			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Type": "[[ANYTHING_PRESENT]]",
 			"Content-Encoding": "[[ANYTHING_PRESENT]]"
-		}
+		},
+    "body": {
+      "supplementary_data": {
+        "response" : {
+          "orgs_assigned_users.OrgA": 25,
+          "orgs_assigned_users.OrgB": 1
+        }
+      }
+    }
 	}
 }
