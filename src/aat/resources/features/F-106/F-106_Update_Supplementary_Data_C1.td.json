@@ -10,7 +10,7 @@
       "caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
     },
     "body": {
-      "requestData": {
+      "supplementary_data_updates": {
         "$set": {
           "orgs_assigned_users.OrgA": 25,
           "orgs_assigned_users.OrgB": 1
