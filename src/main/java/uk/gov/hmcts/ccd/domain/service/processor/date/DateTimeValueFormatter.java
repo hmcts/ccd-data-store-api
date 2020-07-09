@@ -35,14 +35,14 @@ import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 public class DateTimeValueFormatter extends CaseViewFieldProcessor {
 
     private static final List<String> SUPPORTED_TYPES = Arrays.asList(DATETIME, DATE);
-    private static final Map<DisplayContext, DisplayContextParameterType> ENUM_MAP = new EnumMap<>(DisplayContext.class);
+    private static final Map<DisplayContext, DisplayContextParameterType> DISPLAY_CONTEXT_DCP_MAPPING = new EnumMap<>(DisplayContext.class);
 
     private final DateTimeFormatParser dateTimeFormatParser;
 
     static {
-        ENUM_MAP.put(DisplayContext.MANDATORY, DATETIMEENTRY);
-        ENUM_MAP.put(DisplayContext.OPTIONAL, DATETIMEENTRY);
-        ENUM_MAP.put(DisplayContext.READONLY, DATETIMEDISPLAY);
+        DISPLAY_CONTEXT_DCP_MAPPING.put(DisplayContext.MANDATORY, DATETIMEENTRY);
+        DISPLAY_CONTEXT_DCP_MAPPING.put(DisplayContext.OPTIONAL, DATETIMEENTRY);
+        DISPLAY_CONTEXT_DCP_MAPPING.put(DisplayContext.READONLY, DATETIMEDISPLAY);
     }
 
     @Autowired
@@ -72,7 +72,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
                                      CommonField topLevelField) {
         final DisplayContext displayContext = displayContext(topLevelField, override);
         return !isNullOrEmpty(node)
-            && field.hasDisplayContextParameter(ENUM_MAP.get(displayContext))
+            && field.hasDisplayContextParameter(DISPLAY_CONTEXT_DCP_MAPPING.get(displayContext))
             && isSupportedBaseType(baseType, SUPPORTED_TYPES)
                 ? createNode(field, node.asText(), baseType, fieldPath, displayContext)
                 : node;
@@ -97,7 +97,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         final BaseType collectionFieldType = BaseType.get(field.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
         final DisplayContext displayContext = displayContext(topLevelField, override);
 
-        if (shouldExecuteCollection(collectionNode, field, ENUM_MAP.get(displayContext), collectionFieldType, SUPPORTED_TYPES)) {
+        if (shouldExecuteCollection(collectionNode, field, DISPLAY_CONTEXT_DCP_MAPPING.get(displayContext), collectionFieldType, SUPPORTED_TYPES)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
@@ -128,7 +128,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         if (Strings.isNullOrEmpty(valueToConvert)) {
             return new TextNode(valueToConvert);
         }
-        if (ENUM_MAP.containsKey(displayContext)) {
+        if (DISPLAY_CONTEXT_DCP_MAPPING.containsKey(displayContext)) {
             String format = format(field, displayContext, baseType);
             return dateTimeFormatParser.valueToTextNode(valueToConvert, baseType, fieldPath, format, false);
         }
@@ -137,7 +137,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
     }
 
     private String format(CommonDCPModel field, DisplayContext displayContext, BaseType baseType) {
-        return field.getDisplayContextParameter(ENUM_MAP.get(displayContext))
+        return field.getDisplayContextParameter(DISPLAY_CONTEXT_DCP_MAPPING.get(displayContext))
             .map(DisplayContextParameter::getValue)
             .orElseGet(() -> baseType == BaseType.get(DATETIME) ? DATE_TIME_FORMAT : DATE_FORMAT);
     }
