@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 # Rename FEATURE and SCENARIOS - TODO
 
-@F-103
+@F-109
 Feature: F-109: Create case for caseworker using V2 api
 
   Background: Load test data for the scenario
@@ -10,7 +9,7 @@ Feature: F-109: Create case for caseworker using V2 api
   @S-new.1
   Scenario: must validate date in a right format
     Given a user with [an active profile in CCD]
-    And a successful call [to create a token for case creation] as in [F-103_GetToken]
+    And a successful call [to create a token for case creation] as in [F-109_GetToken]
     When a request is prepared with appropriate values
     And the request [contains valid value for a formatted Date field]
     And it is submitted to call the [create case] operation of [CCD Data Store]
@@ -21,7 +20,7 @@ Feature: F-109: Create case for caseworker using V2 api
   @S-new.2
   Scenario: must return an error for date value with invalid format
     Given a user with [an active profile in CCD]
-    And a successful call [to create a token for case creation] as in [F-103_GetToken]
+    And a successful call [to create a token for case creation] as in [F-109_GetToken]
     When a request is prepared with appropriate values
     And the request [contains Date field with incorrect format]
     And it is submitted to call the [create case] operation of [CCD Data Store]

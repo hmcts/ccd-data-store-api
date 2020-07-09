@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-103_GetToken",
+  "_guid_": "F-109_GetToken",
   "_extends_": "Befta_Default_Token_Creation_Data_For_Case_Creation",
   "specs": [
     "to create a token for case creation"
