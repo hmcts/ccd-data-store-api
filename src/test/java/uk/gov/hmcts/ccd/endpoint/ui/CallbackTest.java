@@ -1,5 +1,27 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import org.assertj.core.util.Lists;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
+
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,35 +38,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import org.assertj.core.util.Lists;
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
 
 @SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class CallbackTest extends WireMockBaseTest {
@@ -93,12 +89,6 @@ public class CallbackTest extends WireMockBaseTest {
 
     private MockMvc mockMvc;
 
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
-
     private static final String CREATE_CASE_EVENT_ID = "CREATE-CASE";
     private static final String UPDATE_EVENT_ID = "UPDATE-EVENT";
     private static final String UPDATE_EVENT_TRIGGER_ID = UPDATE_EVENT_ID;
@@ -126,10 +116,6 @@ public class CallbackTest extends WireMockBaseTest {
         CALLBACK_DATA_CLASSIFICATION = mapper.readTree(CALLBACK_DATA_CLASSIFICATION_JSON_STRING);
         INVALID_CALLBACK_DATA = mapper.readTree(INVALID_CALLBACK_DATA_JSON_STRING);
 
-        MockitoAnnotations.initMocks(this);
-
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_TEST_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -147,8 +133,8 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
+        callbackResponse.setDataClassification(JacksonUtils.convertValue(CALLBACK_DATA_CLASSIFICATION));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
@@ -156,7 +142,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
@@ -181,7 +167,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Callback errors should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -201,7 +187,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Callback warnings should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -221,7 +207,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
@@ -239,14 +225,14 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(INVALID_CALLBACK_DATA));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Invalid callback data should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -259,14 +245,14 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Non empty pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -283,7 +269,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andExpect(status().is(404));
     }
 
@@ -295,7 +281,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andExpect(status().is(404));
     }
 
@@ -306,14 +292,14 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, NULL_PRE_STATES_CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Null pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -326,8 +312,8 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
-        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
+        callbackResponse.setDataClassification(JacksonUtils.convertValue(CALLBACK_DATA_CLASSIFICATION));
         callbackResponse.setSecurityClassification(PUBLIC);
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
@@ -335,7 +321,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
@@ -360,7 +346,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Callback errors should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -380,7 +366,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Callback warnings should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -400,7 +386,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
@@ -418,14 +404,14 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(INVALID_CALLBACK_DATA));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Invalid callback data should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -438,14 +424,14 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Empty pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -458,14 +444,14 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, NON_MATCHING_PRE_STATES_UPDATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Non matching pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -478,14 +464,14 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, NULL_PRE_STATES_CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Null pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -498,14 +484,14 @@ public class CallbackTest extends WireMockBaseTest {
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
 
         stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals("Empty pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
@@ -519,7 +505,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 404, mvcResult.getResponse().getStatus());
@@ -534,7 +520,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 404, mvcResult.getResponse().getStatus());
@@ -549,7 +535,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         mockMvc
             .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
             .andExpect(status().is(404));
     }
 

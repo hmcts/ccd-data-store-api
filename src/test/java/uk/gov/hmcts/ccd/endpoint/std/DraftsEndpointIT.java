@@ -1,37 +1,42 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewJurisdiction;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -51,27 +56,14 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     private WebApplicationContext wac;
     private MockMvc mockMvc;
 
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
-
     @Before
     public void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
-
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
-        data = mapper.readTree("{\n"
-            + "    \"PersonFirstName\": \"John\",\n"
-            + "    \"PersonLastName\": \"Smith\"\n"
-            + " }\n");
+        data = mapper.readTree("{\n" +
+                                "    \"PersonFirstName\": \"John\",\n" +
+                                "    \"PersonLastName\": \"Smith\"\n" +
+                                " }\n");
     }
 
     @Test
@@ -80,14 +72,14 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         CaseDataContent caseDetailsToSave = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
-                           .withEventId(TEST_EVENT_ID)
-                           .build())
+                .withEventId(TEST_EVENT_ID)
+                .build())
             .withToken(generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID))
             .build();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                                                        .contentType(JSON_CONTENT_TYPE)
-                                                        .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
@@ -104,7 +96,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
 
         {
             mockMvc.perform(post(URL)
-                                .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
                 .andExpect(status().is(400))
                 .andReturn();
         }
@@ -116,14 +108,14 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         CaseDataContent caseDetailsToUpdate = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
-                           .withEventId(TEST_EVENT_ID)
-                           .build())
+                .withEventId(TEST_EVENT_ID)
+                .build())
             .withToken(generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID))
             .build();
 
         final MvcResult mvcResult = mockMvc.perform(put(URL)
-                                                        .contentType(JSON_CONTENT_TYPE)
-                                                        .content(mapper.writeValueAsBytes(caseDetailsToUpdate))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToUpdate))
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 200, mvcResult.getResponse().getStatus());
@@ -138,7 +130,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
 
         {
             mockMvc.perform(put(URL)
-                                .contentType(JSON_CONTENT_TYPE))
+                .contentType(JSON_CONTENT_TYPE))
                 .andExpect(status().is(400))
                 .andReturn();
         }
@@ -150,14 +142,14 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         CaseDataContent caseDetailsToUpdate = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
-                           .withEventId(TEST_EVENT_ID)
-                           .build())
+                .withEventId(TEST_EVENT_ID)
+                .build())
             .withToken(generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID))
             .build();
 
         final MvcResult mvcResult = mockMvc.perform(put(URL)
-                                                        .contentType(JSON_CONTENT_TYPE)
-                                                        .content(mapper.writeValueAsBytes(caseDetailsToUpdate))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToUpdate))
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
@@ -169,8 +161,8 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     public void shouldReturn200WhenGetValidDraft() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/" + DID;
         final MvcResult result = mockMvc.perform(get(URL)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -284,14 +276,14 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         CaseDataContent caseDetailsToUpdate = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
-                           .withEventId(TEST_EVENT_ID)
-                           .build())
+                .withEventId(TEST_EVENT_ID)
+                .build())
             .withToken(generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID))
             .build();
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
-                                                        .contentType(JSON_CONTENT_TYPE)
-                                                        .content(mapper.writeValueAsBytes(caseDetailsToUpdate))
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToUpdate))
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
@@ -318,8 +310,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     }
 
     private Map<String, JsonNode> getData(JsonNode expectedData) {
-        return mapper.convertValue(expectedData, new TypeReference<HashMap<String, JsonNode>>() {
-        });
+        return JacksonUtils.convertValue(expectedData);
     }
 
 }

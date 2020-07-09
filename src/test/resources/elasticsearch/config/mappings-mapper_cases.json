@@ -1,0 +1,448 @@
+{
+  "_doc": {
+    "dynamic": "strict",
+    "properties": {
+      "@timestamp": {
+        "enabled": false,
+        "type": "object"
+      },
+      "@version": {
+        "enabled": false,
+        "type": "object"
+      },
+      "alias": {
+        "properties": {
+          "FixedListAlias": {
+            "path": "data.OtherFixedListField",
+            "type": "alias"
+          },
+          "FixedListAlias_keyword": {
+            "path": "data.OtherFixedListField.keyword",
+            "type": "alias"
+          },
+          "TextAlias": {
+            "path": "data.TextField",
+            "type": "alias"
+          },
+          "TextAlias_keyword": {
+            "path": "data.TextField.keyword",
+            "type": "alias"
+          }
+        }
+      },
+      "case_type_id": {
+        "fields": {
+          "keyword": {
+            "ignore_above": 256,
+            "type": "keyword"
+          }
+        },
+        "type": "text"
+      },
+      "created_date": {
+        "ignore_malformed": true,
+        "type": "date"
+      },
+      "data": {
+        "properties": {
+          "AddressUKField": {
+            "properties": {
+              "AddressLine1": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              },
+              "AddressLine2": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              },
+              "AddressLine3": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              },
+              "Country": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              },
+              "County": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              },
+              "PostCode": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              },
+              "PostTown": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              }
+            }
+          },
+          "CollectionField": {
+            "properties": {
+              "id": {
+                "enabled": false,
+                "type": "object"
+              },
+              "value": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              }
+            }
+          },
+          "ComplexField": {
+            "properties": {
+              "ComplexFixedListField": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              },
+              "ComplexNestedField": {
+                "properties": {
+                  "NestedCollectionTextField": {
+                    "properties": {
+                      "id": {
+                        "enabled": false,
+                        "type": "object"
+                      },
+                      "value": {
+                        "fields": {
+                          "keyword": {
+                            "ignore_above": 256,
+                            "type": "keyword"
+                          }
+                        },
+                        "type": "text"
+                      }
+                    }
+                  },
+                  "NestedNumberField": {
+                    "type": "double"
+                  }
+                }
+              },
+              "ComplexTextField": {
+                "fields": {
+                  "keyword": {
+                    "ignore_above": 256,
+                    "type": "keyword"
+                  }
+                },
+                "type": "text"
+              }
+            }
+          },
+          "DateField": {
+            "ignore_malformed": true,
+            "type": "date"
+          },
+          "DateTimeField": {
+            "ignore_malformed": true,
+            "type": "date"
+          },
+          "EmailField": {
+            "type": "keyword"
+          },
+          "FixedRadioListField": {
+            "fields": {
+              "keyword": {
+                "ignore_above": 256,
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          },
+          "MoneyGBPField": {
+            "type": "double"
+          },
+          "MultiSelectListField": {
+            "fields": {
+              "keyword": {
+                "ignore_above": 256,
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          },
+          "NumberField": {
+            "type": "double"
+          },
+          "OtherFixedListField": {
+            "fields": {
+              "keyword": {
+                "ignore_above": 256,
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          },
+          "PhoneUKField": {
+            "analyzer": "standard",
+            "search_analyzer": "phone_number_analyzer",
+            "type": "text"
+          },
+          "TextAreaField": {
+            "fields": {
+              "keyword": {
+                "ignore_above": 256,
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          },
+          "TextField": {
+            "fields": {
+              "keyword": {
+                "ignore_above": 256,
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          },
+          "YesOrNoField": {
+            "type": "keyword"
+          },
+          "[STATE]": {
+            "fields": {
+              "keyword": {
+                "ignore_above": 256,
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          }
+        }
+      },
+      "data_classification": {
+        "properties": {
+          "AddressUKField": {
+            "properties": {
+              "classification": {
+                "type": "keyword"
+              },
+              "value": {
+                "properties": {
+                  "AddressLine1": {
+                    "type": "keyword"
+                  },
+                  "AddressLine2": {
+                    "type": "keyword"
+                  },
+                  "AddressLine3": {
+                    "type": "keyword"
+                  },
+                  "Country": {
+                    "type": "keyword"
+                  },
+                  "County": {
+                    "type": "keyword"
+                  },
+                  "PostCode": {
+                    "type": "keyword"
+                  },
+                  "PostTown": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "CollectionField": {
+            "properties": {
+              "classification": {
+                "type": "keyword"
+              },
+              "value": {
+                "properties": {
+                  "classification": {
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "enabled": false,
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "ComplexField": {
+            "properties": {
+              "classification": {
+                "type": "keyword"
+              },
+              "value": {
+                "properties": {
+                  "ComplexFixedListField": {
+                    "type": "keyword"
+                  },
+                  "ComplexNestedField": {
+                    "properties": {
+                      "classification": {
+                        "type": "keyword"
+                      },
+                      "value": {
+                        "properties": {
+                          "NestedCollectionTextField": {
+                            "properties": {
+                              "classification": {
+                                "type": "keyword"
+                              },
+                              "value": {
+                                "properties": {
+                                  "classification": {
+                                    "type": "keyword"
+                                  },
+                                  "id": {
+                                    "enabled": false,
+                                    "type": "object"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "NestedNumberField": {
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "ComplexTextField": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "DateField": {
+            "type": "keyword"
+          },
+          "DateTimeField": {
+            "type": "keyword"
+          },
+          "EmailField": {
+            "type": "keyword"
+          },
+          "FixedRadioListField": {
+            "type": "keyword"
+          },
+          "MoneyGBPField": {
+            "type": "keyword"
+          },
+          "MultiSelectListField": {
+            "type": "keyword"
+          },
+          "NumberField": {
+            "type": "keyword"
+          },
+          "OtherFixedListField": {
+            "type": "keyword"
+          },
+          "PhoneUKField": {
+            "type": "keyword"
+          },
+          "TextAreaField": {
+            "type": "keyword"
+          },
+          "TextField": {
+            "type": "keyword"
+          },
+          "YesOrNoField": {
+            "type": "keyword"
+          },
+          "[STATE]": {
+            "type": "keyword"
+          }
+        }
+      },
+      "id": {
+        "type": "long"
+      },
+      "index_id": {
+        "enabled": false,
+        "type": "object"
+      },
+      "jurisdiction": {
+        "fields": {
+          "keyword": {
+            "ignore_above": 256,
+            "type": "keyword"
+          }
+        },
+        "type": "text"
+      },
+      "last_modified": {
+        "ignore_malformed": true,
+        "type": "date"
+      },
+      "last_state_modified_date": {
+        "ignore_malformed": true,
+        "type": "date"
+      },
+      "reference": {
+        "fields": {
+          "keyword": {
+            "ignore_above": 256,
+            "type": "keyword"
+          }
+        },
+        "type": "text"
+      },
+      "security_classification": {
+        "type": "keyword"
+      },
+      "state": {
+        "fields": {
+          "keyword": {
+            "ignore_above": 256,
+            "type": "keyword"
+          }
+        },
+        "type": "text"
+      }
+    }
+  }
+}

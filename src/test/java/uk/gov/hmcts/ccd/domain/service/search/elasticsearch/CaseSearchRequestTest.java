@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 class CaseSearchRequestTest {
@@ -25,7 +26,7 @@ class CaseSearchRequestTest {
     @BeforeEach
     void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
-        caseSearchRequest = new CaseSearchRequest(CASE_TYPE_ID, objectMapper.readValue(FULL_QUERY, JsonNode.class));
+        caseSearchRequest = new CaseSearchRequest(CASE_TYPE_ID, new ElasticsearchRequest(objectMapper.readValue(FULL_QUERY, JsonNode.class)));
     }
 
     @Test
@@ -38,6 +39,7 @@ class CaseSearchRequestTest {
     @DisplayName("should throw exception when query node not found")
     void shouldThrowExceptionWhenQueryNodeNotFound() {
         String query = "{}";
-        assertThrows(BadSearchRequest.class, () -> new CaseSearchRequest(CASE_TYPE_ID, objectMapper.readValue(query, JsonNode.class)));
+        assertThrows(BadSearchRequest.class, () -> new CaseSearchRequest(CASE_TYPE_ID,
+            new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class))));
     }
 }

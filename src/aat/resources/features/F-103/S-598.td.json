@@ -1,0 +1,46 @@
+{
+	"title": "when the invoking user is not a privileged user but the request includes his/her own User ID, then the invoker's case roles for the case should be returned",
+	"_guid_": "S-598",
+	"productName": "CCD Data Store api",
+	"operationName": "Get Case-Assigned Users and Roles",
+	"_extends_": "F-103_Case_Assigned_User_Roles_Base",
+	"specs": [
+		"Richard - who can create a case",
+		"Dil - with an active profile",
+		"Jamal -  who is a privileged user with permissions to access the case assignments of other users",
+		"is made by Dil with the Case ID of C1 & Dil's own User ID",
+		"contains the list of case roles just granted to Dil, as per above"
+	],
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.2.solicitor.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"case_users": [
+				{
+					"__ordering__": "UNORDERED",
+					"__elementId__": "case_id,user_id,case_role"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_roles][1]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_roles][0]}"
+				}
+			]
+		}
+	}
+}
