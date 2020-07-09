@@ -1,0 +1,67 @@
+{
+  "_guid_": "S-942",
+  "_extends_": "F-109_test_Data_Base_ES_external",
+  "specs": [
+    "Richard - with access to create cases for various jurisdictions eg Divorce & Probate",
+    "Jamal - a client with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of C1 & C2 on the definition file",
+    "is made by Jamal via the new Manage Case Assignment (MCA) microservice",
+    "contains the case type of C1",
+    "includes data for the given case type for C1",
+    "to create a full case"
+  ],
+  "request": {
+    "queryParams": {
+      "ctid": "BEFTA_CASETYPE_1_1"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][Case_Creation_Using_Caseworker1_Role][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "total": 1,
+      "cases": [
+        {
+          "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Case_Creation_Using_Caseworker1_Role]}",
+          "jurisdiction": "BEFTA_JURISDICTION_1",
+          "state": "TODO",
+          "version": null,
+          "case_type_id": "BEFTA_CASETYPE_1_1",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "last_modified": "[[ANYTHING_PRESENT]]",
+          "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+          "security_classification": "PUBLIC",
+          "case_data": {
+           "_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
+          },
+          "data_classification" : {
+            "MoneyGBPField" : "PUBLIC",
+            "YesOrNoField" : "PUBLIC",
+            "EmailField" : "PUBLIC",
+            "TextField" : "PUBLIC",
+            "PhoneUKField" : "PUBLIC",
+            "NumberField" : "PUBLIC"
+          },
+          "after_submit_callback_response" : null,
+          "callback_response_status_code" : null,
+          "callback_response_status" : null,
+          "delete_draft_response_status_code" : null,
+          "delete_draft_response_status" : null,
+          "security_classifications" : {
+            "MoneyGBPField" : "PUBLIC",
+            "YesOrNoField" : "PUBLIC",
+            "EmailField" : "PUBLIC",
+            "TextField" : "PUBLIC",
+            "PhoneUKField" : "PUBLIC",
+            "NumberField" : "PUBLIC"
+          }
+        }
+      ]
+    }
+  }
+
+}
