@@ -31,25 +31,7 @@ import static wiremock.org.apache.http.entity.ContentType.APPLICATION_JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
 
-@ActiveProfiles("test")
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = {"http.client.connection.timeout=1500",
     "http.client.max.total=1",
     "http.client.read.timeout=1500",
@@ -60,9 +42,6 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
 
     @Autowired
     private RestTemplate restTemplate;
-
-    @Value("${wiremock.server.port}")
-    protected Integer wiremockPort;
 
     private static final String RESPONSE_BODY = "{ \"test\": \"name\"}";
     private static final String URL = "/ng/itb";
