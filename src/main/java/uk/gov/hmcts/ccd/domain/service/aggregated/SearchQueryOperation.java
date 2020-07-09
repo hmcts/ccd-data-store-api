@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
@@ -40,7 +40,7 @@ public class SearchQueryOperation {
     private final GetDraftsOperation getDraftsOperation;
     private final SearchResultDefinitionService searchResultDefinitionService;
     private final UserRepository userRepository;
-    private final SearchInputProcessor searchInputProcessor;
+    private final DateTimeSearchInputProcessor dateTimeSearchInputProcessor;
 
     @Autowired
     public SearchQueryOperation(@Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
@@ -49,14 +49,14 @@ public class SearchQueryOperation {
                                 @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation,
                                 SearchResultDefinitionService searchResultDefinitionService,
                                 @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                final SearchInputProcessor searchInputProcessor) {
+                                final DateTimeSearchInputProcessor dateTimeSearchInputProcessor) {
         this.searchOperation = searchOperation;
         this.mergeDataToSearchResultOperation = mergeDataToSearchResultOperation;
         this.getCaseTypeOperation = getCaseTypeOperation;
         this.getDraftsOperation = getDraftsOperation;
         this.searchResultDefinitionService = searchResultDefinitionService;
         this.userRepository = userRepository;
-        this.searchInputProcessor = searchInputProcessor;
+        this.dateTimeSearchInputProcessor = dateTimeSearchInputProcessor;
     }
 
     public SearchResultView execute(final String view,
@@ -75,8 +75,8 @@ public class SearchQueryOperation {
         addSortOrderFields(metadata, searchResult);
 
         final List<CaseDetails> cases = searchOperation.execute(
-            searchInputProcessor.executeMetadata(view, metadata),
-            searchInputProcessor.executeQueryParams(view, metadata, queryParameters)
+            dateTimeSearchInputProcessor.executeMetadata(view, metadata),
+            dateTimeSearchInputProcessor.executeQueryParams(view, metadata, queryParameters)
         );
 
         String draftResultError = NO_ERROR;

@@ -114,13 +114,13 @@ class FieldProcessorServiceTest {
             CaseViewField caseViewField1 = new CaseViewField();
             CaseViewField caseViewField2 = new CaseViewField();
             CaseViewField caseViewField3 = new CaseViewField();
-            when(caseViewFieldProcessor1.execute(caseViewField1)).thenReturn(caseViewField2);
-            when(caseViewFieldProcessor2.execute(caseViewField2)).thenReturn(caseViewField3);
+            when(caseViewFieldProcessor1.execute(caseViewField1, null)).thenReturn(caseViewField2);
+            when(caseViewFieldProcessor2.execute(caseViewField2, null)).thenReturn(caseViewField3);
 
             final CaseViewField result = fieldProcessorService.processCaseViewField(caseViewField1);
 
-            verify(caseViewFieldProcessor1).execute(caseViewField1);
-            verify(caseViewFieldProcessor2).execute(caseViewField2);
+            verify(caseViewFieldProcessor1).execute(caseViewField1, null);
+            verify(caseViewFieldProcessor2).execute(caseViewField2, null);
             verifyNoMoreInteractions(caseViewFieldProcessor1, caseViewFieldProcessor2);
             assertAll(
                 () -> assertThat(result, is(caseViewField3))

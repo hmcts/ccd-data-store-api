@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -93,7 +93,7 @@ class MergeDataToSearchResultOperationTest {
     private UserRepository userRepository;
 
     @Mock
-    private SearchResultProcessor searchResultProcessor;
+    private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
 
     private MergeDataToSearchResultOperation classUnderTest;
 
@@ -156,9 +156,9 @@ class MergeDataToSearchResultOperationTest {
             .withField(labelField)
             .build();
         doReturn(Collections.emptySet()).when(userRepository).getUserRoles();
-        doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(Mockito.any(), Mockito.any());
 
-        classUnderTest = new MergeDataToSearchResultOperation(userRepository, searchResultProcessor);
+        classUnderTest = new MergeDataToSearchResultOperation(userRepository, dateTimeSearchResultProcessor);
     }
 
     @Test
