@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOper
 public class SupplementaryDataUpdateRequest {
 
     @JsonProperty("supplementary_data_updates")
-    @NotBlank
     private Map<String, Map<String, Object>> requestData;
 
     @JsonIgnore
