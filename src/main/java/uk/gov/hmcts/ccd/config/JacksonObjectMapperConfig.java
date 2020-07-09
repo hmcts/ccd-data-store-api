@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.config;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -25,7 +26,8 @@ public class JacksonObjectMapperConfig {
         return new ObjectMapper()
             .registerModule(new Jdk8Module())
             .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-            .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
     }
 
     @Bean(name = "SimpleObjectMapper")
