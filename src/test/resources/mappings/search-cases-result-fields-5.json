@@ -1,0 +1,39 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/display/search-cases-result-fields/AAT?usecase=RDM-8782&version=33"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "case_type_id": "AAT",
+      "fields": [
+        {
+          "metadata": false,
+          "case_field_id": "MoneyGBPField",
+          "case_field_element_path": null,
+          "label": "`Money GBP` field",
+          "order": 1,
+          "role": null,
+          "use_case": "RDM-8782",
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "EmailField",
+          "case_field_element_path": null,
+          "label": "`Email` field",
+          "order": 2,
+          "role": null,
+          "use_case": "RDM-8782",
+          "sort_order": null,
+          "display_context_parameter": null
+        }
+      ]
+    }
+  }
+}

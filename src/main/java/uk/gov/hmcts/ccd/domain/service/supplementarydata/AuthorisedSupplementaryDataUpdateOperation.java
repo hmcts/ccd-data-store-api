@@ -9,9 +9,9 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.common.EndpointAuthorisationService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
 
 @Service
@@ -40,7 +40,7 @@ public class AuthorisedSupplementaryDataUpdateOperation implements Supplementary
             if (this.authorisationService.isAccessAllowed(caseDetails.get())) {
                 return this.supplementaryDataUpdateOperation.updateSupplementaryData(caseReference, supplementaryData);
             }
-            throw new CaseRoleAccessException(V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA);
+            throw new CaseAccessException(V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA);
         }
         throw new CaseNotFoundException(V2.Error.CASE_NOT_FOUND);
     }

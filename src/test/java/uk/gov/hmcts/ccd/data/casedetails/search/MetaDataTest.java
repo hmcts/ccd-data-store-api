@@ -185,4 +185,19 @@ class MetaDataTest {
         assertThrows(IllegalArgumentException.class,
             () -> MetaData.CaseField.valueOfReference("[INVALID]"));
     }
+
+    @Test
+    void shouldGetEnumByDbColumnName() {
+        MetaData.CaseField result = MetaData.CaseField.valueOfColumnName("reference");
+
+        assertAll(
+            () -> assertThat(result, is(MetaData.CaseField.CASE_REFERENCE))
+        );
+    }
+
+    @Test
+    void shouldErrorWhenRetrievingEnumByInvalidDbColumnName() {
+        assertThrows(IllegalArgumentException.class,
+            () -> MetaData.CaseField.valueOfReference("INVALID"));
+    }
 }

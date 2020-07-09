@@ -5,15 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 
 public class FieldTypeDefinition implements Serializable {
 
@@ -134,31 +132,7 @@ public class FieldTypeDefinition implements Serializable {
     }
 
     public Optional<CommonField> getNestedField(String path, boolean pathIncludesParent) {
-        if (StringUtils.isBlank(path) || this.getChildren().isEmpty() || (pathIncludesParent && path.trim().split("\\.").length == 1)) {
-            return Optional.empty();
-        }
-        List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(toList());
-
-        return reduce(this.getChildren(), pathIncludesParent ? pathElements.stream().skip(1).collect(toList()) : pathElements);
-    }
-
-    private Optional<CommonField> reduce(List<CaseFieldDefinition> caseFields, List<String> pathElements) {
-        String firstPathElement = pathElements.get(0);
-        Optional<CaseFieldDefinition> optionalCaseField = caseFields.stream().filter(e -> e.getId().equals(firstPathElement)).findFirst();
-        if (optionalCaseField.isPresent()) {
-            CommonField caseField = optionalCaseField.get();
-
-            if (pathElements.size() == 1) {
-                return Optional.of(caseField);
-            } else {
-                List<CaseFieldDefinition> newCaseFields = caseField.getFieldTypeDefinition().getChildren();
-                List<String> tail = pathElements.subList(1, pathElements.size());
-
-                return reduce(newCaseFields, tail);
-            }
-        } else {
-            return Optional.empty();
-        }
+        return CaseFieldPathUtils.getFieldDefinitionByPath(this, path, pathIncludesParent);
     }
 
     @Override

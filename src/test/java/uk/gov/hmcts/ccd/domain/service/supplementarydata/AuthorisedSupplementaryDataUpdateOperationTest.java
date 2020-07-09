@@ -10,9 +10,9 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.common.EndpointAuthorisationService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseAccessException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -61,7 +61,7 @@ class AuthorisedSupplementaryDataUpdateOperationTest {
     void shouldThrowRoleValidationExceptionWhenUserNotAuthorised() {
         when(endpointAuthorisationService.isAccessAllowed(any())).thenReturn(false);
         assertThrows(
-            CaseRoleAccessException.class, () -> supplementaryDataOperation
+            CaseAccessException.class, () -> supplementaryDataOperation
                 .updateSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest())
         );
     }

@@ -309,7 +309,7 @@ public class CaseController {
         ),
         @ApiResponse(
             code = 400,
-            message = V2.Error.SUPPLEMENTARY_DATA_INVALID
+            message = V2.Error.SUPPLEMENTARY_DATA_UPDATE_INVALID
         ),
         @ApiResponse(
             code = 400,

@@ -125,7 +125,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         assertNotNull(response);
         Map<String, Object> responseMap = response.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users.organisationA"));
-        assertEquals(0, responseMap.get("orgs_assigned_users.organisationA"));
+        assertEquals(-1, responseMap.get("orgs_assigned_users.organisationA"));
     }
 
 

@@ -253,9 +253,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         String content = mvcResult.getResponse().getContentAsString();
         SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
         assertNotNull(supplementaryDataResource);
-        assertNotNull(supplementaryDataResource.getSupplementaryData());
-        assertNotNull(supplementaryDataResource.getSupplementaryData().getResponse());
-        Map<String, Object> response = supplementaryDataResource.getSupplementaryData().getResponse();
+        assertNotNull(supplementaryDataResource.getResponse());
+        Map<String, Object> response = supplementaryDataResource.getResponse();
         assertEquals(1, response.size());
         assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
         assertEquals(23, response.get("orgs_assigned_users.organisationB"));
@@ -278,9 +277,9 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         String content = mvcResult.getResponse().getContentAsString();
         SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
         assertNotNull(supplementaryDataResource);
-        assertNotNull(supplementaryDataResource.getSupplementaryData());
-        assertNotNull(supplementaryDataResource.getSupplementaryData().getResponse());
-        Map<String, Object> response = supplementaryDataResource.getSupplementaryData().getResponse();
+        assertNotNull(supplementaryDataResource.getResponse());
+        assertNotNull(supplementaryDataResource.getResponse());
+        Map<String, Object> response = supplementaryDataResource.getResponse();
         assertEquals(2, response.size());
         assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
         assertEquals(23, response.get("orgs_assigned_users.organisationB"));
@@ -324,7 +323,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         String content = mvcResult.getResponse().getContentAsString();
         SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
         assertNotNull(supplementaryDataResource);
-        assertEquals(1, supplementaryDataResource.getSupplementaryData().getResponse().size());
+        assertNotNull(supplementaryDataResource.getResponse());
+        assertEquals(1, supplementaryDataResource.getResponse().size());
     }
 
     @Test
