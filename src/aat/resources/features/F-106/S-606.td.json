@@ -27,10 +27,8 @@
 		},
     "body": {
       "supplementary_data": {
-        "response" : {
-          "orgs_assigned_users.OrgA": 26,
-          "orgs_assigned_users.OrgB": 0
-        }
+        "orgs_assigned_users.OrgA": 26,
+        "orgs_assigned_users.OrgB": 0
       }
     }
 	}
