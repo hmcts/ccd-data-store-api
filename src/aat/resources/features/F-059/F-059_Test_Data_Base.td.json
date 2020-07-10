@@ -18,7 +18,7 @@
     },
     "body" : {
       "data": {
-        "_extends_": "F-059_Common_Data_In_Body"
+        "_extends_": "F-059_Case_Data_Base"
       },
       "event": {
         "id": "CREATE",
