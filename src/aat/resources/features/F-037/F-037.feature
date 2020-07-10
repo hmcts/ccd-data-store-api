@@ -88,7 +88,7 @@ Feature: F-037: Submit event for an existing case (V2)
     And a call [to update the same case by Solicitor 3] will get the expected response as in [S-577_Later_Case_Update_By_Solicitor_3]
     And a call [to get the same case by Solicitor 3, who doesn't have READ permission] will get the expected response as in [S-577_Later_Case_Read_By_Solicitor_3]
 
-  @S-037.1
+  @S-037.1 @Ignore # uncomment when befta master caseworker available
   Scenario: submit event (v2) with date having formatted value
     Given a user with [an active profile in CCD]
     And a successful call [to create a token for case creation] as in [S-037-1_GetToken]

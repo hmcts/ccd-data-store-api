@@ -5,8 +5,7 @@
   "method": "POST",
   "uri": "/case-types/{ctid}/validate",
   "user": {
-    "username": "master.caseworker@gmail.com",
-    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+    "_extends_": "Common_User_For_Request"
   },
   "request": {
     "_extends_": "Common_Request",
