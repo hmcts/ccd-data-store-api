@@ -6,35 +6,49 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
 
     @S-942
   Scenario: Must return /searchCases values from Datastore for all jurisdictions for the given case type (1/2)
-    Given a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-    And a case that has just been created as in [Case_Creation_Using_Caseworker1_Role]
-#      And a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
+    Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type1_Creation]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
-    And a user [Jamal - a client with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of C1 & C2 on the definition file]
+    And a user [with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of both previously created cases]
     When a request is prepared with appropriate values
-    And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
+    And the request [is made to query the previously created case from Jurisdiction Befta_Jurisdiction1]
     And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
-    And the request [contains the case type of C1]
     Then a positive response is received
-    And the response [includes data for the given case type for C1]
+    And the request [contains the case type of Jurisdiction Befta_Jurisdiction1]
     And the response has all the details as expected
 
+  @S-943
+#    todo Write S-943 data file similar to s-942 that will query ES for the case created in F-109-Befta_Jurisdiction2_Case_Type1_Creation
+  Scenario: Must return /searchCases values from Datastore for all jurisdictions for the given case type (1/2)
+    Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type1_Creation]
+    And a wait time of 5 seconds [to allow for Logstash to index the case just created]
+    And a user [with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of both previously created cases]
+    When a request is prepared with appropriate values
+    And the request [is made to query the previously created case from Jurisdiction Befta_Jurisdiction2]
+    And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
+    Then a positive response is received
+    And the request [contains the case type of Jurisdiction Befta_Jurisdiction2]
+    And the response has all the details as expected
 
-
-#  Scenario 2 - Must return /searchCases values from Datastore for all jurisdictions for the given case type (2/2)
-#    Given an appropriate test context as detailed in the test data source
-#    And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#    And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#    And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#    And a user [Jamal - a client with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of C1 & C2 on the definition file]
-#    When a request is prepared with appropriate values
-#    And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#    And the request [contains the case type of C2]
-#    And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
-#    Then a positive response is received
-#    And the response [includes data for the given case type for C2]
-#    And the response has all the details as expected
-
+  @S-944
+#    todo
+#    1 - create data file (F-109-Befta_Jurisdiction2_Case_Type2_Creation) to create a case for the case type BEFTA_CASETYPE_2_2 in jurisdiction Befta_Jurisdiction2
+#    2 - write data file s-944 to query ES for this previously created case
+  Scenario: Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (/searchCases)
+    Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type1_Creation]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type2_Creation]
+    And a wait time of 5 seconds [to allow for Logstash to index the case just created]
+    And a user [with only the 'caseworker-caa' role is not configured with the required CRUD permissions for Befta_Jurisdiction2_Case_Type2]
+    When a request is prepared with appropriate values
+    And the request [is made to query the previously created case Befta_Jurisdiction2_Case_Type2]
+    And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
+    Then a positive response is received
+    And the request [contains no results]
+    And the response has all the details as expected
 
 #  Scenario 3 - Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (/searchCases)
 #  Given an appropriate test context as detailed in the test data source
