@@ -11,7 +11,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale and a proper Case Role CR-1],
@@ -27,7 +26,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile and valid User ID],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1]
@@ -44,7 +42,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile and valid User ID],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1]
@@ -61,7 +58,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile and valid User ID],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing the Case ID of C1 and a proper Case Role CR-1]
@@ -78,7 +74,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile and valid User ID],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing the Case ID of C1 and a proper Case Role CR-1]
@@ -93,7 +88,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
   Scenario: Must return an error response when the request is made from an un-authorised application
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     And a user [Dil - with an active profile],
     And a user [Olawale - who is not a privileged user and is calling from an un-authorised application],
@@ -111,7 +105,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile and valid User ID],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application by Dil, for 2 assignments each containing the Case ID of C1 and User ID of Olawale],
@@ -128,7 +121,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile and valid User ID],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application by Dil, for 2 assignments each containing the Case ID of C1 and User ID of Olawale],
@@ -167,7 +159,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile and valid User ID],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1]
@@ -185,7 +176,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile and valid User ID],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made by Dil for 2 assignments each containing the Case ID of C1, User ID of Olawale and a proper Case Role CR-1]
@@ -201,7 +191,6 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a user [Richard - who can create a case],
     And a user [Dil - who is to add some case role assignment for a case],
     And a user [Olawale - with an active solicitor profile and valid User ID],
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application by Dil, for 2 assignments each containing the Case ID of C1 and User ID of Olawale],
