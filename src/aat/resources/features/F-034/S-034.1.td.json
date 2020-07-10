@@ -150,7 +150,7 @@
       },
       "_links" : {
         "self" : {
-          "href" : "http://localhost:4452/case-types/FT_DateTimeFormats/validate{?pageId}",
+          "href" : "[[ANYTHING_PRESENT]]",
           "templated" : true
         }
       }
