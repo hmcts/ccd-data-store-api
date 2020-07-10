@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +22,16 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
@@ -211,6 +214,24 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             return null;
         }
         return jurisdictionDefinitions.get(0);
+    }
+
+    @Override
+    public Optional<List<String>> getAllCaseTypesByJurisdictions(List<String> jurisdictionIds) {
+
+        final List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(jurisdictionIds);
+
+        if (jurisdictionDefinitions.isEmpty()) {
+            LOG.warn("No values found Retrieving jurisdiction object(s) from definition store for all Jurisdiction.");
+            Optional.of(Arrays.asList());
+        }
+        final List<String> caseTypes = jurisdictionDefinitions.stream().flatMap(
+            jurisdictionDefinition -> jurisdictionDefinition.getCaseTypeDefinitions().stream().map(
+                caseTypeDefinition -> caseTypeDefinition.getId()
+            )
+        ).distinct().collect(Collectors.toList());
+
+        return Optional.of(caseTypes);
     }
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(List<String> jurisdictionIds) {

@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.UserService;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
@@ -27,7 +30,6 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedC
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,12 +49,18 @@ public class CaseSearchEndpoint {
 
     private final CaseSearchOperation caseSearchOperation;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
+    private final CaseDefinitionRepository caseDefinitionRepository;
+    private final UserService userService;
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
+                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                              UserService userService,
                               ElasticsearchQueryHelper elasticsearchQueryHelper) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
+        this.caseDefinitionRepository = caseDefinitionRepository;
+        this.userService = userService;
     }
 
     @PostMapping(value = "/searchCases")
@@ -93,9 +101,14 @@ public class CaseSearchEndpoint {
 
     private List<String> getCaseTypeIds(List<String> caseTypeIds) {
         if (isAConsolidationQuery(caseTypeIds)) {
-            return Arrays.asList("FT_ComplexOrganisation","FT_Conditionals");
+            return getCaseTypes();
         }
         return caseTypeIds;
+    }
+
+    private List<String> getCaseTypes() {
+        final List<String> roles = userService.getUserRolesJurisdictions();
+        return caseDefinitionRepository.getAllCaseTypesByJurisdictions(roles).get();
     }
 
     private boolean isAConsolidationQuery(List<String> caseTypeIds) {

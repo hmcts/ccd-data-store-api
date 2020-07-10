@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.data.user;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +14,10 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -82,5 +83,9 @@ public class UserService {
     private JurisdictionDisplayProperties[] toResponse(List<JurisdictionDefinition> jurisdictionsDefinition) {
         return jurisdictionsDefinition.stream().map(jurisdictionMapper::toResponse)
         .toArray(JurisdictionDisplayProperties[]::new);
+    }
+
+    public List<String> getUserRolesJurisdictions() {
+        return userRepository.getUserRolesJurisdictions();
     }
 }

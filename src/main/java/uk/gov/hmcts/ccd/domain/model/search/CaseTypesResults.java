@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
-public class CaseFieldsAggregationResult {
+public class CaseTypesResults {
 
     private final String caseType;
     private final long total;
 
-    public CaseFieldsAggregationResult(String caseFieldId, long numberOfMatchedCases) {
+    public CaseTypesResults(String caseFieldId, long numberOfMatchedCases) {
 
         this.caseType = caseFieldId;
         this.total = numberOfMatchedCases;

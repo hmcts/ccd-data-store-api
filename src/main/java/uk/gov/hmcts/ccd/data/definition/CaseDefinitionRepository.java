@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import java.util.List;
+import java.util.Optional;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -23,5 +24,7 @@ public interface CaseDefinitionRepository {
     CaseTypeDefinitionVersion getLatestVersion(String caseTypeId);
 
     JurisdictionDefinition getJurisdiction(String jurisdictionId);
+
+    Optional<List<String>> getAllCaseTypesByJurisdictions(List<String> jurisdictionIds);
 
 }

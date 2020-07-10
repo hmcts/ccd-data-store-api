@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,15 +19,6 @@ import java.util.stream.StreamSupport;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_CLASSIFICATION_COL;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 /**
  * Sample ES json search request.
@@ -92,6 +93,9 @@ public class CrossCaseTypeSearchRequest {
 
     private void addMetadataSourceFields() {
         if (elasticsearchRequest.hasSource()) {
+            if (elasticsearchRequest.getSource() instanceof BooleanNode) {
+                return;
+            }
             ArrayNode sourceNode = (ArrayNode) elasticsearchRequest.getSource();
             Arrays.stream(MetaData.CaseField.values())
                 .forEach(field -> sourceNode.add(new TextNode(field.getDbColumnName())));

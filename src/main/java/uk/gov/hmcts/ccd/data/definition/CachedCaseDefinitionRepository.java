@@ -12,6 +12,7 @@ import org.springframework.web.context.annotation.RequestScope;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -92,9 +93,15 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
+    public Optional<List<String>> getAllCaseTypesByJurisdictions(List<String> jurisdictionIds) {
+        return caseDefinitionRepository.getAllCaseTypesByJurisdictions(jurisdictionIds);
+    }
+
+    @Override
     public List<FieldTypeDefinition> getBaseTypes() {
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }
+
 
     public CaseDefinitionRepository getCaseDefinitionRepository() {
         return caseDefinitionRepository;
