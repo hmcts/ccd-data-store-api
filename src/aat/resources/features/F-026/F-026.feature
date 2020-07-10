@@ -64,7 +64,7 @@ Feature: F-026: Get case data with UI layout
     And the response [contains Last State Modified Date as a column for UI layout]
     And the response has all other details as expected.
 
-  @S-588 @Ignore @RDM-7739 @RDM-7793 #Get cases list from Last State Modified Date filter - when data list 1 or more
+  @S-588 @RDM-7739 #Get cases list from Last State Modified Date filter - when data list 1 or more
   # Enable this after changing it to use Dynamic date instead of a static one
   # Also update this with data ordering when FW support is available
   Scenario: must return the list of cases and status code 200 for correct inputs
