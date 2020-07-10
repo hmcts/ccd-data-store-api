@@ -40,8 +40,8 @@ class DefaultEndpointAuthorisationServiceTest {
     @Test
     void shouldReturnTrueWhenLoggedInUserHasCAARole() {
         CaseDetails caseDetails = mock(CaseDetails.class);
-        when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-caa"));
         when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(Arrays.asList("caseworker-caa"));
+        when(this.userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles())).thenReturn(true);
         boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertTrue(canAccess);
     }

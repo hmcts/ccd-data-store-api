@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
+import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 
 import java.util.Arrays;
@@ -24,6 +25,9 @@ class DefaultCaseAssignedUserRoleValidatorTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private DefaultUserRepository defaultUserRepository;
 
     @Mock
     private ApplicationParams applicationParams;
@@ -44,6 +48,7 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @DisplayName("Can access case roles when user has caseworker-caa")
     void canAccessUserCaseRolesWhenUserRolesContainsValidAccessRole() {
         when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerCaa));
+        when(defaultUserRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerCaa));
         when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(Arrays.asList(roleCaseworkerCaa));
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList());
         assertTrue(canAccess);
