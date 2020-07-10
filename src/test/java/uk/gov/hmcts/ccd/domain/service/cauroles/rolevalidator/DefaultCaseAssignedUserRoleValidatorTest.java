@@ -16,6 +16,7 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class DefaultCaseAssignedUserRoleValidatorTest {
@@ -47,8 +48,7 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Test
     @DisplayName("Can access case roles when user has caseworker-caa")
     void canAccessUserCaseRolesWhenUserRolesContainsValidAccessRole() {
-        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerCaa));
-        when(defaultUserRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerCaa));
+        when(userRepository.anyRoleEqualsAnyOf(any())).thenReturn(true);
         when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(Arrays.asList(roleCaseworkerCaa));
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList());
         assertTrue(canAccess);
