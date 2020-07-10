@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.util.List;
 import java.util.Set;
 
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -22,4 +23,6 @@ public interface UserRepository {
     SecurityClassification getHighestUserClassification(String jurisdictionId);
 
     String getUserId();
+
+    List<String> getUserRolesJurisdictions();
 }
