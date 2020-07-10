@@ -156,7 +156,7 @@ Feature: F-044: Submit event creation as Case worker
     Scenario: should update a single case field
     <already implemented previously. will be refactored later.>
 
-  @S-044.1 @Ignore # uncomment when befta master caseworker available
+  @S-044.1
   Scenario: must submit the event creation successfully for formatted date inputs
     Given a user with [an active profile in CCD]
     And a successful call [to create a token for case creation] as in [S-044-1_GetToken]
