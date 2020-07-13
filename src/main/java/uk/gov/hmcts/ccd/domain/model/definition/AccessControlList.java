@@ -1,11 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.ToString;
 
 import java.io.Serializable;
 
-@ToString
+
 public class AccessControlList implements Serializable {
 
     private String role;
@@ -65,4 +64,12 @@ public class AccessControlList implements Serializable {
         return dup;
     }
 
+    @Override
+    public String toString() {
+        return "ACL{"
+            + "role='" + role + '\''
+            + ", crud=" + (isCreate() ? "C" : "") + (isRead() ? "R" : "")
+            + (isUpdate() ? "U" : "") + (isDelete() ? "D" : "")
+            + '}';
+    }
 }
