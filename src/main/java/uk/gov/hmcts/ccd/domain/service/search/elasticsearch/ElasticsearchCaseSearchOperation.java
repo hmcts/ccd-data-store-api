@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
@@ -86,7 +87,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private Search createSecuredSearch(String caseTypeId, JsonNode searchRequestJsonNode) {
-        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(new CaseSearchRequest(caseTypeId, searchRequestJsonNode));
+        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
+            new CaseSearchRequest(caseTypeId, new ElasticsearchRequest(searchRequestJsonNode)));
         return new Search.Builder(securedSearchRequest.toJsonString())
             .addIndex(getCaseIndexName(caseTypeId))
             .addType(getCaseIndexType())
