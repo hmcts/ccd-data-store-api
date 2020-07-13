@@ -46,7 +46,11 @@ public class CaseAccessService {
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
-        return !canOnlyViewGrantedCases() || accessGranted(caseDetails);
+        if (canOnlyViewExplicitlyGrantedCases()) {
+            return isExplicitAccessGranted(caseDetails);
+        } else {
+            return true;
+        }
     }
 
     public AccessLevel getAccessLevel(UserInfo userInfo) {
@@ -59,7 +63,7 @@ public class CaseAccessService {
     }
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
-        if (canOnlyViewGrantedCases()) {
+        if (canOnlyViewExplicitlyGrantedCases()) {
             return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
         }
 
@@ -90,8 +94,15 @@ public class CaseAccessService {
         return userRoles;
     }
 
+    public boolean isJurisdictionAccessAllowed(String jurisdiction) {
+        return this.userRepository
+            .getUserRolesJurisdictions()
+            .stream()
+            .anyMatch(jurisdiction::equalsIgnoreCase);
+    }
 
-    private Boolean accessGranted(CaseDetails caseDetails) {
+
+    public Boolean isExplicitAccessGranted(CaseDetails caseDetails) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
         if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
@@ -101,7 +112,7 @@ public class CaseAccessService {
         return Boolean.FALSE;
     }
 
-    private Boolean canOnlyViewGrantedCases() {
+    public Boolean canOnlyViewExplicitlyGrantedCases() {
         return userRepository.getUserRoles()
             .stream()
             .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
