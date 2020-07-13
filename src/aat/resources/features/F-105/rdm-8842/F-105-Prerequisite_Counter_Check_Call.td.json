@@ -1,0 +1,26 @@
+{
+  "_guid_": "F-105-Prerequisite_Counter_Check_Call",
+  "_extends_": "F-105_Check_Orgs_Assigned_Users_Base",
+
+  "specs": [
+    "to check the number of users having access to C1 in its supplementary data"
+  ],
+
+  "request": {
+    "body": {
+      "supplementary_data_updates": {
+        "$inc": {
+          "orgs_assigned_users.orgA": 0
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": {
+        "orgs_assigned_users.orgA": 0
+      }
+    }
+  }
+}
