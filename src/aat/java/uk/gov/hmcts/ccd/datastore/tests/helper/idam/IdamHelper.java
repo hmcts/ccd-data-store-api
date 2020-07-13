@@ -32,7 +32,7 @@ public class IdamHelper {
             final String accessToken = getIdamOauth2Token(email, password);
             final IdamApi.IdamUser user = idamApi.getUser(accessToken);
 
-            return new AuthenticatedUser(user.getId(), email, accessToken, user.getRoles());
+            return new AuthenticatedUser(user.getUid(), email, accessToken, user.getRoles());
         });
     }
 

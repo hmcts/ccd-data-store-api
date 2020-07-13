@@ -1,0 +1,25 @@
+{
+  "analysis": {
+    "analyzer": {
+      "phone_number_analyzer": {
+        "type": "custom",
+        "tokenizer": "keyword",
+        "filter": [
+          "whitespace_remove"
+        ]
+      }
+    },
+    "filter": {
+      "whitespace_remove": {
+        "type": "pattern_replace",
+        "pattern": " ",
+        "replacement": ""
+      }
+    }
+  },
+  "mapping": {
+    "total_fields": {
+      "limit": "6000"
+    }
+  }
+}

@@ -19,18 +19,18 @@ public class CaseSearchResult {
     public CaseSearchResult() {
     }
 
-    public CaseSearchResult(Long total, List<CaseDetails> cases, List<CaseTypesResults>  caseFieldsAggregations) {
+    public CaseSearchResult(Long total, List<CaseDetails> cases, List<CaseTypesResults> caseFieldsAggregations) {
         this.cases = cases;
         this.total = total;
         this.caseFieldsAggregations = caseFieldsAggregations;
     }
 
     public CaseSearchResult(Long total, List<CaseDetails> cases) {
-        this(total,cases,new ArrayList<>());
+        this(total, cases, new ArrayList<>());
     }
 
 
-    public CaseSearchResult(List<CaseTypesResults>  caseFieldsAggregations, Long total, List<CaseDetails> cases) {
+    public CaseSearchResult(List<CaseTypesResults> caseFieldsAggregations, Long total, List<CaseDetails> cases) {
         this(total, cases, caseFieldsAggregations);
     }
 

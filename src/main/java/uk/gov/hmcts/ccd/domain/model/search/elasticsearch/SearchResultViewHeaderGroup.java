@@ -2,12 +2,13 @@ package uk.gov.hmcts.ccd.domain.model.search.elasticsearch;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @ApiModel(description = "Definition of a case type in the context of the search")
 public class SearchResultViewHeaderGroup {
 

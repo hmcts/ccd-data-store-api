@@ -27,14 +27,6 @@
       "_extends_": "Common_Response_Headers"
     },
     "body": {
-      "arrayInMap": [
-        {
-          "url": "[[ANYTHING_PRESENT]]",
-          "name": "CCD Print",
-          "type": "CCD Print Type",
-          "description": "Printing for CCD"
-        }
-      ]
     }
   }
 }

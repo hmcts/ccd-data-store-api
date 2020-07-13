@@ -1,8 +1,12 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,12 +14,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import io.swagger.annotations.ApiModel;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @ToString
 @ApiModel(description = "")
@@ -52,7 +54,10 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private String displayContextParameter;
     @JsonProperty("formatted_value")
     private Object formattedValue;
+    @JsonProperty("default_value")
+    private String defaultValue;
 
+    @Override
     public String getId() {
         return id;
     }
@@ -85,6 +90,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         this.hintText = hintText;
     }
 
+    @Override
     public FieldTypeDefinition getFieldTypeDefinition() {
         return fieldTypeDefinition;
     }
@@ -141,6 +147,15 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         this.showConditon = showConditon;
     }
 
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    @Override
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;
     }
@@ -165,26 +180,32 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         this.metadata = metadata;
     }
 
+    @Override
     public String getDisplayContext() {
         return displayContext;
     }
 
+    @Override
     public void setDisplayContext(String displayContext) {
         this.displayContext = displayContext;
     }
 
+    @Override
     public String getDisplayContextParameter() {
         return displayContextParameter;
     }
 
+    @Override
     public void setDisplayContextParameter(String displayContextParameter) {
         this.displayContextParameter = displayContextParameter;
     }
 
+    @Override
     public Object getFormattedValue() {
         return formattedValue;
     }
 
+    @Override
     public void setFormattedValue(Object formattedValue) {
         this.formattedValue = formattedValue;
     }
@@ -280,7 +301,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     }
 
     @JsonIgnore
-    Optional<AccessControlList> getAccessControlListByRole(String role) {
+    public Optional<AccessControlList> getAccessControlListByRole(String role) {
         return this.accessControlLists.stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
     }
 

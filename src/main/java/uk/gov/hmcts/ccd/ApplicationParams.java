@@ -17,6 +17,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Singleton
 public class ApplicationParams {
 
+    @Value("#{'${ccd.s2s-authorised.services.add_case_user_roles}'.split(',')}")
+    private List<String> authorisedServicesForAddUserCaseRoles;
+
     @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")
     private List<String> writeToCCDCaseTypesOnly;
 
@@ -52,9 +55,6 @@ public class ApplicationParams {
 
     @Value("${ccd.ui-definition.host}")
     private String uiDefinitionHost;
-
-    @Value("${auth.idam.client.baseUrl}")
-    private String idamHost;
 
     @Value("${ccd.case.search.wildcards.allowed}")
     private boolean wildcardSearchAllowed;
@@ -147,6 +147,10 @@ public class ApplicationParams {
         }
     }
 
+    public List<String> getAuthorisedServicesForAddUserCaseRoles() {
+        return authorisedServicesForAddUserCaseRoles;
+    }
+
     public boolean isWildcardSearchAllowed() {
         return wildcardSearchAllowed;
     }
@@ -229,10 +233,6 @@ public class ApplicationParams {
 
     public String baseTypesURL() {
         return caseDefinitionHost + "/api/base-types";
-    }
-
-    public String idamUserProfileURL() {
-        return idamHost + "/details";
     }
 
     public String caseRolesURL() {
