@@ -369,6 +369,7 @@
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
    <cve>CVE-2020-10683</cve>
 </suppress>
+    <!-- RDM-8724 Temporarily suppress to unblock development -->
 	<suppress>
 		<notes>Suppress temporarily to unblock dev and qa</notes>
 		<cve>CVE-2020-13692</cve>
@@ -377,4 +378,5 @@
     <suppress>
       <cve>CVE-2017-18365</cve>
      </suppress>
+
 </suppressions>
