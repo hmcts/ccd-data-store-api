@@ -1,19 +1,31 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparingInt;
+import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -29,7 +41,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -71,25 +83,20 @@ public class DefaultUserRepository implements UserRepository {
 
     @Override
     public IdamProperties getUserDetails() {
-        final HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
-        return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IdamProperties.class).getBody();
+        UserInfo userInfo = securityUtils.getUserInfo();
+        return  toIdamProperties(userInfo);
     }
 
     @Override
-    @Cacheable(value = "userCache", key = "@securityUtils.getUserToken()")
     public IdamUser getUser() {
-        try {
-            HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
-            return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IdamUser.class).getBody();
-        } catch (RestClientException e) {
-            LOG.error("Failed to retrieve user", e);
-            throw new ServiceException("Problem retrieving user from IDAM: " + securityUtils.getUserId());
-        }
+        UserInfo userInfo = securityUtils.getUserInfo();
+        return toIdamUser(userInfo);
     }
 
     @Override
     public Set<String> getUserRoles() {
         LOG.debug("retrieving user roles");
+
         final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Set<String> userRoles = serviceAndUser.getAuthorities()
             .stream()
@@ -158,8 +165,18 @@ public class DefaultUserRepository implements UserRepository {
 
     @Override
     public String getUserId() {
-        final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return serviceAndUser.getUsername();
+        return securityUtils.getUserId();
+    }
+
+    @Override
+    public List<String> getUserRolesJurisdictions() {
+        String[] roles = this.getUserDetails().getRoles();
+
+        return Arrays.stream(roles).map(role ->  role.split("-"))
+            .filter(array -> array.length >= 2)
+            .map(element -> element[1])
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     private Set<SecurityClassification> getClassificationsForUserRoles(List<String> roles) {
@@ -173,6 +190,25 @@ public class DefaultUserRepository implements UserRepository {
     private boolean filterRole(final String jurisdictionId, final String role) {
         return startsWithIgnoreCase(role, String.format(RELEVANT_ROLES, jurisdictionId))
             || ArrayUtils.contains(AuthCheckerConfiguration.getCitizenRoles(), role);
+    }
+
+    private IdamProperties toIdamProperties(UserInfo userInfo) {
+        IdamProperties idamProperties = new IdamProperties();
+        idamProperties.setId(userInfo.getUid());
+        idamProperties.setEmail(userInfo.getSub());
+        idamProperties.setForename(userInfo.getGivenName());
+        idamProperties.setSurname(userInfo.getFamilyName());
+        idamProperties.setRoles(userInfo.getRoles().toArray(new String[0]));
+        return idamProperties;
+    }
+
+    private IdamUser toIdamUser(UserInfo userInfo) {
+        IdamUser idamUser = new IdamUser();
+        idamUser.setId(userInfo.getUid());
+        idamUser.setEmail(userInfo.getSub());
+        idamUser.setForename(userInfo.getGivenName());
+        idamUser.setSurname(userInfo.getFamilyName());
+        return idamUser;
     }
 
 }

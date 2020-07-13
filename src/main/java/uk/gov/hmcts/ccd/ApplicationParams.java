@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd;
 
+import com.hazelcast.config.EvictionPolicy;
+import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
@@ -9,13 +13,12 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-import com.hazelcast.config.EvictionPolicy;
-import org.springframework.beans.factory.annotation.Value;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
 @Named
 @Singleton
 public class ApplicationParams {
+
+    @Value("#{'${ccd.s2s-authorised.services.add_case_user_roles}'.split(',')}")
+    private List<String> authorisedServicesForAddUserCaseRoles;
 
     @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")
     private List<String> writeToCCDCaseTypesOnly;
@@ -52,9 +55,6 @@ public class ApplicationParams {
 
     @Value("${ccd.ui-definition.host}")
     private String uiDefinitionHost;
-
-    @Value("${auth.idam.client.baseUrl}")
-    private String idamHost;
 
     @Value("${ccd.case.search.wildcards.allowed}")
     private boolean wildcardSearchAllowed;
@@ -147,6 +147,10 @@ public class ApplicationParams {
         }
     }
 
+    public List<String> getAuthorisedServicesForAddUserCaseRoles() {
+        return authorisedServicesForAddUserCaseRoles;
+    }
+
     public boolean isWildcardSearchAllowed() {
         return wildcardSearchAllowed;
     }
@@ -195,12 +199,16 @@ public class ApplicationParams {
         return uiDefinitionHost + "/api/display/search-result-definition/" + encode(caseTypeId);
     }
 
+    public String displaySearchCasesResultDefURL(final String caseTypeId, final String useCase) {
+        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?usecase=" + useCase;
+    }
+
     public String displayCaseTabCollection(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/tab-structure/" + encode(caseTypeId);
     }
 
     public String displayWizardPageCollection(final String caseTypeId, final String eventId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventId);
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + eventId;
     }
 
     public String jurisdictionDefURL() {
@@ -225,10 +233,6 @@ public class ApplicationParams {
 
     public String baseTypesURL() {
         return caseDefinitionHost + "/api/base-types";
-    }
-
-    public String idamUserProfileURL() {
-        return idamHost + "/details";
     }
 
     public String caseRolesURL() {

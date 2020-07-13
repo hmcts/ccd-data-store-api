@@ -1,0 +1,86 @@
+{
+  "_guid_": "S-900",
+  "_extends_": "F-108_Test_Data_Base",
+  "specs": [
+    "a role with security classification of PRIVATE",
+    "is configured to search for the previously created case via exact match",
+    "contains the previously created case data",
+    "does not contain fields with RESTRICTED security classification"
+  ],
+
+  "request": {
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "total": 1,
+      "cases": [{
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+        "jurisdiction": "AUTOTEST1",
+        "state": "TODO",
+        "version": null,
+        "case_type_id": "AAT_PRIVATE",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PRIVATE",
+        "case_data": {
+          "FixedListField": "VALUE1",
+          "MoneyGBPField": "1000",
+          "AddressUKField": {
+            "PostCode": "SW1H 9AJ",
+            "AddressLine2": "",
+            "PostTown": "London",
+            "AddressLine3": "",
+            "County": "",
+            "AddressLine1": "102 Petty France",
+            "Country": ""
+          },
+          "ComplexField": {
+            "ComplexTextField": "text inside complex",
+            "ComplexNestedField": {
+              "NestedNumberField": "20",
+              "NestedCollectionTextField": [
+                {
+                  "value": "collection text inside complex",
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            },
+            "ComplexFixedListField": "VALUE2"
+          },
+          "DateTimeField": "1989-09-19T14:30:01.000",
+          "PhoneUKField": "02033343555",
+          "NumberField": "1",
+          "MultiSelectListField": [
+            "OPTION1"
+          ],
+          "YesOrNoField": "Yes",
+          "TextField": "text",
+          "DateField": "1989-09-19",
+          "TextAreaField": "text area",
+          "CollectionField": [
+            {
+              "value": "collection text",
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        },
+        "data_classification": "[[ANYTHING_PRESENT]]",
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": "[[ANYTHING_PRESENT]]"
+      }]
+    }
+  }
+}

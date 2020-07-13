@@ -1,19 +1,17 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import java.util.List;
-import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 public interface UIDefinitionGateway {
 
-    SearchResult getWorkBasketResult(int version, String caseTypeId);
+    SearchResultDefinition getWorkBasketResult(int version, String caseTypeId);
 
-    SearchResult getSearchResult(int version, String caseTypeId);
+    SearchResultDefinition getSearchResult(int version, String caseTypeId);
+
+    SearchResultDefinition getSearchCasesResultDefinition(int version, String caseTypeId, String useCase);
 
     SearchInputFieldsDefinition getSearchInputFieldDefinitions(int version, String caseTypeId);
 
