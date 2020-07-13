@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -71,5 +72,10 @@ public class CachedUserRepository implements UserRepository {
             userName = Optional.of(userRepository.getUserId());
             return userName.get();
         });
+    }
+
+    @Override
+    public List<String> getUserRolesJurisdictions() {
+        return userRepository.getUserRolesJurisdictions();
     }
 }
