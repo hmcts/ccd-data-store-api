@@ -114,10 +114,6 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,
                                           List<CaseDetails> cases,
                                           CrossCaseTypeSearchRequest authorisedSearchRequest) {
-        if (authorisedSearchRequest.isConsolidationQuery()) {
-            //TODO FILTER BY CASE ID
-            return;
-        }
         Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypes
             .stream()
             .collect(Collectors.toMap(CaseTypeDefinition::getId, Function.identity()));

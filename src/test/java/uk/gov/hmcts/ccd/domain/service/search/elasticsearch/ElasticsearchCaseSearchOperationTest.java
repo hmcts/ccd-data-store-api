@@ -1,25 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import java.io.IOException;
-import java.util.Collections;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation.MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
@@ -43,6 +27,23 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMa
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
+import java.io.IOException;
+import java.util.Collections;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
+import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation.MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE;
+
 class ElasticsearchCaseSearchOperationTest {
 
     private static final String INDEX_NAME_FORMAT = "%s_cases";
@@ -50,6 +51,17 @@ class ElasticsearchCaseSearchOperationTest {
     private static final String CASE_TYPE_ID_2 = "casetypeid2";
     private static final String INDEX_TYPE = "case";
     private final String caseDetailsElastic = "{some case details}";
+    private final String caseDetailsElasticComplex = "{\n"
+        + "   \"hits\":{\n"
+        + "      \"total\":4,\n"
+        + "      \"max_score\":null,\n"
+        + "      \"hits\":[\n"
+        + "         {\n"
+        + "            \"_index\":\"casetypeid1_cases-000001\"\n"
+        + "         }\n"
+        + "      ]\n"
+        + "   }\n"
+        + "}";
 
     @InjectMocks
     private ElasticsearchCaseSearchOperation searchOperation;
@@ -167,6 +179,60 @@ class ElasticsearchCaseSearchOperationTest {
             assertAll(
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails, caseDetails))),
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
+                () -> verify(jestClient).execute(any(MultiSearch.class)),
+                () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
+                () -> verify(applicationParams, times(2)).getCasesIndexType(),
+                () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Multi case type search")
+    class MultiCaseTypeSearchConsolidated {
+
+        @Test
+        @DisplayName("should execute search on Elasticsearch for multiple case types and return results")
+        void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
+            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
+            final JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
+
+            when(multiSearchResult.isSucceeded()).thenReturn(true);
+
+            SearchResult searchResult1 = mock(SearchResult.class);
+            when(searchResult1.getTotal()).thenReturn(10L);
+            when(searchResult1.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElasticComplex));
+            MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
+            when(searchResult1.getJsonObject()).thenReturn(convertedObject);
+            Whitebox.setInternalState(response1, "searchResult", searchResult1);
+
+            SearchResult searchResult2 = mock(SearchResult.class);
+            when(searchResult2.getTotal()).thenReturn(10L);
+            when(searchResult2.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElasticComplex));
+            MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
+            when(searchResult2.getJsonObject()).thenReturn(convertedObject);
+            Whitebox.setInternalState(response2, "searchResult", searchResult2);
+            when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
+
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
+            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+
+            CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, elasticsearchRequest);
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
+                .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
+                .withSearchRequest(elasticsearchRequest)
+                .withConsolidationQuery(true)
+                .build();
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request1, request2);
+
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
+
+            assertAll(
+                () -> assertThat(caseSearchResult.getCases().size(), equalTo(0)),
+                () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
+                () -> assertThat(caseSearchResult.getCaseTypesResults().size(), equalTo(2)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
