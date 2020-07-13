@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.CaseTypesResults;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.CaseTypesResults;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
@@ -98,10 +98,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult,
                                                        CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
-
-        List<CaseDetails> caseDetails = new ArrayList<>();
-        List<CaseTypesResults> caseFieldsAggregations = new ArrayList<>();
-
+        final List<CaseDetails> caseDetails = new ArrayList<>();
+        final List<CaseTypesResults> caseFieldsAggregations = new ArrayList<>();
         long totalHits = 0L;
 
         for (MultiSearchResult.MultiSearchResponse response : multiSearchResult.getResponses()) {
@@ -115,8 +113,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 throw new BadSearchRequest(errMsg);
             }
             if (response.searchResult != null) {
-
-                buildCaseFieldsAggregations(response, caseFieldsAggregations, crossCaseTypeSearchRequest.getCaseTypeIds());
+                buildCaseFieldsAggregations(response, caseFieldsAggregations, crossCaseTypeSearchRequest);
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
                 totalHits += response.searchResult.getTotal();
             }
@@ -130,14 +127,18 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private void buildCaseFieldsAggregations(
         final MultiSearchResult.MultiSearchResponse response,
         final List<CaseTypesResults> caseFieldsAggregations,
-        final List<String> caseTypeIds) {
+        final CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
 
-        if (response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits").getAsJsonArray().size() != 0) {
+        if (crossCaseTypeSearchRequest.isConsolidationQuery()
+            && response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits").getAsJsonArray().size() != 0) {
 
             final String indexName = response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits")
                 .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
 
-            caseFieldsAggregations.add(new CaseTypesResults(getNameFromIndex(indexName, caseTypeIds), response.searchResult.getTotal()));
+            caseFieldsAggregations.add(new CaseTypesResults(getNameFromIndex(indexName,
+                crossCaseTypeSearchRequest.getCaseTypeIds()),
+                response.searchResult.getTotal())
+            );
         }
     }
 
@@ -166,4 +167,5 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private String getCaseIndexType() {
         return applicationParams.getCasesIndexType();
     }
+
 }

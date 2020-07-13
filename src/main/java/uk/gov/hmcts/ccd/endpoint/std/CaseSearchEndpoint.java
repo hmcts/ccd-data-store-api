@@ -112,7 +112,7 @@ public class CaseSearchEndpoint {
     }
 
     private boolean isAConsolidationQuery(List<String> caseTypeIds) {
-        return "*".equals(caseTypeIds.get(0));
+        return ElasticsearchRequest.SOURCE_WILDCARD.equals(caseTypeIds.get(0));
     }
 
     public static String buildCaseIds(CaseSearchResult caseSearchResult) {

@@ -9,20 +9,19 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 public class CaseSearchResult {
-
     public static final CaseSearchResult EMPTY = new CaseSearchResult(0L, emptyList());
 
     private Long total;
     private List<CaseDetails> cases;
-    private List<CaseTypesResults> caseFieldsAggregations;
+    private List<CaseTypesResults> caseTypesResults;
 
     public CaseSearchResult() {
     }
 
-    public CaseSearchResult(Long total, List<CaseDetails> cases, List<CaseTypesResults> caseFieldsAggregations) {
+    public CaseSearchResult(Long total, List<CaseDetails> cases, List<CaseTypesResults> caseTypesResults) {
         this.cases = cases;
         this.total = total;
-        this.caseFieldsAggregations = caseFieldsAggregations;
+        this.caseTypesResults = caseTypesResults;
     }
 
     public CaseSearchResult(Long total, List<CaseDetails> cases) {
@@ -30,8 +29,8 @@ public class CaseSearchResult {
     }
 
 
-    public CaseSearchResult(List<CaseTypesResults> caseFieldsAggregations, Long total, List<CaseDetails> cases) {
-        this(total, cases, caseFieldsAggregations);
+    public CaseSearchResult(List<CaseTypesResults> caseTypesResults, Long total, List<CaseDetails> cases) {
+        this(total, cases, caseTypesResults);
     }
 
     public List<CaseDetails> getCases() {
@@ -48,7 +47,7 @@ public class CaseSearchResult {
             : cases.stream().filter(c -> c.getCaseTypeId().equals(caseTypeId)).map(CaseDetails::getReferenceAsString).collect(toList());
     }
 
-    public List<CaseTypesResults> getCaseFieldsAggregations() {
-        return caseFieldsAggregations;
+    public List<CaseTypesResults> getCaseTypesResults() {
+        return caseTypesResults;
     }
 }
