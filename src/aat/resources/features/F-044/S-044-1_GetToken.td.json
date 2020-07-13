@@ -1,0 +1,56 @@
+{
+  "_guid_": "S-044-1_GetToken",
+  "_extends_": "Befta_Default_Token_Creation_Data_For_Case_Creation",
+  "specs": [
+    "to create a token for case creation"
+  ],
+  "request": {
+    "pathVariables" : {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_DateTimeFormats",
+      "etid": "CREATE"
+    }
+  },
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json",
+      "Content-Length": "[[ANYTHING_NULLABLE]]",
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANYTHING_NULLABLE]]"
+    },
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": {
+        "id": null,
+        "jurisdiction": "BEFTA_MASTER",
+        "state": null,
+        "version": null,
+        "case_type_id": "FT_DateTimeFormats",
+        "created_date": null,
+        "last_modified": null,
+        "last_state_modified_date": null,
+        "security_classification": null,
+        "case_data": {},
+        "data_classification": {},
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": {}
+      },
+      "event_id": "CREATE"
+    }
+  }
+}

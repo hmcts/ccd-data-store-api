@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,11 +12,12 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -28,6 +26,10 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
@@ -45,6 +47,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
@@ -81,11 +84,17 @@ class AuthorisedGetCaseViewOperationTest {
         .withJurisdictionId(JURISDICTION_ID)
         .withName(JURISDICTION_ID)
         .build();
+    private static final AccessControlList acl1 = anAcl().withRole("caseworker-sscs")
+        .withCreate(true).withRead(true).withUpdate(true).withDelete(true).build();
+    private static final AccessControlList acl2 = anAcl().withRole("caseworker-sscs-clerk")
+        .withCreate(false).withRead(true).withUpdate(false).withDelete(false).build();
     private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType()
         .withId(CASE_TYPE_ID)
         .withJurisdiction(jurisdiction)
         .withEvent(CASE_EVENT)
         .withEvent(CASE_EVENT_2)
+        .withAcl(acl1)
+        .withAcl(acl2)
         .build();
     private static final CaseViewType TEST_CASE_VIEW_TYPE = CaseViewType.createFrom(TEST_CASE_TYPE);
     private static final CaseViewField FIELD_1 = aViewField().withId("FIELD_1").build();
