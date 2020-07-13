@@ -1,20 +1,5 @@
 package uk.gov.hmcts.ccd.data.user;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.util.Comparator.comparingInt;
-import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,6 +31,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,13 +85,13 @@ public class DefaultUserRepository implements UserRepository {
     public Set<String> getUserRoles() {
         LOG.debug("retrieving user roles");
 
-        final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Set<String> userRoles = serviceAndUser.getAuthorities()
-            .stream()
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        Set<String> userRoles = authorities.stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toSet());
 
-        LOG.info("Retrieved roles for user={} roles={}", serviceAndUser.getUsername(), userRoles);
+        String email = getUser().getEmail();
+        LOG.info("Retrieved roles for user={} roles={}", email, userRoles);
 
         return userRoles;
     }
