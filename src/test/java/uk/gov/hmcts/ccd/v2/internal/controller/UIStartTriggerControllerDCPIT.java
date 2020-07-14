@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
@@ -39,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+@Disabled
 public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
     private static final String GET_START_TRIGGER = "/internal/cases/1587051668000989/event-triggers/UPDATE";
     private static final int NUMBER_OF_CASES = 2;
