@@ -38,13 +38,12 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
 #    1 - create data file (F-109-Befta_Jurisdiction2_Case_Type2_Creation) to create a case for the case type BEFTA_CASETYPE_2_2 in jurisdiction Befta_Jurisdiction2
 #    2 - write data file s-944 to query ES for this previously created case
   Scenario: Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (/searchCases)
-    Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
-    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type1_Creation]
-    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type2_Creation]
+    Given a user [with access to create case for Befta_Jurisdiction3]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction3_Case_Type1_Creation]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
-    And a user [with only the 'caseworker-caa' role is not configured with the required CRUD permissions for Befta_Jurisdiction2_Case_Type2]
+    And a user [with only the 'caseworker-caa' role is not configured with the required CRUD permissions for Befta_Jurisdiction3]
     When a request is prepared with appropriate values
-    And the request [is made to query the previously created case Befta_Jurisdiction2_Case_Type2]
+    And the request [is made to query the previously created case Befta_Jurisdiction3_Case_Type1]
     And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
     Then a positive response is received
     And the request [contains no results]

@@ -727,7 +727,7 @@ task smoke(type: Test) {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '@Smoke', '--glue',
-                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features/F-109']
+                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
         }
     }
 
@@ -755,7 +755,7 @@ task functional(type: Test) {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '@S-942', '--glue', "uk.gov.hmcts.ccd.datastore.befta",
-                    '--glue','uk.gov.hmcts.befta.player', 'src/aat/resources/features/F-109']
+                    '--glue','uk.gov.hmcts.befta.player', 'src/aat/resources/features/F-109/F-109.feature']
         }
     }
 }
