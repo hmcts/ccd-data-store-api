@@ -7,8 +7,8 @@ public class MetaDataCriterion extends Criterion {
     }
 
     @Override
-    public String buildClauseString(int position, String operation) {
-        return this.getField() + operation + POSITION_PREFIX + position;
+    public String buildClauseString(String operation) {
+        return this.getField() + operation + PARAM_PREFIX + buildParameterId();
     }
 
 }
