@@ -63,6 +63,8 @@ class ElasticsearchCaseSearchOperationTest {
         + "   }\n"
         + "}";
 
+    final JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
+
     @InjectMocks
     private ElasticsearchCaseSearchOperation searchOperation;
 
@@ -113,6 +115,7 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
+            when(searchResult.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response, "searchResult", searchResult);
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
@@ -153,6 +156,7 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult1.getTotal()).thenReturn(10L);
             when(searchResult1.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
             MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
+            when(searchResult1.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response1, "searchResult", searchResult1);
 
             SearchResult searchResult2 = mock(SearchResult.class);
@@ -160,6 +164,7 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult2.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
             MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
             Whitebox.setInternalState(response2, "searchResult", searchResult2);
+            when(searchResult2.getJsonObject()).thenReturn(convertedObject);
             when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
@@ -195,7 +200,6 @@ class ElasticsearchCaseSearchOperationTest {
         @DisplayName("should execute search on Elasticsearch for multiple case types and return results")
         void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
             MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-            final JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
 
             when(multiSearchResult.isSucceeded()).thenReturn(true);
 

@@ -118,10 +118,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 totalHits += response.searchResult.getTotal();
             }
         }
-        if (crossCaseTypeSearchRequest.isConsolidationQuery()) {
-            return new CaseSearchResult(caseFieldsAggregations, totalHits,caseDetails);
-        }
-        return new CaseSearchResult(totalHits, caseDetails);
+
+        return new CaseSearchResult(caseFieldsAggregations, totalHits, caseDetails);
     }
 
     private void buildCaseFieldsAggregations(
@@ -129,8 +127,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         final List<CaseTypesResults> caseFieldsAggregations,
         final CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
 
-        if (crossCaseTypeSearchRequest.isConsolidationQuery()
-            && response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits").getAsJsonArray().size() != 0) {
+        if (response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits").getAsJsonArray().size() != 0) {
 
             final String indexName = response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits")
                 .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
