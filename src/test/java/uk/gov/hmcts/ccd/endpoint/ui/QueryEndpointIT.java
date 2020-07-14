@@ -1034,11 +1034,11 @@ public class QueryEndpointIT extends WireMockBaseTest {
         List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
-        final MvcResult result = mockMvc.perform(get(GET_CASE_INVALID_REFERENCE)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(400))
-                                        .andReturn();
+        mockMvc.perform(get(GET_CASE_INVALID_REFERENCE)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(400))
+            .andReturn();
 
         resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());

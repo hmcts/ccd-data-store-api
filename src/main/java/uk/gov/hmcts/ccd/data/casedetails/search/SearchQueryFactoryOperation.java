@@ -8,7 +8,6 @@ import javax.persistence.Query;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -98,17 +97,14 @@ public class SearchQueryFactoryOperation {
         return "";
     }
 
-    private void addParameters(final Query query, List<Criterion> criterion) {
-
-        IntStream.range(0, criterion.size())
-                .forEach(position -> query.setParameter(position, criterion.get(position).getSoughtValue()));
+    private void addParameters(final Query query, List<Criterion> criteria) {
+        criteria.forEach(criterion -> query.setParameter(criterion.buildParameterId(), criterion.getSoughtValue()));
     }
 
-    private String toClauses(final List<Criterion> criterion) {
-        return IntStream.range(0, criterion.size())
-                .mapToObj(Integer::new)
-                .map(position -> criterion.get(position).buildClauseString(position, getOperation()))
-                .collect(Collectors.joining(AND));
+    private String toClauses(final List<Criterion> criteria) {
+        return criteria.stream()
+            .map(criterion -> criterion.buildClauseString(getOperation()))
+            .collect(Collectors.joining(AND));
     }
 
     private String getOperation() {

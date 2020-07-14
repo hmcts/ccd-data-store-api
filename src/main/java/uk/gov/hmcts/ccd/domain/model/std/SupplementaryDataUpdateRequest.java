@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOper
 @Getter
 public class SupplementaryDataUpdateRequest {
 
+    @JsonProperty("supplementary_data_updates")
     private Map<String, Map<String, Object>> requestData;
 
     @JsonIgnore

@@ -9,10 +9,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PreDestroy;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -53,6 +59,27 @@ class RestTemplateConfiguration {
         requestFactory.setReadTimeout(readTimeout);
         LOG.info("readTimeout: {}", readTimeout);
         restTemplate.setRequestFactory(requestFactory);
+        return restTemplate;
+    }
+
+    @Bean(name = "documentRestTemplate")
+    public RestTemplate documentRestTemplate() {
+
+        final RestTemplate restTemplate = new RestTemplate();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(getHttpClient());
+        requestFactory.setReadTimeout(readTimeout);
+        LOG.info("readTimeout: {}", readTimeout);
+        restTemplate.setRequestFactory(requestFactory);
+
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        //Add the Jackson Message converter
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        // Note: here we are making this converter to process any kind of response,
+        // not only application/*json, which is the default behaviour
+        converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
+        messageConverters.add(converter);
+        restTemplate.setMessageConverters(messageConverters);
+
         return restTemplate;
     }
 

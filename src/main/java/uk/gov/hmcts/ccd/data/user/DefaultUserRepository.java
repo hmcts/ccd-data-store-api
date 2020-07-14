@@ -27,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -46,6 +47,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -101,10 +103,16 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public Set<String> getUserRoles() {
         LOG.debug("retrieving user roles");
+
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        return authorities.stream()
+        Set<String> userRoles = authorities.stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toSet());
+
+        String email = getUser().getEmail();
+        LOG.info("Retrieved roles for user={} roles={}", email, userRoles);
+
+        return userRoles;
     }
 
     @Override
@@ -145,6 +153,9 @@ public class DefaultUserRepository implements UserRepository {
                     throw new BadRequestException(message);
                 }
             }
+            throw new ServiceException("Problem getting user default settings for " + userId);
+        } catch (ResourceAccessException e) {
+            LOG.error("Failed to retrieve user profile - I/O error", e);
             throw new ServiceException("Problem getting user default settings for " + userId);
         } catch (URISyntaxException e) {
             throw new BadRequestException(e.getMessage());

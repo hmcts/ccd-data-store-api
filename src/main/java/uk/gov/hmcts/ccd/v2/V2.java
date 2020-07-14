@@ -79,5 +79,6 @@ public final class V2 {
         public static final String CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION = "Client service not authorised to perform operation";
         public static final String SUPPLEMENTARY_DATA_UPDATE_INVALID = "Supplementary Data Update Invalid";
         public static final String MORE_THAN_ONE_NESTED_LEVEL = "Supplementary data properties with more than one nested level are currently not supported";
+        public static final String UNKNOWN_SUPPLEMENTARY_UPDATE_OPERATION = "Unknown supplementary data update operation";
     }
 }

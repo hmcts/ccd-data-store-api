@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -88,6 +89,7 @@ public class UserRepositoryTest {
         @DisplayName("should retrieve roles from security principals")
         void shouldRetrieveRolesFromPrincipal() {
             MockUtils.setSecurityAuthorities(authentication, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2, CASEWORKER_DIVORCE);
+            mockUserInfo("userId");
 
             Set<String> userRoles = userRepository.getUserRoles();
 
@@ -100,12 +102,19 @@ public class UserRepositoryTest {
         @DisplayName("should retrieve no role if no relevant role found")
         void shouldRetrieveNoRoleIfNoRelevantRoleFound() {
             MockUtils.setSecurityAuthorities(authentication);
+            mockUserInfo("userId");
 
             Set<String> userRoles = userRepository.getUserRoles();
 
             assertThat(userRoles, is(emptyCollectionOf(String.class)));
         }
 
+        private void mockUserInfo(String userId) {
+            UserInfo userInfo = UserInfo.builder()
+                .uid(userId)
+                .build();
+            when(securityUtils.getUserInfo()).thenReturn(userInfo);
+        }
     }
 
     @Nested

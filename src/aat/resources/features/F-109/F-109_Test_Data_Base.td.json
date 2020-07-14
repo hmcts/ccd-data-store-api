@@ -1,0 +1,42 @@
+{
+  "_guid_": "F-109_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "create case",
+  "method": "POST",
+  "uri": "/case-types/{ctid}/cases",
+  "user": {
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "ctid": "FT_DateTimeFormats"
+    },
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token": "${[scenarioContext][childContexts][F-103_GetToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANY_NULLABLE]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    }
+  }
+}
