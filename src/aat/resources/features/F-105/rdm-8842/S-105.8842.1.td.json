@@ -8,11 +8,27 @@
     "Richard - who can create a case",
     "Dil - who is to add some case role assignment for a case",
     "Olawale - with an active solicitor profile",
+    "Hemanth - with an active solicitor profile",
     "is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and CR-2 and the Organisation ID of Olawale"
   ],
 
   "users": {
-    "_extends_": "F-105_Users"
+    "userRichard": {
+      "username": "befta.caseworker.2.solicitor.1@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+    },
+    "userDil": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    },
+    "userOlawale": {
+      "username": "befta.caseworker.2.solicitor.3@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
+    },
+    "userHemanth": {
+      "username": "befta.caseworker.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_PWD]]"
+    }
   },
 
   "request": {
@@ -25,13 +41,13 @@
           "case_id": "${[scenarioContext][childContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
           "case_role": "[CR-1]",
-          "org_id": "orgA"
+          "organisation_id": "orgA"
         },
         {
           "case_id": "${[scenarioContext][childContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
           "case_role": "[CR-2]",
-          "org_id": "orgA"
+          "organisation_id": "orgA"
         }
       ]
     }
