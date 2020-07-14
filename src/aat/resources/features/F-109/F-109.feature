@@ -5,6 +5,7 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
     Given an appropriate test context as detailed in the test data source
 
     @S-942
+
   Scenario: Must return /searchCases values from Datastore for all jurisdictions for the given case type (1/2)
     Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
     And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
