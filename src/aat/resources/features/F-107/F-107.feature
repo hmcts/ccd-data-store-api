@@ -36,7 +36,7 @@ Feature: F-107: Organisation Policies on Cases
       Then a negative response is received
       And the response has all other details as expected
 
-    @S-928
+    @S-928 @Ignore # Enable test when RDM-8993 is fixed.
     Scenario: must return e negative response for a case update attempt with an invalid data in some OrganisationPolicy fields
       Given a user with [an active profile in CCD]
       Given a successful call [to create a token for case creation] as in [F-107_Case_Data_Create_Token_Creation]

@@ -5,8 +5,6 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in S-927_Create_Case_Data",
-    "contains a token created as in S-927-Prerequisite",
     "contains some OrganisationPolicy fields with incorrect values"
   ],
 
@@ -27,6 +25,16 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_422_Response"
+    "_extends_": "Common_422_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 422,
+      "error" : "Unprocessable Entity",
+      "message" : "[[ANYTHING_PRESENT]]",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
   }
 }

@@ -5,8 +5,6 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in S-927_Create_Case_Data",
-    "contains a token created as in S-927-Prerequisite",
     "contains some OrganisationPolicy fields with all correct values"
   ],
   "request": {
