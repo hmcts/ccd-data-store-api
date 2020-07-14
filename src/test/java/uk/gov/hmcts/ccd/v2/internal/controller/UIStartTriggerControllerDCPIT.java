@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
@@ -111,7 +110,7 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
             () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(0).getDisplayContextParameter(),
                 is("#DATETIMEDISPLAY(yyyy),#DATETIMEENTRY(MM-yyyy)")),
             () -> assertThat(mapOf(complexField.getValue()).get(COMPLEX_DATE_TIME_FIELD), is("2005-03-28T07:45:30.000")),
-//            () -> assertThat(mapOf(complexField.getFormattedValue()).get(COMPLEX_DATE_TIME_FIELD), is("03-2005")),
+            // () -> assertThat(mapOf(complexField.getFormattedValue()).get(COMPLEX_DATE_TIME_FIELD), is("03-2005")),
 
             () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(0)
                 .getId(), is(NESTED_NUMBER_FIELD)),
