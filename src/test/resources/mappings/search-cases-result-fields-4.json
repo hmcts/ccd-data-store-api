@@ -1,0 +1,86 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/display/search-cases-result-fields/AAT?usecase=TEST&version=33"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "case_type_id": "AAT",
+      "fields": [
+        {
+          "metadata": false,
+          "case_field_id": "TextField",
+          "case_field_element_path": null,
+          "label": "`Text` field",
+          "order": 1,
+          "role": null,
+          "use_case": "TEST",
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "EmailField",
+          "case_field_element_path": null,
+          "label": "`Email` field",
+          "order": 2,
+          "role": null,
+          "use_case": "TEST",
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "FixedListField",
+          "case_field_element_path": null,
+          "label": "Fixed List",
+          "order": 3,
+          "role": "caseworker-autotest1",
+          "use_case": "TEST",
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "CollectionField",
+          "case_field_element_path": null,
+          "label": "`Collection` field",
+          "order": 3,
+          "role": "caseworker-autotest1",
+          "use_case": "TEST",
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "ComplexField",
+          "case_field_element_path": null,
+          "label": "`Complex` field",
+          "order": 4,
+          "role": "caseworker-autotest3",
+          "use_case": "TEST",
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": true,
+          "case_field_id": "[STATE]",
+          "case_field_element_path": null,
+          "label": "State",
+          "order": 5,
+          "role": "",
+          "use_case": "TEST",
+          "sort_order": {
+            "direction": "ASC",
+            "priority": 2
+          },
+          "display_context_parameter": null
+        }
+      ]
+    }
+  }
+}

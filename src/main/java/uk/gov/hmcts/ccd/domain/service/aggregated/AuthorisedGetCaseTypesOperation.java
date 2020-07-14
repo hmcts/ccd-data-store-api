@@ -13,11 +13,12 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 /**
+ * Authorised {@link GetCaseTypesOperation}.
  *
  * @deprecated until {@link DefaultGetCaseTypesOperation} is deprecated
  */
@@ -41,7 +42,7 @@ public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
     }
 
     @Override
-    public List<CaseType> execute(String jurisdictionId, Predicate<AccessControlList> access) {
+    public List<CaseTypeDefinition> execute(String jurisdictionId, Predicate<AccessControlList> access) {
         final Set<String> userRoles = getUserRoles();
         return getCaseTypesOperation.execute(jurisdictionId, access).stream()
             .map(caseType -> verifyAccess(caseType, userRoles, access))
@@ -58,29 +59,29 @@ public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
         return userRoles;
     }
 
-    private Optional<CaseType> verifyAccess(CaseType caseType, Set<String> userRoles, Predicate<AccessControlList> access) {
+    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, Predicate<AccessControlList> access) {
 
-        if (caseType == null || CollectionUtils.isEmpty(userRoles)) {
+        if (caseTypeDefinition == null || CollectionUtils.isEmpty(userRoles)) {
             return Optional.empty();
         }
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, access)) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
             return Optional.empty();
         }
 
-        caseType.setStates(accessControlService.filterCaseStatesByAccess(caseType.getStates(),
+        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
                                                                          userRoles,
                                                                          access));
-        caseType.setEvents(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
+        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                                                                          userRoles,
                                                                          access));
 
-        caseType.setCaseFields(accessControlService.filterCaseFieldsByAccess(caseType.getCaseFields(),
+        caseTypeDefinition.setCaseFieldDefinitions(accessControlService.filterCaseFieldsByAccess(caseTypeDefinition.getCaseFieldDefinitions(),
                                                                              userRoles,
                                                                              access));
 
 
-        return Optional.of(caseType);
+        return Optional.of(caseTypeDefinition);
     }
 
 }

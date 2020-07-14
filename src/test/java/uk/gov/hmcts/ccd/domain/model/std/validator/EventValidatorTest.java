@@ -33,7 +33,7 @@ class EventValidatorTest {
     @DisplayName("throws a ValidationException when the event id is null")
     void validateNullEventId() {
         final ValidationException exception = assertThrows(ValidationException.class,
-                                                           () -> underTest.validate(anEvent().build()));
+            () -> underTest.validate(anEvent().build()));
         assertEquals("Cannot create event because event is not specified", exception.getMessage());
     }
 

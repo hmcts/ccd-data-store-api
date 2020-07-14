@@ -23,8 +23,7 @@
 	"expectedResponse": {
 		"headers": {
 			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
-			"Content-Type": "application/json"
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
 		},
 		"body": {
 			"user": {
@@ -63,7 +62,6 @@
 							"jurisdiction": null,
 							"events": [
 								{
-									"__operator__": "equivalent",
 									"__ordering__": "unordered"
 								},
 								{
@@ -323,6 +321,9 @@
 							"jurisdiction": null,
 							"events": [
 								{
+									"__ordering__": "unordered"
+								},
+								{
 									"id": "REVIEW",
 									"name": "Review",
 									"description": null,
@@ -580,8 +581,3 @@
 		}
 	}
 }
-
-
-
-
-

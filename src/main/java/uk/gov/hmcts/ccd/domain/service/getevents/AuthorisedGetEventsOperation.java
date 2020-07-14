@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -78,8 +78,8 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
             return Lists.newArrayList();
         }
 
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
@@ -88,19 +88,19 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
             throw new ValidationException("Cannot find user roles or case roles for the case ID " + caseId);
         }
 
-        return verifyReadAccess(events, accessRoles, caseType);
+        return verifyReadAccess(events, accessRoles, caseTypeDefinition);
     }
 
-    private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<String> userRoles, CaseType caseType) {
+    private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<String> userRoles, CaseTypeDefinition caseTypeDefinition) {
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType,
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
             userRoles,
             CAN_READ)) {
             return Lists.newArrayList();
         }
 
         return accessControlService.filterCaseAuditEventsByReadAccess(events,
-            caseType.getEvents(),
+            caseTypeDefinition.getEvents(),
             userRoles);
     }
 

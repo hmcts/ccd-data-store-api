@@ -1,0 +1,98 @@
+{
+  "_guid_": "S-639",
+  "_extends_": "F-104_Test_Data_Base",
+  "specs": [
+    "a valid user profile",
+    "is configured to search for a case that doesn't exist",
+    "is using the query parameter usecase=orgcases",
+    "contains the header fields for that case type as per definition configuration",
+    "contains no case data",
+    "lists total cases as 0"
+  ],
+  "request": {
+    "queryParams": {
+      "usecase": "ORGCASES"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "data.TextField": "no cases here"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "headers": [
+        {
+          "metadata": {
+            "jurisdiction": "AUTOTEST1",
+            "case_type_id": "AAT_PRIVATE"
+          },
+          "fields": [
+            {
+              "__operator__": "equivalent",
+              "__ordering__": "unordered",
+              "__elementId__": "label"
+            },
+            {
+              "label": "`FixedList` orgcases",
+              "order": 1,
+              "metadata": false,
+              "case_field_id": "FixedListField",
+              "case_field_type": {
+                "id": "FixedList-FixedListType",
+                "type": "FixedList",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [
+                  {
+                    "code": "VALUE3",
+                    "label": "Value 3",
+                    "order": null
+                  },
+                  {
+                    "code": "VALUE2",
+                    "label": "Value 2",
+                    "order": null
+                  },
+                  {
+                    "code": "VALUE1",
+                    "label": "Value 1",
+                    "order": null
+                  }
+                ],
+                "complex_fields": [],
+                "collection_field_type": null
+              },
+              "display_context_parameter": null
+            },
+            {
+              "label": "`CaseReference` orgcases",
+              "order": 3,
+              "metadata": true,
+              "case_field_id": "[CASE_REFERENCE]",
+              "case_field_type": {
+                "id": "Number",
+                "type": "Number",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [],
+                "complex_fields": [],
+                "collection_field_type": null
+              },
+              "display_context_parameter": null
+            }
+          ],
+          "cases": []
+        }
+      ],
+      "cases": [],
+      "total": 0
+    }
+  }
+
+}

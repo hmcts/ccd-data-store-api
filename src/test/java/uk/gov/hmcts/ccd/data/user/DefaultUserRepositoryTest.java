@@ -1,14 +1,50 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.util.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -29,40 +65,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
-import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
 class DefaultUserRepositoryTest {
 
@@ -92,9 +94,6 @@ class DefaultUserRepositoryTest {
     @Mock
     private SecurityContext securityContext;
 
-    @Mock
-    private ServiceAndUserDetails principal;
-
     @InjectMocks
     private DefaultUserRepository userRepository;
 
@@ -103,6 +102,8 @@ class DefaultUserRepositoryTest {
         MockitoAnnotations.initMocks(this);
 
         initSecurityContext();
+
+        mockUserInfo("userId");
     }
 
     @Nested
@@ -240,12 +241,12 @@ class DefaultUserRepositoryTest {
         @DisplayName("should return the User Profile defaults for the user")
         void shouldReturnUserProfileDefaultsForUser() {
             when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
-            final Jurisdiction jurisdiction = new Jurisdiction();
-            jurisdiction.setId("TEST");
-            jurisdiction.setName("Test");
-            jurisdiction.setDescription("Test Jurisdiction");
+            final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+            jurisdictionDefinition.setId("TEST");
+            jurisdictionDefinition.setName("Test");
+            jurisdictionDefinition.setDescription("Test Jurisdiction");
             final UserDefault userDefault = new UserDefault();
-            userDefault.setJurisdictions(singletonList(jurisdiction));
+            userDefault.setJurisdictionDefinitions(singletonList(jurisdictionDefinition));
             final ResponseEntity<UserDefault> responseEntity = new ResponseEntity<>(userDefault, HttpStatus.OK);
             when(restTemplate
                 .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
@@ -282,6 +283,24 @@ class DefaultUserRepositoryTest {
             when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
             final RestClientResponseException exception =
                 new RestClientResponseException(null, 500, "Internal Server Error", null, null, null);
+            when(restTemplate
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
+                .thenThrow(exception);
+
+            final String userId = "ccd+test@hmcts.net";
+            final ServiceException serviceException =
+                assertThrows(ServiceException.class,
+                    () -> userRepository.getUserDefaultSettings(userId),
+                    "Expected getUserDefaultSettings() to throw, but it didn't");
+            assertThat(serviceException.getMessage(), is("Problem getting user default settings for " + userId));
+        }
+
+        @Test
+        @DisplayName("should throw a ServiceException if an IO error occurs retrieving the User Profile defaults")
+        void shouldThrowExceptionIfIOErrorOnRetrievingUserProfile() {
+            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            final ResourceAccessException exception =
+                new ResourceAccessException("I/O Error");
             when(restTemplate
                 .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
                 .thenThrow(exception);
@@ -340,6 +359,7 @@ class DefaultUserRepositoryTest {
         @DisplayName("should throw exception when no user roles returned")
         void shouldThrowExceptionWhenNoUserRolesReturned() {
             asCaseworker();
+
             when(caseDefinitionRepository.getClassificationsForUserRoleList(anyList())).thenReturn(emptyList());
 
             assertThrows(ServiceException.class, () -> userRepository.getHighestUserClassification(JURISDICTION_ID));
@@ -349,61 +369,115 @@ class DefaultUserRepositoryTest {
     @Nested
     @DisplayName("getUser()")
     class GetUser {
-        private static final String URL = "url";
-
-        @BeforeEach
-        void setUp() {
-            when(applicationParams.idamUserProfileURL()).thenReturn(URL);
-        }
-
         @Test
         @DisplayName("should retrieve user from IDAM")
         void shouldRetrieveUserFromIdam() {
-            IdamUser idamUser = new IdamUser();
-            when(restTemplate.exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class)))
-                .thenReturn(ResponseEntity.ok(idamUser));
+            String userId = "userId";
 
             IdamUser result = userRepository.getUser();
 
-            assertThat(result, is(idamUser));
-            verify(applicationParams).idamUserProfileURL();
-            verify(securityUtils).userAuthorizationHeaders();
-            verify(applicationParams).idamUserProfileURL();
-            verify(restTemplate).exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
+            assertThat(result.getId(), is(userId));
+        }
+    }
+
+    @Nested
+    @DisplayName("getUserRolesJurisdictions()")
+    class GetUserRolesJurisdictions {
+
+        @Test
+        @DisplayName("test empty list of jurisdictions")
+        void shouldRetrieveNoJurisdictionsWhenNotPresent() {
+            List<String> roles = newArrayList(
+                "caseworker", "citizen");
+
+            mockUserInfo("userId", roles);
+
+            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+
+            assertAll(
+                () -> assertThat(jurisdictions, hasSize(0))
+            );
         }
 
         @Test
-        @DisplayName("should throw exception when rest call fails")
-        void shouldThrowExceptionWhenRestCallFails() {
-            when(applicationParams.idamUserProfileURL()).thenReturn("url");
-            doThrow(new RestClientException("Error")).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
+        @DisplayName("It should retrieve caseworkers jurisdictions")
+        void shouldRetrieveCaseworkersJurisdictions() {
+            List<String> roles = newArrayList(
+                "caseworker",
+                "caseworker-autotest1",
+                "caseworker-autotest1-solicitor",
+                "caseworker-autotest1-private",
+                "caseworker-autotest1-senior",
+                "caseworker-autotest2",
+                "caseworker-autotest2-solicitor",
+                "caseworker-autotest2-private",
+                "caseworker-autotest2-senior");
 
-            assertThrows(ServiceException.class, () -> userRepository.getUser());
+            mockUserInfo("userId", roles);
+
+            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+
+            assertAll(
+                () -> assertThat(jurisdictions, hasSize(2)),
+                () -> assertThat(jurisdictions, hasItems("autotest1", "autotest2"))
+            );
+        }
+
+        @Test
+        @DisplayName("It should retrieve all roles jurisdictions")
+        void shouldRetrieveAllRolesJurisdictions() {
+            List<String> roles = newArrayList(
+                "caseworker",
+                "citizen",
+                "caseworker-autotest1",
+                "caseworker-autotest2",
+                "otherRole-autotest1",
+                "otherRole-autotest2");
+
+            mockUserInfo("userId", roles);
+
+            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+
+            assertAll(
+                () -> assertThat(jurisdictions, hasSize(2)),
+                () -> assertThat(jurisdictions, hasItems("autotest1", "autotest2"))
+            );
         }
     }
 
     private void asCitizen() {
-        doReturn(newAuthorities(CITIZEN, PROBATE_PRIVATE_BETA)).when(principal)
+        doReturn(newAuthorities(CITIZEN, PROBATE_PRIVATE_BETA)).when(authentication)
                                                                .getAuthorities();
     }
 
     private void asLetterHolderCitizen() {
-        doReturn(newAuthorities(LETTER_HOLDER, PROBATE_PRIVATE_BETA)).when(principal)
+        doReturn(newAuthorities(LETTER_HOLDER, PROBATE_PRIVATE_BETA)).when(authentication)
                                                                      .getAuthorities();
     }
 
     private void asCaseworker() {
-        doReturn(newAuthorities(ROLE_CASEWORKER, ROLE_CASEWORKER_TEST, ROLE_CASEWORKER_CMC)).when(principal)
+        doReturn(newAuthorities(ROLE_CASEWORKER, ROLE_CASEWORKER_TEST, ROLE_CASEWORKER_CMC)).when(authentication)
                                                                                             .getAuthorities();
     }
 
+    private void mockUserInfo(String userId) {
+        mockUserInfo(userId, emptyList());
+    }
+
+    private void mockUserInfo(String userId, List<String> roles) {
+        UserInfo userInfo = UserInfo.builder()
+            .uid(userId)
+            .roles(roles)
+            .build();
+        when(securityUtils.getUserInfo()).thenReturn(userInfo);
+    }
+
     private void asOtherRoles() {
-        doReturn(newAuthorities("role1", "role2")).when(principal)
+        doReturn(newAuthorities("role1", "role2")).when(authentication)
                                                   .getAuthorities();
     }
 
     private void initSecurityContext() {
-        doReturn(principal).when(authentication).getPrincipal();
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
     }

@@ -55,3 +55,23 @@ Feature: F-059: Validate a set of fields as Citizen
     Then a negative response is received
     And the response [has the 409 return code]
     And the response has all other details as expected
+
+  @S-059.1 @Ignore # Enable this when Citizen Login is enabled for BEFTA_MASTER jurisdiction
+  Scenario: must validate date in a right format
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [contains valid value for a formatted Date field]
+    And it is submitted to call the [validation of a set of fields as Citizen] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [has the 200 return code]
+    And the response has all other details as expected
+
+  @S-059.2 @Ignore # Enable this when Citizen Login is enabled for BEFTA_MASTER jurisdiction
+  Scenario: must return an error for date value with invalid format
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [contains Date field with incorrect format]
+    And it is submitted to call the [validation of a set of fields as Citizen] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [has the 422 return code]
+    And the response has all other details as expected

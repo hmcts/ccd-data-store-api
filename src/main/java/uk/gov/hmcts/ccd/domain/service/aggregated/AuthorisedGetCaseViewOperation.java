@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Arrays;
-import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
@@ -13,12 +13,18 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
@@ -26,6 +32,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 @Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER)
 public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOperation implements
     GetCaseViewOperation {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AuthorisedGetCaseViewOperation.class);
 
     public static final String QUALIFIER = "authorised";
     private final GetCaseViewOperation getCaseViewOperation;
@@ -45,13 +53,13 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     public CaseView execute(String caseReference) {
         CaseView caseView = getCaseViewOperation.execute(caseReference);
 
-        CaseType caseType = getCaseType(caseView.getCaseType().getId());
+        CaseTypeDefinition caseTypeDefinition = getCaseType(caseView.getCaseType().getId());
         String caseId = getCaseId(caseReference);
         Set<String> userRoles = getUserRoles(caseId);
-        verifyCaseTypeReadAccess(caseType, userRoles);
+        verifyCaseTypeReadAccess(caseTypeDefinition, userRoles);
         filterCaseTabFieldsByReadAccess(caseView, userRoles);
         filterAllowedTabsWithFields(caseView, userRoles);
-        return filterUpsertAccess(caseType, userRoles, caseView);
+        return filterUpsertAccess(caseReference, caseTypeDefinition, userRoles, caseView);
     }
 
     private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<String> userRoles) {
@@ -64,23 +72,41 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
             }).toArray(CaseViewTab[]::new));
     }
 
-    private CaseView filterUpsertAccess(CaseType caseType, Set<String> userRoles, CaseView caseView) {
-        CaseViewTrigger[] authorisedTriggers;
-        if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseType,
+    private CaseView filterUpsertAccess(String caseReference, CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseView caseView) {
+        CaseViewActionableEvent[] authorisedActionableEvents;
+        if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseTypeDefinition,
                                                                      userRoles,
                                                                      CAN_UPDATE)
             || !getAccessControlService().canAccessCaseStateWithCriteria(caseView.getState().getId(),
-                                                                      caseType,
-                                                                      userRoles,
-                                                                      CAN_UPDATE)) {
-            authorisedTriggers = new CaseViewTrigger[]{};
+                                                                         caseTypeDefinition,
+                                                                         userRoles,
+                                                                         CAN_UPDATE)) {
+            authorisedActionableEvents = new CaseViewActionableEvent[]{};
+            LOG.info("No authorised triggers for caseReference={} caseType={} version={} caseState={}, caseTypeACLs={}, caseStateACLs={} userRoles={}",
+                     caseReference,
+                     caseTypeDefinition.getId(),
+                     caseTypeDefinition.getVersion() != null ? caseTypeDefinition.getVersion().getNumber() : "",
+                     caseView.getState() != null ? caseView.getState().getId() : "",
+                     caseTypeDefinition.getAccessControlLists(),
+                     caseTypeDefinition.getStates()
+                         .stream()
+                         .filter(cState -> cState.getId().equalsIgnoreCase(caseView.getState().getId()))
+                         .map(CaseStateDefinition::getAccessControlLists)
+                         .flatMap(Collection::stream)
+                         .collect(toList()),
+                     userRoles);
         } else {
-            authorisedTriggers = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getTriggers(),
-                                                                                                caseType.getEvents(),
-                                                                                                userRoles);
+            authorisedActionableEvents = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getActionableEvents(),
+                                                                                                        caseTypeDefinition.getEvents(),
+                                                                                                        userRoles);
+            LOG.debug("Authorised triggers for caseReference={} caseType={} version={} triggers={}",
+                     caseReference,
+                     caseTypeDefinition.getId(),
+                     caseTypeDefinition.getVersion() != null ? caseTypeDefinition.getVersion().getNumber() : "",
+                     Arrays.stream(authorisedActionableEvents).map(CaseViewActionableEvent::getName).collect(toList()));
         }
 
-        caseView.setTriggers(authorisedTriggers);
+        caseView.setActionableEvents(authorisedActionableEvents);
 
         return caseView;
     }

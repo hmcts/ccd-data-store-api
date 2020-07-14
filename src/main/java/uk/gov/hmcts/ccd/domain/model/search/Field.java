@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 public class Field {
     private String id;
     private String elementPath;
     @JsonProperty("field_type")
-    private FieldType type;
+    private FieldTypeDefinition type;
     private boolean metadata;
     @JsonProperty("show_condition")
     private String showCondition;
@@ -28,11 +28,11 @@ public class Field {
         this.elementPath = elementPath;
     }
 
-    public FieldType getType() {
+    public FieldTypeDefinition getType() {
         return type;
     }
 
-    public void setType(FieldType type) {
+    public void setType(FieldTypeDefinition type) {
         this.type = type;
     }
 

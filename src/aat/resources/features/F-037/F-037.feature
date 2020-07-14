@@ -47,7 +47,7 @@ Feature: F-037: Submit event for an existing case (V2)
     And the response [contains a HTTP 400 'Bad Request']
     And the response has all the details as expected
 
-  @S-026 @Ignore #This scenario is returning 400 instead of expected 404, Need to raise defect JIRA
+  @S-026
   Scenario: must return negative response when request contains a non-existing case-reference
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -88,3 +88,16 @@ Feature: F-037: Submit event for an existing case (V2)
     And a call [to update the same case by Solicitor 3] will get the expected response as in [S-577_Later_Case_Update_By_Solicitor_3]
     And a call [to get the same case by Solicitor 3, who doesn't have READ permission] will get the expected response as in [S-577_Later_Case_Read_By_Solicitor_3]
 
+  @S-037.1
+  Scenario: submit event (v2) with date having formatted value
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation] as in [S-037-1_GetToken]
+    And a successful call [to create a case] as in [S-037-TEMP_CreateCase]
+    And a successful call [to get an event token for the case just created] as in [S-037-1_GetToken_Update]
+    When a request is prepared with appropriate values
+    And the request [contains a case Id that has just been created]
+    And the request [contains Update token created as in S-037-1_GetToken_Update]
+    And it is submitted to call the [submit event for a created case (V2)] operation of [CCD data store]
+    Then a positive response is received
+    And the response [contains the case detail for the updated case, along with a HTTP 201 OK]
+    And the response has all other details as expected

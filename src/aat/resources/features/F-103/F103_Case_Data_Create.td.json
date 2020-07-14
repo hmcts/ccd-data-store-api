@@ -1,0 +1,13 @@
+{
+	"_guid_": "F103_Case_Data_Create",
+	"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
+	"specs": [
+		"to create a full case"
+	],
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.2.solicitor.2@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+		}
+	}
+}

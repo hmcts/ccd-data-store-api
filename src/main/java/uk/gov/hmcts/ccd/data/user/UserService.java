@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
@@ -32,7 +32,7 @@ public class UserService {
     public UserService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
                        JurisdictionMapper jurisdictionMapper,
-                       @Qualifier(IDAMJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
+                       @Qualifier(IdamJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.jurisdictionMapper = jurisdictionMapper;
@@ -41,24 +41,24 @@ public class UserService {
 
     public UserProfile getUserProfile() {
 
-        IDAMProperties idamProperties = userRepository.getUserDetails();
+        IdamProperties idamProperties = userRepository.getUserDetails();
         String userId = idamProperties.getEmail();
         List<String> jurisdictionIds = jurisdictionsResolver.getJurisdictions();
 
-        List<Jurisdiction> jurisdictions = new ArrayList<>();
+        List<JurisdictionDefinition> jurisdictionDefinitions = new ArrayList<>();
 
         LOGGER.debug("Will get jurisdiction(s) '{}' from repository.", jurisdictionIds);
         jurisdictionIds.stream().forEach(id -> {
-            Jurisdiction jurisdiction = caseDefinitionRepository.getJurisdiction(id);
-            if (jurisdiction != null) {
-                jurisdictions.add(jurisdiction);
+            JurisdictionDefinition jurisdictionDefinition = caseDefinitionRepository.getJurisdiction(id);
+            if (jurisdictionDefinition != null) {
+                jurisdictionDefinitions.add(jurisdictionDefinition);
             }
         });
 
-        return createUserProfile(idamProperties, userId, jurisdictions);
+        return createUserProfile(idamProperties, userId, jurisdictionDefinitions);
     }
 
-    private UserProfile createUserProfile(IDAMProperties idamProperties, String userId, List<Jurisdiction> jurisdictionsDefinition) {
+    private UserProfile createUserProfile(IdamProperties idamProperties, String userId, List<JurisdictionDefinition> jurisdictionsDefinition) {
 
         JurisdictionDisplayProperties[] resultJurisdictions = toResponse(jurisdictionsDefinition);
 
@@ -79,7 +79,7 @@ public class UserService {
         return userProfile;
     }
 
-    private JurisdictionDisplayProperties[] toResponse(List<Jurisdiction> jurisdictionsDefinition) {
+    private JurisdictionDisplayProperties[] toResponse(List<JurisdictionDefinition> jurisdictionsDefinition) {
         return jurisdictionsDefinition.stream().map(jurisdictionMapper::toResponse)
         .toArray(JurisdictionDisplayProperties[]::new);
     }

@@ -15,8 +15,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -67,7 +67,7 @@ class AuthorisedGetEventsOperationTest {
     private CaseDetails caseDetails;
     private List<AuditEvent> classifiedEvents;
     private List<AuditEvent> authorisedEvents;
-    private CaseType caseType;
+    private CaseTypeDefinition caseType;
     private AuditEvent event;
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
@@ -81,8 +81,8 @@ class AuthorisedGetEventsOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseType = new CaseType();
-        List<CaseEvent> eventsDefinition = new ArrayList<>();
+        caseType = new CaseTypeDefinition();
+        List<CaseEventDefinition> eventsDefinition = new ArrayList<>();
         caseType.setEvents(eventsDefinition);
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
@@ -253,22 +253,21 @@ class AuthorisedGetEventsOperationTest {
     void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndEvent() {
         doReturn(Optional.of(event)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
         doReturn(singletonList(event)).when(accessControlService)
-            .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEvent.class), eq(CASE_USER_ROLES));
+            .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEventDefinition.class), eq(CASE_USER_ROLES));
 
         Optional<AuditEvent> optionalAuditEvent = authorisedOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
         InOrder inOrder = inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
-        assertAll(() -> inOrder.verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
-                  () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
-                  () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
-                  () -> inOrder.verify(accessControlService)
-                      .canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ),
-                  () -> inOrder.verify(accessControlService)
-                      .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), eq(caseType.getEvents()),
-                                                         eq(CASE_USER_ROLES)),
-                  () -> assertThat(output, is(event))
+        assertAll(
+            () -> inOrder.verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
+            () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
+            () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ),
+            () -> inOrder.verify(accessControlService)
+                .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), eq(caseType.getEvents()), eq(CASE_USER_ROLES)),
+            () -> assertThat(output, is(event))
         );
     }
 }

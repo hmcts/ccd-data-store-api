@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -72,13 +72,13 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
-        List<CaseType> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
+        List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
         CrossCaseTypeSearchRequest authorisedSearchRequest = createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
 
         return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
     }
 
-    private List<CaseType> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
+    private List<CaseTypeDefinition> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
         return searchRequest.getCaseTypeIds()
             .stream()
             .map(caseTypeId -> authorisedCaseDefinitionDataService.getAuthorisedCaseType(caseTypeId, CAN_READ).orElse(null))
@@ -86,18 +86,20 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             .collect(Collectors.toList());
     }
 
-    private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseType> authorisedCaseTypes, CrossCaseTypeSearchRequest originalSearchRequest) {
-        List<String> authorisedCaseTypeIds = authorisedCaseTypes.stream().map(CaseType::getId).collect(Collectors.toList());
+    private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseTypeDefinition> authorisedCaseTypes,
+                                                                     CrossCaseTypeSearchRequest originalSearchRequest) {
+        List<String> authorisedCaseTypeIds = authorisedCaseTypes.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList());
 
         return new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(authorisedCaseTypeIds)
-            .withSearchRequest(originalSearchRequest.getSearchRequestJsonNode())
+            .withSearchRequest(originalSearchRequest.getElasticSearchRequest())
             .withMultiCaseTypeSearch(originalSearchRequest.isMultiCaseTypeSearch())
             .withSourceFilterAliasFields(originalSearchRequest.getAliasFields())
             .build();
     }
 
-    private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseType> authorisedCaseTypes, CrossCaseTypeSearchRequest authorisedSearchRequest) {
+    private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseTypeDefinition> authorisedCaseTypes,
+                                                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
         if (authorisedCaseTypes.isEmpty()) {
             return CaseSearchResult.EMPTY;
         }
@@ -108,25 +110,28 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         return result;
     }
 
-    private void filterCaseDataByCaseType(List<CaseType> authorisedCaseTypes, List<CaseDetails> cases, CrossCaseTypeSearchRequest authorisedSearchRequest) {
-        Map<String, CaseType> caseTypeIdByCaseType = authorisedCaseTypes
+    private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,
+                                          List<CaseDetails> cases,
+                                          CrossCaseTypeSearchRequest authorisedSearchRequest) {
+        Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypes
             .stream()
-            .collect(Collectors.toMap(CaseType::getId, Function.identity()));
+            .collect(Collectors.toMap(CaseTypeDefinition::getId, Function.identity()));
 
         cases.stream()
             .filter(caseDetails -> caseTypeIdByCaseType.containsKey(caseDetails.getCaseTypeId()))
             .forEach(caseDetails -> filterCaseData(caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()), caseDetails, authorisedSearchRequest));
     }
 
-    private void filterCaseData(CaseType authorisedCaseType, CaseDetails caseDetails, CrossCaseTypeSearchRequest authorisedSearchRequest) {
+    private void filterCaseData(CaseTypeDefinition authorisedCaseType, CaseDetails caseDetails, CrossCaseTypeSearchRequest authorisedSearchRequest) {
         filterCaseDataByAclAccess(authorisedCaseType, caseDetails);
         filterCaseDataBySecurityClassification(caseDetails);
         filterCaseDataForMultiCaseTypeSearch(authorisedSearchRequest, authorisedCaseType, caseDetails);
     }
 
-    private void filterCaseDataByAclAccess(CaseType authorisedCaseType, CaseDetails caseDetails) {
+    private void filterCaseDataByAclAccess(CaseTypeDefinition authorisedCaseType, CaseDetails caseDetails) {
         JsonNode caseData = caseDataToJsonNode(caseDetails);
-        JsonNode accessFilteredData = accessControlService.filterCaseFieldsByAccess(caseData, authorisedCaseType.getCaseFields(), getUserRoles(), CAN_READ, false);
+        JsonNode accessFilteredData =
+            accessControlService.filterCaseFieldsByAccess(caseData, authorisedCaseType.getCaseFieldDefinitions(), getUserRoles(), CAN_READ, false);
         caseDetails.setData(jsonNodeToCaseData(accessFilteredData));
     }
 
@@ -154,7 +159,9 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
      * }
      * If no source filter was passed then this will remove case data and return only metadata.
      */
-    private void filterCaseDataForMultiCaseTypeSearch(CrossCaseTypeSearchRequest searchRequest, CaseType authorisedCaseType, CaseDetails caseDetails) {
+    private void filterCaseDataForMultiCaseTypeSearch(CrossCaseTypeSearchRequest searchRequest,
+                                                      CaseTypeDefinition authorisedCaseType,
+                                                      CaseDetails caseDetails) {
         if (searchRequest.isMultiCaseTypeSearch() && caseDetails.getData() != null) {
             JsonNode caseData = caseDataToJsonNode(caseDetails);
             String caseDataJson = caseData.toString();
@@ -171,11 +178,11 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private Optional<JsonNode> findCaseFieldPathInCaseData(CaseType caseType, String caseDataJson, String path) {
+    private Optional<JsonNode> findCaseFieldPathInCaseData(CaseTypeDefinition caseType, String caseDataJson, String path) {
         try {
             String fieldPath = JSON_PATH_ROOT_ELEMENT_PREFIX + sanitiseCollectionFieldInPath(caseType, path);
             return of(ofNullable(JsonPath.parse(caseDataJson).read(fieldPath, JsonNode.class))
-                          .orElse(NullNode.getInstance()));
+                .orElse(NullNode.getInstance()));
         } catch (PathNotFoundException e) {
             log.warn("Case field path not found in case data. {}", e.getMessage());
             return of(MissingNode.getInstance());
@@ -186,7 +193,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
      * Collection case field has a different syntax when looking up in the case data. The case field path is stored as `collectionField.value` and when looking
      * up this field, it needs to be looked up as collectionField[*].value
      */
-    private String sanitiseCollectionFieldInPath(CaseType caseType, String path) {
+    private String sanitiseCollectionFieldInPath(CaseTypeDefinition caseType, String path) {
         String caseFieldId = getCaseFieldFromPath(path);
         if (path != null && caseType.isCaseFieldACollection(caseFieldId)) {
             return path.replaceAll(caseFieldId, caseFieldId + JSON_PATH_COLLECTION_FIELD_INDICATOR);

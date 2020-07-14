@@ -43,6 +43,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -56,7 +57,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "NumberField",
@@ -78,6 +80,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -91,7 +94,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "YesOrNoField",
@@ -113,6 +117,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -126,7 +131,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "PhoneUKField",
@@ -148,6 +154,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -161,7 +168,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "EmailField",
@@ -183,6 +191,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -196,7 +205,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "MoneyGBPField",
@@ -218,6 +228,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -231,7 +242,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "DateField",
@@ -253,6 +265,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -266,7 +279,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "DateTimeField",
@@ -288,6 +302,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -301,7 +316,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "TextAreaField",
@@ -323,6 +339,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -336,7 +353,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "FixedListField",
@@ -374,6 +392,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -387,7 +406,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "MultiSelectListField",
@@ -435,6 +455,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -448,7 +469,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "CollectionField",
@@ -479,6 +501,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
           "show_condition": null,
@@ -492,7 +515,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "ComplexField",
@@ -543,7 +567,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               },
               {
                 "id": "ComplexFixedListField",
@@ -595,7 +621,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               },
               {
                 "id": "ComplexNestedField",
@@ -646,7 +674,9 @@
                       ],
                       "complexACLs": [],
                       "display_context": null,
-                      "display_context_parameter": null
+                      "display_context_parameter": null,
+                      "formatted_value": null,
+                      "default_value": null
                     },
                     {
                       "id": "NestedCollectionTextField",
@@ -690,7 +720,9 @@
                       ],
                       "complexACLs": [],
                       "display_context": null,
-                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)"
+                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
+                      "formatted_value": null,
+                      "default_value": null
                     }
                   ],
                   "collection_field_type": null
@@ -711,7 +743,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               }
             ],
             "collection_field_type": null
@@ -719,6 +753,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -732,7 +767,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "AddressUKField",
@@ -782,7 +818,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               },
               {
                 "id": "AddressLine2",
@@ -817,7 +855,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               },
               {
                 "id": "AddressLine3",
@@ -852,7 +892,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               },
               {
                 "id": "PostTown",
@@ -887,7 +929,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               },
               {
                 "id": "County",
@@ -922,7 +966,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               },
               {
                 "id": "PostCode",
@@ -957,7 +1003,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               },
               {
                 "id": "Country",
@@ -992,7 +1040,9 @@
                 ],
                 "complexACLs": [],
                 "display_context": null,
-                "display_context_parameter": null
+                "display_context_parameter": null,
+                "formatted_value": null,
+                "default_value": null
               }
             ],
             "collection_field_type": null
@@ -1000,6 +1050,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -1013,7 +1064,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "DocumentField",
@@ -1035,6 +1087,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -1048,7 +1101,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         },
         {
           "id": "FixedRadioListField",
@@ -1086,6 +1140,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
@@ -1099,7 +1154,8 @@
               "update": true,
               "delete": false
             }
-          ]
+          ],
+          "default_value": null
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",

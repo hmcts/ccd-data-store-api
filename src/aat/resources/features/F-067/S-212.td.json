@@ -9,6 +9,9 @@
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers" : {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
+    },
     "body": {
       "tabs": "[[ANYTHING_PRESENT]]",
       "metadataFields": null,

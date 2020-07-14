@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.types;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,29 +16,30 @@ public class BaseType {
     private final String type;
     private final String regularExpression;
 
-    BaseType(final FieldType fieldType) {
-        type = fieldType.getType();
-        regularExpression = fieldType.getRegularExpression();
+    public BaseType(final FieldTypeDefinition fieldTypeDefinition) {
+        type = fieldTypeDefinition.getType();
+        regularExpression = fieldTypeDefinition.getRegularExpression();
     }
 
-    static void setCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
+    public static void setCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
+                                                   final CaseDefinitionRepository caseDefinitionRepository) {
         BaseType.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     /**
      * This needs to be lazily initialised as it would prevent startup of the application otherwise.
      */
-    static void initialise() {
+    public static void initialise() {
         BaseType.caseDefinitionRepository.getBaseTypes()
             .forEach(fieldType -> BaseType.register(new BaseType(fieldType)));
         BaseType.initialised = Boolean.TRUE;
     }
 
-    static void register(final BaseType baseType) {
+    public static void register(final BaseType baseType) {
         BASE_TYPES.put(baseType.getType().toUpperCase(), baseType);
     }
 
-    static BaseType get(final String type) {
+    public static BaseType get(final String type) {
         if (!BaseType.initialised) {
             BaseType.initialise();
         }
@@ -46,7 +47,7 @@ public class BaseType {
         return BASE_TYPES.get(type.toUpperCase());
     }
 
-    static Boolean contains(final String type) {
+    public static Boolean contains(final String type) {
         if (!BaseType.initialised) {
             BaseType.initialise();
         }
@@ -54,7 +55,7 @@ public class BaseType {
         return BASE_TYPES.keySet().contains(type.toUpperCase());
     }
 
-    String getType() {
+    public String getType() {
         return type;
     }
 

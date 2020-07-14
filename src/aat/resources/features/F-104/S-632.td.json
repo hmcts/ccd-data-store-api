@@ -1,0 +1,94 @@
+{
+  "_guid_": "S-632",
+  "_extends_": "F-104_Test_Data_Base",
+  "specs": [
+    "a caseworker-autotest1-senior role",
+    "is configured to search for the previously created case via exact match",
+    "is using the query parameter usecase=workbasket",
+    "contains headers only for fields the user has role access to",
+    "contains data only for fields the user has role access to"
+  ],
+  "user" : {
+    "username": "[[$CCD_RESTRICTED_CASEWORKER_EMAIL]]",
+    "password": "[[$CCD_RESTRICTED_CASEWORKER_PASSWORD]]"
+  },
+  "request": {
+    "queryParams": {
+      "usecase": "WORKBASKET"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "headers": [
+        {
+          "metadata": {
+            "jurisdiction": "AUTOTEST1",
+            "case_type_id": "AAT_PRIVATE"
+          },
+          "fields": [
+            {
+              "__operator__": "equivalent",
+              "__ordering__": "unordered",
+              "__elementId__": "label"
+            },
+            {
+              "label": "`Money` workbasket",
+              "order": 3,
+              "metadata": false,
+              "case_field_id": "MoneyGBPField",
+              "case_field_type": {
+                "id": "MoneyGBP",
+                "type": "MoneyGBP",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [],
+                "complex_fields": [],
+                "collection_field_type": null
+              },
+              "display_context_parameter": null
+            }
+          ],
+          "cases": "[[ANYTHING_PRESENT]]"
+        }
+      ],
+      "cases": [
+        {
+          "fields": {
+            "MoneyGBPField": "1000",
+            "[JURISDICTION]": "AUTOTEST1",
+            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+            "[STATE]": "TODO",
+            "[SECURITY_CLASSIFICATION]": "PRIVATE",
+            "[CASE_TYPE]": "AAT_PRIVATE",
+            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+          },
+          "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
+          "fields_formatted": {
+            "MoneyGBPField": "1000",
+            "[JURISDICTION]": "AUTOTEST1",
+            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+            "[STATE]": "TODO",
+            "[SECURITY_CLASSIFICATION]": "PRIVATE",
+            "[CASE_TYPE]": "AAT_PRIVATE",
+            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+          }
+        }
+      ],
+      "total": 1
+    }
+  }
+
+}

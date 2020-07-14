@@ -3,11 +3,7 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -16,26 +12,19 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.SearchInputsViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.WorkbasketInputsViewResource;
 
 import javax.inject.Inject;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UIDefinitionControllerIT extends WireMockBaseTest {
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
 
     @Inject
     private WebApplicationContext wac;
@@ -44,9 +33,6 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
 
     @Before
     public void setUp() {
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
@@ -64,8 +50,8 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        UIWorkbasketInputsResource response = mapper.readValue(result.getResponse().getContentAsString(), UIWorkbasketInputsResource.class);
-        UIWorkbasketInputsResource.UIWorkbasketInput[] workbasketInputs = response.getWorkbasketInputs();
+        WorkbasketInputsViewResource response = mapper.readValue(result.getResponse().getContentAsString(), WorkbasketInputsViewResource.class);
+        WorkbasketInputsViewResource.WorkbasketInputView[] workbasketInputs = response.getWorkbasketInputs();
 
         assertThat(workbasketInputs[0].getLabel(), is("First Name"));
         assertThat(workbasketInputs[0].getField().getId(), is("PersonFirstName"));
@@ -87,8 +73,8 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        UISearchInputsResource response = mapper.readValue(result.getResponse().getContentAsString(), UISearchInputsResource.class);
-        UISearchInputsResource.UISearchInput[] searchInputs = response.getSearchInputs();
+        SearchInputsViewResource response = mapper.readValue(result.getResponse().getContentAsString(), SearchInputsViewResource.class);
+        SearchInputsViewResource.SearchInputView[] searchInputs = response.getSearchInputs();
 
         assertThat(searchInputs[0].getLabel(), is("First Name"));
         assertThat(searchInputs[0].getField().getId(), is("PersonFirstName"));
