@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-105-Prerequisite_Counter_Check_Call",
+  "_guid_": "F-105_Prerequisite_Counter_Check_Call",
   "_extends_": "F-105_Check_Orgs_Assigned_Users_Base",
 
   "specs": [

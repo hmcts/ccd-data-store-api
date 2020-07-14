@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-105.8842.1.Verify_Counter_3",
-  "_extends_": "S-105.8842.1.Verify_Counter_1",
+  "_guid_": "F-105.8842.1.Verify_Counter_3",
+  "_extends_": "F-105.8842.1.Verify_Counter_1",
 
   "specs": [
     "to verify the count of users assigned to a case has increased by 1"
