@@ -1,0 +1,8 @@
+{
+  "_guid_": "S-105.8842.1.Verify_Counter_2",
+  "_extends_": "S-105.8842.1.Verify_Counter_1",
+
+  "specs": [
+    "to verify the count of users assigned to C1 has NOT increased"
+  ]
+}
