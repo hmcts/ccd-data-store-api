@@ -5,13 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class CaseTypesResults {
 
     @JsonProperty("case_field_id")
-    private final String caseTypeId;
-    private final long total;
+    private String caseTypeId;
+    private long total;
 
     public CaseTypesResults(String caseFieldId, long numberOfMatchedCases) {
 
         this.caseTypeId = caseFieldId;
         this.total = numberOfMatchedCases;
+    }
+
+    public CaseTypesResults() {
     }
 
     public String getCaseTypeId() {
