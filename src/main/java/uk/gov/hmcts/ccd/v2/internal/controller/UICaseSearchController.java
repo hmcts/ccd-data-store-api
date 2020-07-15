@@ -120,7 +120,7 @@ public class UICaseSearchController {
                                      @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` or `orgCases`. "
                                          + "Used when the list of fields to return is configured in the CCD definition.\n"
                                          + "If omitted, all case fields are returned.")
-                                     @RequestParam(value = "usecase", required = false) final String useCase,
+                                     @RequestParam(value = "use_case", required = false) final String useCase,
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 
