@@ -15,7 +15,9 @@
     },
     "body": {
       "data": {
-        "_extends_": "F-059_Common_Data_In_Body"
+        "_extends_": "F-059_Case_Data_Base",
+        "FormattedDateField": "1970-01-21",
+        "FormattedDateTimeField": "2019-01-21T00:05:00.000"
       }
     }
   }

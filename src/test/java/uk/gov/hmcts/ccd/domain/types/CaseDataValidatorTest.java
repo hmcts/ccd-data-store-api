@@ -363,6 +363,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     /**
      * This test is only meant to ensure that validators are invoked and not to test the TextValidator which has it own test.
      */
+    @Test
     public void textFieldWithInvalidMaxMin() throws Exception {
         final String caseFieldString =
             "[{\n" +

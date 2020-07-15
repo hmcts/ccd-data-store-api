@@ -26,7 +26,11 @@ import static org.junit.Assert.assertThat;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static wiremock.com.google.common.collect.Lists.newArrayList;
-import static wiremock.org.apache.http.entity.ContentType.TEXT_PLAIN;
+import static wiremock.org.apache.http.entity.ContentType.APPLICATION_JSON;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @TestPropertySource(properties = {"http.client.connection.timeout=1500",
     "http.client.max.total=1",
@@ -39,12 +43,12 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
     @Autowired
     private RestTemplate restTemplate;
 
-    private static final String RESPONSE_BODY = "Of course la la land";
+    private static final String RESPONSE_BODY = "{ \"test\": \"name\"}";
     private static final String URL = "/ng/itb";
-    private static final String MIME_TYPE = TEXT_PLAIN.getMimeType();
+    private static final String MIME_TYPE = APPLICATION_JSON.getMimeType();
 
     @Test
-    public void restTemplateShouldBeUsable() {
+    public void restTemplateShouldBeUsable() throws Exception {
         assertNotNull(restTemplate);
 
         stubResponse();
@@ -53,7 +57,7 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
             request =
             new RequestEntity<>(PUT, URI.create("http://localhost:" + wiremockPort + URL));
 
-        final ResponseEntity<String> response = restTemplate.exchange(request, String.class);
+        final ResponseEntity<JsonNode> response = restTemplate.exchange(request, JsonNode.class);
         assertResponse(response);
     }
 
@@ -82,7 +86,7 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
                 final RequestEntity<String>
                     request =
                     new RequestEntity<>(PUT, URI.create("http://localhost:" + wiremockPort + URL));
-                final ResponseEntity<String> response = restTemplate.exchange(request, String.class);
+                final ResponseEntity<JsonNode> response = restTemplate.exchange(request, JsonNode.class);
                 assertResponse(response);
                 return response.getStatusCode().value();
             }));
@@ -97,12 +101,14 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
 
     private void stubResponse() {
         stubFor(put(urlEqualTo(URL)).willReturn(aResponse().withStatus(SC_OK)
-                                                           .withHeader(CONTENT_TYPE, MIME_TYPE)
-                                                           .withBody(RESPONSE_BODY)));
+            .withHeader(CONTENT_TYPE, MIME_TYPE)
+            .withBody(RESPONSE_BODY)));
     }
 
-    private void assertResponse(final ResponseEntity<String> response) {
-        assertThat(response.getBody(), is(RESPONSE_BODY));
+    private void assertResponse(final ResponseEntity<JsonNode> response) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        assertThat(response.getBody(), is(objectMapper.readValue(RESPONSE_BODY, JsonNode.class)));
         assertThat(response.getHeaders().get(CONTENT_TYPE), contains(MIME_TYPE));
         assertThat(response.getStatusCode().value(), is(SC_OK));
     }

@@ -16,13 +16,13 @@ public class CriteraTest {
     @Test
     public void checkFieldDataCreationTestCriteraString() {
         FieldDataCriterion subject = new FieldDataCriterion(FIELD_DATA_1, FIELD_DATA_1_VALUE);
-        assertTrue(subject.buildClauseString(1, "AND").contains(FIELD_DATA_1_CONVERTED));
+        assertTrue(subject.buildClauseString("AND").contains(FIELD_DATA_1_CONVERTED));
     }
 
     @Test
     public void checkMetaDataCreationTestCriteraString() {
         MetaDataCriterion subject = new MetaDataCriterion(META_DATA_1, META_DATA_1_VALUE);
-        assertTrue(subject.buildClauseString(1, "AND").contains(META_DATA_1));
+        assertTrue(subject.buildClauseString("AND").contains(META_DATA_1));
     }
 
 }
