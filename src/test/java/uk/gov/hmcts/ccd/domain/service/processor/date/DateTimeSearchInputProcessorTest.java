@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.processor;
+package uk.gov.hmcts.ccd.domain.service.processor.date;
 
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
@@ -22,6 +22,8 @@ import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchInputProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,7 +38,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
-class SearchInputProcessorTest {
+class DateTimeSearchInputProcessorTest {
 
     private static final String DATE_FIELD = "DateField";
     private static final String DATETIME_FIELD = "DateTimeField";
@@ -52,7 +54,7 @@ class SearchInputProcessorTest {
     private MetaData metaData;
 
     @InjectMocks
-    private SearchInputProcessor searchInputProcessor;
+    private DateTimeSearchInputProcessor dateTimeSearchInputProcessor;
 
     @Mock
     private DateTimeFormatParser dateTimeFormatParser;
@@ -87,7 +89,7 @@ class SearchInputProcessorTest {
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-10-10");
         when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "30/01/1990")).thenReturn("1990-01-30");
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -107,7 +109,7 @@ class SearchInputProcessorTest {
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-10-10");
         when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "30/01/1990")).thenReturn("1990-01-30");
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.SEARCH));
         assertAll(
@@ -130,7 +132,7 @@ class SearchInputProcessorTest {
         queryParams.put("ComplexField.NestedField", "2020");
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -151,7 +153,7 @@ class SearchInputProcessorTest {
         queryParams.put("ComplexField.NestedField", "2020");
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.SEARCH));
         assertAll(
@@ -170,7 +172,7 @@ class SearchInputProcessorTest {
         queryParams.put("ComplexField.NestedField", "2020");
         when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020")).thenReturn("2020-01-01T00:00:00.000");
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -189,7 +191,7 @@ class SearchInputProcessorTest {
         queryParams.put("ComplexField.NestedField", "2020");
         when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020")).thenReturn("2020-01-01T00:00:00.000");
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.SEARCH));
         assertAll(
@@ -210,7 +212,7 @@ class SearchInputProcessorTest {
         queryParams.put("CollectionField.0.value", "2020");
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -224,7 +226,7 @@ class SearchInputProcessorTest {
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("New Id", "New Value");
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
 
         assertAll(
             () -> assertThat(result.size(), is(1)),
@@ -240,12 +242,12 @@ class SearchInputProcessorTest {
             .thenThrow(DateTimeParseException.class);
 
         DataProcessingException exception = assertThrows(DataProcessingException.class,
-            () -> searchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams)
+            () -> dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams)
         );
 
         assertAll(
             () -> assertThat(exception.getDetails(),
-                is("Unable to process input DateField with value Invalid Value. Expected format: yyyy"))
+                is("Unable to process search input DateField with value Invalid Value. Expected format: yyyy"))
         );
     }
 
@@ -278,7 +280,7 @@ class SearchInputProcessorTest {
         queryParams.put("ComplexField.OtherNestedField", "2005-05-05");
         queryParams.put("CollectionField.0.value", "2006-06-06");
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         verifyNoMoreInteractions(dateTimeFormatParser);
         assertAll(
@@ -304,7 +306,7 @@ class SearchInputProcessorTest {
         metaData.setCreatedDate(Optional.of("2020"));
         when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
 
-        MetaData result = searchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
+        MetaData result = dateTimeSearchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -325,7 +327,7 @@ class SearchInputProcessorTest {
         metaData.setCreatedDate(Optional.of("2020"));
         when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
 
-        MetaData result = searchInputProcessor.executeMetadata(DEFAULT_VIEW, metaData);
+        MetaData result = dateTimeSearchInputProcessor.executeMetadata(DEFAULT_VIEW, metaData);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.SEARCH));
         assertAll(
@@ -345,7 +347,7 @@ class SearchInputProcessorTest {
         doReturn(criteriaInputs).when(getCriteriaOperation).execute(Mockito.any(), Mockito.any(), Mockito.any());
         metaData.setCreatedDate(Optional.of("abc"));
 
-        MetaData result = searchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
+        MetaData result = dateTimeSearchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -364,7 +366,7 @@ class SearchInputProcessorTest {
         doReturn(criteriaInputs).when(getCriteriaOperation).execute(Mockito.any(), Mockito.any(), Mockito.any());
         metaData.setCreatedDate(Optional.of("abc"));
 
-        MetaData result = searchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
+        MetaData result = dateTimeSearchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -384,7 +386,7 @@ class SearchInputProcessorTest {
         doReturn(criteriaInputs).when(getCriteriaOperation).execute(Mockito.any(), Mockito.any(), Mockito.any());
         metaData.setState(Optional.of("TODO"));
 
-        MetaData result = searchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
+        MetaData result = dateTimeSearchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -403,7 +405,7 @@ class SearchInputProcessorTest {
         doReturn(criteriaInputs).when(getCriteriaOperation).execute(Mockito.any(), Mockito.any(), Mockito.any());
         metaData.setCreatedDate(Optional.empty());
 
-        MetaData result = searchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
+        MetaData result = dateTimeSearchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -422,7 +424,7 @@ class SearchInputProcessorTest {
         doReturn(criteriaInputs).when(getCriteriaOperation).execute(Mockito.any(), Mockito.any(), Mockito.any());
 
         DataProcessingException exception = assertThrows(DataProcessingException.class,
-            () -> searchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData)
+            () -> dateTimeSearchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData)
         );
 
         assertAll(
@@ -444,12 +446,12 @@ class SearchInputProcessorTest {
         when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "abc")).thenThrow(DateTimeException.class);
 
         DataProcessingException exception = assertThrows(DataProcessingException.class,
-            () -> searchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData)
+            () -> dateTimeSearchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData)
         );
 
         assertAll(
             () -> assertThat(exception.getMessage(), is("Processing of data failed")),
-            () -> assertThat(exception.getDetails(), is("Unable to process input [CREATED_DATE] with value abc. Expected format: yyyy"))
+            () -> assertThat(exception.getDetails(), is("Unable to process search input [CREATED_DATE] with value abc. Expected format: yyyy"))
         );
     }
 
@@ -457,7 +459,7 @@ class SearchInputProcessorTest {
     void shouldThrowDataProcessingException() {
         Map<String, String> queryParams = new HashMap<>();
 
-        Map<String, String> result = searchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         assertAll(
             () -> assertThat(result.size(), is(0))

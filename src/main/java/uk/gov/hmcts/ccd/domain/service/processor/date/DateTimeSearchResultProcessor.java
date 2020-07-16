@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.processor;
+package uk.gov.hmcts.ccd.domain.service.processor.date;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,11 +9,11 @@ import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.*;
-import uk.gov.hmcts.ccd.domain.types.BaseType;
-import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
+import uk.gov.hmcts.ccd.domain.model.search.CommonViewHeader;
+import uk.gov.hmcts.ccd.domain.model.search.CommonViewItem;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,13 +21,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
-
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEDISPLAY;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
 import static uk.gov.hmcts.ccd.domain.service.processor.FieldProcessor.isNullOrEmpty;
+import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser.DATE_TIME_FORMAT;
+import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 
 @Component
-public class SearchResultProcessor {
+public class DateTimeSearchResultProcessor {
 
     protected static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String FIELD_SEPARATOR = ".";
@@ -35,7 +36,7 @@ public class SearchResultProcessor {
     private final DateTimeFormatParser dateTimeFormatParser;
 
     @Autowired
-    public SearchResultProcessor(final DateTimeFormatParser dateTimeFormatParser) {
+    public DateTimeSearchResultProcessor(final DateTimeFormatParser dateTimeFormatParser) {
         this.dateTimeFormatParser = dateTimeFormatParser;
     }
 
@@ -68,7 +69,7 @@ public class SearchResultProcessor {
                 viewHeader.getCaseFieldId());
         } else if (object instanceof LocalDateTime) {
             return createTextNodeFrom(new TextNode(((LocalDateTime) object)
-                .format(DateTimeFormatter.ofPattern(DateTimeFormatParser.DATE_TIME_FORMAT))), viewHeader, viewHeader.getCaseFieldId());
+                .format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT))), viewHeader, viewHeader.getCaseFieldId());
         }
 
         return object;
@@ -83,19 +84,18 @@ public class SearchResultProcessor {
         }
 
         ObjectNode newNode = MAPPER.createObjectNode();
-        complexCaseFields.stream().forEach(complexCaseField -> {
+        complexCaseFields.forEach(complexCaseField -> {
             final String test = complexCaseField.getFieldTypeDefinition().getType();
-            final BaseType complexFieldType = BaseType.get(test);
             final String fieldId = complexCaseField.getId();
             final JsonNode caseFieldNode = originalNode.get(fieldId);
             final String fieldPath = fieldPrefix + FIELD_SEPARATOR + fieldId;
 
             if (isNullOrEmpty(caseFieldNode)) {
                 newNode.set(fieldId, caseFieldNode);
-            } else if (complexFieldType == BaseType.get(COLLECTION)) {
+            } else if (complexCaseField.isCollectionFieldType()) {
                 newNode.set(fieldId,
                     createArrayNodeFrom((ArrayNode) caseFieldNode, viewHeader, fieldPath));
-            } else if (complexFieldType == BaseType.get(COMPLEX)) {
+            } else if (complexCaseField.isComplexFieldType()) {
                 Optional.ofNullable(
                     createObjectNodeFrom((ObjectNode) caseFieldNode, viewHeader, complexCaseField.getFieldTypeDefinition().getComplexFields(), fieldPath))
                     .ifPresent(result -> newNode.set(fieldId, result));
@@ -114,21 +114,19 @@ public class SearchResultProcessor {
             return new TextNode(originalNode.asText());
         }
 
-        final Optional<CommonField> nestedField = viewHeader.getCaseFieldTypeDefinition().getNestedField(fieldPath, true);
-        final String displayContextParameter = nestedField
-            .map(CommonField::getDisplayContextParameter)
-            .orElse(viewHeader.getDisplayContextParameter());
+        Optional<CommonField> nestedField = viewHeader.getCaseFieldTypeDefinition().getNestedField(fieldPath, true);
+        CommonDCPModel dcpObject = nestedField.map(CommonDCPModel.class::cast).orElse(viewHeader);
 
-        return DisplayContextParameter.getDisplayContextParameterOfType(displayContextParameter, DisplayContextParameterType.DATETIMEDISPLAY)
+        return dcpObject.getDisplayContextParameter(DATETIMEDISPLAY)
             .map(dcp -> {
-                final String fieldType = nestedField
+                String fieldType = nestedField
                     .map(CommonField::getFieldTypeDefinition)
                     .map(FieldTypeDefinition::getType)
                     .orElseGet(() -> {
                         FieldTypeDefinition collectionFieldType = viewHeader.getCaseFieldTypeDefinition().getCollectionFieldTypeDefinition();
                         return collectionFieldType == null ? viewHeader.getCaseFieldTypeDefinition().getType() : collectionFieldType.getType();
                     });
-                if (fieldType.equals(FieldTypeDefinition.DATETIME) || viewHeader.isMetadata()) {
+                if (fieldType.equals(DATETIME) || viewHeader.isMetadata()) {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDateTime(dcp.getValue(), originalNode.asText()));
                 } else {
                     return new TextNode(dateTimeFormatParser.convertIso8601ToDate(dcp.getValue(), originalNode.asText()));
@@ -143,8 +141,8 @@ public class SearchResultProcessor {
         originalNode.forEach(item -> {
             JsonNode newItem = item.deepCopy();
             if (newItem.isObject()) {
-                ((ObjectNode)newItem).replace(CollectionValidator.VALUE,
-                    createCollectionValue(item.get(CollectionValidator.VALUE), viewHeader, fieldPrefix));
+                ((ObjectNode)newItem).replace(VALUE,
+                    createCollectionValue(item.get(VALUE), viewHeader, fieldPrefix));
             }
             newNode.add(newItem);
         });

@@ -23,12 +23,9 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
-import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
-import uk.gov.hmcts.ccd.domain.service.search.CaseSearchesViewAccessControl;
-import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
+import uk.gov.hmcts.ccd.domain.service.common.*;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
+import uk.gov.hmcts.ccd.domain.service.search.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -124,7 +121,7 @@ class CaseSearchResultViewGeneratorTest {
 
     private CaseSearchesViewAccessControl caseSearchesViewAccessControl;
     @Mock
-    private SearchResultProcessor searchResultProcessor;
+    private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
 
     private CaseSearchResultViewGenerator classUnderTest;
 
@@ -281,11 +278,11 @@ class CaseSearchResultViewGeneratorTest {
                 buildSearchResultField(CASE_TYPE_ID_2, CASE_FIELD_4, "", CASE_FIELD_4, "", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(caseType1SearchResult, caseType2SearchResult);
-        doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(any(), any());
+        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(any(), any());
         when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         classUnderTest = new CaseSearchResultViewGenerator(userRepository,
-            caseTypeService, searchResultDefinitionService, searchResultProcessor, caseSearchesViewAccessControl);
+            caseTypeService, searchResultDefinitionService, dateTimeSearchResultProcessor, caseSearchesViewAccessControl);
     }
 
     @Test
@@ -526,7 +523,7 @@ class CaseSearchResultViewGeneratorTest {
 
         classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
-        verify(searchResultProcessor).execute(any(), any());
+        verify(dateTimeSearchResultProcessor).execute(any(), any());
     }
 
     @Test
@@ -539,7 +536,7 @@ class CaseSearchResultViewGeneratorTest {
 
         classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
-        verifyNoMoreInteractions(searchResultProcessor);
+        verifyNoMoreInteractions(dateTimeSearchResultProcessor);
     }
 
     @Test
