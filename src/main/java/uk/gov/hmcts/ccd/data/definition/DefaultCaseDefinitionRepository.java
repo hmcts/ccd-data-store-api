@@ -225,13 +225,22 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("No values found Retrieving jurisdiction object(s) from definition store for all Jurisdiction.");
             Optional.of(Arrays.asList());
         }
-        final List<String> caseTypes = jurisdictionDefinitions.stream().flatMap(
+        final List<String> caseTypes = getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+        return Optional.of(caseTypes);
+    }
+
+    @Override
+    public List<String> getAllCaseTypesIDs() {
+        final List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Arrays.asList());
+        return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+    }
+
+    private List<String> getCaseTypeIdFromJurisdictionDefinition(List<JurisdictionDefinition> jurisdictionDefinitions) {
+        return jurisdictionDefinitions.stream().flatMap(
             jurisdictionDefinition -> jurisdictionDefinition.getCaseTypeDefinitions().stream().map(
                 caseTypeDefinition -> caseTypeDefinition.getId()
             )
         ).distinct().collect(Collectors.toList());
-
-        return Optional.of(caseTypes);
     }
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(List<String> jurisdictionIds) {

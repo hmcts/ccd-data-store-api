@@ -20,7 +20,8 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.UserService;
+import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
@@ -50,17 +51,17 @@ public class CaseSearchEndpoint {
     private final CaseSearchOperation caseSearchOperation;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
-                              UserService userService,
+                              @Qualifier(DefaultUserRepository.QUALIFIER)  UserRepository userRepository,
                               ElasticsearchQueryHelper elasticsearchQueryHelper) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping(value = "/searchCases")
@@ -107,7 +108,16 @@ public class CaseSearchEndpoint {
     }
 
     private List<String> getCaseTypes() {
-        final List<String> roles = userService.getUserRolesJurisdictions();
+
+        if (true) {
+            return caseDefinitionRepository.getAllCaseTypesIDs();
+        } else {
+            return getCaseTypesFromIdamRoles();
+        }
+    }
+
+    private List<String> getCaseTypesFromIdamRoles() {
+        List<String> roles = userRepository.getUserRolesJurisdictions();
         return caseDefinitionRepository.getAllCaseTypesByJurisdictions(roles).get();
     }
 
