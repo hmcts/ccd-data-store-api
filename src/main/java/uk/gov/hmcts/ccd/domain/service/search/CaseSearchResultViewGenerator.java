@@ -148,7 +148,7 @@ public class CaseSearchResultViewGenerator {
         if (addedFields.contains(id)) {
             return false;
         } else {
-            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole())) {
+            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.anyRoleEqualsTo(resultField.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {

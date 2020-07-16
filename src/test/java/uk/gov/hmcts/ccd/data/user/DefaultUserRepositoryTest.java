@@ -22,6 +22,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -71,6 +72,7 @@ class DefaultUserRepositoryTest {
     private static final String ROLE_CASEWORKER = "caseworker";
     private static final String ROLE_CASEWORKER_TEST = "caseworker-test";
     private static final String ROLE_CASEWORKER_CMC = "caseworker-cmc";
+    private static final String ROLE_CASEWORKER_CAA = "caseworker-caa";
     private static final String JURISDICTION_ID = "CMC";
     private static final String CITIZEN = "citizen";
     private static final String PROBATE_PRIVATE_BETA = "probate-private-beta";
@@ -90,6 +92,9 @@ class DefaultUserRepositoryTest {
 
     @Mock
     private Authentication authentication;
+
+    @Mock
+    private AuthCheckerConfiguration authCheckerConfiguration;
 
     @Mock
     private SecurityContext securityContext;
@@ -148,6 +153,25 @@ class DefaultUserRepositoryTest {
         }
 
         @Nested
+        @DisplayName("when caseworker-caa")
+        class WhenCaseworkerCaa {
+
+            @Test
+            @DisplayName("should only consider roles for given jurisdiction")
+            void shouldOnlyConsiderRolesForJurisdiction() {
+                asCaseworkerCaa();
+                when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(Arrays.asList(ROLE_CASEWORKER_CAA));
+                userRepository.getUserClassifications(JURISDICTION_ID);
+
+                assertAll(
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(
+                        singletonList(ROLE_CASEWORKER_CAA)),
+                    () -> verifyNoMoreInteractions(caseDefinitionRepository)
+                );
+            }
+        }
+
+        @Nested
         @DisplayName("when citizen")
         class WhenCitizen {
 
@@ -155,7 +179,10 @@ class DefaultUserRepositoryTest {
             @DisplayName("should consider `citizen` role")
             void shouldConsiderCitizen() {
                 asCitizen();
-
+                String[] roles = new String[2];
+                roles[0] = "citizen";
+                roles[1] = "letter-holder";
+                when(authCheckerConfiguration.getCitizenRoles()).thenReturn(roles);
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
@@ -169,6 +196,10 @@ class DefaultUserRepositoryTest {
             void shouldConsiderLetterHolder() {
                 asLetterHolderCitizen();
 
+                String[] roles = new String[2];
+                roles[0] = "citizen";
+                roles[1] = "letter-holder";
+                when(authCheckerConfiguration.getCitizenRoles()).thenReturn(roles);
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
@@ -340,7 +371,7 @@ class DefaultUserRepositoryTest {
         @DisplayName("should return highest security classification for user")
         void shouldReturnHighestClassification() {
             asCaseworker();
-
+            when(applicationParams.getCcdAccessControlCitizenRoles()).thenReturn(Arrays.asList("citizen", "letter-holder"));
             UserRole userRole1 = new UserRole();
             userRole1.setSecurityClassification(SecurityClassification.PRIVATE.name());
             UserRole userRole2 = new UserRole();
@@ -359,7 +390,7 @@ class DefaultUserRepositoryTest {
         @DisplayName("should throw exception when no user roles returned")
         void shouldThrowExceptionWhenNoUserRolesReturned() {
             asCaseworker();
-
+            when(applicationParams.getCcdAccessControlCitizenRoles()).thenReturn(emptyList());
             when(caseDefinitionRepository.getClassificationsForUserRoleList(anyList())).thenReturn(emptyList());
 
             assertThrows(ServiceException.class, () -> userRepository.getHighestUserClassification(JURISDICTION_ID));
@@ -460,6 +491,11 @@ class DefaultUserRepositoryTest {
                                                                                             .getAuthorities();
     }
 
+    private void asCaseworkerCaa() {
+        doReturn(newAuthorities(ROLE_CASEWORKER_CAA)).when(authentication)
+            .getAuthorities();
+    }
+    
     private void mockUserInfo(String userId) {
         mockUserInfo(userId, emptyList());
     }
