@@ -20,6 +20,13 @@
     "_extends_": "Common_Request",
     "pathVariables": {
       "cid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$inc": {
+          "orgs_assigned_users.orgA": 0
+        }
+      }
     }
   },
 
