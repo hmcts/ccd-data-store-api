@@ -83,12 +83,45 @@ class DefaultGetEventsOperationTest {
     }
 
     @Test
+    @DisplayName("should find case details and retrieve events from repository for case reference")
+    void shouldFindCaseDetailsAndGetEventsForCaseReference() {
+        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+
+        final List<AuditEvent> events = listEventsOperation.getEvents(CASE_REFERENCE);
+
+        assertAll(
+            () -> verify(auditEventRepository).findByCase(caseDetails),
+            () -> assertThat(events, sameInstance(EVENTS))
+        );
+    }
+
+    @Test
+    @DisplayName("should return resource not found exception when case details cannot be found for case reference")
+    void shouldReturnErrorWhenCaseDetailsCannotBeFoundForCaseReference() {
+        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
+        doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
+
+        assertThrows(ResourceNotFoundException.class,
+            () -> listEventsOperation.getEvents(CASE_REFERENCE));
+    }
+
+    @Test
+    @DisplayName("should return bad request exception when case reference invalid1 when only case reference is passed")
+    void shouldThrowBadRequestExceptionWhenCaseDetailsCannotBeFoundForCaseReference() {
+        doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
+
+        assertThrows(BadRequestException.class,
+            () -> listEventsOperation.getEvents(CASE_REFERENCE));
+    }
+
+
+    @Test
     @DisplayName("should return bad request exception when case reference invalid")
     void shouldThrowBadRequestExceptionWhenCaseDetailsCannotBeFound() {
         doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
 
-        assertThrows(BadRequestException.class,
-                     () -> listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+        assertThrows(BadRequestException.class, () -> listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
     }
 
     @Test
@@ -97,8 +130,7 @@ class DefaultGetEventsOperationTest {
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
-        assertThrows(ResourceNotFoundException.class,
-                     () -> listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+        assertThrows(ResourceNotFoundException.class, () -> listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
     }
 
     @Test
@@ -121,7 +153,6 @@ class DefaultGetEventsOperationTest {
     void shouldReturnErrorWhenEventCannotBeFound() {
         doReturn(Optional.empty()).when(auditEventRepository).findByEventId(EVENT_ID);
 
-        assertThrows(ResourceNotFoundException.class,
-                     () -> listEventsOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID));
+        assertThrows(ResourceNotFoundException.class, () -> listEventsOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID));
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -45,7 +47,7 @@ class CaseResourceTest {
 
     @BeforeEach
     void setUp() {
-        caseDetails = aCaseDetails();
+        caseDetails = caseDetails();
         caseDataContent = newCaseDataContent().build();
     }
 
@@ -53,7 +55,7 @@ class CaseResourceTest {
     @DisplayName("Get case")
     class GetCase {
 
-        private final String LINK_SELF = String.format("/cases/%s", REFERENCE);
+        private final String linkSelf = String.format("/cases/%s", REFERENCE);
 
         @Test
         @DisplayName("should copy case details")
@@ -83,7 +85,8 @@ class CaseResourceTest {
         void shouldLinkToSelf() {
             final CaseResource caseResource = new CaseResource(caseDetails);
 
-            assertThat(caseResource.getLink("self").getHref(), equalTo(LINK_SELF));
+            Optional<Link> self = caseResource.getLink("self");
+            assertThat(self.get().getHref(), equalTo(linkSelf));
         }
     }
 
@@ -91,7 +94,7 @@ class CaseResourceTest {
     @DisplayName("Create event")
     class CreateEvent {
 
-        private final String LINK_SELF = String.format("/cases/%s/events", REFERENCE);
+        private final String linkSelf = String.format("/cases/%s/events", REFERENCE);
 
         @Test
         @DisplayName("should copy case details")
@@ -121,7 +124,8 @@ class CaseResourceTest {
         void shouldLinkToSelf() {
             final CaseResource caseResource = new CaseResource(caseDetails, caseDataContent);
 
-            assertThat(caseResource.getLink("self").getHref(), equalTo(LINK_SELF));
+            Optional<Link> self = caseResource.getLink("self");
+            assertThat(self.get().getHref(), equalTo(linkSelf));
         }
     }
 
@@ -129,7 +133,7 @@ class CaseResourceTest {
     @DisplayName("Create case")
     class CreateCase {
 
-        private final String LINK_SELF = String.format("/case-types/%s/cases?ignore-warning=%s", CASE_TYPE, IGNORE_WARNING);
+        private final String linkSelf = String.format("/case-types/%s/cases?ignore-warning=%s", CASE_TYPE, IGNORE_WARNING);
 
         @Test
         @DisplayName("should copy case details")
@@ -159,11 +163,12 @@ class CaseResourceTest {
         void shouldLinkToSelf() {
             final CaseResource caseResource = new CaseResource(caseDetails, caseDataContent, IGNORE_WARNING);
 
-            assertThat(caseResource.getLink("self").getHref(), equalTo(LINK_SELF));
+            Optional<Link> self = caseResource.getLink("self");
+            assertThat(self.get().getHref(), equalTo(linkSelf));
         }
     }
 
-    private CaseDetails aCaseDetails() {
+    private CaseDetails caseDetails() {
         final CaseDetails caseDetails = new CaseDetails();
 
         caseDetails.setReference(REFERENCE);

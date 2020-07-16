@@ -7,8 +7,9 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEventBuilder;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -25,59 +26,59 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     private final StartEventOperation startEventOperation;
     private final UIDService uidService;
     private final DraftGateway draftGateway;
-    private final CaseEventTriggerBuilder caseEventTriggerBuilder;
+    private final CaseUpdateViewEventBuilder caseUpdateViewEventBuilder;
 
     @Autowired
     public DefaultGetEventTriggerOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                            final UIDService uidService,
                                            @Qualifier("authorised") final StartEventOperation startEventOperation,
                                            @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
-                                           final CaseEventTriggerBuilder caseEventTriggerBuilder) {
+                                           final CaseUpdateViewEventBuilder caseUpdateViewEventBuilder) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
         this.startEventOperation = startEventOperation;
         this.draftGateway = draftGateway;
-        this.caseEventTriggerBuilder = caseEventTriggerBuilder;
+        this.caseUpdateViewEventBuilder = caseUpdateViewEventBuilder;
     }
 
     @Override
-    public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
-        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCaseType(caseTypeId,
-                                                                                          eventTriggerId,
+    public CaseUpdateViewEvent executeForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
+        StartEventResult startEventResult = startEventOperation.triggerStartForCaseType(caseTypeId,
+                                                                                          eventId,
                                                                                           ignoreWarning);
-        return caseEventTriggerBuilder.build(startEventTrigger,
+        return caseUpdateViewEventBuilder.build(startEventResult,
                                              caseTypeId,
-                                             eventTriggerId,
+                                             eventId,
                                              null);
     }
 
     @Override
-    public CaseEventTrigger executeForCase(String caseReference,
-                                           String eventTriggerId,
-                                           Boolean ignoreWarning) {
+    public CaseUpdateViewEvent executeForCase(String caseReference,
+                                              String eventId,
+                                              Boolean ignoreWarning) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
 
-        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCase(caseReference,
-                                                                                      eventTriggerId,
+        StartEventResult startEventResult = startEventOperation.triggerStartForCase(caseReference,
+                                                                                      eventId,
                                                                                       ignoreWarning);
-        return caseEventTriggerBuilder.build(startEventTrigger,
+        return caseUpdateViewEventBuilder.build(startEventResult,
                                              caseDetails.getCaseTypeId(),
-                                             eventTriggerId,
+                                             eventId,
                                              caseReference);
     }
 
     @Override
-    public CaseEventTrigger executeForDraft(String draftReference,
-                                            Boolean ignoreWarning) {
+    public CaseUpdateViewEvent executeForDraft(String draftReference,
+                                               Boolean ignoreWarning) {
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
 
-        String eventTriggerId = draftResponse.getDocument().getEventTriggerId();
-        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForDraft(draftReference,
+        String eventId = draftResponse.getDocument().getEventId();
+        StartEventResult startEventResult = startEventOperation.triggerStartForDraft(draftReference,
                                                                                        ignoreWarning);
-        return caseEventTriggerBuilder.build(startEventTrigger,
+        return caseUpdateViewEventBuilder.build(startEventResult,
                                              caseDetails.getCaseTypeId(),
-                                             eventTriggerId,
+                                             eventId,
                                              draftReference);
     }
 

@@ -1,0 +1,29 @@
+{
+	"_guid_": "S-512",
+	"_extends_": "F-049_Test_Data_Base",
+	"title": "must return 404 when request contains a non-existing Case type ID",
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing Case type ID",
+		"code is HTTP-404"
+	],
+	"request": {
+		"pathVariables": {
+			"ctid": "Dummy"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+		"headers": {
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+			"message": "Resource not found when getting case type version for 'Dummy'.",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
+}
+

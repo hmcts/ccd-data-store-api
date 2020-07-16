@@ -1,0 +1,27 @@
+{
+  "_guid_": "S-205",
+  "_extends_": "F-036_Base_Test_Data",
+  "title": "must return 422 when case event has validation errors",
+  "specs": [
+    "an active profile in CCD",
+    "contains validation errors",
+    "contains HTTP 422 Unprocessable Entity"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "message" : "The case status did not qualify for the event",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

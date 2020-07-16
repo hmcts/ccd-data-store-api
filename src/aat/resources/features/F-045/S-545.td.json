@@ -1,0 +1,21 @@
+{
+	"title": "must return negative response when case id contains some non-numeric characters",
+	"_guid_": "S-545",
+	"_extends_": "F-045_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD",
+		"does not provide the numeric case id for the operation",
+		"has the 400 return code"
+	],
+	"request": {
+		"pathVariables": {
+			"cid": "1573751648840703AA"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_400_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}

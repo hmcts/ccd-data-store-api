@@ -15,19 +15,19 @@ public class FieldDataCriterion extends Criterion {
     }
 
     @Override
-    public String buildClauseString(int position, String operation) {
-        return convertFieldName(this.getField()) + operation + makeCaseInsensitive(POSITION_PREFIX + position);
+    public String buildClauseString(String operation) {
+        return convertFieldName(this.getField()) + operation + makeCaseInsensitive(PARAM_PREFIX + buildParameterId());
     }
 
     private String convertFieldName(String field) {
         return Optional.of(field)
             .map(this::removeFieldNameFilterPrefix)
-            .map(this::convertFieldNameToJSONBsqlFormat)
+            .map(this::convertFieldNameToJsonbSqlFormat)
             .map(this::makeCaseInsensitive)
             .orElseThrow(() -> new IllegalArgumentException("Field not found"));
     }
 
-    private String convertFieldNameToJSONBsqlFormat(final String in) {
+    private String convertFieldNameToJsonbSqlFormat(final String in) {
         return DATA_FIELD + " #>> '{" + StringUtils.replace(in, ".", ",") + "}'";
     }
 

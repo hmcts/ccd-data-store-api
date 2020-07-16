@@ -1,0 +1,18 @@
+{
+  "title": "must return 200 and a list of case ids a user has access to",
+  "_guid_": "S-097",
+  "_extends_": "F-047_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a list of case ids, along with an HTTP-200 OK"
+  ],
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type": "[[ANY_STRING_NULLABLE]]"
+    },
+    "body": {
+      "arrayInMap": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+	"_guid_": "S-133",
+	"_extends_": "Base_Expecting_400",
+	"title": "must return 400 if the sort direction in input parameters is not in ASC or DESC",
+
+	"productName": "CCD Data Store",
+	"operationName": "Get the pagination metadata for a case data search for Case Worker",
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+
+	"specs": [
+		"a detailed profile in CCD",
+		"contains an invalid Sort Direction",
+		"contains an error message : Unknown sort direction"
+	],
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT"
+		},
+		"queryParams": {
+			"sortDirection": "someInvalidSortDirection"
+		}
+	},
+	"expectedResponse": {
+    "_extends_": "Common_400_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+			"timestamp": "[[ANYTHING_PRESENT]]",
+			"message": "Unknown sort direction: someInvalidSortDirection",
+			"path": "[[ANYTHING_PRESENT]]",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
+}

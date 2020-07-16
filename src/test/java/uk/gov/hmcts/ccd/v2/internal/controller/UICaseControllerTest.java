@@ -1,13 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,8 +16,16 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIEventViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @DisplayName("UICaseController")
 class UICaseControllerTest {
@@ -74,7 +74,7 @@ class UICaseControllerTest {
         @Test
         @DisplayName("should return 200 when case found")
         void caseFound() {
-            final ResponseEntity<UICaseViewResource> response = caseController.getCase(CASE_REFERENCE);
+            final ResponseEntity<CaseViewResource> response = caseController.getCaseView(CASE_REFERENCE);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -88,7 +88,7 @@ class UICaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                () -> caseController.getCase(CASE_REFERENCE));
+                () -> caseController.getCaseView(CASE_REFERENCE));
         }
 
         @Test
@@ -97,7 +97,7 @@ class UICaseControllerTest {
             when(getCaseViewOperation.execute(CASE_REFERENCE)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class,
-                () -> caseController.getCase(CASE_REFERENCE));
+                () -> caseController.getCaseView(CASE_REFERENCE));
         }
     }
 
@@ -108,7 +108,7 @@ class UICaseControllerTest {
         @Test
         @DisplayName("should return 200 when event found")
         void caseFound() {
-            final ResponseEntity<UIEventViewResource> response = caseController.getCaseEvent(CASE_REFERENCE, EVENT_ID.toString());
+            final ResponseEntity<CaseHistoryViewResource> response = caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString());
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -123,7 +123,7 @@ class UICaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                () -> caseController.getCaseEvent(CASE_REFERENCE, EVENT_ID.toString()));
+                () -> caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString()));
         }
 
         @Test
@@ -132,7 +132,8 @@ class UICaseControllerTest {
             when(getCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class,
-                () -> caseController.getCaseEvent(CASE_REFERENCE, EVENT_ID.toString()));
+                () -> caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString()));
         }
     }
+
 }

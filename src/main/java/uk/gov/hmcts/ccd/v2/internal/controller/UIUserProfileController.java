@@ -14,8 +14,8 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetUserProfileOperat
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIUserProfileResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.UserProfileViewResource;
 
 @RestController
 @RequestMapping(path = "/internal")
@@ -46,13 +46,13 @@ public class UIUserProfileController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UICaseViewResource.class
+            response = CaseViewResource.class
         )
     })
-    public ResponseEntity<UIUserProfileResource> getUserProfile() {
+    public ResponseEntity<UserProfileViewResource> getUserProfile() {
 
         UserProfile userProfile = getUserProfileOperation.execute(AccessControlService.CAN_READ);
 
-        return ResponseEntity.ok(new UIUserProfileResource(userProfile));
+        return ResponseEntity.ok(new UserProfileViewResource(userProfile));
     }
 }

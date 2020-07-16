@@ -1,0 +1,29 @@
+{
+  "_guid_": "S-224",
+  "_extends_": "F-046_Base_Request_Data",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid authentication credentials in CCD",
+    "has a 401 Unauthorized code"
+  ],
+  "request": {
+    "pathVariables": {
+      "uid": "UserId",
+      "idToDelete": "UserIdToDelete",
+      "cid": "0123456789123456"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "Access Denied",
+      "path": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

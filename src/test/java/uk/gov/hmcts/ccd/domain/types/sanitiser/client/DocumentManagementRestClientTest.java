@@ -15,17 +15,21 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document._links;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static com.xebialabs.restito.builder.stub.StubHttp.whenHttp;
 import static com.xebialabs.restito.builder.verify.VerifyHttp.verifyHttp;
@@ -45,9 +49,9 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     private static final String FILENAME = "Seagulls_Sqaure.jpg";
     private static final String TYPE_DOCUMENT = "Document";
     private static final String DOCUMENT_FIELD_ID = "D8Document";
-    private static final FieldType DOCUMENT_FIELD_TYPE = new FieldType();
-    private static final CaseField DOCUMENT_FIELD = new CaseField();
-    private static final CaseType CASE_TYPE = new CaseType();
+    private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = new FieldTypeDefinition();
+    private static final CaseFieldDefinition DOCUMENT_FIELD = new CaseFieldDefinition();
+    private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
     private static final ObjectNode DOCUMENT_VALUE_INITIAL = JSON_FACTORY.objectNode();
     private static final ObjectNode DOCUMENT_VALUE_SANITISED = JSON_FACTORY.objectNode();
     private static final String BEARER_TEST_JWT = "Bearer testJwt";
@@ -66,9 +70,9 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         DOCUMENT_FIELD_TYPE.setId(TYPE_DOCUMENT);
         DOCUMENT_FIELD_TYPE.setType(TYPE_DOCUMENT);
         DOCUMENT_FIELD.setId(DOCUMENT_FIELD_ID);
-        DOCUMENT_FIELD.setFieldType(DOCUMENT_FIELD_TYPE);
+        DOCUMENT_FIELD.setFieldTypeDefinition(DOCUMENT_FIELD_TYPE);
 
-        CASE_TYPE.setCaseFields(Collections.singletonList(DOCUMENT_FIELD));
+        CASE_TYPE.setCaseFieldDefinitions(Collections.singletonList(DOCUMENT_FIELD));
         DOCUMENT_VALUE_INITIAL.put("document_url", DOCUMENT_URL);
         DOCUMENT_VALUE_SANITISED.put("document_url", DOCUMENT_URL);
         DOCUMENT_VALUE_SANITISED.put("document_binary_url", BINARY_URL);
@@ -91,6 +95,11 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         document.set_links(links);
         document.setOriginalDocumentName(FILENAME);
         subject = new DocumentManagementRestClient(securityUtils, restTemplate);
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
+        messageConverters.add(converter);
+        restTemplate.setMessageConverters(messageConverters);
     }
 
     @Test

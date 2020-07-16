@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-206",
+  "_extends_": "F-036_Base_Test_Data",
+  "title": "must return 422 when user role is missing",
+  "specs": [
+    "an active profile in CCD",
+    "where the user has insufficient privilege",
+    "contains HTTP 422 Unprocessable Entity"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "triggerId": "EVENT_D"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers" : {
+      "Content-Encoding" : "gzip"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "message" : "The case status did not qualify for the event",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

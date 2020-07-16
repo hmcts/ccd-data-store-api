@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-212",
+  "_extends_": "F-067_Test_Data_Base",
+  "title": "should retrieve case view with response code HTTP 200 when the case reference and case event exists",
+  "specs": [
+    "an active profile in CCD",
+    "contains the reference of the case just created and the event id valid for that case",
+    "contains HTTP 200 Ok"
+  ],
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": null,
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type": {
+        "id": "BEFTA_CASETYPE_1_1",
+        "name": "BEFTA Case Type 1 1",
+        "description": "Create a case of type BEFTA_CASETYPE_1_1",
+        "jurisdiction": {
+          "id": "BEFTA_JURISDICTION_1",
+          "name": "BEFTA_JURISDICTION_1",
+          "description": "Content for the Test Jurisdiction."
+        },
+        "printEnabled": false
+      },
+      "event": {
+        "id": "[[ANYTHING_PRESENT]]",
+        "timestamp": "[[ANYTHING_PRESENT]]",
+        "summary": "",
+        "comment": "",
+        "event_id": "CREATE",
+        "event_name": "Create a new case",
+        "user_id": "[[ANYTHING_PRESENT]]",
+        "user_last_name": "[[ANYTHING_PRESENT]]",
+        "user_first_name": "[[ANYTHING_PRESENT]]",
+        "state_name": "To do",
+        "state_id": "TODO",
+        "significant_item": null
+      }
+    }
+  }
+}

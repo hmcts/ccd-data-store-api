@@ -1,0 +1,309 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/case-type/CaseRolesCase"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "CaseRolesCase",
+      "version": {
+        "number": 1,
+        "live_from": "2017-01-01"
+      },
+      "name": "Test Case Roles Case",
+      "description": "Test Case Roles Case",
+      "jurisdiction": {
+        "id": "PROBATE",
+        "name": "Test",
+        "description": "Test Jurisdiction"
+      },
+      "security_classification": "PUBLIC",
+      "acls": [
+        {
+          "role": "caseworker-probate-public",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-probate-private",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "citizen",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        }],
+      "events": [
+        {
+          "id": "CREATE-CASE",
+          "name": "CREATE-CASE",
+          "description": "Creation event",
+          "order": 1,
+          "case_fields": [
+            {
+              "case_field_id": "PersonFirstName",
+              "display_context": "OPTIONAL",
+              "show_summary_content_option": 2
+            },
+            {
+              "case_field_id": "children",
+              "display_context": "OPTIONAL",
+              "show_summary_content_option": 2
+            }
+          ],
+          "pre_states": [],
+          "post_state": "CaseCreated",
+          "security_classification": "PRIVATE",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": false,
+              "delete": false
+            }
+          ],
+          "show_event_notes": true,
+          "can_save_draft": true
+        }
+      ],
+      "states": [
+        {
+          "id": "CaseCreated",
+          "name": "Case Created",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
+        }
+      ],
+      "case_fields": [
+        {
+          "id": "PersonFirstName",
+          "case_type_id": "CaseRolesCase",
+          "label": "First name",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": false,
+              "read": false,
+              "update": false,
+              "delete": false
+            },
+            {
+              "role": "[CREATOR]",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        },
+        {
+          "id": "children",
+          "label": "Child",
+          "hidden": null,
+          "value": null,
+          "metadata": false,
+          "hint_text": null,
+          "field_type": {
+            "id": "children-6ef44a57-2a34-4f96-85f4-388d96aaf608",
+            "type": "Collection",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": {
+              "id": "ChildrenNew",
+              "type": "Complex",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [
+                {
+                  "id": "ChildName",
+                  "case_type_id": "CaseRolesCase",
+                  "label": "Child name",
+                  "security_classification": "PUBLIC",
+                  "acls": [
+                    {
+                      "role": "caseworker-probate-public",
+                      "create": false,
+                      "read": false,
+                      "update": false,
+                      "delete": false
+                    },
+                    {
+                      "role": "[CREATOR]",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ],
+                  "field_type": {
+                    "type": "Text",
+                    "id": "Text"
+                  }
+                },
+                {
+                  "id": "hobbies",
+                  "label": "Hobbies",
+                  "hidden": null,
+                  "value": null,
+                  "metadata": false,
+                  "hint_text": null,
+                  "field_type": {
+                    "id": "hobbies-6ef44a57-2a34-4f96-85f4-388d96aaf666",
+                    "type": "Collection",
+                    "min": null,
+                    "max": null,
+                    "regular_expression": null,
+                    "fixed_list_items": [],
+                    "complex_fields": [],
+                    "collection_field_type": {
+                      "id": "HobbiesNew",
+                      "type": "Complex",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [
+                        {
+                          "id": "HobbyName",
+                          "case_type_id": "CaseRolesCase",
+                          "label": "Hobby name",
+                          "security_classification": "PUBLIC",
+                          "acls": [
+                            {
+                              "role": "caseworker-probate-public",
+                              "create": false,
+                              "read": false,
+                              "update": false,
+                              "delete": false
+                            },
+                            {
+                              "role": "[CREATOR]",
+                              "create": true,
+                              "read": true,
+                              "update": true,
+                              "delete": false
+                            }
+                          ],
+                          "field_type": {
+                            "type": "Text",
+                            "id": "Text"
+                          }
+                        }
+                      ],
+                      "collection_field_type": null
+                    }
+                  },
+                  "validation_expr": null,
+                  "security_label": "PUBLIC",
+                  "order": null,
+                  "display_context": "OPTIONAL",
+                  "display_context_parameter": null,
+                  "show_condition": null,
+                  "show_summary_change_option": true,
+                  "show_summary_content_option": null,
+                  "acls": [
+                    {
+                      "role": "[NO_CREATE_ROLE]",
+                      "create": true,
+                      "read": false,
+                      "update": false,
+                      "delete": false
+                    },
+                    {
+                      "role": "[CAN_READ]",
+                      "create": false,
+                      "read": true,
+                      "update": false,
+                      "delete": false
+                    },
+                    {
+                      "role": "[CAN_UPDATE]",
+                      "create": false,
+                      "read": false,
+                      "update": true,
+                      "delete": false
+                    },
+                    {
+                      "role": "[CAN_DELETE]",
+                      "create": false,
+                      "read": false,
+                      "update": false,
+                      "delete": true
+                    }
+                  ]
+                }
+              ],
+              "collection_field_type": null
+            }
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "display_context": "OPTIONAL",
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": true,
+          "show_summary_content_option": null,
+          "acls": [
+            {
+              "role": "[CAN_CREATE]",
+              "create": true,
+              "read": false,
+              "update": false,
+              "delete": false
+            },
+            {
+              "role": "[CAN_READ]",
+              "create": false,
+              "read": true,
+              "update": false,
+              "delete": false
+            },
+            {
+              "role": "[CAN_UPDATE]",
+              "create": false,
+              "read": false,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "[CAN_DELETE]",
+              "create": false,
+              "read": false,
+              "update": false,
+              "delete": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

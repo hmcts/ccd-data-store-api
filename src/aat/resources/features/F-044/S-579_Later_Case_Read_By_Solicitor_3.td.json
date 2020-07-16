@@ -1,0 +1,115 @@
+{
+  "title": "Get the case for read by a solicitor",
+  "_extends_": "S-579_Get_Case_For_Case_Worker_Data_Base",
+  "_guid_": "S-579_Later_Case_Read_By_Solicitor_3",
+  "specs": [
+    "to get the same case by Solicitor 3, who doesn't have READ permission"
+  ],
+  "user": {
+    "username": "befta.caseworker.2.solicitor.3@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_2",
+      "ctid": "BEFTA_CASETYPE_2_1"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "version": 2,
+      "case_data": {
+        "DocumentField4": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
+          "document_filename": "Screenshot 2019-11-14 at 1.57.32 pm.png",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary"
+        },
+        "DocumentField3": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/68c9f85f-1d0c-4d02-b082-502a87c1ac6c",
+          "document_filename": "Screenshot 2019-11-13 at 9.52.02 am.png",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/68c9f85f-1d0c-4d02-b082-502a87c1ac6c/binary"
+        },
+        "DocumentField6": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/76976634-374f-472b-a819-a3a938b4cc83",
+          "document_filename": "Screenshot 2019-11-13 at 11.25.45 am.png",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/76976634-374f-472b-a819-a3a938b4cc83/binary"
+        },
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4",
+          "document_filename": "Screenshot 2019-11-13 at 3.24.26 pm.png",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4/binary"
+        }
+      },
+      "data_classification": {
+        "DocumentField4": "PUBLIC",
+        "MoneyGBPField": "PUBLIC",
+        "DocumentField3": "PUBLIC",
+        "FixedListField": "PUBLIC",
+        "AddressUKField": {
+          "value": {
+            "County": "PUBLIC",
+            "Country": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "DocumentField6": "PUBLIC",
+        "DocumentField1": "PUBLIC",
+        "FixedRadioListField": "PUBLIC",
+        "DateTimeField": "PUBLIC",
+        "PhoneUKField": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectListField": "PUBLIC",
+        "YesOrNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "CollectionField": {
+          "value": [],
+          "classification": "PUBLIC"
+        }
+      },
+      "security_classifications": {
+        "DocumentField4": "PUBLIC",
+        "MoneyGBPField": "PUBLIC",
+        "DocumentField3": "PUBLIC",
+        "FixedListField": "PUBLIC",
+        "AddressUKField": {
+          "value": {
+            "County": "PUBLIC",
+            "Country": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "DocumentField6": "PUBLIC",
+        "DocumentField1": "PUBLIC",
+        "FixedRadioListField": "PUBLIC",
+        "DateTimeField": "PUBLIC",
+        "PhoneUKField": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectListField": "PUBLIC",
+        "YesOrNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "CollectionField": {
+          "value": [],
+          "classification": "PUBLIC"
+        }
+      }
+    }
+  }
+}

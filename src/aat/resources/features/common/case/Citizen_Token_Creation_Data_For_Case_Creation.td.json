@@ -1,0 +1,62 @@
+{
+  "_guid_": "Citizen_Token_Creation_Data_For_Case_Creation",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Citizen",
+  "method": "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+
+  "specs": [
+    "to create a token for case creation as a citizen"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.citizen.3@gmail.com",
+      "password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_3",
+      "ctid": "BEFTA_CASETYPE_3_2",
+      "etid": "CREATE"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+    },
+    "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "case_details": {
+        "id": null,
+        "jurisdiction": "BEFTA_JURISDICTION_3",
+        "state": null,
+        "version": null,
+        "case_type_id": "BEFTA_CASETYPE_3_2",
+        "created_date": null,
+        "last_modified": null,
+        "last_state_modified_date": null,
+        "security_classification": null,
+        "case_data": {},
+        "data_classification": {},
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": {}
+      },
+      "event_id": "CREATE"
+    }
+  }
+}

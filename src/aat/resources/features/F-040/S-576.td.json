@@ -1,0 +1,58 @@
+{
+  "title": "must return successfully all and only the respective fields with READ access for a Case Worker and a Solicitor",
+  "_extends_": "F-040_Test_Data_Base",
+  "_guid_": "S-576",
+  "specs": [
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "an active solicitor profile with another specific variation of ACLs on the same case type",
+    "an active Solicitor profile having full permissions on the same case type",
+    "is made by the privileged user who just created the case",
+    "contains values for all fields under the case type",
+    "does not contain document fields 1,3,6 for Solicitor 1 as it does not has read access on these fields",
+    "does not contain document fields 2,5,7 for Solicitor 3 as it does not has read access on these fields"
+  ],
+  "user": {
+    "username": "befta.caseworker.2.solicitor.2@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid":  "BEFTA_JURISDICTION_2",
+      "ctid": "BEFTA_CASETYPE_2_1"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_JURISDICTION_2",
+      "state": "TODO",
+      "version": 0,
+      "case_type_id": "BEFTA_CASETYPE_2_1",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data"
+      },
+      "data_classification": {
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null,
+      "security_classifications": {
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
+      }
+    }
+  }
+}

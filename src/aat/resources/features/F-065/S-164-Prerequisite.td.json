@@ -1,0 +1,38 @@
+{
+  "title": "should create an event token for correct inputs",
+  "_guid_": "S-164-Prerequisite",
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a create token",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "specs": [
+    "to get an event token for just created case"
+  ],
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT_AUTH_15",
+      "cid": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "etid": "UPDATE"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": "[[ANYTHING_PRESENT]]",
+      "event_id": "UPDATE"
+    }
+  }
+}

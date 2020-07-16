@@ -1,0 +1,205 @@
+{
+  "title": "should update an existing case with correct inputs",
+  "_guid_": "S-164-Prerequisite_Case_Update",
+
+  "productName": "CCD Data Store",
+  "operationName": "Submit update case event",
+  "method": "POST",
+
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+
+  "specs": [
+    "to update case with the token just created"
+  ],
+
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT_AUTH_15",
+      "cid": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "MoneyGBPField": "4300",
+        "FixedListField": "VALUE3",
+        "AddressUKField": {
+          "County": "Greater London",
+          "Country": "UK",
+          "PostCode": "SW1H 9AJ",
+          "PostTown": "Westminster",
+          "AddressLine1": "102 Petty France",
+          "AddressLine2": "CCD",
+          "AddressLine3": "c/o HMCTS Reform"
+        },
+        "ComplexField": {
+          "ComplexTextField": "Nested text",
+          "ComplexFixedListField": "VALUE2"
+        },
+        "DateTimeField": "1988-07-07T22:20:00",
+        "PhoneUKField": "07123456789",
+        "NumberField": "164528",
+        "MultiSelectListField": [
+          "OPTION2",
+          "OPTION4"
+        ],
+        "YesOrNoField": "Yes",
+        "EmailField": "ccd@hmcts.net",
+        "TextField": "Some Text",
+        "DateField": "2017-02-13",
+        "TextAreaField": "Line1\nLine2",
+        "CollectionField": [
+          {
+            "id": "4926d94c-1fa3-4c16-b5ba-5a122d8c622d",
+            "value": "Alias 1"
+          },
+          {
+            "id": "936b6a65-a179-474f-bdff-1d4f961e9a8c",
+            "value": "Alias 2"
+          }
+        ]
+      },
+      "event": {
+        "id": "UPDATE",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-164-Prerequisite][testData][actualResponse][body][token]}",
+      "ignore_warning": false
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body" : {
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "AUTOTEST1",
+      "state" : "TODO",
+      "version" : 1,
+      "case_type_id" : "AAT_AUTH_15",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date" : "[[ANYTHING_PRESENT]]",
+      "last_modified" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "case_data" : {
+        "MoneyGBPField" : "[[ANYTHING_PRESENT]]",
+        "FixedListField" : "VALUE3",
+        "AddressUKField" : {
+          "County" : "Greater London",
+          "Country" : "UK",
+          "PostCode" : "SW1H 9AJ",
+          "PostTown" : "Westminster",
+          "AddressLine1" : "102 Petty France",
+          "AddressLine2" : "CCD",
+          "AddressLine3" : "c/o HMCTS Reform"
+        },
+        "ComplexField" : {
+          "ComplexTextField" : "Nested text",
+          "ComplexFixedListField" : "VALUE2"
+        },
+        "DateTimeField" : "[[ANYTHING_PRESENT]]",
+        "PhoneUKField" : "07123456789",
+        "NumberField" : "164528",
+        "MultiSelectListField" : [ "OPTION2", "OPTION4" ],
+        "YesOrNoField" : "Yes",
+        "EmailField" : "ccd@hmcts.net",
+        "TextField" : "Some Text",
+        "DateField" : "2017-02-13",
+        "TextAreaField" : "Line1\nLine2",
+        "CollectionField" : [ {
+          "value" : "Alias 1",
+          "id" : "[[ANYTHING_PRESENT]]"
+        }, {
+          "value" : "Alias 2",
+          "id" : "[[ANYTHING_PRESENT]]"
+        } ]
+      },
+      "data_classification" : {
+        "MoneyGBPField" : "PUBLIC",
+        "FixedListField" : "PUBLIC",
+        "AddressUKField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "County" : "PUBLIC",
+            "Country" : "PUBLIC",
+            "PostCode" : "PUBLIC",
+            "PostTown" : "PUBLIC",
+            "AddressLine1" : "PUBLIC",
+            "AddressLine2" : "PUBLIC",
+            "AddressLine3" : "PUBLIC"
+          }
+        },
+        "DateTimeField" : "PUBLIC",
+        "PhoneUKField" : "PUBLIC",
+        "NumberField" : "PUBLIC",
+        "MultiSelectListField" : "PUBLIC",
+        "YesOrNoField" : "PUBLIC",
+        "EmailField" : "PUBLIC",
+        "TextField" : "PUBLIC",
+        "DateField" : "PUBLIC",
+        "TextAreaField" : "PUBLIC",
+        "CollectionField" : {
+          "classification" : "PUBLIC",
+          "value" : [ {
+            "id" : "[[ANYTHING_PRESENT]]",
+            "classification" : "PUBLIC"
+          }, {
+            "id" : "[[ANYTHING_PRESENT]]",
+            "classification" : "PUBLIC"
+          } ]
+        }
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null,
+      "security_classifications" : {
+        "MoneyGBPField" : "PUBLIC",
+        "FixedListField" : "PUBLIC",
+        "AddressUKField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "County" : "PUBLIC",
+            "Country" : "PUBLIC",
+            "PostCode" : "PUBLIC",
+            "PostTown" : "PUBLIC",
+            "AddressLine1" : "PUBLIC",
+            "AddressLine2" : "PUBLIC",
+            "AddressLine3" : "PUBLIC"
+          }
+        },
+        "DateTimeField" : "PUBLIC",
+        "PhoneUKField" : "PUBLIC",
+        "NumberField" : "PUBLIC",
+        "MultiSelectListField" : "PUBLIC",
+        "YesOrNoField" : "PUBLIC",
+        "EmailField" : "PUBLIC",
+        "TextField" : "PUBLIC",
+        "DateField" : "PUBLIC",
+        "TextAreaField" : "PUBLIC",
+        "CollectionField" : {
+          "classification" : "PUBLIC",
+          "value" : [ {
+            "id" : "[[ANYTHING_PRESENT]]",
+            "classification" : "PUBLIC"
+          }, {
+            "id" : "[[ANYTHING_PRESENT]]",
+            "classification" : "PUBLIC"
+          } ]
+        }
+      }
+    }
+  }
+}

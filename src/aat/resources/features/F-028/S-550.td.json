@@ -1,0 +1,27 @@
+{
+  "title": "must return appropriate negative response when Jurisdiction is invalid",
+  "_guid_": "S-550",
+  "_extends_": "F-028_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid Jurisdiction id",
+    "has the 403 return code"
+  ],
+  "request": {
+    "pathVariables": {
+      "jid": "AUTOTEST123",
+      "cid": "1573751648840703"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "message": "Access Denied"
+    }
+  }
+}

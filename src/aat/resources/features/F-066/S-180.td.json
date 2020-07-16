@@ -1,0 +1,31 @@
+{
+  "title": "must return negative response when request contains an invalid event trigger",
+	"_guid_": "S-180",
+  "_extends_": "F-066_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains an invalid event trigger",
+		"includes a HTTP 404 'Not Found'"
+	],
+  "request": {
+    "pathVariables": {
+      "cid": "[[DEFAULT_AUTO_VALUE]]",
+      "etid": "eyJhbGciOiJIUzI1NiJ9"
+    }
+  },
+	"expectedResponse": {
+    "_extends_": "Common_404_Response",
+		"headers": {
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body" : {
+      "exception" : "[[ANYTHING_PRESENT]]",
+      "message" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+	}
+}

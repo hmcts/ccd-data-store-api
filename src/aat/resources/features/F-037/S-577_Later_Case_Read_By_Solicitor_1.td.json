@@ -1,0 +1,61 @@
+{
+  "title": "Get the case for read by a solicitor",
+  "_extends_": "S-577_Get_Case_For_Case_Worker_Data_Base",
+  "_guid_": "S-577_Later_Case_Read_By_Solicitor_1",
+  "specs": [
+    "to get the same case by Solicitor 1"
+  ],
+  "user": {
+    "username": "befta.caseworker.2.solicitor.1@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_2",
+      "ctid": "BEFTA_CASETYPE_2_1"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "version": 1,
+      "case_data": {
+        "DocumentField4": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
+          "document_filename": "Screenshot 2019-11-14 at 1.57.32 pm.png",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary"
+        },
+        "DocumentField5": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/f96735a6-8764-4778-978c-e7612a610a94",
+          "document_filename": "Screenshot 2019-11-18 at 10.20.24 am.png",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/f96735a6-8764-4778-978c-e7612a610a94/binary"
+        },
+        "DocumentField2": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_filename": "Elastic Search test Case.png --> updated by Solicitor 2",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary"
+        },
+        "DocumentField7": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311",
+          "document_filename": "Screenshot 2019-12-24 at 3.41.04 pm.png",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311/binary"
+        }
+      },
+      "data_classification": {
+        "_extends_": "S-577_Response_Data_Classification",
+        "DocumentField4": "PUBLIC",
+        "DocumentField5": "PUBLIC",
+        "DocumentField2": "PUBLIC",
+        "DocumentField7": "PUBLIC"
+      },
+      "security_classifications": {
+        "_extends_": "S-577_Response_Data_Classification",
+        "DocumentField4": "PUBLIC",
+        "DocumentField5": "PUBLIC",
+        "DocumentField2": "PUBLIC",
+        "DocumentField7": "PUBLIC"
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "_guid_": "F-057_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Get the pagination metadata for a case data search for Citizen",
+  "method": "GET",
+  "user": {
+    "username": "befta.citizen.3@gmail.com",
+    "password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
+  },
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT"
+    }
+  }
+}

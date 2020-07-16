@@ -1,0 +1,28 @@
+{
+	"_guid_": "F-035_Base_Test_Data",
+	"productName": "CCD Data Store",
+	"operationName": "retrieve a case by id",
+	"method": "GET",
+	"uri": "/cases/{cid}",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+			"experimental": true
+		},
+		"pathVariables": {
+			"cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}

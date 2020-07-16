@@ -1,0 +1,72 @@
+{
+  "title": "Fire a CREATE event on the case just created",
+  "_guid_": "S-249_Update_Case_State",
+  "_extends_": "F-042_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "specs": [
+    "to fire a START_PROGRESS event on the case just created",
+    "has the 200 return code"
+  ],
+  "operationName": "to fire a START_PROGRESS event on the case just created",
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "cid": "${[scenarioContext][parentContext][childContexts][Case_Creation_Using_Caseworker1_Role][testData][actualResponse][body][id]}",
+      "jid": "BEFTA_JURISDICTION_1",
+      "ctid": "BEFTA_CASETYPE_1_1",
+      "etid": "START_PROGRESS"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": {
+        "id": "[[ANYTHING_PRESENT]]",
+        "jurisdiction": "BEFTA_JURISDICTION_1",
+        "state": "TODO",
+        "version": 0,
+        "case_type_id": "BEFTA_CASETYPE_1_1",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PUBLIC",
+        "case_data": {
+          "MoneyGBPField": "4200",
+          "YesOrNoField": "Yes",
+          "EmailField": "ccd@hmcts.net",
+          "TextField": "Some Text",
+          "PhoneUKField": "07123456789",
+          "NumberField": "164528"
+        },
+        "data_classification": {
+          "MoneyGBPField": "PUBLIC",
+          "YesOrNoField": "PUBLIC",
+          "EmailField": "PUBLIC",
+          "TextField": "PUBLIC",
+          "PhoneUKField": "PUBLIC",
+          "NumberField": "PUBLIC"
+        },
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": {
+          "MoneyGBPField": "PUBLIC",
+          "YesOrNoField": "PUBLIC",
+          "EmailField": "PUBLIC",
+          "TextField": "PUBLIC",
+          "PhoneUKField": "PUBLIC",
+          "NumberField": "PUBLIC"
+        }
+      },
+      "event_id": "START_PROGRESS"
+    }
+  }
+}

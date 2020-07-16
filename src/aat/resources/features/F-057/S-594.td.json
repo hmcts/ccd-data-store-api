@@ -1,0 +1,30 @@
+{
+  "title": "must return pagination metadata successfully for correct inputs",
+  "_guid_": "S-594",
+  "_extends_": "F-057_Test_Data_Base",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata?last_state_modified_date={date}",
+  "specs": [
+    "an active profile in CCD",
+    "provides correct inputs",
+    "has the 200 return code"
+  ],
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_3",
+      "ctid": "BEFTA_CASETYPE_3_4",
+      "date":"1970-01-01"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "total_results_count": 0,
+      "total_pages_count": 0
+    }
+  }
+}

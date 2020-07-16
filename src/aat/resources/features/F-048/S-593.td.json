@@ -1,0 +1,40 @@
+{
+	"_guid_": "S-593",
+	"_extends_": "Base_Expecting_200",
+	"title": "must return pagination metadata successfully for correct inputs",
+
+	"productName": "CCD Data Store",
+	"operationName": "Get the pagination metadata for a case data search for Case Worker",
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata?last_state_modified_date={date}",
+
+	"specs": [
+		"a detailed profile in CCD",
+		"is prepared with valid Jurisdiction, Case ID, User ID and Last State Modified Date",
+		"returns the pagination metadata",
+    "contains pagination results count as 0"
+	],
+  "user": {
+    "username": "befta.caseworker.3@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+  },
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_3",
+      "ctid": "BEFTA_CASETYPE_3_4",
+      "date":"1970-01-01"
+		}
+	},
+	"expectedResponse": {
+    "_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"total_results_count": 0,
+			"total_pages_count": 0
+		}
+	}
+}

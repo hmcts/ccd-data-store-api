@@ -1,0 +1,29 @@
+{
+	"title": "must return 404 when case id is structurally valid but not existing in CCD",
+	"_guid_": "S-152",
+	"_extends_": "F-045_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD",
+		"contains in input parameters a structurally valid but non-existing case-reference",
+		"has the 404 return code"
+	],
+	"request": {
+		"pathVariables": {
+			"cid": "157375164884070312"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+			"message": "[[ANYTHING_PRESENT]]",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
+}

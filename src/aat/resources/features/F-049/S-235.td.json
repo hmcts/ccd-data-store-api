@@ -1,0 +1,46 @@
+{
+	"_guid_": "S-235",
+	"_extends_": "F-049_Test_Data_Base",
+
+	"title": "must start the case creation process successfully for correct inputs",
+
+	"specs": [
+		"an active profile in CCD",
+		"code is HTTP-200"
+	],
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"token": "[[ANYTHING_PRESENT]]",
+			"case_details": {
+				"id": null,
+				"jurisdiction": "AUTOTEST1",
+				"state": null,
+				"version": null,
+				"case_type_id": "AAT",
+				"created_date": null,
+				"last_modified": null,
+				"last_state_modified_date": null,
+				"security_classification": null,
+				"case_data": {
+
+				},
+				"data_classification": {
+
+				},
+				"after_submit_callback_response": null,
+				"callback_response_status_code": null,
+				"callback_response_status": null,
+				"delete_draft_response_status_code": null,
+				"delete_draft_response_status": null,
+				"security_classifications": {
+
+				}
+			},
+			"event_id": "CREATE"
+		}
+	}
+}

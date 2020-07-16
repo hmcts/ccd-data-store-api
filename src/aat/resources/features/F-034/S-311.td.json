@@ -1,0 +1,30 @@
+{
+  "title": "must return 404 when event not provided",
+  "_guid_": "S-311",
+  "_extends_": "F-034_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid event id",
+    "contains HTTP 404 Not Found"
+  ],
+  "request": {
+    "pathVariables": {
+      "ctid": "AAT"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

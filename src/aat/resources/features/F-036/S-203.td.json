@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-203",
+  "_extends_": "F-036_Base_Test_Data",
+  "title": "must return 404 when event trigger is not found",
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid event trigger id",
+    "contains HTTP 404 Not Found"
+  ],
+  "request": {
+    "pathVariables": {
+      "triggerId": "INVALID_TRIGGER_ID"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "message" : "Cannot find event INVALID_TRIGGER_ID for case type AAT_AUTH_15",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

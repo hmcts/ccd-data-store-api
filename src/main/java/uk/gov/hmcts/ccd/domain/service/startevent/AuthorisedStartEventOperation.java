@@ -1,28 +1,18 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import java.util.Collections;
-
-import java.util.HashMap;
-import java.util.Set;
-
-import static com.google.common.collect.Maps.newHashMap;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -31,13 +21,14 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.Set;
+
+import static com.google.common.collect.Maps.newHashMap;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
 @Service
 @Qualifier("authorised")
 public class AuthorisedStartEventOperation implements StartEventOperation {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
 
     private final StartEventOperation startEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -65,14 +56,14 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
         return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForCaseType(caseTypeId,
-                                                                                        eventTriggerId,
+                                                                                        eventId,
                                                                                         ignoreWarning));
     }
 
     @Override
-    public StartEventTrigger triggerStartForCase(String caseReference, String eventTriggerId, Boolean ignoreWarning) {
+    public StartEventResult triggerStartForCase(String caseReference, String eventId, Boolean ignoreWarning) {
 
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
@@ -80,73 +71,70 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
         return caseDetailsRepository.findByReference(caseReference)
             .map(caseDetails -> verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForCase(caseReference,
-                                                                                                                      eventTriggerId,
+                                                                                                                      eventId,
                                                                                                                       ignoreWarning)))
             .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String draftReference,
-                                                  Boolean ignoreWarning) {
+    public StartEventResult triggerStartForDraft(String draftReference,
+                                                 Boolean ignoreWarning) {
 
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         return verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForDraft(draftReference,
-                                                                                                      ignoreWarning));
+            ignoreWarning));
     }
 
-    private CaseType getCaseType(String caseTypeId) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+    private CaseTypeDefinition getCaseType(String caseTypeId) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
-        return caseType;
+        return caseTypeDefinition;
     }
 
     private Set<String> getCaseRoles(CaseDetails caseDetails) {
         if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
-            return Collections.emptySet();
+            return caseAccessService.getCaseCreationCaseRoles();
         } else {
             return caseAccessService.getCaseRoles(caseDetails.getId());
         }
     }
 
+    private StartEventResult verifyReadAccess(final String caseTypeId, final StartEventResult startEventResult) {
 
-    private StartEventTrigger verifyReadAccess(final String caseTypeId, final StartEventTrigger startEventTrigger) {
+        final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
-        final CaseType caseType = getCaseType(caseTypeId);
+        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventResult.getCaseDetails()));
 
-        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventTrigger.getCaseDetails()));
-
-        CaseDetails caseDetails = startEventTrigger.getCaseDetails();
+        CaseDetails caseDetails = startEventResult.getCaseDetails();
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(
-            caseType,
+            caseTypeDefinition,
             userRoles,
             CAN_READ)) {
             caseDetails.setData(newHashMap());
             caseDetails.setDataClassification(newHashMap());
-            return startEventTrigger;
+            return startEventResult;
         }
 
         if (caseDetails != null) {
-            caseDetails.setData(MAPPER.convertValue(
+            caseDetails.setData(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                    caseType.getCaseFields(),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                    caseTypeDefinition.getCaseFieldDefinitions(),
                     userRoles,
                     CAN_READ,
-                    false),
-                STRING_JSON_MAP));
-            caseDetails.setDataClassification(MAPPER.convertValue(
+                    false)));
+            caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
-                    MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                    caseType.getCaseFields(),
+                    JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
+                    caseTypeDefinition.getCaseFieldDefinitions(),
                     userRoles,
                     CAN_READ,
-                    true),
-                STRING_JSON_MAP));
+                    true)));
         }
-        return startEventTrigger;
+        return startEventResult;
     }
 
 

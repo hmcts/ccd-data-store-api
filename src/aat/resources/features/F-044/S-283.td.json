@@ -1,0 +1,41 @@
+{
+  "title": "must return 422 when event submission has failed",
+  "_guid_": "S-283",
+  "_extends_": "F-044_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in Standard_Full_Case_Creation_Data",
+    "contains an event token for the case just created above",
+    "contains an invalid event Id for the pre-state conditions",
+    "contains an HTTP 422 'Unprocessable Entity'"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event": {
+        "id": "STOP_PROGRESS",
+        "summary": "",
+        "description": ""
+      },
+      "event_token" : "${[scenarioContext][childContexts][F-044-Prerequisite][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers": {
+      "vary" : "accept-encoding"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "message" : "Pre-state condition is not valid for case with state: TODO; and event trigger: STOP_PROGRESS",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+	"title": "must return 201 if the grant is successful for a user to a valid case ID",
+	"_guid_": "S-151",
+	"_extends_": "F-045_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD",
+		"uses the id of the case just created",
+		"has the 201 return code"
+	],
+	"request": {
+		"pathVariables": {
+			"cid": "[[DEFAULT_AUTO_VALUE]]"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANY_STRING_NULLABLE]]",
+			"Vary": "Accept-Encoding"
+		}
+	}
+}

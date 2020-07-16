@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-536",
+  "_extends_": "F-102_Test_Data_Base",
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid authorization token",
+    "contains the HTTP 403 Forbidden"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "Authorization": "Dummy_Authorization"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]"
+    },
+    "queryParams": {
+      "access": "create"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "Access Denied",
+      "path": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
+

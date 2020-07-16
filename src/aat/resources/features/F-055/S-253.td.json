@@ -1,0 +1,26 @@
+{
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
+
+  "_guid_": "S-253",
+  "_extends_": "F-055_Base_Test_Data",
+
+  "specs": [
+    "an active profile in CCD",
+    "includes an valid user authorisation token that does not have access to the operation",
+    "contains a HTTP 403 Forbidden"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.solicitor.3@gmail.com",
+      "password": "[[$CCD_BEFTA_SOLICITOR_3_PWD]]"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message" : "Access Denied"
+    }
+  }
+}

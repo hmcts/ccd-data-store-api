@@ -1,0 +1,25 @@
+{
+  "title": "must return appropriate negative response for a user not having a profile in CCD",
+  "_guid_": "S-034",
+  "_extends_": "F-027_Test_Data_Base",
+
+  "specs": ["no profile in CCD",
+    "has the 403 return code"],
+  "request": {
+    "pathVariables": {
+      "uid": "some id",
+      "cid": "1234567890"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers" : {
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body" : {
+      "message" : "Access Denied"
+    }
+  }
+}
+

@@ -1,0 +1,30 @@
+{
+  "title": "must return appropriate negative response when request does not provide a valid sort direction",
+  "_guid_": "S-137",
+  "_extends_": "F-057_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "does not provide a valid sort direction",
+    "has the 400 return code"
+  ],
+  "request": {
+    "queryParams": {
+      "sortDirection": "someInvalidSortDirection"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "headers" : {
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message": "Unknown sort direction: someInvalidSortDirection",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

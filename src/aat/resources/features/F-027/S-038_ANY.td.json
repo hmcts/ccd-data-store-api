@@ -1,0 +1,75 @@
+{
+  "title": "must return status 200 along with the CaseView object successfully",
+  "_guid_": "S-038",
+  "_extends_": "F-027_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "uses the case-reference of the case just created",
+    "contains the details of the case just created"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "[[DEFAULT_AUTO_VALUE]]"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Transfer-Encoding": "chunked"
+    },
+    "body" : {
+      "tabs" : "[[ANYTHING_PRESENT]]",
+      "metadataFields" : "[[ANYTHING_PRESENT]]",
+      "state" : {
+        "id" : "TODO",
+        "name" : "To do",
+        "description" : null,
+        "title_display" : null
+      },
+      "channels" : "[[ANYTHING_PRESENT]]",
+      "triggers" : [ {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : null,
+        "order" : "[[ANYTHING_PRESENT]]"
+      }, {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : null,
+        "order" : "[[ANYTHING_PRESENT]]"
+      }, {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : null,
+        "order" : "[[ANYTHING_PRESENT]]"
+      } ],
+      "events" : [ {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "timestamp" : "[[ANYTHING_PRESENT]]",
+        "summary" : null,
+        "comment" : null,
+        "event_id" : "[[ANYTHING_PRESENT]]",
+        "event_name" : "[[ANYTHING_PRESENT]]",
+        "user_id" : "[[ANYTHING_PRESENT]]",
+        "user_last_name" : "[[ANYTHING_PRESENT]]",
+        "user_first_name" : "[[ANYTHING_PRESENT]]",
+        "state_name" : "[[ANYTHING_PRESENT]]",
+        "state_id" : "[[ANYTHING_PRESENT]]",
+        "significant_item" : null
+      } ],
+      "case_id" : "[[ANYTHING_PRESENT]]",
+      "case_type" : {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : "[[ANYTHING_PRESENT]]",
+        "jurisdiction" : {
+          "id" : "[[ANYTHING_PRESENT]]",
+          "name" : "[[ANYTHING_PRESENT]]",
+          "description" : "[[ANYTHING_PRESENT]]"
+        },
+        "printEnabled" : false
+      }
+    }
+  }
+}

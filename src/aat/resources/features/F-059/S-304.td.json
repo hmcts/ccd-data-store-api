@@ -1,0 +1,37 @@
+{
+  "title": "must not validate when field validation fails",
+  "_guid_": "S-304",
+  "_extends_": "F-059_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "uses a value that exceeds the field's max limit",
+    "has the 422 return code"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "PhoneUKField": "0123412341349"
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "message": "Case data validation failed",
+      "details": {
+        "field_errors": [
+          {
+            "id": "PhoneUKField",
+            "message": "The data entered is not valid for this type of field, please delete and re-enter using only valid data"
+          }
+        ]
+      }
+    }
+  }
+}

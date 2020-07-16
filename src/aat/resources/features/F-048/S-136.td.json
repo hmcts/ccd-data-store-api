@@ -1,0 +1,33 @@
+{
+	"_guid_": "S-136",
+	"_extends_": "Base_Expecting_200",
+	"title": "must return pagination metadata successfully for correct inputs",
+
+	"productName": "CCD Data Store",
+	"operationName": "Get the pagination metadata for a case data search for Case Worker",
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+
+	"specs": [
+		"a detailed profile in CCD",
+		"is prepared with valid Jurisdiction, Case ID and User ID",
+		"returns the pagination metadata"
+	],
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT"
+		}
+	},
+	"expectedResponse": {
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"total_results_count": "[[ANYTHING_PRESENT]]",
+			"total_pages_count": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}

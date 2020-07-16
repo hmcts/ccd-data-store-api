@@ -1,0 +1,33 @@
+{
+  "title": "Trigger the aboutToStart callback event for a caseworker for an invalid Case ID",
+  "_guid_": "S-246",
+  "_extends_": "F-042_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "is prepared with an invalid Case ID",
+    "contains the HTTP 400 Bad Request return code"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "000000000000000000000000000000000000000000000000000"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "status": 400,
+      "error": "Bad Request",
+      "message": "Case reference is not valid",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

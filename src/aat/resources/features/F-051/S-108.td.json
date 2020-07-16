@@ -1,0 +1,38 @@
+{
+	"_guid_": "S-108",
+	"_extends_": "Base_Expecting_403",
+	"title": "must return 403 when request provides authentic credentials without authorised access to the operation",
+
+	"productName": "CCD Data Store",
+	"operationName": "Get default settings for user",
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/profile",
+
+	"specs": [
+		"a detailed profile in CCD",
+		"uses the Case ID of the case just created",
+		"uses the invalid authorization",
+		"has the 403 return code"
+	],
+	"request": {
+		"headers": {
+			"Authorization": "TEST"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]"
+		}
+	},
+	"expectedResponse": {
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"timestamp": "[[ANYTHING_PRESENT]]",
+			"status": 403,
+			"error": "Forbidden",
+			"message": "Access Denied",
+			"path": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}

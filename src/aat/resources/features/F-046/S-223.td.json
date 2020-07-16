@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-223",
+  "_extends_": "F-046_Base_Request_Data",
+  "title": "must return 400 when an invalid case id is provided",
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid case id",
+    "has a 404 not found code"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "1234567890123456"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "No case found for reference: 1234567890123456",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

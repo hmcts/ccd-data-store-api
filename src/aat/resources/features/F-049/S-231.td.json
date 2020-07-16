@@ -1,0 +1,26 @@
+{
+	"_guid_": "S-231",
+	"_extends_": "F-049_Test_Data_Base",
+
+	"title": "must return 401 when request provides invalid authentication credentials",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a dummy user id",
+		"code is HTTP-403"
+	],
+	"request": {
+		"pathVariables": {
+			"uid": "dummy"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"headers": {
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"message": "Access Denied"
+		}
+	}
+}

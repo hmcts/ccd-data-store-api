@@ -1,0 +1,47 @@
+{
+	"_guid_": "S-110",
+	"_extends_": "Base_Expecting_200",
+	"title": "must return default user setting successfully for a user having a profile in CCD",
+	"productName": "CCD Data Store",
+	"operationName": "Get default settings for user",
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/profile",
+	"specs": [
+		"a detailed profile in CCD",
+		"uses the Case ID of the case just created",
+		"has the 200 return code"
+	],
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]"
+		}
+	},
+	"expectedResponse": {
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANY_INTEGER_NULLABLE]]",
+			"Transfer-Encoding": "[[ANY_STRING_NULLABLE]]"
+		},
+		"body": {
+			"user": {
+				"idam": {
+					"id": "[[ANYTHING_PRESENT]]",
+					"email": "[[ANYTHING_PRESENT]]",
+					"forename": "[[ANYTHING_PRESENT]]",
+					"surname": "[[ANYTHING_PRESENT]]",
+					"roles": "[[ANYTHING_PRESENT]]",
+					"defaultService": null
+				}
+			},
+			"channels": null,
+			"jurisdictions": "[[ANYTHING_PRESENT]]",
+			"default": {
+				"workbasket": {
+					"jurisdiction_id": "[[ANYTHING_PRESENT]]",
+					"case_type_id": "[[ANYTHING_PRESENT]]",
+					"state_id": "[[ANYTHING_PRESENT]]"
+				}
+			}
+		}
+	}
+}

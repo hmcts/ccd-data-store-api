@@ -24,11 +24,13 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_T
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.JURISDICTION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_PAYMENT_HISTORY_VIEWER;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_PAYMENT_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
+@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
@@ -52,6 +54,9 @@ public class CaseDetails implements Cloneable {
     @JsonProperty("last_modified")
     private LocalDateTime lastModified;
 
+    @JsonProperty("last_state_modified_date")
+    private LocalDateTime lastStateModifiedDate;
+
     private String state;
 
     @JsonProperty("security_classification")
@@ -66,32 +71,32 @@ public class CaseDetails implements Cloneable {
     private Map<String, JsonNode> dataClassification;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("after_submit_callback_response")
     private AfterSubmitCallbackResponse afterSubmitCallbackResponse;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("callback_response_status_code")
     private Integer callbackResponseStatusCode;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("delete_draft_response_status_code")
     private Integer deleteDraftResponseStatusCode;
 
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("delete_draft_response_status")
     private String deleteDraftResponseStatus;
@@ -195,6 +200,14 @@ public class CaseDetails implements Cloneable {
         return callbackResponseStatus;
     }
 
+    public LocalDateTime getLastStateModifiedDate() {
+        return lastStateModifiedDate;
+    }
+
+    public void setLastStateModifiedDate(LocalDateTime lastStateModifiedDate) {
+        this.lastStateModifiedDate = lastStateModifiedDate;
+    }
+
     /**
      * @deprecated Will be removed in version 2.x. Use {@link CaseDetails#dataClassification} instead.
      */
@@ -217,17 +230,6 @@ public class CaseDetails implements Cloneable {
         return afterSubmitCallbackResponse;
     }
 
-    private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
-        this.afterSubmitCallbackResponse = response;
-        this.callbackResponseStatusCode = SC_OK;
-        this.callbackResponseStatus = "CALLBACK_COMPLETED";
-    }
-
-    private void setDeleteDraftResponseEntity() {
-        this.deleteDraftResponseStatusCode =  SC_OK;
-        this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
-    }
-
     public void setIncompleteCallbackResponse() {
         this.callbackResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
         this.callbackResponseStatus = "INCOMPLETE_CALLBACK";
@@ -241,16 +243,16 @@ public class CaseDetails implements Cloneable {
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
         return isFieldWithNoValue(caseTypeTabField)
             || hasDataForTabField(caseTypeTabField)
-            || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
+            || getMetadata().containsKey(caseTypeTabField.getCaseFieldDefinition().getId());
     }
 
     private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
-        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
+        return data.keySet().contains(caseTypeTabField.getCaseFieldDefinition().getId());
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
-        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL)
-            || caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
+        return caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(LABEL)
+            || caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
     }
 
     @JsonIgnore
@@ -271,6 +273,11 @@ public class CaseDetails implements Cloneable {
         }
     }
 
+    private void setDeleteDraftResponseEntity() {
+        this.deleteDraftResponseStatusCode =  SC_OK;
+        this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
+    }
+
     @JsonIgnore
     public void setAfterSubmitCallbackResponseEntity(final ResponseEntity<AfterSubmitCallbackResponse>
                                                          callBackResponse) {
@@ -286,6 +293,12 @@ public class CaseDetails implements Cloneable {
         }
     }
 
+    private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
+        this.afterSubmitCallbackResponse = response;
+        this.callbackResponseStatusCode = SC_OK;
+        this.callbackResponseStatus = "CALLBACK_COMPLETED";
+    }
+
     @JsonIgnore
     public Map<String, Object> getMetadata() {
         if (metadata.isEmpty()) {
@@ -295,6 +308,7 @@ public class CaseDetails implements Cloneable {
             metadata.put(CASE_REFERENCE.getReference(), getReference() != null ? getReference() : getId());
             metadata.put(CREATED_DATE.getReference(), getCreatedDate());
             metadata.put(LAST_MODIFIED_DATE.getReference(), getLastModified());
+            metadata.put(LAST_STATE_MODIFIED_DATE.getReference(), getLastStateModifiedDate());
             metadata.put(SECURITY_CLASSIFICATION.getReference(), getSecurityClassification());
         }
         return metadata;

@@ -1,0 +1,27 @@
+{
+	"title": "must return negative response when request body doesn't provide a mandatory field",
+	"_guid_": "S-544",
+	"_extends_": "F-045_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD",
+		"does not provide a mandatory field for the operation",
+		"has the 400 return code"
+	],
+	"request": {
+		"pathVariables": {
+			"cid": "157375164884070312"
+		},
+		"body": {
+			"id_wrong_filed_name": "Test User"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_400_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANY_STRING_NULLABLE]]",
+			"Vary": "Accept-Encoding"
+		},
+		"body": null
+	}
+}

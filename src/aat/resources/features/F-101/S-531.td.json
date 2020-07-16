@@ -1,0 +1,26 @@
+{
+	"title": "must return 204 when revoke is successful for a user to a valid case ID",
+	"_guid_": "S-531",
+  "productName": "CCD Data Store",
+  "operationName": "Revoke access to a case",
+	"_extends_": "F-101_Test_Data_Base",
+
+	"specs": [
+    "an active solicitor profile in CCD",
+    "another active solicitor profile in CCD",
+    "uses the first solicitor to call the api and the second one to be granted access to the case just created",
+    "has the 204 return code"
+	],
+  "request": {
+    "body": {
+      "case_roles": [
+      ]
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_204_Response",
+    "headers": {
+      "Content-Type": "[[ANY_STRING_NULLABLE]]"
+    }
+  }
+}

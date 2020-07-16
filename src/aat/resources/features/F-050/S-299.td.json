@@ -1,0 +1,31 @@
+{
+	"_guid_": "S-299",
+	"_extends_": "F-050_Test_Data_Base",
+
+	"title": "must return negative response when request does not provide valid authentication credentials",
+
+	"specs": [
+		"an active profile in CCD",
+		"uses an invalid user Id that doesn’t exist in CCD",
+		"uses a dummy authorization token",
+		"has the 403 return code"
+	],
+	"request": {
+		"headers": {
+			"Authorization": "InvalidAuthorization"
+		},
+		"pathVariables": {
+			"uid": "xxxxxxxx"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"message": "Access Denied"
+		}
+	}
+}

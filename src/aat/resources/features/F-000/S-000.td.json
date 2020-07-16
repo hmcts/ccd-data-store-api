@@ -1,0 +1,49 @@
+{
+	"_guid_": "S-000",
+	"_extends_": "S-000-Base-Success",
+	"title": "must return default user setting successfully for a user having a profile in CCD",
+	"productName": "CCD Data Store",
+	"operationName": "Get default settings for user",
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/profile",
+	"specs": [
+		"a detailed profile in CCD",
+		"uses a uid that exists in IDAM"
+	],
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.1@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
+		}
+	},
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]"
+		}
+	},
+	"expectedResponse": {
+		"responseCode": 200,
+		"headers": {
+			"X-Frame-Options": "[[ANYTHING_PRESENT]]",
+			"Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
+			"Cache-Control": "[[ANYTHING_PRESENT]]",
+			"X-Content-Type-Options": "[[ANYTHING_PRESENT]]",
+			"X-XSS-Protection": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "[[ANYTHING_PRESENT]]",
+			"vary": "[[ANYTHING_PRESENT]]",
+			"Expires": "[[ANYTHING_PRESENT]]",
+			"Pragma": "[[ANYTHING_PRESENT]]",
+			"Date": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Strict-Transport-Security": "max-age=31536000 ; includeSubDomains",
+			"Request-Context": "[[ANY_STRING_NULLABLE]]"
+		},
+		"body": {
+			"user": "[[ANYTHING_PRESENT]]",
+			"channels": null,
+			"jurisdictions": "[[ANYTHING_PRESENT]]",
+			"default": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}

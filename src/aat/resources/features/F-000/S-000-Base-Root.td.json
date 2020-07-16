@@ -1,0 +1,16 @@
+{
+	"_guid_": "S-000-Base-Root",
+
+	"users": {
+		"invokingUser": {
+			"username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+		}
+	},
+	"request": {
+		"headers": {
+			"Authorization": "[[DEFAULT_AUTO_VALUE]]",
+			"ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
+		}
+	}
+}

@@ -1,0 +1,80 @@
+{
+  "_guid_": "S-577_Get_Case_For_Case_Worker_Data_Base",
+  "_extends_": "S-577_Response_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Get Case for Case Worker",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_2",
+      "ctid": "BEFTA_CASETYPE_2_1"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip"
+    },
+    "body" : {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_JURISDICTION_2",
+      "state": "TODO",
+      "version": "[[ANYTHING_PRESENT]]",
+      "case_type_id": "BEFTA_CASETYPE_2_1",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "MoneyGBPField": "111100",
+        "FixedListField": "VALUE3",
+        "AddressUKField": {
+          "County": null,
+          "Country": null,
+          "PostCode": null,
+          "PostTown": null,
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null
+        },
+        "ComplexField": {
+          "ComplexTextField": null,
+          "ComplexNestedField": {
+            "NestedNumberField": null,
+            "NestedCollectionTextField": []
+          },
+          "ComplexFixedListField": null
+        },
+        "FixedRadioListField": "RADIOVALUE2",
+        "DateTimeField": null,
+        "PhoneUKField": null,
+        "NumberField": "111111222222",
+        "MultiSelectListField": [
+          "OPTION5",
+          "OPTION4",
+          "OPTION3"
+        ],
+        "YesOrNoField": "Yes",
+        "EmailField": "testemail@gmail.com",
+        "TextField": "sometextfield",
+        "DateField": "2222-01-02",
+        "TextAreaField": "textarea",
+        "CollectionField": []
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

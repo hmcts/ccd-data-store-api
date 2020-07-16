@@ -1,0 +1,10 @@
+{
+  "_guid_": "Standard_Full_Case_Data_With_Document",
+  "_extends_": "Standard_Full_Case_Data",
+
+  "DocumentField": {
+    "document_url": "{{DM_STORE_BASE_URL}}/documents/1d9e2f5f-2114-4748-b01c-70481000ce6d",
+    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/1d9e2f5f-2114-4748-b01c-70481000ce6d/binary",
+    "document_filename": "Screenshot 2019-09-26 at 13.06.47.png"
+  }
+}

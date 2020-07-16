@@ -1,0 +1,31 @@
+{
+  "title": "must return appropriate negative response when case-reference does not exists",
+  "_guid_": "S-548",
+  "_extends_": "F-028_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains invalid event-id",
+    "has the 404 return code"
+  ],
+  "request": {
+    "pathVariables": {
+      "etid": "UPDATE123",
+      "cid": "157375164884070311"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

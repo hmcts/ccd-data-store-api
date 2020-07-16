@@ -1,0 +1,26 @@
+{
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
+  "_guid_": "S-161",
+  "_extends_": "F-065_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "does not provide an authorised access to the operation",
+    "contains an HTTP-403 Forbidden"
+  ],
+  "request": {
+    "headers": {
+      "ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "message": "Access Denied"
+    }
+  }
+}

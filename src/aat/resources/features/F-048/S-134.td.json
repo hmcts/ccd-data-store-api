@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-134",
+  "_extends_": "Base_Expecting_403",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": [
+    "a detailed profile in CCD",
+    "does not provide a valid authentication credentials"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Get the pagination metadata for a case data search for Case Worker",
+  "method": "GET",
+  "user": {
+    "username": "auto.test.cnp_invalid@gmail.com",
+    "password": "Pa55word12_wrong",
+    "token": "fakeToken",
+    "uid": "dummyval"
+  },
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+  "request": {
+    "pathVariables": {
+      "uid": "Some_wrong_uid",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+			"Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "Access Denied",
+      "path": "/caseworkers/Some_wrong_uid/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata"
+    }
+  }
+}

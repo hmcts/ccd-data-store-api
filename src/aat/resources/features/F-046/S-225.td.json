@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-225",
+  "_extends_": "F-046_Base_Request_Data",
+  "title": "must return 403 when request does not provide valid authentication credentials",
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid authentication credentials in CCD",
+    "has a 403 Forbidden code"
+  ],
+  "request": {
+    "pathVariables": {
+      "uid": "UserId",
+      "idToDelete": "UserIdToDelete",
+      "cid": "0123456789123456"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Date" : "[[ANYTHING_PRESENT]]",
+      "Expires" : "0",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "Access Denied",
+      "path": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

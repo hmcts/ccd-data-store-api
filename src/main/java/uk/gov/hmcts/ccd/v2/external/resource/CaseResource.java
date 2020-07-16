@@ -1,29 +1,32 @@
 package uk.gov.hmcts.ccd.v2.external.resource;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import org.springframework.hateoas.RepresentationModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import javax.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
 
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.Map;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class CaseResource extends ResourceSupport {
+public class CaseResource extends RepresentationModel<RepresentationModel<?>> {
 
     @JsonProperty("id")
     private String reference;
@@ -39,6 +42,9 @@ public class CaseResource extends ResourceSupport {
 
     @JsonProperty("last_modified_on")
     private LocalDateTime lastModifiedOn;
+
+    @JsonProperty("last_state_modified_on")
+    private LocalDateTime lastStateModifiedOn;
 
     @JsonProperty("state")
     private String state;
@@ -97,6 +103,7 @@ public class CaseResource extends ResourceSupport {
         this.caseType = caseDetails.getCaseTypeId();
         this.createdOn = caseDetails.getCreatedDate();
         this.lastModifiedOn = caseDetails.getLastModified();
+        this.lastStateModifiedOn = caseDetails.getLastStateModifiedDate();
         this.state = caseDetails.getState();
         this.securityClassification = caseDetails.getSecurityClassification();
         this.data = caseDetails.getData();

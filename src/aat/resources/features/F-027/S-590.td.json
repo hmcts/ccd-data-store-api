@@ -1,0 +1,356 @@
+{
+  "title": "must return status 200 along with the CaseView object successfully",
+  "_guid_": "S-590",
+  "_extends_": "F-027_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "uses the case-reference of the case just created",
+    "contains Last State Modified Date metadata field"
+  ],
+  "user": {
+      "username": "befta.caseworker.3@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+  },
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_3",
+      "ctid": "BEFTA_CASETYPE_3_4",
+      "cid": "${[scenarioContext][childContexts][S-027.01_Case][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
+      "Strict-Transport-Security":"[[ANY_STRING_NULLABLE]]"
+    },
+    "body" : {
+      "tabs" : "[[ANYTHING_PRESENT]]",
+      "metadataFields": [
+        {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
+        {
+          "id": "[STATE]",
+          "label": "State",
+          "hidden": false,
+          "value": "TODO",
+          "metadata": true,
+          "hint_text": null,
+          "field_type": "[[ANYTHING_PRESENT]]",
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "acls": [
+
+          ],
+          "default_value" : null
+        },
+        {
+          "id": "[LAST_STATE_MODIFIED_DATE]",
+          "label": "Last State Modified Date",
+          "hidden": false,
+          "value": "[[ANY_DATE_NOT_NULLABLE]]",
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "DateTime",
+            "type": "DateTime",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [
+
+            ],
+            "complex_fields": [
+
+            ],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "acls": [
+
+          ],
+          "default_value" : null
+        },
+        {
+          "id": "[JURISDICTION]",
+          "label": "Jurisdiction",
+          "hidden": false,
+          "value": "[[ANYTHING_PRESENT]]",
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "Text",
+            "type": "Text",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [
+
+            ],
+            "complex_fields": [
+
+            ],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "acls": [
+
+          ],
+          "default_value" : null
+        },
+        {
+          "id": "[CASE_TYPE]",
+          "label": "Case Type",
+          "hidden": false,
+          "value": "[[ANYTHING_PRESENT]]",
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "Text",
+            "type": "Text",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [
+
+            ],
+            "complex_fields": [
+
+            ],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "acls": [
+
+          ],
+          "default_value" : null
+        },
+        {
+          "id": "[SECURITY_CLASSIFICATION]",
+          "label": "Security Classification",
+          "hidden": false,
+          "value": "PUBLIC",
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "Text",
+            "type": "Text",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [
+
+            ],
+            "complex_fields": [
+
+            ],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "acls": [
+
+          ],
+          "default_value" : null
+        },
+        {
+          "id": "[CASE_REFERENCE]",
+          "label": "Case Reference",
+          "hidden": false,
+          "value": "[[ANY_NUMBER_NOT_NULLABLE]]",
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "Number",
+            "type": "Number",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [
+
+            ],
+            "complex_fields": [
+
+            ],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "acls": [
+
+          ],
+          "default_value" : null
+        },
+        {
+          "id": "[CREATED_DATE]",
+          "label": "Created Date",
+          "hidden": false,
+          "value": "[[ANY_DATE_NOT_NULLABLE]]",
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "DateTime",
+            "type": "DateTime",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [
+
+            ],
+            "complex_fields": [
+
+            ],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "acls": [
+
+          ],
+          "default_value" : null
+        },
+        {
+          "id": "[LAST_MODIFIED_DATE]",
+          "label": "Last Modified Date",
+          "hidden": false,
+          "value": "[[ANY_DATE_NOT_NULLABLE]]",
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "DateTime",
+            "type": "DateTime",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [
+
+            ],
+            "complex_fields": [
+
+            ],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "acls": [
+
+          ],
+          "default_value" : null
+        }
+      ],
+      "state" : {
+        "id" : "TODO",
+        "name" : "To do",
+        "description" : null,
+        "title_display" : null
+      },
+      "channels" : "[[ANYTHING_PRESENT]]",
+      "triggers" : [ {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : null,
+        "order" : "[[ANYTHING_PRESENT]]"
+      }, {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : null,
+        "order" : "[[ANYTHING_PRESENT]]"
+      }, {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : null,
+        "order" : "[[ANYTHING_PRESENT]]"
+      } ],
+      "events" : [ {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "timestamp" : "[[ANYTHING_PRESENT]]",
+        "summary" : "[[ANYTHING_PRESENT]]",
+        "comment" : "[[ANYTHING_PRESENT]]",
+        "event_id" : "[[ANYTHING_PRESENT]]",
+        "event_name" : "[[ANYTHING_PRESENT]]",
+        "user_id" : "[[ANYTHING_PRESENT]]",
+        "user_last_name" : "[[ANYTHING_PRESENT]]",
+        "user_first_name" : "[[ANYTHING_PRESENT]]",
+        "state_name" : "[[ANYTHING_PRESENT]]",
+        "state_id" : "[[ANYTHING_PRESENT]]",
+        "significant_item" : null
+      } ],
+      "case_id" : "[[ANYTHING_PRESENT]]",
+      "case_type" : {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : "[[ANYTHING_PRESENT]]",
+        "jurisdiction" : {
+          "id" : "[[ANYTHING_PRESENT]]",
+          "name" : "[[ANYTHING_PRESENT]]",
+          "description" : "[[ANYTHING_PRESENT]]"
+        },
+        "printEnabled" : false
+      }
+    }
+  }
+}

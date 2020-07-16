@@ -1,0 +1,29 @@
+{
+  "title": "must return negative response when request provides authentic credentials without authorized access to the operation",
+  "_guid_": "S-046",
+  "_extends_": "F-028_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "provides a dummy authorisation token to the operation",
+    "has the 403 return code"
+  ],
+  "request": {
+    "headers": {
+      "Authorization": "Invalid_Authorization"
+    },
+    "pathVariables": {
+      "cid": "1573751648840703"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "message": "Access Denied"
+    }
+  }
+}

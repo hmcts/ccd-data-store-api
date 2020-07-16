@@ -1,0 +1,21 @@
+{
+	"_guid_": "F-045_Test_Data_Base",
+	"productName": "CCD Data Store",
+	"operationName": "Grant access to case",
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT"
+		},
+		"body": {
+			"id": "Test User"
+		}
+	}
+}

@@ -18,7 +18,8 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
     private final UIDService uidService;
 
     @Autowired
-    public DefaultGetCaseOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository, final UIDService uidService) {
+    public DefaultGetCaseOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                                   final UIDService uidService) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
     }

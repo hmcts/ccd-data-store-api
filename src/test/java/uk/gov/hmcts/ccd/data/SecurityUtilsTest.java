@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.data;
 
-import java.util.Arrays;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -19,10 +17,22 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
+
+import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 @DisplayName("SecurityUtils")
 class SecurityUtilsTest {
@@ -38,7 +48,7 @@ class SecurityUtilsTest {
     private SecurityContext securityContext;
 
     @Mock
-    private ServiceAndUserDetails principal;
+    private IdamRepository idamRepository;
 
     @Mock
     private AuthTokenGenerator serviceTokenGenerator;
@@ -54,12 +64,26 @@ class SecurityUtilsTest {
 
         when(serviceTokenGenerator.generate()).thenReturn(SERVICE_JWT);
 
-        doReturn(Arrays.asList(authorities)).when(principal).getAuthorities();
-        doReturn(USER_ID).when(principal).getUsername();
-        doReturn(principal).when(authentication).getPrincipal();
-        doReturn(USER_JWT).when(principal).getPassword();
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+            .claim("aClaim", "aClaim")
+            .claim("aud", Lists.newArrayList("ccd_gateway"))
+            .header("aHeader", "aHeader")
+            .build();
+        Collection<? extends GrantedAuthority> authorityCollection = Stream.of("role1", "role2")
+            .map(a -> new SimpleGrantedAuthority(a))
+            .collect(Collectors.toCollection(ArrayList::new));
+
+        doReturn(jwt).when(authentication).getPrincipal();
         doReturn(authentication).when(securityContext).getAuthentication();
+        when(authentication.getAuthorities()).thenAnswer(invocationOnMock -> authorityCollection);
         SecurityContextHolder.setContext(securityContext);
+
+
+        UserInfo userInfo = UserInfo.builder()
+            .uid(USER_ID)
+            .sub("emailId@a.com")
+            .build();
+        doReturn(userInfo).when(idamRepository).getUserInfo(USER_JWT);
     }
 
     @Test
@@ -78,6 +102,40 @@ class SecurityUtilsTest {
     @DisplayName("Get user token")
     void shouldReturnUserToken() {
         assertThat(securityUtils.getUserToken(), is(USER_JWT));
+    }
+    
+    @Test
+    @DisplayName("Get service name")
+    void shouldGetServiceName() {
+        assertThat(securityUtils.getServiceName(), is("ccd_gateway"));
+    }
+
+    @Test
+    @DisplayName("Get service name from token supplied with bearer")
+    void getServiceNameFromS2SToken_shouldReturnNameFromTokenWithBearer() {
+        // ARRANGE
+        String serviceName = "my-service";
+        String s2STokenWithBearer = "Bearer " + MockUtils.generateDummyS2SToken(serviceName);
+
+        // ACT
+        String result = securityUtils.getServiceNameFromS2SToken(s2STokenWithBearer);
+
+        // ASSERT
+        assertThat(result, is(serviceName));
+    }
+
+    @Test
+    @DisplayName("Get service name from token supplied without bearer")
+    void getServiceNameFromS2SToken_shouldReturnNameFromTokenWithoutBearer() {
+        // ARRANGE
+        String serviceName = "my-service";
+        String s2SToken = MockUtils.generateDummyS2SToken(serviceName);
+
+        // ACT
+        String result = securityUtils.getServiceNameFromS2SToken(s2SToken);
+
+        // ASSERT
+        assertThat(result, is(serviceName));
     }
 
     private void assertHeader(HttpHeaders headers, String name, String value) {

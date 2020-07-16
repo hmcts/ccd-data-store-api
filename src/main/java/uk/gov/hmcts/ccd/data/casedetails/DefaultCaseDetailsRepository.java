@@ -36,6 +36,7 @@ import java.util.Optional;
 @Named
 @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
 @Singleton
+@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
@@ -72,7 +73,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             mergedEntity = em.merge(newCaseDetailsEntity);
             em.flush();
         } catch (StaleObjectStateException | OptimisticLockException e) {
-            LOG.info("Optimistic Lock Exception: Case data has been altered", e);
+            LOG.info("Optimistic Lock Exception: Case data has been altered, UUID={}", caseDetails.getReference(), e);
             throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException && isDuplicateReference(e)) {
@@ -80,7 +81,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                     caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
                 throw new ReferenceKeyUniqueConstraintException(e.getMessage());
             } else {
-                LOG.warn("Failed to store case details", e);
+                LOG.warn("Failed to store case details, UUID={}", caseDetails.getReference(), e);
                 throw new CasePersistenceException(e.getMessage());
             }
         }
@@ -90,6 +91,17 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
         return find(jurisdiction, id, null).map(this.caseDetailsMapper::entityToModel);
+    }
+
+    /**
+     * @param id Internal case ID
+     * @return Case details if found; null otherwise
+     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
+     */
+    @Override
+    @Deprecated
+    public CaseDetails findById(final Long id) {
+        return findById(null, id).orElse(null);
     }
 
     @Override
@@ -105,17 +117,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public Optional<CaseDetails> findByReference(String caseReference) {
         return findByReference(null, caseReference);
-    }
-
-    /**
-     * @param id Internal case ID
-     * @return Case details if found; null otherwise
-     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
-     */
-    @Override
-    @Deprecated
-    public CaseDetails findById(final Long id) {
-        return findById(null, id).orElse(null);
     }
 
     /**

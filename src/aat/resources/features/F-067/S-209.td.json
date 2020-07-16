@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-209",
+  "_extends_": "F-067_Test_Data_Base",
+  "title": "should get 400 when request contains non-existing case reference",
+  "specs": [
+    "an active profile in CCD",
+    "contains a non-existing case reference",
+    "contains HTTP 400 Bad Request"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "non-existing case reference"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message": "Case ID is not valid",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

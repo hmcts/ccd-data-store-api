@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-312",
+  "_extends_": "F-034_Test_Data_Base",
+  "title": "must return 422 when event trigger does not exist",
+  "specs": [
+    "an active profile in CCD",
+    "contains an event trigger id with no pre state",
+    "contains HTTP 422 Unprocessable Entity"
+  ],
+  "request": {
+    "pathVariables": {
+      "ctid": "EVENT"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "message" : "Event id does not exist",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

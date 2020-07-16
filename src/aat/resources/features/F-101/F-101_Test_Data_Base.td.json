@@ -1,0 +1,22 @@
+{
+	"_guid_": "F-101_Test_Data_Base",
+	"method": "PUT",
+	"uri": "/cases/{cid}/users/{uid}",
+	"users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    },
+    "solicitor3": {
+      "username": "befta.caseworker.2.solicitor.3@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+	},
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"cid": "${[scenarioContext][childContexts][F101_Case_Data_Solicitor][testData][actualResponse][body][id]}",
+			"uid": "${[scenarioContext][testData][users][solicitor3][id]}"
+		}
+	}
+}

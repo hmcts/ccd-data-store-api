@@ -1,0 +1,27 @@
+{
+	"_guid_": "F-049_Test_Data_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Start case creation as Case worker",
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT",
+			"etid": "CREATE"
+		}
+	},
+	"expectedResponse": {
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Strict-Transport-Security": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}
