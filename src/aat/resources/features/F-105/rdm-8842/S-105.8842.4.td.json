@@ -1,0 +1,60 @@
+{
+  "title": "Invalid Organisation ID provided",
+
+  "_guid_": "S-105.8842.4",
+  "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - who is to add some case role assignment for a case",
+    "Olawale - with an active solicitor profile",
+    "Hemanth - with an active solicitor profile",
+    "is made from an authorised application, by Dil for 2 assignments each containing the Case ID of C1, User ID of Olawale and Hemanth and proper Case Role CR-1",
+    "contains a valid Organisation ID in one entry and an improper Organisation ID in the other"
+  ],
+
+  "users": {
+    "userRichard": {
+      "username": "befta.caseworker.2.solicitor.1@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+    },
+    "userDil": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    },
+    "userOlawale": {
+      "username": "befta.caseworker.2.solicitor.3@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
+    },
+    "userHemanth": {
+      "username": "befta.caseworker.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_PWD]]"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]",
+          "organisation_id": "orgA"
+        },
+        {
+          "case_id": "${[scenarioContext][childContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userHemanth][id]}",
+          "case_role": "[CR-1]",
+          "organisation_id": ""
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-105_Add_Case_Assigned_User_Roles_400_response"
+  }
+}
