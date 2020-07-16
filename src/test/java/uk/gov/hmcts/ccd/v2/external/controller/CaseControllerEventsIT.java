@@ -1,16 +1,12 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import javax.inject.Inject;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -21,9 +17,13 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 
+import javax.inject.Inject;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,18 +31,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CaseControllerEventsIT extends WireMockBaseTest {
     private static final String GET_CASE_EVENTS = "/cases/1504259907353529/events";
     private static final String UID_NO_EVENT_ACCESS = "1234";
-    private static final String UID_WITH_EVENT_ACCESS = "2345";
+    private static final String UID_WITH_EVENT_ACCESS = "123";
 
     private static final int NUMBER_OF_CASES = 1;
 
     @Inject
     private WebApplicationContext wac;
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
 
     private MockMvc mockMvc;
 
@@ -50,13 +44,7 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-
-        MockUtils.setSecurityAuthorities(UID_NO_EVENT_ACCESS, authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
+        MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
     }
@@ -66,6 +54,18 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
     public void shouldNotReturnEventHistoryDataForCitizenWhoHasNoAccessToEvents() throws Exception {
 
         assertCaseDataResultSetSize();
+
+        String userJson = "{\n"
+            + "          \"sub\": \"Cloud.Strife@test.com\",\n"
+            + "          \"uid\": \"1234\",\n"
+            + "          \"roles\": [\n"
+            + "            \"caseworker\",\n"
+            + "            \"caseworker-test\"\n"
+            + "          ],\n"
+            + "          \"name\": \"Cloud Strife\"\n"
+            + "        }";
+        stubFor(WireMock.get(urlMatching("/o/userinfo"))
+            .willReturn(okJson(userJson).withStatus(200)));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer " + UID_NO_EVENT_ACCESS);
@@ -91,7 +91,6 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
     public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
 
         assertCaseDataResultSetSize();
-        MockUtils.setSecurityAuthorities(UID_WITH_EVENT_ACCESS, authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer " + UID_WITH_EVENT_ACCESS);

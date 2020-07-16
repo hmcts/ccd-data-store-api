@@ -1,5 +1,17 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Maps;
+import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,74 +20,62 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
-import org.json.JSONException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 class CaseDataServiceTest {
-    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     private static final CaseDataService caseDataService = new CaseDataService();
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
 
     @BeforeEach
     public void setUp() {
-        setCaseType(RESTRICTED);
+        setCaseTypeDefinition(RESTRICTED);
     }
 
-    private void setCaseType(SecurityClassification securityClassification) {
-        final FieldType textFieldType = aFieldType().withType("Text")
+    private void setCaseTypeDefinition(SecurityClassification securityClassification) {
+        final FieldTypeDefinition textFieldTypeDefinition = aFieldType().withType("Text")
                                            .build();
 
-        CaseField postalAddress = newCaseField()
+        CaseFieldDefinition postalAddress = newCaseField()
             .withId("PostalAddress")
             .withSC(SecurityClassification.PRIVATE.name())
             .withFieldType(aFieldType()
                                .withType("Complex")
                                .withComplexField(newCaseField()
                                                      .withId("AddressLine1")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(securityClassification.name())
                                                      .build())
                                .withComplexField(newCaseField()
                                                      .withId("AddressLine2")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(securityClassification.name())
                                                      .build())
                                .withComplexField(newCaseField()
                                                      .withId("AddressLine3")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(securityClassification.name())
                                                      .build())
                                .withComplexField(newCaseField()
                                                      .withId("Country")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(PRIVATE.name())
                                                      .build())
                                .withComplexField(newCaseField()
                                                      .withId("PostCode")
-                                                     .withFieldType(textFieldType)
+                                                     .withFieldType(textFieldTypeDefinition)
                                                      .withSC(RESTRICTED.name())
                                                      .build())
                                .withComplexField(newCaseField()
@@ -86,7 +86,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "Title")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                  textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   PUBLIC.name())
                                                                                               .build())
@@ -94,7 +94,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "FirstName")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                  textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   PUBLIC.name())
                                                                                               .build())
@@ -102,7 +102,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "MiddleName")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                  textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   PRIVATE.name())
                                                                                               .build())
@@ -110,7 +110,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "LastName")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                  textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   PRIVATE.name())
                                                                                               .build())
@@ -129,7 +129,7 @@ class CaseDataServiceTest {
                                                                                               .withId(
                                                                                                   "NationalInsuranceNumber")
                                                                                               .withFieldType(
-                                                                                                  textFieldType)
+                                                                                                  textFieldTypeDefinition)
                                                                                               .withSC(
                                                                                                   RESTRICTED.name())
                                                                                               .build())
@@ -149,20 +149,20 @@ class CaseDataServiceTest {
                                                      .build())
                                .build())
             .build();
-        caseType = TestBuildersUtil.CaseTypeBuilder.newCaseType()
+        caseTypeDefinition = TestBuildersUtil.CaseTypeBuilder.newCaseType()
             .withField(newCaseField()
-                           .withId("ClientsAddresses")
-                           .withSC(PRIVATE.name())
-                           .withFieldType(aFieldType()
-                                              .withType(COLLECTION)
-                                              .withCollectionFieldType(aFieldType()
-                                                                           .withId("Address")
-                                                                           .withType("Complex")
-                                                                           .withComplexField(postalAddress)
-                                                                           .build()
-                                              )
-                                              .build())
-                           .build()
+                .withId("ClientsAddresses")
+                .withSC(PRIVATE.name())
+                .withFieldType(aFieldType()
+                    .withType(COLLECTION)
+                    .withCollectionFieldType(aFieldType()
+                        .withId("Address")
+                        .withType("Complex")
+                        .withComplexField(postalAddress)
+                        .build()
+                    )
+                    .build())
+                .build()
             )
             .withField(newCaseField()
                            .withId("Company")
@@ -172,7 +172,7 @@ class CaseDataServiceTest {
                                    .withType("Complex")
                                    .withComplexField(newCaseField()
                                                          .withId("Name")
-                                                         .withFieldType(textFieldType)
+                                                         .withFieldType(textFieldTypeDefinition)
                                                          .withSC(PRIVATE.name())
                                                          .build())
                                    .withComplexField(postalAddress)
@@ -182,13 +182,13 @@ class CaseDataServiceTest {
             )
             .withField(newCaseField()
                            .withId("OtherInfo")
-                           .withFieldType(textFieldType)
+                           .withFieldType(textFieldTypeDefinition)
                            .withSC(PRIVATE.name())
                            .build())
             .withField(newCaseField().withId("simple_collection")
                                    .withSC("PUBLIC")
                                    .withFieldType(aFieldType().withType(COLLECTION)
-                                                              .withCollectionFieldType(textFieldType)
+                                                              .withCollectionFieldType(textFieldTypeDefinition)
                                                               .build()
                                    )
                                    .build()
@@ -199,7 +199,7 @@ class CaseDataServiceTest {
     @Test
     @DisplayName("should get the default security classifications")
     void shouldGetDefaultClassifications() throws IOException, JSONException {
-        final Map<String, JsonNode> DATA = MAPPER.convertValue(MAPPER.readTree(
+        final Map<String, JsonNode> DATA = JacksonUtils.convertValue(MAPPER.readTree(
             "{\n" +
                 "  \"PersonFirstName\": \"First Name\",\n" +
                 "  \"PersonLastName\": \"Last Name\",\n" +
@@ -237,9 +237,9 @@ class CaseDataServiceTest {
                 "   ]\n" +
                 "  }\n" +
                 "}\n"
-        ), STRING_JSON_MAP);
+        ));
 
-        final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(caseType, DATA, Maps.newHashMap());
+        final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, DATA, Maps.newHashMap());
         final String expectedResult = "{  \n" +
             "   \"Company\":{  \n" +
             "      \"classification\":\"PUBLIC\",\n" +
@@ -301,7 +301,7 @@ class CaseDataServiceTest {
             "   \"PersonFirstName\":\"\"\n" +
             "}";
 
-        JsonNode result = MAPPER.convertValue(classifications, JsonNode.class);
+        JsonNode result = JacksonUtils.convertValueJsonNode(classifications);
         System.out.println(result);
         assertEquals(expectedResult, result.toString(), false);
     }
@@ -309,8 +309,8 @@ class CaseDataServiceTest {
     @Test
     @DisplayName("should not overwrite previously set classifications")
     void shouldKeepExistingClassifications() throws IOException, JSONException {
-        // ARRANGE
-        final Map<String, JsonNode> DATA = MAPPER.convertValue(MAPPER.readTree(
+
+        JsonNode treeValue = MAPPER.readTree(
             "{\n" +
                 " \"ClientsAddresses\": " +
                 "       [\n" +
@@ -337,9 +337,11 @@ class CaseDataServiceTest {
                 "           }\n" +
                 "       ]\n" +
                 "  }\n"
-        ), STRING_JSON_MAP);
+        );
+
+        final Map<String, JsonNode> DATA = JacksonUtils.convertValue(treeValue);
         // first to set default classification
-        final Map<String, JsonNode> defaultClassifications = caseDataService.getDefaultSecurityClassifications(caseType, DATA, Maps.newHashMap());
+        final Map<String, JsonNode> defaultClassifications = caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, DATA, Maps.newHashMap());
         final String expectedDefaultResult = "{  \n" +
             "   \"ClientsAddresses\":{  \n" +
             "      \"classification\":\"PRIVATE\",\n" +
@@ -373,11 +375,11 @@ class CaseDataServiceTest {
             "      ]\n" +
             "   }\n" +
             "}";
-        JsonNode defaultResult = MAPPER.convertValue(defaultClassifications, JsonNode.class);
+        JsonNode defaultResult = JacksonUtils.convertValueJsonNode(defaultClassifications);
         assertEquals(expectedDefaultResult, defaultResult.toString(), false);
 
         // then to test already set classification is not overwritten
-        final Map<String, JsonNode> NEW_DATA = MAPPER.convertValue(MAPPER.readTree(
+        final Map<String, JsonNode> NEW_DATA = JacksonUtils.convertValue(MAPPER.readTree(
             "{\n" +
                 "  \"PersonFirstName\": \"First Name\",\n" +
                 "  \"PersonLastName\": \"Last Name\",\n" +
@@ -422,11 +424,12 @@ class CaseDataServiceTest {
                 "           }\n" +
                 "       ]\n" +
                 "}\n"
-        ), STRING_JSON_MAP);
-        setCaseType(PUBLIC);
+        ));
+        setCaseTypeDefinition(PUBLIC);
 
         // ACT
-        final Map<String, JsonNode> newClassifications = caseDataService.getDefaultSecurityClassifications(caseType, NEW_DATA, defaultClassifications);
+        final Map<String, JsonNode> newClassifications = caseDataService.getDefaultSecurityClassifications(
+            caseTypeDefinition, NEW_DATA, defaultClassifications);
 
         // ASSERT
         JsonNode newClassificationsResult = MAPPER.convertValue(newClassifications, JsonNode.class);
@@ -490,62 +493,62 @@ class CaseDataServiceTest {
             "   },\n" +
             "   \"PersonFirstName\":\"\"\n" +
             "}";
-           assertEquals(expectedNewResult, newClassificationsResult.toString(), false);
+        assertEquals(expectedNewResult, newClassificationsResult.toString(), false);
     }
 
     @Test
     @DisplayName("should assign default classifications to simple collection items")
     void shouldAssignDefaultClassificationToCollectionItems() {
         final Map<String, JsonNode> caseData = newCaseData().withField("simple_collection")
-                                                         .asCollectionOf(
-                                                             TestBuildersUtil.collectionItem("1", "Item 1"),
-                                                             TestBuildersUtil.collectionItem("2", "Item 2")
-                                                          )
-                                                         .build();
+            .asCollectionOf(
+                TestBuildersUtil.collectionItem("1", "Item 1"),
+                TestBuildersUtil.collectionItem("2", "Item 2")
+            )
+            .build();
 
         final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(
-            caseType,
+            caseTypeDefinition,
             caseData,
             new HashMap<>());
 
         assertThat(classifications.size(), equalTo(1));
         final JsonNode collection = classifications.get("simple_collection");
         assertSimpleCollectionClassification(collection,
-                                             "PUBLIC",
-                                             "PUBLIC", "PUBLIC");
+            "PUBLIC",
+            "PUBLIC", "PUBLIC");
     }
 
     @Test
     @DisplayName("should preserve existing classifications to simple collection items")
     void shouldPreserveExistingClassificationForCollectionItems() {
         final Map<String, JsonNode> caseData = newCaseData().withField("simple_collection")
-                                                         .asCollectionOf(
-                                                             TestBuildersUtil.collectionItem("1", "Item 1"),
-                                                             TestBuildersUtil.collectionItem("2", "Item 2")
-                                                          )
-                                                         .build();
+            .asCollectionOf(
+                TestBuildersUtil.collectionItem("1", "Item 1"),
+                TestBuildersUtil.collectionItem("2", "Item 2")
+            )
+            .build();
         final Map<String, JsonNode> existingClassification =
             dataClassification().withField("simple_collection")
-                                .asCollectionOf("PRIVATE",
-                                                TestBuildersUtil.collectionClassification(
-                                                     "1",
-                                                     "PUBLIC"),
-                                                TestBuildersUtil.collectionClassification(
-                                                     "2",
-                                                     "RESTRICTED")
-                                 )
-                                .build();
+                .asCollectionOf("PRIVATE",
+                    TestBuildersUtil.collectionClassification(
+                        "1",
+                        "PUBLIC"),
+                    TestBuildersUtil.collectionClassification(
+                        "2",
+                        "RESTRICTED")
+                )
+                .build();
 
         final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(
-            caseType,
+            caseTypeDefinition,
             caseData,
             existingClassification);
 
         assertThat(classifications.size(), equalTo(1));
         final JsonNode collection = classifications.get("simple_collection");
         assertSimpleCollectionClassification(collection,
-                                             "PRIVATE",
-                                             "PUBLIC", "RESTRICTED");
+            "PRIVATE",
+            "PUBLIC", "RESTRICTED");
     }
 
     private void assertSimpleCollectionClassification(JsonNode collection,
@@ -560,7 +563,7 @@ class CaseDataServiceTest {
 
         for (int i = 0; i < expectedItemClassifications.length; i++) {
             assertThat(classificationValues.get(i).get("classification").textValue(),
-                       is(expectedItemClassifications[i]));
+                is(expectedItemClassifications[i]));
         }
     }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.data.JsonDataConverter;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 
 import javax.persistence.CascadeType;
@@ -23,13 +24,13 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
 
 @NamedQueries({
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_CASE, query =
-        FIND_BY_CASE_DATA_ID_HQL +
-            " ORDER BY cae.createdDate DESC"
+        FIND_BY_CASE_DATA_ID_HQL
+            + " ORDER BY cae.createdDate DESC"
     ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_CREATE_EVENT, query =
-        FIND_BY_CASE_DATA_ID_HQL +
-            " AND createdDate = " +
-            "(select min(caeDate.createdDate) from CaseAuditEventEntity caeDate WHERE caeDate.caseDataId = :"
+        FIND_BY_CASE_DATA_ID_HQL
+            + " AND createdDate = "
+            + "(select min(caeDate.createdDate) from CaseAuditEventEntity caeDate WHERE caeDate.caseDataId = :"
             + CaseAuditEventEntity.CASE_DATA_ID + ")"
     ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_ID, query =
@@ -90,10 +91,10 @@ public class CaseAuditEventEntity {
     @Column(name = "security_classification", nullable = false)
     private SecurityClassification securityClassification;
     @Column(name = "data", nullable = false)
-    @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
+    @Convert(converter = JsonDataConverter.class)
     private JsonNode data;
     @Column(name = "data_classification", nullable = false)
-    @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
+    @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
 
     @OneToOne(mappedBy = "caseEvent", cascade = CascadeType.PERSIST, orphanRemoval = true)

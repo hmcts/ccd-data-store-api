@@ -1,0 +1,97 @@
+{
+	"title": "when no User ID is supplied for a list of Case IDs, then the case roles relating to all users with access to all listed cases must be returned",
+	"_guid_": "S-600",
+	"productName": "CCD Data Store api",
+	"operationName": "Get Case-Assigned Users and Roles",
+	"_extends_": "F-103_Case_Assigned_User_Roles_Base",
+	"specs": [
+		"Richard - who can create a case",
+		"Dil - with an active profile",
+		"Steve - with an active profile",
+		"Jamal -  who is a privileged user with permissions to access the case assignments of other users",
+		"is made by Jamal with Case IDs of C1, C2 & C3 & no User ID",
+		"contains the list of case roles just granted to Dil & Steve for C1, C2 & C3, as per above"
+	],
+	"request": {
+		"queryParams": {
+			"case_ids": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F103_Case_Data_Create_C2][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F103_Case_Data_Create_C3][testData][actualResponse][body][id]}",
+			"user_ids": ""
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"case_users": [
+				{
+					"__ordering__": "UNORDERED",
+					"__elementId__": "case_id,user_id,case_role"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_roles][0]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_roles][1]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][body][case_roles][0]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C2][testData][request][body][case_roles][1]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][body][case_roles][0]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C3][testData][request][body][case_roles][1]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][body][case_roles][0]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C1][testData][request][body][case_roles][1]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][body][case_roles][0]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C2][testData][request][body][case_roles][1]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][body][case_roles][0]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Steve_Case_Role_To_C3][testData][request][body][case_roles][1]}"
+				}
+			]
+		}
+	}
+}

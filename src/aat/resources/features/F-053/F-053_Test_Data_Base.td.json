@@ -37,6 +37,8 @@
           "ComplexFixedListField": "VALUE2"
         },
         "DateTimeField": "1988-07-07T22:20:00",
+        "FormattedDateField" : "21",
+        "FormattedDateTimeField" : "2019-05-21",
         "PhoneUKField": "07123456789",
         "NumberField": "164528",
         "MultiSelectListField": [
@@ -71,8 +73,7 @@
   "expectedResponse": {
     "headers": {
       "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/json"
+      "Content-Encoding": "gzip"
     }
   }
 }

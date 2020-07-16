@@ -6,34 +6,34 @@ import javax.inject.Inject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
 
     private static final int VERSION = 33;
+    private static final String ORG_CASES = "ORGCASES";
 
     @Inject
     private HttpUIDefinitionGateway httpUIDefinitionGateway;
 
     @Test
     public void getDefinition() {
-        final SearchResult workBasketResult = httpUIDefinitionGateway.getWorkBasketResult(VERSION,"TestAddressBookCase");
+        final SearchResultDefinition workBasketResult = httpUIDefinitionGateway.getWorkBasketResult(VERSION,"TestAddressBookCase");
         assertThat(workBasketResult.getFields().length, is(3));
     }
 
     @Test
     @DisplayName("should Return Workbasket Input Definitions")
     public void shouldReturnWorkbasketInputDefinitions() {
-        final WorkbasketInputDefinition workbasketInputDefinitions = httpUIDefinitionGateway
-            .getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
-        assertThat(workbasketInputDefinitions.getFields().size(), is(3));
+        final WorkbasketInputFieldsDefinition workbasketInputFieldsDefinitions = httpUIDefinitionGateway
+            .getWorkbasketInputFieldsDefinitions(VERSION, "TestAddressBookCase");
+        assertThat(workbasketInputFieldsDefinitions.getFields().size(), is(3));
     }
 
     @Test
@@ -50,5 +50,15 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
         List<String> jurisdictionIds = Lists.newArrayList("PROBATE", "DIVORCE");
         final JurisdictionUiConfigResult configResult = httpUIDefinitionGateway.getJurisdictionUiConfigs(jurisdictionIds);
         assertThat(configResult.getConfigs().size(), is(2));
+    }
+
+    @Test
+    @DisplayName("should Return search cases result fields")
+    public void shouldReturnSearchCasesResultFields() {
+        final SearchResultDefinition searchResult = httpUIDefinitionGateway.getSearchCasesResultDefinition(VERSION, "TestAddressBookCase", ORG_CASES);
+        assertAll(
+            () -> assertThat(searchResult.getFields().length, is(7)),
+            () -> assertThat(searchResult.getFields()[0].getUseCase(), is(ORG_CASES))
+        );
     }
 }

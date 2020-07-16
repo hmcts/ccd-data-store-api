@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public interface BaseTypeValidator {
 
     List<ValidationResult> validate(final String dataFieldId,
                                     final JsonNode dataValue,
-                                    final CaseField caseFieldDefinition);
+                                    final CaseFieldDefinition caseFieldDefinition);
 
     default Boolean isNullOrEmpty(final JsonNode dataValue) {
         return dataValue == null

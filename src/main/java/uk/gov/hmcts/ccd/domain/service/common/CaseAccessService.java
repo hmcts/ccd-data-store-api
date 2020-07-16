@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
@@ -17,14 +16,14 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 /**
  * Check access to a case for the current user.
- * <p>
- * User with the following roles should only be given access to the cases explicitly granted:
+ *
+ * <p>User with the following roles should only be given access to the cases explicitly granted:
  * <ul>
  * <li>caseworker-*-solicitor: Solicitors</li>
  * <li>citizen(-loa[0-3]): Citizens</li>
@@ -47,21 +46,24 @@ public class CaseAccessService {
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
-        return !canOnlyViewGrantedCases() || accessGranted(caseDetails);
+        if (canOnlyViewExplicitlyGrantedCases()) {
+            return isExplicitAccessGranted(caseDetails);
+        } else {
+            return true;
+        }
     }
 
-    public AccessLevel getAccessLevel(ServiceAndUserDetails serviceAndUserDetails) {
-        return serviceAndUserDetails.getAuthorities()
-                                    .stream()
-                                    .map(GrantedAuthority::getAuthority)
-                                    .filter(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches())
-                                    .findFirst()
-                                    .map(role -> AccessLevel.GRANTED)
-                                    .orElse(AccessLevel.ALL);
+    public AccessLevel getAccessLevel(UserInfo userInfo) {
+        return userInfo.getRoles()
+            .stream()
+            .filter(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches())
+            .findFirst()
+            .map(role -> AccessLevel.GRANTED)
+            .orElse(AccessLevel.ALL);
     }
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
-        if (canOnlyViewGrantedCases()) {
+        if (canOnlyViewExplicitlyGrantedCases()) {
             return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
         }
 
@@ -92,8 +94,15 @@ public class CaseAccessService {
         return userRoles;
     }
 
+    public boolean isJurisdictionAccessAllowed(String jurisdiction) {
+        return this.userRepository
+            .getUserRolesJurisdictions()
+            .stream()
+            .anyMatch(jurisdiction::equalsIgnoreCase);
+    }
 
-    private Boolean accessGranted(CaseDetails caseDetails) {
+
+    public Boolean isExplicitAccessGranted(CaseDetails caseDetails) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
         if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
@@ -103,10 +112,8 @@ public class CaseAccessService {
         return Boolean.FALSE;
     }
 
-    private Boolean canOnlyViewGrantedCases() {
-        return userRepository.getUserRoles()
-            .stream()
-            .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
+    public Boolean canOnlyViewExplicitlyGrantedCases() {
+        return userRepository.anyRoleMatches(RESTRICT_GRANTED_ROLES_PATTERN);
     }
 
 }

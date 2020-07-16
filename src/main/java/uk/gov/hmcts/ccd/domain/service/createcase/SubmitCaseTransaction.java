@@ -11,9 +11,9 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -72,9 +72,9 @@ class SubmitCaseTransaction {
         backoff = @Backoff(delay = 50)
     )
     public CaseDetails submitCase(Event event,
-                                  CaseType caseType,
+                                  CaseTypeDefinition caseTypeDefinition,
                                   IdamUser idamUser,
-                                  CaseEvent eventTrigger,
+                                  CaseEventDefinition caseEventDefinition,
                                   CaseDetails newCaseDetails, Boolean ignoreWarning) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -90,10 +90,10 @@ class SubmitCaseTransaction {
             been assigned and the UID generation has to be part of a retryable transaction in order to recover from collisions.
          */
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
-            callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseType, ignoreWarning);
+            callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, null, newCaseDetails, caseTypeDefinition, ignoreWarning);
 
         final CaseDetails savedCaseDetails =
-            saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseType, idamUser, eventTrigger, newCaseDetails);
+            saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseTypeDefinition, idamUser, caseEventDefinition, newCaseDetails);
 
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()),
@@ -106,29 +106,29 @@ class SubmitCaseTransaction {
 
     private CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,
                                                      Event event,
-                                                     CaseType caseType,
+                                                     CaseTypeDefinition caseTypeDefinition,
                                                      IdamUser idamUser,
-                                                     CaseEvent eventTrigger,
+                                                     CaseEventDefinition caseEventDefinition,
                                                      CaseDetails newCaseDetails) {
 
         final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
-        auditEvent.setEventName(eventTrigger.getName());
+        auditEvent.setEventName(caseEventDefinition.getName());
         auditEvent.setSummary(event.getSummary());
         auditEvent.setDescription(event.getDescription());
         auditEvent.setCaseDataId(savedCaseDetails.getId());
         auditEvent.setData(savedCaseDetails.getData());
         auditEvent.setStateId(savedCaseDetails.getState());
-        CaseState caseState = caseTypeService.findState(caseType, savedCaseDetails.getState());
-        auditEvent.setStateName(caseState.getName());
-        auditEvent.setCaseTypeId(caseType.getId());
-        auditEvent.setCaseTypeVersion(caseType.getVersion().getNumber());
+        CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, savedCaseDetails.getState());
+        auditEvent.setStateName(caseStateDefinition.getName());
+        auditEvent.setCaseTypeId(caseTypeDefinition.getId());
+        auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
         auditEvent.setUserId(idamUser.getId());
         auditEvent.setUserLastName(idamUser.getSurname());
         auditEvent.setUserFirstName(idamUser.getForename());
         auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
-        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
+        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition));
         auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
         auditEvent.setSignificantItem(response.getSignificantItem());
 

@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIUserProfileResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.UserProfileViewResource;
 
 @DisplayName("UIStartTriggerControllerTest")
 class UIUserProfileControllerTest {
@@ -48,7 +48,7 @@ class UIUserProfileControllerTest {
         @Test
         @DisplayName("should return 200 when profile found")
         void caseFound() {
-            final ResponseEntity<UIUserProfileResource> response = profileController.getUserProfile();
+            final ResponseEntity<UserProfileViewResource> response = profileController.getUserProfile();
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),

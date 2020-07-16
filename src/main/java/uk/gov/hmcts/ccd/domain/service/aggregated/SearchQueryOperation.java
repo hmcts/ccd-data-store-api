@@ -1,70 +1,83 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
+import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
+@Slf4j
 public class SearchQueryOperation {
     protected static final String NO_ERROR = null;
     public static final String WORKBASKET = "WORKBASKET";
+    public static final String SEARCH = "SEARCH";
 
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
     private final GetCaseTypeOperation getCaseTypeOperation;
     private final SearchOperation searchOperation;
     private final GetDraftsOperation getDraftsOperation;
-    private final UIDefinitionRepository uiDefinitionRepository;
+    private final SearchResultDefinitionService searchResultDefinitionService;
     private final UserRepository userRepository;
+    private final SearchInputProcessor searchInputProcessor;
 
     @Autowired
     public SearchQueryOperation(@Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                 final MergeDataToSearchResultOperation mergeDataToSearchResultOperation,
                                 @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
                                 @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation,
-                                final UIDefinitionRepository uiDefinitionRepository,
-                                @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
+                                SearchResultDefinitionService searchResultDefinitionService,
+                                @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                                final SearchInputProcessor searchInputProcessor) {
         this.searchOperation = searchOperation;
         this.mergeDataToSearchResultOperation = mergeDataToSearchResultOperation;
         this.getCaseTypeOperation = getCaseTypeOperation;
         this.getDraftsOperation = getDraftsOperation;
-        this.uiDefinitionRepository = uiDefinitionRepository;
+        this.searchResultDefinitionService = searchResultDefinitionService;
         this.userRepository = userRepository;
+        this.searchInputProcessor = searchInputProcessor;
     }
 
     public SearchResultView execute(final String view,
                                     final MetaData metadata,
                                     final Map<String, String> queryParameters) {
 
-        Optional<CaseType> caseType = this.getCaseTypeOperation.execute(metadata.getCaseTypeId(), CAN_READ);
+        Optional<CaseTypeDefinition> caseType = this.getCaseTypeOperation.execute(metadata.getCaseTypeId(), CAN_READ);
 
         if (!caseType.isPresent()) {
             return new SearchResultView(Collections.emptyList(), Collections.emptyList(), NO_ERROR);
         }
 
-        final SearchResult searchResult = getSearchResultDefinition(caseType.get(), view);
+        final SearchResultDefinition searchResult = searchResultDefinitionService.getSearchResultDefinition(caseType.get(),
+            Strings.isNullOrEmpty(view) ? SEARCH : view, Collections.emptyList());
 
         addSortOrderFields(metadata, searchResult);
 
-        final List<CaseDetails> cases = searchOperation.execute(metadata, queryParameters);
+        final List<CaseDetails> cases = searchOperation.execute(
+            searchInputProcessor.executeMetadata(view, metadata),
+            searchInputProcessor.executeQueryParams(view, metadata, queryParameters)
+        );
 
         String draftResultError = NO_ERROR;
         List<CaseDetails> draftsAndCases = Lists.newArrayList();
@@ -79,25 +92,22 @@ public class SearchQueryOperation {
         return mergeDataToSearchResultOperation.execute(caseType.get(), searchResult, draftsAndCases, draftResultError);
     }
 
-    private SearchResult getSearchResultDefinition(final CaseType caseType, final String view) {
-        if (WORKBASKET.equalsIgnoreCase(view)) {
-            return uiDefinitionRepository.getWorkBasketResult(caseType.getId());
-        }
-        return uiDefinitionRepository.getSearchResult(caseType.getId());
+    public List<SortOrderField> getSortOrders(CaseTypeDefinition caseType, String useCase) {
+        return getSortOrders(searchResultDefinitionService.getSearchResultDefinition(caseType, useCase, Collections.emptyList()));
     }
 
-    private void addSortOrderFields(MetaData metadata,SearchResult searchResult) {
-        List<SortOrderField> sortOrders = getSortOrders(searchResult);
-        metadata.setSortOrderFields(sortOrders);
-    }
-
-    private List<SortOrderField> getSortOrders(SearchResult searchResult) {
+    private List<SortOrderField> getSortOrders(SearchResultDefinition searchResult) {
         return Arrays.stream(searchResult.getFields())
-            .filter(searchResultField -> hasSortField(searchResultField))
-            .filter(searchResultField -> filterByRole(searchResultField))
+            .filter(this::hasSortField)
+            .filter(this::filterByRole)
             .sorted(Comparator.comparing(srf -> srf.getSortOrder().getPriority()))
             .map(this::toSortOrderField)
             .collect(Collectors.toList());
+    }
+
+    private void addSortOrderFields(MetaData metadata, SearchResultDefinition searchResult) {
+        List<SortOrderField> sortOrders = getSortOrders(searchResult);
+        metadata.setSortOrderFields(sortOrders);
     }
 
     private boolean hasSortField(SearchResultField searchResultField) {
@@ -106,7 +116,7 @@ public class SearchQueryOperation {
     }
 
     private boolean filterByRole(SearchResultField resultField) {
-        return StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole());
+        return StringUtils.isEmpty(resultField.getRole()) || userRepository.anyRoleEqualsTo(resultField.getRole());
     }
 
     private SortOrderField toSortOrderField(SearchResultField searchResultField) {

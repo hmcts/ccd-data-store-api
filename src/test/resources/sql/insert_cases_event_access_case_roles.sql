@@ -12,7 +12,7 @@ VALUES (1, 'TestAddressBookNoEventAccessToCaseRole', 'PROBATE', 'CaseCreated', '
             "AddressLine3": "Hexton",
             "AddressLine2": "Fake Street",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -64,7 +64,7 @@ INSERT INTO case_event (
         'The summary',
         'TEST_EVENT_ACCESS',
         'TEST EVENT ACCESS NAME',
-        2345,
+        123,
         'Justin',
         'Smith',
         'CaseCreated',
@@ -98,7 +98,7 @@ INSERT INTO case_event (
         'The summary 2',
         'Goodness',
         'GRACIOUS',
-        2345,
+        123,
         'Justin',
         'Smith',
         'state4',
@@ -111,4 +111,4 @@ INSERT INTO case_event (
 
 
 insert into case_users (case_data_id, user_id, case_role)
-values (1, 2345, '[TEST-EVENT-ACCESS-ROLE]');
+values (1, 123, '[TEST-EVENT-ACCESS-ROLE]');
