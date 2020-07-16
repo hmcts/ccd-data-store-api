@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
@@ -26,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -43,6 +45,21 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparingInt;
+import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
+
 @Repository
 @Qualifier(DefaultUserRepository.QUALIFIER)
 public class DefaultUserRepository implements UserRepository {
@@ -56,16 +73,19 @@ public class DefaultUserRepository implements UserRepository {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
+    private final AuthCheckerConfiguration authCheckerConfiguration;
 
     @Autowired
     public DefaultUserRepository(ApplicationParams applicationParams,
                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
                                  SecurityUtils securityUtils,
-                                 @Qualifier("restTemplate") RestTemplate restTemplate) {
+                                 @Qualifier("restTemplate") RestTemplate restTemplate,
+                                 AuthCheckerConfiguration authCheckerConfiguration) {
         this.applicationParams = applicationParams;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
+        this.authCheckerConfiguration = authCheckerConfiguration;
     }
 
     @Override
@@ -83,10 +103,16 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public Set<String> getUserRoles() {
         LOG.debug("retrieving user roles");
+
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        return authorities.stream()
+        Set<String> userRoles = authorities.stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toSet());
+
+        String email = getUser().getEmail();
+        LOG.info("Retrieved roles for user={} roles={}", email, userRoles);
+
+        return userRoles;
     }
 
     @Override
@@ -128,6 +154,9 @@ public class DefaultUserRepository implements UserRepository {
                 }
             }
             throw new ServiceException("Problem getting user default settings for " + userId);
+        } catch (ResourceAccessException e) {
+            LOG.error("Failed to retrieve user profile - I/O error", e);
+            throw new ServiceException("Problem getting user default settings for " + userId);
         } catch (URISyntaxException e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -157,6 +186,21 @@ public class DefaultUserRepository implements UserRepository {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean anyRoleEqualsAnyOf(List<String> userRoles) {
+        return getUserRoles().stream().anyMatch(userRoles::contains);
+    }
+
+    @Override
+    public boolean anyRoleEqualsTo(String userRole) {
+        return getUserRoles().contains(userRole);
+    }
+
+    @Override
+    public boolean anyRoleMatches(Pattern rolesPattern) {
+        return getUserRoles().stream().anyMatch(role -> rolesPattern.matcher(role).matches());
+    }
+
     private Set<SecurityClassification> getClassificationsForUserRoles(List<String> roles) {
         return caseDefinitionRepository.getClassificationsForUserRoleList(roles).stream()
             .filter(Objects::nonNull)
@@ -167,7 +211,8 @@ public class DefaultUserRepository implements UserRepository {
 
     private boolean filterRole(final String jurisdictionId, final String role) {
         return startsWithIgnoreCase(role, String.format(RELEVANT_ROLES, jurisdictionId))
-            || ArrayUtils.contains(AuthCheckerConfiguration.getCitizenRoles(), role);
+                || ArrayUtils.contains(authCheckerConfiguration.getCitizenRoles(), role)
+                || applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role);
     }
 
     private IdamProperties toIdamProperties(UserInfo userInfo) {
