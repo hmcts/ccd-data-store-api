@@ -116,7 +116,7 @@ public class SearchQueryOperation {
     }
 
     private boolean filterByRole(SearchResultField resultField) {
-        return StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole());
+        return StringUtils.isEmpty(resultField.getRole()) || userRepository.anyRoleEqualsTo(resultField.getRole());
     }
 
     private SortOrderField toSortOrderField(SearchResultField searchResultField) {

@@ -1,25 +1,31 @@
 package uk.gov.hmcts.ccd;
 
 import com.google.common.collect.Lists;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 @Configuration
 public class AuthCheckerConfiguration {
 
-    @SuppressWarnings("squid:S3437")
-    public static final String[] CITIZEN_ROLES = {"citizen", "letter-holder"};
+    @Autowired
+    private ApplicationParams applicationParams;
 
-    public static String[] getCitizenRoles() {
-        return CITIZEN_ROLES;
+    public String[] getCitizenRoles() {
+        return applicationParams.getCcdAccessControlCitizenRoles().stream().toArray(String[]::new);
+    }
+
+    @Autowired
+    public AuthCheckerConfiguration(ApplicationParams applicationParams) {
+        this.applicationParams = applicationParams;
     }
 
     @Bean
@@ -54,11 +60,11 @@ public class AuthCheckerConfiguration {
                 final Matcher jurisdictionMatcher = jurisdictionPattern.matcher(request.getRequestURI());
                 if (jurisdictionMatcher.find()) {
                     role.append("-")
-                        .append(jurisdictionMatcher.group(1).toLowerCase());
+                            .append(jurisdictionMatcher.group(1).toLowerCase());
                 }
                 roles.add(role.toString());
             } else if (citizenMatcher.find()) {
-                roles.addAll(Arrays.asList(CITIZEN_ROLES));
+                roles.addAll(this.applicationParams.getCcdAccessControlCitizenRoles());
             }
 
             return roles;
