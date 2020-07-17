@@ -128,6 +128,12 @@ public class ApplicationParams {
     @Value("#{'${audit.log.ignore.statues}'.split(',')}")
     private List<Integer> auditLogIgnoreStatuses;
 
+    @Value("#{'${ccd.access-control.cross-jurisdictional-roles}'.split(',')}")
+    private List<String> ccdAccessControlCrossJurisdictionRoles;
+
+    @Value("#{'${ccd.access-control.citizen-roles}'.split(',')}")
+    private List<String> ccdAccessControlCitizenRoles;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -362,4 +368,13 @@ public class ApplicationParams {
     public boolean isAuditLogEnabled() {
         return auditLogEnabled;
     }
+
+    public List<String> getCcdAccessControlCrossJurisdictionRoles() {
+        return ccdAccessControlCrossJurisdictionRoles;
+    }
+
+    public List<String> getCcdAccessControlCitizenRoles() {
+        return ccdAccessControlCitizenRoles;
+    }
+
 }

@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -62,6 +63,9 @@ public class UserRepositoryTest {
     private Authentication authentication;
 
     @Mock
+    private AuthCheckerConfiguration authCheckerConfiguration;
+
+    @Mock
     private SecurityContext securityContext;
 
     private UserRepository userRepository;
@@ -74,7 +78,7 @@ public class UserRepositoryTest {
         SecurityContextHolder.setContext(securityContext);
 
         userRepository = spy(new DefaultUserRepository(applicationParams,
-                                                       caseDefinitionRepository, securityUtils, restTemplate));
+                                                       caseDefinitionRepository, securityUtils, restTemplate, authCheckerConfiguration));
     }
 
     @Nested

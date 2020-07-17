@@ -94,9 +94,9 @@ public class FieldTypeDefinition implements Serializable {
 
     @JsonIgnore
     public List<CaseFieldDefinition> getChildren() {
-        if (type.equalsIgnoreCase(COMPLEX)) {
+        if (isComplexFieldType()) {
             return complexFields;
-        } else if (type.equalsIgnoreCase(COLLECTION)) {
+        } else if (isCollectionFieldType()) {
             if (collectionFieldTypeDefinition == null) {
                 return emptyList();
             }
@@ -113,6 +113,16 @@ public class FieldTypeDefinition implements Serializable {
         } else if (type.equalsIgnoreCase(COLLECTION) && collectionFieldTypeDefinition != null) {
             collectionFieldTypeDefinition.complexFields = caseFieldDefinitions;
         }
+    }
+
+    @JsonIgnore
+    public boolean isCollectionFieldType() {
+        return type.equalsIgnoreCase(COLLECTION);
+    }
+
+    @JsonIgnore
+    public boolean isComplexFieldType() {
+        return type.equalsIgnoreCase(COMPLEX);
     }
 
     public String getId() {
