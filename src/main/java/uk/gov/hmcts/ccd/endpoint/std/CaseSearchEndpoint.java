@@ -78,9 +78,9 @@ public class CaseSearchEndpoint {
     public CaseSearchResult searchCases(
         @ApiParam(value = "Case type ID(s)", required = true)
         @RequestParam("ctid") List<String> caseTypeIds,
-        @ApiParam(value = "Comma separated list of case type ID(s) or '*' if the search should be applied on any " +
-            "existing case type. Note that using '*' is an expensive operation and might have low response times so " +
-            "always prefer explicitly listing the case types when known in advance", required = true)
+        @ApiParam(value = "Comma separated list of case type ID(s) or '*' if the search should be applied on any "
+            + "existing case type. Note that using '*' is an expensive operation and might have low response times so "
+            + "always prefer explicitly listing the case types when known in advance", required = true)
         @RequestBody String jsonSearchRequest) {
 
         Instant start = Instant.now();

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import lombok.NonNull;
@@ -39,10 +40,16 @@ public class ElasticsearchRequest {
     }
 
     public boolean hasSourceFields() {
-
         // If a source is empty or only has a wildcard element, then equivalent to no provided source
-        return searchRequest.has(SOURCE) && !getSource().isEmpty()
+        return isResourceFalse() && searchRequest.has(SOURCE) && !getSource().isEmpty()
             && !(getSource().size() == 1 && getSource().get(0).asText().equals(ANY_CASE_TYPE));
+    }
+
+    private boolean isResourceFalse() {
+        if (this.getSource() instanceof BooleanNode) {
+            return ((BooleanNode) this.getSource()).asBoolean();
+        }
+        return true;
     }
 
     public JsonNode getSource() {
