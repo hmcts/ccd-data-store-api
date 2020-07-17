@@ -1,18 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
+import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -127,7 +123,10 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     }
 
     @Override
-    public void validateData(Map<String, JsonNode> data, CaseTypeDefinition caseTypeDefinition) {
+    public void validateData(Map<String, JsonNode> data,
+                             CaseTypeDefinition caseTypeDefinition,
+                             final CaseDataContent content) {
         caseTypeService.validateData(data, caseTypeDefinition);
+        validateOrganisationPolicy(caseTypeDefinition.getId(), content);
     }
 }
