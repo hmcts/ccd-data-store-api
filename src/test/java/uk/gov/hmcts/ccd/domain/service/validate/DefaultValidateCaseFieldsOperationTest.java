@@ -229,7 +229,8 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
         ValidationException exception =
-            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent));
+            assertThrows(ValidationException.class,
+                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent));
 
         assertThat(exception.getMessage(),
             containsString("has an incorrect value"));
@@ -244,7 +245,8 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
         ValidationException exception =
-            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent));
+            assertThrows(ValidationException.class,
+                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent));
 
         assertThat(exception.getMessage(),
             containsString("incorrect value"));
