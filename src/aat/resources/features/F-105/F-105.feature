@@ -273,5 +273,5 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
      Then a negative response is received,
      And the response has all the details as expected,
-     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [F-105.8842.4_Verify_Case_Roles_for_Case_C1],
-     And a call [to verify the count of users assigned to a case] will get the expected response as in [F-105_Verify_Counter_1].
+     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [F-105.8842.4_Verify_Case_Roles_for_Case_C1],
+     And a call [to verify the count of users assigned to a case] will get the expected response as in [F-105_Verify_Counter_0].
