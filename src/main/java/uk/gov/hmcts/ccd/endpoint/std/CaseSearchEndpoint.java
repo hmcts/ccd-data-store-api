@@ -78,12 +78,9 @@ public class CaseSearchEndpoint {
     public CaseSearchResult searchCases(
         @ApiParam(value = "Case type ID(s)", required = true)
         @RequestParam("ctid") List<String> caseTypeIds,
-        @ApiParam(value = "Native ElasticSearch Search API request. Please refer to the ElasticSearch official "
-            + "documentation. For cross case type search, "
-            + "the search results will contain only metadata by default (no case field data). To get case data in the "
-            + "search results, please state the alias fields to be returned in the _source property for e.g."
-            + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
-            required = true)
+        @ApiParam(value = "Comma separated list of case type ID(s) or '*' if the search should be applied on any " +
+            "existing case type. Note that using '*' is an expensive operation and might have low response times so " +
+            "always prefer explicitly listing the case types when known in advance", required = true)
         @RequestBody String jsonSearchRequest) {
 
         Instant start = Instant.now();
@@ -93,7 +90,6 @@ public class CaseSearchEndpoint {
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(getCaseTypeIds(caseTypeIds))
             .withSearchRequest(elasticsearchRequest)
-            .withAnyCaseTypeRequest(isAnyCaseTypeRequest(caseTypeIds))
             .build();
 
         CaseSearchResult result = caseSearchOperation.execute(request);

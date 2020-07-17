@@ -38,7 +38,8 @@ public class ElasticsearchRequest {
         ((ObjectNode) searchRequest).set(SORT, sortNode);
     }
 
-    public boolean hasSource() {
+    public boolean hasSourceFields() {
+
         // If a source is empty or only has a wildcard element, then equivalent to no provided source
         return searchRequest.has(SOURCE) && !getSource().isEmpty()
             && !(getSource().size() == 1 && getSource().get(0).asText().equals(ANY_CASE_TYPE));
@@ -49,7 +50,7 @@ public class ElasticsearchRequest {
     }
 
     public List<String> getRequestedFields() {
-        if (hasSource() && getSource().isArray()) {
+        if (hasSourceFields() && getSource().isArray()) {
             return StreamSupport.stream(getSource().spliterator(), false)
                 .map(JsonNode::asText)
                 .map(this::getFieldId)

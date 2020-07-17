@@ -20,7 +20,7 @@ class ElasticsearchRequestTest {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.Field\"],\"query\":{\"match_all\": {}}}");
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-        assertTrue(elasticsearchRequest.hasSource());
+        assertTrue(elasticsearchRequest.hasSourceFields());
     }
 
     @Test
@@ -28,7 +28,7 @@ class ElasticsearchRequestTest {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[],\"query\":{\"match_all\": {}}}");
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-        assertFalse(elasticsearchRequest.hasSource());
+        assertFalse(elasticsearchRequest.hasSourceFields());
     }
 
     @Test
@@ -36,7 +36,7 @@ class ElasticsearchRequestTest {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"*\"],\"query\":{\"match_all\": {}}}");
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-        assertFalse(elasticsearchRequest.hasSource());
+        assertFalse(elasticsearchRequest.hasSourceFields());
     }
 
     @Test

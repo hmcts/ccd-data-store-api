@@ -95,7 +95,6 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             .withSearchRequest(originalSearchRequest.getElasticSearchRequest())
             .withMultiCaseTypeSearch(originalSearchRequest.isMultiCaseTypeSearch())
             .withSourceFilterAliasFields(originalSearchRequest.getAliasFields())
-            .withAnyCaseTypeRequest(originalSearchRequest.isConsolidationQuery())
             .build();
     }
 

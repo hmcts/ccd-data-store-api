@@ -227,7 +227,6 @@ class ElasticsearchCaseSearchOperationTest {
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
-                .withAnyCaseTypeRequest(true)
                 .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request1, request2);
 
