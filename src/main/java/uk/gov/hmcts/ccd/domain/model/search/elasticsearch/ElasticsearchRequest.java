@@ -22,7 +22,7 @@ public class ElasticsearchRequest {
     public static final String QUERY = "query";
     public static final String CASE_DATA_PREFIX = "data.";
     public static final String COLLECTION_VALUE_SUFFIX = ".value";
-    public static final String ANY_CASE_TYPE = "*";
+    public static final String WILDCARD = "*";
 
     @NonNull
     private JsonNode searchRequest;
@@ -42,7 +42,7 @@ public class ElasticsearchRequest {
     public boolean hasSourceFields() {
         // If a source is empty or only has a wildcard element, then equivalent to no provided source
         return isResourceFalse() && searchRequest.has(SOURCE) && !getSource().isEmpty()
-            && !(getSource().size() == 1 && getSource().get(0).asText().equals(ANY_CASE_TYPE));
+            && !(getSource().size() == 1 && getSource().get(0).asText().equals(WILDCARD));
     }
 
     private boolean isResourceFalse() {

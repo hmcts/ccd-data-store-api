@@ -121,7 +121,7 @@ public class CaseSearchEndpoint {
     }
 
     private boolean isAllCaseTypesRequest(List<String> caseTypeIds) {
-        return ElasticsearchRequest.ANY_CASE_TYPE.equals(caseTypeIds.get(0));
+        return ElasticsearchRequest.WILDCARD.equals(caseTypeIds.get(0));
     }
 
     public static String buildCaseIds(CaseSearchResult caseSearchResult) {
