@@ -1,6 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.processor;
-
-import com.google.common.base.Strings;
+package uk.gov.hmcts.ccd.domain.model.common;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -30,7 +28,7 @@ public enum DisplayContextParameterType {
 
     public static Optional<String> getParameterValueFor(String displayContextParameter) {
         Matcher m = PATTERN.matcher(displayContextParameter);
-        if (m.matches() && !Strings.isNullOrEmpty(m.group(VALUE_GROUP))) {
+        if (m.matches()) {
             return Optional.of(m.group(VALUE_GROUP));
         }
         return Optional.empty();

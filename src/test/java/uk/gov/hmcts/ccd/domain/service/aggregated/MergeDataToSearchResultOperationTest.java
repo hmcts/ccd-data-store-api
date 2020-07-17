@@ -4,13 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.collect.Sets;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,11 +13,22 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -93,7 +97,7 @@ class MergeDataToSearchResultOperationTest {
     private UserRepository userRepository;
 
     @Mock
-    private SearchResultProcessor searchResultProcessor;
+    private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
 
     private MergeDataToSearchResultOperation classUnderTest;
 
@@ -156,9 +160,9 @@ class MergeDataToSearchResultOperationTest {
             .withField(labelField)
             .build();
         doReturn(Collections.emptySet()).when(userRepository).getUserRoles();
-        doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(Mockito.any(), Mockito.any());
 
-        classUnderTest = new MergeDataToSearchResultOperation(userRepository, searchResultProcessor);
+        classUnderTest = new MergeDataToSearchResultOperation(userRepository, dateTimeSearchResultProcessor);
     }
 
     @Test
@@ -223,7 +227,7 @@ class MergeDataToSearchResultOperationTest {
                 searchResultFieldWithInvalidRole)
             .build();
 
-        doReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1)).when(userRepository).getUserRoles();
+        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
         assertAll(
@@ -259,7 +263,8 @@ class MergeDataToSearchResultOperationTest {
                 searchResultFieldWithInvalidRole)
             .build();
 
-        doReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2)).when(userRepository).getUserRoles();
+        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
+        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole2.getRole());
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
         assertAll(
@@ -293,7 +298,7 @@ class MergeDataToSearchResultOperationTest {
                 searchResultFieldWithValidRole)
             .build();
 
-        doReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2)).when(userRepository).getUserRoles();
+        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
 
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
