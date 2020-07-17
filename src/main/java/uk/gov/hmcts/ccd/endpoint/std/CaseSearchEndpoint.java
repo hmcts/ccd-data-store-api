@@ -101,7 +101,7 @@ public class CaseSearchEndpoint {
     }
 
     private List<String> getCaseTypeIds(List<String> caseTypeIds) {
-        if (isAnyCaseTypeRequest(caseTypeIds)) {
+        if (isAllCaseTypeRequest(caseTypeIds)) {
             return getCaseTypes();
         }
         return caseTypeIds;
@@ -120,7 +120,7 @@ public class CaseSearchEndpoint {
         return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
     }
 
-    private boolean isAnyCaseTypeRequest(List<String> caseTypeIds) {
+    private boolean isAllCaseTypeRequest(List<String> caseTypeIds) {
         return ElasticsearchRequest.ANY_CASE_TYPE.equals(caseTypeIds.get(0));
     }
 
