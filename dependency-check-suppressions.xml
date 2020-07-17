@@ -2,27 +2,10 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
     <suppress>
-        <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258</notes>
+        <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see
+            https://pivotal.io/security/cve-2018-1258
+        </notes>
         <cve>CVE-2018-1258</cve>
-    </suppress>
-
-    <!-- THIS CVEs should not be removed until the elastic search client is updated to 7.
-    Before updating the elastic client make sure that the server has been updated to 7 -->
-
-    <suppress>
-        <notes><![CDATA[
-            A permission issue was found in Elasticsearch versions before 5.6.15 and 6.6.1 when Field Level Security and Document Level
-            Security are disabled and the _aliases, _shrink, or _split endpoints are used . If the elasticsearch.yml file has xpack.security.dls_fls.enabled set to false,
-            certain permission checks are skipped when users perform one of the actions mentioned above, to make existing data available under a new index/alias name.
-            This could result in an attacker gaining additional permissions against a restricted index.
-            https://www.elastic.co/community/security
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-        <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-        <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-        <!-- Temporary suppression to ignore until it's fixed in master -->
-        <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
 
     <!--  This has been fixed in RDM-8001-->
@@ -41,61 +24,61 @@
         <cve>CVE-2015-9251</cve>
     </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: log4j-to-slf4j-2.12.1.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j-to-slf4j@.*$</packageUrl>
-   <cve>CVE-2020-9488</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j-to-slf4j@.*$</packageUrl>
+        <cve>CVE-2020-9488</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: log4j-api-2.11.1.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j-api@.*$</packageUrl>
-   <cve>CVE-2020-9488</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j-api@.*$</packageUrl>
+        <cve>CVE-2020-9488</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: dom4j-2.1.1.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
-   <cpe>cpe:/a:dom4j_project:dom4j</cpe>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
+        <cpe>cpe:/a:dom4j_project:dom4j</cpe>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-config-5.3.0.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
-   <cve>CVE-2020-5407</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
+        <cve>CVE-2020-5407</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-web-5.3.0.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
-   <cve>CVE-2020-5407</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
+        <cve>CVE-2020-5407</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-core-5.3.0.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
-   <cve>CVE-2020-5407</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+        <cve>CVE-2020-5407</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-crypto-5.3.0.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
-   <cve>CVE-2020-5407</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
+        <cve>CVE-2020-5407</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: dom4j-2.1.1.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
-   <cve>CVE-2020-10683</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
+        <cve>CVE-2020-10683</cve>
+    </suppress>
     <suppress>
         <notes><![CDATA[
    file name: spring-security-config-5.2.1.RELEASE.jar
@@ -174,68 +157,47 @@
         <cpe>cpe:/a:security-framework_project:security-framework</cpe>
     </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-config-5.3.2.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
-   <cve>CVE-2018-1258</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-web-5.3.2.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
-   <cve>CVE-2018-1258</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-core-5.3.2.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
-   <cve>CVE-2018-1258</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-crypto-5.3.2.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
-   <cve>CVE-2018-1258</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: dom4j-2.1.1.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
-   <cve>CVE-2020-10683</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
+        <cve>CVE-2020-10683</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: dom4j-2.1.1.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
-   <cve>CVE-2020-10683</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
+        <cve>CVE-2020-10683</cve>
+    </suppress>
     <suppress>
         <notes><![CDATA[
    file name: spring-security-config-5.2.1.RELEASE.jar
@@ -314,63 +276,41 @@
         <cpe>cpe:/a:security-framework_project:security-framework</cpe>
     </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-config-5.3.2.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
-   <cve>CVE-2018-1258</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-config@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-web-5.3.2.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
-   <cve>CVE-2018-1258</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-core-5.3.2.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
-   <cve>CVE-2018-1258</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-core@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: spring-security-crypto-5.3.2.RELEASE.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
-   <cve>CVE-2018-1258</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
     <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
+        <notes><![CDATA[
    file name: dom4j-2.1.1.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
-   <cve>CVE-2020-10683</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
+        <cve>CVE-2020-10683</cve>
+    </suppress>
     <suppress>
         <cve>CVE-2017-18365</cve>
     </suppress>
-
 </suppressions>
