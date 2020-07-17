@@ -2,19 +2,19 @@ package uk.gov.hmcts.ccd.domain.model.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CaseTypesResults {
+public class CaseTypeResults {
 
-    @JsonProperty("case_field_id")
+    @JsonProperty("case_type_id")
     private String caseTypeId;
     private long total;
 
-    public CaseTypesResults(String caseFieldId, long numberOfMatchedCases) {
+    public CaseTypeResults(String caseTypeId, long total) {
 
-        this.caseTypeId = caseFieldId;
-        this.total = numberOfMatchedCases;
+        this.caseTypeId = caseTypeId;
+        this.total = total;
     }
 
-    public CaseTypesResults() {
+    public CaseTypeResults() {
     }
 
     public String getCaseTypeId() {

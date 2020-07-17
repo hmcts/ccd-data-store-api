@@ -227,7 +227,7 @@ class ElasticsearchCaseSearchOperationTest {
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
-                .withConsolidationQuery(true)
+                .withAnyCaseTypeRequest(true)
                 .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request1, request2);
 
@@ -236,7 +236,7 @@ class ElasticsearchCaseSearchOperationTest {
             assertAll(
                 () -> assertThat(caseSearchResult.getCases().size(), equalTo(0)),
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
-                () -> assertThat(caseSearchResult.getCaseTypesResults().size(), equalTo(2)),
+                () -> assertThat(caseSearchResult.getCaseTypeResults().size(), equalTo(2)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),

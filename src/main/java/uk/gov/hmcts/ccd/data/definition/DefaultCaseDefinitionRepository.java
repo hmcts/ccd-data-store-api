@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
@@ -217,21 +216,20 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    public Optional<List<String>> getAllCaseTypesByJurisdictions(List<String> jurisdictionIds) {
+    public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
 
-        final List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(jurisdictionIds);
-
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(jurisdictionIds);
         if (jurisdictionDefinitions.isEmpty()) {
-            LOG.warn("No values found Retrieving jurisdiction object(s) from definition store for all Jurisdiction.");
-            Optional.of(Arrays.asList());
+            LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
+            Arrays.asList();
         }
-        final List<String> caseTypes = getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
-        return Optional.of(caseTypes);
+        List<String> caseTypes = getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+        return caseTypes;
     }
 
     @Override
     public List<String> getAllCaseTypesIDs() {
-        final List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Arrays.asList());
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Arrays.asList());
         return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
     }
 

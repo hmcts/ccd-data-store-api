@@ -15,15 +15,15 @@ public class CaseSearchResult {
     private Long total;
     private List<CaseDetails> cases;
     @JsonProperty("case_types_results")
-    private List<CaseTypesResults> caseTypesResults;
+    private List<CaseTypeResults> caseTypeResults;
 
     public CaseSearchResult() {
     }
 
-    public CaseSearchResult(Long total, List<CaseDetails> cases, List<CaseTypesResults> caseTypesResults) {
+    public CaseSearchResult(Long total, List<CaseDetails> cases, List<CaseTypeResults> caseTypeResults) {
         this.cases = cases;
         this.total = total;
-        this.caseTypesResults = caseTypesResults;
+        this.caseTypeResults = caseTypeResults;
     }
 
     public CaseSearchResult(Long total, List<CaseDetails> cases) {
@@ -31,8 +31,8 @@ public class CaseSearchResult {
     }
 
 
-    public CaseSearchResult(List<CaseTypesResults> caseTypesResults, Long total, List<CaseDetails> cases) {
-        this(total, cases, caseTypesResults);
+    public CaseSearchResult(List<CaseTypeResults> caseTypeResults, Long total, List<CaseDetails> cases) {
+        this(total, cases, caseTypeResults);
     }
 
     public List<CaseDetails> getCases() {
@@ -49,7 +49,7 @@ public class CaseSearchResult {
             : cases.stream().filter(c -> c.getCaseTypeId().equals(caseTypeId)).map(CaseDetails::getReferenceAsString).collect(toList());
     }
 
-    public List<CaseTypesResults> getCaseTypesResults() {
-        return caseTypesResults;
+    public List<CaseTypeResults> getCaseTypeResults() {
+        return caseTypeResults;
     }
 }

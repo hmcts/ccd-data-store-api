@@ -136,7 +136,7 @@ public class CrossCaseTypeSearchRequest {
             return this;
         }
 
-        public Builder withConsolidationQuery(boolean consolidationQuery) {
+        public Builder withAnyCaseTypeRequest(boolean consolidationQuery) {
             this.consolidationQuery = consolidationQuery;
             return this;
         }

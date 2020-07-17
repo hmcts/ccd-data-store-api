@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.CaseTypesResults;
+import uk.gov.hmcts.ccd.domain.model.search.CaseTypeResults;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
@@ -99,7 +99,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult,
                                                        CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
         final List<CaseDetails> caseDetails = new ArrayList<>();
-        final List<CaseTypesResults> caseFieldsAggregations = new ArrayList<>();
+        final List<CaseTypeResults> caseTypeResults = new ArrayList<>();
         long totalHits = 0L;
 
         for (MultiSearchResult.MultiSearchResponse response : multiSearchResult.getResponses()) {
@@ -113,33 +113,39 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 throw new BadSearchRequest(errMsg);
             }
             if (response.searchResult != null) {
-                buildCaseFieldsAggregations(response, caseFieldsAggregations, crossCaseTypeSearchRequest);
+                buildCaseTypesResults(response, caseTypeResults, crossCaseTypeSearchRequest);
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
                 totalHits += response.searchResult.getTotal();
             }
         }
 
-        return new CaseSearchResult(caseFieldsAggregations, totalHits, caseDetails);
+        return new CaseSearchResult(caseTypeResults, totalHits, caseDetails);
     }
 
-    private void buildCaseFieldsAggregations(
-        final MultiSearchResult.MultiSearchResponse response,
-        final List<CaseTypesResults> caseFieldsAggregations,
-        final CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
+    private void buildCaseTypesResults(
+        MultiSearchResult.MultiSearchResponse response,
+        List<CaseTypeResults> caseFieldsAggregations,
+        CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
 
-        if (response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits").getAsJsonArray().size() != 0) {
-
-            final String indexName = response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits")
-                .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
-
-            caseFieldsAggregations.add(new CaseTypesResults(getNameFromIndex(indexName,
+        if (hitsIsNotEmpty(response)) {
+            String indexName = getIndexName(response);
+            caseFieldsAggregations.add(new CaseTypeResults(getCaseTypeIDFromIndex(indexName,
                 crossCaseTypeSearchRequest.getCaseTypeIds()),
                 response.searchResult.getTotal())
             );
         }
     }
 
-    private String getNameFromIndex(final String index, List<String> caseTypeIds) {
+    private String getIndexName(MultiSearchResult.MultiSearchResponse response) {
+        return response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits")
+            .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
+    }
+
+    private boolean hitsIsNotEmpty(MultiSearchResult.MultiSearchResponse response) {
+        return response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits").getAsJsonArray().size() != 0;
+    }
+
+    private String getCaseTypeIDFromIndex(final String index, List<String> caseTypeIds) {
         final String caseTypeIdFromIndex = index.substring(0, index.indexOf("_cases")).replaceAll("\"", "");
         return caseTypeIds.stream().filter(caseTypeId -> caseTypeId.equalsIgnoreCase(caseTypeIdFromIndex)).findFirst().get();
     }

@@ -93,7 +93,7 @@ public class CaseSearchEndpoint {
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(getCaseTypeIds(caseTypeIds))
             .withSearchRequest(elasticsearchRequest)
-            .withConsolidationQuery(isAConsolidationQuery(caseTypeIds))
+            .withAnyCaseTypeRequest(isAnyCaseTypeRequest(caseTypeIds))
             .build();
 
         CaseSearchResult result = caseSearchOperation.execute(request);
@@ -105,7 +105,7 @@ public class CaseSearchEndpoint {
     }
 
     private List<String> getCaseTypeIds(List<String> caseTypeIds) {
-        if (isAConsolidationQuery(caseTypeIds)) {
+        if (isAnyCaseTypeRequest(caseTypeIds)) {
             return getCaseTypes();
         }
         return caseTypeIds;
@@ -120,12 +120,12 @@ public class CaseSearchEndpoint {
     }
 
     private List<String> getCaseTypesFromIdamRoles() {
-        List<String> roles = userRepository.getUserRolesJurisdictions();
-        return caseDefinitionRepository.getAllCaseTypesByJurisdictions(roles).get();
+        List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+        return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
     }
 
-    private boolean isAConsolidationQuery(List<String> caseTypeIds) {
-        return ElasticsearchRequest.SOURCE_WILDCARD.equals(caseTypeIds.get(0));
+    private boolean isAnyCaseTypeRequest(List<String> caseTypeIds) {
+        return ElasticsearchRequest.ANY_CASE_TYPE.equals(caseTypeIds.get(0));
     }
 
     public static String buildCaseIds(CaseSearchResult caseSearchResult) {
