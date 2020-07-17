@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.*;
 
 import java.util.*;
@@ -27,18 +27,18 @@ public class CaseSearchResultViewGenerator {
     private final UserRepository userRepository;
     private final CaseTypeService caseTypeService;
     private final SearchResultDefinitionService searchResultDefinitionService;
-    private final SearchResultProcessor searchResultProcessor;
+    private final DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
     private final CaseSearchesViewAccessControl caseSearchesViewAccessControl;
 
     public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                          CaseTypeService caseTypeService,
                                          SearchResultDefinitionService searchResultDefinitionService,
-                                         SearchResultProcessor searchResultProcessor,
+                                         DateTimeSearchResultProcessor dateTimeSearchResultProcessor,
                                          CaseSearchesViewAccessControl caseSearchesViewAccessControl) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
         this.searchResultDefinitionService = searchResultDefinitionService;
-        this.searchResultProcessor = searchResultProcessor;
+        this.dateTimeSearchResultProcessor = dateTimeSearchResultProcessor;
         this.caseSearchesViewAccessControl = caseSearchesViewAccessControl;
     }
 
@@ -51,7 +51,7 @@ public class CaseSearchResultViewGenerator {
         List<SearchResultViewItem> items = buildItems(useCase, caseSearchResult, caseTypeId, requestedFields);
 
         if (itemsRequireFormatting(headerGroups)) {
-            items = searchResultProcessor.execute(headerGroups.get(0).getFields(), items);
+            items = dateTimeSearchResultProcessor.execute(headerGroups.get(0).getFields(), items);
         }
 
         return new CaseSearchResultView(
@@ -148,7 +148,7 @@ public class CaseSearchResultViewGenerator {
         if (addedFields.contains(id)) {
             return false;
         } else {
-            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole())) {
+            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.anyRoleEqualsTo(resultField.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {
