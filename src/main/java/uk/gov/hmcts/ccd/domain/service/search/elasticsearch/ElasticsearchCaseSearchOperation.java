@@ -146,8 +146,13 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private String getCaseTypeIDFromIndex(final String index, List<String> caseTypeIds) {
-        final String caseTypeIdFromIndex = index.substring(0, index.indexOf("_cases")).replaceAll("\"", "");
-        return caseTypeIds.stream().filter(caseTypeId -> caseTypeId.equalsIgnoreCase(caseTypeIdFromIndex)).findFirst().get();
+        String pureIndexFormat = applicationParams.getCasesIndexNameFormat().substring(2);
+        final String caseTypeIdFromIndex = index.substring(0, index.indexOf(pureIndexFormat))
+            .replaceAll("\"", "");
+
+        return caseTypeIds.stream().filter(
+            caseTypeId -> caseTypeId.equalsIgnoreCase(caseTypeIdFromIndex)
+        ).findFirst().get();
     }
 
     private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
