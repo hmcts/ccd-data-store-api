@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -52,16 +53,19 @@ public class CaseSearchEndpoint {
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final UserRepository userRepository;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
                               @Qualifier(DefaultUserRepository.QUALIFIER)  UserRepository userRepository,
-                              ElasticsearchQueryHelper elasticsearchQueryHelper) {
+                              ElasticsearchQueryHelper elasticsearchQueryHelper,
+                              ApplicationParams applicationParams) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.userRepository = userRepository;
+        this.applicationParams = applicationParams;
     }
 
     @PostMapping(value = "/searchCases")
@@ -108,8 +112,7 @@ public class CaseSearchEndpoint {
     }
 
     private List<String> getCaseTypes() {
-
-        if (true) {
+        if (userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles())) {
             return caseDefinitionRepository.getAllCaseTypesIDs();
         } else {
             return getCaseTypesFromIdamRoles();
