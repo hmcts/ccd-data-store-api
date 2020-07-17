@@ -55,6 +55,9 @@
   },
 
   "expectedResponse": {
-    "_extends_": "F-105_Add_Case_Assigned_User_Roles_400_response"
+    "_extends_": "F-105_Add_Case_Assigned_User_Roles_400_response",
+    "body": {
+      "message": "Invalid data provided for the following inputs to the request:\nOrganisation ID is not valid"
+    }
   }
 }
