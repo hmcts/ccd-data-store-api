@@ -12,15 +12,20 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+/**
+ * Used to log information about requests and the invoking user.
+ *
+ * To be enabled this filter should be registered after successful authentication as part of the Spring Security filter chain.
+ */
 @Slf4j
-public class LoggingFilter extends OncePerRequestFilter {
+public class SecurityLoggingFilter extends OncePerRequestFilter {
 
-    private static final String LOG_MESSAGE_TEMPLATE = "[LOG FILTER] Attempting to serve request %s %s for user with IDAM roles %s";
+    private static final String LOG_MESSAGE_TEMPLATE = "Attempting to serve request %s %s for user with IDAM roles %s";
 
     private final SecurityUtils securityUtils;
     private final Pattern pathPattern;
 
-    public LoggingFilter(SecurityUtils securityUtils, String pathRegex) {
+    public SecurityLoggingFilter(SecurityUtils securityUtils, String pathRegex) {
         this.securityUtils = securityUtils;
         this.pathPattern = Pattern.compile(pathRegex);
     }

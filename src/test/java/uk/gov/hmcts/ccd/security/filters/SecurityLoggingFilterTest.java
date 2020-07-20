@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class LoggingFilterTest {
+class SecurityLoggingFilterTest {
 
     private static final List<String> ROLES_LIST = Arrays.asList(
         "ccd-import",
@@ -34,7 +34,7 @@ class LoggingFilterTest {
     );
     private static final String REQUEST_URI = "/url/path?with=param";
 
-    private LoggingFilter filter;
+    private SecurityLoggingFilter filter;
 
     @Mock
     private SecurityUtils securityUtils;
@@ -51,7 +51,7 @@ class LoggingFilterTest {
         response = new MockHttpServletResponse();
         filterChain = new MockFilterChain();
 
-        Logger filterLogger = (Logger) LoggerFactory.getLogger(LoggingFilter.class);
+        Logger filterLogger = (Logger) LoggerFactory.getLogger(SecurityLoggingFilter.class);
         filterLogger.setLevel(Level.DEBUG);
         filterLoggerCapture = new ListAppender<>();
         filterLoggerCapture.start();
@@ -60,7 +60,7 @@ class LoggingFilterTest {
 
     @Test
     void shouldLogRolesOfInvoker() throws Exception {
-        filter = new LoggingFilter(securityUtils, "/first-url.*|/url.*");
+        filter = new SecurityLoggingFilter(securityUtils, "/first-url.*|/url.*");
 
         UserInfo userInfo = UserInfo.builder()
             .uid("user123")
@@ -73,7 +73,7 @@ class LoggingFilterTest {
 
         filter.doFilterInternal(request, response, filterChain);
 
-        String expectedMessage = "[LOG FILTER] Attempting to serve request POST /url/path?with=param for user with IDAM roles "
+        String expectedMessage = "Attempting to serve request POST /url/path?with=param for user with IDAM roles "
             + "ccd-import,caseworker-autotest1,caseworker";
         List<ILoggingEvent> loggingEvents = filterLoggerCapture.list;
         assertAll(
@@ -85,7 +85,7 @@ class LoggingFilterTest {
 
     @Test
     void shouldNotFilterWhenUrlDoesNotMatchRegex() throws Exception {
-        filter = new LoggingFilter(securityUtils, "/no-match.*");
+        filter = new SecurityLoggingFilter(securityUtils, "/no-match.*");
         request.setRequestURI(REQUEST_URI);
 
         boolean result = filter.shouldNotFilter(request);
@@ -95,7 +95,7 @@ class LoggingFilterTest {
 
     @Test
     void shouldFilterWhenUrlMatchesRegex() throws Exception {
-        filter = new LoggingFilter(securityUtils, "/first-url.*|/url.*");
+        filter = new SecurityLoggingFilter(securityUtils, "/first-url.*|/url.*");
         request.setRequestURI(REQUEST_URI);
 
         boolean result = filter.shouldNotFilter(request);
