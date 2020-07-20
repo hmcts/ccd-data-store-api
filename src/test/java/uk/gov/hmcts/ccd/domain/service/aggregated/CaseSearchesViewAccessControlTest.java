@@ -8,32 +8,22 @@ import org.mockito.*;
 import uk.gov.hmcts.ccd.data.casedetails.*;
 import uk.gov.hmcts.ccd.data.user.*;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.search.*;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.*;
 import uk.gov.hmcts.ccd.domain.service.common.*;
-import uk.gov.hmcts.ccd.domain.service.processor.*;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.*;
-import uk.gov.hmcts.ccd.endpoint.exceptions.*;
 
 import java.io.*;
 import java.time.*;
 import java.util.*;
-import java.util.stream.*;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.*;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil.CaseDetailsBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.*;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.*;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.*;
 
 class CaseSearchesViewAccessControlTest {
@@ -94,7 +84,7 @@ class CaseSearchesViewAccessControlTest {
     private SecurityClassificationService securityClassificationService;
 
     @Mock
-    private SearchResultProcessor searchResultProcessor;
+    private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
 
     private CaseSearchesViewAccessControl classUnderTest;
 
@@ -144,7 +134,7 @@ class CaseSearchesViewAccessControlTest {
             .build();
 
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(caseType1SearchResult);
-        doAnswer(i -> i.getArgument(1)).when(searchResultProcessor).execute(any(), any());
+        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(any(), any());
         when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
 
         classUnderTest = new CaseSearchesViewAccessControl(userRepository, caseTypeService, searchResultDefinitionService, securityClassificationService);

@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.definition.SortOrder;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchInputProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 
@@ -95,7 +95,7 @@ public class SearchQueryOperationTest {
     private UserRepository userRepository;
 
     @Mock
-    private SearchInputProcessor searchInputProcessor;
+    private DateTimeSearchInputProcessor dateTimeSearchInputProcessor;
 
     @Mock
     private SearchResultDefinitionService searchResultDefinitionService;
@@ -128,14 +128,14 @@ public class SearchQueryOperationTest {
                                                         mergeDataToSearchResultOperation,
                                                         getCaseTypeOperation,
                                                         getDraftsOperation, searchResultDefinitionService, userRepository,
-                                                        searchInputProcessor);
+            dateTimeSearchInputProcessor);
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(SEARCH), any());
-        doAnswer(i -> i.getArgument(2)).when(searchInputProcessor).executeQueryParams(Mockito.any(), Mockito.any(), Mockito.any());
-        doAnswer(i -> i.getArgument(1)).when(searchInputProcessor).executeMetadata(Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(2)).when(dateTimeSearchInputProcessor).executeQueryParams(Mockito.any(), Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchInputProcessor).executeMetadata(Mockito.any(), Mockito.any());
 
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
@@ -334,7 +334,7 @@ public class SearchQueryOperationTest {
         assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_ID_1_2 + "." + CASE_FIELD_PATH));
         assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC));
     }
-    
+
     private static SearchResultField buildSortResultField(String caseFieldId,
                                                     String caseFieldPath,
                                                     String role,
