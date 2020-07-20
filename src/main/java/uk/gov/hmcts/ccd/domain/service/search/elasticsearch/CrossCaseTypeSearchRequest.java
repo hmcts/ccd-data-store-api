@@ -87,7 +87,7 @@ public class CrossCaseTypeSearchRequest {
     private void addMetadataSourceFields() {
         if (elasticsearchRequest.hasSourceFields()) {
             // when fields are explicitly specified in _source, we need to add metadata fields explicitly to the response.
-            // Otherwise, we don't need because the metadata are in the response already
+            // Otherwise, we don't need because all case data including metadata fields are in the response already
             ArrayNode sourceNode = (ArrayNode) elasticsearchRequest.getSource();
             Arrays.stream(MetaData.CaseField.values())
                 .forEach(field -> sourceNode.add(new TextNode(field.getDbColumnName())));
