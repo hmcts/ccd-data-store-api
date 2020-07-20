@@ -39,6 +39,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     public static final String QUALIFIER = "ElasticsearchCaseSearchOperation";
     static final String MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE = "root_cause";
+    private static final String HITS = "hits";
 
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
@@ -137,12 +138,12 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private String getIndexName(MultiSearchResult.MultiSearchResponse response) {
-        return response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits")
+        return response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS)
             .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
     }
 
     private boolean hitsIsNotEmpty(MultiSearchResult.MultiSearchResponse response) {
-        return response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits").getAsJsonArray().size() != 0;
+        return response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS).getAsJsonArray().size() != 0;
     }
 
     private String getCaseTypeIDFromIndex(final String index, List<String> caseTypeIds) {
