@@ -152,7 +152,10 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
         return caseTypeIds.stream().filter(
             caseTypeId -> caseTypeId.equalsIgnoreCase(caseTypeIdFromIndex)
-        ).findFirst().get();
+        ).findFirst().orElseGet(() -> {
+            log.error("The Case type id could be found using the following index name: {}", caseTypeIdFromIndex);
+            return "index-error";
+        });
     }
 
     private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
