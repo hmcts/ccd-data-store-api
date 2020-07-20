@@ -30,7 +30,6 @@ public class CaseSearchResult {
         this(total, cases, new ArrayList<>());
     }
 
-
     public List<CaseDetails> getCases() {
         return cases;
     }
