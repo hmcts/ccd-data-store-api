@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -87,7 +86,8 @@ public class CrossCaseTypeSearchRequest {
 
     private void addMetadataSourceFields() {
         if (elasticsearchRequest.hasSourceFields()) {
-
+            // when fields are explicitly specified in _source, we need to add metadata fields explicitly to the response.
+            // Otherwise, we don't need because the metadata are in the response already
             ArrayNode sourceNode = (ArrayNode) elasticsearchRequest.getSource();
             Arrays.stream(MetaData.CaseField.values())
                 .forEach(field -> sourceNode.add(new TextNode(field.getDbColumnName())));
