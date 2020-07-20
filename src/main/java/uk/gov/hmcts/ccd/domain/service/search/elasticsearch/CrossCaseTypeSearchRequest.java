@@ -22,17 +22,17 @@ import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRe
 /**
  * Sample ES json search request.
  * {
- * "_source": ["alias.searchField1", "alias.searchField2"],
- * "query": {
- * "bool": {
- * "filter": {
- * "match": { "state": "AwaitingPayment"}
- * }
- * }
- * },
- * "sort": {
- * "id": { "order":"asc" }
- * }
+ *   "_source": ["alias.searchField1", "alias.searchField2"],
+ *   "query": {
+ *     "bool": {
+ *       "filter": {
+ *         "match": { "state": "AwaitingPayment"}
+ *       }
+ *     }
+ *   },
+ *  "sort": {
+ *     "id": { "order":"asc" }
+ *   }
  * }
  */
 public class CrossCaseTypeSearchRequest {
