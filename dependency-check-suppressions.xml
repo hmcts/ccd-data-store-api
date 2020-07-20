@@ -373,5 +373,32 @@
     <suppress>
         <cve>CVE-2017-18365</cve>
     </suppress>
-
+	<suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+   <cve>CVE-2020-13934</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+   <cve>CVE-2020-13935</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+   <cve>CVE-2020-13934</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+   <cve>CVE-2020-13935</cve>
+</suppress>
 </suppressions>
