@@ -125,12 +125,12 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private void buildCaseTypesResults(
         MultiSearchResult.MultiSearchResponse response,
-        List<CaseTypeResults> caseFieldsAggregations,
+        List<CaseTypeResults> caseTypeResults,
         CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
 
         if (hitsIsNotEmpty(response)) {
             String indexName = getIndexName(response);
-            caseFieldsAggregations.add(new CaseTypeResults(getCaseTypeIDFromIndex(indexName,
+            caseTypeResults.add(new CaseTypeResults(getCaseTypeIDFromIndex(indexName,
                 crossCaseTypeSearchRequest.getCaseTypeIds()),
                 response.searchResult.getTotal())
             );
