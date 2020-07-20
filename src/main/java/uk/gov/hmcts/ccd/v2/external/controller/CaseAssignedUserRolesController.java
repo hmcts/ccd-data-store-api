@@ -50,6 +50,8 @@ public class CaseAssignedUserRolesController {
 
     public static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
 
+    final Pattern caseRolePattern = Pattern.compile("^\\[.+]$");
+
     private final ApplicationParams applicationParams;
     private final UIDService caseReferenceService;
     private final CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
@@ -85,7 +87,8 @@ public class CaseAssignedUserRolesController {
                 + "1. " + V2.Error.EMPTY_CASE_USER_ROLE_LIST + "\n"
                 + "2. " + V2.Error.CASE_ID_INVALID + "\n"
                 + "3. " + V2.Error.USER_ID_INVALID + "\n"
-                + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + "."
+                + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + "\n"
+                + "5. " + V2.Error.ORGANISATION_ID_INVALID + "."
         ),
         @ApiResponse(
             code = 401,
@@ -195,7 +198,6 @@ public class CaseAssignedUserRolesController {
     }
 
     private void validateRequestParams(CaseAssignedUserRolesResource caseAssignedUserRoles) {
-        final Pattern caseRolePattern = Pattern.compile("^\\[.+]$");
 
         List<String> errorMessages = Lists.newArrayList("Invalid data provided for the following inputs to the request:");
 
@@ -206,25 +208,31 @@ public class CaseAssignedUserRolesController {
         if (caseUserRoles.isEmpty()) {
             errorMessages.add(V2.Error.EMPTY_CASE_USER_ROLE_LIST);
         } else {
-            caseUserRoles.forEach(caseRole -> {
-                // case_id: has to be a valid 16-digit Luhn number)
-                if (!caseReferenceService.validateUID(caseRole.getCaseDataId())) {
-                    errorMessages.add(V2.Error.CASE_ID_INVALID);
-                }
-                // user_id: has to be a string of length > 0
-                if (StringUtils.isAllBlank(caseRole.getUserId())) {
-                    errorMessages.add(V2.Error.USER_ID_INVALID);
-                }
-                // case_role: has to be a none-empty string in square brackets
-                if (caseRole.getCaseRole() == null || !caseRolePattern.matcher(caseRole.getCaseRole()).matches()) {
-                    errorMessages.add(V2.Error.CASE_ROLE_FORMAT_INVALID);
-                }
-            });
+            caseUserRoles.forEach(caseRole -> validateCaseAssignedUserRole(caseRole, errorMessages));
         }
 
         if (errorMessages.size() > 1) {
             String message = String.join("\n", errorMessages);
             throw new BadRequestException(message);
+        }
+    }
+
+    private void validateCaseAssignedUserRole(CaseAssignedUserRole caseRole, List<String> errorMessages) {
+        // case_id: has to be a valid 16-digit Luhn number)
+        if (!caseReferenceService.validateUID(caseRole.getCaseDataId())) {
+            errorMessages.add(V2.Error.CASE_ID_INVALID);
+        }
+        // user_id: has to be a string of length > 0
+        if (StringUtils.isAllBlank(caseRole.getUserId())) {
+            errorMessages.add(V2.Error.USER_ID_INVALID);
+        }
+        // case_role: has to be a none-empty string in square brackets
+        if (caseRole.getCaseRole() == null || !caseRolePattern.matcher(caseRole.getCaseRole()).matches()) {
+            errorMessages.add(V2.Error.CASE_ROLE_FORMAT_INVALID);
+        }
+        // organisation_id: has to be a non-empty string, when present
+        if (caseRole.getOrganisationId() != null && caseRole.getOrganisationId().isEmpty()) {
+            errorMessages.add(V2.Error.ORGANISATION_ID_INVALID);
         }
     }
 
