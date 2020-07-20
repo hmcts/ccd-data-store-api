@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.ccd.security.filters.LoggingFilter;
 import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 
@@ -38,6 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final ServiceAuthFilter serviceAuthFilter;
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
+    private final LoggingFilter loggingFilter;
     private JwtAuthenticationConverter jwtAuthenticationConverter;
 
     private static final String[] AUTH_WHITELIST = {
@@ -57,9 +59,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                                  final ServiceAuthFilter serviceAuthFilter,
                                  final Function<HttpServletRequest, Optional<String>> userIdExtractor,
                                  final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
-                                 final SecurityUtils securityUtils) {
+                                 final SecurityUtils securityUtils,
+                                 @Value("${logging.filter.path.regex}") String loggingFilterPathRegex) {
         this.v1EndpointsPathParamSecurityFilter = new V1EndpointsPathParamSecurityFilter(
             userIdExtractor, authorizedRolesExtractor, securityUtils);
+        this.loggingFilter = new LoggingFilter(securityUtils, loggingFilterPathRegex);
         this.serviceAuthFilter = serviceAuthFilter;
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
@@ -74,6 +78,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
+            .addFilterAfter(loggingFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(v1EndpointsPathParamSecurityFilter, BearerTokenAuthenticationFilter.class)
             .sessionManagement().sessionCreationPolicy(STATELESS).and()
             .csrf().disable()

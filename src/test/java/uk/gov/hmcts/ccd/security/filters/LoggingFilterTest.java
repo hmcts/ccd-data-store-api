@@ -29,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class RoleLoggingFilterTest {
+class LoggingFilterTest {
 
     private static final List<String> ROLES_LIST = Arrays.asList(
         "ccd-import",
@@ -38,10 +38,7 @@ class RoleLoggingFilterTest {
     );
     private static final String REQUEST_URI = "/url/path?with=param";
 
-    private RoleLoggingFilter filter;
-
-    @Mock
-    private AppInsights appInsights;
+    private LoggingFilter filter;
 
     @Mock
     private SecurityUtils securityUtils;
@@ -58,7 +55,7 @@ class RoleLoggingFilterTest {
         response = new MockHttpServletResponse();
         filterChain = new MockFilterChain();
 
-        Logger filterLogger = (Logger) LoggerFactory.getLogger(RoleLoggingFilter.class);
+        Logger filterLogger = (Logger) LoggerFactory.getLogger(LoggingFilter.class);
         filterLogger.setLevel(Level.DEBUG);
         filterLoggerCapture = new ListAppender<>();
         filterLoggerCapture.start();
@@ -67,7 +64,7 @@ class RoleLoggingFilterTest {
 
     @Test
     void shouldLogRolesOfInvoker() throws Exception {
-        filter = new RoleLoggingFilter(appInsights, securityUtils, "/first-url.*|/url.*");
+        filter = new LoggingFilter(securityUtils, "/first-url.*|/url.*");
 
         UserInfo userInfo = UserInfo.builder()
             .uid("user123")
@@ -80,20 +77,19 @@ class RoleLoggingFilterTest {
 
         filter.doFilterInternal(request, response, filterChain);
 
-        String expectedMessage = "[ROLE LOG] Attempting to serve request POST /url/path?with=param for user with IDAM roles "
+        String expectedMessage = "[LOG FILTER] Attempting to serve request POST /url/path?with=param for user with IDAM roles "
             + "ccd-import,caseworker-autotest1,caseworker";
         List<ILoggingEvent> loggingEvents = filterLoggerCapture.list;
         assertAll(
             () -> assertEquals(1, loggingEvents.size()),
             () -> assertEquals(expectedMessage, loggingEvents.get(0).getFormattedMessage()),
-            () -> assertEquals(Level.DEBUG, loggingEvents.get(0).getLevel()),
-            () -> verify(appInsights).trackTrace(eq(expectedMessage), eq(SeverityLevel.Verbose))
+            () -> assertEquals(Level.DEBUG, loggingEvents.get(0).getLevel())
         );
     }
 
     @Test
     void shouldNotFilterWhenUrlDoesNotMatchRegex() throws Exception {
-        filter = new RoleLoggingFilter(appInsights, securityUtils, "/no-match.*");
+        filter = new LoggingFilter(securityUtils, "/no-match.*");
         request.setRequestURI(REQUEST_URI);
 
         boolean result = filter.shouldNotFilter(request);
@@ -103,7 +99,7 @@ class RoleLoggingFilterTest {
 
     @Test
     void shouldFilterWhenUrlMatchesRegex() throws Exception {
-        filter = new RoleLoggingFilter(appInsights, securityUtils, "/first-url.*|/url.*");
+        filter = new LoggingFilter(securityUtils, "/first-url.*|/url.*");
         request.setRequestURI(REQUEST_URI);
 
         boolean result = filter.shouldNotFilter(request);
