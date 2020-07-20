@@ -127,7 +127,6 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         MultiSearchResult.MultiSearchResponse response,
         List<CaseTypeResults> caseTypeResults,
         CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
-
         if (hitsIsNotEmpty(response)) {
             String indexName = getIndexName(response);
             caseTypeResults.add(new CaseTypeResults(getCaseTypeIDFromIndex(indexName,
