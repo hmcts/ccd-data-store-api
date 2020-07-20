@@ -16,26 +16,19 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 201,
-    "responseMessage": "OK",
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8",
-      "Vary" : "Accept-Encoding"
-    },
     "body": {
       "_links": {
         "self": {
           "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "[[ANYTHING_PRESENT]]",
-      "case_type": "[[ANYTHING_PRESENT]]",
+      "id": "${[scenarioContext][childContexts][S-927_Create_Case_Data][testData][actualResponse][body][id]}",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_MasterCaseType",
       "created_on": "[[ANYTHING_PRESENT]]",
       "last_modified_on": "[[ANYTHING_PRESENT]]",
       "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "state": "[[ANYTHING_PRESENT]]",
+      "state": "CaseUpdated",
       "security_classification": "[[ANYTHING_PRESENT]]",
       "data": {
         "AddressField": {

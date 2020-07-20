@@ -9,13 +9,6 @@
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",
-    "headers": {
-      "Keep-Alive": "[[ANYTHING_PRESENT]]",
-      "Connection": "[[ANYTHING_PRESENT]]",
-      "Transfer-Encoding" : "[[ANYTHING_PRESENT]]",
-      "vary" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "[[ANYTHING_PRESENT]]"
-    },
     "body": {
       "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
@@ -39,8 +32,8 @@
           "OrgPolicyCaseAssignedRole": "[Defendant]",
           "OrgPolicyReference": "ref",
           "Organisation": {
-            "OrganisationID": "[[ANYTHING_PRESENT]]",
-            "OrganisationName": "[[ANYTHING_PRESENT]]"
+            "OrganisationID": "orgID2",
+            "OrganisationName": "orgName2"
           }
         },
         "TextAreaField": "[[ANYTHING_PRESENT]]",
@@ -48,8 +41,8 @@
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": "ref",
           "Organisation": {
-            "OrganisationID": "[[ANYTHING_PRESENT]]",
-            "OrganisationName": "[[ANYTHING_PRESENT]]"
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
           }
         }
       },

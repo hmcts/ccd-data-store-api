@@ -1,11 +1,11 @@
 {
-  "title": "should create event successfully for an existing case",
+  "title": "must return 422 for case update with invalid organisation policy",
   "_guid_": "S-928",
   "_extends_": "F-107_Test_Data_Update",
 
   "specs": [
     "an active profile in CCD",
-    "contains some OrganisationPolicy fields with incorrect values"
+    "contains OrganisationPolicy case roles which are different from the default case roles"
   ],
 
   "request": {

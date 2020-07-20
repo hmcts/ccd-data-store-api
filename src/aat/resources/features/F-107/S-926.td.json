@@ -1,11 +1,11 @@
 {
-	"title": "must return 422 for case creation with organisation policy",
+	"title": "must return 422 for case creation with invalid organisation policy",
 	"_guid_": "S-926",
 	"_extends_": "F-107_Test_Data_Base",
 
 	"specs": [
 		"an active profile in CCD",
-		"contains some OrganisationPolicy fields with incorrect values"
+		"contains OrganisationPolicy case roles which are different from the default case roles"
 	],
 
   "request": {

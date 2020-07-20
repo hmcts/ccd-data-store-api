@@ -49,9 +49,6 @@
     }
   },
   "expectedResponse": {
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
-    }
+    "_extends_": "Common_201_Response"
   }
 }
