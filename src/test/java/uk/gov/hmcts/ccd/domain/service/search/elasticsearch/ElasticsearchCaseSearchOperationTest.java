@@ -135,7 +135,7 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails))),
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(1L)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams).getCasesIndexNameFormat(),
+                () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
@@ -185,7 +185,7 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails, caseDetails))),
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
+                () -> verify(applicationParams, times(4)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
@@ -237,7 +237,7 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
                 () -> assertThat(caseSearchResult.getCaseTypeResults().size(), equalTo(2)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
+                () -> verify(applicationParams, times(4)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
