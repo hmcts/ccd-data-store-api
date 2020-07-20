@@ -238,7 +238,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      Then a positive response is received,
      And the response has all the details as expected,
      And a call [to verify Olawale's reception of the role CR-2 over the case C1] will get the expected response as in [F-105.8842.2_Verify_Case_Roles_for_Case_C1].
-     And a call [to verify the count of users assigned to a case] will get the expected response as in [F-105_Verify_Counter_1].
+     And a call [to verify the count of users assigned to a case] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
    # RDM-8842 AC-3
    @S-105.8842.3
@@ -255,7 +255,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      Then a positive response is received,
      And the response has all the details as expected,
      And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [F-105.8842.3_Verify_Case_Roles_for_Case_C1],
-     And a call [to verify the count of users assigned to a case] will get the expected response as in [F-105_Verify_Counter_1].
+     And a call [to verify the count of users assigned to a case] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
    # RDM-8842 AC-4
    @S-105.8842.4
@@ -274,4 +274,4 @@ Feature: F-105: Add Case-Assigned Users and Roles
      Then a negative response is received,
      And the response has all the details as expected,
      And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [F-105.8842.4_Verify_Case_Roles_for_Case_C1],
-     And a call [to verify the count of users assigned to a case] will get the expected response as in [F-105_Verify_Counter_0].
+     And a call [to verify the count of users assigned to a case] will get the expected response as in [F-105_Verify_Counter_Unchanged].
