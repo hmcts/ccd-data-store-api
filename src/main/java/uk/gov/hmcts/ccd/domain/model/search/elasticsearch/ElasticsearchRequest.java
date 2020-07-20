@@ -40,16 +40,13 @@ public class ElasticsearchRequest {
     }
 
     public boolean hasSourceFields() {
-        // If a source is empty or only has a wildcard element, then equivalent to no provided source
-        return isResourceFalse() && searchRequest.has(SOURCE) && !getSource().isEmpty()
-            && !(getSource().size() == 1 && getSource().get(0).asText().equals(WILDCARD));
-    }
-
-    private boolean isResourceFalse() {
+        // If a source is empty, boolean or only has a wildcard element, then equivalent to no provided source
         if (this.getSource() instanceof BooleanNode) {
-            return ((BooleanNode) this.getSource()).asBoolean();
+            return false;
         }
-        return true;
+
+        return searchRequest.has(SOURCE) && !getSource().isEmpty()
+            && !(getSource().size() == 1 && getSource().get(0).asText().equals(WILDCARD));
     }
 
     public JsonNode getSource() {

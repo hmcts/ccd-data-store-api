@@ -87,9 +87,7 @@ public class CrossCaseTypeSearchRequest {
 
     private void addMetadataSourceFields() {
         if (elasticsearchRequest.hasSourceFields()) {
-            if (elasticsearchRequest.getSource() instanceof BooleanNode) {
-                return;
-            }
+
             ArrayNode sourceNode = (ArrayNode) elasticsearchRequest.getSource();
             Arrays.stream(MetaData.CaseField.values())
                 .forEach(field -> sourceNode.add(new TextNode(field.getDbColumnName())));
