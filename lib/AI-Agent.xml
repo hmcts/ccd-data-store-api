@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ApplicationInsightsAgent>
-    <AgentLogger>DEBUG</AgentLogger>
+    <AgentLogger>INFO</AgentLogger>
     <Instrumentation>
         <BuiltIn enabled="true">
             <HTTP enabled="true"/>
