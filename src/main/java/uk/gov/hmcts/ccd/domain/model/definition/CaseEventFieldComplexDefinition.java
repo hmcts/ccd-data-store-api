@@ -3,9 +3,10 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import java.io.Serializable;
 
 import lombok.Builder;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 @Builder
-public class CaseEventFieldComplexDefinition implements Serializable {
+public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPModel {
 
     private String reference;
 
