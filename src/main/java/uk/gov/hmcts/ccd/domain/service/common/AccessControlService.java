@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterUtil;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
@@ -71,7 +71,6 @@ public class AccessControlService {
         this.compoundAccessControlService = compoundAccessControlService;
     }
 
-
     public boolean canAccessCaseTypeWithCriteria(final CaseTypeDefinition caseType,
                                                  final Set<String> userRoles,
                                                  final Predicate<AccessControlList> criteria) {
@@ -79,9 +78,10 @@ public class AccessControlService {
             && hasAccessControlList(userRoles, criteria, caseType.getAccessControlLists());
 
         if (!hasAccess) {
-            LOG.debug("No relevant case type access for caseTypeACLs={}, userRoles={}",
-                caseType != null ? caseType.getAccessControlLists() : newArrayList(),
-                userRoles);
+            LOG.debug("No relevant case type access for caseType={}, caseTypeACLs={}, userRoles={}",
+                     caseType != null ? caseType.getId() : "",
+                     caseType != null ? caseType.getAccessControlLists() : newArrayList(),
+                     userRoles);
         }
 
         return hasAccess;
@@ -91,18 +91,21 @@ public class AccessControlService {
                                                   final CaseTypeDefinition caseType,
                                                   final Set<String> userRoles,
                                                   final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasAccessControlList(userRoles, criteria, caseType.getStates()
+
+        List<AccessControlList> stateACLs = caseType.getStates()
             .stream()
             .filter(cState -> cState.getId().equalsIgnoreCase(caseState))
             .map(CaseStateDefinition::getAccessControlLists)
             .flatMap(Collection::stream)
-            .collect(toList()));
+            .collect(toList());
+
+        boolean hasAccess = hasAccessControlList(userRoles, criteria, stateACLs);
 
         if (!hasAccess) {
-            LOG.debug("No relevant case state access for caseState= {}, caseTypeACLs={}, userRoles={}",
-                caseState,
-                caseType.getAccessControlLists(),
-                userRoles);
+            LOG.debug("No relevant case state access for caseState={}, caseStateACL={}, userRoles={}",
+                     caseState,
+                     stateACLs,
+                     userRoles);
         }
         return hasAccess;
     }

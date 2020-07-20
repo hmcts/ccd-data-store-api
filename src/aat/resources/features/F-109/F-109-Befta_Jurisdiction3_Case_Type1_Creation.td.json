@@ -1,6 +1,8 @@
 {
   "_guid_": "F-109-Befta_Jurisdiction3_Case_Type1_Creation",
   "_extends_": "Befta_Jurisdiction2_Case_Creation_Base_Data",
+  "specs": [
+  ],
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.3@gmail.com",
@@ -165,5 +167,3 @@
     }
   }
 }
-
-

@@ -1,0 +1,111 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/display/wizard-page-structure/case-types/DCP.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "case_type_id": "DCP",
+      "wizard_pages": [
+        {
+          "id": "UPDATEfirst",
+          "label": "First page",
+          "order": 1,
+          "wizard_page_fields": [
+            {
+              "case_field_id": "[LAST_MODIFIED_DATE]",
+              "order": 13,
+              "page_column_no": null,
+              "complex_field_overrides": []
+            },
+            {
+              "case_field_id": "TextField",
+              "order": 1,
+              "page_column_no": null,
+              "complex_field_overrides": []
+            },
+            {
+              "case_field_id": "CollectionComplexDateTime",
+              "order": 12,
+              "page_column_no": null,
+              "complex_field_overrides": []
+            }
+          ],
+          "show_condition": null,
+          "callback_url_mid_event": null,
+          "retries_timeout_mid_event": []
+        },
+        {
+          "id": "UPDATEsecond",
+          "label": "Second page",
+          "order": 2,
+          "wizard_page_fields": [
+            {
+              "case_field_id": "DateField",
+              "order": 2,
+              "page_column_no": null,
+              "complex_field_overrides": []
+            },
+            {
+              "case_field_id": "DateTimeField",
+              "order": 3,
+              "page_column_no": null,
+              "complex_field_overrides": []
+            }
+          ],
+          "show_condition": null,
+          "callback_url_mid_event": null,
+          "retries_timeout_mid_event": []
+        },
+        {
+          "id": "UPDATEthird",
+          "label": "Third page",
+          "order": 3,
+          "wizard_page_fields": [
+            {
+              "case_field_id": "CollectionField",
+              "order": 2,
+              "page_column_no": null,
+              "complex_field_overrides": []
+            },
+            {
+              "case_field_id": "ComplexField",
+              "order": 1,
+              "page_column_no": null,
+              "complex_field_overrides": [
+                {
+                  "complex_field_element_id": "ComplexField.ComplexDateTimeField",
+                  "display_context": "OPTIONAL",
+                  "label": null,
+                  "hint_text": null,
+                  "show_condition": null
+                },
+                {
+                  "complex_field_element_id": "ComplexField.ComplexNestedField.NestedNumberField",
+                  "display_context": "OPTIONAL",
+                  "label": null,
+                  "hint_text": null,
+                  "show_condition": null
+                },
+                {
+                  "complex_field_element_id": "ComplexField.ComplexNestedField.NestedCollectionTextField",
+                  "display_context": "HIDDEN",
+                  "label": null,
+                  "hint_text": null,
+                  "show_condition": null
+                }
+              ]
+            }
+          ],
+          "show_condition": null,
+          "callback_url_mid_event": null,
+          "retries_timeout_mid_event": []
+        }
+      ]
+    }
+  }
+}

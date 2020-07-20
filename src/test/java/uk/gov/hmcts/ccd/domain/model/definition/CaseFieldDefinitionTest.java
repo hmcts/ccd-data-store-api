@@ -27,6 +27,21 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
+import org.hamcrest.MatcherAssert;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameter;
+import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 public class CaseFieldDefinitionTest {
 
     private static final String TEXT_TYPE = "Text";
@@ -337,6 +352,122 @@ public class CaseFieldDefinitionTest {
             DisplayContext result = name.displayContextType();
 
             assertNull(result);
+        }
+    }
+
+    @Nested
+    @DisplayName("displayContextParameter tests")
+    class CaseFieldDisplayContextParameterTest {
+
+        @Test
+        void shouldReturnListOfDCPWithSingleDCP() {
+            name.setDisplayContextParameter("#DATETIMEENTRY(ddMMyy)");
+
+            final List<DisplayContextParameter> result = name.getDisplayContextParameters();
+
+            assertAll(
+                () -> assertThat(result.size(), is(1)),
+                () -> assertThat(result.get(0).getType(), is(DisplayContextParameterType.DATETIMEENTRY)),
+                () -> assertThat(result.get(0).getValue(), is("ddMMyy"))
+            );
+        }
+
+        @Test
+        void shouldReturnListOfDCPWithMultipleDCP() {
+            name.setDisplayContextParameter("#DATETIMEENTRY(ddMMyy),#DATETIMEDISPLAY(yyyy)");
+
+            final List<DisplayContextParameter> result = name.getDisplayContextParameters();
+
+            assertAll(
+                () -> assertThat(result.size(), is(2)),
+                () -> assertThat(result.get(0).getType(), is(DisplayContextParameterType.DATETIMEENTRY)),
+                () -> assertThat(result.get(0).getValue(), is("ddMMyy")),
+                () -> assertThat(result.get(1).getType(), is(DisplayContextParameterType.DATETIMEDISPLAY)),
+                () -> assertThat(result.get(1).getValue(), is("yyyy"))
+            );
+        }
+
+        @Test
+        void shouldNotIncludeInvalidTypeOfDCP() {
+            name.setDisplayContextParameter("#INVALID(ddMMyy),#DATETIMEDISPLAY(yyyy)");
+
+            final List<DisplayContextParameter> result = name.getDisplayContextParameters();
+
+            assertAll(
+                () -> assertThat(result.size(), is(1)),
+                () -> assertThat(result.get(0).getType(), is(DisplayContextParameterType.DATETIMEDISPLAY)),
+                () -> assertThat(result.get(0).getValue(), is("yyyy"))
+            );
+        }
+
+        @Test
+        void shouldNotIncludeEmptyValueOfDCP() {
+            name.setDisplayContextParameter("#DATETIMEENTRY(),#DATETIMEDISPLAY(yyyy)");
+
+            final List<DisplayContextParameter> result = name.getDisplayContextParameters();
+
+            assertAll(
+                () -> assertThat(result.size(), is(1)),
+                () -> assertThat(result.get(0).getType(), is(DisplayContextParameterType.DATETIMEDISPLAY)),
+                () -> assertThat(result.get(0).getValue(), is("yyyy"))
+            );
+        }
+
+        @Test
+        void shouldReturnEmptyListWithNoDCP() {
+            name.setDisplayContextParameter(null);
+
+            final List<DisplayContextParameter> result = name.getDisplayContextParameters();
+
+            assertAll(
+                () -> assertThat(result.size(), is(0))
+            );
+        }
+
+        @Test
+        void shouldReturnDCPOfSpecifiedType() {
+            name.setDisplayContextParameter("#DATETIMEENTRY(dd),#DATETIMEDISPLAY(yyyy)");
+
+            final Optional<DisplayContextParameter> result = name.getDisplayContextParameter(DisplayContextParameterType.DATETIMEDISPLAY);
+
+            assertAll(
+                () -> assertThat(result.isPresent(), is(true)),
+                () -> assertThat(result.get().getType(), is(DisplayContextParameterType.DATETIMEDISPLAY)),
+                () -> assertThat(result.get().getValue(), is("yyyy"))
+            );
+        }
+
+        @Test
+        void shouldReturnEmptyOptionalWhenDCPOfSpecifiedTypeDoesNotExist() {
+            name.setDisplayContextParameter("#DATETIMEENTRY(dd),#DATETIMEDISPLAY(yyyy)");
+
+            final Optional<DisplayContextParameter> result = name.getDisplayContextParameter(DisplayContextParameterType.LIST);
+
+            assertAll(
+                () -> assertThat(result.isPresent(), is(false))
+            );
+        }
+
+        @Test
+        void shouldReturnTrueWhenDCPTypeIsPresent() {
+            name.setDisplayContextParameter("#DATETIMEENTRY(ddMMyy)");
+
+            final boolean result = name.hasDisplayContextParameter(DisplayContextParameterType.DATETIMEENTRY);
+
+            assertAll(
+                () -> assertThat(result, is(true))
+            );
+        }
+
+        @Test
+        void shouldReturnFalseWhenDCPTypeIsNotPresent() {
+            name.setDisplayContextParameter("#DATETIMEENTRY(ddMMyy)");
+
+            final boolean result = name.hasDisplayContextParameter(DisplayContextParameterType.DATETIMEDISPLAY);
+
+            assertAll(
+                () -> assertThat(result, is(false))
+            );
         }
     }
 

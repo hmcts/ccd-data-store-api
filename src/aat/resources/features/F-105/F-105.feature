@@ -20,6 +20,21 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And the response has all the details as expected,
     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
 
+  @S-105.1.2
+  Scenario: Must successfully assign a user and case role for a specific case by a user, with caseworker-caa role, calling through/from an authorised application
+    Given an appropriate test context as detailed in the test data source,
+    And a user [Admin - who has only caseworker-caa role],
+    And a user [Richard - who can create a case],
+    And a user [Olawale - with an active solicitor profile],
+    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
+    And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
+    When a request is prepared with appropriate values,
+    And the request [is made from an authorised application, by Admin, with the Case ID of C1, User ID of Olawale and a proper Case Role CR-1],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
+    Then a positive response is received,
+    And the response has all the details as expected,
+    And a call [to verify Olawale's reception of the role CR-1 over the case C1 by an admin] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
+
   # RDM-8606/8806 AC-2
   @S-105.2
   Scenario: Must return an error response for a missing Case ID
