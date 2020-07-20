@@ -119,7 +119,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             }
         }
 
-        return new CaseSearchResult(caseTypeResults, totalHits, caseDetails);
+        return new CaseSearchResult(totalHits,caseDetails,caseTypeResults);
     }
 
     private void buildCaseTypesResults(

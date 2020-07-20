@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
@@ -208,7 +209,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Arrays.asList(jurisdictionId));
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
+            Optional.of(Arrays.asList(jurisdictionId))
+        );
         if (jurisdictionDefinitions.isEmpty()) {
             return null;
         }
@@ -218,7 +221,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
 
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(jurisdictionIds);
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Optional.of(jurisdictionIds));
         if (jurisdictionDefinitions.isEmpty()) {
             LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
             return Collections.emptyList();
@@ -229,7 +232,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     public List<String> getAllCaseTypesIDs() {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Collections.emptyList());
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Optional.ofNullable(null));
         return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
     }
 
@@ -241,13 +244,16 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         ).distinct().collect(Collectors.toList());
     }
 
-    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(List<String> jurisdictionIds) {
+    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
+            if (jurisdictionIds.isPresent()) {
+                builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
+            }
             LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
-                jurisdictionIds);
+                jurisdictionIds.orElse(Collections.emptyList()));
             HttpEntity<List<JurisdictionDefinition>> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
-                .queryParam("ids", String.join(",", jurisdictionIds));
+
             List<JurisdictionDefinition> jurisdictionDefinitionList = restTemplate.exchange(builder.build().encode().toUri(),
                 HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
                 }).getBody();
@@ -258,7 +264,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
-                    jurisdictionIds);
+                    jurisdictionIds.orElse(Collections.emptyList()));
                 return new ArrayList<>();
             } else {
                 throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
