@@ -18,9 +18,24 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
     And the request [contains the case type of Jurisdiction Befta_Jurisdiction1]
     And the response has all the details as expected
 
-  @S-943
-#    todo Write S-943 data file similar to s-942 that will query ES for the case created in F-109-Befta_Jurisdiction2_Case_Type1_Creation
-  Scenario: Must return /searchCases values from Datastore for all jurisdictions for the given case type (1/2)
+
+
+  @S-945
+  Scenario: Must return internal/searchCases values from Datastore for all jurisdictions for the given case type (1/2)
+    Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type1_Creation]
+    And a wait time of 5 seconds [to allow for Logstash to index the case just created]
+    And a user [with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of both previously created cases]
+    When a request is prepared with appropriate values
+    And the request [is made to query the previously created case from Jurisdiction Befta_Jurisdiction1]
+    And it is submitted to call the [internal/searchCases] operation of [CCD Data Store api]
+    Then a positive response is received
+    And the request [contains the case type of Jurisdiction Befta_Jurisdiction1]
+    And the response has all the details as expected
+
+  @S-946
+  Scenario: Must return internal/searchCases values from Datastore for all jurisdictions for the given case type (1/2)
     Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
     And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
     And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type1_Creation]
@@ -28,283 +43,39 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
     And a user [with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of both previously created cases]
     When a request is prepared with appropriate values
     And the request [is made to query the previously created case from Jurisdiction Befta_Jurisdiction2]
-    And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
+    And it is submitted to call the [internal/searchCases] operation of [CCD Data Store api]
     Then a positive response is received
     And the request [contains the case type of Jurisdiction Befta_Jurisdiction2]
     And the response has all the details as expected
 
-  @S-944
-#    todo
-#    1 - create data file (F-109-Befta_Jurisdiction2_Case_Type2_Creation) to create a case for the case type BEFTA_CASETYPE_2_2 in jurisdiction Befta_Jurisdiction2
-#    2 - write data file s-944 to query ES for this previously created case
-  Scenario: Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (/searchCases)
+  @S-947
+  Scenario: Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (internal/searchCases)
     Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
-    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type1_Creation]
-    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type2_Creation]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction3_Case_Type1_Creation_Token_Creation]
     And a wait time of 5 seconds [to allow for Logstash to index the case just created]
-    And a user [with only the 'caseworker-caa' role is not configured with the required CRUD permissions for Befta_Jurisdiction2_Case_Type2]
+    And a user [with only the 'caseworker-caa' role is not configured with the required CRUD permissions for Befta_Jurisdiction3_Case_Type1]
     When a request is prepared with appropriate values
-    And the request [is made to query the previously created case Befta_Jurisdiction2_Case_Type2]
-    And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
+    And the request [is made to query the previously created case Befta_Jurisdiction3_Case_Type1]
+    And it is submitted to call the [internal/searchCases] operation of [CCD Data Store api]
     Then a positive response is received
     And the request [contains no results]
     And the response has all the details as expected
 
-#  Scenario 3 - Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (/searchCases)
-#  Given an appropriate test context as detailed in the test data source
-#
-#  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#
-#  And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a user [Jamal - a client with only the 'caseworker-caa' role which has not been configured with the required CRUD permissions for the case types of C1 or C2 on the definition file]
-#
-#  When a request is prepared with appropriate values
-#
-#  And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#
-#  And the request [contains the case type of either C1 or C2]
-#
-#  And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
-#
-#  Then a positive response is received
-#
-#  And the response [only includes data relating to the case types for which Jamal has the required CRUD permissions for - ie no results are returned in this example]
-#
-#  And the response has all the details as expected
-#
-#
-#
-#
-#
-#  Scenario 4 - Must return /internal/searchCases values from Datastore for all jurisdictions for the given case type (1/2)
-#  Given an appropriate test context as detailed in the test data sourgit stash pop
-  #  ce
-#
-#  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#
-#  And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a user [Jamal - a client with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of C1 & C2 on the definition file]
-#
-#  When a request is prepared with appropriate values
-#
-#  And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#
-#  And the request [contains the case type of C1]
-#
-#  And it is submitted to call the [/internal/searchCases] operation of [CCD Data Store api]
-#
-#  Then a positive response is received
-#
-#  And the response [includes data for the given case type for C1]
-#
-#  And the response has all the details as expected
-#
-#
-#
-#
-#
-#  Scenario 5 - Must return /internal/searchCases values from Datastore for all jurisdictions for the given case type (2/2)
-#  Given an appropriate test context as detailed in the test data source
-#
-#  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#
-#  And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a user [Jamal - a client with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of C1 & C2 on the definition file]
-#
-#  When a request is prepared with appropriate values
-#
-#  And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#
-#  And the request [contains the case type of C2]
-#
-#  And it is submitted to call the [/internal/searchCases] operation of [CCD Data Store api]
-#
-#  Then a positive response is received
-#
-#  And the response [includes data for the given case type for C2]
-#
-#  And the response has all the details as expected
-#
-#
-#  Scenario 6 - Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (/internal/searchCases)
-#  Given an appropriate test context as detailed in the test data source
-#
-#  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#
-#  And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a user [Jamal - a client with only the 'caseworker-caa' role which has not been configured with the required CRUD permissions for the case types of C1 or C2 on the definition file]
-#
-#  When a request is prepared with appropriate values
-#
-#  And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#
-#  And the request [contains the case type of either C1 or C2]
-#
-#  And it is submitted to call the [/internal/searchCases] operation of [CCD Data Store api]
-#
-#  Then a positive response is received
-#
-#  And the response [only includes data relating to the case types for which Jamal has the required CRUD permissions for - ie no results are returned in this example]
-#
-#  And the response has all the details as expected
-#
-#
-#
-#
-#
-#  Scenario 7 - Must return /case-users values from Datastore for all jurisdictions for the given case type (1/2)
-#  Given an appropriate test context as detailed in the test data source
-#
-#  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#
-#  And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a user [Jamal - a client with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of C1 & C2 on the definition file]
-#
-#  When a request is prepared with appropriate values
-#
-#  And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#
-#  And the request [contains the case type of C1]
-#
-#  And it is submitted to call the [/case-users] operation of [CCD Data Store api]
-#
-#  Then a positive response is received
-#
-#  And the response [includes data for the given case type for C1]
-#
-#  And the response has all the details as expected
-#
-#
-#
-#
-#
-#  Scenario 8 - Must return /case-users values from Datastore for all jurisdictions for the given case type (2/2)
-#  Given an appropriate test context as detailed in the test data source
-#
-#  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#
-#  And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a user [Jamal - a client with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of C1 & C2 on the definition file]
-#
-#  When a request is prepared with appropriate values
-#
-#  And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#
-#  And the request [contains the case type of C2]
-#
-#  And it is submitted to call the [/case-users] operation of [CCD Data Store api]
-#
-#  Then a positive response is received
-#
-#  And the response [includes data for the given case type for C2]
-#
-#  And the response has all the details as expected
-#
-#
-#  Scenario 9 - Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (/case-users)
-#  Given an appropriate test context as detailed in the test data source
-#
-#  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#
-#  And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a user [Jamal - a client with only the 'caseworker-caa' role which has not been configured with the required CRUD permissions for the case types of C1 or C2 on the definition file]
-#
-#  When a request is prepared with appropriate values
-#
-#  And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#
-#  And the request [contains the case type of either C1 or C2]
-#
-#  And it is submitted to call the [/case-users] operation of [CCD Data Store api]
-#
-#  Then a positive response is received
-#
-#  And the response [only includes data relating to the case types for which Jamal has the required CRUD permissions for - ie no results are returned in this example]
-#
-#  And the response has all the details as expected
-#
-#
-#
-#
-#
-#
-#
-#  Scenario 10 - Must return /cases/{caseId}/supplementary-data values from Datastore for all jurisdictions and all case types
-#  Given an appropriate test context as detailed in the test data source
-#
-#  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#
-#  And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a user [Jamal - a client with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of C1 & C2 on the definition file]
-#
-#  When a request is prepared with appropriate values
-#
-#  And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#
-#  And the request [does not contain any specific case type]
-#
-#  And it is submitted to call the [/cases/
-#
-#  {caseId}/supplementary-data] operation of [CCD Data Store api]
-#
-#  Then a positive response is received
-#
-#  And the response [includes data for the case type of both C1 & C2]
-#
-#  And the response has all the details as expected
-#
-#
-#
-#
-#
-#  Scenario 11 - Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for a given case type (/cases/{caseId}/supplementary-data)
-#  Given an appropriate test context as detailed in the test data source
-#
-#  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
-#
-#  And a successful call [by Richard to create a case (C1) for a jurisdiction eg Divorce] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a successful call [by Richard to create another case (C2) for a different jurisdiction eg Probate] as in [Prerequisite Case Creation Call for Case Assignment]
-#
-#  And a user [Jamal - a client with only the 'caseworker-caa' role which has not been configured with the required CRUD permissions for the case types of C1 and/or C2 on the definition file]
-#
-#  When a request is prepared with appropriate values
-#
-#  And the request [is made by Jamal via the new Manage Case Assignment (MCA) microservice]
-#
-#  And the request [does not contain any specific case type]
-#
-#  And it is submitted to call the [/cases/{caseId}/supplementary-data] operation of [CCD Data Store api]
-#
-#  Then a positive response is received
-#
-#  And the response [only includes data relating to the case types for which Jamal has the required CRUD permissions for - ie no results are returned in this example]
-#
-#  And the response has all the details as expected
+  @S-105.1.2
+  Scenario: /case-users endpoint can be used with caseworker-caa role
+    Given an appropriate test context as detailed in the test data source,
+    And a user [Admin - who has only caseworker-caa role],
+    And a user [Richard - who can create a case],
+    And a user [Olawale - with an active solicitor profile],
+    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
+    And a successful call [by Richard to create a case - C1] as in [F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment],
+    When a request is prepared with appropriate values,
+    And the request [is made from an authorised application, by Admin, with the Case ID of C1, User ID of Olawale and a proper Case Role CR-1],
+    And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
+    Then a positive response is received,
+    And the response has all the details as expected,
+    And a call [to verify Olawale's reception of the role CR-1 over the case C1 by an admin] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
+
 
   @S-new.1 @Ignore
   Scenario: must validate date in a right format
