@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCas
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -97,6 +98,8 @@ class ElasticsearchCaseSearchOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         when(applicationParams.getCasesIndexNameFormat()).thenReturn(INDEX_NAME_FORMAT);
+        when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+?)(_cases.*)");
+        when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
         searchRequestJsonNode.set(QUERY, mock(ObjectNode.class));
     }
@@ -135,11 +138,96 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails))),
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(1L)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
 
+        @Test
+        @DisplayName("should return ServiceError when ES index case type id capturing group is not matching the ES index")
+        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotMatching() throws IOException {
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("a_regex_with_not_matching_(capturing)_group");
+
+            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
+            when(multiSearchResult.isSucceeded()).thenReturn(true);
+            SearchResult searchResult = mock(SearchResult.class);
+            when(searchResult.getTotal()).thenReturn(1L);
+            when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
+            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
+            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
+            when(searchResult.getJsonObject()).thenReturn(convertedObject);
+            Whitebox.setInternalState(response, "searchResult", searchResult);
+
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
+            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
+                .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
+                .withSearchRequest(elasticsearchRequest)
+                .build();
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+
+            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+        }
+
+        @Test
+        @DisplayName("should return ServiceError when ES index case type id capturing group is not specified")
+        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotSpedified() throws IOException {
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("a_regex_with_no_capturing_group");
+
+            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
+            when(multiSearchResult.isSucceeded()).thenReturn(true);
+            SearchResult searchResult = mock(SearchResult.class);
+            when(searchResult.getTotal()).thenReturn(1L);
+            when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
+            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
+            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
+            when(searchResult.getJsonObject()).thenReturn(convertedObject);
+            Whitebox.setInternalState(response, "searchResult", searchResult);
+
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
+            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
+                .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
+                .withSearchRequest(elasticsearchRequest)
+                .build();
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+
+            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+        }
+
+        @Test
+        @DisplayName("should return error")
+        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotSpedified2() throws IOException {
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+?)(_cases.*)");
+
+            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
+            when(multiSearchResult.isSucceeded()).thenReturn(true);
+            SearchResult searchResult = mock(SearchResult.class);
+            when(searchResult.getTotal()).thenReturn(1L);
+            when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
+            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
+            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
+            when(searchResult.getJsonObject()).thenReturn(convertedObject);
+            Whitebox.setInternalState(response, "searchResult", searchResult);
+
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
+            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+
+            CaseSearchRequest request = new CaseSearchRequest("aaa", elasticsearchRequest);
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
+                .withCaseTypes(Collections.singletonList("aaa"))
+                .withSearchRequest(elasticsearchRequest)
+                .build();
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+
+            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+        }
     }
 
     @Nested
@@ -185,7 +273,6 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails, caseDetails))),
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams, times(4)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
@@ -237,7 +324,6 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
                 () -> assertThat(caseSearchResult.getCaseTypeResults().size(), equalTo(2)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams, times(4)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }

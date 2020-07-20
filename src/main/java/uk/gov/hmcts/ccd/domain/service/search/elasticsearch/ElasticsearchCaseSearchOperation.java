@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -137,8 +139,10 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private String getIndexName(MultiSearchResult.MultiSearchResponse response) {
-        return response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits")
+        String quotedIndexName = response.searchResult.getJsonObject().getAsJsonObject("hits").get("hits")
             .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
+        String unquotedIndexName = quotedIndexName.replaceAll("\"", "");
+        return unquotedIndexName;
     }
 
     private boolean hitsIsNotEmpty(MultiSearchResult.MultiSearchResponse response) {
@@ -146,16 +150,22 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private String getCaseTypeIDFromIndex(final String index, List<String> caseTypeIds) {
-        String pureIndexFormat = applicationParams.getCasesIndexNameFormat().substring(2);
-        final String caseTypeIdFromIndex = index.substring(0, index.indexOf(pureIndexFormat))
-            .replaceAll("\"", "");
-
-        return caseTypeIds.stream().filter(
-            caseTypeId -> caseTypeId.equalsIgnoreCase(caseTypeIdFromIndex)
-        ).findFirst().orElseGet(() -> {
-            log.error("The Case type id could be found using the following index name: {}", caseTypeIdFromIndex);
-            return "index-error";
-        });
+        String caseTypeIdGroupRegex = applicationParams.getCasesIndexNameCaseTypeIdGroup();
+        int caseTypeIdGroupPosition = applicationParams.getCasesIndexNameCaseTypeIdGroupPosition();
+        Pattern pattern = Pattern.compile(caseTypeIdGroupRegex);
+        Matcher m = pattern.matcher(index);
+        if (m.matches() && m.groupCount() > 1) {
+            return caseTypeIds.stream().filter(
+                caseTypeId -> caseTypeId.equalsIgnoreCase(m.group(caseTypeIdGroupPosition))
+            ).findFirst().orElseThrow(() -> {
+                log.error("Cannot match any known case type id from index '{}' extracted case type id : {}", index, m.group(1));
+                throw new ServiceException("Cannot determine case type id from ES index name - unknown extracted case type id");
+            });
+        } else {
+            log.error("Cannot determine case type id from index name: '{}'. No capturing group configured or capturing group not matching: '{}'.",
+                index, caseTypeIdGroupRegex);
+            throw new ServiceException("Cannot determine case type id from ES index name - cannot extract case type id");
+        }
     }
 
     private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
