@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.processor;
+package uk.gov.hmcts.ccd.domain.service.processor.date;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +23,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 
@@ -32,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.MULTI_SELECT_LIST;
 
-class SearchResultProcessorTest {
+class DateTimeSearchResultProcessorTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String DATE_FIELD = "DateField";
@@ -51,7 +53,7 @@ class SearchResultProcessorTest {
     private Map<String, Object> caseFields = new HashMap<>();
 
     @InjectMocks
-    private SearchResultProcessor searchResultProcessor;
+    private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
 
     @Mock
     private DateTimeFormatParser dateTimeFormatParser;
@@ -88,7 +90,7 @@ class SearchResultProcessorTest {
         when(dateTimeFormatParser.convertIso8601ToDateTime("ddMMyyyy", "1985-12-30"))
             .thenReturn("30121985");
 
-        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
+        List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
 
         SearchResultViewItem itemResult = result.get(0);
         assertAll(
@@ -114,7 +116,7 @@ class SearchResultProcessorTest {
             .thenReturn("01/10/2020");
         viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
 
-        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
+        List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
 
         SearchResultViewItem itemResult = result.get(0);
         assertAll(
@@ -136,7 +138,7 @@ class SearchResultProcessorTest {
 
         when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "2020-10-05")).thenReturn("10-2020");
 
-        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
+        List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
 
         SearchResultViewItem itemResult = result.get(0);
         assertAll(
@@ -161,7 +163,7 @@ class SearchResultProcessorTest {
         when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "1999-12-01"))
             .thenReturn("12-1999");
 
-        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
+        List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
 
         SearchResultViewItem itemResult = result.get(0);
         assertAll(
@@ -197,7 +199,7 @@ class SearchResultProcessorTest {
         when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "1992-07-30"))
             .thenReturn("07-1992");
 
-        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
+        List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
 
         SearchResultViewItem itemResult = result.get(0);
         assertAll(
@@ -231,7 +233,7 @@ class SearchResultProcessorTest {
         List<SearchResultViewColumn> columns = new ArrayList<>();
         columns.addAll(Arrays.asList(column1, column2));
 
-        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
+        List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
 
         SearchResultViewItem itemResult = result.get(0);
         assertAll(
@@ -254,7 +256,7 @@ class SearchResultProcessorTest {
         viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
         viewColumns.add(column1);
 
-        List<SearchResultViewItem> result = searchResultProcessor.execute(viewColumns, viewItems);
+        List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
 
         SearchResultViewItem itemResult = result.get(0);
         ArrayNode multiSelectResult = (ArrayNode)itemResult.getFields().get(multiSelectField);

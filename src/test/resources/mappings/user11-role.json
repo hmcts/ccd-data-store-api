@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/user-role?role=Y2FzZXdvcmtlci1kY3B0ZXN0MQ%3D%3D"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "role": "caseworker-dcptest1",
+      "security_classification": "PUBLIC"
+    }
+  }
+}

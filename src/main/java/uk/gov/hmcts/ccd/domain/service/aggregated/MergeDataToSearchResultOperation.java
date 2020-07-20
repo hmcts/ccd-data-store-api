@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.service.processor.SearchResultProcessor;
+import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import javax.inject.Named;
@@ -32,12 +32,12 @@ import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedC
 public class MergeDataToSearchResultOperation {
 
     private final UserRepository userRepository;
-    private final SearchResultProcessor searchResultProcessor;
+    private final DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
 
     public MergeDataToSearchResultOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                            final SearchResultProcessor searchResultProcessor) {
+                                            final DateTimeSearchResultProcessor dateTimeSearchResultProcessor) {
         this.userRepository = userRepository;
-        this.searchResultProcessor = searchResultProcessor;
+        this.dateTimeSearchResultProcessor = dateTimeSearchResultProcessor;
     }
 
     public SearchResultView execute(final CaseTypeDefinition caseTypeDefinition,
@@ -53,7 +53,7 @@ public class MergeDataToSearchResultOperation {
 
         return new SearchResultView(
             viewColumns,
-            searchResultProcessor.execute(viewColumns, viewItems),
+            dateTimeSearchResultProcessor.execute(viewColumns, viewItems),
             resultError
         );
     }
@@ -87,7 +87,7 @@ public class MergeDataToSearchResultOperation {
         if (addedFields.contains(id)) {
             return false;
         } else {
-            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole())) {
+            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.anyRoleEqualsTo(resultField.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {

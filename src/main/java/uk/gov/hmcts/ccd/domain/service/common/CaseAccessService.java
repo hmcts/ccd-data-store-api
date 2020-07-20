@@ -113,9 +113,7 @@ public class CaseAccessService {
     }
 
     public Boolean canOnlyViewExplicitlyGrantedCases() {
-        return userRepository.getUserRoles()
-            .stream()
-            .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
+        return userRepository.anyRoleMatches(RESTRICT_GRANTED_ROLES_PATTERN);
     }
 
 }

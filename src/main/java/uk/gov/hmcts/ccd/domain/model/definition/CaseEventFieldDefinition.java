@@ -9,10 +9,11 @@ import java.util.List;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 @ToString
 @ApiModel(description = "")
-public class CaseEventFieldDefinition implements Serializable {
+public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
     private String caseFieldId = null;
     private String displayContext = null;

@@ -80,7 +80,8 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
 #
 #
 #  Scenario 4 - Must return /internal/searchCases values from Datastore for all jurisdictions for the given case type (1/2)
-#  Given an appropriate test context as detailed in the test data source
+#  Given an appropriate test context as detailed in the test data sourgit stash pop
+  #  ce
 #
 #  And a user [Richard - with access to create cases for various jurisdictions eg Divorce & Probate]
 #
@@ -304,7 +305,7 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
 #  And the response [only includes data relating to the case types for which Jamal has the required CRUD permissions for - ie no results are returned in this example]
 #
 #  And the response has all the details as expected
-=======
+
   @S-new.1 @Ignore
   Scenario: must validate date in a right format
     Given a user with [an active profile in CCD]

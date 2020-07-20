@@ -1,22 +1,50 @@
-package uk.gov.hmcts.ccd.domain.service.processor;
+package uk.gov.hmcts.ccd.domain.service.processor.date;
+
+import com.fasterxml.jackson.databind.node.TextNode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.types.BaseType;
+import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
+
+import java.time.format.DateTimeParseException;
+import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.time.format.DateTimeParseException;
+import static org.powermock.api.mockito.PowerMockito.when;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.*;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class DateTimeFormatParserTest {
 
+    private static final String DATETIME_FIELD_TYPE = "DateTime";
+    private static final String DATE_FIELD_TYPE = "Date";
+    private static final String COLLECTION_FIELD_TYPE = "Collection";
+    private static final String COMPLEX_FIELD_TYPE = "Complex";
+
+    @InjectMocks
     private DateTimeFormatParser dateTimeFormatParser;
+
+    @Mock
+    private CaseDefinitionRepository definitionRepository;
 
     @BeforeEach
     void setUp() {
         dateTimeFormatParser = new DateTimeFormatParser();
+        MockitoAnnotations.initMocks(this);
+
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.EMPTY_LIST);
+        BaseType.setCaseDefinitionRepository(definitionRepository);
+        BaseType.initialise();
+        setUpBaseTypes();
     }
 
     @Test
@@ -286,5 +314,142 @@ class DateTimeFormatParserTest {
         assertAll(
             () -> assertThat(result, is("2000-10-20"))
         );
+    }
+
+    @Test
+    void shouldCreateTextNodeForDate_ToIso() {
+        TextNode result = dateTimeFormatParser.valueToTextNode("2010", BaseType.get(DATE), "FieldId", "yyyy", true);
+
+        assertAll(
+            () -> assertThat(result.asText(), is("2010-01-01"))
+        );
+    }
+
+    @Test
+    void shouldCreateTextNodeForDateTime_ToIso() {
+        TextNode result = dateTimeFormatParser.valueToTextNode("2010", BaseType.get(DATETIME), "FieldId", "yyyy", true);
+
+        assertAll(
+            () -> assertThat(result.asText(), is("2010-01-01T00:00:00.000"))
+        );
+    }
+
+    @Test
+    void shouldCreateTextNodeForDate_FromIso() {
+        TextNode result = dateTimeFormatParser.valueToTextNode("2010-01-01", BaseType.get(DATE), "FieldId", "yyyy", false);
+
+        assertAll(
+            () -> assertThat(result.asText(), is("2010"))
+        );
+    }
+
+    @Test
+    void shouldCreateTextNodeForDateTime_FromIso() {
+        TextNode result = dateTimeFormatParser.valueToTextNode("2010-01-01T00:00:00.000", BaseType.get(DATETIME), "FieldId", "yyyy", false);
+
+        assertAll(
+            () -> assertThat(result.asText(), is("2010"))
+        );
+    }
+
+    @Test
+    void shouldCreateTextNodeForNullValue() {
+        TextNode result = dateTimeFormatParser.valueToTextNode(null, BaseType.get(DATE), "FieldId", "yyyy", true);
+
+        assertAll(
+            () -> assertThat(result.asText(), is(nullValue()))
+        );
+    }
+
+    @Test
+    void shouldCreateTextNodeForEmptyValue() {
+        TextNode result = dateTimeFormatParser.valueToTextNode("", BaseType.get(DATE), "FieldId", "yyyy", true);
+
+        assertAll(
+            () -> assertThat(result.asText(), is(""))
+        );
+    }
+
+    @Test
+    void shouldThrowErrorForInvalidBaseType_ToIso() {
+        DataProcessingException exception = assertThrows(DataProcessingException.class,
+            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(COLLECTION), "FieldId", "dd/MM/yyyy", true)
+        );
+
+        assertAll(
+            () -> assertThat(exception.getDetails(),
+                is("Unable to process field FieldId of type Collection. Expected type to be either DateTime or Date"))
+        );
+    }
+
+    @Test
+    void shouldThrowErrorDetailingExpectedDateTimeFormat_ToIso() {
+        DataProcessingException exception = assertThrows(DataProcessingException.class,
+            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(DATETIME), "FieldId", "dd/MM/yyyy", true)
+        );
+
+        assertAll(
+            () -> assertThat(exception.getDetails(),
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd'T'HH:mm:ss.SSS"))
+        );
+    }
+
+    @Test
+    void shouldThrowErrorDetailingExpectedDateFormat_ToIso() {
+        DataProcessingException exception = assertThrows(DataProcessingException.class,
+            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(DATE), "FieldId", "dd/MM/yyyy", true)
+        );
+
+        assertAll(
+            () -> assertThat(exception.getDetails(),
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd"))
+        );
+    }
+
+    @Test
+    void shouldThrowErrorForInvalidBaseType_FromIso() {
+        DataProcessingException exception = assertThrows(DataProcessingException.class,
+            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(COLLECTION), "FieldId", "dd/MM/yyyy", false)
+        );
+
+        assertAll(
+            () -> assertThat(exception.getDetails(),
+                is("Unable to process field FieldId of type Collection. Expected type to be either DateTime or Date"))
+        );
+    }
+
+    @Test
+    void shouldThrowErrorDetailingExpectedDateTimeFormat_FromIso() {
+        DataProcessingException exception = assertThrows(DataProcessingException.class,
+            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(DATETIME), "FieldId", "dd/MM/yyyy", false)
+        );
+
+        assertAll(
+            () -> assertThat(exception.getDetails(),
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd'T'HH:mm:ss.SSS"))
+        );
+    }
+
+    @Test
+    void shouldThrowErrorDetailingExpectedDateFormat_FromIso() {
+        DataProcessingException exception = assertThrows(DataProcessingException.class,
+            () -> dateTimeFormatParser.valueToTextNode("abc", BaseType.get(DATE), "FieldId", "dd/MM/yyyy", false)
+        );
+
+        assertAll(
+            () -> assertThat(exception.getDetails(),
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd"))
+        );
+    }
+
+    private FieldTypeDefinition fieldType(String fieldType) {
+        return aFieldType().withType(fieldType).build();
+    }
+
+    private void setUpBaseTypes() {
+        BaseType.register(new BaseType(fieldType(DATE_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(DATETIME_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(COLLECTION_FIELD_TYPE)));
+        BaseType.register(new BaseType(fieldType(COMPLEX_FIELD_TYPE)));
     }
 }
