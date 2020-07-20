@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 /**
  * Used to log information about requests and the invoking user.
- *
  * To be enabled this filter should be registered after successful authentication as part of the Spring Security filter chain.
  */
 @Slf4j
