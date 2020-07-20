@@ -1,12 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Optional;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameter;
-import uk.gov.hmcts.ccd.domain.service.processor.DisplayContextParameterType;
 
-public class SearchResultViewColumn implements CommonViewHeader {
+public class SearchResultViewColumn implements CommonViewHeader, CommonDCPModel {
 
     @JsonProperty("case_field_id")
     private String caseFieldId;
@@ -62,9 +60,5 @@ public class SearchResultViewColumn implements CommonViewHeader {
     @Override
     public String getDisplayContextParameter() {
         return displayContextParameter;
-    }
-
-    public Optional<DisplayContextParameter> getDisplayContextParameterOfType(DisplayContextParameterType displayContextParameterType) {
-        return DisplayContextParameter.getDisplayContextParameterOfType(getDisplayContextParameter(), displayContextParameterType);
     }
 }

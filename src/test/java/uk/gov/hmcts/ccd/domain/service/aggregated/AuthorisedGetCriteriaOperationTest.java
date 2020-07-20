@@ -272,7 +272,7 @@ class AuthorisedGetCriteriaOperationTest {
 
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
-        final List<WorkbasketInput> searchInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<SearchInput> searchInputs = (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(3)),
@@ -294,7 +294,7 @@ class AuthorisedGetCriteriaOperationTest {
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         doReturn(Sets.newHashSet(ROLE1)).when(userRepository).getUserRoles();
 
-        final List<WorkbasketInput> searchInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<SearchInput> searchInputs = (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(2)),

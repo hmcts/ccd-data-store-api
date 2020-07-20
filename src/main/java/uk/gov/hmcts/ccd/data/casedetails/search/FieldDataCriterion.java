@@ -15,8 +15,8 @@ public class FieldDataCriterion extends Criterion {
     }
 
     @Override
-    public String buildClauseString(int position, String operation) {
-        return convertFieldName(this.getField()) + operation + makeCaseInsensitive(POSITION_PREFIX + position);
+    public String buildClauseString(String operation) {
+        return convertFieldName(this.getField()) + operation + makeCaseInsensitive(PARAM_PREFIX + buildParameterId());
     }
 
     private String convertFieldName(String field) {
