@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
+import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,5 +36,9 @@ public class AppInsights {
 
     public void trackDependency(String dependencyName, String commandName, long duration, boolean success) {
         telemetry.trackDependency(dependencyName, commandName, new Duration(duration), success);
+    }
+
+    public void trackTrace(String message, SeverityLevel severityLevel) {
+        telemetry.trackTrace(message, severityLevel);
     }
 }
