@@ -24,7 +24,7 @@ java:
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
   postgresql:
-    enabled: false
+    enabled: true
 
 elastic:
   enabled: false # enable whenever required on a particular PR
