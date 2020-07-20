@@ -16,7 +16,15 @@ class ElasticsearchRequestTest {
     private ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    void shouldReturnTrueWhenSourceIsProvided() throws JsonProcessingException {
+    void hasSourceFieldsShouldReturnFalseWhenSourceIsMissing() throws JsonProcessingException {
+        JsonNode queryNode = queryAsJsonNode("{\"query\":{\"match_all\": {}}}");
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+
+        assertFalse(elasticsearchRequest.hasSourceFields());
+    }
+
+    @Test
+    void hasSourceFieldsShouldReturnTrueWhenSourceIsProvided() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.Field\"],\"query\":{\"match_all\": {}}}");
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
@@ -24,7 +32,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void shouldReturnFalseWhenSourceIsEmpty() throws JsonProcessingException {
+    void hasSourceFieldsShouldReturnFalseWhenSourceIsEmpty() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[],\"query\":{\"match_all\": {}}}");
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
@@ -32,8 +40,24 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void shouldReturnFalseWhenSourceOnlyHasWildcard() throws JsonProcessingException {
+    void hasSourceFieldsShouldReturnFalseWhenSourceOnlyHasWildcard() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"*\"],\"query\":{\"match_all\": {}}}");
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+
+        assertFalse(elasticsearchRequest.hasSourceFields());
+    }
+
+    @Test
+    void hasSourceFieldsShouldReturnFalseWhenSourceIsFalse() throws JsonProcessingException {
+        JsonNode queryNode = queryAsJsonNode("{\"_source\": false,\"query\":{\"match_all\": {}}}");
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+
+        assertFalse(elasticsearchRequest.hasSourceFields());
+    }
+
+    @Test
+    void hasSourceFieldsShouldReturnFalseWhenSourceIsTrue() throws JsonProcessingException {
+        JsonNode queryNode = queryAsJsonNode("{\"_source\": true,\"query\":{\"match_all\": {}}}");
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
