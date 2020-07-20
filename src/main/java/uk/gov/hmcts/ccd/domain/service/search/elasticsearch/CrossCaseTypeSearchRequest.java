@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -23,17 +22,17 @@ import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRe
 /**
  * Sample ES json search request.
  * {
- *   "_source": ["alias.searchField1", "alias.searchField2"],
- *   "query": {
- *     "bool": {
- *       "filter": {
- *         "match": { "state": "AwaitingPayment"}
- *       }
- *     }
- *   },
- *  "sort": {
- *     "id": { "order":"asc" }
- *   }
+ * "_source": ["alias.searchField1", "alias.searchField2"],
+ * "query": {
+ * "bool": {
+ * "filter": {
+ * "match": { "state": "AwaitingPayment"}
+ * }
+ * }
+ * },
+ * "sort": {
+ * "id": { "order":"asc" }
+ * }
  * }
  */
 public class CrossCaseTypeSearchRequest {
