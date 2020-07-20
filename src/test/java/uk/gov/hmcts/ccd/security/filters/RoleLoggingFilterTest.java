@@ -80,8 +80,8 @@ class RoleLoggingFilterTest {
 
         filter.doFilterInternal(request, response, filterChain);
 
-        String expectedMessage = "[ROLE LOG] Attempting to serve request POST /url/path?with=param for user with IDAM roles " +
-            "ccd-import,caseworker-autotest1,caseworker";
+        String expectedMessage = "[ROLE LOG] Attempting to serve request POST /url/path?with=param for user with IDAM roles "
+            + "ccd-import,caseworker-autotest1,caseworker";
         List<ILoggingEvent> loggingEvents = filterLoggerCapture.list;
         assertAll(
             () -> assertEquals(1, loggingEvents.size()),
