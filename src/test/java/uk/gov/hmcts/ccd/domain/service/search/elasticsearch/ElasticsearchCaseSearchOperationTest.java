@@ -98,7 +98,7 @@ class ElasticsearchCaseSearchOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         when(applicationParams.getCasesIndexNameFormat()).thenReturn(INDEX_NAME_FORMAT);
-        when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+?)(_cases.*)");
+        when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
         when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
         searchRequestJsonNode.set(QUERY, mock(ObjectNode.class));
@@ -201,9 +201,9 @@ class ElasticsearchCaseSearchOperationTest {
         }
 
         @Test
-        @DisplayName("should return error")
-        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotSpedified2() throws IOException {
-            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+?)(_cases.*)");
+        @DisplayName("should return ServiceError when ES index case type id capturing group is not associated to any case type")
+        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotAssociatedToAnyCaseType() throws IOException {
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
 
             MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
             when(multiSearchResult.isSucceeded()).thenReturn(true);
@@ -227,6 +227,52 @@ class ElasticsearchCaseSearchOperationTest {
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
             assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+        }
+
+        @Test
+        @DisplayName("test complex ES index case type id capturing group scenario")
+        void testComplexESIndexCapturingGroupScenario() throws IOException {
+            String caseDetailsElasticComplex = "{\n"
+                + "   \"hits\":{\n"
+                + "      \"total\":4,\n"
+                + "      \"max_score\":null,\n"
+                + "      \"hits\":[\n"
+                + "         {\n"
+                + "            \"_index\":\"casetypeid1_cases_cases-000001\"\n"
+                + "         }\n"
+                + "      ]\n"
+                + "   }\n"
+                + "}";
+
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
+            JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
+
+            MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
+            when(multiSearchResult.isSucceeded()).thenReturn(true);
+            SearchResult searchResult = mock(SearchResult.class);
+            when(searchResult.getTotal()).thenReturn(1L);
+            when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
+            MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
+            when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
+            when(searchResult.getJsonObject()).thenReturn(convertedObject);
+            Whitebox.setInternalState(response, "searchResult", searchResult);
+
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
+            when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
+
+            CaseSearchRequest request = new CaseSearchRequest("casetypeid1_cases", elasticsearchRequest);
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
+                .withCaseTypes(Collections.singletonList("casetypeid1_cases"))
+                .withSearchRequest(elasticsearchRequest)
+                .build();
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
+
+            assertAll(
+                () -> assertThat(caseSearchResult.getCaseTypesResults().get(0).getCaseTypeId(), equalTo("casetypeid1_cases"))
+            );
         }
     }
 
