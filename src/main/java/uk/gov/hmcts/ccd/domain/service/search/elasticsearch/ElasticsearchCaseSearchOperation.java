@@ -1,13 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
@@ -15,7 +7,6 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +21,14 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMa
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
@@ -111,14 +110,14 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             }
             if (response.searchResult != null) {
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
-                totalHits += response.searchResult.getTotal();
+                totalHits += new JestSearchResult(response.searchResult).getTotal();
             }
         }
 
         return new CaseSearchResult(totalHits, caseDetails);
     }
 
-    private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
+    private List<CaseDetails> searchResultToCaseList(io.searchbox.core.SearchResult searchResult) {
         List<String> casesAsString = searchResult.getSourceAsStringList();
         List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
         return caseDetailsMapper.dtosToCaseDetailsList(dtos);
