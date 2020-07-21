@@ -40,7 +40,23 @@
           "last_state_modified_date": "[[ANYTHING_PRESENT]]",
           "security_classification": "PUBLIC",
           "case_data": {
-           "_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
+           "_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role",
+            "TextField": "[[ANYTHING_PRESENT]]",
+            "NumberField": "[[ANY_STRING_NULLABLE]]",
+            "YesOrNoField": "[[ANY_STRING_NULLABLE]]",
+            "PhoneUKField": "[[ANY_STRING_NULLABLE]]",
+            "EmailField": "[[ANY_STRING_NULLABLE]]",
+            "MoneyGBPField": "[[ANY_STRING_NULLABLE]]",
+            "FixedListField": "[[ANY_STRING_NULLABLE]]",
+            "AddressUKField":"[[ANYTHING_PRESENT]]",
+            "ComplexField": "[[ANYTHING_PRESENT]]",
+            "FixedRadioListField":"[[ANY_STRING_NULLABLE]]",
+            "DateTimeField": "[[ANY_STRING_NULLABLE]]",
+            "MultiSelectListField":"[[ANYTHING_PRESENT]]",
+            "DateField": "[[ANY_STRING_NULLABLE]]",
+            "TextAreaField":"[[ANY_STRING_NULLABLE]]",
+            "CollectionField": "[[ANYTHING_PRESENT]]"
+
           },
           "data_classification" : {
             "MoneyGBPField" : "PUBLIC",
@@ -48,7 +64,16 @@
             "EmailField" : "PUBLIC",
             "TextField" : "PUBLIC",
             "PhoneUKField" : "PUBLIC",
-            "NumberField" : "PUBLIC"
+            "NumberField" : "PUBLIC",
+            "FixedListField": "[[ANYTHING_PRESENT]]",
+            "AddressUKField":"[[ANYTHING_PRESENT]]",
+            "ComplexField": "[[ANYTHING_PRESENT]]",
+            "FixedRadioListField":"[[ANYTHING_PRESENT]]",
+            "DateTimeField": "[[ANYTHING_PRESENT]]",
+            "MultiSelectListField":"[[ANYTHING_PRESENT]]",
+            "DateField": "[[ANYTHING_PRESENT]]",
+            "TextAreaField":"[[ANYTHING_PRESENT]]",
+            "CollectionField": "[[ANYTHING_PRESENT]]"
           },
           "after_submit_callback_response" : null,
           "callback_response_status_code" : null,
@@ -61,7 +86,16 @@
             "EmailField" : "PUBLIC",
             "TextField" : "PUBLIC",
             "PhoneUKField" : "PUBLIC",
-            "NumberField" : "PUBLIC"
+            "NumberField" : "PUBLIC",
+            "FixedListField": "[[ANYTHING_PRESENT]]",
+            "AddressUKField":"[[ANYTHING_PRESENT]]",
+            "ComplexField": "[[ANYTHING_PRESENT]]",
+            "FixedRadioListField":"[[ANYTHING_PRESENT]]",
+            "DateTimeField": "[[ANYTHING_PRESENT]]",
+            "MultiSelectListField":"[[ANYTHING_PRESENT]]",
+            "DateField": "[[ANYTHING_PRESENT]]",
+            "TextAreaField":"[[ANYTHING_PRESENT]]",
+            "CollectionField": "[[ANYTHING_PRESENT]]"
           }
         }
       ]
