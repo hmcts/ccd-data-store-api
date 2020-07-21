@@ -328,10 +328,7 @@
    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
    <cve>CVE-2018-1258</cve>
 </suppress>
-<<<<<<< HEAD
 
-=======
->>>>>>> refs/heads/release-cut-19.1
     <suppress>
    <notes><![CDATA[
    file name: spring-security-core-5.3.2.RELEASE.jar
