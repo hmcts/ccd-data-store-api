@@ -71,8 +71,7 @@ Feature: Elasticsearch external endpoint
 
   ### CrossCaseTypeSearch
   @S-910
-  Scenario: should return cases only for case types the user has access to - the user role can read case type and has same security classification "
-  + "as case type
+  Scenario: should return cases only for case types the user has access to - the user role can read case type and has same security classification as case type
     Given a case that has just been created as in [S-910_Create_Case_Private_Autotest1],
     And a case that has just been created as in [S-910_Create_Case_Private_Autotest2],
     And a wait time of 5 seconds [to allow for Logstash to index the case just created],
