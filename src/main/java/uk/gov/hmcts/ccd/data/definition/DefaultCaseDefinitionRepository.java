@@ -238,9 +238,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private List<String> getCaseTypeIdFromJurisdictionDefinition(List<JurisdictionDefinition> jurisdictionDefinitions) {
         return jurisdictionDefinitions.stream().flatMap(
-            jurisdictionDefinition -> jurisdictionDefinition.getCaseTypeDefinitions().stream().map(
-                caseTypeDefinition -> caseTypeDefinition.getId()
-            )
+            jurisdictionDefinition -> jurisdictionDefinition.getCaseTypesIDs().stream()
         ).distinct().collect(Collectors.toList());
     }
 

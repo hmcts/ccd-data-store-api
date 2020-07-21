@@ -158,7 +158,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             return caseTypeIds.stream().filter(
                 caseTypeId -> caseTypeId.equalsIgnoreCase(m.group(caseTypeIdGroupPosition))
             ).findFirst().orElseThrow(() -> {
-                log.error("Cannot match any known case type id from index '{}' extracted case type id : {}", index, m.group(1));
+                log.error("Cannot match any known case type id from index '{}' extracted case type id : {}", index, m.group(caseTypeIdGroupPosition));
                 throw new ServiceException("Cannot determine case type id from ES index name - unknown extracted case type id");
             });
         } else {
