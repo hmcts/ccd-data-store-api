@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @RestController
 @RequestMapping(path = "/")
+@ConditionalOnProperty(value = "feature.case-assigned.enabled", havingValue = "true")
 public class CaseAssignedUserRolesController {
 
     public static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
