@@ -7,10 +7,6 @@
     "is made to query the previously created case Befta_Jurisdiction3_Case_Type1",
     "contains no results"
   ],
-  "user" : {
-    "username": "befta.caseworker.caa@gmail.com",
-    "password": "Pa55word11"
-  },
   "request": {
     "queryParams": {
       "ctid": "BEFTA_CASETYPE_3_1"
