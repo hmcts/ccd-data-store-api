@@ -55,7 +55,7 @@ apply from: 'liquibase.gradle'
 
 pmd {
     toolVersion = '6.11.0'
-    maxFailures = 3050 // Failures need to be reviewed/fixed before removing this property
+    maxFailures = 3150 // Failures need to be reviewed/fixed before removing this property
 }
 
 dependencyUpdates.resolutionStrategy = {
