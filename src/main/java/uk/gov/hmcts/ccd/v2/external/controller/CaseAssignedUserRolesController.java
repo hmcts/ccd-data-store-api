@@ -47,7 +47,7 @@ import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @RestController
 @RequestMapping(path = "/")
-@ConditionalOnProperty(value = "feature.case-assigned.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "api.case-assigned.enabled", havingValue = "true")
 public class CaseAssignedUserRolesController {
 
     public static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
