@@ -100,26 +100,3 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
     Then a positive response is received,
     And the response has all the details as expected,
     And a call [to verify Olawale's reception of the role CR-1 over the case C1 by an admin] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
-
-
-  @S-new.1 @Ignore
-  Scenario: must validate date in a right format
-    Given a user with [an active profile in CCD]
-    And a successful call [to create a token for case creation] as in [F-109_GetToken]
-    When a request is prepared with appropriate values
-    And the request [contains valid value for a formatted Date field]
-    And it is submitted to call the [create case] operation of [CCD Data Store]
-    Then a positive response is received
-    And the response [has 201 return code]
-    And the response has all other details as expected
-
-  @S-new.2 @Ignore
-  Scenario: must return an error for date value with invalid format
-    Given a user with [an active profile in CCD]
-    And a successful call [to create a token for case creation] as in [F-109_GetToken]
-    When a request is prepared with appropriate values
-    And the request [contains Date field with incorrect format]
-    And it is submitted to call the [create case] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [has 422 return code]
-    And the response has all other details as expected
