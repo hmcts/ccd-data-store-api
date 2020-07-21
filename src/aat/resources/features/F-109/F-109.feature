@@ -4,7 +4,7 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-    @S-942
+    @S-942 @elasticsearch
   Scenario: Must return /searchCases values from Datastore for all jurisdictions for the given case type (1/2)
     Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
     And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
@@ -18,9 +18,34 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
     And the request [contains the case type of Jurisdiction Befta_Jurisdiction1]
     And the response has all the details as expected
 
+  @S-943 @elasticsearch
+  Scenario: Must return /searchCases values from Datastore for all jurisdictions for the given case type (1/2)
+    Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction2_Case_Type1_Creation]
+    And a wait time of 5 seconds [to allow for Logstash to index the case just created]
+    And a user [with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of both previously created cases]
+    When a request is prepared with appropriate values
+    And the request [is made to query the previously created case from Jurisdiction Befta_Jurisdiction2]
+    And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
+    Then a positive response is received
+    And the request [contains the case type of Jurisdiction Befta_Jurisdiction2]
+    And the response has all the details as expected
 
+  @S-944 @elasticsearch
+  Scenario: Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (/searchCases)
+    Given a user [with access to create case for Befta_Jurisdiction3]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction3_Case_Type1_Creation]
+    And a wait time of 5 seconds [to allow for Logstash to index the case just created]
+    And a user [with only the 'caseworker-caa' role is not configured with the required CRUD permissions for Befta_Jurisdiction3]
+    When a request is prepared with appropriate values
+    And the request [is made to query the previously created case Befta_Jurisdiction3_Case_Type1]
+    And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
+    Then a positive response is received
+    And the request [contains no results]
+    And the response has all the details as expected
 
-  @S-945
+  @S-945 @elasticsearch
   Scenario: Must return internal/searchCases values from Datastore for all jurisdictions for the given case type (1/2)
     Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
     And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
@@ -34,7 +59,7 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
     And the request [contains the case type of Jurisdiction Befta_Jurisdiction1]
     And the response has all the details as expected
 
-  @S-946
+  @S-946 @elasticsearch
   Scenario: Must return internal/searchCases values from Datastore for all jurisdictions for the given case type (1/2)
     Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
     And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
@@ -48,7 +73,7 @@ Feature: Add support in CCD role based authorisation for caseworker-caa
     And the request [contains the case type of Jurisdiction Befta_Jurisdiction2]
     And the response has all the details as expected
 
-  @S-947
+  @S-947 @elasticsearch
   Scenario: Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (internal/searchCases)
     Given a user [with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2]
     And a case that has just been created as in [F-109-Befta_Jurisdiction3_Case_Type1_Creation_Token_Creation]
