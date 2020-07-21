@@ -30,13 +30,13 @@
       }
     }
   },
-	"expectedResponse": {
-		"_extends_": "Common_422_Response",
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
     "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp" : "[[ANYTHING_PRESENT]]",
-      "status" : 422,
-      "error" : "Unprocessable Entity",
+      "status" : 400,
+      "error" : "Bad Request",
       "message" : "[[ANYTHING_PRESENT]]",
       "path" : "[[ANYTHING_PRESENT]]",
       "details" : null,
