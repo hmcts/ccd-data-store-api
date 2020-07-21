@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -140,13 +139,14 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private String getIndexName(MultiSearchResult.MultiSearchResponse response) {
-        return response.searchResult.getFirstHit(SearchResult.Hit.class).index;
+        String quotedIndexName =  response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS)
+            .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
+        String unquotedIndexName = quotedIndexName.replaceAll("\"", "");
+        return unquotedIndexName;
     }
 
     private boolean hitsIsNotEmpty(MultiSearchResult.MultiSearchResponse response) {
-        return Optional.ofNullable(
-            response.searchResult.getFirstHit(SearchResult.Hit.class)
-        ).isPresent();
+        return response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS).getAsJsonArray().size() != 0;
     }
 
     private String getCaseTypeIDFromIndex(final String index, List<String> caseTypeIds) {
