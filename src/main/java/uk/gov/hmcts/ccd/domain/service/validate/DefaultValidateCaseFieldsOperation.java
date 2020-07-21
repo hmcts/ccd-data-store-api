@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
@@ -71,7 +72,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
                             errorList);
                     })));
         if (errorList.size() != 0) {
-            throw new ValidationException("Roles validation error: " + String.join(", ", errorList));
+            throw new BadRequestException("Roles validation error: " + String.join(", ", errorList));
         }
     }
 

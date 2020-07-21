@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import static org.hamcrest.Matchers.containsString;
@@ -187,8 +188,8 @@ class DefaultValidateCaseFieldsOperationTest {
         final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole(null);
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        ValidationException exception =
-            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+        BadRequestException exception =
+            assertThrows(BadRequestException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
         assertThat(exception.getMessage(),
             containsString("has an incorrect value"));
@@ -202,8 +203,8 @@ class DefaultValidateCaseFieldsOperationTest {
         final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        ValidationException exception =
-            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+        BadRequestException exception =
+            assertThrows(BadRequestException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
         assertThat(exception.getMessage(),
             containsString("incorrect value"));
@@ -228,8 +229,8 @@ class DefaultValidateCaseFieldsOperationTest {
         final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole(null);
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        ValidationException exception =
-            assertThrows(ValidationException.class,
+        BadRequestException exception =
+            assertThrows(BadRequestException.class,
                 () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent));
 
         assertThat(exception.getMessage(),
@@ -244,8 +245,8 @@ class DefaultValidateCaseFieldsOperationTest {
         final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        ValidationException exception =
-            assertThrows(ValidationException.class,
+        BadRequestException exception =
+            assertThrows(BadRequestException.class,
                 () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent));
 
         assertThat(exception.getMessage(),
