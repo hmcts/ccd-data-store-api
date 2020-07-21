@@ -3,7 +3,7 @@
   "_extends_": "F-107_Test_Data_Base",
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][F-107_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][siblingContexts][S-927_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 

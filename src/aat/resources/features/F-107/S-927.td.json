@@ -22,7 +22,7 @@
           "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "id": "${[scenarioContext][childContexts][S-927_Create_Case_Data][testData][actualResponse][body][id]}",
+      "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
       "case_type": "FT_MasterCaseType",
       "created_on": "[[ANYTHING_PRESENT]]",
