@@ -314,4 +314,15 @@
     <suppress>
         <cve>CVE-2017-18365</cve>
     </suppress>
+
+    <!-- FIXME : RDM-???? -->
+    <suppress>
+        <notes>Temporary suppression for on-going developments.</notes>
+        <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.36.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+        <cve>CVE-2020-13934</cve>
+        <cve>CVE-2020-13935</cve>
+    </suppress>
 </suppressions>
