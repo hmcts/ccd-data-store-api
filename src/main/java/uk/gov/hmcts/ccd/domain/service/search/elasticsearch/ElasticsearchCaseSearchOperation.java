@@ -140,7 +140,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private String getIndexName(MultiSearchResult.MultiSearchResponse response) {
-         return response.searchResult.getFirstHit(SearchResult.Hit.class).index;
+        return response.searchResult.getFirstHit(SearchResult.Hit.class).index;
     }
 
     private boolean hitsIsNotEmpty(MultiSearchResult.MultiSearchResponse response) {
