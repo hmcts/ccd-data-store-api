@@ -31,6 +31,6 @@ public class CaseAssignedUserRole {
     private String caseRole;
 
     @JsonProperty("organisation_id")
-    @JsonInclude(Include.NON_EMPTY)
+    @JsonInclude(Include.NON_NULL)
     private String organisationId;
 }
