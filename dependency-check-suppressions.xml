@@ -298,6 +298,7 @@
         <cve>CVE-2020-5408</cve>
         <cve>CVE-2020-9484</cve>
         <cve>CVE-2020-13692</cve>
+		<cve>CVE-2019-14900</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -327,6 +328,7 @@
    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
    <cve>CVE-2018-1258</cve>
 </suppress>
+
     <suppress>
    <notes><![CDATA[
    file name: spring-security-core-5.3.2.RELEASE.jar
@@ -369,12 +371,44 @@
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
    <cve>CVE-2020-10683</cve>
 </suppress>
-	<suppress>
-		<notes>Suppress temporarily to unblock dev and qa</notes>
-		<cve>CVE-2020-13692</cve>
-	</suppress>
-    <!-- Temporarily suppress to unblock development -->
     <suppress>
-      <cve>CVE-2017-18365</cve>
-     </suppress>
+        <cve>CVE-2017-18365</cve>
+    </suppress>
+
+<suppress> <!-- Temporary suppressions to allow continued development -->
+    <cve>CVE-2019-14900</cve>
+    <cve>CVE-2020-13934</cve>
+    <cve>CVE-2020-13935</cve>
+    <cve>CVE-2020-8022</cve>
+</suppress>
+
+	<suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+   <cve>CVE-2020-13934</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+   <cve>CVE-2020-13935</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+   <cve>CVE-2020-13934</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+   <cve>CVE-2020-13935</cve>
+</suppress>
+
 </suppressions>

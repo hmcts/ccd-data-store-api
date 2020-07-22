@@ -4,7 +4,7 @@ public abstract class Criterion {
 
     protected static final String TOKEN_SEPARATOR = ".";
 
-    protected static final String POSITION_PREFIX = "?";
+    protected static final String PARAM_PREFIX = ":";
 
     private final String field;
 
@@ -23,7 +23,11 @@ public abstract class Criterion {
         return soughtValue;
     }
 
-    public abstract String buildClauseString(int position, String operation);
+    public String buildParameterId() {
+        return field.replaceAll("[()]", "_");
+    }
+
+    public abstract String buildClauseString(String operation);
 
     protected String makeCaseInsensitive(String in) {
         return "TRIM( UPPER ( " + in + "))";

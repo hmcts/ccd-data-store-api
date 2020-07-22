@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd;
 
+import com.hazelcast.config.EvictionPolicy;
+import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
@@ -8,10 +12,6 @@ import java.util.Base64;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-
-import com.hazelcast.config.EvictionPolicy;
-import org.springframework.beans.factory.annotation.Value;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Named
 @Singleton
@@ -128,6 +128,12 @@ public class ApplicationParams {
     @Value("#{'${audit.log.ignore.statues}'.split(',')}")
     private List<Integer> auditLogIgnoreStatuses;
 
+    @Value("#{'${ccd.access-control.cross-jurisdictional-roles}'.split(',')}")
+    private List<String> ccdAccessControlCrossJurisdictionRoles;
+
+    @Value("#{'${ccd.access-control.citizen-roles}'.split(',')}")
+    private List<String> ccdAccessControlCitizenRoles;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -208,7 +214,7 @@ public class ApplicationParams {
     }
 
     public String displayWizardPageCollection(final String caseTypeId, final String eventId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventId);
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + eventId;
     }
 
     public String jurisdictionDefURL() {
@@ -362,4 +368,13 @@ public class ApplicationParams {
     public boolean isAuditLogEnabled() {
         return auditLogEnabled;
     }
+
+    public List<String> getCcdAccessControlCrossJurisdictionRoles() {
+        return ccdAccessControlCrossJurisdictionRoles;
+    }
+
+    public List<String> getCcdAccessControlCitizenRoles() {
+        return ccdAccessControlCitizenRoles;
+    }
+
 }

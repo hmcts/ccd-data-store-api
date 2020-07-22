@@ -6,44 +6,23 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
-
 public abstract class CaseViewFieldProcessor extends FieldProcessor {
 
     public CaseViewFieldProcessor(CaseViewFieldBuilder caseViewFieldBuilder) {
         super(caseViewFieldBuilder);
     }
 
-    public CaseViewField execute(CaseViewField caseViewField) {
-        final BaseType fieldType = BaseType.get(caseViewField.getFieldTypeDefinition().getType());
-
-        if (BaseType.get(COMPLEX) == fieldType) {
-            return executeComplex(caseViewField, caseViewField.getId(), caseViewField);
-        } else if (BaseType.get(COLLECTION) == fieldType) {
-            return executeCollection(caseViewField);
-        } else {
-            return executeSimple(caseViewField, fieldType);
-        }
-    }
-
     public CaseViewField execute(CaseViewField caseViewField, WizardPageField wizardPageField) {
-        final BaseType fieldType = BaseType.get(caseViewField.getFieldTypeDefinition().getType());
-
-        if (BaseType.get(COMPLEX) == fieldType) {
+        if (caseViewField.isComplexFieldType()) {
             return executeComplex(caseViewField, wizardPageField, caseViewField.getId(), caseViewField);
-        } else if (BaseType.get(COLLECTION) == fieldType) {
+        } else if (caseViewField.isCollectionFieldType()) {
             return executeCollection(caseViewField);
         } else {
-            return executeSimple(caseViewField, fieldType);
+            return executeSimple(caseViewField, BaseType.get(caseViewField.getFieldTypeDefinition().getType()));
         }
     }
 
-    protected CaseViewField executeComplex(CaseViewField caseViewField, String fieldPrefix, CaseViewField topLevelField) {
-        return executeComplex(caseViewField, null, fieldPrefix, topLevelField);
-    }
-
-    protected CaseViewField executeComplex(CaseViewField caseViewField,     WizardPageField wizardPageField, String fieldPrefix, CaseViewField topLevelField) {
+    protected CaseViewField executeComplex(CaseViewField caseViewField, WizardPageField wizardPageField, String fieldPrefix, CaseViewField topLevelField) {
         caseViewField.setFormattedValue(
             caseViewField.getValue() instanceof ObjectNode
                 ? executeComplex((ObjectNode) caseViewField.getValue(),

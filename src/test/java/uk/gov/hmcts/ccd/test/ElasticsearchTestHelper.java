@@ -90,6 +90,7 @@ public class ElasticsearchTestHelper {
     public static final String AUTOTEST1_RESTRICTED = "caseworker-autotest1-restricted";
     public static final String AUTOTEST1_PRIVATE = "caseworker-autotest1-private";
     public static final String AUTOTEST1_SOLICITOR = "caseworker-autotest1-solicitor";
+    public static final String CASEWORKER_CAA = "caseworker-caa";
 
     private static final String CASE_TYPE_ID_PARAM = "ctid";
     private static final String USE_CASE_PARAM = "use_case";

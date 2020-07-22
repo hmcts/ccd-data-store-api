@@ -3,8 +3,9 @@ package uk.gov.hmcts.ccd.domain.model.search;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
-public class CriteriaInput {
+public class CriteriaInput implements CommonDCPModel {
     private String label;
     private int order;
     private Field field;

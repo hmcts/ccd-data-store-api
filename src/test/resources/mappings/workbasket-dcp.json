@@ -1,0 +1,77 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/display/work-basket-definition/DCP?version=33"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "case_type_id": "DCP",
+      "fields": [
+        {
+          "metadata": false,
+          "case_field_id": "TextField",
+          "case_field_element_path": null,
+          "label": "`Text` field",
+          "order": 1,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": false,
+          "case_field_id": "DateField",
+          "case_field_element_path": null,
+          "label": "`Date` field",
+          "order": 2,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": "#DATETIMEDISPLAY(dd MMM yyyy)"
+        },
+        {
+          "metadata": false,
+          "case_field_id": "DateTimeField",
+          "case_field_element_path": null,
+          "label": "`DateTime` field",
+          "order": 3,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": "#DATETIMEDISPLAY(yyyy)"
+        },
+        {
+          "metadata": false,
+          "case_field_id": "CollectionField",
+          "case_field_element_path": null,
+          "label": "`Collection` field",
+          "order": 4,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": "#DATETIMEDISPLAY(MM-yyyy)"
+        },
+        {
+          "metadata": false,
+          "case_field_id": "ComplexField",
+          "case_field_element_path": null,
+          "label": "`Complex` field",
+          "order": 5,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": null
+        },
+        {
+          "metadata": true,
+          "case_field_id": "[LAST_MODIFIED_DATE]",
+          "case_field_element_path": null,
+          "label": "Last modified date",
+          "order": 6,
+          "role": null,
+          "sort_order": null,
+          "display_context_parameter": "#DATETIMEDISPLAY(dd MMM yyyy HH:mm:ss)"
+        }
+      ]
+    }
+  }
+}
