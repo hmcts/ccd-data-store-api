@@ -8,7 +8,7 @@ Feature: External Search API
   @S-625
   Scenario: Usecase request using SearchResultsFields useCase returns correct fields
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
     And the request [is using the query parameter usecase=search],
@@ -24,7 +24,7 @@ Feature: External Search API
   @S-626
   Scenario: Usecase request using WorkbasketResultsFields useCase returns correct fields
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
     And the request [is using the query parameter usecase=workbasket],
@@ -40,7 +40,7 @@ Feature: External Search API
   @S-627
   Scenario: Usecase request using SearchCasesResultFields useCase returns correct fields
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
     And the request [is using the query parameter usecase=orgcases],
@@ -56,7 +56,7 @@ Feature: External Search API
   @S-628
   Scenario: Standard request return all fields in a case user has access to
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
     And the request [is using not using any use case query parameter],
@@ -71,7 +71,7 @@ Feature: External Search API
   @S-629
   Scenario: Standard Request with specified fields return only headers and data for fields specified
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
     When the request [is configured to return specific fields],
@@ -87,7 +87,7 @@ Feature: External Search API
   @S-630
   Scenario: Usecase request with specified fields acts as a Standard Request
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
     When the request [is configured to return specific fields],
@@ -104,7 +104,7 @@ Feature: External Search API
   @S-631 #senior no access to number field due to role in caseAuth
   Scenario: usecase request with no access to field via user role in CaseAuthTab
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a caseworker-autotest1-senior role],
     When the request [is configured to search for the previously created case via exact match],
     And the request [is using the query parameter usecase=search],
@@ -119,7 +119,7 @@ Feature: External Search API
   @S-632 #senior role only has access to money field through user rol on result tab (workbasket )
   Scenario: usecase request with no access to field via user role in Result Fields config tab
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a caseworker-autotest1-senior role],
     And a request is prepared with appropriate values,
     When the request [is configured to search for the previously created case via exact match],
@@ -136,7 +136,7 @@ Feature: External Search API
   @S-633 #private user cant see email field
   Scenario: usecase request with no access to field via Security Classification
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a role with security classification of PRIVATE],
     When the request [is configured to search for the previously created case via exact match],
     And the request [is using the query parameter usecase=orgcases],
@@ -151,7 +151,7 @@ Feature: External Search API
   @S-634
   Scenario: standard request specifying field that user doesn't have access to
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
     When the request [is configured to return specific fields that the user does not have access to],
@@ -169,7 +169,7 @@ Feature: External Search API
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering1_2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering1_1],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering1_3],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created cases],
     And the request [is using the query parameter usecase=orgcases],
@@ -185,7 +185,7 @@ Feature: External Search API
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering2_2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering2_1],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering2_3],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created cases],
     And the request [is using the query parameter usecase=orgcases],
@@ -202,7 +202,7 @@ Feature: External Search API
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering3_2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering3_1],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering3_3],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created cases],
     And the request [is configured to order by a meta data field],
@@ -243,7 +243,7 @@ Feature: External Search API
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Pagination2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Pagination3],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Pagination4],
-    And a wait time of 5 seconds [to allow for Logstash to index the case just created],
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for previously created cases using pagination criteria],
     And the request [is using the query parameter usecase=orgcases],
