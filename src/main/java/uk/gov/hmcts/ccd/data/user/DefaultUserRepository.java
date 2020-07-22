@@ -179,7 +179,9 @@ public class DefaultUserRepository implements UserRepository {
     public List<String> getUserRolesJurisdictions() {
         String[] roles = this.getUserDetails().getRoles();
 
-        return Arrays.stream(roles).map(role ->  role.split("-"))
+        return Arrays.stream(roles)
+            .filter(role -> !applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role))
+            .map(role ->  role.split("-"))
             .filter(array -> array.length >= 2)
             .map(element -> element[1])
             .distinct()

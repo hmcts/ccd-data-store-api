@@ -415,6 +415,11 @@ class DefaultUserRepositoryTest {
     @DisplayName("getUserRolesJurisdictions()")
     class GetUserRolesJurisdictions {
 
+        @BeforeEach
+        public void setUp() {
+            when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(singletonList(ROLE_CASEWORKER_CAA));
+        }
+
         @Test
         @DisplayName("test empty list of jurisdictions")
         void shouldRetrieveNoJurisdictionsWhenNotPresent() {
@@ -463,7 +468,8 @@ class DefaultUserRepositoryTest {
                 "caseworker-autotest1",
                 "caseworker-autotest2",
                 "otherRole-autotest1",
-                "otherRole-autotest2");
+                "otherRole-autotest2",
+                ROLE_CASEWORKER_CAA);
 
             mockUserInfo("userId", roles);
 
@@ -472,6 +478,20 @@ class DefaultUserRepositoryTest {
             assertAll(
                 () -> assertThat(jurisdictions, hasSize(2)),
                 () -> assertThat(jurisdictions, hasItems("autotest1", "autotest2"))
+            );
+        }
+
+        @Test
+        @DisplayName("It should ignore cross-jurisdictional roles")
+        void shouldIgnoreCrossJurisdictionalRoles() {
+            List<String> roles = singletonList(ROLE_CASEWORKER_CAA);
+
+            mockUserInfo("userId", roles);
+
+            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+
+            assertAll(
+                () -> assertThat(jurisdictions, hasSize(0))
             );
         }
     }
