@@ -30,11 +30,13 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleRequest;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
@@ -84,11 +86,11 @@ public class CaseAssignedUserRolesController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
-                + "1. " + V2.Error.EMPTY_CASE_USER_ROLE_LIST + "\n"
-                + "2. " + V2.Error.CASE_ID_INVALID + "\n"
-                + "3. " + V2.Error.USER_ID_INVALID + "\n"
-                + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + "\n"
-                + "5. " + V2.Error.ORGANISATION_ID_INVALID + "."
+                + "1. " + V2.Error.EMPTY_CASE_USER_ROLE_LIST + ", \n"
+                + "2. " + V2.Error.CASE_ID_INVALID + ": has to be a valid 16-digit Luhn number, \n"
+                + "3. " + V2.Error.USER_ID_INVALID + ": has to be a string of length > 0, \n"
+                + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square brackets, \n"
+                + "5. " + V2.Error.ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present."
         ),
         @ApiResponse(
             code = 401,
@@ -107,20 +109,20 @@ public class CaseAssignedUserRolesController {
     })
     @LogAudit(
         operationType = ADD_CASE_ASSIGNED_USER_ROLES,
-        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseIds(#caseAssignedUserRoles)",
-        targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildUserIds(#caseAssignedUserRoles)",
-        targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseRoles(#caseAssignedUserRoles)"
+        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseIds(#addCaseAssignedUserRolesRequest)",
+        targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildUserIds(#addCaseAssignedUserRolesRequest)",
+        targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseRoles(#addCaseAssignedUserRolesRequest)"
     )
     public ResponseEntity<AddCaseAssignedUserRolesResponse> addCaseUserRoles(
         @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
         @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
         @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
-        @RequestBody CaseAssignedUserRolesResource caseAssignedUserRoles
+        @RequestBody AddCaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest
     ) {
         String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
         if (applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(clientServiceName)) {
-            validateRequestParams(caseAssignedUserRoles);
-            this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles.getCaseAssignedUserRoles());
+            validateRequestParams(addCaseAssignedUserRolesRequest);
+            this.caseAssignedUserRolesOperation.addCaseUserRoles(addCaseAssignedUserRolesRequest.getCaseAssignedUserRoleRequests());
             return ResponseEntity.status(HttpStatus.CREATED).body(new AddCaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
         } else {
             throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
@@ -197,18 +199,18 @@ public class CaseAssignedUserRolesController {
         }
     }
 
-    private void validateRequestParams(CaseAssignedUserRolesResource caseAssignedUserRoles) {
+    private void validateRequestParams(AddCaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
 
         List<String> errorMessages = Lists.newArrayList("Invalid data provided for the following inputs to the request:");
 
-        List<CaseAssignedUserRole> caseUserRoles =
-            caseAssignedUserRolesToStream(caseAssignedUserRoles).collect(Collectors.toList());
+        List<CaseAssignedUserRoleRequest> caseUserRoles =
+            caseAssignedUserRolesToStream(addCaseAssignedUserRolesRequest).collect(Collectors.toList());
 
         /// case-users: must be none empty
         if (caseUserRoles.isEmpty()) {
             errorMessages.add(V2.Error.EMPTY_CASE_USER_ROLE_LIST);
         } else {
-            caseUserRoles.forEach(caseRole -> validateCaseAssignedUserRole(caseRole, errorMessages));
+            caseUserRoles.forEach(caseRole -> validateCaseAssignedUserRoleRequest(caseRole, errorMessages));
         }
 
         if (errorMessages.size() > 1) {
@@ -217,8 +219,8 @@ public class CaseAssignedUserRolesController {
         }
     }
 
-    private void validateCaseAssignedUserRole(CaseAssignedUserRole caseRole, List<String> errorMessages) {
-        // case_id: has to be a valid 16-digit Luhn number)
+    private void validateCaseAssignedUserRoleRequest(CaseAssignedUserRoleRequest caseRole, List<String> errorMessages) {
+        // case_id: has to be a valid 16-digit Luhn number
         if (!caseReferenceService.validateUID(caseRole.getCaseDataId())) {
             errorMessages.add(V2.Error.CASE_ID_INVALID);
         }
@@ -236,22 +238,22 @@ public class CaseAssignedUserRolesController {
         }
     }
 
-    public static String buildCaseIds(CaseAssignedUserRolesResource caseAssignedUserRoles) {
-        return caseAssignedUserRolesToStream(caseAssignedUserRoles).limit(MAX_CASE_IDS_LIST)
+    public static String buildCaseIds(AddCaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
+        return caseAssignedUserRolesToStream(addCaseAssignedUserRolesRequest).limit(MAX_CASE_IDS_LIST)
             .map(CaseAssignedUserRole::getCaseDataId)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
-    public static String buildCaseRoles(CaseAssignedUserRolesResource caseAssignedUserRoles) {
+    public static String buildCaseRoles(AddCaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
         // NB: match Case ID list size and separator configuration
-        return caseAssignedUserRolesToStream(caseAssignedUserRoles).limit(MAX_CASE_IDS_LIST)
+        return caseAssignedUserRolesToStream(addCaseAssignedUserRolesRequest).limit(MAX_CASE_IDS_LIST)
             .map(CaseAssignedUserRole::getCaseRole)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
-    public static String buildUserIds(CaseAssignedUserRolesResource caseAssignedUserRoles) {
+    public static String buildUserIds(AddCaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
         // NB: match Case ID list size and separator configuration
-        return caseAssignedUserRolesToStream(caseAssignedUserRoles).limit(MAX_CASE_IDS_LIST)
+        return caseAssignedUserRolesToStream(addCaseAssignedUserRolesRequest).limit(MAX_CASE_IDS_LIST)
             .map(CaseAssignedUserRole::getUserId)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
@@ -263,9 +265,9 @@ public class CaseAssignedUserRolesController {
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
-    private static Stream<CaseAssignedUserRole> caseAssignedUserRolesToStream(CaseAssignedUserRolesResource caseAssignedUserRoles) {
-        return caseAssignedUserRoles != null
-            ? Optional.ofNullable(caseAssignedUserRoles.getCaseAssignedUserRoles())
+    private static Stream<CaseAssignedUserRoleRequest> caseAssignedUserRolesToStream(AddCaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
+        return addCaseAssignedUserRolesRequest != null
+            ? Optional.ofNullable(addCaseAssignedUserRolesRequest.getCaseAssignedUserRoleRequests())
                 .map(Collection::stream)
                 .orElseGet(Stream::empty)
             : Stream.empty();

@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleRequest;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
@@ -240,12 +241,12 @@ class CaseAccessOperationTest {
         @DisplayName("should add single case user role")
         void shouldAddSingleCaseUserRole() {
             // ARRANGE
-            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
             );
 
             // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            caseAccessOperation.addCaseUserRoles(caseUserRoleRequests);
 
             // ASSERT
             verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
@@ -260,13 +261,13 @@ class CaseAccessOperationTest {
             caseDetailsOther.setReference(CASE_REFERENCE_OTHER);
             doReturn(Optional.of(caseDetailsOther)).when(caseDetailsRepository).findByReference(null, CASE_REFERENCE_OTHER);
 
-            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
-                new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
+            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
             );
 
             // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            caseAccessOperation.addCaseUserRoles(caseUserRoleRequests);
 
             // ASSERT
             verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
@@ -277,13 +278,13 @@ class CaseAccessOperationTest {
         @DisplayName("should add multiple case user roles but lookup case details once per case")
         void shouldAddMultipleCaseUserRolesButLoadCaseDetailsOncePerCase() {
             // ARRANGE
-            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER) // NB: repeat case reference
+            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER) // NB: repeat case reference
             );
 
             // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            caseAccessOperation.addCaseUserRoles(caseUserRoleRequests);
 
             // ASSERT
             // NB: only one lookup per case reference
@@ -297,20 +298,20 @@ class CaseAccessOperationTest {
         @DisplayName("should throw not found exception when case not found")
         void shouldThrowNotFound() {
             // ARRANGE
-            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRole(CASE_NOT_FOUND.toString(), USER_ID, CASE_ROLE)
+            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleRequest(CASE_NOT_FOUND.toString(), USER_ID, CASE_ROLE)
             );
 
             // ACT / ASSERT
-            assertThrows(CaseNotFoundException.class, () -> caseAccessOperation.addCaseUserRoles(caseUserRoles));
+            assertThrows(CaseNotFoundException.class, () -> caseAccessOperation.addCaseUserRoles(caseUserRoleRequests));
         }
 
         @Test
         @DisplayName("should increment organisation user count for single new case-user relationship")
         void shouldIncrementOrganisationUserCountForSingleNewRelationship() {
             // ARRANGE
-            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
             // behave as a new relationship
             when(caseUserRepository.findCaseUserRoles(
@@ -319,7 +320,7 @@ class CaseAccessOperationTest {
             )).thenReturn(new ArrayList<>());
 
             // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            caseAccessOperation.addCaseUserRoles(caseUserRoleRequests);
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
@@ -330,8 +331,8 @@ class CaseAccessOperationTest {
         @DisplayName("should not increment organisation user count for existing case-user relationship")
         void shouldNotIncrementOrganisationUserCountForExistingRelationship() {
             // ARRANGE
-            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
             // behave as a new relationship
             when(caseUserRepository.findCaseUserRoles(
@@ -342,7 +343,7 @@ class CaseAccessOperationTest {
             ));
 
             // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            caseAccessOperation.addCaseUserRoles(caseUserRoleRequests);
 
             // ASSERT
             verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
@@ -352,9 +353,9 @@ class CaseAccessOperationTest {
         @DisplayName("should increment organisation user count only once for repeat new case-user relationship")
         void shouldIncrementOrganisationUserCountOnlyOnceForRepeatNewRelationship() {
             // ARRANGE
-            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER, ORGANISATION)
+            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER, ORGANISATION)
             );
             // behave as a new relationship
             when(caseUserRepository.findCaseUserRoles(
@@ -363,7 +364,7 @@ class CaseAccessOperationTest {
             )).thenReturn(new ArrayList<>());
 
             // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            caseAccessOperation.addCaseUserRoles(caseUserRoleRequests);
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
@@ -374,21 +375,21 @@ class CaseAccessOperationTest {
         @DisplayName("should increment organisation user count for multiple new case-user relationship")
         void shouldIncrementOrganisationUserCountForMultipleNewRelationships() {
             // ARRANGE
-            List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList(
+            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
                 // CASE_REFERENCE/CASE_ID
                 // (2 orgs with 2 users with 2 roles >> 2 org counts incremented by 2)
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE, ORGANISATION),
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER, ORGANISATION_OTHER),
-                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE_OTHER, ORGANISATION_OTHER),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER, ORGANISATION_OTHER),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE_OTHER, ORGANISATION_OTHER),
 
                 // CASE_REFERENCE_OTHER/CASE_ID_OTHER
                 // (2 orgs with 1 user each with multiple roles >> 2 org counts incremented by 1)
                 // (however 2nd org count will not be required as existing relationship added below **)
-                new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE, ORGANISATION),
-                new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_OTHER, ORGANISATION),
-                new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE, ORGANISATION_OTHER),
-                new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE_OTHER, ORGANISATION_OTHER)
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_OTHER, ORGANISATION),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE, ORGANISATION_OTHER),
+                new CaseAssignedUserRoleRequest(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE_OTHER, ORGANISATION_OTHER)
 
             );
             // ** CASE_REFERENCE_OTHER + USER_ID_OTHER as exiting relationship (i.e. to check adjusting count still works in multiple)
@@ -398,7 +399,7 @@ class CaseAccessOperationTest {
             )).thenReturn(Collections.singletonList(createCaseUserEntity(CASE_ID_OTHER, CASE_ROLE_OTHER, USER_ID_OTHER)));
 
             // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            caseAccessOperation.addCaseUserRoles(caseUserRoleRequests);
 
             // ASSERT
             // verify CASE_REFERENCE/CASE_ID

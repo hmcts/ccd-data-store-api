@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleRequest;
 import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
 
 @Service
@@ -18,7 +19,7 @@ public class DefaultCaseAssignedUserRolesOperation implements CaseAssignedUserRo
         this.caseAccessOperation = caseAccessOperation;
     }
 
-    public void addCaseUserRoles(List<CaseAssignedUserRole> caseUserRoles) {
+    public void addCaseUserRoles(List<CaseAssignedUserRoleRequest> caseUserRoles) {
         this.caseAccessOperation.addCaseUserRoles(caseUserRoles);
     }
 
