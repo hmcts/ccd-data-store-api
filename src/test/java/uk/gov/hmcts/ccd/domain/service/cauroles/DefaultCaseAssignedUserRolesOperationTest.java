@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleRequest;
 import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,13 +32,16 @@ class DefaultCaseAssignedUserRolesOperationTest {
     @Test
     void addCaseUserRoles() {
         // ARRANGE
-        List<CaseAssignedUserRole> caseAssignedUserRoles = createCaseAssignedUserRoles();
+        List<CaseAssignedUserRoleRequest> caseUserRolesRequests = Lists.newArrayList(
+            new CaseAssignedUserRoleRequest(),
+            new CaseAssignedUserRoleRequest()
+        );
 
         // ACT
-        caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles);
+        caseAssignedUserRolesOperation.addCaseUserRoles(caseUserRolesRequests);
 
         // ASSERT
-        verify(caseAccessOperation).addCaseUserRoles(caseAssignedUserRoles);
+        verify(caseAccessOperation).addCaseUserRoles(caseUserRolesRequests);
     }
 
     @Test
