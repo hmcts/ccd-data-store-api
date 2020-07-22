@@ -482,8 +482,8 @@ class DefaultUserRepositoryTest {
         }
 
         @Test
-        @DisplayName("It should ignore cross-jurisdictional roles")
-        void shouldIgnoreCrossJurisdictionalRoles() {
+        @DisplayName("It should ignore cross-jurisdiction roles")
+        void shouldIgnoreCrossJurisdictionRoles() {
             List<String> roles = singletonList(ROLE_CASEWORKER_CAA);
 
             mockUserInfo("userId", roles);
