@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
+import static java.util.function.Predicate.not;
 import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -180,7 +181,7 @@ public class DefaultUserRepository implements UserRepository {
         String[] roles = this.getUserDetails().getRoles();
 
         return Arrays.stream(roles)
-            .filter(role -> !applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role))
+            .filter(not(this::isCrossJurisdictionRole))
             .map(role ->  role.split("-"))
             .filter(array -> array.length >= 2)
             .map(element -> element[1])
@@ -234,6 +235,10 @@ public class DefaultUserRepository implements UserRepository {
         idamUser.setForename(userInfo.getGivenName());
         idamUser.setSurname(userInfo.getFamilyName());
         return idamUser;
+    }
+
+    private boolean isCrossJurisdictionRole(String role) {
+        return applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role);
     }
 
 }
