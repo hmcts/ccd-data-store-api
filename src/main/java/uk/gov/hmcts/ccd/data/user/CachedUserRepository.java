@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.google.common.collect.Maps.newHashMap;
 
@@ -71,5 +73,25 @@ public class CachedUserRepository implements UserRepository {
             userName = Optional.of(userRepository.getUserId());
             return userName.get();
         });
+    }
+
+    @Override
+    public List<String> getUserRolesJurisdictions() {
+        return userRepository.getUserRolesJurisdictions();
+    }
+
+    @Override
+    public boolean anyRoleEqualsAnyOf(List<String> userRoles) {
+        return userRepository.anyRoleEqualsAnyOf(userRoles);
+    }
+
+    @Override
+    public boolean anyRoleEqualsTo(String userRole) {
+        return userRepository.anyRoleEqualsTo(userRole);
+    }
+
+    @Override
+    public boolean anyRoleMatches(Pattern rolesPattern) {
+        return userRepository.anyRoleMatches(rolesPattern);
     }
 }

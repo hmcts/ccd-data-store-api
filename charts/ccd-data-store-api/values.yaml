@@ -48,7 +48,7 @@ java:
     IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     USER_PROFILE_HOST: http://ccd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    CCD_DM_DOMAIN: ^https?://(?:api-gateway\.preprod\.dm\.reform\.hmcts\.net|dm-store-aat\.service\.core-compute-aat\.internal(?::\d+)?)
+    CCD_DM_DOMAIN: ^https?://(?:api-gateway\.preprod\.dm\.reform\.hmcts\.net|dm-store-{{ .Values.global.environment }}\.service\.core-compute-{{ .Values.global.environment }}\.internal(?::\d+)?)
     IDAM_USER_URL: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
     CCD_DRAFT_STORE_URL: http://draft-store-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
@@ -60,3 +60,7 @@ java:
     HTTP_CLIENT_SECONDS_IDLE_CONNECTION: '120'
     HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '20'
     HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY: '2000'
+
+    DATA_STORE_CROSS_JURISDICTIONAL_ROLES: caseworker-caa
+    DATA_STORE_CITIZEN_ROLES: citizen,letter-holder
+    DATA_STORE_SECURITY_LOGGING_FILTER_PATH_REGEX: '.*'

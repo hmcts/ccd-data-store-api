@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.Optional;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
-
-public interface CommonField {
+public interface CommonField extends CommonDCPModel {
 
     FieldTypeDefinition getFieldTypeDefinition();
 
@@ -22,8 +21,6 @@ public interface CommonField {
 
     void setDisplayContext(String displayContext);
 
-    String getDisplayContextParameter();
-
     void setDisplayContextParameter(String displayContextParameter);
 
     Object getFormattedValue();
@@ -32,12 +29,12 @@ public interface CommonField {
 
     @JsonIgnore
     default boolean isCollectionFieldType() {
-        return FieldTypeDefinition.COLLECTION.equalsIgnoreCase(getFieldTypeDefinition().getType());
+        return getFieldTypeDefinition().isCollectionFieldType();
     }
 
     @JsonIgnore
     default boolean isComplexFieldType() {
-        return COMPLEX.equalsIgnoreCase(getFieldTypeDefinition().getType());
+        return getFieldTypeDefinition().isComplexFieldType();
     }
 
     @JsonIgnore
