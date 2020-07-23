@@ -419,11 +419,6 @@ class DefaultUserRepositoryTest {
     @DisplayName("getCaseworkerUserRolesJurisdictions()")
     class GetCaseworkerUserRolesJurisdictions {
 
-        @BeforeEach
-        public void setUp() {
-
-        }
-
         @Test
         @DisplayName("test empty list of jurisdictions")
         void shouldRetrieveNoJurisdictionsWhenNotPresent() {
@@ -533,7 +528,7 @@ class DefaultUserRepositoryTest {
         doReturn(newAuthorities(ROLE_CASEWORKER_CAA)).when(authentication)
             .getAuthorities();
     }
-
+    
     private void mockUserInfo(String userId) {
         mockUserInfo(userId, emptyList());
     }
