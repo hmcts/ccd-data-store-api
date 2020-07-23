@@ -76,8 +76,8 @@ public class CachedUserRepository implements UserRepository {
     }
 
     @Override
-    public List<String> getUserRolesJurisdictions() {
-        return userRepository.getUserRolesJurisdictions();
+    public List<String> getCaseworkerUserRolesJurisdictions() {
+        return userRepository.getCaseworkerUserRolesJurisdictions();
     }
 
     @Override

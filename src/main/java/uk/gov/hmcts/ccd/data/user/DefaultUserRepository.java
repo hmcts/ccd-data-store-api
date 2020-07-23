@@ -46,21 +46,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.util.Comparator.comparingInt;
-import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
-
 @Repository
 @Qualifier(DefaultUserRepository.QUALIFIER)
 public class DefaultUserRepository implements UserRepository {
@@ -177,14 +162,15 @@ public class DefaultUserRepository implements UserRepository {
     }
 
     @Override
-    public List<String> getUserRolesJurisdictions() {
+    public List<String> getCaseworkerUserRolesJurisdictions() {
         String[] roles = this.getUserDetails().getRoles();
 
         return Arrays.stream(roles)
+            .filter(this::isCaseworkerRole)
             .filter(not(this::isCrossJurisdictionRole))
-            .map(role ->  role.split("-"))
+            .map(role -> role.split(applicationParams.getCaseworkerRoleDelimiter()))
             .filter(array -> array.length >= 2)
-            .map(element -> element[1])
+            .map(element -> element[applicationParams.getCaseworkerRoleJurisdictionElementIndex()])
             .distinct()
             .collect(Collectors.toList());
     }
@@ -215,7 +201,7 @@ public class DefaultUserRepository implements UserRepository {
     private boolean filterRole(final String jurisdictionId, final String role) {
         return startsWithIgnoreCase(role, String.format(RELEVANT_ROLES, jurisdictionId))
                 || ArrayUtils.contains(authCheckerConfiguration.getCitizenRoles(), role)
-                || applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role);
+                || isCrossJurisdictionRole(role);
     }
 
     private IdamProperties toIdamProperties(UserInfo userInfo) {
@@ -239,6 +225,10 @@ public class DefaultUserRepository implements UserRepository {
 
     private boolean isCrossJurisdictionRole(String role) {
         return applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role);
+    }
+
+    private boolean isCaseworkerRole(String role) {
+        return role.matches(applicationParams.getCaseworkerRoleRegex());
     }
 
 }
