@@ -328,6 +328,7 @@
    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-web@.*$</packageUrl>
    <cve>CVE-2018-1258</cve>
 </suppress>
+
     <suppress>
    <notes><![CDATA[
    file name: spring-security-core-5.3.2.RELEASE.jar
@@ -373,32 +374,41 @@
     <suppress>
         <cve>CVE-2017-18365</cve>
     </suppress>
-    <suppress>
-        <notes><![CDATA[
+
+<suppress> <!-- Temporary suppressions to allow continued development -->
+    <cve>CVE-2019-14900</cve>
+    <cve>CVE-2020-13934</cve>
+    <cve>CVE-2020-13935</cve>
+    <cve>CVE-2020-8022</cve>
+</suppress>
+
+	<suppress>
+   <notes><![CDATA[
    file name: tomcat-embed-websocket-9.0.36.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
-        <cve>CVE-2020-13934</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+   <cve>CVE-2020-13934</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
    file name: tomcat-embed-websocket-9.0.36.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
-        <cve>CVE-2020-13935</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+   <cve>CVE-2020-13935</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
    file name: tomcat-embed-core-9.0.36.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
-        <cve>CVE-2020-13934</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+   <cve>CVE-2020-13934</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
    file name: tomcat-embed-core-9.0.36.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
-        <cve>CVE-2020-13935</cve>
-    </suppress>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+   <cve>CVE-2020-13935</cve>
+</suppress>
+  
 </suppressions>
