@@ -195,7 +195,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Error while retrieving case type version", e);
             if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(
-                    "Resource not found when getting case type version for '" + caseTypeId + "'.", e);
+                    "Error when getting case type version. Unknown case type '" + caseTypeId + "'.", e);
             } else {
                 throw new ServiceException("Problem getting case type version for '" + caseTypeId + "'.", e);
             }
