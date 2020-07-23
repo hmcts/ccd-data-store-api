@@ -10,7 +10,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][S-927_Create_Case_Data][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][S-930_Create_Case_Data][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
@@ -21,7 +21,7 @@
           "OrgPolicyCaseAssignedRole": "[Invalid]"
           }
         },
-      "event_token": "${[scenarioContext][childContexts][S-927-Prerequisite][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][S-930-Prerequisite][testData][actualResponse][body][token]}"
     }
   },
   "expectedResponse": {
