@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
@@ -60,7 +59,7 @@ public class CaseSearchEndpoint {
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
-                              @Qualifier(DefaultUserRepository.QUALIFIER)  UserRepository userRepository,
+                              @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
                               ElasticsearchQueryHelper elasticsearchQueryHelper,
                               ApplicationParams applicationParams) {
         this.caseSearchOperation = caseSearchOperation;
@@ -128,10 +127,11 @@ public class CaseSearchEndpoint {
     }
 
     private void validateCtid(List<String> caseTypeIds) {
-        if (caseTypeIds == null || caseTypeIds.size()==0) {
+        if (caseTypeIds == null || caseTypeIds.size() == 0) {
             throw new BadRequestException("Missing required case type. Please provide a case type or list of case types to search.");
         }
     }
+
     private boolean isAllCaseTypesRequest(List<String> caseTypeIds) {
         return ElasticsearchRequest.WILDCARD.equals(caseTypeIds.get(0));
     }
