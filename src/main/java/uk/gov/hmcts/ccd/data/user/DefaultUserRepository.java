@@ -231,11 +231,7 @@ public class DefaultUserRepository implements UserRepository {
 
     private Optional<String> extractJurisdiction(String caseworkerRole) {
         String[] parts = caseworkerRole.split("-");
-        if (parts.length < 2) {
-            return Optional.empty();
-        } else {
-            return Optional.of(parts[JURISDICTION_INDEX]);
-        }
+        return parts.length < 2 ? Optional.empty() : Optional.of(parts[JURISDICTION_INDEX]);
     }
 
     private boolean isCaseworkerRole(String role) {
