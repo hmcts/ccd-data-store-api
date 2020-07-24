@@ -417,7 +417,7 @@ class ElasticsearchCaseSearchOperationTest {
 
             assertAll(
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
-                () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
+                () -> assertThat(caseSearchResult.getTotal(), equalTo(4L)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
