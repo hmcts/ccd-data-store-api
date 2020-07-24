@@ -1,17 +1,10 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
-import static java.lang.Boolean.FALSE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import java.util.function.Supplier;
-
-import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
@@ -20,6 +13,11 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.v2.V2;
+
+import java.util.function.Supplier;
+
+import static java.lang.Boolean.FALSE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 
 @DisplayName("Get UI start trigger by case type and event ids")
 class GetCaseValidatorTest extends BaseTest {

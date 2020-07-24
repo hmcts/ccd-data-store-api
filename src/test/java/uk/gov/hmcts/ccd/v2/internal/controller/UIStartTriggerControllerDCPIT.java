@@ -36,7 +36,19 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_COMPLEX_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_NESTED_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.NESTED_COMPLEX;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.NESTED_NUMBER_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.TEXT_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.arrayOf;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.mapOf;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
@@ -70,7 +82,7 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_case_dcp.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_dcp.sql"})
     @SuppressWarnings("unchecked")
     public void shouldGetStartTriggerForCaseWithDCPConfigured() throws Exception {
         assertCaseDataResultSetSize();
@@ -103,8 +115,8 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
             () -> assertSimpleField(dateTimeField, DATE_TIME_FIELD, "#DATETIMEENTRY(yyyy-dd)", "1987-11-15T12:30:00.000", "1987-15"),
 
             () -> assertCollectionField(collectionField, COLLECTION_FIELD, "#DATETIMEENTRY(yyyyHHmm),#COLLECTION(allowDelete,allowInsert)",
-                new String[]{"2004-03-02T05:06:07.000", "2010-09-08T11:12:13.000"},
-                new String[]{"20040506", "20101112"}),
+                new String[] {"2004-03-02T05:06:07.000", "2010-09-08T11:12:13.000"},
+                new String[] {"20040506", "20101112"}),
 
             () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(0).getId(), is(COMPLEX_DATE_TIME_FIELD)),
             () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(0).getDisplayContextParameter(),

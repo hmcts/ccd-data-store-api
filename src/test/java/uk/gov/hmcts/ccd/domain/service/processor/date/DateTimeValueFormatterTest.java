@@ -13,7 +13,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
@@ -149,12 +153,12 @@ class DateTimeValueFormatterTest {
             CaseViewField result = dateTimeValueFormatter.execute(caseViewField, null);
 
             String expectedResultJson = "{"
-                    + "\"ComplexDateField\":\"1990-01-01\","
-                    + "\"ComplexNestedField\":{"
-                    + "\"NestedDateField\":\"03 2020\","
-                    + "\"NestedCollectionDateField\":["
-                    + "{\"id\":\"id1\",\"value\":\"10/10/2020\"},"
-                    + "{\"id\":\"id2\",\"value\":\"30/01/2010\"}"
+                + "\"ComplexDateField\":\"1990-01-01\","
+                + "\"ComplexNestedField\":{"
+                + "\"NestedDateField\":\"03 2020\","
+                + "\"NestedCollectionDateField\":["
+                + "{\"id\":\"id1\",\"value\":\"10/10/2020\"},"
+                + "{\"id\":\"id2\",\"value\":\"30/01/2010\"}"
                 + "]}}";
             ObjectNode expectedValue = (ObjectNode) MAPPER.readTree(expectedResultJson);
 
@@ -367,12 +371,12 @@ class DateTimeValueFormatterTest {
             CaseViewField result = dateTimeValueFormatter.execute(caseViewField, wizardPageField);
 
             String expectedResultJson = "{\"ComplexDateField\":\"1990-01-01\","
-                                        + "\"ComplexNestedField\":{"
-                                            + "\"NestedDateField\":\"03 2020\","
-                                            + "\"NestedCollectionDateField\":["
-                                                + "{\"id\":\"id1\",\"value\":\"10/10/2020\"},"
-                                                + "{\"id\":\"id2\",\"value\":\"30/01/2010\"}"
-                                        + "]}}";
+                + "\"ComplexNestedField\":{"
+                + "\"NestedDateField\":\"03 2020\","
+                + "\"NestedCollectionDateField\":["
+                + "{\"id\":\"id1\",\"value\":\"10/10/2020\"},"
+                + "{\"id\":\"id2\",\"value\":\"30/01/2010\"}"
+                + "]}}";
             ObjectNode expectedValue = (ObjectNode) MAPPER.readTree(expectedResultJson);
 
             assertAll(
@@ -415,12 +419,12 @@ class DateTimeValueFormatterTest {
             CaseViewField result = dateTimeValueFormatter.execute(caseViewField, wizardPageField);
 
             String expectedResultJson = "{\"ComplexDateField\":\"1\","
-                                        + "\"ComplexNestedField\":{"
-                                            + "\"NestedDateField\":\"2020\","
-                                            + "\"NestedCollectionDateField\":["
-                                                + "{\"id\":\"id1\",\"value\":\"10\"},"
-                                                + "{\"id\":\"id2\",\"value\":\"01\"}"
-                                        + "]}}";
+                + "\"ComplexNestedField\":{"
+                + "\"NestedDateField\":\"2020\","
+                + "\"NestedCollectionDateField\":["
+                + "{\"id\":\"id1\",\"value\":\"10\"},"
+                + "{\"id\":\"id2\",\"value\":\"01\"}"
+                + "]}}";
             ObjectNode expectedValue = (ObjectNode) MAPPER.readTree(expectedResultJson);
 
             assertThat(result.getFormattedValue(), is(expectedValue));
@@ -493,13 +497,13 @@ class DateTimeValueFormatterTest {
 
     private ObjectNode complexValue() throws IOException {
         String json = "{"
-                      + "\"ComplexDateField\":\"1990-01-01\","
-                      + "\"ComplexNestedField\":{"
-                            + "\"NestedDateField\":\"2020-03-13\""
-                            + ",\"NestedCollectionDateField\":["
-                                + "{\"id\":\"id1\",\"value\":\"2020-10-10\"},"
-                                + "{\"id\":\"id2\",\"value\":\"2010-01-30\"}"
-                      + "]}}";
+            + "\"ComplexDateField\":\"1990-01-01\","
+            + "\"ComplexNestedField\":{"
+            + "\"NestedDateField\":\"2020-03-13\""
+            + ",\"NestedCollectionDateField\":["
+            + "{\"id\":\"id1\",\"value\":\"2020-10-10\"},"
+            + "{\"id\":\"id2\",\"value\":\"2010-01-30\"}"
+            + "]}}";
         return (ObjectNode) MAPPER.readTree(json);
     }
 }

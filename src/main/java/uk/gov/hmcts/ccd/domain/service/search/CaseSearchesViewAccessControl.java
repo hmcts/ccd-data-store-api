@@ -1,12 +1,18 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.stereotype.*;
-import uk.gov.hmcts.ccd.data.user.*;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.service.common.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class CaseSearchesViewAccessControl {

@@ -14,7 +14,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.emptyCollectionOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
 @DisplayName("TextAreaValidator")
@@ -74,8 +77,8 @@ class TextAreaValidatorTest {
     @Test
     void validate_shouldBeValidWhenNonEmptyString() {
         final List<ValidationResult> results = validator.validate(FIELD_ID,
-                                                                  NODE_FACTORY.textNode("Some text"),
-                caseFieldDefinition);
+            NODE_FACTORY.textNode("Some text"),
+            caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
@@ -133,8 +136,8 @@ class TextAreaValidatorTest {
         final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
 
         final List<ValidationResult> results = validator.validate(FIELD_ID,
-                                                                  NODE_FACTORY.textNode("3232-32-32"),
-                caseFieldDefinition);
+            NODE_FACTORY.textNode("3232-32-32"),
+            caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }

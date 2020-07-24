@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import java.net.URI;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +10,23 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 
 /**
  * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway.
@@ -52,21 +59,21 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final SearchResultDefinition
-                    searchResult =
-                    restTemplate.exchange(withVersionQueryParam(applicationParams.displaySearchResultDefURL(caseTypeId), version),
-                            HttpMethod.GET,
-                            requestEntity,
-                            SearchResultDefinition.class).getBody();
+                searchResult =
+                restTemplate.exchange(withVersionQueryParam(applicationParams.displaySearchResultDefURL(caseTypeId), version),
+                    HttpMethod.GET,
+                    requestEntity,
+                    SearchResultDefinition.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             LOG.debug("Rest API getSearchResultGetHttp called for {}, finished in {}",
-                    caseTypeId,
-                    duration.toMillis());
+                caseTypeId,
+                duration.toMillis());
             return searchResult;
         } catch (final Exception e) {
             throw new ServiceException(String.format(
-                    "Problem getting SearchResultDefinition definition for case type: %s because of %s",
-                    caseTypeId,
-                    e.getMessage()));
+                "Problem getting SearchResultDefinition definition for case type: %s because of %s",
+                caseTypeId,
+                e.getMessage()));
         }
     }
 
@@ -76,21 +83,21 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final SearchInputFieldsDefinition
-                    definition =
-                    restTemplate.exchange(withVersionQueryParam(applicationParams.searchInputDefinition(caseTypeId), version),
-                            HttpMethod.GET,
-                            requestEntity,
-                            SearchInputFieldsDefinition.class).getBody();
+                definition =
+                restTemplate.exchange(withVersionQueryParam(applicationParams.searchInputDefinition(caseTypeId), version),
+                    HttpMethod.GET,
+                    requestEntity,
+                    SearchInputFieldsDefinition.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             LOG.debug("Rest API getSearchInputDefinitionsGetHttp called for {}, finished in {}",
-                    caseTypeId,
-                    duration.toMillis());
+                caseTypeId,
+                duration.toMillis());
             return definition;
         } catch (final Exception e) {
             throw new ServiceException(String.format(
-                    "Problem getting SearchInputs definition for case type: %s because of %s",
-                    caseTypeId,
-                    e.getMessage()));
+                "Problem getting SearchInputs definition for case type: %s because of %s",
+                caseTypeId,
+                e.getMessage()));
         }
     }
 
@@ -100,21 +107,21 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final WorkbasketInputFieldsDefinition
-                    definition =
-                    restTemplate.exchange(withVersionQueryParam(applicationParams.workbasketInputDefinition(caseTypeId), version),
-                            HttpMethod.GET,
-                            requestEntity,
-                            WorkbasketInputFieldsDefinition.class).getBody();
+                definition =
+                restTemplate.exchange(withVersionQueryParam(applicationParams.workbasketInputDefinition(caseTypeId), version),
+                    HttpMethod.GET,
+                    requestEntity,
+                    WorkbasketInputFieldsDefinition.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             LOG.debug("Rest API getWorkbasketInputDefinitionsGetHttp called for {}, finished in {}",
-                    caseTypeId,
-                    duration.toMillis());
+                caseTypeId,
+                duration.toMillis());
             return definition;
         } catch (final Exception e) {
             throw new ServiceException(String.format(
-                    "Problem getting WorkbasketInputs definition for case type: %s because of %s",
-                    caseTypeId,
-                    e.getMessage()));
+                "Problem getting WorkbasketInputs definition for case type: %s because of %s",
+                caseTypeId,
+                e.getMessage()));
         }
     }
 
@@ -123,15 +130,15 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         final Instant start = Instant.now();
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
         final CaseTypeTabsDefinition
-                collection =
-                restTemplate.exchange(withVersionQueryParam(applicationParams.displayCaseTabCollection(caseTypeId), version),
-                        HttpMethod.GET,
-                        requestEntity,
-                        CaseTypeTabsDefinition.class).getBody();
+            collection =
+            restTemplate.exchange(withVersionQueryParam(applicationParams.displayCaseTabCollection(caseTypeId), version),
+                HttpMethod.GET,
+                requestEntity,
+                CaseTypeTabsDefinition.class).getBody();
         final Duration duration = Duration.between(start, Instant.now());
         LOG.debug("Rest API getCaseTypeTabsCollection called for {}, finished in {}",
-                caseTypeId,
-                duration.toMillis());
+            caseTypeId,
+            duration.toMillis());
         return collection;
     }
 
@@ -140,15 +147,15 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         final Instant start = Instant.now();
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
         final WizardPageCollection
-                wpc =
-                restTemplate.exchange(withVersionQueryParam(applicationParams.displayWizardPageCollection(caseTypeId, eventId), version),
-                        HttpMethod.GET,
-                        requestEntity,
-                        WizardPageCollection.class).getBody();
+            wpc =
+            restTemplate.exchange(withVersionQueryParam(applicationParams.displayWizardPageCollection(caseTypeId, eventId), version),
+                HttpMethod.GET,
+                requestEntity,
+                WizardPageCollection.class).getBody();
         final Duration duration = Duration.between(start, Instant.now());
         LOG.debug("Rest API getWizardPageCollectionGetHttp called for {}, finished in {}",
-                caseTypeId,
-                duration.toMillis());
+            caseTypeId,
+            duration.toMillis());
         return wpc.getWizardPages();
     }
 
@@ -158,21 +165,21 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final SearchResultDefinition
-                    searchResult =
-                    restTemplate.exchange(withVersionQueryParam(applicationParams.displayWorkbasketDefURL(caseTypeId), version),
-                            HttpMethod.GET,
-                            requestEntity,
-                            SearchResultDefinition.class).getBody();
+                searchResult =
+                restTemplate.exchange(withVersionQueryParam(applicationParams.displayWorkbasketDefURL(caseTypeId), version),
+                    HttpMethod.GET,
+                    requestEntity,
+                    SearchResultDefinition.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             LOG.debug("Rest API getWorkBasketResultGetHttp called for {}, finished in {}",
-                    caseTypeId,
-                    duration.toMillis());
+                caseTypeId,
+                duration.toMillis());
             return searchResult;
         } catch (final Exception e) {
             throw new ServiceException(String.format(
-                    "Problem getting WorkBasketResult definition for case type: %s because of %s",
-                    caseTypeId,
-                    e.getMessage()));
+                "Problem getting WorkBasketResult definition for case type: %s because of %s",
+                caseTypeId,
+                e.getMessage()));
         }
     }
 

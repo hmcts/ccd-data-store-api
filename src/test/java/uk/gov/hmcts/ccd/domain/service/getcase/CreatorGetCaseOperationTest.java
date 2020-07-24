@@ -1,13 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
-import java.util.Optional;
-
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +8,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+
+import java.util.Optional;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class CreatorGetCaseOperationTest {
 
@@ -51,7 +52,7 @@ class CreatorGetCaseOperationTest {
         @DisplayName("Should return an Optional containing the case if the case is visible")
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsTrue_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(true);
-            assertCaseDetailsPresent(true, true,JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+            assertCaseDetailsPresent(true, true, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
             verify(caseAccessService).canUserAccess(same(caseDetails));
         }
 
@@ -59,14 +60,14 @@ class CreatorGetCaseOperationTest {
         @DisplayName("Should return an empty optional if case is not visible")
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsFalse_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(false);
-            assertCaseDetailsPresent(false, true,JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+            assertCaseDetailsPresent(false, true, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
             verify(caseAccessService).canUserAccess(same(caseDetails));
         }
 
         @Test
         @DisplayName("Should return an empty optional when GetCaseOperation returns an empty optional")
         void searchOperationReturnsCaseDetails_GetCaseOperationReturnsEmptyOptional_caseDetailsReturned() {
-            when(getCaseOperation.execute(any(),any(),any())).thenReturn(Optional.empty());
+            when(getCaseOperation.execute(any(), any(), any())).thenReturn(Optional.empty());
             assertCaseDetailsPresent(false, false, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
         }
 
@@ -94,16 +95,16 @@ class CreatorGetCaseOperationTest {
         @DisplayName("Should return an empty optional when GetCaseOperation returns an empty optional")
         void searchOperationReturnsCaseDetails_GetCaseOperationReturnsEmptyOptional_caseDetailsReturned() {
             when(getCaseOperation.execute(any())).thenReturn(Optional.empty());
-            assertCaseDetailsPresent(false,false, JURISDICTION_ID);
+            assertCaseDetailsPresent(false, false, JURISDICTION_ID);
         }
 
     }
 
-    private void assertCaseDetailsPresent(boolean isPresent, boolean solicitorVisibilityServiceCalled, String... args)  {
+    private void assertCaseDetailsPresent(boolean isPresent, boolean solicitorVisibilityServiceCalled, String... args) {
 
         Optional<CaseDetails> result = (args.length == 1)
             ? classUnderTest.execute(args[0])
-                : classUnderTest.execute(args[0], args[1], args[2]);
+            : classUnderTest.execute(args[0], args[1], args[2]);
 
         assertEquals(isPresent, result.isPresent());
 

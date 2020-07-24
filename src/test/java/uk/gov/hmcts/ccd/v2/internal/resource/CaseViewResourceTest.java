@@ -6,7 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.Link;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,9 +77,9 @@ class CaseViewResourceTest {
     }
 
     private void mockArrays() {
-        tabs = new CaseViewTab[]{};
-        caseViewActionableEvents = new CaseViewActionableEvent[]{};
-        caseViewEvents = new CaseViewEvent[]{};
+        tabs = new CaseViewTab[] {};
+        caseViewActionableEvents = new CaseViewActionableEvent[] {};
+        caseViewEvents = new CaseViewEvent[] {};
     }
 
     private CaseView newCaseView() {

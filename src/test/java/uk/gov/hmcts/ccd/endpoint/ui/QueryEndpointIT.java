@@ -64,7 +64,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
-import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.arrayOf;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.mapOf;
 
 public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
@@ -145,18 +151,18 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("view", WORKBASKET)
-                                                     .param("case_type", TEST_CASE_TYPE)
-                                                     .param("jurisdiction", TEST_JURISDICTION)
-                                                     .param("state", "CaseCreated")
-                                                     .param("page", "1")
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("view", WORKBASKET)
+            .param("case_type", TEST_CASE_TYPE)
+            .param("jurisdiction", TEST_JURISDICTION)
+            .param("state", "CaseCreated")
+            .param("page", "1")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                   SearchResultView.class);
+            SearchResultView.class);
         final List<SearchResultViewColumn> searchResultViewColumns = searchResultView.getSearchResultViewColumns();
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
@@ -230,14 +236,14 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_NO_READ_CASE_FIELD_ACCESS)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("view", WORKBASKET)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("view", WORKBASKET)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                   SearchResultView.class);
+            SearchResultView.class);
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
         assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
@@ -290,17 +296,17 @@ public class QueryEndpointIT extends WireMockBaseTest {
         // Check that we have the expected test data set size, this is to ensure
         // that state filtering is correct
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation",NUMBER_OF_CASES, resultList.size());
+        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_NO_READ_CASE_TYPE_ACCESS)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("view", WORKBASKET)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("view", WORKBASKET)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                   SearchResultView.class);
+            SearchResultView.class);
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
         assertEquals("Incorrect view items count", 0, searchResultViewItems.size());
@@ -315,14 +321,14 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("case.PersonFirstName", "Janet ")
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case.PersonFirstName", "Janet ")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                   SearchResultView.class);
+            SearchResultView.class);
         final List<SearchResultViewColumn> searchResultViewColumns = searchResultView.getSearchResultViewColumns();
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
@@ -366,16 +372,16 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("case_type", TEST_CASE_TYPE)
-                                                     .param("jurisdiction", TEST_JURISDICTION)
-                                                     .param("case.PersonFirstName", "JanetX")
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is2xxSuccessful())
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_type", TEST_CASE_TYPE)
+            .param("jurisdiction", TEST_JURISDICTION)
+            .param("case.PersonFirstName", "JanetX")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn();
 
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                   SearchResultView.class);
+            SearchResultView.class);
         final List<SearchResultViewColumn> searchResultViewColumns = searchResultView.getSearchResultViewColumns();
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
@@ -406,13 +412,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("case_type", TEST_CASE_TYPE)
-                                                     .param("jurisdiction", TEST_JURISDICTION)
-                                                     .param("case.PersonFirstName$", "JanetX")
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(400))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_type", TEST_CASE_TYPE)
+            .param("jurisdiction", TEST_JURISDICTION)
+            .param("case.PersonFirstName$", "JanetX")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(400))
+            .andReturn();
 
     }
 
@@ -425,16 +431,16 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("case_type", TEST_CASE_TYPE)
-                                                     .param("jurisdiction", TEST_JURISDICTION)
-                                                     .param("case.PersonAddress.Country", "EnglanD")
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_type", TEST_CASE_TYPE)
+            .param("jurisdiction", TEST_JURISDICTION)
+            .param("case.PersonAddress.Country", "EnglanD")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                   SearchResultView.class);
+            SearchResultView.class);
         final List<SearchResultViewColumn> searchResultViewColumns = searchResultView.getSearchResultViewColumns();
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
@@ -458,9 +464,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull(searchResultViewItems.get(1).getCaseId());
         assertNotEquals(searchResultViewItems.get(1).getCaseId(), searchResultViewItems.get(0).getCaseId());
         assertEquals("England",
-                     ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress")).get("Country"));
+            ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress")).get("Country"));
         assertEquals("England",
-                     ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress")).get("Country"));
+            ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress")).get("Country"));
     }
 
     @Test
@@ -472,15 +478,15 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("case_type", TEST_CASE_TYPE)
-                                                     .param("jurisdiction", TEST_JURISDICTION)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_type", TEST_CASE_TYPE)
+            .param("jurisdiction", TEST_JURISDICTION)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                   SearchResultView.class);
+            SearchResultView.class);
         final List<SearchResultViewColumn> searchResultViewColumns = searchResultView.getSearchResultViewColumns();
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
@@ -515,15 +521,15 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("view", WORKBASKET)
-                                                     .param("case_type", TEST_CASE_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("view", WORKBASKET)
+            .param("case_type", TEST_CASE_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                   SearchResultView.class);
+            SearchResultView.class);
         final List<SearchResultViewColumn> searchResultViewColumns = searchResultView.getSearchResultViewColumns();
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
@@ -581,14 +587,14 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("case_type", TEST_CASE_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_type", TEST_CASE_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                   SearchResultView.class);
+            SearchResultView.class);
         final List<SearchResultViewColumn> searchResultViewColumns = searchResultView.getSearchResultViewColumns();
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
@@ -641,40 +647,40 @@ public class QueryEndpointIT extends WireMockBaseTest {
     @Ignore // this should default to Search view,
     public void missingViewParam() throws Exception {
         mockMvc.perform(get(GET_CASES)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .param("case_type", TEST_CASE_TYPE)
-                            .param("jurisdiction", TEST_JURISDICTION)
-                            .param("state", "CaseCreated")
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(400));
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case_type", TEST_CASE_TYPE)
+            .param("jurisdiction", TEST_JURISDICTION)
+            .param("state", "CaseCreated")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(400));
     }
 
     @Test
     public void invalidJurisdiction() throws Exception {
         mockMvc.perform(get(GET_CASES_INVALID_JURISDICTION)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .param("view", WORKBASKET)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404));
+            .contentType(JSON_CONTENT_TYPE)
+            .param("view", WORKBASKET)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404));
     }
 
     @Test
     public void invalidCaseType() throws Exception {
         mockMvc.perform(get(GET_CASES_INVALID_CASE_TYPE)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .param("view", WORKBASKET)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404));
+            .contentType(JSON_CONTENT_TYPE)
+            .param("view", WORKBASKET)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404));
     }
 
     @Test
     public void validGetDraft() throws Exception {
 
         final MvcResult result = mockMvc.perform(get(GET_DRAFT)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
@@ -789,10 +795,10 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASE)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
@@ -902,13 +908,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final Map documentNode = (Map) documentField.getValue();
         assertNotNull("Null address value", documentNode);
         assertEquals("Unexpected address value",
-                     "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-                     documentNode.get("document_url"));
+            "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            documentNode.get("document_url"));
         assertEquals("Unexpected address value",
-                     "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
-                         .get("document_binary_url"));
+            "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
+                .get("document_binary_url"));
         assertEquals("Unexpected address value",
-                     "Seagulls_Square.jpg", documentNode.get("document_filename"));
+            "Seagulls_Square.jpg", documentNode.get("document_filename"));
 
         final CaseViewEvent[] events = caseView.getEvents();
         assertNotNull("Events are null", events);
@@ -972,10 +978,10 @@ public class QueryEndpointIT extends WireMockBaseTest {
         template.execute("UPDATE case_data SET state='some-state' WHERE reference='1504259907353529'");
 
         final MvcResult result = mockMvc.perform(get(GET_CASE)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
@@ -994,10 +1000,10 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASE_NO_EVENT_READ_ACCESS)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         final CaseViewEvent[] events = caseView.getEvents();
@@ -1027,8 +1033,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE)
                 .header(AUTHORIZATION, "Bearer user1")
         )
-               .andExpect(status().is(404))
-               .andReturn();
+            .andExpect(status().is(404))
+            .andReturn();
     }
 
     @Test
@@ -1058,10 +1064,10 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", 2, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_COMPLEX_CASE)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
@@ -1170,9 +1176,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
         // When - trying to find the Case
         // Then - assert that the expected error is returned
         mockMvc.perform(get(GET_NULL_CASE)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404));
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404));
     }
 
     @Test
@@ -1186,9 +1192,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
         // When - trying to find the Case
         // Then - assert that the expected error is returned
         mockMvc.perform(get(GET_CASE_INVALID_STATE)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404));
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404));
     }
 
     @Test
@@ -1199,13 +1205,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_VALID)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(result.getResponse().getContentAsString(),
-                                                               CaseUpdateViewEvent.class);
+            CaseUpdateViewEvent.class);
         assertNotNull("Event Trigger is null", caseUpdateViewEvent);
 
         assertThat("Unexpected Case ID", caseUpdateViewEvent.getCaseId(), is(nullValue()));
@@ -1236,21 +1242,21 @@ public class QueryEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getEventTriggerForCaseType_invalidPreState() throws Exception {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INVALID_PRE_STATES)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(422))
-               .andExpect(content().string(containsString("The case status did not qualify for the event")))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(422))
+            .andExpect(content().string(containsString("The case status did not qualify for the event")))
+            .andReturn();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getEventTriggerForCaseType_invalidEvent() throws Exception {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INVALID_EVENT)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404))
+            .andReturn();
     }
 
     @Test
@@ -1262,13 +1268,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_VALID)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(result.getResponse().getContentAsString(),
-                                                               CaseUpdateViewEvent.class);
+            CaseUpdateViewEvent.class);
         assertNotNull("Event Trigger is null", caseUpdateViewEvent);
 
         assertEquals("Unexpected Case Reference", "1504259907353545", caseUpdateViewEvent.getCaseId());
@@ -1309,88 +1315,88 @@ public class QueryEndpointIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE)
                 .header(AUTHORIZATION, "Bearer user1")
         )
-               .andExpect(status().is(404))
-               .andReturn();
+            .andExpect(status().is(404))
+            .andReturn();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getEventTriggerForCase_invalidPreState() throws Exception {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_STATE)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(422))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(422))
+            .andReturn();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getEventTriggerForCase_invalidCaseReference() throws Exception {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE_REFERENCE)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(400))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(400))
+            .andReturn();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getEventTriggerForCase_invalidCase() throws Exception {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404))
+            .andReturn();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getEventTriggerForCase_invalidEvent() throws Exception {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_EVENT)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404))
+            .andReturn();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn400WhenGetCaseTypesWithNoAccessParam() throws Exception {
         mockMvc.perform(get(GET_CASE_TYPES_NO_ACCESS_PARAM)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(400))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(400))
+            .andReturn();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenGetCaseTypesWithMisnamedAccessParam() throws Exception {
         mockMvc.perform(get(GET_CASE_TYPES_MISNAMED_ACCESS_PARAM)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404))
+            .andReturn();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenGetCaseTypesWithInvalidAccessParam() throws Exception {
         mockMvc.perform(get(GET_CASE_TYPES_INVALID_ACCESS_PARAM)
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404))
+            .andReturn();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGetCaseTypesForReadAccess() throws Exception {
         final MvcResult result = mockMvc.perform(get(GET_CASE_TYPES_READ_ACCESS)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(200))
-                                        .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final CaseTypeDefinition[] caseTypeDefinitions = mapper.readValue(result.getResponse().getContentAsString(), CaseTypeDefinition[].class);
 
@@ -1401,21 +1407,21 @@ public class QueryEndpointIT extends WireMockBaseTest {
             // added a create event with read access for testing drafts properly
             () -> assertThat(caseTypeDefinitions[0].getCaseFieldDefinitions(), hasSize(3)),
             () -> assertThat(caseTypeDefinitions[0].getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo("PersonFirstName")),
-                                                                    hasProperty("id", equalTo("PersonLastName")),
-                                                                    hasProperty("id", equalTo("PersonAddress")))),
+                hasProperty("id", equalTo("PersonLastName")),
+                hasProperty("id", equalTo("PersonAddress")))),
             () -> assertThat(caseTypeDefinitions[1], hasProperty("id", equalTo("TestAddressBookCase3"))),
             () -> assertThat(caseTypeDefinitions[1].getEvents(), hasSize(1)),
             () -> assertThat(caseTypeDefinitions[1].getEvents(), hasItems(hasProperty("id", equalTo("TEST_EVENT_3")))),
             () -> assertThat(caseTypeDefinitions[1].getCaseFieldDefinitions(), hasSize(2)),
             () -> assertThat(caseTypeDefinitions[1].getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo("PersonLastName")),
-                                                                    hasProperty("id", equalTo("PersonAddress")))),
+                hasProperty("id", equalTo("PersonAddress")))),
             () -> assertThat(caseTypeDefinitions[2], hasProperty("id", equalTo("TestAddressBookCaseNoReadFieldAccess"))),
             () -> assertThat(caseTypeDefinitions[2].getEvents(), hasSize(1)),
             () -> assertThat(caseTypeDefinitions[2].getEvents(),
-                             hasItems(hasProperty("id", equalTo("TEST_EVENT_NO_READ_FIELD_ACCESS")))),
+                hasItems(hasProperty("id", equalTo("TEST_EVENT_NO_READ_FIELD_ACCESS")))),
             () -> assertThat(caseTypeDefinitions[2].getCaseFieldDefinitions(), hasSize(2)),
             () -> assertThat(caseTypeDefinitions[2].getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo("PersonLastName")),
-                                                                    hasProperty("id", equalTo("PersonAddress"))))
+                hasProperty("id", equalTo("PersonAddress"))))
         );
     }
 
@@ -1452,13 +1458,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", 3, eventList.size());
 
         MvcResult result = mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT, eventList.get(1).getId()))
-                                               .contentType(JSON_CONTENT_TYPE)
-                                               .header(AUTHORIZATION, "Bearer user1"))
-                                  .andExpect(status().is(200))
-                                  .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
 
         final CaseHistoryView caseHistoryView = mapper.readValue(result.getResponse().getContentAsString(),
-                                                                 CaseHistoryView.class);
+            CaseHistoryView.class);
         assertNotNull("Case View is null", caseHistoryView);
         assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseHistoryView.getCaseId()));
 
@@ -1557,13 +1563,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final int dmApiPort = 10000;
         assertNotNull("Null address value", documentNode);
         assertEquals("Unexpected address value",
-                     "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-                     documentNode.get("document_url"));
+            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            documentNode.get("document_url"));
         assertEquals("Unexpected address value",
-                     "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
-                     documentNode.get("document_binary_url"));
+            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            documentNode.get("document_binary_url"));
         assertEquals("Unexpected address value",
-                     "Seagulls_Square.jpg", documentNode.get("document_filename"));
+            "Seagulls_Square.jpg", documentNode.get("document_filename"));
 
         final CaseViewEvent event = caseHistoryView.getEvent();
         assertNotNull("Null event value", event);
@@ -1592,10 +1598,10 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         // User role has access to PUBLIC and event is classified as PRIVATE
         mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT, eventList.get(2).getId()))
-                            .contentType(JSON_CONTENT_TYPE)
-                            .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404))
-               .andReturn();
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404))
+            .andReturn();
     }
 
     @Test

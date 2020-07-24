@@ -19,13 +19,13 @@ public class CCDHelper {
         casePayload.setToken(generateTokenCreateCase(asUser, jurisdiction, caseType, event));
 
         return asUser.get()
-                     .given()
-                     .pathParam("jurisdiction", jurisdiction)
-                     .pathParam("caseType", caseType)
-                     .contentType(ContentType.JSON)
-                     .body(casePayload)
-                     .when()
-                     .post("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases");
+            .given()
+            .pathParam("jurisdiction", jurisdiction)
+            .pathParam("caseType", caseType)
+            .contentType(ContentType.JSON)
+            .body(casePayload)
+            .when()
+            .post("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases");
     }
 
 
@@ -60,15 +60,15 @@ public class CCDHelper {
         casePayload.setToken(generateTokenUpdateCase(asUser, jurisdiction, caseType, caseReference, event));
 
         return asUser.get()
-                     .given()
-                     .pathParam("jurisdiction", jurisdiction)
-                     .pathParam("caseType", caseType)
-                     .pathParam("reference", caseReference)
-                     .contentType(ContentType.JSON)
-                     .body(casePayload)
-                     .when()
-                     .post(
-                         "/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{reference}/events");
+            .given()
+            .pathParam("jurisdiction", jurisdiction)
+            .pathParam("caseType", caseType)
+            .pathParam("reference", caseReference)
+            .contentType(ContentType.JSON)
+            .body(casePayload)
+            .when()
+            .post(
+                "/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{reference}/events");
     }
 
     public String generateTokenUpdateCase(Supplier<RequestSpecification> asUser,

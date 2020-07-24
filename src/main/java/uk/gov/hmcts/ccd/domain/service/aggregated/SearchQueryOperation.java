@@ -13,7 +13,10 @@ import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
+import uk.gov.hmcts.ccd.domain.model.definition.SortOrder;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
@@ -22,7 +25,12 @@ import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;

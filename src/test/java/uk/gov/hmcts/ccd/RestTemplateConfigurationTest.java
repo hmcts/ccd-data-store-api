@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.protocol.HTTP.CONTENT_TYPE;
 import static org.hamcrest.Matchers.contains;
@@ -27,10 +34,6 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static wiremock.com.google.common.collect.Lists.newArrayList;
 import static wiremock.org.apache.http.entity.ContentType.APPLICATION_JSON;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @TestPropertySource(properties = {"http.client.connection.timeout=1500",
     "http.client.max.total=1",
@@ -94,7 +97,7 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
 
         assertThat(futures, hasSize(totalNumberOfCalls));
 
-        for (Future<Integer> future: futures) {
+        for (Future<Integer> future : futures) {
             assertThat(future.get(), is(SC_OK));
         }
     }

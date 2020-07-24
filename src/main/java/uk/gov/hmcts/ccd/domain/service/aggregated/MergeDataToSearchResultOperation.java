@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
@@ -59,15 +62,15 @@ public class MergeDataToSearchResultOperation {
     }
 
     private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseTypeDefinition caseTypeDefinition,
-                                                                    SearchResultDefinition searchResult) {
+                                                                     SearchResultDefinition searchResult) {
         final HashSet<String> addedFields = new HashSet<>();
 
         return Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseTypeDefinition.getCaseFieldDefinitions().stream()
-                    .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
-                    .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
-                    .map(caseField -> createSearchResultViewColumn(searchResultField, caseField))
-                    )
+                .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
+                .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
+                .map(caseField -> createSearchResultViewColumn(searchResultField, caseField))
+            )
             .collect(Collectors.toList());
     }
 
@@ -95,7 +98,6 @@ public class MergeDataToSearchResultOperation {
             }
         }
     }
-
 
 
     private CommonField commonField(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {

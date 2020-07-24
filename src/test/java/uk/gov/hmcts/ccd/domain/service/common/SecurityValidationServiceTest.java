@@ -17,7 +17,9 @@ import java.util.Map;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
@@ -214,13 +216,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PRIVATE"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PRIVATE"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
@@ -229,13 +231,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("RESTRICTED"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("RESTRICTED"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("RESTRICTED"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("RESTRICTED"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -259,12 +261,12 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PUBLIC"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PUBLIC"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -272,13 +274,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("RESTRICTED"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("RESTRICTED"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -293,13 +295,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PUBLIC"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PUBLIC"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -307,12 +309,12 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("RESTRICTED"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("RESTRICTED"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -327,13 +329,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PUBLIC"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PUBLIC"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -341,9 +343,9 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -358,9 +360,9 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -368,13 +370,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PUBLIC"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PUBLIC"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -389,14 +391,14 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PUBLIC"))
-                                                    .withData("missingField3", getTextNode("RESTRICTED"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PUBLIC"))
+                                        .withData("missingField3", getTextNode("RESTRICTED"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -404,13 +406,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("RESTRICTED"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("RESTRICTED"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -425,13 +427,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PUBLIC"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PUBLIC"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -439,14 +441,14 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PRIVATE"))
-                                                    .withData("extraField3", getTextNode("RESTRICTED"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PRIVATE"))
+                                        .withData("extraField3", getTextNode("RESTRICTED"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -461,13 +463,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PRIVATE"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PRIVATE"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -475,13 +477,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PLOP"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PRIVATE"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PLOP"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PRIVATE"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -496,13 +498,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PRIVATE"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PRIVATE"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -510,13 +512,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PLOP"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PLOP"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -532,13 +534,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PRIVATE"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PRIVATE"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -546,13 +548,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PUBLIC"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PRIVATE"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PUBLIC"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PRIVATE"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -567,13 +569,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PRIVATE"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PRIVATE"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
@@ -581,13 +583,13 @@ class SecurityValidationServiceTest {
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
-                                  aClassificationBuilder()
-                                      .withData("classification", getTextNode("PRIVATE"))
-                                      .withData("value",
-                                                aClassificationBuilder()
-                                                    .withData("field2", getTextNode("PUBLIC"))
-                                                    .buildAsNode())
-                                      .buildAsNode())
+                            aClassificationBuilder()
+                                .withData("classification", getTextNode("PRIVATE"))
+                                .withData("value",
+                                    aClassificationBuilder()
+                                        .withData("field2", getTextNode("PUBLIC"))
+                                        .buildAsNode())
+                                .buildAsNode())
                         .buildAsMap())
                 .build();
 
@@ -605,37 +607,37 @@ class SecurityValidationServiceTest {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(
-                                                              aClassificationBuilder()
-                                                                  .withData("value",
-                                                                            aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("PRIVATE"))
-                                                                                .buildAsNode())
-                                                                  .withData("id", getTextNode("someId1"))
-                                                                  .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(
+                                aClassificationBuilder()
+                                    .withData("value",
+                                        aClassificationBuilder()
+                                            .withData("field2", getTextNode("PRIVATE"))
+                                            .buildAsNode())
+                                    .withData("id", getTextNode("someId1"))
+                                    .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
             final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("RESTRICTED"))
-                                                .withData("value",
-                                                          newArrayList(
-                                                              aClassificationBuilder()
-                                                                  .withData("value",
-                                                                            aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("RESTRICTED"))
-                                                                                .buildAsNode())
-                                                                  .withData("id", getTextNode("someId1"))
-                                                                  .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("RESTRICTED"))
+                        .withData("value",
+                            newArrayList(
+                                aClassificationBuilder()
+                                    .withData("value",
+                                        aClassificationBuilder()
+                                            .withData("field2", getTextNode("RESTRICTED"))
+                                            .buildAsNode())
+                                    .withData("id", getTextNode("someId1"))
+                                    .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
 
             securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
@@ -647,7 +649,7 @@ class SecurityValidationServiceTest {
                 () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").size(), is(1)),
                 () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").get(0).get("id"), is(getTextNode("someId1"))),
                 () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").get(0).get("value").get("field2"),
-                                        is(getTextNode("RESTRICTED")))
+                    is(getTextNode("RESTRICTED")))
             );
         }
 
@@ -657,46 +659,46 @@ class SecurityValidationServiceTest {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(
-                                                              aClassificationBuilder()
-                                                                  .withData("value",
-                                                                            aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("PRIVATE"))
-                                                                                .buildAsNode())
-                                                                  .withData("id", getTextNode("someId1"))
-                                                                  .buildAsMap(),
-                                                              aClassificationBuilder()
-                                                                  .withData("value",
-                                                                            aClassificationBuilder()
-                                                                                .withData("field3", getTextNode("PRIVATE"))
-                                                                                .buildAsNode())
-                                                                  .withData("id", getTextNode("someId2"))
-                                                                  .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(
+                                aClassificationBuilder()
+                                    .withData("value",
+                                        aClassificationBuilder()
+                                            .withData("field2", getTextNode("PRIVATE"))
+                                            .buildAsNode())
+                                    .withData("id", getTextNode("someId1"))
+                                    .buildAsMap(),
+                                aClassificationBuilder()
+                                    .withData("value",
+                                        aClassificationBuilder()
+                                            .withData("field3", getTextNode("PRIVATE"))
+                                            .buildAsNode())
+                                    .withData("id", getTextNode("someId2"))
+                                    .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("RESTRICTED"))
-                                                .withData("value",
-                                                          newArrayList(
-                                                              aClassificationBuilder()
-                                                                  .withData("value",
-                                                                            aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("PRIVATE"))
-                                                                                .buildAsNode())
-                                                                  .withData("id", getTextNode("someId1"))
-                                                                  .buildAsMap(),
-                                                              aClassificationBuilder()
-                                                                  .withData("id", getTextNode("someId2"))
-                                                                  .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("RESTRICTED"))
+                        .withData("value",
+                            newArrayList(
+                                aClassificationBuilder()
+                                    .withData("value",
+                                        aClassificationBuilder()
+                                            .withData("field2", getTextNode("PRIVATE"))
+                                            .buildAsNode())
+                                    .withData("id", getTextNode("someId1"))
+                                    .buildAsMap(),
+                                aClassificationBuilder()
+                                    .withData("id", getTextNode("someId2"))
+                                    .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
@@ -708,37 +710,37 @@ class SecurityValidationServiceTest {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(
-                                                              aClassificationBuilder()
-                                                                  .withData("value",
-                                                                            aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("PRIVATE"))
-                                                                                .withData("missingField3", getTextNode("RESTRICTED"))
-                                                                                .buildAsNode())
-                                                                  .withData("id", getTextNode("someId1"))
-                                                                  .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(
+                                aClassificationBuilder()
+                                    .withData("value",
+                                        aClassificationBuilder()
+                                            .withData("field2", getTextNode("PRIVATE"))
+                                            .withData("missingField3", getTextNode("RESTRICTED"))
+                                            .buildAsNode())
+                                    .withData("id", getTextNode("someId1"))
+                                    .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(
-                                                              aClassificationBuilder()
-                                                                  .withData("value",
-                                                                            aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("RESTRICTED"))
-                                                                                .buildAsNode())
-                                                                  .withData("id", getTextNode("someId1"))
-                                                                  .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(
+                                aClassificationBuilder()
+                                    .withData("value",
+                                        aClassificationBuilder()
+                                            .withData("field2", getTextNode("RESTRICTED"))
+                                            .buildAsNode())
+                                    .withData("id", getTextNode("someId1"))
+                                    .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
@@ -750,33 +752,33 @@ class SecurityValidationServiceTest {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PRIVATE"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .withData("extraField3", getTextNode("RESTRICTED"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PRIVATE"))
+                                    .withData("extraField3", getTextNode("RESTRICTED"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
@@ -788,41 +790,41 @@ class SecurityValidationServiceTest {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .withData("field3", getTextNode("RESTRICTED"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PRIVATE"))
+                                    .withData("field3", getTextNode("RESTRICTED"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .withData("field3", getTextNode("RESTRICTED"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap(),
-                                                                       aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("extraField1", getTextNode("PRIVATE"))
-                                                                               .withData("extraField2", getTextNode("RESTRICTED"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("extraItemId"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                    .withData("value", aClassificationBuilder()
+                                        .withData("field2", getTextNode("PRIVATE"))
+                                        .withData("field3", getTextNode("RESTRICTED"))
+                                        .buildAsNode())
+                                    .withData("id", getTextNode("someId1"))
+                                    .buildAsMap(),
+                                aClassificationBuilder()
+                                    .withData("value", aClassificationBuilder()
+                                        .withData("extraField1", getTextNode("PRIVATE"))
+                                        .withData("extraField2", getTextNode("RESTRICTED"))
+                                        .buildAsNode())
+                                    .withData("id", getTextNode("extraItemId"))
+                                    .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
@@ -834,32 +836,32 @@ class SecurityValidationServiceTest {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PRIVATE"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PLOP"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PLOP"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PRIVATE"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
@@ -871,32 +873,32 @@ class SecurityValidationServiceTest {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PRIVATE"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PLOP"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PLOP"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
@@ -908,32 +910,32 @@ class SecurityValidationServiceTest {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PRIVATE"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PUBLIC"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PUBLIC"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
@@ -945,32 +947,32 @@ class SecurityValidationServiceTest {
             final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PRIVATE"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PRIVATE"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PRIVATE"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
-                                            .withData("collectionField1", aClassificationBuilder()
-                                                .withData("classification", getTextNode("PUBLIC"))
-                                                .withData("value",
-                                                          newArrayList(aClassificationBuilder()
-                                                                           .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
-                                                                           .buildAsMap()))
-                                                .buildAsNode())
-                                            .buildAsMap())
+                    .withData("collectionField1", aClassificationBuilder()
+                        .withData("classification", getTextNode("PUBLIC"))
+                        .withData("value",
+                            newArrayList(aClassificationBuilder()
+                                .withData("value", aClassificationBuilder()
+                                    .withData("field2", getTextNode("PRIVATE"))
+                                    .buildAsNode())
+                                .withData("id", getTextNode("someId1"))
+                                .buildAsMap()))
+                        .buildAsNode())
+                    .buildAsMap())
                 .build();
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);

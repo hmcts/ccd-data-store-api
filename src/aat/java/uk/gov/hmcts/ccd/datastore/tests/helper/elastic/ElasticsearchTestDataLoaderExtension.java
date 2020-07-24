@@ -1,15 +1,14 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper.elastic;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static uk.gov.hmcts.ccd.datastore.tests.util.TestUtils.withRetries;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.helper.TestDataLoaderExtension;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static uk.gov.hmcts.ccd.datastore.tests.util.TestUtils.withRetries;
 
 public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtension {
 
@@ -77,8 +76,8 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
 
     private RequestSpecification asElasticsearchApiUser() {
         return RestAssured.given(new RequestSpecBuilder()
-                                     .setBaseUri(elasticsearchHelper.getElasticsearchBaseUri())
-                                     .build());
+            .setBaseUri(elasticsearchHelper.getElasticsearchBaseUri())
+            .build());
     }
 
     private String getCaseIndexAliasApi(String indexName, String indexAlias) {

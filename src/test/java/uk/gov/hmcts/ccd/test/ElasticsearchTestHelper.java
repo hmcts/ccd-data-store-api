@@ -95,7 +95,8 @@ public class ElasticsearchTestHelper {
     private static final String CASE_TYPE_ID_PARAM = "ctid";
     private static final String USE_CASE_PARAM = "usecase";
 
-    private ElasticsearchTestHelper() { }
+    private ElasticsearchTestHelper() {
+    }
 
     public static String caseData(String fieldPath) {
         return DATA_PREFIX + fieldPath;

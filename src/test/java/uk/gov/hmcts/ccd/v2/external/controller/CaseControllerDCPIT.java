@@ -24,7 +24,6 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 
 import javax.inject.Inject;
-
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -36,7 +35,21 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_COMPLEX_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_NESTED_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.NESTED_COMPLEX;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.NESTED_NUMBER_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.TEXT_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.createCaseRequestContent;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.jsonPath;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.updateEventRequestContent;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class CaseControllerDCPIT extends WireMockBaseTest {

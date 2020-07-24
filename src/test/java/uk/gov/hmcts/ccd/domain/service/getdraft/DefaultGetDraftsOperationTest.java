@@ -17,10 +17,16 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
@@ -55,10 +61,10 @@ class DefaultGetDraftsOperationTest {
         draft = newDraftResponse()
             .withId(DRAFT_ID)
             .withDocument(newCaseDraft()
-                              .withJurisdictionId(JURISDICTION_ID)
-                              .withCaseTypeId(CASE_TYPE_ID)
-                              .withCaseDataContent(CASE_DATA_CONTENT)
-                              .build())
+                .withJurisdictionId(JURISDICTION_ID)
+                .withCaseTypeId(CASE_TYPE_ID)
+                .withCaseDataContent(CASE_DATA_CONTENT)
+                .build())
             .build();
         drafts.add(draft);
         doReturn(drafts).when(draftGateway).getAll();
@@ -118,13 +124,13 @@ class DefaultGetDraftsOperationTest {
     public void shouldNotReturnDraftsThatDoNotMatchJurisdiction() {
         drafts = Lists.newArrayList();
         drafts.add(newDraftResponse()
-                       .withId(DRAFT_ID)
-                       .withDocument(newCaseDraft()
-                                         .withJurisdictionId(OTHER_JURISDICTION_ID)
-                                         .withCaseTypeId(CASE_TYPE_ID)
-                                         .withCaseDataContent(CASE_DATA_CONTENT)
-                                         .build())
-                       .build());
+            .withId(DRAFT_ID)
+            .withDocument(newCaseDraft()
+                .withJurisdictionId(OTHER_JURISDICTION_ID)
+                .withCaseTypeId(CASE_TYPE_ID)
+                .withCaseDataContent(CASE_DATA_CONTENT)
+                .build())
+            .build());
         doReturn(drafts).when(draftGateway).getAll();
         metadata.setPage(Optional.of("1"));
 
@@ -141,13 +147,13 @@ class DefaultGetDraftsOperationTest {
     public void shouldNotReturnDraftsThatDoNotMatchCaseType() {
         drafts = Lists.newArrayList();
         drafts.add(newDraftResponse()
-                       .withId(DRAFT_ID)
-                       .withDocument(newCaseDraft()
-                                         .withJurisdictionId(JURISDICTION_ID)
-                                         .withCaseTypeId(OTHER_CASE_TYPE_ID)
-                                         .withCaseDataContent(CASE_DATA_CONTENT)
-                                         .build())
-                       .build());
+            .withId(DRAFT_ID)
+            .withDocument(newCaseDraft()
+                .withJurisdictionId(JURISDICTION_ID)
+                .withCaseTypeId(OTHER_CASE_TYPE_ID)
+                .withCaseDataContent(CASE_DATA_CONTENT)
+                .build())
+            .build());
         doReturn(drafts).when(draftGateway).getAll();
         metadata.setPage(Optional.of("1"));
 
@@ -161,8 +167,8 @@ class DefaultGetDraftsOperationTest {
 
     private Matcher<Iterable<? super CaseDetails>> hasDraftItemInResults() {
         return hasItem(allOf(hasProperty("id", is(DRAFT_ID)),
-                             hasProperty("jurisdiction", is(JURISDICTION_ID)),
-                             hasProperty("caseTypeId", is(CASE_TYPE_ID)),
-                             hasProperty("data", is(CASE_DATA_CONTENT.getData()))));
+            hasProperty("jurisdiction", is(JURISDICTION_ID)),
+            hasProperty("caseTypeId", is(CASE_TYPE_ID)),
+            hasProperty("data", is(CASE_DATA_CONTENT.getData()))));
     }
 }

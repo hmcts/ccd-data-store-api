@@ -1,14 +1,5 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -16,6 +7,19 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+
+import java.util.Arrays;
+import java.util.Collections;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public class ComplexSanitiserTest {
 

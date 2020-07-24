@@ -1,31 +1,42 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.JsonDataConverter;
+
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Version;
+import java.time.LocalDateTime;
 
 @SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @NamedQueries({
     @NamedQuery(name = CaseDetailsEntity.FIND_BY_METADATA, query =
         "SELECT cd FROM CaseDetailsEntity cd " +
-        "WHERE UPPER(cd.jurisdiction) LIKE UPPER(:" + CaseDetailsEntity.JURISDICTION_ID_PARAM + ") " +
-        "AND UPPER(cd.caseType) LIKE UPPER(:" + CaseDetailsEntity.CASE_TYPE_PARAM + ") " +
-        "AND UPPER(cd.state) LIKE UPPER(:" + CaseDetailsEntity.STATE_PARAM + ") " +
-        "ORDER BY cd.createdDate ASC "
+            "WHERE UPPER(cd.jurisdiction) LIKE UPPER(:" + CaseDetailsEntity.JURISDICTION_ID_PARAM + ") " +
+            "AND UPPER(cd.caseType) LIKE UPPER(:" + CaseDetailsEntity.CASE_TYPE_PARAM + ") " +
+            "AND UPPER(cd.state) LIKE UPPER(:" + CaseDetailsEntity.STATE_PARAM + ") " +
+            "ORDER BY cd.createdDate ASC "
     ),
 
     @NamedQuery(name = CaseDetailsEntity.FIND_CASE, query =
         "SELECT cd FROM CaseDetailsEntity cd " +
-        "WHERE UPPER(cd.jurisdiction) = UPPER(:" + CaseDetailsEntity.JURISDICTION_ID_PARAM + ") " +
-        "AND UPPER(cd.caseType) = UPPER(:" + CaseDetailsEntity.CASE_TYPE_PARAM + ") " +
-        "AND cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
+            "WHERE UPPER(cd.jurisdiction) = UPPER(:" + CaseDetailsEntity.JURISDICTION_ID_PARAM + ") " +
+            "AND UPPER(cd.caseType) = UPPER(:" + CaseDetailsEntity.CASE_TYPE_PARAM + ") " +
+            "AND cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
     ),
 
     @NamedQuery(name = CaseDetailsEntity.FIND_BY_REFERENCE, query =
         "SELECT cd FROM CaseDetailsEntity cd " +
-        "WHERE cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
+            "WHERE cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
     ),
 
     @NamedQuery(
@@ -64,7 +75,6 @@ public class CaseDetailsEntity {
     public static final String SECURITY_CLASSIFICATION_FIELD_COL = "security_classification";
     public static final String DATA_COL = "data";
     public static final String DATA_CLASSIFICATION_COL = "data_classification";
-
 
 
     @Id

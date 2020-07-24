@@ -7,7 +7,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class ElasticsearchMappingsTest {

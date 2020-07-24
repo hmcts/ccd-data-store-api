@@ -8,7 +8,8 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("UserAuthorisation")
 class UserAuthorisationTest {
@@ -47,7 +48,7 @@ class UserAuthorisationTest {
         @DisplayName("should return false when user has not base jurisdiction role")
         void shouldBeFalseWhenHasNotJurisdictionBaseRole() {
             final UserAuthorisation userAuthorisation = newUserAuthorization("caseworker",
-                                                                             "caseworker-finrem-divorce");
+                "caseworker-finrem-divorce");
 
             assertFalse(userAuthorisation.hasJurisdictionRole("divorce"));
         }

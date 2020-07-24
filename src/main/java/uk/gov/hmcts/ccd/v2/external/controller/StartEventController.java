@@ -6,7 +6,11 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -66,8 +70,8 @@ public class StartEventController {
                                                                 @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         final StartEventResult startEventResult = this.startEventOperation.triggerStartForCaseType(caseTypeId,
-                                                                                                     triggerId,
-                                                                                                     ignoreWarning);
+            triggerId,
+            ignoreWarning);
 
         return ResponseEntity.ok(new StartEventResource(startEventResult, ignoreWarning, false));
     }
@@ -112,8 +116,8 @@ public class StartEventController {
         }
 
         final StartEventResult startEventResult = this.startEventOperation.triggerStartForCase(caseId,
-                                                                                                 triggerId,
-                                                                                                 ignoreWarning);
+            triggerId,
+            ignoreWarning);
 
         return ResponseEntity.ok(new StartEventResource(startEventResult, ignoreWarning, true));
     }

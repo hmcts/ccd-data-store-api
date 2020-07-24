@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
-import static java.lang.Boolean.FALSE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
-
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.v2.V2;
+
+import static java.lang.Boolean.FALSE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 
 @DisplayName("Get start trigger by case type and event ids")
 class GetStartTriggerTest extends BaseTest {

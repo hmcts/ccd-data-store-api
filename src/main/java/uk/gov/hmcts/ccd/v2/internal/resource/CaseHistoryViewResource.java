@@ -1,18 +1,22 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
-import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.hateoas.RepresentationModel;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.v2.internal.controller.UICaseController;
+
+import java.util.List;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

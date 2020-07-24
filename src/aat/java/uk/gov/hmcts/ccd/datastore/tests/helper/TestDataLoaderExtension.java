@@ -1,20 +1,19 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper;
 
-import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
-
+import io.restassured.specification.RequestSpecification;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.function.Supplier;
-
-import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
+
+import java.util.function.Supplier;
+
+import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 
 public class TestDataLoaderExtension extends BaseTest implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
 

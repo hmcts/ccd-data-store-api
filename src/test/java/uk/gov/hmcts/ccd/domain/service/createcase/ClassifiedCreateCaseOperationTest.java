@@ -12,7 +12,9 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -42,8 +44,8 @@ class ClassifiedCreateCaseOperationTest {
 
         caseDetails = new CaseDetails();
         doReturn(caseDetails).when(createCaseOperation).createCaseDetails(CASE_TYPE_ID,
-                                                                          EVENT_DATA,
-                                                                          IGNORE);
+            EVENT_DATA,
+            IGNORE);
 
         classifiedCase = new CaseDetails();
         doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails);
@@ -63,12 +65,12 @@ class ClassifiedCreateCaseOperationTest {
     @DisplayName("should return null when decorated operation returns null")
     void shouldReturnNullWhenOperationReturnsNull() {
         doReturn(null).when(createCaseOperation).createCaseDetails(CASE_TYPE_ID,
-                                                                   EVENT_DATA,
-                                                                   IGNORE);
+            EVENT_DATA,
+            IGNORE);
 
         final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
-                                                                                   EVENT_DATA,
-                                                                                   IGNORE);
+            EVENT_DATA,
+            IGNORE);
 
         assertThat(output, is(nullValue()));
     }
@@ -78,8 +80,8 @@ class ClassifiedCreateCaseOperationTest {
     void shouldReturnClassifiedCaseDetails() {
 
         final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
-                                                                                   EVENT_DATA,
-                                                                                   IGNORE);
+            EVENT_DATA,
+            IGNORE);
 
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
@@ -94,8 +96,8 @@ class ClassifiedCreateCaseOperationTest {
         doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails);
 
         final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
-                                                                                   EVENT_DATA,
-                                                                                   IGNORE);
+            EVENT_DATA,
+            IGNORE);
 
         assertThat(output, is(nullValue()));
     }

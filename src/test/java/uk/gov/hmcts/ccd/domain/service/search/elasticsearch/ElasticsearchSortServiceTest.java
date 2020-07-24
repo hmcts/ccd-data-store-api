@@ -30,7 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.SEARCH;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
@@ -87,7 +89,7 @@ class ElasticsearchSortServiceTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         sortOrderFields = new ArrayList<>();
-        doAnswer(invocation -> objectMapperES.readValue((String)invocation.getArgument(0), ObjectNode.class))
+        doAnswer(invocation -> objectMapperES.readValue((String) invocation.getArgument(0), ObjectNode.class))
             .when(objectMapperService).convertStringToObject(anyString(), any());
         when(caseTypeService.getCaseType(any())).thenReturn(caseTypeDefinition);
         when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE_A);
@@ -133,7 +135,7 @@ class ElasticsearchSortServiceTest {
         assertAll(
             () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
                 is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"},{\"data.DateField\":\"DESC\"},"
-                   + "{\"data.CollectionTextField.value.keyword\":\"DESC\"},{\"data.CollectionDateField.value\":\"ASC\"},\"created_date\"]}"))
+                    + "{\"data.CollectionTextField.value.keyword\":\"DESC\"},{\"data.CollectionDateField.value\":\"ASC\"},\"created_date\"]}"))
         );
     }
 

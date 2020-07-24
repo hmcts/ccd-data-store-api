@@ -23,13 +23,57 @@ import uk.gov.hmcts.ccd.test.ElasticsearchTestHelper;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_PUBLIC;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST2_PUBLIC;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_A;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_B;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COLLECTION_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTRY_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTRY_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_TIME_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.EMAIL_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.EMAIL_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_LIST_ALIAS;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_LIST_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_LIST_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.FIXED_RADIO_LIST_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.LAST_MODIFIED_DATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.LAST_STATE_MODIFIED_DATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.MULTI_SELECT_LIST_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_ALIAS;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_AREA_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_AREA_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.VALUE_SUFFIX;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.alias;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseData;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseTypesParam;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
 
 class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
@@ -60,7 +104,8 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
     @Nested
     class CrossCaseTypeSearch {
 
-        @Test // Note that cross case type searches do NOT return case data
+        @Test
+        // Note that cross case type searches do NOT return case data
         void shouldReturnAllCasesForAllSpecifiedCaseTypes() throws Exception {
             ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -97,7 +142,8 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
             );
         }
 
-        @Test // Note that the size and sort is applied to each separate case type then results combined
+        @Test
+        // Note that the size and sort is applied to each separate case type then results combined
         void shouldReturnPaginatedResults() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(matchAllQuery())
@@ -186,22 +232,22 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(data.get(ADDRESS_FIELD).toString(),
                     is("{\"AddressLine1\":\"StreetValue\","
-                       + "\"AddressLine2\":\"AddressLine2Value\","
-                       + "\"AddressLine3\":\"AddressLine3Value\","
-                       + "\"Country\":\"CountryValue\","
-                       + "\"County\":\"CountyValue\","
-                       + "\"PostCode\":\"PST CDE\","
-                       + "\"PostTown\":\"TownValue\"}")),
+                        + "\"AddressLine2\":\"AddressLine2Value\","
+                        + "\"AddressLine3\":\"AddressLine3Value\","
+                        + "\"Country\":\"CountryValue\","
+                        + "\"County\":\"CountyValue\","
+                        + "\"PostCode\":\"PST CDE\","
+                        + "\"PostTown\":\"TownValue\"}")),
                 () -> assertThat(data.get(COLLECTION_FIELD).toString(),
                     is("[{\"id\":\"2c6da07c-1dfb-4765-88f6-96cd5d5f33b1\",\"value\":\"CollectionTextValue2\"},"
-                       + "{\"id\":\"f7d67f03-172d-4adb-85e5-ca958ad442ce\",\"value\":\"CollectionTextValue1\"}]")),
+                        + "{\"id\":\"f7d67f03-172d-4adb-85e5-ca958ad442ce\",\"value\":\"CollectionTextValue1\"}]")),
                 () -> assertThat(data.get(COMPLEX_FIELD).toString(),
                     is("{\"ComplexFixedListField\":\"VALUE3\""
-                       + ",\"ComplexNestedField\":{\"NestedCollectionTextField\":"
-                       + "[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\",\"value\":\"NestedCollectionTextValue1\"},"
-                       + "{\"id\":\"95f337e8-5f17-4b25-a795-b7f84f4b2855\",\"value\":\"NestedCollectionTextValue2\"}],"
-                       + "\"NestedNumberField\":\"567\"},"
-                       + "\"ComplexTextField\":\"ComplexTextValue\"}")),
+                        + ",\"ComplexNestedField\":{\"NestedCollectionTextField\":"
+                        + "[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\",\"value\":\"NestedCollectionTextValue1\"},"
+                        + "{\"id\":\"95f337e8-5f17-4b25-a795-b7f84f4b2855\",\"value\":\"NestedCollectionTextValue2\"}],"
+                        + "\"NestedNumberField\":\"567\"},"
+                        + "\"ComplexTextField\":\"ComplexTextValue\"}")),
                 () -> assertThat(data.get(DATE_FIELD).asText(), is(DATE_VALUE)),
                 () -> assertThat(data.get(DATE_TIME_FIELD).asText(), is(DATE_TIME_VALUE)),
                 () -> assertThat(data.get(EMAIL_FIELD).asText(), is(EMAIL_VALUE)),

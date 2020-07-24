@@ -1,16 +1,16 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CaseSearchResultViewResourceTest {
 

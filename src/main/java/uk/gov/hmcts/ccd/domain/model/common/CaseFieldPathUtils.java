@@ -7,7 +7,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -24,7 +26,7 @@ public class CaseFieldPathUtils {
      * Supports top level and nested field paths.
      *
      * @param caseTypeDefinition The case type within which to search
-     * @param path The full stop (".") separated path
+     * @param path               The full stop (".") separated path
      * @return The case field; empty if no such field exists
      */
     public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(CaseTypeDefinition caseTypeDefinition, String path) {
@@ -42,9 +44,9 @@ public class CaseFieldPathUtils {
      * Find a nested case field definition with a case field itself by its path.
      *
      * @param caseFieldDefinition The case field definition within which to search
-     * @param path The full stop (".") separated path
+     * @param path                The full stop (".") separated path
      * @return The nested field. The case field passed in is returned if the path is empty;
-     *         empty if no such field exists
+     *      empty if no such field exists
      */
     public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(T caseFieldDefinition, String path) {
         if (StringUtils.isBlank(path)) {
@@ -59,21 +61,21 @@ public class CaseFieldPathUtils {
      * For use with Complex fields.
      *
      * @param fieldTypeDefinition The field type definition to search within
-     * @param path The full stop (".") separated path
-     * @param pathIncludesParent Whether the path includes a parent field which should be discarded
-     *                           e.g. if the path is ParentField.ChildField then the path searched
-     *                           would simply be for ChildField
+     * @param path                The full stop (".") separated path
+     * @param pathIncludesParent  Whether the path includes a parent field which should be discarded
+     *                            e.g. if the path is ParentField.ChildField then the path searched
+     *                            would simply be for ChildField
      * @return The nested field; empty if no such field exists
      */
     public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(FieldTypeDefinition fieldTypeDefinition,
-                                                                 String path,
-                                                                 boolean pathIncludesParent) {
+                                                                               String path,
+                                                                               boolean pathIncludesParent) {
         if (StringUtils.isBlank(path) || fieldTypeDefinition.getChildren().isEmpty() || (pathIncludesParent && splitPath(path).length == 1)) {
             return Optional.empty();
         }
         List<String> pathElements = getPathElements(path);
 
-        return reduce((List<T>)fieldTypeDefinition.getChildren(), pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
+        return reduce((List<T>) fieldTypeDefinition.getChildren(), pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
     }
 
     /**

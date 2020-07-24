@@ -15,7 +15,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 class ClassifiedGetCaseOperationTest {
 
@@ -64,8 +67,8 @@ class ClassifiedGetCaseOperationTest {
             doReturn(Optional.empty()).when(getCaseOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
             final Optional<CaseDetails> output = classifiedGetCaseOperation.execute(JURISDICTION_ID,
-                                                                                    CASE_TYPE_ID,
-                                                                                    CASE_REFERENCE);
+                CASE_TYPE_ID,
+                CASE_REFERENCE);
 
             assertAll(
                 () -> assertThat(output.isPresent(), is(false)),
@@ -77,8 +80,8 @@ class ClassifiedGetCaseOperationTest {
         @DisplayName("should apply classification when case found")
         void shouldApplyClassificationWhenCaseFound() {
             final Optional<CaseDetails> result = classifiedGetCaseOperation.execute(JURISDICTION_ID,
-                                                                                    CASE_TYPE_ID,
-                                                                                    CASE_REFERENCE);
+                CASE_TYPE_ID,
+                CASE_REFERENCE);
 
             verify(classificationService).applyClassification(caseDetails.get());
             assertThat(result, sameInstance(classifiedDetails));
@@ -90,8 +93,8 @@ class ClassifiedGetCaseOperationTest {
             doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails.get());
 
             final Optional<CaseDetails> output = classifiedGetCaseOperation.execute(JURISDICTION_ID,
-                                                                                    CASE_TYPE_ID,
-                                                                                    CASE_REFERENCE);
+                CASE_TYPE_ID,
+                CASE_REFERENCE);
             assertThat(output.isPresent(), is(false));
         }
 

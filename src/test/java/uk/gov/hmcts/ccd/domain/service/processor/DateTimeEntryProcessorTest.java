@@ -12,7 +12,11 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeEntryProcessor;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
@@ -161,14 +165,14 @@ class DateTimeEntryProcessorTest {
     @Test
     void shouldReturnProcessedNodeForComplexField() throws IOException {
         String json = "{\n"
-                      + "    \"ComplexField\": {\n"
-                      + "        \"ComplexDateTimeField\": \"2001\",\n"
-                      + "        \"ComplexNestedField\": {\n"
-                      + "            \"NestedDateField\": \"12\",\n"
-                      + "            \"NestedCollectionTextField\": []\n"
-                      + "        }\n"
-                      + "    }\n"
-                      + "}";
+            + "    \"ComplexField\": {\n"
+            + "        \"ComplexDateTimeField\": \"2001\",\n"
+            + "        \"ComplexNestedField\": {\n"
+            + "            \"NestedDateField\": \"12\",\n"
+            + "            \"NestedCollectionTextField\": []\n"
+            + "        }\n"
+            + "    }\n"
+            + "}";
         JsonNode node = MAPPER.readTree(json).get("ComplexField");
         CaseFieldDefinition caseField1 = newCaseField().withId("ComplexDateTimeField")
             .withFieldType(fieldType()).withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build();

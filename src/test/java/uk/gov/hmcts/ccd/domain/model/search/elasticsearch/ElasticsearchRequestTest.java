@@ -9,7 +9,9 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ElasticsearchRequestTest {
 
@@ -42,7 +44,7 @@ class ElasticsearchRequestTest {
     @Test
     void shouldReturnRequestedFieldsAsCaseFieldIds() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.CaseDataField\",\"reference\",\"state\","
-                                             + "\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}}");
+            + "\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}}");
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         List<String> requestedFields = elasticsearchRequest.getRequestedFields();

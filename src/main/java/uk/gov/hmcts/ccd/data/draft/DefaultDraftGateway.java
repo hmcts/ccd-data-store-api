@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.data.draft;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +15,21 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
-import uk.gov.hmcts.ccd.domain.model.draft.*;
+import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftList;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service
 @Qualifier(DefaultDraftGateway.QUALIFIER)
@@ -66,9 +71,9 @@ public class DefaultDraftGateway implements DraftGateway {
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(draft, headers);
             HttpHeaders responseHeaders = createDraftRestTemplate.exchange(applicationParams.draftBaseURL(),
-                                                                           HttpMethod.POST,
-                                                                           requestEntity,
-                                                                           HttpEntity.class).getHeaders();
+                HttpMethod.POST,
+                requestEntity,
+                HttpEntity.class).getHeaders();
             return getDraftId(responseHeaders);
         } catch (Exception e) {
             LOG.warn("Error while saving draft", e);

@@ -9,7 +9,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -44,7 +50,7 @@ public class IdamIT extends IntegrationTest {
         assertThat(response.getStatusCodeValue(), not(401));
         assertThat(response.getStatusCodeValue(), not(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
-                   .withHeader("Authorization", equalTo(VALID_IDAM_TOKEN)));
+            .withHeader("Authorization", equalTo(VALID_IDAM_TOKEN)));
     }
 
     @Test
@@ -60,7 +66,7 @@ public class IdamIT extends IntegrationTest {
         assertThat(response.getStatusCodeValue(), not(401));
         assertThat(response.getStatusCodeValue(), not(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
-                   .withHeader("Authorization", equalTo(VALID_CITIZEN_TOKEN)));
+            .withHeader("Authorization", equalTo(VALID_CITIZEN_TOKEN)));
     }
 
     @Test
@@ -76,15 +82,15 @@ public class IdamIT extends IntegrationTest {
         assertThat(response.getStatusCodeValue(), not(401));
         assertThat(response.getStatusCodeValue(), not(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
-                   .withHeader("Authorization", equalTo(VALID_LETTERHOLDER_TOKEN)));
+            .withHeader("Authorization", equalTo(VALID_LETTERHOLDER_TOKEN)));
     }
 
     @Test
     public void shouldFailUserAuthorizationWhenInvalidUser() {
 
         stubFor(get(urlEqualTo("/idam/details"))
-                    .withHeader("Authorization", equalTo(INVALID_IDAM_TOKEN))
-                    .willReturn(aResponse().withStatus(403)));
+            .withHeader("Authorization", equalTo(INVALID_IDAM_TOKEN))
+            .willReturn(aResponse().withStatus(403)));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", INVALID_IDAM_TOKEN);
@@ -100,7 +106,7 @@ public class IdamIT extends IntegrationTest {
 
         assertThat(response.getStatusCodeValue(), is(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
-                   .withHeader("Authorization", equalTo(INVALID_IDAM_TOKEN)));
+            .withHeader("Authorization", equalTo(INVALID_IDAM_TOKEN)));
     }
 
     @Test
@@ -115,7 +121,7 @@ public class IdamIT extends IntegrationTest {
 
         assertThat(response.getStatusCodeValue(), is(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
-                   .withHeader("Authorization", equalTo(VALID_IDAM_TOKEN)));
+            .withHeader("Authorization", equalTo(VALID_IDAM_TOKEN)));
     }
 
     @Test
@@ -130,7 +136,7 @@ public class IdamIT extends IntegrationTest {
 
         assertThat(response.getStatusCodeValue(), is(403));
         verify(getRequestedFor(urlEqualTo("/idam/details"))
-                   .withHeader("Authorization", equalTo(VALID_IDAM_TOKEN)));
+            .withHeader("Authorization", equalTo(VALID_IDAM_TOKEN)));
     }
 
     private HttpHeaders validHeaders() {

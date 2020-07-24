@@ -9,7 +9,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -43,7 +49,7 @@ public class ServiceToServiceIT extends IntegrationTest {
         assertThat(response.getStatusCodeValue(), not(401));
         assertThat(response.getStatusCodeValue(), not(403));
         verify(getRequestedFor(urlEqualTo("/s2s/details"))
-                   .withHeader("Authorization", equalTo("Bearer " + SERVICE_TOKEN)));
+            .withHeader("Authorization", equalTo("Bearer " + SERVICE_TOKEN)));
 
     }
 
@@ -51,8 +57,8 @@ public class ServiceToServiceIT extends IntegrationTest {
     public void shouldFailServiceAuthorizationWhenInvalidServiceToken() {
 
         stubFor(get(urlEqualTo("/s2s/details"))
-                      .withHeader("Authorization", equalTo("Bearer " + INVALID_SERVICE_TOKEN))
-                      .willReturn(aResponse().withStatus(401)));
+            .withHeader("Authorization", equalTo("Bearer " + INVALID_SERVICE_TOKEN))
+            .willReturn(aResponse().withStatus(401)));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("ServiceAuthorization", INVALID_SERVICE_TOKEN);
@@ -68,7 +74,7 @@ public class ServiceToServiceIT extends IntegrationTest {
 
         assertThat(response.getStatusCodeValue(), is(403));
         verify(getRequestedFor(urlEqualTo("/s2s/details"))
-                   .withHeader("Authorization", equalTo("Bearer " + INVALID_SERVICE_TOKEN)));
+            .withHeader("Authorization", equalTo("Bearer " + INVALID_SERVICE_TOKEN)));
 
     }
 

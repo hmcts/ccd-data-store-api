@@ -17,7 +17,10 @@ import java.util.List;
 
 import static java.math.BigDecimal.ONE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.emptyCollectionOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
 @DisplayName("MultiSelectListValidator")
@@ -73,8 +76,8 @@ class MultiSelectListValidatorTest {
     @Test
     void validate_shouldBeValidWhenArrayOfValidValues() {
         final ArrayNode values = NODE_FACTORY.arrayNode()
-                                             .add(OPTION_1)
-                                             .add(OPTION_2);
+            .add(OPTION_1)
+            .add(OPTION_2);
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
@@ -93,8 +96,8 @@ class MultiSelectListValidatorTest {
     @Test
     void validate_shouldNOTBeValidWhenContainsUnknownValue() {
         final ArrayNode values = NODE_FACTORY.arrayNode()
-                                             .add(OPTION_1)
-                                             .add(OPTION_UNKNOWN);
+            .add(OPTION_1)
+            .add(OPTION_UNKNOWN);
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
@@ -104,8 +107,8 @@ class MultiSelectListValidatorTest {
     @Test
     void validate_shouldNOTBeValidWhenContainsDuplicateValues() {
         final ArrayNode values = NODE_FACTORY.arrayNode()
-                                             .add(OPTION_1)
-                                             .add(OPTION_1);
+            .add(OPTION_1)
+            .add(OPTION_1);
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
@@ -117,7 +120,7 @@ class MultiSelectListValidatorTest {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(2).build();
 
         final ArrayNode values = NODE_FACTORY.arrayNode()
-                                             .add(OPTION_1);
+            .add(OPTION_1);
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
@@ -130,8 +133,8 @@ class MultiSelectListValidatorTest {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMax(ONE).build();
 
         final ArrayNode values = NODE_FACTORY.arrayNode()
-                                             .add(OPTION_1)
-                                             .add(OPTION_2);
+            .add(OPTION_1)
+            .add(OPTION_2);
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, values, caseFieldDefinition);
 
@@ -141,8 +144,8 @@ class MultiSelectListValidatorTest {
 
     private CaseFieldDefinitionBuilder caseField() {
         return new CaseFieldDefinitionBuilder(FIELD_ID).withType(MultiSelectListValidator.TYPE_ID)
-                                             .withFixedListItem(OPTION_1)
-                                             .withFixedListItem(OPTION_2)
-                                             .withFixedListItem(OPTION_3);
+            .withFixedListItem(OPTION_1)
+            .withFixedListItem(OPTION_2)
+            .withFixedListItem(OPTION_3);
     }
 }

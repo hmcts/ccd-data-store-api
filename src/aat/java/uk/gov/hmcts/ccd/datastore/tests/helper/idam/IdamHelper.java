@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper.idam;
 
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 public class IdamHelper {
 
@@ -21,9 +21,9 @@ public class IdamHelper {
 
     public IdamHelper(String idamBaseUrl, OAuth2 oauth2) {
         idamApi = Feign.builder()
-                       .encoder(new JacksonEncoder())
-                       .decoder(new JacksonDecoder())
-                       .target(IdamApi.class, idamBaseUrl);
+            .encoder(new JacksonEncoder())
+            .decoder(new JacksonDecoder())
+            .target(IdamApi.class, idamBaseUrl);
         this.oauth2 = oauth2;
     }
 

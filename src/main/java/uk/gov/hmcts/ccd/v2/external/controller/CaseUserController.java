@@ -6,9 +6,13 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -89,7 +93,7 @@ public class CaseUserController {
         }
 
         final CaseDetails caseDetails = caseRepository.findByReference(caseReference)
-                                                      .orElseThrow(() -> new CaseNotFoundException(caseReference));
+            .orElseThrow(() -> new CaseNotFoundException(caseReference));
 
         if (!accessUpdateAuthorised(caseDetails)) {
             throw new ForbiddenException();
@@ -99,7 +103,7 @@ public class CaseUserController {
         caseAccessOperation.updateUserAccess(caseDetails, caseUser);
 
         return ResponseEntity.noContent()
-                             .build();
+            .build();
     }
 
     private Boolean accessUpdateAuthorised(CaseDetails caseDetails) {

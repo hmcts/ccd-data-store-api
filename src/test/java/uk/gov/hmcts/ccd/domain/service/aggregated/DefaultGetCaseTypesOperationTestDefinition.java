@@ -16,7 +16,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 class DefaultGetCaseTypesOperationTestDefinition {
@@ -58,7 +60,7 @@ class DefaultGetCaseTypesOperationTestDefinition {
             () -> assertThat(readCaseTypeDefinitions, is(equalTo(updateCaseTypeDefinitions))),
             () -> assertThat(updateCaseTypeDefinitions, is(equalTo(readCaseTypeDefinitions))),
             () -> assertThat(createCaseTypeDefinitions, IsCollectionContaining.hasItems(testCaseTypeDefinition1,
-                                                        testCaseTypeDefinition2, testCaseTypeDefinition3))
+                testCaseTypeDefinition2, testCaseTypeDefinition3))
         );
     }
 

@@ -1,15 +1,20 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.*;
-
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
 @Named
 @Singleton

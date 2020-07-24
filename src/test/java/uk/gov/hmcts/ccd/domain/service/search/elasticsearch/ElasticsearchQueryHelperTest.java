@@ -24,7 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
@@ -69,7 +71,7 @@ class ElasticsearchQueryHelperTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         when(applicationParams.getSearchBlackList()).thenReturn(newArrayList("query_string"));
-        doAnswer(invocation -> objectMapperES.readValue((String)invocation.getArgument(0), ObjectNode.class))
+        doAnswer(invocation -> objectMapperES.readValue((String) invocation.getArgument(0), ObjectNode.class))
             .when(objectMapperService).convertStringToObject(anyString(), any());
         when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE_A);
         when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(JURISDICTION))).thenReturn(Optional.of(JURISDICTION_FIELD));
@@ -105,29 +107,29 @@ class ElasticsearchQueryHelperTest {
 
     private String blacklistedQuery() {
         return "{  \n"
-               + "   \"query\":{  \n"
-               + "      \"bool\":{  \n"
-               + "         \"must\":[  \n"
-               + "            {  \n"
-               + "               \"simple_query_string\":{  \n"
-               + "                  \"query\":\"isde~2\"\n"
-               + "               }\n"
-               + "            },\n"
-               + "            {  \n"
-               + "               \"query_string\":{  \n"
-               + "                  \"query\":\"isde~2\"\n"
-               + "               }\n"
-               + "            },\n"
-               + "            {  \n"
-               + "               \"range\":{  \n"
-               + "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{  \n"
-               + "                     \"lt\":\"91\"\n"
-               + "                  }\n"
-               + "               }\n"
-               + "            }\n"
-               + "         ]\n"
-               + "      }\n"
-               + "   }\n"
-               + "}";
+            + "   \"query\":{  \n"
+            + "      \"bool\":{  \n"
+            + "         \"must\":[  \n"
+            + "            {  \n"
+            + "               \"simple_query_string\":{  \n"
+            + "                  \"query\":\"isde~2\"\n"
+            + "               }\n"
+            + "            },\n"
+            + "            {  \n"
+            + "               \"query_string\":{  \n"
+            + "                  \"query\":\"isde~2\"\n"
+            + "               }\n"
+            + "            },\n"
+            + "            {  \n"
+            + "               \"range\":{  \n"
+            + "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{  \n"
+            + "                     \"lt\":\"91\"\n"
+            + "                  }\n"
+            + "               }\n"
+            + "            }\n"
+            + "         ]\n"
+            + "      }\n"
+            + "   }\n"
+            + "}";
     }
 }

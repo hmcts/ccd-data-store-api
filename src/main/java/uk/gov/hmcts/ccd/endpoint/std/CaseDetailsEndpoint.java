@@ -1,13 +1,24 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
@@ -46,7 +57,12 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.*;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 
@@ -149,7 +165,7 @@ public class CaseDetailsEndpoint {
     @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
     @ApiOperation(value = "Start event creation as Case worker",
-                  notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
+        notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Event creation process started"),
         @ApiResponse(code = 404, message = "No case found for the given ID"),
@@ -319,11 +335,11 @@ public class CaseDetailsEndpoint {
         @RequestBody final CaseDataContent content) {
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
-                                                        content);
+            content);
 
         return midEventCallback.invoke(caseTypeId,
-                                       content,
-                                       pageId);
+            content,
+            pageId);
     }
 
     @Transactional
@@ -351,7 +367,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
         return createEventOperation.createCaseEvent(caseId,
-                                                    content);
+            content);
     }
 
     @Transactional
@@ -379,7 +395,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
         return createEventOperation.createCaseEvent(caseId,
-                                                    content);
+            content);
     }
 
     @Transactional
@@ -479,7 +495,7 @@ public class CaseDetailsEndpoint {
         List<String> metadataParams = queryParameters.keySet().stream().filter(p -> !FieldMapSanitizeOperation.isCaseFieldParameter(p)).collect(toList());
         if (!MetaData.unknownMetadata(metadataParams).isEmpty()) {
             throw new BadRequestException(String.format("unknown metadata search parameters: %s",
-                                                        String.join((","), MetaData.unknownMetadata(metadataParams))));
+                String.join((","), MetaData.unknownMetadata(metadataParams))));
         }
         param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()).ifPresent(sc -> {
             if (!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {

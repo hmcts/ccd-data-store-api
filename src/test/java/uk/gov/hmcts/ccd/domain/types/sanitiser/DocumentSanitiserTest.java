@@ -28,8 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser.DOCUMENT_BINARY_URL;
+import static uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser.DOCUMENT_FILENAME;
+import static uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser.DOCUMENT_URL;
 
 @DisplayName("DocumentSanitiser")
 class DocumentSanitiserTest {
@@ -70,7 +74,7 @@ class DocumentSanitiserTest {
         documentSanitiser = new DocumentSanitiser(documentManagementRestClient);
         DOCUMENT_VALUE_INITIAL.put("document_url", DOCUMENT_URL_VALUE);
         DOCUMENT_VALUE_SANITISED.put("document_url", DOCUMENT_URL_VALUE);
-        DOCUMENT_VALUE_SANITISED.put("document_binary_url",BINARY_URL);
+        DOCUMENT_VALUE_SANITISED.put("document_binary_url", BINARY_URL);
         DOCUMENT_VALUE_SANITISED.put("document_filename", FILENAME);
     }
 
@@ -90,9 +94,9 @@ class DocumentSanitiserTest {
     @DisplayName("should not sanitise already sane document")
     void shouldNotSanitizeIfDocumentSanitizedAlready() {
         final JsonNode documentValue = JSON_FACTORY.objectNode();
-        ((ObjectNode)documentValue).set(DOCUMENT_URL, JSON_FACTORY.textNode("testUrl"));
-        ((ObjectNode)documentValue).set(DOCUMENT_BINARY_URL, JSON_FACTORY.textNode("testBinaryUrl"));
-        ((ObjectNode)documentValue).set(DOCUMENT_FILENAME, JSON_FACTORY.textNode("testFilename"));
+        ((ObjectNode) documentValue).set(DOCUMENT_URL, JSON_FACTORY.textNode("testUrl"));
+        ((ObjectNode) documentValue).set(DOCUMENT_BINARY_URL, JSON_FACTORY.textNode("testBinaryUrl"));
+        ((ObjectNode) documentValue).set(DOCUMENT_FILENAME, JSON_FACTORY.textNode("testFilename"));
 
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValue);
 

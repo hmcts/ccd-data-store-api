@@ -16,7 +16,11 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 
@@ -48,8 +52,8 @@ class TextValidatorTest {
         validator = new TextValidator();
 
         caseFieldDefinition = caseField().withMin(5)
-                               .withMax(10)
-                               .build();
+            .withMax(10)
+            .build();
     }
 
     @Test
@@ -95,8 +99,8 @@ class TextValidatorTest {
     @DisplayName("should test exact length when min and max are equal")
     void textFieldWithSameMinMax() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
-                                               .withMax(5)
-                                               .build();
+            .withMax(5)
+            .build();
         final JsonNode valid_value = NODE_FACTORY.textNode("12345");
         final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, valid_value, caseFieldDefinition);
 
