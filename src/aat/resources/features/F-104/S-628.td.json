@@ -522,6 +522,10 @@
                     "max" : null,
                     "regular_expression" : null,
                     "fixed_list_items" : [ {
+                      "code" : "VALUE4",
+                      "label" : "Value 4",
+                      "order" : null
+                    },{
                       "code" : "VALUE3",
                       "label" : "Value 3",
                       "order" : null
@@ -952,10 +956,14 @@
                 "max" : null,
                 "regular_expression" : null,
                 "fixed_list_items" : [ {
-                  "code" : "VALUE3",
-                  "label" : "Value 3",
-                  "order" : null
-                }, {
+                      "code" : "VALUE4",
+                      "label" : "Value 4",
+                      "order" : null
+                    },{
+                      "code" : "VALUE3",
+                      "label" : "Value 3",
+                      "order" : null
+                    }, {
                   "code" : "VALUE2",
                   "label" : "Value 2",
                   "order" : null

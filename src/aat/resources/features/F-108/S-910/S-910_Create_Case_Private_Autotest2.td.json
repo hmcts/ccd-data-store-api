@@ -6,7 +6,7 @@
       "event_token": "${[scenarioContext][parentContext][childContexts][S-910_Create_Case_Private_Autotest2_Token_Creation][testData][actualResponse][body][token]}",
 
       "data": {
-        "NumberField": "2"
+        "NumberField": "910"
       }
     }
   }
