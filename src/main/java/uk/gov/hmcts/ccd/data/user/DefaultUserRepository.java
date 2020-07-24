@@ -54,6 +54,7 @@ public class DefaultUserRepository implements UserRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultUserRepository.class);
     private static final String RELEVANT_ROLES = "caseworker-%s";
+    private static final int JURISDICTION_INDEX = 1;
 
     private final ApplicationParams applicationParams;
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -168,9 +169,9 @@ public class DefaultUserRepository implements UserRepository {
         return Arrays.stream(roles)
             .filter(this::isCaseworkerRole)
             .filter(not(this::isCrossJurisdictionRole))
-            .map(role -> role.split("-"))
-            .filter(array -> array.length >= 2)
-            .map(element -> element[1])
+            .map(this::extractJurisdiction)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
             .distinct()
             .collect(Collectors.toList());
     }
@@ -226,6 +227,15 @@ public class DefaultUserRepository implements UserRepository {
         idamUser.setForename(userInfo.getGivenName());
         idamUser.setSurname(userInfo.getFamilyName());
         return idamUser;
+    }
+
+    private Optional<String> extractJurisdiction(String caseworkerRole) {
+        String[] parts = caseworkerRole.split("-");
+        if (parts.length < 2) {
+            return Optional.empty();
+        } else {
+            return Optional.of(parts[JURISDICTION_INDEX]);
+        }
     }
 
     private boolean isCaseworkerRole(String role) {
