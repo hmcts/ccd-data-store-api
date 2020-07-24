@@ -168,9 +168,9 @@ public class DefaultUserRepository implements UserRepository {
         return Arrays.stream(roles)
             .filter(this::isCaseworkerRole)
             .filter(not(this::isCrossJurisdictionRole))
-            .map(role -> role.split(applicationParams.getCaseworkerRoleDelimiter()))
+            .map(role -> role.split("-"))
             .filter(array -> array.length >= 2)
-            .map(element -> element[applicationParams.getCaseworkerRoleJurisdictionElementIndex()])
+            .map(element -> element[1])
             .distinct()
             .collect(Collectors.toList());
     }
@@ -188,6 +188,11 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public boolean anyRoleMatches(Pattern rolesPattern) {
         return getUserRoles().stream().anyMatch(role -> rolesPattern.matcher(role).matches());
+    }
+
+    @Override
+    public boolean isCrossJurisdictionRole(String role) {
+        return applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role);
     }
 
     private Set<SecurityClassification> getClassificationsForUserRoles(List<String> roles) {
@@ -223,12 +228,7 @@ public class DefaultUserRepository implements UserRepository {
         return idamUser;
     }
 
-    private boolean isCrossJurisdictionRole(String role) {
-        return applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role);
-    }
-
     private boolean isCaseworkerRole(String role) {
-        return role.matches(applicationParams.getCaseworkerRoleRegex());
+        return role.matches(applicationParams.getCcdAccessControlCaseworkerRoleRegex());
     }
-
 }

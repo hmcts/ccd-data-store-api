@@ -94,4 +94,9 @@ public class CachedUserRepository implements UserRepository {
     public boolean anyRoleMatches(Pattern rolesPattern) {
         return userRepository.anyRoleMatches(rolesPattern);
     }
+
+    @Override
+    public boolean isCrossJurisdictionRole(String role) {
+        return userRepository.isCrossJurisdictionRole(role);
+    }
 }

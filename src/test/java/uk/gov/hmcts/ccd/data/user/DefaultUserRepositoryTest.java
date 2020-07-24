@@ -111,9 +111,7 @@ class DefaultUserRepositoryTest {
         mockUserInfo("userId");
 
         when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(singletonList(ROLE_CASEWORKER_CAA));
-        when(applicationParams.getCaseworkerRoleDelimiter()).thenReturn("-");
-        when(applicationParams.getCaseworkerRoleRegex()).thenReturn("caseworker.+");
-        when(applicationParams.getCaseworkerRoleJurisdictionElementIndex()).thenReturn(1);
+        when(applicationParams.getCcdAccessControlCaseworkerRoleRegex()).thenReturn("caseworker.+");
     }
 
     @Nested
@@ -528,7 +526,7 @@ class DefaultUserRepositoryTest {
         doReturn(newAuthorities(ROLE_CASEWORKER_CAA)).when(authentication)
             .getAuthorities();
     }
-    
+
     private void mockUserInfo(String userId) {
         mockUserInfo(userId, emptyList());
     }

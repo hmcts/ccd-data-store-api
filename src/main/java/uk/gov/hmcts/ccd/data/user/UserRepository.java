@@ -39,4 +39,6 @@ public interface UserRepository {
     boolean anyRoleEqualsTo(String userRole);
 
     boolean anyRoleMatches(Pattern rolesPattern);
+
+    boolean isCrossJurisdictionRole(String role);
 }

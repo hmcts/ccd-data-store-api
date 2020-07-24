@@ -134,14 +134,8 @@ public class ApplicationParams {
     @Value("#{'${ccd.access-control.citizen-roles}'.split(',')}")
     private List<String> ccdAccessControlCitizenRoles;
 
-    @Value("${caseworker.role.regex}")
-    private String caseworkerRoleRegex;
-
-    @Value("${caseworker.role.delimiter}")
-    private String caseworkerRoleDelimiter;
-
-    @Value("${caseworker.role.jurisdiction.element.index}")
-    private int caseworkerRoleJurisdictionElementIndex;
+    @Value("${ccd.access-control.caseworker.role.regex}")
+    private String ccdAccessControlCaseworkerRoleRegex;
 
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
@@ -382,16 +376,8 @@ public class ApplicationParams {
         return ccdAccessControlCrossJurisdictionRoles;
     }
 
-    public String getCaseworkerRoleRegex() {
-        return caseworkerRoleRegex;
-    }
-
-    public String getCaseworkerRoleDelimiter() {
-        return caseworkerRoleDelimiter;
-    }
-
-    public int getCaseworkerRoleJurisdictionElementIndex() {
-        return caseworkerRoleJurisdictionElementIndex;
+    public String getCcdAccessControlCaseworkerRoleRegex() {
+        return ccdAccessControlCaseworkerRoleRegex;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {
