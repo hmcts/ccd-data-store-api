@@ -17,7 +17,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
-    private static final String UNIQUE_UUID = "string-" + UUID.randomUUID().toString();;
+    private static final String UNIQUE_UUID = "string-" + UUID.randomUUID().toString();
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
