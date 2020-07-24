@@ -129,238 +129,238 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
         when(multiSearchResult.isSucceeded()).thenReturn(true);
 
-        String json = "{\n" +
-                "    \"took\": 96,\n" +
-                "    \"timed_out\": false,\n" +
-                "    \"_shards\": {\n" +
-                "        \"total\": 2,\n" +
-                "        \"successful\": 2,\n" +
-                "        \"skipped\": 0,\n" +
-                "        \"failed\": 0\n" +
-                "    },\n" +
-                "    \"hits\": {\n" +
-                "        \"total\": 2,\n" +
-                "        \"max_score\": 0.18232156,\n" +
-                "        \"hits\": [\n" +
-                "            {\n" +
-                "                \"_index\": \"aat_cases-000001\",\n" +
-                "                \"_type\": \"_doc\",\n" +
-                "                \"_id\": \"355\",\n" +
-                "                \"_score\": 0.18232156,\n" +
-                "                \"_source\": {\n" +
-                "                    \"jurisdiction\": \"AUTOTEST1\",\n" +
-                "                    \"case_type_id\": \"AAT\",\n" +
-                "                    \"data\": {\n" +
-                "                        \"FixedRadioListField\": null,\n" +
-                "                        \"TextAreaField\": null,\n" +
-                "                        \"ComplexField\": {\n" +
-                "                            \"ComplexTextField\": null,\n" +
-                "                            \"ComplexFixedListField\": null,\n" +
-                "                            \"ComplexNestedField\": {\n" +
-                "                                \"NestedNumberField\": null,\n" +
-                "                                \"NestedCollectionTextField\": [\n" +
-                "                                    \n" +
-                "                                ]\n" +
-                "                            }\n" +
-                "                        },\n" +
-                "                        \"EmailField\": null,\n" +
-                "                        \"TextField\": null,\n" +
-                "                        \"AddressUKField\": {\n" +
-                "                            \"Country\": null,\n" +
-                "                            \"AddressLine3\": null,\n" +
-                "                            \"County\": null,\n" +
-                "                            \"AddressLine1\": null,\n" +
-                "                            \"PostCode\": null,\n" +
-                "                            \"AddressLine2\": null,\n" +
-                "                            \"PostTown\": null\n" +
-                "                        },\n" +
-                "                        \"CollectionField\": [\n" +
-                "                            \n" +
-                "                        ],\n" +
-                "                        \"MoneyGBPField\": null,\n" +
-                "                        \"DateField\": null,\n" +
-                "                        \"MultiSelectListField\": [\n" +
-                "                            \n" +
-                "                        ],\n" +
-                "                        \"PhoneUKField\": null,\n" +
-                "                        \"YesOrNoField\": null,\n" +
-                "                        \"NumberField\": null,\n" +
-                "                        \"DateTimeField\": null,\n" +
-                "                        \"FixedListField\": null\n" +
-                "                    },\n" +
-                "                    \"created_date\": \"2020-06-30T14:47:26.061Z\",\n" +
-                "                    \"id\": 355,\n" +
-                "                    \"last_modified\": \"2020-06-30T14:52:36.335Z\",\n" +
-                "                    \"@timestamp\": \"2020-07-16T22:58:33.430Z\",\n" +
-                "                    \"index_id\": \"aat_cases\",\n" +
-                "                    \"@version\": \"1\",\n" +
-                "                    \"data_classification\": {\n" +
-                "                        \"FixedRadioListField\": \"PUBLIC\",\n" +
-                "                        \"TextAreaField\": \"PUBLIC\",\n" +
-                "                        \"ComplexField\": {\n" +
-                "                            \"classification\": \"PUBLIC\",\n" +
-                "                            \"value\": {\n" +
-                "                                \"ComplexTextField\": \"PUBLIC\",\n" +
-                "                                \"ComplexFixedListField\": \"PUBLIC\",\n" +
-                "                                \"ComplexNestedField\": {\n" +
-                "                                    \"classification\": \"PUBLIC\",\n" +
-                "                                    \"value\": {\n" +
-                "                                        \"NestedNumberField\": \"PUBLIC\",\n" +
-                "                                        \"NestedCollectionTextField\": {\n" +
-                "                                            \"classification\": \"PUBLIC\",\n" +
-                "                                            \"value\": [\n" +
-                "                                                \n" +
-                "                                            ]\n" +
-                "                                        }\n" +
-                "                                    }\n" +
-                "                                }\n" +
-                "                            }\n" +
-                "                        },\n" +
-                "                        \"EmailField\": \"PUBLIC\",\n" +
-                "                        \"TextField\": \"PUBLIC\",\n" +
-                "                        \"AddressUKField\": {\n" +
-                "                            \"classification\": \"PUBLIC\",\n" +
-                "                            \"value\": {\n" +
-                "                                \"Country\": \"PUBLIC\",\n" +
-                "                                \"AddressLine3\": \"PUBLIC\",\n" +
-                "                                \"County\": \"PUBLIC\",\n" +
-                "                                \"AddressLine1\": \"PUBLIC\",\n" +
-                "                                \"PostCode\": \"PUBLIC\",\n" +
-                "                                \"AddressLine2\": \"PUBLIC\",\n" +
-                "                                \"PostTown\": \"PUBLIC\"\n" +
-                "                            }\n" +
-                "                        },\n" +
-                "                        \"CollectionField\": {\n" +
-                "                            \"classification\": \"PUBLIC\",\n" +
-                "                            \"value\": [\n" +
-                "                                \n" +
-                "                            ]\n" +
-                "                        },\n" +
-                "                        \"MoneyGBPField\": \"PUBLIC\",\n" +
-                "                        \"DateField\": \"PUBLIC\",\n" +
-                "                        \"MultiSelectListField\": \"PUBLIC\",\n" +
-                "                        \"PhoneUKField\": \"PUBLIC\",\n" +
-                "                        \"YesOrNoField\": \"PUBLIC\",\n" +
-                "                        \"NumberField\": \"PUBLIC\",\n" +
-                "                        \"DateTimeField\": \"PUBLIC\",\n" +
-                "                        \"FixedListField\": \"PUBLIC\"\n" +
-                "                    },\n" +
-                "                    \"security_classification\": \"PUBLIC\",\n" +
-                "                    \"state\": \"TODO\",\n" +
-                "                    \"reference\": 1593528446017551\n" +
-                "                }\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"_index\": \"aat_cases-000001\",\n" +
-                "                \"_type\": \"_doc\",\n" +
-                "                \"_id\": \"357\",\n" +
-                "                \"_score\": 0.18232156,\n" +
-                "                \"_source\": {\n" +
-                "                    \"jurisdiction\": \"AUTOTEST1\",\n" +
-                "                    \"case_type_id\": \"AAT\",\n" +
-                "                    \"data\": {\n" +
-                "                        \"FixedRadioListField\": null,\n" +
-                "                        \"TextAreaField\": null,\n" +
-                "                        \"ComplexField\": {\n" +
-                "                            \"ComplexTextField\": null,\n" +
-                "                            \"ComplexFixedListField\": null,\n" +
-                "                            \"ComplexNestedField\": {\n" +
-                "                                \"NestedNumberField\": null,\n" +
-                "                                \"NestedCollectionTextField\": [\n" +
-                "                                    \n" +
-                "                                ]\n" +
-                "                            }\n" +
-                "                        },\n" +
-                "                        \"EmailField\": \"email1@gmail.com\",\n" +
-                "                        \"TextField\": \"Text Field 1\",\n" +
-                "                        \"AddressUKField\": {\n" +
-                "                            \"Country\": null,\n" +
-                "                            \"AddressLine3\": null,\n" +
-                "                            \"County\": null,\n" +
-                "                            \"AddressLine1\": null,\n" +
-                "                            \"PostCode\": null,\n" +
-                "                            \"AddressLine2\": null,\n" +
-                "                            \"PostTown\": null\n" +
-                "                        },\n" +
-                "                        \"CollectionField\": [\n" +
-                "                            \n" +
-                "                        ],\n" +
-                "                        \"MoneyGBPField\": null,\n" +
-                "                        \"DateField\": null,\n" +
-                "                        \"MultiSelectListField\": [\n" +
-                "                            \n" +
-                "                        ],\n" +
-                "                        \"PhoneUKField\": null,\n" +
-                "                        \"YesOrNoField\": null,\n" +
-                "                        \"NumberField\": null,\n" +
-                "                        \"DateTimeField\": null,\n" +
-                "                        \"FixedListField\": null\n" +
-                "                    },\n" +
-                "                    \"created_date\": \"2020-07-07T15:12:53.258Z\",\n" +
-                "                    \"id\": 357,\n" +
-                "                    \"last_modified\": \"2020-07-07T15:14:04.635Z\",\n" +
-                "                    \"@timestamp\": \"2020-07-16T22:58:33.435Z\",\n" +
-                "                    \"index_id\": \"aat_cases\",\n" +
-                "                    \"@version\": \"1\",\n" +
-                "                    \"data_classification\": {\n" +
-                "                        \"FixedRadioListField\": \"PUBLIC\",\n" +
-                "                        \"TextAreaField\": \"PUBLIC\",\n" +
-                "                        \"ComplexField\": {\n" +
-                "                            \"classification\": \"PUBLIC\",\n" +
-                "                            \"value\": {\n" +
-                "                                \"ComplexTextField\": \"PUBLIC\",\n" +
-                "                                \"ComplexFixedListField\": \"PUBLIC\",\n" +
-                "                                \"ComplexNestedField\": {\n" +
-                "                                    \"classification\": \"PUBLIC\",\n" +
-                "                                    \"value\": {\n" +
-                "                                        \"NestedNumberField\": \"PUBLIC\",\n" +
-                "                                        \"NestedCollectionTextField\": {\n" +
-                "                                            \"classification\": \"PUBLIC\",\n" +
-                "                                            \"value\": [\n" +
-                "                                                \n" +
-                "                                            ]\n" +
-                "                                        }\n" +
-                "                                    }\n" +
-                "                                }\n" +
-                "                            }\n" +
-                "                        },\n" +
-                "                        \"EmailField\": \"PUBLIC\",\n" +
-                "                        \"TextField\": \"PUBLIC\",\n" +
-                "                        \"AddressUKField\": {\n" +
-                "                            \"classification\": \"PUBLIC\",\n" +
-                "                            \"value\": {\n" +
-                "                                \"Country\": \"PUBLIC\",\n" +
-                "                                \"AddressLine3\": \"PUBLIC\",\n" +
-                "                                \"County\": \"PUBLIC\",\n" +
-                "                                \"AddressLine1\": \"PUBLIC\",\n" +
-                "                                \"PostCode\": \"PUBLIC\",\n" +
-                "                                \"AddressLine2\": \"PUBLIC\",\n" +
-                "                                \"PostTown\": \"PUBLIC\"\n" +
-                "                            }\n" +
-                "                        },\n" +
-                "                        \"CollectionField\": {\n" +
-                "                            \"classification\": \"PUBLIC\",\n" +
-                "                            \"value\": [\n" +
-                "                                \n" +
-                "                            ]\n" +
-                "                        },\n" +
-                "                        \"MoneyGBPField\": \"PUBLIC\",\n" +
-                "                        \"DateField\": \"PUBLIC\",\n" +
-                "                        \"MultiSelectListField\": \"PUBLIC\",\n" +
-                "                        \"PhoneUKField\": \"PUBLIC\",\n" +
-                "                        \"YesOrNoField\": \"PUBLIC\",\n" +
-                "                        \"NumberField\": \"PUBLIC\",\n" +
-                "                        \"DateTimeField\": \"PUBLIC\",\n" +
-                "                        \"FixedListField\": \"PUBLIC\"\n" +
-                "                    },\n" +
-                "                    \"security_classification\": \"PUBLIC\",\n" +
-                "                    \"state\": \"TODO\",\n" +
-                "                    \"reference\": 1594134773278525\n" +
-                "                }\n" +
-                "            }\n" +
-                "        ]\n" +
-                "    }\n" +
-                "}";
+        String json = "{\n"
+                + "    \"took\": 96,\n"
+                + "    \"timed_out\": false,\n"
+                + "    \"_shards\": {\n"
+                + "        \"total\": 2,\n"
+                + "        \"successful\": 2,\n"
+                + "        \"skipped\": 0,\n"
+                + "        \"failed\": 0\n"
+                + "    },\n"
+                + "    \"hits\": {\n"
+                + "        \"total\": 2,\n"
+                + "        \"max_score\": 0.18232156,\n"
+                + "        \"hits\": [\n"
+                + "            {\n"
+                + "                \"_index\": \"aat_cases-000001\",\n"
+                + "                \"_type\": \"_doc\",\n"
+                + "                \"_id\": \"355\",\n"
+                + "                \"_score\": 0.18232156,\n"
+                + "                \"_source\": {\n"
+                + "                    \"jurisdiction\": \"AUTOTEST1\",\n"
+                + "                    \"case_type_id\": \"AAT\",\n"
+                + "                    \"data\": {\n"
+                + "                        \"FixedRadioListField\": null,\n"
+                + "                        \"TextAreaField\": null,\n"
+                + "                        \"ComplexField\": {\n"
+                + "                            \"ComplexTextField\": null,\n"
+                + "                            \"ComplexFixedListField\": null,\n"
+                + "                            \"ComplexNestedField\": {\n"
+                + "                                \"NestedNumberField\": null,\n"
+                + "                                \"NestedCollectionTextField\": [\n"
+                + "                                    \n"
+                + "                                ]\n"
+                + "                            }\n"
+                + "                        },\n"
+                + "                        \"EmailField\": null,\n"
+                + "                        \"TextField\": null,\n"
+                + "                        \"AddressUKField\": {\n"
+                + "                            \"Country\": null,\n"
+                + "                            \"AddressLine3\": null,\n"
+                + "                            \"County\": null,\n"
+                + "                            \"AddressLine1\": null,\n"
+                + "                            \"PostCode\": null,\n"
+                + "                            \"AddressLine2\": null,\n"
+                + "                            \"PostTown\": null\n"
+                + "                        },\n"
+                + "                        \"CollectionField\": [\n"
+                + "                            \n"
+                + "                        ],\n"
+                + "                        \"MoneyGBPField\": null,\n"
+                + "                        \"DateField\": null,\n"
+                + "                        \"MultiSelectListField\": [\n"
+                + "                            \n"
+                + "                        ],\n"
+                + "                        \"PhoneUKField\": null,\n"
+                + "                        \"YesOrNoField\": null,\n"
+                + "                        \"NumberField\": null,\n"
+                + "                        \"DateTimeField\": null,\n"
+                + "                        \"FixedListField\": null\n"
+                + "                    },\n"
+                + "                    \"created_date\": \"2020-06-30T14:47:26.061Z\",\n"
+                + "                    \"id\": 355,\n"
+                + "                    \"last_modified\": \"2020-06-30T14:52:36.335Z\",\n"
+                + "                    \"@timestamp\": \"2020-07-16T22:58:33.430Z\",\n"
+                + "                    \"index_id\": \"aat_cases\",\n"
+                + "                    \"@version\": \"1\",\n"
+                + "                    \"data_classification\": {\n"
+                + "                        \"FixedRadioListField\": \"PUBLIC\",\n"
+                + "                        \"TextAreaField\": \"PUBLIC\",\n"
+                + "                        \"ComplexField\": {\n"
+                + "                            \"classification\": \"PUBLIC\",\n"
+                + "                            \"value\": {\n"
+                + "                                \"ComplexTextField\": \"PUBLIC\",\n"
+                + "                                \"ComplexFixedListField\": \"PUBLIC\",\n"
+                + "                                \"ComplexNestedField\": {\n"
+                + "                                    \"classification\": \"PUBLIC\",\n"
+                + "                                    \"value\": {\n"
+                + "                                        \"NestedNumberField\": \"PUBLIC\",\n"
+                + "                                        \"NestedCollectionTextField\": {\n"
+                + "                                            \"classification\": \"PUBLIC\",\n"
+                + "                                            \"value\": [\n"
+                + "                                                \n"
+                + "                                            ]\n"
+                + "                                        }\n"
+                + "                                    }\n"
+                + "                                }\n"
+                + "                            }\n"
+                + "                        },\n"
+                + "                        \"EmailField\": \"PUBLIC\",\n"
+                + "                        \"TextField\": \"PUBLIC\",\n"
+                + "                        \"AddressUKField\": {\n"
+                + "                            \"classification\": \"PUBLIC\",\n"
+                + "                            \"value\": {\n"
+                + "                                \"Country\": \"PUBLIC\",\n"
+                + "                                \"AddressLine3\": \"PUBLIC\",\n"
+                + "                                \"County\": \"PUBLIC\",\n"
+                + "                                \"AddressLine1\": \"PUBLIC\",\n"
+                + "                                \"PostCode\": \"PUBLIC\",\n"
+                + "                                \"AddressLine2\": \"PUBLIC\",\n"
+                + "                                \"PostTown\": \"PUBLIC\"\n"
+                + "                            }\n"
+                + "                        },\n"
+                + "                        \"CollectionField\": {\n"
+                + "                            \"classification\": \"PUBLIC\",\n"
+                + "                            \"value\": [\n"
+                + "                                \n"
+                + "                            ]\n"
+                + "                        },\n"
+                + "                        \"MoneyGBPField\": \"PUBLIC\",\n"
+                + "                        \"DateField\": \"PUBLIC\",\n"
+                + "                        \"MultiSelectListField\": \"PUBLIC\",\n"
+                + "                        \"PhoneUKField\": \"PUBLIC\",\n"
+                + "                        \"YesOrNoField\": \"PUBLIC\",\n"
+                + "                        \"NumberField\": \"PUBLIC\",\n"
+                + "                        \"DateTimeField\": \"PUBLIC\",\n"
+                + "                        \"FixedListField\": \"PUBLIC\"\n"
+                + "                    },\n"
+                + "                    \"security_classification\": \"PUBLIC\",\n"
+                + "                    \"state\": \"TODO\",\n"
+                + "                    \"reference\": 1593528446017551\n"
+                + "                }\n"
+                + "            },\n"
+                + "            {\n"
+                + "                \"_index\": \"aat_cases-000001\",\n"
+                + "                \"_type\": \"_doc\",\n"
+                + "                \"_id\": \"357\",\n"
+                + "                \"_score\": 0.18232156,\n"
+                + "                \"_source\": {\n"
+                + "                    \"jurisdiction\": \"AUTOTEST1\",\n"
+                + "                    \"case_type_id\": \"AAT\",\n"
+                + "                    \"data\": {\n"
+                + "                        \"FixedRadioListField\": null,\n"
+                + "                        \"TextAreaField\": null,\n"
+                + "                        \"ComplexField\": {\n"
+                + "                            \"ComplexTextField\": null,\n"
+                + "                            \"ComplexFixedListField\": null,\n"
+                + "                            \"ComplexNestedField\": {\n"
+                + "                                \"NestedNumberField\": null,\n"
+                + "                                \"NestedCollectionTextField\": [\n"
+                + "                                    \n"
+                + "                                ]\n"
+                + "                            }\n"
+                + "                        },\n"
+                + "                        \"EmailField\": \"email1@gmail.com\",\n"
+                + "                        \"TextField\": \"Text Field 1\",\n"
+                + "                        \"AddressUKField\": {\n"
+                + "                            \"Country\": null,\n"
+                + "                            \"AddressLine3\": null,\n"
+                + "                            \"County\": null,\n"
+                + "                            \"AddressLine1\": null,\n"
+                + "                            \"PostCode\": null,\n"
+                + "                            \"AddressLine2\": null,\n"
+                + "                            \"PostTown\": null\n"
+                + "                        },\n"
+                + "                        \"CollectionField\": [\n"
+                + "                            \n"
+                + "                        ],\n"
+                + "                        \"MoneyGBPField\": null,\n"
+                + "                        \"DateField\": null,\n"
+                + "                        \"MultiSelectListField\": [\n"
+                + "                            \n"
+                + "                        ],\n"
+                + "                        \"PhoneUKField\": null,\n"
+                + "                        \"YesOrNoField\": null,\n"
+                + "                        \"NumberField\": null,\n"
+                + "                        \"DateTimeField\": null,\n"
+                + "                        \"FixedListField\": null\n"
+                + "                    },\n"
+                + "                    \"created_date\": \"2020-07-07T15:12:53.258Z\",\n"
+                + "                    \"id\": 357,\n"
+                + "                    \"last_modified\": \"2020-07-07T15:14:04.635Z\",\n"
+                + "                    \"@timestamp\": \"2020-07-16T22:58:33.435Z\",\n"
+                + "                    \"index_id\": \"aat_cases\",\n"
+                + "                    \"@version\": \"1\",\n"
+                + "                    \"data_classification\": {\n"
+                + "                        \"FixedRadioListField\": \"PUBLIC\",\n"
+                + "                        \"TextAreaField\": \"PUBLIC\",\n"
+                + "                        \"ComplexField\": {\n"
+                + "                            \"classification\": \"PUBLIC\",\n"
+                + "                            \"value\": {\n"
+                + "                                \"ComplexTextField\": \"PUBLIC\",\n"
+                + "                                \"ComplexFixedListField\": \"PUBLIC\",\n"
+                + "                                \"ComplexNestedField\": {\n"
+                + "                                    \"classification\": \"PUBLIC\",\n"
+                + "                                    \"value\": {\n"
+                + "                                        \"NestedNumberField\": \"PUBLIC\",\n"
+                + "                                        \"NestedCollectionTextField\": {\n"
+                + "                                            \"classification\": \"PUBLIC\",\n"
+                + "                                            \"value\": [\n"
+                + "                                                \n"
+                + "                                            ]\n"
+                + "                                        }\n"
+                + "                                    }\n"
+                + "                                }\n"
+                + "                            }\n"
+                + "                        },\n"
+                + "                        \"EmailField\": \"PUBLIC\",\n"
+                + "                        \"TextField\": \"PUBLIC\",\n"
+                + "                        \"AddressUKField\": {\n"
+                + "                            \"classification\": \"PUBLIC\",\n"
+                + "                            \"value\": {\n"
+                + "                                \"Country\": \"PUBLIC\",\n"
+                + "                                \"AddressLine3\": \"PUBLIC\",\n"
+                + "                                \"County\": \"PUBLIC\",\n"
+                + "                                \"AddressLine1\": \"PUBLIC\",\n"
+                + "                                \"PostCode\": \"PUBLIC\",\n"
+                + "                                \"AddressLine2\": \"PUBLIC\",\n"
+                + "                                \"PostTown\": \"PUBLIC\"\n"
+                + "                            }\n"
+                + "                        },\n"
+                + "                        \"CollectionField\": {\n"
+                + "                            \"classification\": \"PUBLIC\",\n"
+                + "                            \"value\": [\n"
+                + "                                \n"
+                + "                            ]\n"
+                + "                        },\n"
+                + "                        \"MoneyGBPField\": \"PUBLIC\",\n"
+                + "                        \"DateField\": \"PUBLIC\",\n"
+                + "                        \"MultiSelectListField\": \"PUBLIC\",\n"
+                + "                        \"PhoneUKField\": \"PUBLIC\",\n"
+                + "                        \"YesOrNoField\": \"PUBLIC\",\n"
+                + "                        \"NumberField\": \"PUBLIC\",\n"
+                + "                        \"DateTimeField\": \"PUBLIC\",\n"
+                + "                        \"FixedListField\": \"PUBLIC\"\n"
+                + "                    },\n"
+                + "                    \"security_classification\": \"PUBLIC\",\n"
+                + "                    \"state\": \"TODO\",\n"
+                + "                    \"reference\": 1594134773278525\n"
+                + "                }\n"
+                + "            }\n"
+                + "        ]\n"
+                + "    }\n"
+                + "}";
         JsonObject convertedObject = new Gson().fromJson(json, JsonObject.class);
         SearchResult searchResult;
         Gson gson = new Gson();
