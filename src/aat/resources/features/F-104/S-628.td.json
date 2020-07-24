@@ -114,6 +114,12 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -156,6 +162,12 @@
                     "delete" : false
                   }, {
                     "role" : "caseworker-autotest1-solicitor",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -206,6 +218,12 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -252,7 +270,13 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
-                  } ],
+                  },{
+                      "role" : "[DEFENDANT]",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
@@ -294,6 +318,12 @@
                     "delete" : false
                   }, {
                     "role" : "caseworker-autotest1-solicitor",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -344,6 +374,12 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -386,6 +422,12 @@
                     "delete" : false
                   }, {
                     "role" : "caseworker-autotest1-solicitor",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -453,6 +495,12 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -507,6 +555,12 @@
                     "delete" : false
                   }, {
                     "role" : "caseworker-autotest1-solicitor",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -572,6 +626,12 @@
                         "read" : true,
                         "update" : true,
                         "delete" : false
+                      },{
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       } ],
                       "complexACLs" : [ ],
                       "display_context" : null,
@@ -627,6 +687,12 @@
                         "read" : true,
                         "update" : true,
                         "delete" : false
+                      },{
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       } ],
                       "complexACLs" : [ ],
                       "display_context" : null,
@@ -654,6 +720,12 @@
                     "delete" : false
                   }, {
                     "role" : "caseworker-autotest1-solicitor",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
                     "create" : true,
                     "read" : true,
                     "update" : true,
