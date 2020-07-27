@@ -213,7 +213,13 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
 									]
 								},
 								{
