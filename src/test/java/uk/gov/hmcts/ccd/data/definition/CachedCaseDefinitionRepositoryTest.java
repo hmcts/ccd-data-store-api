@@ -1,5 +1,16 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import com.google.common.collect.Lists;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,17 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UserRoleBuilder.aUserRole;
-
-import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 class CachedCaseDefinitionRepositoryTest {
 
@@ -121,6 +121,43 @@ class CachedCaseDefinitionRepositoryTest {
             assertAll(
                 () -> assertThat(baseTypes, is(expectedBaseTypes)),
                 () -> verifyNoMoreInteractions(caseDefinitionRepository)
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("getAllCaseTypesIDs()")
+    class GetAllCaseTypesIDs {
+
+        @Test
+        @DisplayName("should retrieve all Case types IDs from decorated repository")
+        void shouldRetrieveAllCaseTypesIDs() {
+            final List<String> expectedBaseTypes = newArrayList("caseTypeId1", "caseTypeId2");
+            doReturn(expectedBaseTypes).when(caseDefinitionRepository).getAllCaseTypesIDs();
+
+            final List<String> caseTypesIDs = cachedCaseDefinitionRepository.getAllCaseTypesIDs();
+
+            assertAll(
+                () -> assertThat(caseTypesIDs, is(expectedBaseTypes))
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("getCaseTypesIDsByJurisdictions()")
+    class GetCaseTypesIDsByJurisdictions {
+
+        @Test
+        @DisplayName("should retrieve all Case types IDs by Jurisdictions.")
+        void shouldRetrieveCaseTypesIDsByJurisdictions() {
+            final List<String> expectedBaseTypes = newArrayList("caseTypeId1", "caseTypeId2");
+            final List<String> jurisdictions = newArrayList("jurisdiction1", "jurisdiction2");
+            doReturn(expectedBaseTypes).when(caseDefinitionRepository).getCaseTypesIDsByJurisdictions(jurisdictions);
+
+            final List<String> caseTypesIDs = cachedCaseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
+
+            assertAll(
+                () -> assertThat(caseTypesIDs, is(expectedBaseTypes))
             );
         }
     }
