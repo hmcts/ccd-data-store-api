@@ -262,6 +262,8 @@ Feature: Elasticsearch external endpoint
     Then the response [contains the previously created case],
     And the response has all other details as expected.
 
+
+
   @S-925
   Scenario: should return the case for a solicitor role if granted access to the case
     Given a case that has just been created as in [S-925_Create_Case_Private_Autotest1],
@@ -297,5 +299,3 @@ Feature: Elasticsearch external endpoint
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then the response [contains no results],
     And the response has all other details as expected.
-
-

@@ -23,7 +23,7 @@
       ],
       "query": {
         "match": {
-          "alias.NumberFieldAlias": 4
+          "alias.NumberFieldAlias": 914
         }
       }
     }
@@ -44,7 +44,7 @@
         "last_state_modified_date": "[[ANYTHING_PRESENT]]",
         "security_classification": "PRIVATE",
         "case_data": {
-          "NumberFieldAlias": "4",
+          "NumberFieldAlias": "914",
           "EmailFieldAlias": "fuctional@test.com"
         },
         "data_classification": "[[ANYTHING_PRESENT]]",
@@ -65,7 +65,7 @@
         "last_state_modified_date": "[[ANYTHING_PRESENT]]",
         "security_classification": "PRIVATE",
         "case_data": {
-          "NumberFieldAlias": "4",
+          "NumberFieldAlias": "914",
           "EmailFieldAlias": "fuctional@test.com"
         },
         "data_classification": "[[ANYTHING_PRESENT]]",
