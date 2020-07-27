@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-105.8842.1.Verify_Counter_1",
+  "_guid_": "S-105.8842.1_Verify_Counter_1",
   "_extends_": "F-105_Check_Orgs_Assigned_Users_Base",
 
   "specs": [
