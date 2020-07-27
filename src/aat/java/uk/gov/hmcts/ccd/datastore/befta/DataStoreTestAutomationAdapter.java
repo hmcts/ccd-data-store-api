@@ -17,11 +17,10 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
-    private String uniqueUUID;
-
     @Before
     public void createUID() {
-        uniqueUUID = "string-" + UUID.randomUUID().toString();
+        String uniqueID = UUID.randomUUID().toString();
+        ScenarioData.setUniqueString("string-" + uniqueID);
     }
 
     @Before("@elasticsearch")
@@ -59,7 +58,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
         } else if (key.toString().equals("UniqueString")) {
-            return uniqueUUID;
+            return ScenarioData.getUniqueString();
         }
         return super.calculateCustomValue(scenarioContext, key);
     }
