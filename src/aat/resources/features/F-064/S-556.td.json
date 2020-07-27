@@ -19,7 +19,7 @@
     },
     "body" : {
       "exception" : "[[ANYTHING_PRESENT]]",
-      "message" : "Resource not found when getting case type version for 'eyJhbGciOiJIUzI1NiJ9'.",
+      "message" : "Error when getting case type version. Unknown case type 'eyJhbGciOiJIUzI1NiJ9'.",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

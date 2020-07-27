@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.ToString;
 
 @ApiModel(description = "")
@@ -81,4 +83,7 @@ public class JurisdictionDefinition implements Serializable {
         this.caseTypeDefinitions = caseTypeDefinitions;
     }
 
+    public List<String> getCaseTypesIDs() {
+        return this.getCaseTypeDefinitions().stream().map(CaseTypeDefinition::getId).collect(Collectors.toList());
+    }
 }
