@@ -1,14 +1,10 @@
 {
-  "_guid_": "F-105.8842.3_Verify_Case_Roles_for_Case_C1",
+  "_guid_": "S-105.8842.3_Verify_Case_Roles_for_Case_C1",
   "_extends_": "F-105_Get_Case_Roles_for_Case_C1_Base",
 
   "specs": [
     "to verify Olawale's reception of the role CR-1 over the case C1"
   ],
-
-  "users": {
-    "_extends_": "F-105_Users"
-  },
 
   "expectedResponse": {
     "body": {
@@ -18,7 +14,7 @@
           "__elementId__": "case_id,user_id,case_role"
         },{
           "case_id": "${}${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
-          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "user_id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}",
           "case_role": "[CR-1]"
         }
       ]
