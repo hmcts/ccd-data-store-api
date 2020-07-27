@@ -8,7 +8,7 @@
     "contains Last State Modified Date metadata field"
   ],
   "users": {
-    "caseworker3": {
+    "invokingUser": {
       "username": "befta.caseworker.3@gmail.com",
       "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
     }
