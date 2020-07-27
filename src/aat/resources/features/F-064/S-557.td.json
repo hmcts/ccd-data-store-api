@@ -19,7 +19,7 @@
     },
     "body" : {
       "exception" : "[[ANYTHING_PRESENT]]",
-      "message" : "Resource not found when getting case type version for '!@@£ $%%^^  &&  # € because of 404'.",
+      "message" : "Error when getting case type version. Unknown case type '!@@£ $%%^^  &&  # € because of 404'.",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

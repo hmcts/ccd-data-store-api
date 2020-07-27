@@ -125,9 +125,9 @@ public class SearchQueryOperationTest {
 
         doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
         searchQueryOperation = new SearchQueryOperation(searchOperation,
-                                                        mergeDataToSearchResultOperation,
-                                                        getCaseTypeOperation,
-                                                        getDraftsOperation, searchResultDefinitionService, userRepository,
+            mergeDataToSearchResultOperation,
+            getCaseTypeOperation,
+            getDraftsOperation, searchResultDefinitionService, userRepository,
             dateTimeSearchInputProcessor);
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
@@ -140,10 +140,10 @@ public class SearchQueryOperationTest {
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
         drafts.add(newCaseDetails()
-                       .withId(DRAFT_ID)
-                       .withJurisdiction(JURISDICTION_ID)
-                       .withCaseTypeId(CASE_TYPE_ID)
-                       .build());
+            .withId(DRAFT_ID)
+            .withJurisdiction(JURISDICTION_ID)
+            .withCaseTypeId(CASE_TYPE_ID)
+            .build());
         cases.add(newCaseDetails().build());
     }
 
@@ -249,8 +249,8 @@ public class SearchQueryOperationTest {
     @DisplayName("should get workBasketResult and pass to mergeDataToSearchResultOperation")
     public void shouldGetWorkBasketResultAndMerge() {
         SearchResultDefinition searchResult = searchResult()
-             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
-             .build();
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
+            .build();
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
@@ -336,9 +336,9 @@ public class SearchQueryOperationTest {
     }
 
     private static SearchResultField buildSortResultField(String caseFieldId,
-                                                    String caseFieldPath,
-                                                    String role,
-                                                    String sortDirection, Integer sortPriority) {
+                                                          String caseFieldPath,
+                                                          String role,
+                                                          String sortDirection, Integer sortPriority) {
         SortOrder sortOrder = getSortOrder(sortDirection, sortPriority);
         SearchResultField searchResultField = buildSearchResultField(CASE_TYPE_ID, caseFieldId, caseFieldPath, caseFieldId, "", "");
         searchResultField.setSortOrder(sortOrder);
@@ -355,8 +355,8 @@ public class SearchQueryOperationTest {
 
     private Matcher<Iterable<? super CaseDetails>> hasDraftItemInResults() {
         return hasItem(allOf(hasProperty("id", is(DRAFT_ID)),
-                             hasProperty("jurisdiction", is(JURISDICTION_ID)),
-                             hasProperty("caseTypeId", is(CASE_TYPE_ID))));
+            hasProperty("jurisdiction", is(JURISDICTION_ID)),
+            hasProperty("caseTypeId", is(CASE_TYPE_ID))));
     }
 
 }

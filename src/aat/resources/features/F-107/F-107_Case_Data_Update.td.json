@@ -1,0 +1,54 @@
+{
+  "_guid_": "F-107_Test_Data_Update",
+  "productName": "CCD data store",
+  "operationName": "submit event for an existing case (V2)",
+  "method": "POST",
+  "uri": "/cases/{cid}/events",
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.caa@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "1234567890123456"
+    },
+    "body": {
+      "data": {
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID2",
+            "OrganisationName": "orgName2"
+          }
+        }
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJrNHZpNHZwMGhyNmk4MTNoZmZnYWpncmJrdiIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTYzMTQ5MiwiY2FzZS1pZCI6IjI0NTEiLCJldmVudC1pZCI6IlNUQVJUX1BST0dSRVNTIiwiY2FzZS10eXBlLWlkIjoiQUFUX0FVVEhfMTUiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjE1NDQ1NGIxYTJmNzczYTg0NjU5YmVjYzc3ZjYyODdjNDVlYTE4MzgiLCJlbnRpdHktdmVyc2lvbiI6MH0.gwKtIzJ-JGp-luGbTDXBBlbQ6iqbHY-dcAJaubhrBRM",
+      "ignore_warning": false
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response"
+  }
+}
