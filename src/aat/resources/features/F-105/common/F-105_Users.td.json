@@ -2,19 +2,17 @@
   "_guid_": "F-105_Users",
 
   "userRichard": {
-    "username": "befta.caseworker.2.solicitor.1@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+    "_extends_": "F-105_User_Richard"
   },
   "userDil": {
-    "username": "befta.caseworker.2.solicitor.2@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    "_extends_": "F-105_User_Dil"
   },
   "userOlawale": {
     "username": "befta.caseworker.2.solicitor.3@gmail.com",
     "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
   },
-  "userAdmin": {
-      "username": "befta.caseworker.caa@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_CAA_PWD]]"
+  "userHemanth": {
+    "username": "befta.caseworker.caa@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_CAA_PWD]]"
   }
 }
