@@ -53,7 +53,7 @@ public class CaseDataValidatorController {
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = CaseViewResource.class
+            response = CaseDataResource.class
         ),
         @ApiResponse(
             code = 404,
