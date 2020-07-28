@@ -5,7 +5,7 @@
     "body": {
       "event_token": "${[scenarioContext][parentContext][childContexts][S-919_Create_Case_Private_Autotest1_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
-        "FixedListField": "VALUE3"
+        "FixedListField": "VALUE4"
       }
     }
   }

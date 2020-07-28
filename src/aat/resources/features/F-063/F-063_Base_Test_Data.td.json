@@ -3,15 +3,14 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve search input details for dynamic display",
-
 	"method": "GET",
 	"uri": "/internal/case-types/{ctid}/search-inputs",
 
 	"users": {
-    "invokingUser": {
-      "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-    }
+		"invokingUser": {
+			"username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+		}
 	},
 
 	"request": {
@@ -24,9 +23,9 @@
 		}
 	},
 
-  "expectedResponse": {
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"expectedResponse": {
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		}
+	}
 }
