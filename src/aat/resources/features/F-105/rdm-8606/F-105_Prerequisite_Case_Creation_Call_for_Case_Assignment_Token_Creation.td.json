@@ -7,10 +7,6 @@
   ],
 
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "Authorization": "Bearer ${[scenarioContext][parentContext][parentContext][testData][users][userRichard][accessToken]}"
-    },
     "pathVariables": {
       "uid": "${[scenarioContext][parentContext][parentContext][testData][users][userRichard][id]}"
     }

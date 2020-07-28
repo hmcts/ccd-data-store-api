@@ -7,14 +7,12 @@
   ],
 
   "users": {
-    "invokingUser": null
+    "invokingUser": {
+      "_extends_": "F-105_User_Richard"
+    }
   },
 
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "Authorization": "Bearer ${[scenarioContext][parentContext][testData][users][userRichard][accessToken]}"
-    },
     "body": {
       "event_token": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1_Token_Creation][testData][actualResponse][body][token]}"
     }

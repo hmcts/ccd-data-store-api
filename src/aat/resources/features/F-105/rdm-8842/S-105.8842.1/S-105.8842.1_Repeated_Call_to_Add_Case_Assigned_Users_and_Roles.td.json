@@ -7,12 +7,12 @@
   ],
 
   "users": {
+    "invokingUser": {
+      "_extends_": "F-105_User_Dil"
+    }
   },
 
   "request": {
-    "headers": {
-      "Authorization": "Bearer ${[scenarioContext][parentContext][testData][users][userDil][accessToken]}"
-    },
     "body": {
       "case_users": [
         {
