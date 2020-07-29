@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -120,7 +119,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         verify(auditRepository).save(captor.capture());
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.SEARCH_CASE.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is("1535450291607660,1535450291607670"));
+        assertThat(captor.getValue().getCaseId(), is("1593528446017551,1594134773278525"));
         assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
@@ -145,7 +144,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
                 + "        \"max_score\": 0.18232156,\n"
                 + "        \"hits\": [\n"
                 + "            {\n"
-                + "                \"_index\": \"aat_cases-000001\",\n"
+                + "                \"_index\": \"TestAddressBookCase_cases-000001\",\n"
                 + "                \"_type\": \"_doc\",\n"
                 + "                \"_id\": \"355\",\n"
                 + "                \"_score\": 0.18232156,\n"
@@ -253,7 +252,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
                 + "                }\n"
                 + "            },\n"
                 + "            {\n"
-                + "                \"_index\": \"aat_cases-000001\",\n"
+                + "                \"_index\": \"TestAddressBookCase_cases-000001\",\n"
                 + "                \"_type\": \"_doc\",\n"
                 + "                \"_id\": \"357\",\n"
                 + "                \"_score\": 0.18232156,\n"
@@ -374,7 +373,6 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
         when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-        when(searchResult.getJsonObject()).thenReturn(convertedObject);
         Whitebox.setInternalState(response, "searchResult", searchResult);
 
         given(jestClient.execute(any())).willReturn(multiSearchResult);

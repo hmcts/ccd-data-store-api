@@ -108,7 +108,7 @@ class ElasticsearchCaseSearchOperationTest {
             + "        \"max_score\": 0.18232156,\n"
             + "        \"hits\": [\n"
             + "            {\n"
-            + "                \"_index\": \"aat_cases-000001\",\n"
+            + "                \"_index\": \"casetypeid1_cases-000001\",\n"
             + "                \"_type\": \"_doc\",\n"
             + "                \"_id\": \"355\",\n"
             + "                \"_score\": 0.18232156,\n"
@@ -216,7 +216,7 @@ class ElasticsearchCaseSearchOperationTest {
             + "                }\n"
             + "            },\n"
             + "            {\n"
-            + "                \"_index\": \"aat_cases-000001\",\n"
+            + "                \"_index\": \"casetypeid1_cases-000001\",\n"
             + "                \"_type\": \"_doc\",\n"
             + "                \"_id\": \"357\",\n"
             + "                \"_score\": 0.18232156,\n"
@@ -358,7 +358,6 @@ class ElasticsearchCaseSearchOperationTest {
 
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            when(searchResult.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response, "searchResult", searchResult);
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
@@ -367,19 +366,20 @@ class ElasticsearchCaseSearchOperationTest {
 
             CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
-                .withSearchRequest(elasticsearchRequest)
-                .build();
+                    .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
+                    .withSearchRequest(elasticsearchRequest)
+                    .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
             assertAll(
-                () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
-                () -> assertThat(caseSearchResult.getTotal(), equalTo(2L)),
-                () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams).getCasesIndexType(),
-                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                    () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
+                    () -> assertThat(caseSearchResult.getTotal(), equalTo(2L)),
+                    () -> verify(jestClient).execute(any(MultiSearch.class)),
+                    () -> verify(applicationParams).getCasesIndexNameFormat(),
+                    () -> verify(applicationParams).getCasesIndexType(),
+                    () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
 
         @Test
@@ -484,17 +484,21 @@ class ElasticsearchCaseSearchOperationTest {
                 + "   }\n"
                 + "}";
 
-            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
             JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
+            SearchResult searchResult;
+            Gson gson = new Gson();
+            searchResult = new SearchResult(gson);
+            searchResult.setSucceeded(true);
+            searchResult.setJsonObject(convertedObject);
+            searchResult.setJsonString(convertedObject.toString());
+            searchResult.setPathToResult("hits/hits/_source");
+
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
 
             MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
             when(multiSearchResult.isSucceeded()).thenReturn(true);
-            SearchResult searchResult = mock(SearchResult.class);
-            when(searchResult.getTotal()).thenReturn(1L);
-            when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            when(searchResult.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response, "searchResult", searchResult);
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
@@ -535,18 +539,11 @@ class ElasticsearchCaseSearchOperationTest {
             searchResult.setJsonString(convertedObject.toString());
             searchResult.setPathToResult("hits/hits/_source");
 
+
             MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
             Whitebox.setInternalState(response1, "searchResult", searchResult);
-
-            SearchResult searchResult2;
-            searchResult2 = new SearchResult(gson);
-            searchResult2.setSucceeded(true);
-            searchResult2.setJsonObject(convertedObject);
-            searchResult2.setJsonString(convertedObject.toString());
-            searchResult2.setPathToResult("hits/hits/_source");
-
             MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
-            Whitebox.setInternalState(response2, "searchResult", searchResult2);
+            Whitebox.setInternalState(response2, "searchResult", searchResult);
             when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
@@ -584,18 +581,26 @@ class ElasticsearchCaseSearchOperationTest {
 
             when(multiSearchResult.isSucceeded()).thenReturn(true);
 
-            SearchResult searchResult1 = mock(SearchResult.class);
-            when(searchResult1.getTotal()).thenReturn(10L);
-            when(searchResult1.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElasticComplex));
-            MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
-            when(searchResult1.getJsonObject()).thenReturn(convertedObject);
-            Whitebox.setInternalState(response1, "searchResult", searchResult1);
+            JsonObject convertedObject = new Gson().fromJson(json, JsonObject.class);
+            SearchResult searchResult;
+            Gson gson = new Gson();
+            searchResult = new SearchResult(gson);
+            searchResult.setSucceeded(true);
+            searchResult.setJsonObject(convertedObject);
+            searchResult.setJsonString(convertedObject.toString());
+            searchResult.setPathToResult("hits/hits/_source");
 
-            SearchResult searchResult2 = mock(SearchResult.class);
-            when(searchResult2.getTotal()).thenReturn(10L);
-            when(searchResult2.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElasticComplex));
+            MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
+            Whitebox.setInternalState(response1, "searchResult", searchResult);
+
+            SearchResult searchResult2;
+            searchResult2 = new SearchResult(gson);
+            searchResult2.setSucceeded(true);
+            searchResult2.setJsonObject(convertedObject);
+            searchResult2.setJsonString(convertedObject.toString());
+            searchResult2.setPathToResult("hits/hits/_source");
+
             MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
-            when(searchResult2.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response2, "searchResult", searchResult2);
             when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
 
@@ -614,12 +619,12 @@ class ElasticsearchCaseSearchOperationTest {
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
             assertAll(
-                () -> assertThat(caseSearchResult.getCases().size(), equalTo(0)),
-                () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
-                () -> assertThat(caseSearchResult.getCaseTypesResults().size(), equalTo(2)),
-                () -> verify(jestClient).execute(any(MultiSearch.class)),
-                () -> verify(applicationParams, times(2)).getCasesIndexType(),
-                () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                    () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
+                    () -> assertThat(caseSearchResult.getTotal(), equalTo(4L)),
+                    () -> verify(jestClient).execute(any(MultiSearch.class)),
+                    () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
+                    () -> verify(applicationParams, times(2)).getCasesIndexType(),
+                    () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
 
     }
