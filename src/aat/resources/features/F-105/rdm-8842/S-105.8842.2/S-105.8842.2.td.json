@@ -25,7 +25,7 @@
           "case_id": "${[scenarioContext][childContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
           "case_role": "[CR-2]",
-          "organisation_id": "orgA"
+          "organisation_id": "${[scenarioContext][childContexts][F-105_Prerequisite_Counter_Check_Call][childContexts][F-105_Get_Organisation_Identifier_Olawale][testData][actualResponse][body][organisationIdentifier]}"
         }
       ]
     }

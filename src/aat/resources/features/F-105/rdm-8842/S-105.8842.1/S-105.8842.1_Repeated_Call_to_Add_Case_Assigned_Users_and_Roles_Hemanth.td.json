@@ -12,6 +12,10 @@
     }
   },
 
+  "prerequisites": [
+    "F-105_Get_Organisation_Identifier_Hemanth"
+  ],
+
   "request": {
     "body": {
       "case_users": [
@@ -19,13 +23,13 @@
           "case_id": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][parentContext][testData][users][userHemanth][id]}",
           "case_role": "[CR-1]",
-          "organisation_id": "orgA"
+          "organisation_id": "${[scenarioContext][childContexts][F-105_Get_Organisation_Identifier_Hemanth][testData][actualResponse][body][organisationIdentifier]}"
         },
         {
           "case_id": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][parentContext][testData][users][userHemanth][id]}",
           "case_role": "[CR-2]",
-          "organisation_id": "orgA"
+          "organisation_id": "${[scenarioContext][childContexts][F-105_Get_Organisation_Identifier_Hemanth][testData][actualResponse][body][organisationIdentifier]}"
         }
       ]
     }
