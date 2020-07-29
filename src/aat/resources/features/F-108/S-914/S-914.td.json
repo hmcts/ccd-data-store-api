@@ -75,6 +75,10 @@
         "delete_draft_response_status_code": null,
         "delete_draft_response_status": null,
         "security_classifications": "[[ANYTHING_PRESENT]]"
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE"
       }]
     }
   }
