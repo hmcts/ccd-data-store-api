@@ -259,6 +259,7 @@ dependencies {
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
+    //RDM-8901 to bump version to ES7 ASAP
     compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.2') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }

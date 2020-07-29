@@ -7,7 +7,8 @@
     </suppress>
 
     <!-- THIS CVEs should not be removed until the elastic search client is updated to 7.
-    Before updating the elastic client make sure that the server has been updated to 7 -->
+    Before updating the elastic client make sure that the server has been updated to 7
+    RDM-8901 to bump version to ES7 ASAP -->
 
     <suppress>
         <notes><![CDATA[

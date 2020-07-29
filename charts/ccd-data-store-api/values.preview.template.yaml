@@ -29,6 +29,7 @@ java:
 elastic:
   enabled: false # enable whenever required on a particular PR
 
+#RDM-8901 to bump version to ES7 ASAP
 elasticsearch:
   clusterName: "es"
   imageTag: "6.4.2"
