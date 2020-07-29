@@ -7,7 +7,6 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,7 +117,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             if (response.searchResult != null) {
                 buildCaseTypesResults(response, caseTypeResults, crossCaseTypeSearchRequest);
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
-                totalHits += response.searchResult.getTotal();
+                totalHits += new JestSearchResult(response.searchResult).getTotal();
             }
         }
 
@@ -168,7 +167,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
+    private List<CaseDetails> searchResultToCaseList(io.searchbox.core.SearchResult searchResult) {
         List<String> casesAsString = searchResult.getSourceAsStringList();
         List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
         return caseDetailsMapper.dtosToCaseDetailsList(dtos);
