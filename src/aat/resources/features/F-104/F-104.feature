@@ -1,4 +1,4 @@
-@F-104 @elasticsearch
+@F-104 @elasticsearch @Ignore # Fix for LAST_STATE_MODIFIED_DATE coming in 19.1
 Feature: F-104: External Search API
 
   Background: Load test data for the scenario
