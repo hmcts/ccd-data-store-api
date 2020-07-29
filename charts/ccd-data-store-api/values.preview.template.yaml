@@ -31,7 +31,7 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
-  imageTag: "7.7.0"
+  imageTag: "6.4.2"  #RDM-8901 to bump version to ES7 ASAP
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
