@@ -1,17 +1,17 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
-import static java.util.Optional.ofNullable;
-
-import org.aspectj.lang.annotation.Before;
+import io.cucumber.java.Before;
 import org.junit.AssumptionViolatedException;
-
-import java.util.UUID;
-
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
+import uk.gov.hmcts.befta.util.ReflectionUtils;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
+
+import java.util.UUID;
+
+import static java.util.Optional.ofNullable;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
