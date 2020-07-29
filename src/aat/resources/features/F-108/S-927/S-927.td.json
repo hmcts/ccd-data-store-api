@@ -27,7 +27,8 @@
   "expectedResponse": {
     "body": {
       "total": 0,
-      "cases": []
+      "cases": [],
+      "case_types_results" : []
     }
   }
 }
