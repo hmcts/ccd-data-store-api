@@ -484,6 +484,7 @@ class ElasticsearchCaseSearchOperationTest {
                 + "   }\n"
                 + "}";
 
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
             JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
             SearchResult searchResult;
             Gson gson = new Gson();
