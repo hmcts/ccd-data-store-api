@@ -103,7 +103,7 @@ ext {
     junitVintageVersion = '5.5.2'
     powermockVersion = '2.0.0-beta.5'
     reformLogging = '5.1.0'
-    swagger2Version = '3.0.0-SNAPSHOT'
+    swagger2Version = '2.10.0'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -265,7 +265,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '4.0.1'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.0.0'
 
 }
 // end::dependencies[]
@@ -280,7 +280,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:24.1.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.36') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.37') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -762,7 +762,7 @@ task functional(type: Test) {
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '(not @Ignore) and (not @elasticsearch)', '--glue', "uk.gov.hmcts.ccd.datastore.befta",
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue', "uk.gov.hmcts.ccd.datastore.befta",
                     '--glue','uk.gov.hmcts.befta.player', 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }

@@ -121,6 +121,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -172,6 +179,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -223,6 +237,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -274,6 +295,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -325,6 +353,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -376,6 +411,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -427,6 +469,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -496,6 +545,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -518,7 +574,11 @@
                       "min": null,
                       "max": null,
                       "regular_expression": null,
-                      "fixed_list_items": [
+                      "fixed_list_items": [{
+                        "code" : "VALUE4",
+                        "label" : "Value 4",
+                        "order" : null
+                      },
                         {
                           "code": "VALUE3",
                           "label": "Value 3",
@@ -563,6 +623,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -630,6 +697,13 @@
                               "read": true,
                               "update": true,
                               "delete": false
+                            },
+                            {
+                              "role" : "[DEFENDANT]",
+                              "create" : true,
+                              "read" : true,
+                              "update" : true,
+                              "delete" : false
                             }
                           ],
                           "complexACLs": [],
@@ -690,6 +764,13 @@
                               "read": true,
                               "update": true,
                               "delete": false
+                            },
+                            {
+                              "role" : "[DEFENDANT]",
+                              "create" : true,
+                              "read" : true,
+                              "update" : true,
+                              "delete" : false
                             }
                           ],
                           "complexACLs": [],
@@ -726,6 +807,13 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
@@ -819,7 +907,11 @@
                 "min": null,
                 "max": null,
                 "regular_expression": null,
-                "fixed_list_items": [
+                "fixed_list_items": [{
+                  "code" : "VALUE4",
+                  "label" : "Value 4",
+                  "order" : null
+                },
                   {
                     "code": "VALUE3",
                     "label": "Value 3",

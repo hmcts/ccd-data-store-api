@@ -77,6 +77,8 @@ env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
+env.ELASTIC_SEARCH_HOSTS = "http://es-ccd-data-store-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+env.ELASTIC_SEARCH_ENABLED = "false"
 
 withPipeline(type, product, component) {
     onMaster {
@@ -109,6 +111,10 @@ withPipeline(type, product, component) {
     }
 
     after('functionalTest:aat') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
+    }
+
+    after('smokeTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
     }
 }

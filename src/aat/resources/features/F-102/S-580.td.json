@@ -65,8 +65,14 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
-									]
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
+                  ]
 								},
 								{
 									"id": "UPDATE",
@@ -96,8 +102,14 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
-									]
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
+                  ]
 								},
 								{
 									"id": "COMPLETE",
@@ -127,8 +139,14 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
-									]
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
+                  ]
 								},
 								{
 									"id": "STOP_PROGRESS",
@@ -158,8 +176,14 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
-									]
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
+                  ]
 								},
 								{
 									"id": "START_PROGRESS",
@@ -189,7 +213,13 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
 									]
 								},
 								{
@@ -218,8 +248,14 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
-									]
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
+                  ]
 								}
 							],
 							"states": [
@@ -236,8 +272,14 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
-									]
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
+                  ]
 								},
 								{
 									"id": "IN_PROGRESS",
@@ -252,8 +294,14 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
-									]
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
+                  ]
 								},
 								{
 									"id": "DONE",
@@ -268,8 +316,14 @@
 											"read": true,
 											"update": true,
 											"delete": false
-										}
-									]
+										}, {
+                      "role" : "caseworker-caa",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }
+                  ]
 								}
 							],
 							"searchAliasFields": [],
@@ -283,8 +337,14 @@
 									"read": true,
 									"update": true,
 									"delete": false
-								}
-							]
+								}, {
+                  "role" : "caseworker-caa",
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : false
+                }
+              ]
 						},
 						{
 							"id": "CASE_TYPE_WITH_NO_CASES",

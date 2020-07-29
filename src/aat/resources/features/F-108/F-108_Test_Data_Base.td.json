@@ -2,7 +2,7 @@
   "_guid_": "F-108_Test_Data_Base",
   "title": "External Elastic Search Endpoint",
   "productName": "CCD Data Store Elastic Search API",
-  "operationName": "internal search query",
+  "operationName": "external search query",
   "method": "POST",
   "uri": "/searchCases",
   "user" : {
