@@ -53,16 +53,16 @@ class ElasticsearchCaseSearchOperationTest {
     private static final String INDEX_TYPE = "case";
     private final String caseDetailsElastic = "{some case details}";
     private final String caseDetailsElasticComplex = "{\n"
-        + "   \"hits\":{\n"
-        + "      \"total\":4,\n"
-        + "      \"max_score\":null,\n"
-        + "      \"hits\":[\n"
-        + "         {\n"
-        + "            \"_index\":\"casetypeid1_cases-000001\"\n"
-        + "         }\n"
-        + "      ]\n"
-        + "   }\n"
-        + "}";
+            + "   \"hits\":{\n"
+            + "      \"total\":4,\n"
+            + "      \"max_score\":null,\n"
+            + "      \"hits\":[\n"
+            + "         {\n"
+            + "            \"_index\":\"casetypeid1_cases-000001\"\n"
+            + "         }\n"
+            + "      ]\n"
+            + "   }\n"
+            + "}";
 
     final JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
 
@@ -366,20 +366,19 @@ class ElasticsearchCaseSearchOperationTest {
 
             CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
-                    .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
-                    .withSearchRequest(elasticsearchRequest)
-                    .build();
+                .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
+                .withSearchRequest(elasticsearchRequest)
+                .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
             assertAll(
-                    () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
-                    () -> assertThat(caseSearchResult.getTotal(), equalTo(2L)),
-                    () -> verify(jestClient).execute(any(MultiSearch.class)),
-                    () -> verify(applicationParams).getCasesIndexNameFormat(),
-                    () -> verify(applicationParams).getCasesIndexType(),
-                    () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
+                () -> assertThat(caseSearchResult.getTotal(), equalTo(2L)),
+                () -> verify(jestClient).execute(any(MultiSearch.class)),
+                () -> verify(applicationParams).getCasesIndexType(),
+                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
 
         @Test
@@ -473,16 +472,16 @@ class ElasticsearchCaseSearchOperationTest {
         @DisplayName("test complex ES index case type id capturing group scenario")
         void testComplexESIndexCapturingGroupScenario() throws IOException {
             String caseDetailsElasticComplex = "{\n"
-                + "   \"hits\":{\n"
-                + "      \"total\":4,\n"
-                + "      \"max_score\":null,\n"
-                + "      \"hits\":[\n"
-                + "         {\n"
-                + "            \"_index\":\"casetypeid1_cases_cases-000001\"\n"
-                + "         }\n"
-                + "      ]\n"
-                + "   }\n"
-                + "}";
+                    + "   \"hits\":{\n"
+                    + "      \"total\":4,\n"
+                    + "      \"max_score\":null,\n"
+                    + "      \"hits\":[\n"
+                    + "         {\n"
+                    + "            \"_index\":\"casetypeid1_cases_cases-000001\"\n"
+                    + "         }\n"
+                    + "      ]\n"
+                    + "   }\n"
+                    + "}";
 
             JsonObject convertedObject = new Gson().fromJson(caseDetailsElasticComplex, JsonObject.class);
             SearchResult searchResult;
@@ -561,8 +560,8 @@ class ElasticsearchCaseSearchOperationTest {
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
             assertAll(
-                () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
-                () -> assertThat(caseSearchResult.getTotal(), equalTo(4L)),
+                () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails, caseDetails))),
+                () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
@@ -619,12 +618,13 @@ class ElasticsearchCaseSearchOperationTest {
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
             assertAll(
-                    () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList())),
-                    () -> assertThat(caseSearchResult.getTotal(), equalTo(4L)),
-                    () -> verify(jestClient).execute(any(MultiSearch.class)),
-                    () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
-                    () -> verify(applicationParams, times(2)).getCasesIndexType(),
-                    () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                () -> assertThat(caseSearchResult.getCases().size(), equalTo(0)),
+                () -> assertThat(caseSearchResult.getTotal(), equalTo(4L)),
+                () -> assertThat(caseSearchResult.getCaseTypesResults().size(), equalTo(2)),
+                () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
+                () -> verify(jestClient).execute(any(MultiSearch.class)),
+                () -> verify(applicationParams, times(2)).getCasesIndexType(),
+                () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
 
     }
