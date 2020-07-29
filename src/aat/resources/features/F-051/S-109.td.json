@@ -87,19 +87,24 @@
 									"can_save_draft": null,
 									"acls": [
 										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
 											"role": "caseworker-befta_jurisdiction_1",
 											"create": true,
 											"read": true,
 											"update": true,
 											"delete": false
-										}, {
-                      "role" : "caseworker-caa",
-                      "create" : true,
-                      "read" : true,
-                      "update" : true,
-                      "delete" : false
-                    }
-                  ]
+										},
+										{
+											"role": "caseworker-caa",
+											"create": true,
+											"read": true,
+											"update": true,
+											"delete": false
+										}
+									]
 								},
 								{
 									"id": "UPDATE",
@@ -124,19 +129,24 @@
 									"can_save_draft": null,
 									"acls": [
 										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
 											"role": "caseworker-befta_jurisdiction_1",
 											"create": true,
 											"read": true,
 											"update": true,
 											"delete": false
-										}, {
-                      "role" : "caseworker-caa",
-                      "create" : true,
-                      "read" : true,
-                      "update" : true,
-                      "delete" : false
-                    }
-                  ]
+										},
+										{
+											"role": "caseworker-caa",
+											"create": true,
+											"read": true,
+											"update": true,
+											"delete": false
+										}
+									]
 								},
 								{
 									"id": "COMPLETE",
@@ -161,19 +171,24 @@
 									"can_save_draft": null,
 									"acls": [
 										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
 											"role": "caseworker-befta_jurisdiction_1",
 											"create": true,
 											"read": true,
 											"update": true,
 											"delete": false
-										}, {
-                      "role" : "caseworker-caa",
-                      "create" : true,
-                      "read" : true,
-                      "update" : true,
-                      "delete" : false
-                    }
-                  ]
+										},
+										{
+											"role": "caseworker-caa",
+											"create": true,
+											"read": true,
+											"update": true,
+											"delete": false
+										}
+									]
 								},
 								{
 									"id": "STOP_PROGRESS",
@@ -198,19 +213,24 @@
 									"can_save_draft": null,
 									"acls": [
 										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
 											"role": "caseworker-befta_jurisdiction_1",
 											"create": true,
 											"read": true,
 											"update": true,
 											"delete": false
-										}, {
-                      "role" : "caseworker-caa",
-                      "create" : true,
-                      "read" : true,
-                      "update" : true,
-                      "delete" : false
-                    }
-                  ]
+										},
+										{
+											"role": "caseworker-caa",
+											"create": true,
+											"read": true,
+											"update": true,
+											"delete": false
+										}
+									]
 								},
 								{
 									"id": "START_PROGRESS",
@@ -235,19 +255,24 @@
 									"can_save_draft": null,
 									"acls": [
 										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
 											"role": "caseworker-befta_jurisdiction_1",
 											"create": true,
 											"read": true,
 											"update": true,
 											"delete": false
-										}, {
-                      "role" : "caseworker-caa",
-                      "create" : true,
-                      "read" : true,
-                      "update" : true,
-                      "delete" : false
-                    }
-                  ]
+										},
+										{
+											"role": "caseworker-caa",
+											"create": true,
+											"read": true,
+											"update": true,
+											"delete": false
+										}
+									]
 								},
 								{
 									"id": "CREATE",
@@ -270,19 +295,24 @@
 									"can_save_draft": null,
 									"acls": [
 										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
 											"role": "caseworker-befta_jurisdiction_1",
 											"create": true,
 											"read": true,
 											"update": true,
 											"delete": false
-										}, {
-                      "role" : "caseworker-caa",
-                      "create" : true,
-                      "read" : true,
-                      "update" : true,
-                      "delete" : false
-                    }
-                  ]
+										},
+										{
+											"role": "caseworker-caa",
+											"create": true,
+											"read": true,
+											"update": true,
+											"delete": false
+										}
+									]
 								}
 							],
 							"states": [
@@ -294,19 +324,24 @@
 									"title_display": null,
 									"acls": [
 										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
 											"role": "caseworker-befta_jurisdiction_1",
 											"create": true,
 											"read": true,
 											"update": true,
 											"delete": false
-										}, {
-                      "role" : "caseworker-caa",
-                      "create" : true,
-                      "read" : true,
-                      "update" : true,
-                      "delete" : false
-                    }
-                  ]
+										},
+										{
+											"role": "caseworker-caa",
+											"create": true,
+											"read": true,
+											"update": true,
+											"delete": false
+										}
+									]
 								},
 								{
 									"id": "IN_PROGRESS",
@@ -316,19 +351,24 @@
 									"title_display": null,
 									"acls": [
 										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
 											"role": "caseworker-befta_jurisdiction_1",
 											"create": true,
 											"read": true,
 											"update": true,
 											"delete": false
-										}, {
-                      "role" : "caseworker-caa",
-                      "create" : true,
-                      "read" : true,
-                      "update" : true,
-                      "delete" : false
-                    }
-                  ]
+										},
+										{
+											"role": "caseworker-caa",
+											"create": true,
+											"read": true,
+											"update": true,
+											"delete": false
+										}
+									]
 								},
 								{
 									"id": "DONE",
@@ -338,19 +378,24 @@
 									"title_display": null,
 									"acls": [
 										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
 											"role": "caseworker-befta_jurisdiction_1",
 											"create": true,
 											"read": true,
 											"update": true,
 											"delete": false
-										}, {
-                      "role" : "caseworker-caa",
-                      "create" : true,
-                      "read" : true,
-                      "update" : true,
-                      "delete" : false
-                    }
-                  ]
+										},
+										{
+											"role": "caseworker-caa",
+											"create": true,
+											"read": true,
+											"update": true,
+											"delete": false
+										}
+									]
 								}
 							],
 							"searchAliasFields": [],
@@ -359,19 +404,24 @@
 							"printable_document_url": null,
 							"acls": [
 								{
+									"__ordering__": "unordered",
+									"__elementId__": "role"
+								},
+								{
 									"role": "caseworker-befta_jurisdiction_1",
 									"create": true,
 									"read": true,
 									"update": true,
 									"delete": false
-								}, {
-                  "role" : "caseworker-caa",
-                  "create" : true,
-                  "read" : true,
-                  "update" : true,
-                  "delete" : false
-                }
-              ]
+								},
+								{
+									"role": "caseworker-caa",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": false
+								}
+							]
 						},
 						{
 							"id": "CASE_TYPE_WITH_NO_CASES",

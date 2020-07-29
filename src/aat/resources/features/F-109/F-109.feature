@@ -1,5 +1,5 @@
 @F-109
-Feature: Add support in CCD role based authorisation for caseworker-caa
+Feature: F-109: Role-Based Authorisation of Caseworker CAAs
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
