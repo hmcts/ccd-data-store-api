@@ -1,5 +1,5 @@
 @F-108 @elasticsearch
-Feature: Elasticsearch external endpoint
+Feature: F-108: Elasticsearch external endpoint
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
