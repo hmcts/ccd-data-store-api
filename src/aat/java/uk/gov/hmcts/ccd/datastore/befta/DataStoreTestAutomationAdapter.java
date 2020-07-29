@@ -1,26 +1,27 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
-import io.cucumber.java.Before;
+import static java.util.Optional.ofNullable;
+
+import org.aspectj.lang.annotation.Before;
 import org.junit.AssumptionViolatedException;
+
+import java.util.UUID;
+
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
-import uk.gov.hmcts.befta.util.ReflectionUtils;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
-
-import java.util.UUID;
-
-import static java.util.Optional.ofNullable;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
+    private static String uniqueString;
+
     @Before
     public void createUID() {
-        String uniqueID = UUID.randomUUID().toString();
-        ScenarioData.setUniqueString("string-" + uniqueID);
+        uniqueString = UUID.randomUUID().toString();
     }
 
     @Before("@elasticsearch")
@@ -58,7 +59,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
         } else if (key.toString().equals("UniqueString")) {
-            return ScenarioData.getUniqueString();
+            return uniqueString;
         }
         return super.calculateCustomValue(scenarioContext, key);
     }
