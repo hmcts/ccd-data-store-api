@@ -23,6 +23,7 @@ def secrets = [
         secret('ccd-importer-autotest-password', 'CCD_IMPORT_AUTOTEST_PASSWORD'),
         secret('ccd-private-caseworker-email', 'CCD_PRIVATE_CASEWORKER_EMAIL'),
         secret('ccd-private-caseworker-password', 'CCD_PRIVATE_CASEWORKER_PASSWORD'),
+        secret('ccd-private-caseworker-autotest-1and2-password', 'CCD_PRIVATE_CASEWORKER_AUTOTEST_1AND2_PASSWORD'),
         secret('ccd-restricted-caseworker-email', 'CCD_RESTRICTED_CASEWORKER_EMAIL'),
         secret('ccd-restricted-caseworker-password', 'CCD_RESTRICTED_CASEWORKER_PASSWORD'),
         secret('ccd-private-caseworker-solicitor-email', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL'),
