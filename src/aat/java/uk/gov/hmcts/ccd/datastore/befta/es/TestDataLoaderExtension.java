@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests.helper;
+package uk.gov.hmcts.ccd.datastore.befta.es;
 
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 

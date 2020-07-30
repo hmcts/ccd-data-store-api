@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests.util;
+package uk.gov.hmcts.ccd.datastore.befta.es;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;

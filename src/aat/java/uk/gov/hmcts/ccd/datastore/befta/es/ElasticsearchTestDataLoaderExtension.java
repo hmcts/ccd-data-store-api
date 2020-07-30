@@ -1,7 +1,7 @@
-package uk.gov.hmcts.ccd.datastore.tests.helper.elastic;
+package uk.gov.hmcts.ccd.datastore.befta.es;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static uk.gov.hmcts.ccd.datastore.tests.util.TestUtils.withRetries;
+import static uk.gov.hmcts.ccd.datastore.befta.es.TestUtils.withRetries;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import uk.gov.hmcts.ccd.datastore.tests.helper.TestDataLoaderExtension;
 
 public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtension {
 
