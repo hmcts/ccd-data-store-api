@@ -96,6 +96,7 @@ withPipeline(type, product, component) {
     if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'PR-601') {
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
     }
+    echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
 
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()
