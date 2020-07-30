@@ -78,10 +78,10 @@ env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
-env.ELASTIC_SEARCH_FTA_ENABLED = "false"
 
 withPipeline(type, product, component) {
     onMaster {
+        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
         enableSlackNotifications('#ccd-master-builds')
     }
     if (env.BRANCH_NAME == 'develop') {
@@ -91,10 +91,11 @@ withPipeline(type, product, component) {
         enableSlackNotifications('#ccd-demo-builds')
     }
     onPR {
+        env.ELASTIC_SEARCH_FTA_ENABLED = "false"
+        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop') {
+           env.ELASTIC_SEARCH_FTA_ENABLED = "true"
+        }
         enableSlackNotifications('#ccd-pr-builds')
-    }
-    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop') {
-        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
     }
 
     overrideVaultEnvironments(vaultOverrides)
