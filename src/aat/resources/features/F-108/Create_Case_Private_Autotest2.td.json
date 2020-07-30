@@ -17,12 +17,8 @@
   "users": {
     "invokingUser": {
       "username": "auto.test12.cnp+private@gmail.com",
-      "password": "Pa55word11"
+      "password": "[[$CCD_PRIVATE_CASEWORKER_AUTOTEST_1AND2_PASSWORD]]"
     }
-  },
-  "user": {
-    "username": "auto.test12.cnp+private@gmail.com",
-    "password": "Pa55word11"
   },
 
   "request": {
