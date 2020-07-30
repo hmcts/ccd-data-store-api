@@ -10,7 +10,7 @@
 
   "user" : {
     "username": "[[$CCD_RESTRICTED_CASEWORKER_EMAIL]]",
-    "password": "[[$CCD_RESTRICTED_CASEWORKER_EMAIL]]"
+    "password": "[[$CCD_RESTRICTED_CASEWORKER_PASSWORD]]"
   },
 
   "request": {
@@ -27,7 +27,8 @@
   "expectedResponse": {
     "body": {
       "total": 0,
-      "cases": []
+      "cases": [],
+      "case_types_results" : []
     }
   }
 }

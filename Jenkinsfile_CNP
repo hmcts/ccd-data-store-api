@@ -23,6 +23,7 @@ def secrets = [
         secret('ccd-importer-autotest-password', 'CCD_IMPORT_AUTOTEST_PASSWORD'),
         secret('ccd-private-caseworker-email', 'CCD_PRIVATE_CASEWORKER_EMAIL'),
         secret('ccd-private-caseworker-password', 'CCD_PRIVATE_CASEWORKER_PASSWORD'),
+        secret('ccd-private-caseworker-autotest-1and2-password', 'CCD_PRIVATE_CASEWORKER_AUTOTEST_1AND2_PASSWORD'),
         secret('ccd-restricted-caseworker-email', 'CCD_RESTRICTED_CASEWORKER_EMAIL'),
         secret('ccd-restricted-caseworker-password', 'CCD_RESTRICTED_CASEWORKER_PASSWORD'),
         secret('ccd-private-caseworker-solicitor-email', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL'),
@@ -75,10 +76,10 @@ env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-680.service.core-compute-preview.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.ELASTIC_SEARCH_HOSTS = "http://es-ccd-data-store-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-env.ELASTIC_SEARCH_ENABLED = "false"
+env.ELASTIC_SEARCH_ENABLED = "true"
 
 withPipeline(type, product, component) {
     onMaster {
