@@ -11,7 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Transactional
-public class DefaultCaseDetailsRepositoryTest extends BaseTest {
+public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     private static final long CASE_REFERENCE = 999999L;
     private static final String JURISDICTION_ID = "JeyOne";
@@ -159,6 +159,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assertThat(byMetaData.getTotalResultsCount(), is(0));
     }
 
+//CHECKSTYLE.OFF: CommentsIndentation
 //  This test should be uncommented as part of future RDM-7408
 //    @Test(expected = IllegalArgumentException.class)
 //    public void validateInputsMainQuerySortOrder() {
@@ -179,6 +180,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 //        // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql injection vulnerability
 //        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
 //    }
+    //CHECKSTYLE.ON: CommentsIndentation
+
 
     @Test
     public void sanitiseInputMainQuerySortOrderForDirection() {

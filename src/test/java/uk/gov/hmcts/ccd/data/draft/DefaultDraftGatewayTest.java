@@ -134,7 +134,7 @@ class DefaultDraftGatewayTest {
             .withUserId(UID)
             .withJurisdictionId(JID)
             .withCaseTypeId(CTID)
-            .withEventTriggerId(ETID)
+            .withEventId(ETID)
             .withCaseDataContent(caseDataContent)
             .build();
         draft = anDraft()
@@ -238,7 +238,7 @@ class DefaultDraftGatewayTest {
             () -> assertThat(result, hasProperty("document", hasProperty("userId", is(caseDraft.getUserId())))),
             () -> assertThat(result, hasProperty("document", hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId())))),
             () -> assertThat(result, hasProperty("document", hasProperty("caseTypeId", is(caseDraft.getCaseTypeId())))),
-            () -> assertThat(result, hasProperty("document", hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId())))),
+            () -> assertThat(result, hasProperty("document", hasProperty("eventId", is(caseDraft.getEventId())))),
             () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("data", is(caseDataContent.getData()))))),
             () -> assertThat(result,
                 hasProperty("document",

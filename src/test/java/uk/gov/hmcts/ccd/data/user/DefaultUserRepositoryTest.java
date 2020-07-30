@@ -48,7 +48,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -57,12 +56,12 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 class DefaultUserRepositoryTest {
 
@@ -91,9 +90,6 @@ class DefaultUserRepositoryTest {
 
     @Mock
     private SecurityContext securityContext;
-
-    @Mock
-    private ServiceAndUserDetails principal;
 
     @InjectMocks
     private DefaultUserRepository userRepository;
@@ -240,12 +236,12 @@ class DefaultUserRepositoryTest {
         @DisplayName("should return the User Profile defaults for the user")
         void shouldReturnUserProfileDefaultsForUser() {
             when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
-            final Jurisdiction jurisdiction = new Jurisdiction();
-            jurisdiction.setId("TEST");
-            jurisdiction.setName("Test");
-            jurisdiction.setDescription("Test Jurisdiction");
+            final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+            jurisdictionDefinition.setId("TEST");
+            jurisdictionDefinition.setName("Test");
+            jurisdictionDefinition.setDescription("Test Jurisdiction");
             final UserDefault userDefault = new UserDefault();
-            userDefault.setJurisdictions(singletonList(jurisdiction));
+            userDefault.setJurisdictionDefinitions(singletonList(jurisdictionDefinition));
             final ResponseEntity<UserDefault> responseEntity = new ResponseEntity<>(userDefault, HttpStatus.OK);
             when(restTemplate
                 .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
@@ -349,61 +345,42 @@ class DefaultUserRepositoryTest {
     @Nested
     @DisplayName("getUser()")
     class GetUser {
-        private static final String URL = "url";
-
-        @BeforeEach
-        void setUp() {
-            when(applicationParams.idamUserProfileURL()).thenReturn(URL);
-        }
-
         @Test
         @DisplayName("should retrieve user from IDAM")
         void shouldRetrieveUserFromIdam() {
-            IdamUser idamUser = new IdamUser();
-            when(restTemplate.exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class)))
-                .thenReturn(ResponseEntity.ok(idamUser));
+            String userId = "userId";
+            UserInfo userInfo = UserInfo.builder()
+                .uid(userId)
+                .build();
+            when(securityUtils.getUserInfo()).thenReturn(userInfo);
 
             IdamUser result = userRepository.getUser();
 
-            assertThat(result, is(idamUser));
-            verify(applicationParams).idamUserProfileURL();
-            verify(securityUtils).userAuthorizationHeaders();
-            verify(applicationParams).idamUserProfileURL();
-            verify(restTemplate).exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
-        }
-
-        @Test
-        @DisplayName("should throw exception when rest call fails")
-        void shouldThrowExceptionWhenRestCallFails() {
-            when(applicationParams.idamUserProfileURL()).thenReturn("url");
-            doThrow(new RestClientException("Error")).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
-
-            assertThrows(ServiceException.class, () -> userRepository.getUser());
+            assertThat(result.getId(), is(userId));
         }
     }
 
     private void asCitizen() {
-        doReturn(newAuthorities(CITIZEN, PROBATE_PRIVATE_BETA)).when(principal)
+        doReturn(newAuthorities(CITIZEN, PROBATE_PRIVATE_BETA)).when(authentication)
                                                                .getAuthorities();
     }
 
     private void asLetterHolderCitizen() {
-        doReturn(newAuthorities(LETTER_HOLDER, PROBATE_PRIVATE_BETA)).when(principal)
+        doReturn(newAuthorities(LETTER_HOLDER, PROBATE_PRIVATE_BETA)).when(authentication)
                                                                      .getAuthorities();
     }
 
     private void asCaseworker() {
-        doReturn(newAuthorities(ROLE_CASEWORKER, ROLE_CASEWORKER_TEST, ROLE_CASEWORKER_CMC)).when(principal)
+        doReturn(newAuthorities(ROLE_CASEWORKER, ROLE_CASEWORKER_TEST, ROLE_CASEWORKER_CMC)).when(authentication)
                                                                                             .getAuthorities();
     }
 
     private void asOtherRoles() {
-        doReturn(newAuthorities("role1", "role2")).when(principal)
+        doReturn(newAuthorities("role1", "role2")).when(authentication)
                                                   .getAuthorities();
     }
 
     private void initSecurityContext() {
-        doReturn(principal).when(authentication).getPrincipal();
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
     }

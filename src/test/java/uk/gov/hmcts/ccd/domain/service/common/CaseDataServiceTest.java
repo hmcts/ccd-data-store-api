@@ -8,9 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,129 +24,132 @@ import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 
+@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 class CaseDataServiceTest {
 
     private static final CaseDataService caseDataService = new CaseDataService();
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
 
     @BeforeEach
     public void setUp() {
-        setCaseType(RESTRICTED);
+        setCaseTypeDefinition(RESTRICTED);
     }
 
-    private void setCaseType(SecurityClassification securityClassification) {
-        final FieldType textFieldType = aFieldType().withType("Text")
-            .build();
+    private void setCaseTypeDefinition(SecurityClassification securityClassification) {
+        final FieldTypeDefinition textFieldTypeDefinition = aFieldType().withType("Text")
+                                           .build();
 
-        CaseField postalAddress = newCaseField()
+        CaseFieldDefinition postalAddress = newCaseField()
             .withId("PostalAddress")
             .withSC(SecurityClassification.PRIVATE.name())
             .withFieldType(aFieldType()
-                .withType("Complex")
-                .withComplexField(newCaseField()
-                    .withId("AddressLine1")
-                    .withFieldType(textFieldType)
-                    .withSC(securityClassification.name())
-                    .build())
-                .withComplexField(newCaseField()
-                    .withId("AddressLine2")
-                    .withFieldType(textFieldType)
-                    .withSC(securityClassification.name())
-                    .build())
-                .withComplexField(newCaseField()
-                    .withId("AddressLine3")
-                    .withFieldType(textFieldType)
-                    .withSC(securityClassification.name())
-                    .build())
-                .withComplexField(newCaseField()
-                    .withId("Country")
-                    .withFieldType(textFieldType)
-                    .withSC(PRIVATE.name())
-                    .build())
-                .withComplexField(newCaseField()
-                    .withId("PostCode")
-                    .withFieldType(textFieldType)
-                    .withSC(RESTRICTED.name())
-                    .build())
-                .withComplexField(newCaseField()
-                    .withId("Occupant")
-                    .withFieldType(aFieldType()
-                        .withType("Complex")
-                        .withComplexField(newCaseField()
-                            .withId(
-                                "Title")
-                            .withFieldType(
-                                textFieldType)
-                            .withSC(
-                                PUBLIC.name())
-                            .build())
-                        .withComplexField(newCaseField()
-                            .withId(
-                                "FirstName")
-                            .withFieldType(
-                                textFieldType)
-                            .withSC(
-                                PUBLIC.name())
-                            .build())
-                        .withComplexField(newCaseField()
-                            .withId(
-                                "MiddleName")
-                            .withFieldType(
-                                textFieldType)
-                            .withSC(
-                                PRIVATE.name())
-                            .build())
-                        .withComplexField(newCaseField()
-                            .withId(
-                                "LastName")
-                            .withFieldType(
-                                textFieldType)
-                            .withSC(
-                                PRIVATE.name())
-                            .build())
-                        .withComplexField(newCaseField()
-                            .withId(
-                                "DateOfBirth")
-                            .withFieldType(
-                                aFieldType()
-                                    .withType(
-                                        "Date")
-                                    .build())
-                            .withSC(
-                                PRIVATE.name())
-                            .build())
-                        .withComplexField(newCaseField()
-                            .withId(
-                                "NationalInsuranceNumber")
-                            .withFieldType(
-                                textFieldType)
-                            .withSC(
-                                RESTRICTED.name())
-                            .build())
-                        .withComplexField(newCaseField()
-                            .withId(
-                                "MaritalStatus")
-                            .withFieldType(
-                                aFieldType()
-                                    .withType(
-                                        "FixedList")
-                                    .build())
-                            .withSC(
-                                RESTRICTED.name())
-                            .build())
-                        .build())
-                    .withSC(PUBLIC.name())
-                    .build())
-                .build())
+                               .withType("Complex")
+                               .withComplexField(newCaseField()
+                                                     .withId("AddressLine1")
+                                                     .withFieldType(textFieldTypeDefinition)
+                                                     .withSC(securityClassification.name())
+                                                     .build())
+                               .withComplexField(newCaseField()
+                                                     .withId("AddressLine2")
+                                                     .withFieldType(textFieldTypeDefinition)
+                                                     .withSC(securityClassification.name())
+                                                     .build())
+                               .withComplexField(newCaseField()
+                                                     .withId("AddressLine3")
+                                                     .withFieldType(textFieldTypeDefinition)
+                                                     .withSC(securityClassification.name())
+                                                     .build())
+                               .withComplexField(newCaseField()
+                                                     .withId("Country")
+                                                     .withFieldType(textFieldTypeDefinition)
+                                                     .withSC(PRIVATE.name())
+                                                     .build())
+                               .withComplexField(newCaseField()
+                                                     .withId("PostCode")
+                                                     .withFieldType(textFieldTypeDefinition)
+                                                     .withSC(RESTRICTED.name())
+                                                     .build())
+                               .withComplexField(newCaseField()
+                                                     .withId("Occupant")
+                                                     .withFieldType(aFieldType()
+                                                                        .withType("Complex")
+                                                                        .withComplexField(newCaseField()
+                                                                                              .withId(
+                                                                                                  "Title")
+                                                                                              .withFieldType(
+                                                                                                  textFieldTypeDefinition)
+                                                                                              .withSC(
+                                                                                                  PUBLIC.name())
+                                                                                              .build())
+                                                                        .withComplexField(newCaseField()
+                                                                                              .withId(
+                                                                                                  "FirstName")
+                                                                                              .withFieldType(
+                                                                                                  textFieldTypeDefinition)
+                                                                                              .withSC(
+                                                                                                  PUBLIC.name())
+                                                                                              .build())
+                                                                        .withComplexField(newCaseField()
+                                                                                              .withId(
+                                                                                                  "MiddleName")
+                                                                                              .withFieldType(
+                                                                                                  textFieldTypeDefinition)
+                                                                                              .withSC(
+                                                                                                  PRIVATE.name())
+                                                                                              .build())
+                                                                        .withComplexField(newCaseField()
+                                                                                              .withId(
+                                                                                                  "LastName")
+                                                                                              .withFieldType(
+                                                                                                  textFieldTypeDefinition)
+                                                                                              .withSC(
+                                                                                                  PRIVATE.name())
+                                                                                              .build())
+                                                                        .withComplexField(newCaseField()
+                                                                                              .withId(
+                                                                                                  "DateOfBirth")
+                                                                                              .withFieldType(
+                                                                                                  aFieldType()
+                                                                                                      .withType(
+                                                                                                          "Date")
+                                                                                                      .build())
+                                                                                              .withSC(
+                                                                                                  PRIVATE.name())
+                                                                                              .build())
+                                                                        .withComplexField(newCaseField()
+                                                                                              .withId(
+                                                                                                  "NationalInsuranceNumber")
+                                                                                              .withFieldType(
+                                                                                                  textFieldTypeDefinition)
+                                                                                              .withSC(
+                                                                                                  RESTRICTED.name())
+                                                                                              .build())
+                                                                        .withComplexField(newCaseField()
+                                                                                              .withId(
+                                                                                                  "MaritalStatus")
+                                                                                              .withFieldType(
+                                                                                                  aFieldType()
+                                                                                                      .withType(
+                                                                                                          "FixedList")
+                                                                                                      .build())
+                                                                                              .withSC(
+                                                                                                  RESTRICTED.name())
+                                                                                              .build())
+                                                                        .build())
+                                                     .withSC(PUBLIC.name())
+                                                     .build())
+                               .build())
             .build();
-        caseType = TestBuildersUtil.CaseTypeBuilder.newCaseType()
+        caseTypeDefinition = TestBuildersUtil.CaseTypeBuilder.newCaseType()
             .withField(newCaseField()
                 .withId("ClientsAddresses")
                 .withSC(PRIVATE.name())
@@ -162,33 +165,33 @@ class CaseDataServiceTest {
                 .build()
             )
             .withField(newCaseField()
-                .withId("Company")
-                .withSC(PUBLIC.name())
-                .withFieldType(
-                    aFieldType()
-                        .withType("Complex")
-                        .withComplexField(newCaseField()
-                            .withId("Name")
-                            .withFieldType(textFieldType)
-                            .withSC(PRIVATE.name())
-                            .build())
-                        .withComplexField(postalAddress)
-                        .build()
-                )
-                .build()
+                           .withId("Company")
+                           .withSC(PUBLIC.name())
+                           .withFieldType(
+                               aFieldType()
+                                   .withType("Complex")
+                                   .withComplexField(newCaseField()
+                                                         .withId("Name")
+                                                         .withFieldType(textFieldTypeDefinition)
+                                                         .withSC(PRIVATE.name())
+                                                         .build())
+                                   .withComplexField(postalAddress)
+                                   .build()
+                           )
+                           .build()
             )
             .withField(newCaseField()
-                .withId("OtherInfo")
-                .withFieldType(textFieldType)
-                .withSC(PRIVATE.name())
-                .build())
+                           .withId("OtherInfo")
+                           .withFieldType(textFieldTypeDefinition)
+                           .withSC(PRIVATE.name())
+                           .build())
             .withField(newCaseField().withId("simple_collection")
-                .withSC("PUBLIC")
-                .withFieldType(aFieldType().withType(COLLECTION)
-                    .withCollectionFieldType(textFieldType)
-                    .build()
-                )
-                .build()
+                                   .withSC("PUBLIC")
+                                   .withFieldType(aFieldType().withType(COLLECTION)
+                                                              .withCollectionFieldType(textFieldTypeDefinition)
+                                                              .build()
+                                   )
+                                   .build()
             )
             .build();
     }
@@ -236,7 +239,7 @@ class CaseDataServiceTest {
                 "}\n"
         ));
 
-        final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(caseType, DATA, Maps.newHashMap());
+        final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, DATA, Maps.newHashMap());
         final String expectedResult = "{  \n" +
             "   \"Company\":{  \n" +
             "      \"classification\":\"PUBLIC\",\n" +
@@ -338,7 +341,7 @@ class CaseDataServiceTest {
 
         final Map<String, JsonNode> DATA = JacksonUtils.convertValue(treeValue);
         // first to set default classification
-        final Map<String, JsonNode> defaultClassifications = caseDataService.getDefaultSecurityClassifications(caseType, DATA, Maps.newHashMap());
+        final Map<String, JsonNode> defaultClassifications = caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, DATA, Maps.newHashMap());
         final String expectedDefaultResult = "{  \n" +
             "   \"ClientsAddresses\":{  \n" +
             "      \"classification\":\"PRIVATE\",\n" +
@@ -422,13 +425,14 @@ class CaseDataServiceTest {
                 "       ]\n" +
                 "}\n"
         ));
-        setCaseType(PUBLIC);
+        setCaseTypeDefinition(PUBLIC);
 
         // ACT
-        final Map<String, JsonNode> newClassifications = caseDataService.getDefaultSecurityClassifications(caseType, NEW_DATA, defaultClassifications);
+        final Map<String, JsonNode> newClassifications = caseDataService.getDefaultSecurityClassifications(
+            caseTypeDefinition, NEW_DATA, defaultClassifications);
 
         // ASSERT
-        JsonNode newClassificationsResult = JacksonUtils.convertValueJsonNode(newClassifications);
+        JsonNode newClassificationsResult = MAPPER.convertValue(newClassifications, JsonNode.class);
         final String expectedNewResult = "{  \n" +
             "   \"Company\":{  \n" +
             "      \"classification\":\"PUBLIC\",\n" +
@@ -503,7 +507,7 @@ class CaseDataServiceTest {
             .build();
 
         final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(
-            caseType,
+            caseTypeDefinition,
             caseData,
             new HashMap<>());
 
@@ -536,7 +540,7 @@ class CaseDataServiceTest {
                 .build();
 
         final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(
-            caseType,
+            caseTypeDefinition,
             caseData,
             existingClassification);
 

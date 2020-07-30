@@ -1,16 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 
 public interface StartEventOperation {
-    StartEventTrigger triggerStartForCaseType(String caseTypeId,
-                                              String eventTriggerId,
-                                              Boolean ignoreWarning);
+    StartEventResult triggerStartForCaseType(String caseTypeId,
+                                             String eventId,
+                                             Boolean ignoreWarning);
 
-    StartEventTrigger triggerStartForCase(String caseReference,
-                                          String eventTriggerId,
+    StartEventResult triggerStartForCase(String caseReference,
+                                         String eventId,
+                                         Boolean ignoreWarning);
+
+    StartEventResult triggerStartForDraft(String draftReference,
                                           Boolean ignoreWarning);
-
-    StartEventTrigger triggerStartForDraft(String draftReference,
-                                           Boolean ignoreWarning);
 }

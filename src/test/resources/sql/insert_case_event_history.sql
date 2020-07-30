@@ -116,7 +116,7 @@ INSERT INTO case_event (
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
@@ -165,7 +165,7 @@ INSERT INTO case_event (
             "AddressLine2": "Fake Street",
             "AddressLine3": "Hexton",
             "Country": "England",
-            "Postcode": "HX08 UTG"
+            "Postcode": "HX08 5TG"
           },
           "D8Document": {
             "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",

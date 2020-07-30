@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -55,8 +55,8 @@ public class DocumentsOperation {
         String caseTypeId = caseDetails.getCaseTypeId();
         String jurisdictionId = caseDetails.getJurisdiction();
         try {
-            final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
-            final String documentListUrl = caseType.getPrintableDocumentsUrl();
+            final CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
+            final String documentListUrl = caseTypeDefinition.getPrintableDocumentsUrl();
             final RestTemplate restTemplate = new RestTemplate();
             final HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);

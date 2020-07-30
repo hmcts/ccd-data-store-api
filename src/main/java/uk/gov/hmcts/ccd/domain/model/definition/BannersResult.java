@@ -14,13 +14,11 @@ public class BannersResult implements Serializable {
     public BannersResult() {
 
     }
-    
+
     public BannersResult(List<Banner> banners) {
         this.banners = banners;
     }
 
-    /**
-     **/
     @ApiModelProperty(value = "")
     @JsonProperty("banners")
     public List<Banner> getBanners() {

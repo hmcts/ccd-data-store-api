@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 @Service
@@ -30,10 +30,10 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     public static final String QUALIFIER = "cached";
 
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final Map<String, List<CaseType>> caseTypesForJurisdictions = newHashMap();
+    private final Map<String, List<CaseTypeDefinition>> caseTypesForJurisdictions = newHashMap();
     private final Map<String, CaseTypeDefinitionVersion> versions = newHashMap();
     private final Map<String, UserRole> userRoleClassifications = newHashMap();
-    private final Map<String, List<FieldType>> baseTypes = newHashMap();
+    private final Map<String, List<FieldTypeDefinition>> baseTypes = newHashMap();
 
     @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository) {
@@ -41,14 +41,19 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public List<CaseType> getCaseTypesForJurisdiction(final String jurisdictionId) {
+    public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         return caseTypesForJurisdictions.computeIfAbsent(jurisdictionId, caseDefinitionRepository::getCaseTypesForJurisdiction);
     }
 
     @Override
-    public CaseType getCaseType(final String caseTypeId) {
+    public CaseTypeDefinition getCaseType(final String caseTypeId) {
         CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
         return caseDefinitionRepository.getCaseType(latestVersion.getVersion(), caseTypeId);
+    }
+
+    @Override
+    public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
+        return caseDefinitionRepository.getCaseType(version, caseTypeId);
     }
 
     @Override
@@ -81,18 +86,13 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public Jurisdiction getJurisdiction(String jurisdictionId) {
+    public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
         LOGGER.debug("Will get jurisdiction '{}' from repository.", jurisdictionId);
         return caseDefinitionRepository.getJurisdiction(jurisdictionId);
     }
 
     @Override
-    public CaseType getCaseType(int version, String caseTypeId) {
-        return caseDefinitionRepository.getCaseType(version, caseTypeId);
-    }
-
-    @Override
-    public List<FieldType> getBaseTypes() {
+    public List<FieldTypeDefinition> getBaseTypes() {
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }
 

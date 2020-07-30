@@ -14,7 +14,7 @@
         "userId":"25",
         "jurisdictionId":"PROBATE",
         "caseTypeId":"TestAddressBookCase",
-        "eventTriggerId":"createCase",
+        "eventId":"createCase",
         "caseDataContent" : {
           "event": {
             "id": "createCase",

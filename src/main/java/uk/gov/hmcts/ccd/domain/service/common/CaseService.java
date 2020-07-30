@@ -19,6 +19,7 @@ import java.util.Optional;
 
 // TODO CaseService and CaseDataService could probably be merged together.
 @Service
+@SuppressWarnings("checkstyle:SummaryJavadoc") // partal javadoc attributes added prior to checkstyle implementation in module
 public class CaseService {
 
     private final CaseDataService caseDataService;
@@ -61,7 +62,7 @@ public class CaseService {
     /**
      * @param content     Data received from the client.
      * @param caseDetails of the case.
-     * @return <code>Optional&lt;CaseDetails&gt;<code/> - CaseDetails wrapped in Optional
+     * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
 

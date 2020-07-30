@@ -8,8 +8,8 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 import static java.lang.String.format;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
 @Named
 @Singleton
@@ -46,26 +46,26 @@ public class MergeDataToSearchResultOperation {
         this.searchResultProcessor = searchResultProcessor;
     }
 
-    public SearchResultView execute(final CaseType caseType,
+    public SearchResultView execute(final CaseTypeDefinition caseTypeDefinition,
                                     final SearchResult searchResult,
                                     final List<CaseDetails> caseDetails,
                                     final String resultError) {
 
-        final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseType, searchResult);
+        final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseTypeDefinition, searchResult);
 
         final List<SearchResultViewItem> viewItems = caseDetails.stream()
-            .map(caseData -> buildSearchResultViewItem(caseData, caseType, searchResult))
+            .map(caseData -> buildSearchResultViewItem(caseData, caseTypeDefinition, searchResult))
             .collect(Collectors.toList());
 
         return searchResultProcessor.execute(viewColumns, viewItems, resultError);
     }
 
-    private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseType caseType,
+    private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseTypeDefinition caseTypeDefinition,
                                                                      SearchResult searchResult) {
         final HashSet<String> addedFields = new HashSet<>();
 
         return Arrays.stream(searchResult.getFields())
-            .flatMap(searchResultField -> caseType.getCaseFields().stream()
+            .flatMap(searchResultField -> caseTypeDefinition.getCaseFieldDefinitions().stream()
                     .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                     .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
                     .map(caseField -> createSearchResultViewColumn(searchResultField, caseField))
@@ -73,11 +73,11 @@ public class MergeDataToSearchResultOperation {
             .collect(Collectors.toList());
     }
 
-    private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseField caseField) {
-        CommonField commonField = commonField(searchResultField, caseField);
+    private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseFieldDefinition caseFieldDefinition) {
+        CommonField commonField = commonField(searchResultField, caseFieldDefinition);
         return new SearchResultViewColumn(
             searchResultField.buildCaseFieldId(),
-            commonField.getFieldType(),
+            commonField.getFieldTypeDefinition(),
             searchResultField.getLabel(),
             searchResultField.getDisplayOrder(),
             searchResultField.isMetadata(),
@@ -98,24 +98,28 @@ public class MergeDataToSearchResultOperation {
         }
     }
 
-    private CommonField commonField(SearchResultField searchResultField, CaseField caseField) {
-        return caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
-            .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseField.getId(), searchResultField.getCaseFieldPath())));
+
+
+    private CommonField commonField(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {
+        return caseFieldDefinition.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
+            .orElseThrow(() ->
+                new BadRequestException(format("CaseField %s has no nested elements with code %s.",
+                    caseFieldDefinition.getId(), searchResultField.getCaseFieldPath())));
     }
 
     private String displayContextParameter(SearchResultField searchResultField, CommonField commonField) {
-        return searchResultField.getDisplayContextParameter() == null ?
-            commonField.getDisplayContextParameter() :
-            searchResultField.getDisplayContextParameter();
+        return searchResultField.getDisplayContextParameter() == null
+            ? commonField.getDisplayContextParameter()
+            : searchResultField.getDisplayContextParameter();
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
-                                                           final CaseType caseType,
+                                                           final CaseTypeDefinition caseTypeDefinition,
                                                            final SearchResult searchResult) {
 
         Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
         Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
-        Map<String, TextNode> labels = getLabelsFromCaseFields(caseType);
+        Map<String, TextNode> labels = getLabelsFromCaseFields(caseTypeDefinition);
         Map<String, Object> caseFields = prepareData(searchResult, caseData, caseMetadata, labels);
 
         String caseId = caseDetails.hasCaseReference() ? caseDetails.getReferenceAsString() : caseDetails.getId();
@@ -132,8 +136,10 @@ public class MergeDataToSearchResultOperation {
         searchResult.getFieldsWithPaths().forEach(searchResultField -> {
             JsonNode jsonNode = caseData.get(searchResultField.getCaseFieldId());
             if (jsonNode != null) {
-                newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(),
-                    getObjectByPath(searchResultField, jsonNode));
+                Object objectByPath = getObjectByPath(searchResultField, jsonNode);
+                if (objectByPath != null) {
+                    newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(), objectByPath);
+                }
             }
         });
 
@@ -154,10 +160,9 @@ public class MergeDataToSearchResultOperation {
     private Object reduce(JsonNode caseFields, List<String> pathElements, String path) {
         String firstPathElement = pathElements.get(0);
 
-        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement))
-            .orElseThrow(() -> new BadRequestException(format(NESTED_ELEMENT_NOT_FOUND_FOR_PATH, path)));
+        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement)).orElse(null);
 
-        if (pathElements.size() == 1) {
+        if (caseField == null || pathElements.size() == 1) {
             return caseField;
         } else {
             List<String> tail = pathElements.subList(1, pathElements.size());
@@ -165,11 +170,11 @@ public class MergeDataToSearchResultOperation {
         }
     }
 
-    private Map<String, TextNode> getLabelsFromCaseFields(CaseType caseType) {
-        return caseType.getCaseFields()
+    private Map<String, TextNode> getLabelsFromCaseFields(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeDefinition.getCaseFieldDefinitions()
             .stream()
-            .filter(caseField -> LABEL.equals(caseField.getFieldType().getType()))
-            .collect(Collectors.toMap(CaseField::getId, caseField -> instance.textNode(caseField.getLabel())));
+            .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
+            .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField -> instance.textNode(caseField.getLabel())));
     }
 
 }

@@ -71,7 +71,7 @@ public class UserRepositoryTest {
 
     @Nested
     @DisplayName("getUserRoles()")
-    class getUserRoles {
+    class GetUserRoles {
 
         @Test
         @DisplayName("should retrieve roles from security principals")
@@ -81,7 +81,7 @@ public class UserRepositoryTest {
             Set<String> userRoles = userRepository.getUserRoles();
 
             verify(securityContext, times(1)).getAuthentication();
-            verify(authentication, times(1)).getPrincipal();
+            verify(authentication, times(1)).getAuthorities();
             assertThat(userRoles, hasItems(CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2, CASEWORKER_DIVORCE));
         }
 
@@ -99,7 +99,7 @@ public class UserRepositoryTest {
 
     @Nested
     @DisplayName("getUserClassifications()")
-    class getUserClassifications {
+    class GetUserClassifications {
 
         @Test
         @DisplayName("should retrieve roles from user repository")
