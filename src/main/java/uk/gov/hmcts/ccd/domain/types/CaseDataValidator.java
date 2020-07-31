@@ -46,13 +46,23 @@ public class CaseDataValidator {
                 .map(caseDataPair -> caseFieldDefinitions.stream()
                     .filter(caseField -> caseField.getId().equalsIgnoreCase(caseDataPair.getKey()))
                     .findAny()
-                    .map(caseField -> validateField(caseDataPair.getKey(), caseDataPair.getValue(), caseField, fieldIdPrefix))
+                    .map(caseField -> validateField(
+                        caseDataPair.getKey(),
+                        caseDataPair.getValue(),
+                        caseField, fieldIdPrefix
+                    ))
                     .orElseGet(() -> Collections.singletonList(
                         new ValidationResult("Field is not recognised", fieldIdPrefix + caseDataPair.getKey()))))
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
+    private boolean isAPredefinedComplexType(final CaseFieldDefinition caseFieldDefinition) {
 
+        if ( caseFieldDefinition.getFieldTypeDefinition().getId().equals("CaseLink") ) {
+            return true;
+        }
+        return false;
+    }
     private List<ValidationResult> validateField(final String dataFieldId,
                                                  final JsonNode dataValue,
                                                  final CaseFieldDefinition caseFieldDefinition,
@@ -97,17 +107,36 @@ public class CaseDataValidator {
                                                        final CaseFieldDefinition caseFieldDefinition,
                                                        final String fieldIdPrefix,
                                                        final BaseType fieldType) {
+
+
+//        List<ValidationResult> a = validators.stream()
+//            .filter(validator ->
+//                validator.getType() == fieldType || isPredefinedTypeBaseValidator(validator,caseFieldDefinition.getFieldTypeDefinition().getId())
+//            )
+//            .map(baseTypeValidator -> baseTypeValidator.validate(dataFieldId, dataValue, caseFieldDefinition) )
+//            .flatMap( validationResults -> validationResults.stream()
+//                .map(validationResult -> new ValidationResult(validationResult.getErrorMessage(), fieldIdPrefix + validationResult.getFieldId()))
+//
+//            ).collect(Collectors.toList());
+
         return validators.stream()
-            .filter(validator -> validator.getType() == fieldType)
-            .findAny()
-            .map(baseTypeValidator -> baseTypeValidator
-                .validate(dataFieldId, dataValue, caseFieldDefinition)
-                .stream()
-                .map(result -> new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
-                .collect(Collectors.toList()))
-            .orElseThrow(() -> new RuntimeException("System error: No validator found for " + fieldType.getType()));
+            .filter(validator ->
+                validator.getType() == fieldType || isPredefinedTypeBaseValidator(validator,caseFieldDefinition.getFieldTypeDefinition().getId())
+            )
+            .map(baseTypeValidator -> baseTypeValidator.validate(dataFieldId, dataValue, caseFieldDefinition))
+            .flatMap( validationResults -> validationResults.stream()
+                .map(validationResult -> new ValidationResult(validationResult.getErrorMessage(), fieldIdPrefix + validationResult.getFieldId()))
+            ).collect(Collectors.toList());
     }
 
+    private boolean isPredefinedTypeBaseValidator(BaseTypeValidator validator, String fieldID){
+
+        if ( validator instanceof PredefinedTypeBaseTypeValidator) {
+            String predefinedId = ( (PredefinedTypeBaseTypeValidator)validator).getPredefinedFieldId();
+            return predefinedId.equals(fieldID);
+      }
+        return false;
+    }
     private List<ValidationResult> validateCollectionItem(FieldTypeDefinition fieldTypeDefinition, JsonNode item, String fieldIdPrefix, String index) {
         final String itemFieldId = fieldIdPrefix + index;
 

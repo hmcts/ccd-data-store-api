@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.types;
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.math.BigDecimal;
@@ -13,6 +14,15 @@ import java.util.List;
 @Singleton
 public class TextValidator implements BaseTypeValidator {
     public static final String TYPE_ID = "Text";
+
+    private TextCaseReferenceCaseLinkValidator caseLinkValidator;
+
+    public TextValidator() { }
+
+    @Inject
+    public TextValidator(TextCaseReferenceCaseLinkValidator caseLinkValidator) {
+        this.caseLinkValidator = caseLinkValidator;
+    }
 
     @Override
     public BaseType getType() {
@@ -52,6 +62,10 @@ public class TextValidator implements BaseTypeValidator {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
 
+//        //
+//        if (isACaseLink(caseFieldDefinition)) {
+//            return caseLinkValidator.validate(dataFieldId,dataValue,caseFieldDefinition);
+//        }
         return Collections.emptyList();
     }
 
@@ -65,5 +79,9 @@ public class TextValidator implements BaseTypeValidator {
 
     static Boolean checkRegex(final String regex, final String value) {
         return regex == null || regex.length() == 0 || value.matches(regex);
+    }
+
+    private boolean isACaseLink(final CaseFieldDefinition caseFieldDefinition){
+        return caseFieldDefinition.getFieldTypeDefinition().getId().equals("TextCaseReference");
     }
 }
