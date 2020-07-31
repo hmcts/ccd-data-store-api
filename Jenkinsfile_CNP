@@ -79,14 +79,13 @@ env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
-env.ELASTIC_SEARCH_HOSTS = "http://es-ccd-data-store-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-env.ELASTIC_SEARCH_ENABLED = "true"
+env.ELASTIC_SEARCH_FTA_ENABLED = "false"
 
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
     }
-    if (env.BRANCH_NAME == 'develop') {
+    if (env.BRANCH_NAME == 'PR-601') {
         enableSlackNotifications('#ccd-develop-builds')
     }
     onDemo {
@@ -95,6 +94,10 @@ withPipeline(type, product, component) {
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
     }
+    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'PR-601') {
+        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
+    }
+    echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
 
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()
