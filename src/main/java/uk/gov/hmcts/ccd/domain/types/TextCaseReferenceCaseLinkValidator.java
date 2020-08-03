@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -20,8 +21,9 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
     private TextValidator textValidator;
 
     @Inject
-    public TextCaseReferenceCaseLinkValidator(TextValidator textValidator, CaseService caseService) {
+    public TextCaseReferenceCaseLinkValidator(@Qualifier("TextValidator") TextValidator textValidator, CaseService caseService) {
         this.caseService = caseService;
+        this.textValidator = textValidator;
     }
 
     @Override
