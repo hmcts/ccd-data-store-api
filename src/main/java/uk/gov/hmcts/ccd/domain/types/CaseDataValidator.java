@@ -102,11 +102,13 @@ public class CaseDataValidator {
                                                        final String fieldIdPrefix,
                                                        final BaseType fieldType) {
 
-        Optional<FieldValidator> predefinedFieldValidator = validators.stream()
-            .filter(validator -> isPredefinedTypeFieldValidator(validator, caseFieldDefinition.getFieldTypeDefinition().getId())
-            ).findFirst();
+        Optional<FieldValidator> predefinedFieldValidator = validators.stream().filter(
+            validator -> isPredefinedTypeFieldValidator(validator, caseFieldDefinition.getFieldTypeDefinition().getId())
+        ).findFirst();
 
-        Optional<FieldValidator> baseTypeValidator = validators.stream().filter(validator -> isBaseTypeValidator(validator, fieldType)).findAny();
+        Optional<FieldValidator> baseTypeValidator = validators.stream().filter(validator ->
+            isBaseTypeValidator(validator, fieldType)
+        ).findFirst();
 
         Optional<FieldValidator> validatorToExecute = predefinedFieldValidator.or(() -> baseTypeValidator);
 
@@ -114,7 +116,7 @@ public class CaseDataValidator {
                 .stream()
                 .map(result -> new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
                 .collect(Collectors.toList()))
-            .orElseThrow(() -> new RuntimeException("System error: No validator found for " + fieldType.getType()));
+                .orElseThrow(() -> new RuntimeException("System error: No validator found for " + fieldType.getType()));
     }
 
     private boolean isPredefinedTypeFieldValidator(FieldValidator validator, String fieldID) {
