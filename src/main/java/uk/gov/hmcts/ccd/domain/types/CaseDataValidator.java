@@ -49,7 +49,8 @@ public class CaseDataValidator {
                     .map(caseField -> validateField(
                         caseDataPair.getKey(),
                         caseDataPair.getValue(),
-                        caseField, fieldIdPrefix
+                        caseField,
+                        fieldIdPrefix
                     ))
                     .orElseGet(() -> Collections.singletonList(
                         new ValidationResult("Field is not recognised", fieldIdPrefix + caseDataPair.getKey()))))
@@ -104,12 +105,14 @@ public class CaseDataValidator {
 
         Optional<FieldValidator> predefinedFieldValidator = validators.stream().filter(
             validator -> isPredefinedTypeFieldValidator(validator, caseFieldDefinition.getFieldTypeDefinition().getId())
-        ).findFirst();
+        ).findAny();
 
         Optional<FieldValidator> baseTypeValidator = validators.stream().filter(validator ->
             isBaseTypeValidator(validator, fieldType)
-        ).findFirst();
+        ).findAny();
 
+        //if a PredefinedTypeFieldValidator is configured, the field type BaseTypeValidator is not executed. The PredefinedTypeFieldValidator
+        // can execute it if needed
         Optional<FieldValidator> validatorToExecute = predefinedFieldValidator.or(() -> baseTypeValidator);
 
         return validatorToExecute.map(validator -> validator.validate(dataFieldId, dataValue, caseFieldDefinition)
