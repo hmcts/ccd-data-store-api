@@ -14,20 +14,14 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
 @Named("CaseLinkValidator")
 @Singleton
-public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeBaseTypeValidator {
-    public static final String TYPE_ID = "CaseLink";
+public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldValidator {
+
     public String predefinedFieldId = "TextCaseReference";
-    private static final String REGULAR_EXPRESSION = "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)";
     private CaseService caseService;
 
     @Inject
-    public TextCaseReferenceCaseLinkValidator(CaseService caseService) {
+    public TextCaseReferenceCaseLinkValidator(TextValidator textValidator, CaseService caseService) {
         this.caseService = caseService;
-    }
-
-    @Override
-    public BaseType getType() {
-        return BaseType.get(TYPE_ID);
     }
 
     @Override
@@ -35,15 +29,11 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeBaseTyp
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
 
-        if (isNullOrEmpty(dataValue)) {
-            return Collections.emptyList();
-        }
+        //TODO call TextValidator
 
-        final String value = dataValue.textValue();
-        if (!checkRegex(REGULAR_EXPRESSION, value)) {
-            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
-        }
-        return isAnExistingCase(value, dataFieldId);
+//        return isAnExistingCase(value, dataFieldId);
+
+        return Collections.emptyList();
     }
 
     private List<ValidationResult> isAnExistingCase(final String value, final String dataFieldId) {
