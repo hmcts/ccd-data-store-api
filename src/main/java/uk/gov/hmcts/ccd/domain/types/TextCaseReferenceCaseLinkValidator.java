@@ -11,11 +11,10 @@ import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
-@Named("CaseLinkValidator")
+@Named("TextCaseReferenceCaseLinkValidator")
 @Singleton
 public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldValidator {
 
-    public String predefinedFieldId = "TextCaseReference";
     private CaseService caseService;
     private TextValidator textValidator;
 
@@ -61,6 +60,6 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
 
     @Override
     public String getPredefinedFieldId() {
-        return this.predefinedFieldId;
+        return PredefinedFields.CASE_LINK_TEXT_CASE_REFERENCE.getFieldID();
     }
 }
