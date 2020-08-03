@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 /**
- * lists the field ID of the predefined types' fields
+ * Lists the field ID of the predefined types' fields.
  */
 public enum PredefinedFields {
 
