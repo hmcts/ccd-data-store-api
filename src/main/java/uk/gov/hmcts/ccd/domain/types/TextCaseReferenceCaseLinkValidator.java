@@ -17,8 +17,7 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeBaseTypeValidator {
     public static final String TYPE_ID = "CaseLink";
     public String predefinedFieldId = "TextCaseReference";
-    private static final String REGULAR_EXPRESSION ="(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)";
-
+    private static final String REGULAR_EXPRESSION = "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)";
     private CaseService caseService;
 
     @Inject
@@ -41,7 +40,7 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeBaseTyp
         }
 
         final String value = dataValue.textValue();
-        if (!checkRegex(REGULAR_EXPRESSION,value)) {
+        if (!checkRegex(REGULAR_EXPRESSION, value)) {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
         return isAnExistingCase(value, dataFieldId);
@@ -57,14 +56,14 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeBaseTyp
                     value + " does not correspond to an existing CCD case. Please update before proceeding",
                     dataFieldId)
             );
-        } catch (Exception exception){
+        } catch (Exception exception) {
             return Collections.emptyList();
         }
     }
 
-    private String formatCaseReference(String caseReference){
-        if(caseReference.contains("-")){
-            return String.join("", caseReference.split("-") );
+    private String formatCaseReference(String caseReference) {
+        if (caseReference.contains("-")) {
+            return String.join("", caseReference.split("-"));
         }
         return caseReference;
     }

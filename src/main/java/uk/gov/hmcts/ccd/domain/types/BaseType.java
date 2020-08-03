@@ -32,13 +32,6 @@ public class BaseType {
     public static void initialise() {
         BaseType.caseDefinitionRepository.getBaseTypes()
             .forEach(fieldType -> BaseType.register(new BaseType(fieldType)));
-
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId("CaseLink");
-        fieldTypeDefinition.setType("CaseLink");
-        BaseType baseTypeAA = new BaseType (fieldTypeDefinition);
-        BASE_TYPES.put(baseTypeAA.getType().toUpperCase(), baseTypeAA);
-
         BaseType.initialised = Boolean.TRUE;
     }
 
