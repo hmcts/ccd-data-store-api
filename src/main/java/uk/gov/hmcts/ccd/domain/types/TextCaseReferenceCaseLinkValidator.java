@@ -10,7 +10,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
-import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
 @Named("CaseLinkValidator")
 @Singleton
@@ -18,6 +17,7 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
 
     public String predefinedFieldId = "TextCaseReference";
     private CaseService caseService;
+    private TextValidator textValidator;
 
     @Inject
     public TextCaseReferenceCaseLinkValidator(TextValidator textValidator, CaseService caseService) {
@@ -29,11 +29,12 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
 
-        //TODO call TextValidator
-
-//        return isAnExistingCase(value, dataFieldId);
-
-        return Collections.emptyList();
+        List<ValidationResult> validationResults = textValidator.validate(dataFieldId, dataValue, caseFieldDefinition);
+        if (validationResults.isEmpty()) {
+            final String value = dataValue.textValue();
+            return isAnExistingCase(value, dataFieldId);
+        }
+        return validationResults;
     }
 
     private List<ValidationResult> isAnExistingCase(final String value, final String dataFieldId) {

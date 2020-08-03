@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-
-import java.util.List;
 
 public interface BaseTypeValidator extends FieldValidator {
 
