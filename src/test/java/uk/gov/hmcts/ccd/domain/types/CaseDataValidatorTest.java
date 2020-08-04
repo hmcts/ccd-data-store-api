@@ -339,6 +339,23 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldPassForTextCaseReference() throws Exception {
+
+        final String DATA = "{\n" +
+            "        \"CaseReference\": \"1596-1048-4059--OOOO\"\n" +
+            "      }";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        assertEquals(results.toString(), 1, results.size());
+
+        final ValidationResult result0 = results.get(0);
+        assertThat(result0.getFieldId(), equalTo("CaseReference"));
+
+    }
+
+    @Test
     public void textFieldWithMaxMin() throws Exception {
         final String caseFieldString =
             "[{\n" +
