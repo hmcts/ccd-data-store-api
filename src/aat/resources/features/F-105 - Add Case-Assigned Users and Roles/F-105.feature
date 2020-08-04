@@ -201,7 +201,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify Olawale's reception of the role CR-1 and CR-2 over the case C1] will get the expected response as in [S-105.13_Get_Case_Roles_for_Case_C1].
 
   # RDM-8842 AC-1
-  @S-105.8842.1
+  @S-105.14
   Scenario: Must successfully increment Assigned User Count when assigning a user and case role for a specific case (by a user calling through/from an authorised application)
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -215,33 +215,33 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a positive response is received,
     And the response has all the details as expected,
-    And a call [to verify Olawale's reception of the role CR-1 and CR-2 over the case C1] will get the expected response as in [S-105.8842.1_Verify_Case_Roles_for_Case_C1],
-    And a call [to verify the count of users assigned to C1 has increased by 1] will get the expected response as in [S-105.8842.1_Verify_Counter_1],
-    And a call [to repeat the same request as above] will get the expected response as in [S-105.8842.1_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles],
-    And a call [to verify the count of users assigned to C1 has NOT changed] will get the expected response as in [S-105.8842.1_Verify_Counter_2],
-    And a call [to repeat the same request as above this time with a different user, Hemanth] will get the expected response as in [S-105.8842.1_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles_Hemanth],
-    And a call [to verify the count of users assigned to a case has increased by 1] will get the expected response as in [S-105.8842.1_Verify_Counter_3].
+    And a call [to verify Olawale's reception of the role CR-1 and CR-2 over the case C1] will get the expected response as in [S-105.14_Verify_Case_Roles_for_Case_C1],
+    And a call [to verify the count of users assigned to C1 has increased by 1] will get the expected response as in [S-105.14_Verify_Counter_1],
+    And a call [to repeat the same request as above] will get the expected response as in [S-105.14_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles],
+    And a call [to verify the count of users assigned to C1 has NOT changed] will get the expected response as in [S-105.14_Verify_Counter_2],
+    And a call [to repeat the same request as above this time with a different user, Hemanth] will get the expected response as in [S-105.14_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles_Hemanth],
+    And a call [to verify the count of users assigned to a case has increased by 1] will get the expected response as in [S-105.14_Verify_Counter_3].
 
    # RDM-8842 AC-2
-   @S-105.8842.2
+   @S-105.15
    Scenario: Must not increment Assigned User Count when assigning a user and case role for a specific case if there was already a case user role assignment with the respective values in the request (by a user calling through/from an authorised application)
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
      And a user [Dil - who is to add some case role assignment for a case],
      And a user [Olawale - with an active solicitor profile and valid User ID],
      And a case [C1, which Richard has just] created as in [F-105_Case_Data_Create_C1],
-     And a successful call [to grant access for Olawale with a case role CR-1 over the case C1] as in [S-105.8842.2_Grant_Access],
+     And a successful call [to grant access for Olawale with a case role CR-1 over the case C1] as in [S-105.15_Grant_Access],
      And a successful call [to check the number of users having access to C1 in its supplementary data] as in [F-105_Prerequisite_Counter_Check_Call],
      When a request is prepared with appropriate values,
      And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-2 and the Organisation ID of Olawale],
      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
      Then a positive response is received,
      And the response has all the details as expected,
-     And a call [to verify Olawale's reception of the role CR-2 over the case C1] will get the expected response as in [S-105.8842.2_Verify_Case_Roles_for_Case_C1],
+     And a call [to verify Olawale's reception of the role CR-2 over the case C1] will get the expected response as in [S-105.15_Verify_Case_Roles_for_Case_C1],
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
    # RDM-8842 AC-3
-   @S-105.8842.3
+   @S-105.16
    Scenario: No organisation ID is provided by the user so Assigned User Count remains unchanged
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
@@ -254,11 +254,11 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
      Then a positive response is received,
      And the response has all the details as expected,
-     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.8842.3_Verify_Case_Roles_for_Case_C1],
+     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.16_Verify_Case_Roles_for_Case_C1],
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
    # RDM-8842 AC-4
-   @S-105.8842.4
+   @S-105.17
    Scenario: Invalid Organisation ID provided
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
@@ -273,5 +273,5 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
      Then a negative response is received,
      And the response has all the details as expected,
-     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.8842.4_Verify_Case_Roles_for_Case_C1],
+     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.17_Verify_Case_Roles_for_Case_C1],
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
