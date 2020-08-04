@@ -339,10 +339,33 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldPassForTextCaseReference() throws Exception {
-
+    public void shouldPassForTextCaseReferenceForFormat1() throws Exception {
         final String DATA = "{\n" +
-            "        \"CaseReference\": \"1596-1048-4059--OOOO\"\n" +
+            "        \"CaseReference\": \"1596-1048-4059-0000\"\n" +
+            "      }";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        assertEquals(results.toString(), 0, results.size());
+    }
+
+    @Test
+    public void shouldPassForTextCaseReferenceForFormat2() throws Exception {
+        final String DATA = "{\n" +
+            "        \"CaseReference\": \"1596104840590000\"\n" +
+            "      }";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        assertEquals(results.toString(), 0, results.size());
+    }
+
+    @Test
+    public void shouldFailForTextCaseReference() throws Exception {
+        final String DATA = "{\n" +
+            "        \"CaseReference\": \"1596XXXXX1048-4059XXXOOOO\"\n" +
             "      }";
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
@@ -352,7 +375,9 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final ValidationResult result0 = results.get(0);
         assertThat(result0.getFieldId(), equalTo("CaseReference"));
-
+        assertThat(result0.getErrorMessage(),
+            equalTo("The data entered is not valid for this type of field, please delete and re-enter using only valid data")
+        );
     }
 
     @Test

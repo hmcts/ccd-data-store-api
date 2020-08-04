@@ -18,7 +18,7 @@
     "field_type": {
       "type": "Text",
       "id": "TextCaseReference",
-      "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}$)"
+      "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)"
     }
   },
   {

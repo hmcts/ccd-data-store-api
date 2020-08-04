@@ -48,8 +48,6 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
                     value + " does not correspond to an existing CCD case. Please update before proceeding",
                     dataFieldId)
             );
-        } catch (Exception exception) {
-            return Collections.emptyList();
         }
     }
 
