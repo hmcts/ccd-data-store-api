@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleRequest;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 
 import java.util.List;
 
@@ -14,6 +14,6 @@ import java.util.List;
 public class AddCaseAssignedUserRolesRequest {
 
     @JsonProperty("case_users")
-    private List<CaseAssignedUserRoleRequest> caseAssignedUserRoleRequests;
+    private List<CaseAssignedUserRoleWithOrganisation> caseAssignedUserRoles;
 
 }
