@@ -31,7 +31,7 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
                                            final CaseFieldDefinition caseFieldDefinition) {
 
         List<ValidationResult> validationResults = textValidator.validate(dataFieldId, dataValue, caseFieldDefinition);
-        if (validationResults.isEmpty()) {
+        if (validationResults.isEmpty() && !textValidator.isNullOrEmpty(dataValue)) {
             final String value = dataValue.textValue();
             return isAnExistingCase(value, dataFieldId);
         }
