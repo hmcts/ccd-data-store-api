@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
-import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleRequest;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.cauroles.rolevalidator.CaseAssignedUserRoleValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 
@@ -39,9 +39,9 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
     @Test
     void shouldCallDefaultAddCaseUserRoles() {
         // ARRANGE
-        List<CaseAssignedUserRoleRequest> caseUserRolesRequests = Lists.newArrayList(
-            new CaseAssignedUserRoleRequest(),
-            new CaseAssignedUserRoleRequest()
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRolesRequests = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(),
+            new CaseAssignedUserRoleWithOrganisation()
         );
 
         // ACT

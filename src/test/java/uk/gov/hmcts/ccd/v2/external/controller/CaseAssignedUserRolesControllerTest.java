@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
-import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleRequest;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -103,11 +103,11 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void addCaseUserRoles_shouldCallAddWhenValidSingleGoodCaseUserRoleSupplied() {
             // ARRANGE
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD)
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT
             ResponseEntity<AddCaseAssignedUserRolesResponse> response =
@@ -118,17 +118,17 @@ class CaseAssignedUserRolesControllerTest {
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
             assertNotNull(response.getBody());
             assertEquals(ADD_SUCCESS_MESSAGE, response.getBody().getStatus());
-            verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoleRequests);
+            verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoles);
         }
 
         @Test
         void addCaseUserRoles_shouldCallAddWhenValidSingleGoodCaseUserRoleSupplied_withOrganisation() {
             // ARRANGE
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_GOOD)
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT
             ResponseEntity<AddCaseAssignedUserRolesResponse> response =
@@ -139,19 +139,19 @@ class CaseAssignedUserRolesControllerTest {
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
             assertNotNull(response.getBody());
             assertEquals(ADD_SUCCESS_MESSAGE, response.getBody().getStatus());
-            verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoleRequests);
+            verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoles);
         }
 
         @Test
         void addCaseUserRoles_shouldCallAddWhenValidMultipleGoodCaseUserRolesSupplied() {
             // ARRANGE
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD),
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD),
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD, ORGANISATION_ID_GOOD)
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD),
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD),
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD, ORGANISATION_ID_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT
             ResponseEntity<AddCaseAssignedUserRolesResponse> response =
@@ -162,7 +162,7 @@ class CaseAssignedUserRolesControllerTest {
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
             assertNotNull(response.getBody());
             assertEquals(ADD_SUCCESS_MESSAGE, response.getBody().getStatus());
-            verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoleRequests);
+            verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoles);
         }
 
         @Test
@@ -212,9 +212,9 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void addCaseUserRoles_throwsExceptionWhenEmptyCaseUserRolesListPassed() {
             // ARRANGE
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList();
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList();
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -229,12 +229,12 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void addCaseUserRoles_throwsExceptionWhenInvalidCaseIdPassed() {
             // ARRANGE
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 // case_id: has to be a valid 16-digit Luhn number
-                new CaseAssignedUserRoleRequest(CASE_ID_BAD, USER_ID_1, CASE_ROLE_GOOD)
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -249,12 +249,12 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void addCaseUserRoles_throwsExceptionWhenInvalidUserIdPassed() {
             // ARRANGE
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 // user_id: has to be a string of length > 0
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, "", CASE_ROLE_GOOD)
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -269,12 +269,12 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void addCaseUserRoles_throwsExceptionWhenInvalidCaseRolePassed() {
             // ARRANGE
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 // case_role: has to be a none-empty string in square brackets
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, "", CASE_ROLE_BAD)
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_BAD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -289,12 +289,12 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void addCaseUserRoles_throwsExceptionWhenInvalidOrganisationIdPassed() {
             // ARRANGE
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 // organisation_id: has to be a non-empty string, when present
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_BAD)
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_BAD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -309,17 +309,17 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void addCaseUserRoles_throwsExceptionWhenMultipleErrorsPassed() {
             // ARRANGE
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList(
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 // case_id: has to be a valid 16-digit Luhn number
                 // case_role: has to be a none-empty string in square brackets
-                new CaseAssignedUserRoleRequest(CASE_ID_BAD, USER_ID_1, CASE_ROLE_BAD),
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_BAD),
                 // user_id: has to be a string of length > 0
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, "", CASE_ROLE_GOOD),
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD),
                 // organisation_id: has to be a non-empty string, when present
-                new CaseAssignedUserRoleRequest(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_BAD)
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_BAD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -585,10 +585,10 @@ class CaseAssignedUserRolesControllerTest {
         }
 
         private AddCaseAssignedUserRolesRequest createAddCaseAssignedUserRolesRequest(int numberRequired) {
-            List<CaseAssignedUserRoleRequest> caseUserRoleRequests = Lists.newArrayList();
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList();
 
             for (int i = 1; i <= numberRequired; i++) {
-                caseUserRoleRequests.add(new CaseAssignedUserRoleRequest(
+                caseUserRoles.add(new CaseAssignedUserRoleWithOrganisation(
                     // count up, square, count down
                     Integer.toString(i),  // test data is: count up
                     Integer.toString(i * i), // test data is: square
@@ -596,7 +596,7 @@ class CaseAssignedUserRolesControllerTest {
                 ));
             }
 
-            return new AddCaseAssignedUserRolesRequest(caseUserRoleRequests);
+            return new AddCaseAssignedUserRolesRequest(caseUserRoles);
         }
 
     }

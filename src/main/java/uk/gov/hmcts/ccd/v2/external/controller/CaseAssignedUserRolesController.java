@@ -31,7 +31,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
-import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleRequest;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -124,7 +124,7 @@ public class CaseAssignedUserRolesController {
         String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
         if (applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(clientServiceName)) {
             validateRequestParams(addCaseAssignedUserRolesRequest);
-            this.caseAssignedUserRolesOperation.addCaseUserRoles(addCaseAssignedUserRolesRequest.getCaseAssignedUserRoleRequests());
+            this.caseAssignedUserRolesOperation.addCaseUserRoles(addCaseAssignedUserRolesRequest.getCaseAssignedUserRoles());
             return ResponseEntity.status(HttpStatus.CREATED).body(new AddCaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
         } else {
             throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
@@ -205,7 +205,7 @@ public class CaseAssignedUserRolesController {
 
         List<String> errorMessages = Lists.newArrayList("Invalid data provided for the following inputs to the request:");
 
-        List<CaseAssignedUserRoleRequest> caseUserRoles =
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles =
             caseAssignedUserRolesToStream(addCaseAssignedUserRolesRequest).collect(Collectors.toList());
 
         /// case-users: must be none empty
@@ -221,7 +221,7 @@ public class CaseAssignedUserRolesController {
         }
     }
 
-    private void validateCaseAssignedUserRoleRequest(CaseAssignedUserRoleRequest caseRole, List<String> errorMessages) {
+    private void validateCaseAssignedUserRoleRequest(CaseAssignedUserRoleWithOrganisation caseRole, List<String> errorMessages) {
         // case_id: has to be a valid 16-digit Luhn number
         if (!caseReferenceService.validateUID(caseRole.getCaseDataId())) {
             errorMessages.add(V2.Error.CASE_ID_INVALID);
@@ -267,9 +267,9 @@ public class CaseAssignedUserRolesController {
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
-    private static Stream<CaseAssignedUserRoleRequest> caseAssignedUserRolesToStream(AddCaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
+    private static Stream<CaseAssignedUserRoleWithOrganisation> caseAssignedUserRolesToStream(AddCaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
         return addCaseAssignedUserRolesRequest != null
-            ? Optional.ofNullable(addCaseAssignedUserRolesRequest.getCaseAssignedUserRoleRequests())
+            ? Optional.ofNullable(addCaseAssignedUserRolesRequest.getCaseAssignedUserRoles())
                 .map(Collection::stream)
                 .orElseGet(Stream::empty)
             : Stream.empty();

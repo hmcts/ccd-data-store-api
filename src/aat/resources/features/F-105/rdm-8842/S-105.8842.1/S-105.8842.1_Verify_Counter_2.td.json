@@ -3,7 +3,7 @@
   "_extends_": "F-105_Check_Orgs_Assigned_Users_Base",
 
   "specs": [
-    "to verify the count of users assigned to C1 has NOT increased"
+    "to verify the count of users assigned to C1 has NOT changed"
   ],
 
   "expectedResponse": {
