@@ -163,7 +163,8 @@ public class CaseController {
         )
     })
     @ResponseStatus(HttpStatus.CREATED) // To remove default 200 response from Swagger
-    @ApiImplicitParams(
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = V2.EXPERIMENTAL_HEADER, value = "'true' to use this endpoint", paramType = "header"),
         @ApiImplicitParam(
             name = "content",
             value = "Case data content for the event. Note that the `data` property is used for event submission data; NOT the `event_data`",
@@ -225,7 +226,7 @@ public class CaseController {
             ),
             required = true,
             dataTypeClass = CaseDataContent.class
-        )
+        )}
     )
     @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
