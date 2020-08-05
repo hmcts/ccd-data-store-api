@@ -8,11 +8,9 @@
     "_extends_": "F-105_User_Dil"
   },
   "userOlawale": {
-    "username": "befta.caseworker.2.solicitor.3@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
+    "_extends_": "F-105_User_Olawale"
   },
   "userHemanth": {
-    "username": "befta.caseworker.caa@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_CAA_PWD]]"
+    "_extends_": "F-105_User_Hemanth"
   }
 }

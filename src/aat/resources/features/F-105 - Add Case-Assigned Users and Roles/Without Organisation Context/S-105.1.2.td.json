@@ -18,12 +18,10 @@
       "password": "[[$CCD_BEFTA_CASEWORKER_CAA_PWD]]"
     },
     "userRichard": {
-      "username": "befta.caseworker.2.solicitor.1@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+      "_extends_": "F-105_User_Richard"
     },
     "userOlawale": {
-      "username": "befta.caseworker.2.solicitor.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
+      "_extends_": "F-105_User_Olawale"
     }
 
   },
