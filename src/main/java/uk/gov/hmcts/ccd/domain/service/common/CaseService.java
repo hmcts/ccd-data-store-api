@@ -96,7 +96,7 @@ public class CaseService {
     }
 
     public CaseDetails getCaseDetailsByCaseReference(String caseReference) {
-        final Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseReference);
+        final Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReferenceWithNoAccessControl(caseReference);
         return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
     }
 

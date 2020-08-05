@@ -180,10 +180,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
      * Required in some corner cases but {@link CaseDetailsRepository#findByReference(String, Long)} should be used most of the times
      */
     @Override
-    public Optional<CaseDetailsEntity> findByReferenceWithNoAccessControl(Long reference) {
+    public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
         CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectUnsecured(em);
         qb.whereReference(String.valueOf(reference));
-        return qb.getSingleResult();
+        return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
     }
 
     private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id, String reference, CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
