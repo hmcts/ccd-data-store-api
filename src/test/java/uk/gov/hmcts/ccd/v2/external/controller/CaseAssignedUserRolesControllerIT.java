@@ -37,8 +37,8 @@ import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesRequest;
-import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesResponse;
+import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
+import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
 import javax.inject.Inject;
@@ -190,7 +190,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         final MvcResult result = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isCreated())
             .andReturn();
@@ -199,7 +199,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        AddCaseAssignedUserRolesResponse response = mapper.readValue(content, AddCaseAssignedUserRolesResponse.class);
+        CaseAssignedUserRolesResponse response = mapper.readValue(content, CaseAssignedUserRolesResponse.class);
         assertNotNull("Response should not be null", response);
         assertEquals("Success message should be returned", ADD_SUCCESS_MESSAGE, response.getStatus());
 
@@ -227,7 +227,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -259,7 +259,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -291,7 +291,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -323,7 +323,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -358,7 +358,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(httpHeaders))
             .andExpect(status().isForbidden())
             .andReturn().getResolvedException();
@@ -390,7 +390,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -422,7 +422,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -448,7 +448,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(null)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(null)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -472,7 +472,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -500,7 +500,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isNotFound())
             .andReturn().getResolvedException();
@@ -532,7 +532,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         final MvcResult result = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isCreated())
             .andReturn();
@@ -541,7 +541,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        AddCaseAssignedUserRolesResponse response = mapper.readValue(content, AddCaseAssignedUserRolesResponse.class);
+        CaseAssignedUserRolesResponse response = mapper.readValue(content, CaseAssignedUserRolesResponse.class);
         assertNotNull("Response should not be null", response);
         assertEquals("Success message should be returned", ADD_SUCCESS_MESSAGE, response.getStatus());
 
@@ -576,7 +576,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         final MvcResult result = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(httpHeaders))
             .andExpect(status().isCreated())
             .andReturn();
@@ -585,7 +585,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        AddCaseAssignedUserRolesResponse response = mapper.readValue(content, AddCaseAssignedUserRolesResponse.class);
+        CaseAssignedUserRolesResponse response = mapper.readValue(content, CaseAssignedUserRolesResponse.class);
         assertNotNull("Response should not be null", response);
         assertEquals("Success message should be returned", ADD_SUCCESS_MESSAGE, response.getStatus());
 
@@ -625,7 +625,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // first call
         mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles1)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles1)))
             .headers(createHttpHeaders()))
             .andExpect(status().isCreated())
             .andReturn();
@@ -634,7 +634,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // second call (repeat)
         mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles1)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles1)))
             .headers(createHttpHeaders()))
             .andExpect(status().isCreated())
             .andReturn();
@@ -643,7 +643,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // third call (different user)
         mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles2)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles2)))
             .headers(createHttpHeaders()))
             .andExpect(status().isCreated())
             .andReturn();
@@ -691,7 +691,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // make test call
         mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isCreated())
             .andReturn();
@@ -734,7 +734,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // make test call
         mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isCreated())
             .andReturn();
@@ -778,7 +778,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // make test call
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();

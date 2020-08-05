@@ -36,6 +36,8 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Service
 public class CaseAccessOperation {
 
+    public static final String ORGS_ASSIGNED_USERS_PAH = "orgs_assigned_users.";
+
     private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseRoleRepository caseRoleRepository;
@@ -96,7 +98,7 @@ public class CaseAccessOperation {
 
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
 
-        Map<String, Map<String, Object>> newUserCounts = getNewUserCountByCaseAndOrganisation(cauRolesByCaseId);
+        Map<String, Map<String, Long>> newUserCounts = getNewUserCountByCaseAndOrganisation(cauRolesByCaseId);
 
         cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
@@ -106,8 +108,28 @@ public class CaseAccessOperation {
 
         newUserCounts.forEach((caseReference, orgNewUserCountMap) ->
             orgNewUserCountMap.forEach((organisationId, newUserCount) ->
-                supplementaryDataRepository.incrementSupplementaryData(caseReference, "orgs_assigned_users." + organisationId, newUserCount)
+                supplementaryDataRepository.incrementSupplementaryData(caseReference, ORGS_ASSIGNED_USERS_PAH + organisationId, newUserCount)
             )
+        );
+    }
+
+    @Transactional
+    public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
+
+        cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
+                requestedAssignments.forEach(requestedAssignment ->
+                        caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(), requestedAssignment.getCaseRole())
+                )
+        );
+
+        Map<String, Map<String, Long>> removeUserCounts = null; // TODO : get counts map
+
+        removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
+                orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
+                        supplementaryDataRepository.incrementSupplementaryData(caseReference, ORGS_ASSIGNED_USERS_PAH + organisationId, Math.negateExact(removeUserCount))
+                )
         );
     }
 
@@ -145,8 +167,8 @@ public class CaseAccessOperation {
         return cauRolesByCaseId;
     }
 
-    private Map<String, Map<String, Object>> getNewUserCountByCaseAndOrganisation(Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
-        Map<String, Map<String, Object>> result = new HashMap<>();
+    private Map<String, Map<String, Long>> getNewUserCountByCaseAndOrganisation(Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
+        Map<String, Map<String, Long>> result = new HashMap<>();
 
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId = cauRolesByCaseId.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
@@ -189,7 +211,7 @@ public class CaseAccessOperation {
         caseUserRolesWhichHaveAnOrgId.forEach((caseId, requestedAssignments) -> {
             List<String> existingUsersForCase = existingCaseUserRelationships.getOrDefault(caseId, new ArrayList<>());
 
-            Map<String, Object> newRelationshipCounts = requestedAssignments.stream()
+            Map<String, Long> newRelationshipCounts = requestedAssignments.stream()
                 // filter out any existing relationships
                 .filter(cauRole -> !existingUsersForCase.contains(cauRole.getUserId()))
                 // count unique users for each organisation
