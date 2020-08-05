@@ -124,7 +124,8 @@ public class CaseAccessOperation {
                 )
         );
 
-        Map<String, Map<String, Long>> removeUserCounts = null; // TODO : get counts map
+        // TODO : get remove counts map
+        Map<String, Map<String, Long>> removeUserCounts = getNewUserCountByCaseAndOrganisation(cauRolesByCaseId);
 
         removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
                 orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
