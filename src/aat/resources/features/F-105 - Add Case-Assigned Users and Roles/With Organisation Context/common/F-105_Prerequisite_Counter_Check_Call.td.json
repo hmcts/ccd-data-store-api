@@ -6,21 +6,13 @@
     "to check the number of users having access to C1 in its supplementary data"
   ],
 
-  "request": {
-    "body": {
-      "supplementary_data_updates": {
-        "$inc": {
-          "orgs_assigned_users.orgA": 0
-        }
-      }
-    }
-  },
+  "prerequisites": [
+    "F-105_Get_Organisation_Identifier_Olawale"
+  ],
 
   "expectedResponse": {
     "body": {
-      "supplementary_data": {
-        "orgs_assigned_users.orgA": 0
-      }
+      "supplementary_data": "[[ANYTHING_PRESENT]]"
     }
   }
 }

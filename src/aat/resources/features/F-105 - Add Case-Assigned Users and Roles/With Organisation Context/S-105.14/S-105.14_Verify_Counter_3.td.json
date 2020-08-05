@@ -8,9 +8,7 @@
 
   "expectedResponse": {
     "body": {
-      "supplementary_data": {
-        "orgs_assigned_users.orgA": 2
-      }
+      "supplementary_data": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.F-105_Prerequisite_Counter_Check_Call.childContexts.F-105_Get_Organisation_Identifier_Olawale|siblingContexts.S-105\\.14_Verify_Counter_2|1]}"
     }
   }
 }
