@@ -373,4 +373,42 @@ class CachedCaseDetailsRepositoryTest {
             );
         }
     }
+
+    @Nested
+    @DisplayName("findByReferenceWithNoAccessControl(String)")
+    class FindByReferenceWithNoAccessControl {
+        @Test
+        @DisplayName("should initially retrieve case details from decorated repository")
+        void findByReferenceWithNoAccessControl() {
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReferenceWithNoAccessControl(CASE_REFERENCE_STR);
+
+            final CaseDetails returned = cachedRepository.findByReferenceWithNoAccessControl(CASE_REFERENCE_STR)
+                .orElseThrow(() -> new AssertionError("Not found"));
+
+            assertAll(
+                () -> assertThat(returned, is(caseDetails)),
+                () -> verify(caseDetailsRepository, times(1)).findByReferenceWithNoAccessControl(CASE_REFERENCE_STR)
+            );
+        }
+
+        @Test
+        @DisplayName("should cache case details for subsequent calls")
+        void findByReferenceWithNoAccessControlAgain() {
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReferenceWithNoAccessControl(CASE_REFERENCE_STR);
+
+            cachedRepository.findByReferenceWithNoAccessControl(CASE_REFERENCE_STR);
+
+            verify(caseDetailsRepository, times(1)).findByReferenceWithNoAccessControl(CASE_REFERENCE_STR);
+
+            doReturn(Optional.of(new CaseDetails())).when(caseDetailsRepository).findByReferenceWithNoAccessControl(CASE_REFERENCE_STR);
+
+            final CaseDetails returned = cachedRepository.findByReferenceWithNoAccessControl(CASE_REFERENCE_STR)
+                .orElseThrow(() -> new AssertionError("Not found"));
+
+            assertAll(
+                () -> assertThat(returned, is(caseDetails)),
+                () -> verifyNoMoreInteractions(caseDetailsRepository)
+            );
+        }
+    }
 }
