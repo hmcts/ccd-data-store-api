@@ -67,7 +67,7 @@ class CaseDetailsQueryBuilderFactoryTest {
         @Test
         @DisplayName("should secure new builder instance with user authorisation")
         void secureNewInstance() {
-            final CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.select(em);
+            final CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.selectSecured(em);
 
             assertAll(
                 () -> assertThat(queryBuilder, is(notNullValue())),
@@ -84,7 +84,7 @@ class CaseDetailsQueryBuilderFactoryTest {
         @DisplayName("should secure select query")
         void shouldSecureSelectQuery() {
             MetaData metaData = new MetaData("caseType", "jurisdiction");
-            CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.select(em, metaData);
+            CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.selectSecured(em, metaData);
             assertAll(
                 () -> assertThat(queryBuilder, is(notNullValue())),
                 () -> verify(userAuthorisationSecurity).secure(queryBuilder, metaData),
@@ -99,7 +99,7 @@ class CaseDetailsQueryBuilderFactoryTest {
             MetaData metaData = new MetaData("caseType", "jurisdiction");
             metaData.setSortDirection(Optional.of(sortDirection));
 
-            CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.select(em, metaData);
+            CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.selectSecured(em, metaData);
             queryBuilder.orderBy(metaData);
 
             assertAll(

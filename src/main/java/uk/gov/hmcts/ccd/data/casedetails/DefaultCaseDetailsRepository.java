@@ -166,12 +166,21 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     // be annotated with @NotNull
     private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
-        final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.select(em);
+        final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectSecured(em);
 
         if (null != jurisdiction) {
             qb.whereJurisdiction(jurisdiction);
         }
 
+        return getCaseDetailsEntity(id, reference, qb);
+    }
+
+    /**
+     * Finds a case without applying access control
+     */
+    @Override
+    public Optional<CaseDetailsEntity> findWithNoAccessControl(Long id, String reference) {
+        CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectUnsecured(em);
         return getCaseDetailsEntity(id, reference, qb);
     }
 

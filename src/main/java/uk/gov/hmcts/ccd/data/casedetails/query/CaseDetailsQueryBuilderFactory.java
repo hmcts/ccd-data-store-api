@@ -18,12 +18,12 @@ public class CaseDetailsQueryBuilderFactory {
         this.caseDetailsAuthorisationSecurities = caseDetailsAuthorisationSecurities;
     }
 
-    public CaseDetailsQueryBuilder<CaseDetailsEntity> select(EntityManager em, MetaData metaData) {
+    public CaseDetailsQueryBuilder<CaseDetailsEntity> selectSecured(EntityManager em, MetaData metaData) {
         return secure(new SelectCaseDetailsQueryBuilder(em), metaData);
     }
 
-    public CaseDetailsQueryBuilder<CaseDetailsEntity> select(EntityManager em) {
-        return select(em, null);
+    public CaseDetailsQueryBuilder<CaseDetailsEntity> selectSecured(EntityManager em) {
+        return selectSecured(em, null);
     }
 
     public CaseDetailsQueryBuilder<Long> count(EntityManager em, MetaData metaData) {
@@ -33,5 +33,9 @@ public class CaseDetailsQueryBuilderFactory {
     private <T> CaseDetailsQueryBuilder<T> secure(CaseDetailsQueryBuilder<T> builder, MetaData metadata) {
         caseDetailsAuthorisationSecurities.forEach(security -> security.secure(builder, metadata));
         return builder;
+    }
+
+    public CaseDetailsQueryBuilder<CaseDetailsEntity> selectUnsecured(EntityManager em) {
+        return new SelectCaseDetailsQueryBuilder(em);
     }
 }
