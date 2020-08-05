@@ -1,0 +1,16 @@
+{
+  "_guid_": "S-105.14_Verify_Counter_3",
+  "_extends_": "F-105_Check_Orgs_Assigned_Users_Base",
+
+  "specs": [
+    "to verify the count of users assigned to a case has increased by 1"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": {
+        "orgs_assigned_users.orgA": 2
+      }
+    }
+  }
+}
