@@ -31,6 +31,8 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
+  cluster.initial_master_nodes:
+    - "{{ .Release.Name }}-es-master"
   imageTag: "7.7.0"
   replicas: 1
   minimumMasterNodes: 1
