@@ -1,5 +1,5 @@
 @F-110
-Feature: Feature: F-110: Create case for caseworker using V2 api
+Feature: F-110: Create case for caseworker using V2 api
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
