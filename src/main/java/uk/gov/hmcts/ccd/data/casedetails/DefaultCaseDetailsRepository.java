@@ -176,12 +176,14 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     /**
-     * Finds a case without applying access control
+     * Finds a case using a query builder that doesn't secure the query.
+     * Required in some corner cases but {@link CaseDetailsRepository#findByReference(String, Long)} should be used most of the times
      */
     @Override
-    public Optional<CaseDetailsEntity> findWithNoAccessControl(Long id, String reference) {
+    public Optional<CaseDetailsEntity> findByReferenceWithNoAccessControl(Long reference) {
         CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectUnsecured(em);
-        return getCaseDetailsEntity(id, reference, qb);
+        qb.whereReference(String.valueOf(reference));
+        return qb.getSingleResult();
     }
 
     private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id, String reference, CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
