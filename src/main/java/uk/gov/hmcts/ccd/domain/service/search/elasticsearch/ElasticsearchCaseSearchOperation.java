@@ -132,7 +132,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             String indexName = getIndexName(response);
             caseTypeResults.add(new CaseTypeResults(getCaseTypeIDFromIndex(indexName,
                 crossCaseTypeSearchRequest.getCaseTypeIds()),
-                response.searchResult.getTotal())
+                new JestSearchResult(response.searchResult).getTotal())
             );
         }
     }
