@@ -128,7 +128,8 @@ public class CaseAccessOperation {
 
         removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
                 orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
-                        supplementaryDataRepository.incrementSupplementaryData(caseReference, ORGS_ASSIGNED_USERS_PAH + organisationId, Math.negateExact(removeUserCount))
+                        supplementaryDataRepository.incrementSupplementaryData(caseReference,
+                                ORGS_ASSIGNED_USERS_PAH + organisationId, Math.negateExact(removeUserCount))
                 )
         );
     }

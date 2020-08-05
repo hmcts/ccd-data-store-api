@@ -128,7 +128,7 @@ public class CaseAssignedUserRolesController {
         if (applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(clientServiceName)) {
             validateRequestParams(caseAssignedUserRolesRequest);
             this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
-            return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new CaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
         } else {
             throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
         }
