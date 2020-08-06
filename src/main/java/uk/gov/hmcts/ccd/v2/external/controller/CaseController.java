@@ -163,75 +163,64 @@ public class CaseController {
         )
     })
     @ResponseStatus(HttpStatus.CREATED) // To remove default 200 response from Swagger
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = V2.EXPERIMENTAL_HEADER, value = "'true' to use this endpoint", paramType = "header"),
-        @ApiImplicitParam(
-            name = "content",
-            value = "Case data content for the event. Note that the `data` property is used for event submission data; NOT the `event_data`",
-            examples = @Example(value =
-                @ExampleProperty(
-                    mediaType = "application/json",
-                    value = "{\n"
-                        + "    \"data\": {\n"
-                        + "        \"TextField\": \"TextField1\",\n"
-                        + "        \"NumberField\": \"123\",\n"
-                        + "        \"YesOrNoField\": \"Yes\",\n"
-                        + "        \"PhoneUKField\": \"01234 567890\",\n"
-                        + "        \"EmailField\": \"email@gmail.com\",\n"
-                        + "        \"MoneyGBPField\": \"12300\",\n"
-                        + "        \"DateField\": \"2015-12-23\",\n"
-                        + "        \"DateTimeField\": \"2000-05-17T12:30:00.000\",\n"
-                        + "        \"FixedListField\": \"VALUE3\",\n"
-                        + "        \"MultiSelectListField\": [\n"
-                        + "            \"OPTION5\",\n"
-                        + "            \"OPTION4\"\n"
-                        + "        ],\n"
-                        + "        \"ComplexField\": {\n"
-                        + "            \"ComplexTextField\": \"Nested text field\",\n"
-                        + "            \"ComplexFixedListField\": null,\n"
-                        + "            \"ComplexNestedField\": {\n"
-                        + "                \"NestedNumberField\": \"987\",\n"
-                        + "                \"NestedCollectionTextField\": []\n"
-                        + "            }\n"
-                        + "        },\n"
-                        + "        \"CollectionField\": [\n"
-                        + "            {\n"
-                        + "                \"id\": null,\n"
-                        + "                \"value\": \"Collection field 1\"\n"
-                        + "            },\n"
-                        + "            {\n"
-                        + "                \"id\": null,\n"
-                        + "                \"value\": \"Collection field 2\"\n"
-                        + "            }\n"
-                        + "        ],\n"
-                        + "        \"AddressUKField\": {\n"
-                        + "            \"AddressLine1\": \"1 The Street\",\n"
-                        + "            \"AddressLine2\": \"\",\n"
-                        + "            \"AddressLine3\": \"\",\n"
-                        + "            \"PostTown\": \"Town\",\n"
-                        + "            \"County\": \"County\",\n"
-                        + "            \"PostCode\": \"AB1 2CD\",\n"
-                        + "            \"Country\": \"England\"\n"
-                        + "        }\n"
-                        + "    },\n"
-                        + "    \"event\": {\n"
-                        + "        \"id\": \"UPDATE\",\n"
-                        + "        \"summary\": \"\",\n"
-                        + "        \"description\": \"\"\n"
-                        + "    },\n"
-                        + "    \"event_token\": \"<event token>\",\n"
-                        + "    \"ignore_warning\": false\n"
-                        + "}"
-                )
-            ),
-            required = true,
-            dataTypeClass = CaseDataContent.class
-        )}
-    )
     @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted", required = true)
                                                     @PathVariable("caseId") String caseId,
+                                                    @ApiParam(value = "Case data content for the event. Note that the `data` property is used for event submission data; NOT the `event_data`. For example:\n"
+                                                        + "```\n"
+                                                        + "{\n"
+                                                        + "    \"data\": {\n"
+                                                        + "        \"TextField\": \"TextField1\",\n"
+                                                        + "        \"NumberField\": \"123\",\n"
+                                                        + "        \"YesOrNoField\": \"Yes\",\n"
+                                                        + "        \"PhoneUKField\": \"01234 567890\",\n"
+                                                        + "        \"EmailField\": \"email@gmail.com\",\n"
+                                                        + "        \"MoneyGBPField\": \"12300\",\n"
+                                                        + "        \"DateField\": \"2015-12-23\",\n"
+                                                        + "        \"DateTimeField\": \"2000-05-17T12:30:00.000\",\n"
+                                                        + "        \"FixedListField\": \"VALUE3\",\n"
+                                                        + "        \"MultiSelectListField\": [\n"
+                                                        + "            \"OPTION5\",\n"
+                                                        + "            \"OPTION4\"\n"
+                                                        + "        ],\n"
+                                                        + "        \"ComplexField\": {\n"
+                                                        + "            \"ComplexTextField\": \"Nested text field\",\n"
+                                                        + "            \"ComplexFixedListField\": null,\n"
+                                                        + "            \"ComplexNestedField\": {\n"
+                                                        + "                \"NestedNumberField\": \"987\",\n"
+                                                        + "                \"NestedCollectionTextField\": []\n"
+                                                        + "            }\n"
+                                                        + "        },\n"
+                                                        + "        \"CollectionField\": [\n"
+                                                        + "            {\n"
+                                                        + "                \"id\": null,\n"
+                                                        + "                \"value\": \"Collection field 1\"\n"
+                                                        + "            },\n"
+                                                        + "            {\n"
+                                                        + "                \"id\": null,\n"
+                                                        + "                \"value\": \"Collection field 2\"\n"
+                                                        + "            }\n"
+                                                        + "        ],\n"
+                                                        + "        \"AddressUKField\": {\n"
+                                                        + "            \"AddressLine1\": \"1 The Street\",\n"
+                                                        + "            \"AddressLine2\": \"\",\n"
+                                                        + "            \"AddressLine3\": \"\",\n"
+                                                        + "            \"PostTown\": \"Town\",\n"
+                                                        + "            \"County\": \"County\",\n"
+                                                        + "            \"PostCode\": \"AB1 2CD\",\n"
+                                                        + "            \"Country\": \"England\"\n"
+                                                        + "        }\n"
+                                                        + "    },\n"
+                                                        + "    \"event\": {\n"
+                                                        + "        \"id\": \"UPDATE\",\n"
+                                                        + "        \"summary\": \"\",\n"
+                                                        + "        \"description\": \"\"\n"
+                                                        + "    },\n"
+                                                        + "    \"event_token\": \"<event token>\",\n"
+                                                        + "    \"ignore_warning\": false\n"
+                                                        + "}"
+                                                        + "\n```", required = true)
                                                     @RequestBody final CaseDataContent content) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
