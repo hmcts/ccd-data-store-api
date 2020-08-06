@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -170,7 +169,8 @@ public class CaseController {
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted", required = true)
                                                     @PathVariable("caseId") String caseId,
-                                                    @ApiParam(value = "Case data content for the event. Note that the `data` property is used for event submission data; NOT the `event_data`. For example:\n"
+                                                    @ApiParam(value = "Case data content for the event. Note that the `data` property "
+                                                        + "is used for event submission data; NOT the `event_data`. For example:\n"
                                                         + "```\n"
                                                         + "{\n"
                                                         + "    \"data\": {\n"
