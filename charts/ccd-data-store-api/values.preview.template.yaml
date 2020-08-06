@@ -31,7 +31,8 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
-  cluster.initial_master_nodes: ccd-data-store-api-pr-1034-es-master-0
+  environment:
+    - cluster.initial_master_nodes=ccd-data-store-api-pr-1034-es-master-0
   imageTag: "7.7.0"
   replicas: 1
   minimumMasterNodes: 1
