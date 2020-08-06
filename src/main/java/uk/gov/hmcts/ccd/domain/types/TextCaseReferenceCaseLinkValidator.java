@@ -45,7 +45,7 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
         } catch (ResourceNotFoundException resourceNotFoundException) {
             return Collections.singletonList(
                 new ValidationResult(
-                    value + " does not correspond to an existing CCD case. Please update before proceeding",
+                    value + " does not correspond to an existing CCD case.",
                     dataFieldId)
             );
         }
