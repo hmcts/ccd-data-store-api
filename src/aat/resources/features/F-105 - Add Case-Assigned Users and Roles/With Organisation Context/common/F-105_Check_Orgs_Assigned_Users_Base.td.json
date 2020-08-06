@@ -23,9 +23,7 @@
     },
     "body": {
       "supplementary_data_updates": {
-        "$inc": {
-          "orgs_assigned_users.orgA": 0
-        }
+        "$inc": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.F-105_Prerequisite_Counter_Check_Call.childContexts.F-105_Get_Organisation_Identifier_Olawale]}"
       }
     }
   },
