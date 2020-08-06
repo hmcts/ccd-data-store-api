@@ -47,6 +47,11 @@
                 "regular_expression": null,
                 "fixed_list_items": [
                   {
+                    "code" : "VALUE4",
+                    "label" : "Value 4",
+                    "order" : null
+                  },
+                  {
                     "code": "VALUE3",
                     "label": "Value 3",
                     "order": null

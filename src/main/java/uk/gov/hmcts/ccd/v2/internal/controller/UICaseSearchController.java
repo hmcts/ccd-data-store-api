@@ -125,7 +125,7 @@ public class UICaseSearchController {
         Instant start = Instant.now();
 
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
-        String useCaseUppercase = Strings.isNullOrEmpty(useCase) || searchRequest.hasSource() ? null : useCase.toUpperCase();
+        String useCaseUppercase = Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields() ? null : useCase.toUpperCase();
         elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCaseUppercase);
         List<String> requestedFields = searchRequest.getRequestedFields();
 

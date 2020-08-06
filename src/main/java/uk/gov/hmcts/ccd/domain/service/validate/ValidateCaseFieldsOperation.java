@@ -11,5 +11,6 @@ public interface ValidateCaseFieldsOperation {
                                               final CaseDataContent content);
 
     void validateData(final Map<String, JsonNode> data,
-                      final CaseTypeDefinition caseTypeDefinition);
+                      final CaseTypeDefinition caseTypeDefinition,
+                      final CaseDataContent content);
 }

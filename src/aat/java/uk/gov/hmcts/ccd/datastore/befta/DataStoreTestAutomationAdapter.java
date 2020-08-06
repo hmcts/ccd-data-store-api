@@ -1,11 +1,14 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import io.cucumber.java.Before;
+import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
-import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
+
+import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
 
@@ -13,11 +16,22 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
+    private static String uniqueString;
+
+    @Before
+    public void createUID() {
+        uniqueString = UUID.randomUUID().toString();
+    }
+
+    @Before("@elasticsearch")
+    public void skipElasticSearchTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("ELASTIC_SEARCH_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("Elastic Search not Enabled");
+        }
+    }
+
     @Override
     public void doLoadTestData() {
-        if (elasticSearchEnabled()) {
-            new ElasticsearchTestDataLoaderExtension().deleteIndexesIfPresent();
-        }
         loader.addCcdRoles();
         loader.importDefinitions();
     }
@@ -41,7 +55,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
         } else if (key.toString().equals("UniqueString")) {
-            return ScenarioData.getUniqueString();
+            return uniqueString;
         }
         return super.calculateCustomValue(scenarioContext, key);
     }
