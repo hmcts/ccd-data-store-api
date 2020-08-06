@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,6 +60,14 @@ class CaseDetailsQueryBuilderFactoryTest {
         when(criteriaBuilder.createQuery(CaseDetailsEntity.class)).thenReturn(query);
         when(criteriaBuilder.createQuery(Long.class)).thenReturn(countQuery);
         when(query.from(CaseDetailsEntity.class)).thenReturn(root);
+    }
+
+    private void assertAllA(CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder) {
+        assertAll(
+            () -> assertThat(queryBuilder, is(notNullValue())),
+            () -> verify(userAuthorisationSecurity).secure(queryBuilder, null),
+            () -> verify(caseStateAuthorisationSecurity).secure(queryBuilder, null)
+        );
     }
 
     @Nested
@@ -126,4 +135,53 @@ class CaseDetailsQueryBuilderFactoryTest {
             );
         }
     }
+
+    @Nested
+    @DisplayName("createUnsecured()")
+    class CreateUnsecured {
+        @Test
+        @DisplayName("should unsecured a new builder instance with user authorisation")
+        void secureNewInstance() {
+            final CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.selectUnsecured(em);
+
+            assertAll(
+                () -> assertThat(queryBuilder, is(notNullValue())),
+                () -> verify(userAuthorisationSecurity,never()).secure(queryBuilder, null),
+                () -> verify(caseStateAuthorisationSecurity,never()).secure(queryBuilder, null)
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("selectUnsecured()")
+    class SelectUnsecured {
+        @Test
+        @DisplayName("should selectUnsecured query")
+        void shouldSecureSelectQuery() {
+            CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.selectUnsecured(em);
+            assertAll(
+                () -> assertThat(queryBuilder, is(notNullValue())),
+                () -> verify(userAuthorisationSecurity,never()).secure(queryBuilder, null),
+                () -> verify(caseStateAuthorisationSecurity,never()).secure(queryBuilder, null)
+            );
+        }
+
+        @Test
+        @DisplayName("should add order by clause to select query")
+        void shouldAddOrderByClauseToSelectQuery() {
+            String sortDirection = "desc";
+            MetaData metaData = new MetaData("caseType", "jurisdiction");
+            metaData.setSortDirection(Optional.of(sortDirection));
+
+            CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.selectUnsecured(em);
+            queryBuilder.orderBy(metaData);
+
+            assertAll(
+                () -> assertThat(queryBuilder, is(notNullValue())),
+                () -> verify(root).get("createdDate"),
+                () -> verify(criteriaBuilder).desc(any())
+            );
+        }
+    }
+
 }
