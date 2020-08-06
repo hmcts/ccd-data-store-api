@@ -31,6 +31,7 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
+  discovery.type: "single-node"
   cluster.initial_master_nodes:
     - "{{ .Release.Name }}-es-master"
   imageTag: "7.7.0"
