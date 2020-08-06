@@ -132,6 +132,9 @@ public class CaseController {
     @ApiOperation(
         value = "Submit an event for a case"
     )
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = V2.EXPERIMENTAL_HEADER, value = "'true' to use this endpoint", paramType = "header")
+    })
     @ApiResponses({
         @ApiResponse(
             code = 201,
