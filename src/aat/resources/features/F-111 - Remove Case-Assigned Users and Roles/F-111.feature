@@ -1,4 +1,4 @@
-@F-111 @Ignore
+@F-111
 Feature: F-111: Remove Case-Assigned Users and Roles
 
   Background: Load test data for the scenario
@@ -9,10 +9,11 @@ Feature: F-111: Remove Case-Assigned Users and Roles
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
       And a user [Olawale - with an active solicitor profile],
-      And a successful call [by Richard to create a case - C1] as in [the respective test data file],
-      And a successful call [by Dil, without an organisation context, to add a Case Role - CR1 on C1 for Olawale] as in [the respective test data file],
-      And a successful call [to verify Olawale's reception of the role CR-1 over the case C1] as in [the respective test data file],
-      And a successful call [to verify number of users in Dil's organisation accessing C1 is zero] as in [the respective test data file],
+      And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
+      And a successful call [by Dil, without an organisation context, to add a Case Role - CR1 on C1 for Olawale] as in [F-111_Add_Case_Assigned_User_Roles_for_Case_C1],
+      And a successful call [to verify Olawale's reception of the role CR-1 over the case C1] as in [S-111.1_Get_Case_Roles_for_Case_C1],
+      # TODO : check with Mutlu if any re-wording is required as original case doesn't have organisation context / supplementary data
+#      And a successful call [to verify number of users in Dil's organisation accessing C1 is zero] as in [the respective test data file],
 
      When a request is prepared with appropriate values,
       And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale and a proper Case Role CR-1],
@@ -20,10 +21,11 @@ Feature: F-111: Remove Case-Assigned Users and Roles
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify Olawale's eventual loss of the role CR-1 over the case C1] will get the expected response as in [the respective test data file].
-      And a call [to verify number of users in Dil's organisation accessing C1 is zero] will get the expected response as in [the respective test data file],
-  
+      And a call [to verify Olawale's eventual loss of the role CR-1 over the case C1] will get the expected response as in [S-111.1_Get_Case_Roles_for_Case_C1_After_Remove].
+#      And a call [to verify number of users in Dil's organisation accessing C1 is zero] will get the expected response as in [the respective test data file],
+
   @S-111.2
+  @Ignore
   Scenario: must successfully remove multiple user and case roles for a specific case by a user calling through/from an authorised application
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -45,6 +47,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify number of users in Dil's organisation accessing C1 is zero] will get the expected response as in [the respective test data file],
  
   @S-111.13
+  @Ignore
   Scenario: must successfully decrease Assigned User Count when removing a user and case role for a specific case
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -69,6 +72,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify the count of users assigned to a case has decreased by 1] will get the expected response as in [S-111.14_Verify_Counter_3].
  
   @S-111.14
+  @Ignore
   Scenario: must not decrease Assigned User Count when unassigning a user and case role for a specific case if there was already a different case user role assignment
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -88,6 +92,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify the count of users unassigned to C1 has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
   @S-111.15
+  @Ignore
   Scenario: must not decrease Assigned User Count when when no organisation ID is provided
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -107,6 +112,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify the count of users unassigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
   @S-111.17
+  @Ignore
   Scenario: must not decrease the Assigned User Count to the case when removing only some but not all of the roles for a user
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -125,6 +131,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
   @S-111.3
+  @Ignore
   Scenario: must return an error response for a missing Case ID
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -143,6 +150,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [the respective test data file].
 
   @S-111.4
+  @Ignore
   Scenario: must return an error response for a malformed Case ID
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -161,6 +169,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [the respective test data file].
  
   @S-111.5
+  @Ignore
   Scenario: must return an error response for a missing User ID
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -179,6 +188,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [the respective test data file].
  
   @S-111.6
+  @Ignore
   Scenario: must return an error response for a malformed User ID Provided
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -197,6 +207,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [S-111.5_Get_Case_Roles_for_Case_C1].
 
   @S-111.7
+  @Ignore
   Scenario: must return an error response when the request is made from an un-authorised application
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -215,6 +226,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Dil hasn't lost the role CR-1 over the case C1] will get the expected response as in [S-111.6_Get_Case_Roles_for_Case_C1].
  
   @S-111.8
+  @Ignore
   Scenario: Must return an error response for a malformed Case Role provided
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -233,6 +245,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [S-111.7_Get_Case_Roles_for_Case_C1].
  
   @S-111.9
+  @Ignore
   Scenario: must return an error response for a missing Case Role
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -251,6 +264,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [S-111.8_Get_Case_Roles_for_Case_C1].
  
   @S-111.10
+  @Ignore
   Scenario: must return an error response for missing case_users list
     Given a user [Dil - who is to add some case role assignment for a case],
 
@@ -262,6 +276,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And the response has all the details as expected.
  
   @S-111.11
+  @Ignore
   Scenario: must return an error response for empty case_users list
     Given a user [Dil - who is to add some case role assignment for a case],
 
@@ -273,6 +288,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And the response has all the details as expected.
  
   @S-111.12
+  @Ignore
   Scenario: must return an error response when the case does not exist
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -291,6 +307,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [S-111.11_Get_Case_Roles_for_Case_C1].
 
   @S-111.16
+  @Ignore
   Scenario: must reject request when an invalid Organisation ID is provided
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
