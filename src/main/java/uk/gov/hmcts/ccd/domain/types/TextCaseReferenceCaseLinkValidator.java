@@ -55,8 +55,9 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
                     dataFieldId)
             );
         } catch (Exception exception) {
-            LOG.error("Un expected error during case link validation.", exception);
-            throw new ServiceException("Un expected error during case link validation.", exception);
+            final String message = "Un expected error during case link validation.";
+            LOG.error(message, exception);
+            throw new ServiceException(message, exception);
         }
     }
 
