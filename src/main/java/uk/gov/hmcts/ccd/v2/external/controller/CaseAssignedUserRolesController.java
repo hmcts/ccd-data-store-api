@@ -124,14 +124,9 @@ public class CaseAssignedUserRolesController {
         @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
         @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
-        String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
-        if (applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(clientServiceName)) {
-            validateRequestParams(caseAssignedUserRolesRequest);
-            this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
-            return ResponseEntity.status(HttpStatus.CREATED).body(new CaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
-        } else {
-            throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
-        }
+        validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
+        this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
     }
 
     @DeleteMapping(
@@ -183,14 +178,9 @@ public class CaseAssignedUserRolesController {
             @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
             @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
-        String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
-        if (applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(clientServiceName)) {
-            validateRequestParams(caseAssignedUserRolesRequest);
-            this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
-            return ResponseEntity.status(HttpStatus.CREATED).body(new CaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
-        } else {
-            throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
-        }
+        validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
+        this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
+        return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(DELETE_SUCCESS_MESSAGE));
     }
 
     @GetMapping(
@@ -335,6 +325,16 @@ public class CaseAssignedUserRolesController {
                 .map(Collection::stream)
                 .orElseGet(Stream::empty)
             : Stream.empty();
+    }
+
+    private void validateRequest(String clientS2SToken, CaseAssignedUserRolesRequest request) {
+
+        String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
+        if (applicationParams.getAuthorisedServicesForAddUserCaseRoles().contains(clientServiceName)) {
+            validateRequestParams(request);
+        } else {
+            throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
+        }
     }
 
 }
