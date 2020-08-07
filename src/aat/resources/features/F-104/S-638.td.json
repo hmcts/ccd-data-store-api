@@ -121,13 +121,6 @@
                         "read": true,
                         "update": true,
                         "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
                       }
                     ],
                     "complexACLs": [],
@@ -175,13 +168,6 @@
                       },
                       {
                         "role": "caseworker-autotest1-solicitor",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
                         "create": true,
                         "read": true,
                         "update": true,
@@ -237,13 +223,6 @@
                         "read": true,
                         "update": true,
                         "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
                       }
                     ],
                     "complexACLs": [],
@@ -291,13 +270,6 @@
                       },
                       {
                         "role": "caseworker-autotest1-solicitor",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
                         "create": true,
                         "read": true,
                         "update": true,
@@ -353,13 +325,6 @@
                         "read": true,
                         "update": true,
                         "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
                       }
                     ],
                     "complexACLs": [],
@@ -411,13 +376,6 @@
                         "read": true,
                         "update": true,
                         "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
                       }
                     ],
                     "complexACLs": [],
@@ -465,13 +423,6 @@
                       },
                       {
                         "role": "caseworker-autotest1-solicitor",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
                         "create": true,
                         "read": true,
                         "update": true,
@@ -545,13 +496,6 @@
                         "read": true,
                         "update": true,
                         "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
                       }
                     ],
                     "complexACLs": [],
@@ -615,13 +559,6 @@
                       },
                       {
                         "role": "caseworker-autotest1-solicitor",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
                         "create": true,
                         "read": true,
                         "update": true,
@@ -693,13 +630,6 @@
                               "read": true,
                               "update": true,
                               "delete": false
-                            },
-                            {
-                              "role": "[DEFENDANT]",
-                              "create": true,
-                              "read": true,
-                              "update": true,
-                              "delete": false
                             }
                           ],
                           "complexACLs": [],
@@ -760,13 +690,6 @@
                               "read": true,
                               "update": true,
                               "delete": false
-                            },
-                            {
-                              "role": "[DEFENDANT]",
-                              "create": true,
-                              "read": true,
-                              "update": true,
-                              "delete": false
                             }
                           ],
                           "complexACLs": [],
@@ -799,13 +722,6 @@
                       },
                       {
                         "role": "caseworker-autotest1-solicitor",
-                        "create": true,
-                        "read": true,
-                        "update": true,
-                        "delete": false
-                      },
-                      {
-                        "role": "[DEFENDANT]",
                         "create": true,
                         "read": true,
                         "update": true,
