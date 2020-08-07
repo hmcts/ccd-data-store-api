@@ -32,10 +32,7 @@ elastic:
 elasticsearch:
   clusterName: "es"
   environment:
-    - node.name=ccd-data-store-api-pr-1034-es-master
-    - cluster.name=es-docker-cluster
-    - cluster.initial_master_nodes=ccd-data-store-api-pr-1034-es-master
-    - bootstrap.memory_lock=true
+    - cluster.initial_master_nodes: "{{ .Release.Name }}-es-master"
   imageTag: "7.7.0"
   replicas: 1
   minimumMasterNodes: 1
