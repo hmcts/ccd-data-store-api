@@ -1,0 +1,199 @@
+{
+	"title": "Must return the updated supplementary data values from Data store internal search elastic search call",
+	"_guid_": "S-608",
+	"_extends_": "F-106_Test_Data_Base",
+	"specs": [
+    "is configured to search for supplementary data from previously updated case",
+    "a valid profile",
+    "contains the previoulsy created case"
+	],
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "request": {
+    "queryParams": {
+      "usecase": "workbasket"
+    },
+    "body": {
+      "query":{
+        "bool":{
+          "filter":[
+            { "bool":{
+              "should": [
+                { "range": { "supplementary_data.orgs_assigned_users.OrgZ": { "gte": 50 } } }
+              ]
+            }
+            }
+          ]
+        }
+      },
+      "from":0,
+      "size":6,
+      "_source":true,
+      "sort":{
+        "created_date":{
+          "order":"desc"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "total": 1,
+      "cases": [
+        {
+          "id": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "jurisdiction": "BEFTA_JURISDICTION_2",
+          "state": "[[ANY_STRING_NOT_NULLABLE]]",
+          "version": "[[ANYTHING_NULLABLE]]",
+          "case_type_id": "BEFTA_CASETYPE_2_1",
+          "created_date": "[[ANY_DATE_NOT_NULLABLE]]",
+          "last_modified": "[[ANY_DATE_NOT_NULLABLE]]",
+          "last_state_modified_date": "[[ANY_DATE_NOT_NULLABLE]]",
+          "security_classification": "[[ANY_STRING_NOT_NULLABLE]]",
+          "case_data": {
+            "MoneyGBPField": "[[ANYTHING_NULLABLE]]",
+            "FixedListField": "[[ANYTHING_NULLABLE]]",
+            "AddressUKField": {
+              "PostCode": "[[ANYTHING_NULLABLE]]",
+              "PostTown": "[[ANYTHING_NULLABLE]]",
+              "County": "[[ANYTHING_NULLABLE]]",
+              "Country": "[[ANYTHING_NULLABLE]]",
+              "AddressLine2": "[[ANYTHING_NULLABLE]]",
+              "AddressLine3": "[[ANYTHING_NULLABLE]]",
+              "AddressLine1": "[[ANYTHING_NULLABLE]]"
+            },
+            "ComplexField": {
+              "ComplexFixedListField": "[[ANYTHING_NULLABLE]]",
+              "ComplexNestedField": {
+                "NestedCollectionTextField": [],
+                "NestedNumberField": "[[ANYTHING_NULLABLE]]"
+              },
+              "ComplexTextField": "[[ANYTHING_NULLABLE]]"
+            },
+            "FixedRadioListField": "[[ANYTHING_NULLABLE]]",
+            "DateTimeField": "[[ANYTHING_NULLABLE]]",
+            "PhoneUKField": "[[ANYTHING_NULLABLE]]",
+            "NumberField":"[[ANYTHING_NULLABLE]]",
+            "MultiSelectListField": [],
+            "YesOrNoField": "[[ANYTHING_NULLABLE]]",
+            "EmailField": "[[ANYTHING_NULLABLE]]",
+            "TextField": "[[ANYTHING_NULLABLE]]",
+            "DateField": "[[ANYTHING_NULLABLE]]",
+            "TextAreaField": "[[ANYTHING_NULLABLE]]",
+            "CollectionField": []
+          },
+          "data_classification": {
+            "MoneyGBPField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "FixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "AddressUKField": {
+              "value": {
+                "PostCode": "[[ANY_STRING_NOT_NULLABLE]]",
+                "PostTown": "[[ANY_STRING_NOT_NULLABLE]]",
+                "County": "[[ANY_STRING_NOT_NULLABLE]]",
+                "Country": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine2": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine3": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine1": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "ComplexField": {
+              "value": {
+                "ComplexFixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+                "ComplexNestedField": {
+                  "value": {
+                    "NestedCollectionTextField": {
+                      "value": [],
+                      "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                    },
+                    "NestedNumberField": "[[ANY_STRING_NOT_NULLABLE]]"
+                  },
+                  "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                },
+                "ComplexTextField": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "FixedRadioListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateTimeField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "PhoneUKField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "NumberField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "MultiSelectListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "YesOrNoField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "EmailField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextAreaField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "CollectionField": {
+              "value": [],
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            }
+          },
+          "after_submit_callback_response": "[[ANYTHING_NULLABLE]]",
+          "callback_response_status_code": "[[ANYTHING_NULLABLE]]",
+          "callback_response_status": "[[ANYTHING_NULLABLE]]",
+          "delete_draft_response_status_code": "[[ANYTHING_NULLABLE]]",
+          "delete_draft_response_status": "[[ANYTHING_NULLABLE]]",
+          "security_classifications": {
+            "MoneyGBPField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "FixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "AddressUKField": {
+              "value": {
+                "PostCode": "[[ANY_STRING_NOT_NULLABLE]]",
+                "PostTown": "[[ANY_STRING_NOT_NULLABLE]]",
+                "County": "[[ANY_STRING_NOT_NULLABLE]]",
+                "Country": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine2": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine3": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine1": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "ComplexField": {
+              "value": {
+                "ComplexFixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+                "ComplexNestedField": {
+                  "value": {
+                    "NestedCollectionTextField": {
+                      "value": [],
+                      "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                    },
+                    "NestedNumberField": "[[ANY_STRING_NOT_NULLABLE]]"
+                  },
+                  "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                },
+                "ComplexTextField": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "FixedRadioListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateTimeField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "PhoneUKField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "NumberField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "MultiSelectListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "YesOrNoField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "EmailField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextAreaField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "CollectionField": {
+              "value": [],
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            }
+          }
+        }
+      ],
+      "case_types_results": [
+        {
+          "total": 1,
+          "case_type_id": "BEFTA_CASETYPE_2_1"
+        }
+      ]
+    }
+  }
+}
