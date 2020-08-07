@@ -16,7 +16,7 @@
     "_extends_": "Common_404_Response",
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "Resource not found when getting case type version for 'eyJhbGciOiJIUzUxMiJ9'.",
+      "message": "Error when getting case type version. Unknown case type 'eyJhbGciOiJIUzUxMiJ9'.",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

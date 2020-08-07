@@ -11,7 +11,7 @@
     "body": {
       "query": {
         "match": {
-          "data.FixedListField": "VALUE3"
+          "data.FixedListField": "VALUE4"
         }
       }
     }
@@ -32,7 +32,7 @@
         "last_state_modified_date": "[[ANYTHING_PRESENT]]",
         "security_classification": "PRIVATE",
         "case_data": {
-          "FixedListField": "VALUE3",
+          "FixedListField": "VALUE4",
           "MoneyGBPField": "1000",
           "AddressUKField": {
             "PostCode": "SW1H 9AJ",
@@ -80,6 +80,10 @@
         "delete_draft_response_status_code": null,
         "delete_draft_response_status": null,
         "security_classifications": "[[ANYTHING_PRESENT]]"
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE"
       }]
     }
   }

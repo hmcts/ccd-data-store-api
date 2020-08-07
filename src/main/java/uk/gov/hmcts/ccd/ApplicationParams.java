@@ -113,6 +113,12 @@ public class ApplicationParams {
     @Value("${search.cases.index.name.format}")
     private String casesIndexNameFormat;
 
+    @Value("${search.cases.index.name.case-type-id.group}")
+    private String casesIndexNameCaseTypeIdGroup;
+
+    @Value("${search.cases.index.name.case-type-id.group.position}")
+    private Integer casesIndexNameCaseTypeIdGroupPosition;
+
     @Value("${search.cases.index.name.type}")
     private String casesIndexType;
 
@@ -384,4 +390,11 @@ public class ApplicationParams {
         return ccdAccessControlCitizenRoles;
     }
 
+    public String getCasesIndexNameCaseTypeIdGroup() {
+        return casesIndexNameCaseTypeIdGroup;
+    }
+
+    public Integer getCasesIndexNameCaseTypeIdGroupPosition() {
+        return casesIndexNameCaseTypeIdGroupPosition;
+    }
 }

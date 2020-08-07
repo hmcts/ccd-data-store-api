@@ -103,7 +103,7 @@ ext {
     junitVintageVersion = '5.5.2'
     powermockVersion = '2.0.0-beta.5'
     reformLogging = '5.1.0'
-    swagger2Version = '3.0.0-SNAPSHOT'
+    swagger2Version = '2.10.0'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -264,8 +264,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '4.1.0'
-
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.0.0'
 
 }
 // end::dependencies[]

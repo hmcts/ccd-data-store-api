@@ -171,31 +171,31 @@ class CaseSearchResultViewGeneratorTest {
             .withFieldType(textFieldType())
             .withSC(SECURITY_CLASSIFICATION.name())
             .withAcl(anAcl()
-            .withRole(ROLE_IN_USER_ROLE_1)
-            .withRead(true)
-            .build()).build();
+                .withRole(ROLE_IN_USER_ROLE_1)
+                .withRead(true)
+                .build()).build();
         final CaseFieldDefinition motherName = newCaseField().withId(MOTHER_NAME)
             .withFieldType(textFieldType())
             .withSC(SECURITY_CLASSIFICATION.name())
             .withAcl(anAcl()
-            .withRole(ROLE_IN_USER_ROLE_1)
-            .withRead(true)
-            .build()).build();
+                .withRole(ROLE_IN_USER_ROLE_1)
+                .withRead(true)
+                .build()).build();
 
         final CaseFieldDefinition addressLine1 = newCaseField().withId(ADDRESS_LINE_1)
             .withFieldType(textFieldType())
             .withSC(SECURITY_CLASSIFICATION.name())
             .withAcl(anAcl()
-            .withRole(ROLE_IN_USER_ROLE_1)
-            .withRead(true)
-            .build()).build();
+                .withRole(ROLE_IN_USER_ROLE_1)
+                .withRead(true)
+                .build()).build();
         final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE)
             .withFieldType(textFieldType())
             .withSC(SECURITY_CLASSIFICATION.name())
             .withAcl(anAcl()
-            .withRole(ROLE_IN_USER_ROLE_1)
-            .withRead(true)
-            .build()).build();
+                .withRole(ROLE_IN_USER_ROLE_1)
+                .withRead(true)
+                .build()).build();
         final FieldTypeDefinition addressFieldTypeDefinition = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
             .withComplexField(addressLine1).withComplexField(postCode).build();
         final CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition).withAcl(anAcl()
