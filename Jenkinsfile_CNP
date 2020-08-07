@@ -77,7 +77,7 @@ env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-673.service.core-compute-preview.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
-env.ELASTIC_SEARCH_FTA_ENABLED = "true"
+env.ELASTIC_SEARCH_ENABLED = "true"
 
 withPipeline(type, product, component) {
     onMaster {
@@ -93,9 +93,9 @@ withPipeline(type, product, component) {
         enableSlackNotifications('#ccd-pr-builds')
     }
     if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'PR-601') {
-        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
+        env.ELASTIC_SEARCH_ENABLED = "true"
     }
-    echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
+    echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_ENABLED} on branch ${env.BRANCH_NAME}"
 
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()
