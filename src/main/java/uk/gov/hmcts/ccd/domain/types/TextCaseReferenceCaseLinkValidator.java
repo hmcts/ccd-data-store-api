@@ -1,10 +1,13 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -12,10 +15,13 @@ import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
+import static uk.gov.hmcts.ccd.domain.model.common.CaseReferenceUtils.formatCaseReference;
+
 @Named("TextCaseReferenceCaseLinkValidator")
 @Singleton
 public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldValidator {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TextCaseReferenceCaseLinkValidator.class);
     private CaseService caseService;
     private TextValidator textValidator;
 
@@ -48,14 +54,10 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
                     value + " does not correspond to an existing CCD case.",
                     dataFieldId)
             );
+        } catch (Exception exception) {
+            LOG.error("Un expected error during case link validation.", exception);
+            throw new ServiceException("Un expected error during case link validation.", exception);
         }
-    }
-
-    private String formatCaseReference(String caseReference) {
-        if (caseReference.contains("-")) {
-            return String.join("", caseReference.split("-"));
-        }
-        return caseReference;
     }
 
     @Override
