@@ -171,7 +171,11 @@
             }
           }
         }
-      ]
+      ],
+      "case_types_results" : [ {
+        "total" : 1,
+        "case_type_id" : "BEFTA_CASETYPE_2_1"
+      } ]
     }
   }
 }
