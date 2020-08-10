@@ -62,11 +62,13 @@ public class CaseDetailsEntity {
     public static final String LAST_MODIFIED_FIELD_COL = "last_modified";
     public static final String LAST_STATE_MODIFIED_DATE_FIELD_COL = "last_state_modified_date";
     public static final String SECURITY_CLASSIFICATION_FIELD_COL = "security_classification";
+    public static final String DATA_COL = "data";
+    public static final String DATA_CLASSIFICATION_COL = "data_classification";
 
 
 
     @Id
-    @Column(name = "id")
+    @Column(name = ID_FIELD_COL)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = REFERENCE_FIELD_COL, nullable = false)
@@ -87,10 +89,10 @@ public class CaseDetailsEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = SECURITY_CLASSIFICATION_FIELD_COL, nullable = false)
     private SecurityClassification securityClassification;
-    @Column(name = "data", nullable = false)
+    @Column(name = DATA_COL, nullable = false)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode data;
-    @Column(name = "data_classification", nullable = false)
+    @Column(name = DATA_CLASSIFICATION_COL, nullable = false)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
 

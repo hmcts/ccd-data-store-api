@@ -1,11 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,13 +18,22 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -78,12 +83,14 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return true if access was granted")
         void userHasSolicitorRoleAndAccessGrantedCaseVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
         void userHasSolicitorRoleAndAccessRevokedCaseNotVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessRevoked(caseRevoked());
         }
 
@@ -111,12 +118,14 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return true if access was granted")
         void userHasSolicitorRoleAndAccessGrantedCaseVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
         void userHasSolicitorRoleAndAccessRevokedCaseNotVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessRevoked(caseRevoked());
         }
 
@@ -144,12 +153,14 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return true if access was granted")
         void shouldGrantAccessToGrantedCase() {
+            doReturn(false).when(userRepository).anyRoleMatches(any());
             assertAccessGrantedWithoutChecks(caseGranted());
         }
 
         @Test
         @DisplayName("should return true if access was revoked")
         void shouldGrantAccessToRevokedCase() {
+            doReturn(false).when(userRepository).anyRoleMatches(any());
             assertAccessGrantedWithoutChecks(caseRevoked());
         }
 
@@ -178,12 +189,14 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return true if access was granted")
         void userHasPanelMemberRoleAndAccessGrantedCaseVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
         void userHasPanelMemberRoleAndAccessRevokedCaseNotVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessRevoked(caseRevoked());
         }
 
@@ -212,18 +225,21 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return true if access was granted")
         void userHasCitizenRoleAndAccessGrantedCaseVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
         void userHasCitizenRoleAndAccessRevokedCaseNotVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessRevoked(caseRevoked());
         }
 
         @Test
         @DisplayName("should return false if no access granted")
         void userHasNoAccessGranted_caseNotVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             noAccessGranted();
 
             assertAccessRevoked(caseGranted());
@@ -253,12 +269,14 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return true if access was granted")
         void userHasLetterHolderRoleAndAccessGrantedCaseVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
         void userHasLetterHolderRoleAndAccessRevokedCaseNotVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessRevoked(caseRevoked());
         }
 
@@ -286,12 +304,14 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return true if access was granted")
         void userHasCitizenRoleAndAccessGrantedCaseVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
         void userHasCitizenRoleAndAccessRevokedCaseNotVisible() {
+            doReturn(true).when(userRepository).anyRoleMatches(any());
             assertAccessRevoked(caseRevoked());
         }
 
@@ -323,12 +343,14 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return true if access was granted")
         void shouldGrantAccessToGrantedCase() {
+            doReturn(false).when(userRepository).anyRoleMatches(any());
             assertAccessGrantedWithoutChecks(caseGranted());
         }
 
         @Test
         @DisplayName("should return true if access was revoked")
         void shouldGrantAccessToRevokedCase() {
+            doReturn(false).when(userRepository).anyRoleMatches(any());
             assertAccessGrantedWithoutChecks(caseRevoked());
         }
 
@@ -359,6 +381,7 @@ class CaseAccessServiceTest {
             @Test
             @DisplayName("should return granted case ids for user with solicitor role")
             void shouldReturnCaseIds() {
+                doReturn(true).when(userRepository).anyRoleMatches(any());
                 Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
 
                 assertThat(result.isPresent(), is(true));
@@ -381,6 +404,7 @@ class CaseAccessServiceTest {
             @Test
             @DisplayName("should return granted case ids for user with citizen role")
             void shouldReturnCaseIds() {
+                doReturn(true).when(userRepository).anyRoleMatches(any());
                 Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
 
                 assertThat(result.isPresent(), is(true));
@@ -403,8 +427,8 @@ class CaseAccessServiceTest {
             @Test
             @DisplayName("should return granted case ids for user with letter-holder role")
             void shouldReturnCaseIds() {
+                doReturn(true).when(userRepository).anyRoleMatches(any());
                 Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
-
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIds(result.get());
             }
@@ -435,7 +459,7 @@ class CaseAccessServiceTest {
             assertAll(
                 () -> assertThat(result, hasItems(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID))),
                 () -> verify(userRepository).getUserId(),
-                () -> verify(userRepository).getUserRoles(),
+                () -> verify(userRepository).anyRoleMatches(any()),
                 () -> verify(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID)
             );
         }
@@ -531,6 +555,30 @@ class CaseAccessServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("jurisdiction access validation")
+    class JurisdictionAccessTest {
+
+        @BeforeEach
+        void setUp() {
+            doReturn(Lists.newArrayList("PROBATE", "DIVORCE")).when(userRepository).getUserRolesJurisdictions();
+        }
+
+        @Test
+        @DisplayName("should return true when user has access to jurisdiction")
+        void shouldReturnTrueWhenUserHasAccess() {
+            boolean canAccess = caseAccessService.isJurisdictionAccessAllowed("probate");
+            assertTrue(canAccess);
+        }
+
+        @Test
+        @DisplayName("should return false when user has no access to jurisdiction")
+        void shouldReturnFalseWhenUserHasAccess() {
+            boolean canAccess = caseAccessService.isJurisdictionAccessAllowed("autotest1");
+            assertFalse(canAccess);
+        }
+    }
+
     private void assertAccessGranted(CaseDetails caseDetails) {
         assertAccess(caseDetails, true, true);
     }
@@ -546,7 +594,7 @@ class CaseAccessServiceTest {
     private void assertAccess(CaseDetails caseDetails, Boolean granted, Boolean withChecks) {
         assertAll(
             () -> assertThat(caseAccessService.canUserAccess(caseDetails), is(granted)),
-            () -> verify(userRepository).getUserRoles(),
+            () -> verify(userRepository).anyRoleMatches(any()),
             () -> verify(caseUserRepository, withChecks ? atLeastOnce() : never()).findCasesUserIdHasAccessTo(USER_ID)
         );
     }

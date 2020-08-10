@@ -86,13 +86,13 @@ public class SearchWithSortIT extends WireMockBaseTest {
 
         assertEquals("Incorrect view items count", 4, searchResultViewItems.size());
 
-        assertEquals("John", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
-        assertEquals(null, searchResultViewItems.get(0).getCaseFields().get("PersonAddress"));
+        assertEquals("John", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
+        assertEquals(null, searchResultViewItems.get(0).getFields().get("PersonAddress"));
 
-        assertEquals("Angel", searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"));
-        assertEquals("George", searchResultViewItems.get(2).getCaseFields().get("PersonFirstName"));
+        assertEquals("Angel", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
+        assertEquals("George", searchResultViewItems.get(2).getFields().get("PersonFirstName"));
         assertEquals("1504259907353545", searchResultViewItems.get(2).getCaseId());
-        assertEquals("George", searchResultViewItems.get(3).getCaseFields().get("PersonFirstName"));
+        assertEquals("George", searchResultViewItems.get(3).getFields().get("PersonFirstName"));
         assertEquals("1504259907353548", searchResultViewItems.get(3).getCaseId());
     }
 
@@ -119,18 +119,18 @@ public class SearchWithSortIT extends WireMockBaseTest {
 
         assertEquals("Incorrect view items count", 4, searchResultViewItems.size());
 
-        assertEquals("John", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
-        assertEquals(null, searchResultViewItems.get(0).getCaseFields().get("PersonAddress"));
+        assertEquals("John", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
+        assertEquals(null, searchResultViewItems.get(0).getFields().get("PersonAddress"));
 
-        assertEquals("Angel", searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"));
-        assertEquals("SE1 4EE", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("Angel", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
+        assertEquals("SE1 4EE", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("Postcode"));
 
-        assertEquals("George", searchResultViewItems.get(2).getCaseFields().get("PersonFirstName"));
-        assertEquals("W11 5CF", ((Map) searchResultViewItems.get(2).getCaseFields().get("PersonAddress"))
+        assertEquals("George", searchResultViewItems.get(2).getFields().get("PersonFirstName"));
+        assertEquals("W11 5CF", ((Map) searchResultViewItems.get(2).getFields().get("PersonAddress"))
             .get("Postcode"));
-        assertEquals("George", searchResultViewItems.get(3).getCaseFields().get("PersonFirstName"));
-        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(3).getCaseFields().get("PersonAddress"))
+        assertEquals("George", searchResultViewItems.get(3).getFields().get("PersonFirstName"));
+        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(3).getFields().get("PersonAddress"))
             .get("Postcode"));
     }
 }

@@ -1,0 +1,33 @@
+{
+	"title": "Need to be able to replace an existing property",
+	"_guid_": "S-607",
+	"productName": "CCD Data Store api",
+	"operationName": "Update Supplementary Data",
+	"_extends_": "F-106_Update_Supplementary_Data_Base",
+	"specs": [
+		"Dil - who can create a case",
+    "replaces the value of an existing supplementary_data property with the provided value"
+	],
+  "request": {
+    "body": {
+      "supplementary_data_updates": {
+        "$set": {
+          "orgs_assigned_users.OrgA": 20
+        }
+      }
+    }
+  },
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+    "body": {
+      "supplementary_data": {
+        "orgs_assigned_users.OrgA": 20
+      }
+    }
+	}
+}

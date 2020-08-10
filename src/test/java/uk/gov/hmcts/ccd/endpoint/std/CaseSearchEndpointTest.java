@@ -1,145 +1,66 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import java.io.IOException;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
+
+import java.util.List;
+
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 class CaseSearchEndpointTest {
 
     private static final String CASE_TYPE_ID = "GrantOnly";
-    private static final String QUERY = "{\"query\":{}}";
-
-    @Mock
-    private ApplicationParams applicationParams;
 
     @Mock
     private CaseSearchOperation caseSearchOperation;
 
     @Mock
-    private ObjectMapperService objectMapperService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ElasticsearchQueryHelper elasticsearchQueryHelper;
 
     @InjectMocks
     private CaseSearchEndpoint endpoint;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(objectMapperService.convertStringToObject(anyString(), any())).thenReturn(objectMapper.readValue(QUERY, ObjectNode.class));
     }
 
     @Test
-    void searchCaseDetailsThrowsExceptionWhenNoQueryProvided() throws IOException {
-        String searchRequest = "{\n"
-            + "\"from\" : 0,\n"
-            + "\"size\" : 3\n"
-            + "}";
-        when(applicationParams.getSearchBlackList()).thenReturn(singletonList("query_string"));
-        when(objectMapperService.convertStringToObject(searchRequest, JsonNode.class)).thenReturn(objectMapper.readValue(searchRequest, ObjectNode.class));
-
-        assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest));
-        verifyZeroInteractions(caseSearchOperation);
-    }
-
-    @Test
-    void searchCaseDetailsRejectsBlacklistedSearchQueries() {
-        String searchRequest = "{  \n"
-            + "   \"query\":{  \n"
-            + "      \"bool\":{  \n"
-            + "         \"must\":[  \n"
-            + "            {  \n"
-            + "               \"simple_query_string\":{  \n"
-            + "                  \"query\":\"isde~2\"\n"
-            + "               }\n"
-            + "            },\n"
-            + "            {  \n"
-            + "               \"query_string\":{  \n"
-            + "                  \"query\":\"isde~2\"\n"
-            + "               }\n"
-            + "            },\n"
-            + "            {  \n"
-            + "               \"range\":{  \n"
-            + "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{  \n"
-            + "                     \"lt\":\"91\"\n"
-            + "                  }\n"
-            + "               }\n"
-            + "            }\n"
-            + "         ]\n"
-            + "      }\n"
-            + "   }\n"
-            + "}";
-        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
-
-        assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest));
-        verifyZeroInteractions(caseSearchOperation);
-    }
-
-    @Test
-    void searchCaseDetailsAllowsQueriesNotBlacklisted() {
-        String query = "{\n"
-            + "   \"query\":{\n"
-            + "      \"bool\":{\n"
-            + "         \"must\":[\n"
-            + "            {\n"
-            + "               \"simple_query_string\":{\n"
-            + "                  \"query\":\"isde~2\"\n"
-            + "               }\n"
-            + "            },\n"
-            + "            {\n"
-            + "               \"range\":{\n"
-            + "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{\n"
-            + "                     \"lt\":\"91\"\n"
-            + "                  }\n"
-            + "               }\n"
-            + "            }\n"
-            + "         ]\n"
-            + "      }\n"
-            + "   }\n"
-            + "}";
-        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
-
-        endpoint.searchCases(singletonList(CASE_TYPE_ID), query);
-
-        verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class));
-    }
-
-    @Test
-    void searchCaseDetailsInvokesOperation() {
-        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
+    void searchCaseDetailsInvokesOperation() throws JsonProcessingException {
         CaseSearchResult result = mock(CaseSearchResult.class);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
+        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
+        when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
+        List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
 
-        CaseSearchResult caseSearchResult = endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest);
+        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest);
 
-        verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class));
+        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
+        verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
+            assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().get(0), is(CASE_TYPE_ID));
+            assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
+            assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
+            return true;
+        }));
         assertThat(caseSearchResult, is(result));
     }
 }

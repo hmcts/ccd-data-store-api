@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd;
 
 import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,7 @@ public abstract class WireMockBaseTest extends BaseTest {
     protected ApplicationParams applicationParams;
 
     @Before
+    @BeforeEach
     public void initMock() throws IOException {
         super.initMock();
         final String hostUrl = "http://localhost:" + wiremockPort;

@@ -13,6 +13,7 @@ public class WizardPageComplexFieldOverride implements Serializable {
     private String label;
     private String hintText;
     private String showCondition;
+    private String defaultValue;
 
     @JsonProperty("complex_field_element_id")
     public String getComplexFieldElementId() {
@@ -64,5 +65,14 @@ public class WizardPageComplexFieldOverride implements Serializable {
             .filter(dc -> !dc.equals("HIDDEN"))
             .map(DisplayContext::valueOf)
             .orElse(null);
+    }
+
+    @JsonProperty("default_value")
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

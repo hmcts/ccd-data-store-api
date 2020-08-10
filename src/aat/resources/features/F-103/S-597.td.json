@@ -1,0 +1,40 @@
+{
+	"title": "when a specific User ID is supplied for a specific case ID, then the case roles relating only to the User ID for that specific Case ID must be returned",
+	"_guid_": "S-597",
+	"productName": "CCD Data Store api",
+	"operationName": "Get Case-Assigned Users and Roles",
+	"_extends_": "F-103_Case_Assigned_User_Roles_Base",
+	"specs": [
+		"Richard - who can create a case",
+		"Dil - with an active profile",
+		"Jamal -  who is a privileged user with permissions to access the case assignments of other users",
+		"is made by Jamal with the Case ID of C1 & Dil's User ID",
+		"contains the list of case roles just granted to Dil, as per above"
+	],
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"case_users": [
+				{
+					"__ordering__": "UNORDERED",
+					"__elementId__": "case_id,user_id,case_role"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_roles][1]}"
+				},
+				{
+					"case_id": "${}${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][case_id]}",
+					"user_id": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][pathVariables][user_id]}",
+					"case_role": "${[scenarioContext][childContexts][F-103_Jamal_Assign_Dil_Case_Role_To_C1][testData][request][body][case_roles][0]}"
+				}
+			]
+		}
+	}
+}

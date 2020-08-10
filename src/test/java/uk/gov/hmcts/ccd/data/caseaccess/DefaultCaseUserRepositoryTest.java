@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import com.google.common.collect.Lists;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -117,6 +118,22 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
 
         assertThat(caseRoles.size(), equalTo(2));
         assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases.sql",
+        "classpath:sql/insert_case_users.sql",
+    })
+    public void shouldFindCaseAssignedCaseUserRolesForCaseAndUserList() {
+        List<CaseUserEntity> caseUserEn = repository.findCaseUserRoles(Lists.newArrayList(CASE_ID), Lists.newArrayList(USER_ID));
+
+        assertThat(caseUserEn.size(), equalTo(1));
+        assertThat(caseUserEn.get(0).getCasePrimaryKey().getCaseRole(), equalTo(CASE_ROLE_CREATOR));
+
+        caseUserEn = repository.findCaseUserRoles(Lists.newArrayList(CASE_ID_GRANTED), Lists.newArrayList());
+
+        assertThat(caseUserEn.size(), equalTo(2));
     }
 
 }

@@ -92,7 +92,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
         return new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(authorisedCaseTypeIds)
-            .withSearchRequest(originalSearchRequest.getSearchRequestJsonNode())
+            .withSearchRequest(originalSearchRequest.getElasticSearchRequest())
             .withMultiCaseTypeSearch(originalSearchRequest.isMultiCaseTypeSearch())
             .withSourceFilterAliasFields(originalSearchRequest.getAliasFields())
             .build();
@@ -182,7 +182,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         try {
             String fieldPath = JSON_PATH_ROOT_ELEMENT_PREFIX + sanitiseCollectionFieldInPath(caseType, path);
             return of(ofNullable(JsonPath.parse(caseDataJson).read(fieldPath, JsonNode.class))
-                          .orElse(NullNode.getInstance()));
+                .orElse(NullNode.getInstance()));
         } catch (PathNotFoundException e) {
             log.warn("Case field path not found in case data. {}", e.getMessage());
             return of(MissingNode.getInstance());

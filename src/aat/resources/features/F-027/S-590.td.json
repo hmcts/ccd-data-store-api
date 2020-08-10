@@ -53,7 +53,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[LAST_STATE_MODIFIED_DATE]",
@@ -87,7 +88,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[JURISDICTION]",
@@ -121,7 +123,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[CASE_TYPE]",
@@ -155,7 +158,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[SECURITY_CLASSIFICATION]",
@@ -189,7 +193,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[CASE_REFERENCE]",
@@ -223,7 +228,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[CREATED_DATE]",
@@ -257,7 +263,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[LAST_MODIFIED_DATE]",
@@ -291,7 +298,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         }
       ],
       "state" : {

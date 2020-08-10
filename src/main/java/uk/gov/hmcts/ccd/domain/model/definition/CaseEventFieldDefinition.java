@@ -1,17 +1,19 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 @ToString
 @ApiModel(description = "")
-public class CaseEventFieldDefinition implements Serializable {
+public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
     private String caseFieldId = null;
     private String displayContext = null;
@@ -21,6 +23,7 @@ public class CaseEventFieldDefinition implements Serializable {
     private Integer showSummaryContentOption = null;
     private String label = null;
     private String hintText = null;
+    private String defaultValue;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
 
     @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
@@ -117,6 +120,16 @@ public class CaseEventFieldDefinition implements Serializable {
 
     public void setCaseEventFieldComplexDefinitions(List<CaseEventFieldComplexDefinition> eventComplexTypeEntities) {
         this.caseEventFieldComplexDefinitions = eventComplexTypeEntities;
+    }
+
+    @ApiModelProperty(value = "Default value coming from the Event that overwrites complex fields.")
+    @JsonProperty("defaultValue")
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 
 }

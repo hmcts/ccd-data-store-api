@@ -4,8 +4,9 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
-public class CriteriaField implements Serializable {
+public class CriteriaField implements Serializable, CommonDCPModel {
     private String caseFieldId;
     private String caseFieldPath = null;
     private String label;

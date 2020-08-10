@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -61,6 +63,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
+import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
 
 public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
@@ -106,6 +110,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/xxx/event-triggers/HAS_PRE_STATES_EVENT";
     private static final String GET_CASES_INVALID_JURISDICTION = "/aggregated/caseworkers/0/jurisdictions/XYZ/case-types/TestAddressBookCase/cases";
     private static final String GET_CASES_INVALID_CASE_TYPE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/XYZAddressBookCase/cases";
+    private static final String GET_CASES_DCP = "/aggregated/caseworkers/0/jurisdictions/DCPTest1/case-types/DCP/cases";
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
@@ -174,36 +179,36 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 3, searchResultViewItems.size());
 
         assertNotNull(searchResultViewItems.get(0).getCaseId());
-        assertEquals("John", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
-        assertEquals("Smith", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
-        assertEquals(null, searchResultViewItems.get(0).getCaseFields().get("PersonAddress"));
+        assertEquals("John", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
+        assertEquals("Smith", searchResultViewItems.get(0).getFields().get("PersonLastName"));
+        assertEquals(null, searchResultViewItems.get(0).getFields().get("PersonAddress"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
-        assertEquals("Janet", searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"));
-        assertEquals("Parker", searchResultViewItems.get(1).getCaseFields().get("PersonLastName"));
-        assertEquals("123", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("Janet", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
+        assertEquals("Parker", searchResultViewItems.get(1).getFields().get("PersonLastName"));
+        assertEquals("123", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("Fake Street", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("Fake Street", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("Hexton", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("Hexton", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("England", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("England", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(2).getCaseId());
-        assertEquals("George", searchResultViewItems.get(2).getCaseFields().get("PersonFirstName"));
-        assertEquals("Roof", searchResultViewItems.get(2).getCaseFields().get("PersonLastName"));
-        assertEquals("Flat 9", ((Map) searchResultViewItems.get(2).getCaseFields().get("PersonAddress"))
+        assertEquals("George", searchResultViewItems.get(2).getFields().get("PersonFirstName"));
+        assertEquals("Roof", searchResultViewItems.get(2).getFields().get("PersonLastName"));
+        assertEquals("Flat 9", ((Map) searchResultViewItems.get(2).getFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("2 Hubble Avenue", ((Map) searchResultViewItems.get(2).getCaseFields().get("PersonAddress"))
+        assertEquals("2 Hubble Avenue", ((Map) searchResultViewItems.get(2).getFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("ButtonVillie", ((Map) searchResultViewItems.get(2).getCaseFields().get("PersonAddress"))
+        assertEquals("ButtonVillie", ((Map) searchResultViewItems.get(2).getFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("Wales", ((Map) searchResultViewItems.get(2).getCaseFields().get("PersonAddress"))
+        assertEquals("Wales", ((Map) searchResultViewItems.get(2).getFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(2).getCaseFields().get("PersonAddress"))
+        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(2).getFields().get("PersonAddress"))
             .get("Postcode"));
 
         // audit-log assertions
@@ -243,40 +248,40 @@ public class QueryEndpointIT extends WireMockBaseTest {
         SearchResultViewItem findItemByLastName =
             getFindItemByLastName(searchResultViewItems, "Pullen");
 
-        assertThat(findItemByLastName.getCaseFields().get("PersonFirstName"), is(nullValue()));
-        assertEquals("Pullen", findItemByLastName.getCaseFields().get("PersonLastName"));
-        assertEquals("Governer House", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertThat(findItemByLastName.getFields().get("PersonFirstName"), is(nullValue()));
+        assertEquals("Pullen", findItemByLastName.getFields().get("PersonLastName"));
+        assertEquals("Governer House", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("1 Puddle Lane", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("1 Puddle Lane", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("London", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("London", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("England", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("England", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("SE1 4EE", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("SE1 4EE", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("Postcode"));
 
         findItemByLastName =
             getFindItemByLastName(searchResultViewItems, "Parker");
 
         assertNotNull(findItemByLastName.getCaseId());
-        assertThat(findItemByLastName.getCaseFields().get("PersonFirstName"), is(nullValue()));
-        assertEquals("Parker", findItemByLastName.getCaseFields().get("PersonLastName"));
-        assertEquals("123", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertThat(findItemByLastName.getFields().get("PersonFirstName"), is(nullValue()));
+        assertEquals("Parker", findItemByLastName.getFields().get("PersonLastName"));
+        assertEquals("123", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("Fake Street", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("Fake Street", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("Hexton", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("Hexton", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("England", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("England", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 5TG", ((Map) findItemByLastName.getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) findItemByLastName.getFields().get("PersonAddress"))
             .get("Postcode"));
     }
 
     private SearchResultViewItem getFindItemByLastName(List<SearchResultViewItem> searchResultViewItems,
                                                        String lastName) {
-        return searchResultViewItems.stream().filter(e -> e.getCaseFields().get("PersonLastName").equals(lastName)).findFirst().get();
+        return searchResultViewItems.stream().filter(e -> e.getFields().get("PersonLastName").equals(lastName)).findFirst().get();
     }
 
     @Test
@@ -338,17 +343,17 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
 
         assertNotNull(searchResultViewItems.get(0).getCaseId());
-        assertEquals("Janet", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
-        assertEquals("Parker", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
-        assertEquals("123", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("Janet", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
+        assertEquals("Parker", searchResultViewItems.get(0).getFields().get("PersonLastName"));
+        assertEquals("123", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("England", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("Postcode"));
     }
 
@@ -453,9 +458,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull(searchResultViewItems.get(1).getCaseId());
         assertNotEquals(searchResultViewItems.get(1).getCaseId(), searchResultViewItems.get(0).getCaseId());
         assertEquals("England",
-                     ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress")).get("Country"));
+                     ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress")).get("Country"));
         assertEquals("England",
-                     ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress")).get("Country"));
+                     ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress")).get("Country"));
     }
 
     @Test
@@ -539,31 +544,31 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
 
         assertNotNull(searchResultViewItems.get(0).getCaseId());
-        assertEquals("Janet", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
-        assertEquals("Parker", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
-        assertEquals("123", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("Janet", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
+        assertEquals("Parker", searchResultViewItems.get(0).getFields().get("PersonLastName"));
+        assertEquals("123", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("England", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
-        assertEquals("George", searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"));
-        assertEquals("Roof", searchResultViewItems.get(1).getCaseFields().get("PersonLastName"));
-        assertEquals("Flat 9", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("George", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
+        assertEquals("Roof", searchResultViewItems.get(1).getFields().get("PersonLastName"));
+        assertEquals("Flat 9", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("2 Hubble Avenue", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("2 Hubble Avenue", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("ButtonVillie", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("ButtonVillie", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("Wales", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("Wales", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("Postcode"));
     }
 
@@ -604,31 +609,31 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
 
         assertNotNull(searchResultViewItems.get(0).getCaseId());
-        assertEquals("Janet", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
-        assertEquals("Parker", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
-        assertEquals("123", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("Janet", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
+        assertEquals("Parker", searchResultViewItems.get(0).getFields().get("PersonLastName"));
+        assertEquals("123", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("England", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(0).getFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
-        assertEquals("George", searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"));
-        assertEquals("Roof", searchResultViewItems.get(1).getCaseFields().get("PersonLastName"));
-        assertEquals("Flat 9", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("George", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
+        assertEquals("Roof", searchResultViewItems.get(1).getFields().get("PersonLastName"));
+        assertEquals("Flat 9", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("2 Hubble Avenue", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("2 Hubble Avenue", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("ButtonVillie", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("ButtonVillie", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("Wales", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("Wales", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("Postcode"));
     }
 
@@ -1034,11 +1039,11 @@ public class QueryEndpointIT extends WireMockBaseTest {
         List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
 
-        final MvcResult result = mockMvc.perform(get(GET_CASE_INVALID_REFERENCE)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .header(AUTHORIZATION, "Bearer user1"))
-                                        .andExpect(status().is(400))
-                                        .andReturn();
+        mockMvc.perform(get(GET_CASE_INVALID_REFERENCE)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(400))
+            .andReturn();
 
         resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
@@ -1591,5 +1596,58 @@ public class QueryEndpointIT extends WireMockBaseTest {
                             .header(AUTHORIZATION, "Bearer user1"))
                .andExpect(status().is(404))
                .andReturn();
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_dcp.sql"})
+    public void shouldSearchCasesWithFormattedDCP() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_DCP_CASEWORKER);
+
+        List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect data initiation", 2, resultList.size());
+
+        final MvcResult result = mockMvc.perform(get(GET_CASES_DCP)
+            .contentType(JSON_CONTENT_TYPE)
+            .param("state", "TODO")
+            .param("view", "WORKBASKET")
+            .param("case.DateField", "12-1987")
+            .param("case.DateTimeField", "1999")
+            .param("case.CollectionField.0.value", "02031994")
+            .param("case.ComplexField.ComplexDateTimeField", "01-2004")
+            // .param("last_modified_date", "22-04-20") // Uncomment after RDM-8269
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
+            SearchResultView.class);
+
+        SearchResultViewItem case1 = searchResultView.getSearchResultViewItems().get(0);
+
+        assertAll(
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(1)),
+            () -> assertThat(case1.getCaseId(), is("1587471326156579")),
+            () -> assertThat(case1.getFields().get(DATE_FIELD), is("1987-12-01")),
+            () -> assertThat(case1.getFieldsFormatted().get(DATE_FIELD), is("01 Dec 1987")),
+            () -> assertThat(case1.getFields().get(DATE_TIME_FIELD), is("1999-01-01T00:00:00.000")),
+            () -> assertThat(case1.getFieldsFormatted().get(DATE_TIME_FIELD), is("1999")),
+            () -> assertThat(arrayOf(case1.getFields().get(COLLECTION_FIELD)).get(0).get(VALUE),
+                is("1994-03-02T00:00:00.000")),
+            () -> assertThat(arrayOf(case1.getFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(VALUE),
+                is("03-1994")),
+            () -> assertThat(arrayOf(case1.getFields().get(COLLECTION_FIELD)).get(1).get(VALUE),
+                is("1999-09-08T00:00:00.000")),
+            () -> assertThat(arrayOf(case1.getFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(VALUE),
+                is("09-1999")),
+            () -> assertThat(mapOf(case1.getFields().get(COMPLEX_FIELD)).get(COMPLEX_DATE_TIME_FIELD),
+                is("2004-01-01T00:00:00.000")),
+            () -> assertThat(mapOf(case1.getFieldsFormatted().get(COMPLEX_FIELD)).get(COMPLEX_DATE_TIME_FIELD),
+                is("2004")),
+            () -> assertThat(case1.getFields().get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()),
+                is("2020-04-22T14:45:39.987")),
+            () -> assertThat(case1.getFieldsFormatted().get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()),
+                is("22 Apr 2020 14:45:39"))
+        );
     }
 }

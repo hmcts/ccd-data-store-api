@@ -2,13 +2,14 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel(description = "")
-public class CaseTypeTabDefinition implements Serializable {
+public class CaseTypeTabDefinition implements Serializable, CommonDCPModel {
 
     private String id = null;
     private String label = null;
