@@ -38,7 +38,7 @@ Feature: F-106: Update Supplementary Data
     Then a positive response is received,
     And the response has all the details as expected.
 
-  @S-608
+  @S-608 @elasticsearch @Ignore
   Scenario: Must return the updated supplementary data values from Data store and search through elastic search
     Given a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
     And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],
@@ -50,7 +50,7 @@ Feature: F-106: Update Supplementary Data
     Then the response [contains the previoulsy created case],
     And the response has all other details as expected.
 
-  @S-609
+  @S-609 @elasticsearch @Ignore
   Scenario: Need to be able to decrement an existing property and search through elastic search
     Given a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
     And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],

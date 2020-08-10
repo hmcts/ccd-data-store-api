@@ -12,7 +12,7 @@
     "body": {
       "supplementary_data_updates": {
         "$set": {
-          "orgs_assigned_users.OrgZ": 50
+          "orgs_assigned_users.OrgZ": 2500
         }
       }
     }
@@ -26,7 +26,7 @@
     },
     "body": {
       "supplementary_data": {
-        "orgs_assigned_users.OrgZ": 50
+        "orgs_assigned_users.OrgZ": 2500
       }
     }
 	}

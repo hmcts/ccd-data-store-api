@@ -23,7 +23,7 @@
           "filter":[
             { "bool":{
               "should": [
-                { "range": { "supplementary_data.orgs_assigned_users.OrgZ": { "gte": 50 } } }
+                { "range": { "supplementary_data.orgs_assigned_users.OrgZ": { "gte": 2500 } } }
               ]
             }
             }
@@ -49,47 +49,55 @@
           "id": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}",
           "jurisdiction": "BEFTA_JURISDICTION_2",
           "state": "[[ANY_STRING_NOT_NULLABLE]]",
-          "version": "[[ANYTHING_NULLABLE]]",
+          "version": "[[ANY_NULLABLE]]",
           "case_type_id": "BEFTA_CASETYPE_2_1",
           "created_date": "[[ANY_DATE_NOT_NULLABLE]]",
           "last_modified": "[[ANY_DATE_NOT_NULLABLE]]",
           "last_state_modified_date": "[[ANY_DATE_NOT_NULLABLE]]",
           "security_classification": "[[ANY_STRING_NOT_NULLABLE]]",
           "case_data": {
-            "MoneyGBPField": "[[ANYTHING_NULLABLE]]",
-            "FixedListField": "[[ANYTHING_NULLABLE]]",
+            "MoneyGBPField": "[[ANY_NULLABLE]]",
+            "FixedListField": "[[ANY_NULLABLE]]",
+            "DocumentField4": "[[ANY_NULLABLE]]",
+            "DocumentField7": "[[ANY_NULLABLE]]",
             "AddressUKField": {
-              "PostCode": "[[ANYTHING_NULLABLE]]",
-              "PostTown": "[[ANYTHING_NULLABLE]]",
-              "County": "[[ANYTHING_NULLABLE]]",
-              "Country": "[[ANYTHING_NULLABLE]]",
-              "AddressLine2": "[[ANYTHING_NULLABLE]]",
-              "AddressLine3": "[[ANYTHING_NULLABLE]]",
-              "AddressLine1": "[[ANYTHING_NULLABLE]]"
+              "PostCode": "[[ANY_NULLABLE]]",
+              "PostTown": "[[ANY_NULLABLE]]",
+              "County": "[[ANY_NULLABLE]]",
+              "Country": "[[ANY_NULLABLE]]",
+              "AddressLine2": "[[ANY_NULLABLE]]",
+              "AddressLine3": "[[ANY_NULLABLE]]",
+              "AddressLine1": "[[ANY_NULLABLE]]"
             },
             "ComplexField": {
-              "ComplexFixedListField": "[[ANYTHING_NULLABLE]]",
+              "ComplexFixedListField": "[[ANY_NULLABLE]]",
               "ComplexNestedField": {
                 "NestedCollectionTextField": [],
-                "NestedNumberField": "[[ANYTHING_NULLABLE]]"
+                "NestedNumberField": "[[ANY_NULLABLE]]"
               },
-              "ComplexTextField": "[[ANYTHING_NULLABLE]]"
+              "ComplexTextField": "[[ANY_NULLABLE]]"
             },
-            "FixedRadioListField": "[[ANYTHING_NULLABLE]]",
-            "DateTimeField": "[[ANYTHING_NULLABLE]]",
-            "PhoneUKField": "[[ANYTHING_NULLABLE]]",
-            "NumberField":"[[ANYTHING_NULLABLE]]",
-            "MultiSelectListField": [],
-            "YesOrNoField": "[[ANYTHING_NULLABLE]]",
-            "EmailField": "[[ANYTHING_NULLABLE]]",
-            "TextField": "[[ANYTHING_NULLABLE]]",
-            "DateField": "[[ANYTHING_NULLABLE]]",
-            "TextAreaField": "[[ANYTHING_NULLABLE]]",
+            "FixedRadioListField": "[[ANY_NULLABLE]]",
+            "DateTimeField": "[[ANY_NULLABLE]]",
+            "PhoneUKField": "[[ANY_NULLABLE]]",
+            "NumberField":"[[ANY_NULLABLE]]",
+            "MultiSelectListField": [
+              "OPTION5",
+              "OPTION4",
+              "OPTION3"
+            ],
+            "YesOrNoField": "[[ANY_NULLABLE]]",
+            "EmailField": "[[ANY_NULLABLE]]",
+            "TextField": "[[ANY_NULLABLE]]",
+            "DateField": "[[ANY_NULLABLE]]",
+            "TextAreaField": "[[ANY_NULLABLE]]",
             "CollectionField": []
           },
           "data_classification": {
             "MoneyGBPField": "[[ANY_STRING_NOT_NULLABLE]]",
             "FixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DocumentField4": "[[ANY_NULLABLE]]",
+            "DocumentField7": "[[ANY_NULLABLE]]",
             "AddressUKField": {
               "value": {
                 "PostCode": "[[ANY_STRING_NOT_NULLABLE]]",
@@ -134,14 +142,16 @@
               "classification": "[[ANY_STRING_NOT_NULLABLE]]"
             }
           },
-          "after_submit_callback_response": "[[ANYTHING_NULLABLE]]",
-          "callback_response_status_code": "[[ANYTHING_NULLABLE]]",
-          "callback_response_status": "[[ANYTHING_NULLABLE]]",
-          "delete_draft_response_status_code": "[[ANYTHING_NULLABLE]]",
-          "delete_draft_response_status": "[[ANYTHING_NULLABLE]]",
+          "after_submit_callback_response": "[[ANY_NULLABLE]]",
+          "callback_response_status_code": "[[ANY_NULLABLE]]",
+          "callback_response_status": "[[ANY_NULLABLE]]",
+          "delete_draft_response_status_code": "[[ANY_NULLABLE]]",
+          "delete_draft_response_status": "[[ANY_NULLABLE]]",
           "security_classifications": {
             "MoneyGBPField": "[[ANY_STRING_NOT_NULLABLE]]",
             "FixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DocumentField4": "[[ANY_NULLABLE]]",
+            "DocumentField7": "[[ANY_NULLABLE]]",
             "AddressUKField": {
               "value": {
                 "PostCode": "[[ANY_STRING_NOT_NULLABLE]]",
