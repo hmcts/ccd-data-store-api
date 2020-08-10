@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-105_Verify_Counter_Unchanged",
+  "_extends_": "F-105_Check_Orgs_Assigned_Users_Base",
+
+  "specs": [
+    "to verify the count of users assigned to a case has NOT changed"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.F-105_Prerequisite_Counter_Check_Call.childContexts.F-105_Get_Organisation_Identifier_Olawale|siblingContexts.F-105_Prerequisite_Counter_Check_Call|0]}"
+    }
+  }
+}
