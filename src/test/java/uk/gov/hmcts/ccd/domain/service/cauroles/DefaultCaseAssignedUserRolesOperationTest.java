@@ -54,6 +54,18 @@ class DefaultCaseAssignedUserRolesOperationTest {
         assertEquals(2, caseAssignedUserRoles.size());
     }
 
+    @Test
+    void removeCaseUserRoles() {
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(),
+                new CaseAssignedUserRoleWithOrganisation()
+        );
+
+        caseAssignedUserRolesOperation.addCaseUserRoles(caseUserRoles);
+
+        verify(caseAccessOperation).addCaseUserRoles(caseUserRoles);
+    }
+
     private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {
         List<CaseAssignedUserRole> caseAssignedUserRoles = Lists.newArrayList();
 

@@ -55,7 +55,7 @@ import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 public class CaseAssignedUserRolesController {
 
     public static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
-    public static final String DELETE_SUCCESS_MESSAGE = "Case-User-Role assignments removed successfully";
+    public static final String REMOVE_SUCCESS_MESSAGE = "Case-User-Role assignments removed successfully";
 
     final Pattern caseRolePattern = Pattern.compile("^\\[.+]$");
 
@@ -139,7 +139,7 @@ public class CaseAssignedUserRolesController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = DELETE_SUCCESS_MESSAGE,
+                    message = REMOVE_SUCCESS_MESSAGE,
                     response = CaseAssignedUserRolesResponse.class
             ),
             @ApiResponse(
@@ -172,7 +172,7 @@ public class CaseAssignedUserRolesController {
             targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildUserIds(#caseAssignedUserRolesRequest)",
             targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseRoles(#caseAssignedUserRolesRequest)"
     )
-    public ResponseEntity<CaseAssignedUserRolesResponse> deleteCaseUserRoles(
+    public ResponseEntity<CaseAssignedUserRolesResponse> removeCaseUserRoles(
             @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
             @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
             @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
@@ -180,7 +180,7 @@ public class CaseAssignedUserRolesController {
     ) {
         validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
         this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
-        return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(DELETE_SUCCESS_MESSAGE));
+        return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
     }
 
     @GetMapping(
