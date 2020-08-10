@@ -31,7 +31,9 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
-  imageTag: "6.4.2"
+  environment:
+    - cluster.initial_master_nodes: "{{ .Release.Name }}-es-master"
+  imageTag: "7.7.0"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
