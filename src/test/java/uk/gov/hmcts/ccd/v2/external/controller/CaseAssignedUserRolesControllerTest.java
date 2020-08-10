@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -518,10 +517,10 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT / ASSERT
             CaseRoleAccessException exception = assertThrows(CaseRoleAccessException.class,
-                    () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_BAD, null));
+               () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_BAD, null));
 
             assertAll(
-                    () -> assertThat(exception.getMessage(),
+               () -> assertThat(exception.getMessage(),
                             containsString(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION))
             );
         }
@@ -532,10 +531,10 @@ class CaseAssignedUserRolesControllerTest {
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
-                    () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, null));
+               () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, null));
 
             assertAll(
-                    () -> assertThat(exception.getMessage(),
+               () -> assertThat(exception.getMessage(),
                             containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
             );
         }
