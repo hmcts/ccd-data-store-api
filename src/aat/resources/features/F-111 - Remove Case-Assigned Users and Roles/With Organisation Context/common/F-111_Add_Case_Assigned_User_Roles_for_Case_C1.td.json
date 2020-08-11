@@ -1,11 +1,11 @@
 {
   "title": "Must successfully assign a user and case role for a specific case by a user calling through/from an authorised application",
 
-  "_guid_": "F-111_Add_Case_Assigned_User_Roles_for_Case_C1_Without_Organisation",
+  "_guid_": "F-111_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation",
   "_extends_": "F-111_Add_Case_Assigned_User_Roles_Base",
 
   "specs": [
-    "by Dil, without an organisation context, to add a Case Role - CR1 on C1 for Olawale"
+    "by Dil, within the context of his organisation, to add a Case Role - CR1 on C1 for Olawale and Hemanth"
   ],
 
   "users": {

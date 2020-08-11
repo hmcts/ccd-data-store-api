@@ -4,14 +4,14 @@ Feature: F-111: Remove Case-Assigned Users and Roles
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-111.1
+  @S-111.1 @sateesh
   Scenario: must successfully remove a user and case role for a specific case by a user calling through/from an authorised application
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
       And a user [Olawale - with an active solicitor profile],
-      And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment_WithOutOrgnisation],
-      And a successful call [by Dil, without an organisation context, to add a Case Role - CR1 on C1 for Olawale] as in [F-111_Add_Case_Assigned_User_Roles_for_Case_C1],
-      And a successful call [to verify Olawale's reception of the role CR-1 over the case C1] as in [S-111.1_Get_Case_Roles_for_Case_C1],
+      And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
+      And a successful call [by Dil, without an organisation context, to add a Case Role - CR1 on C1 for Olawale] as in [F-111_Add_Case_Assigned_User_Roles_for_Case_C1_Without_Organisation],
+      And a successful call [to verify Olawale's reception of the role CR-1 over the case C1] as in [S-111.1_Get_Case_Roles_for_Case_C1_After_Add],
 
      When a request is prepared with appropriate values,
       And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale and a proper Case Role CR-1],
@@ -22,15 +22,15 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify Olawale's eventual loss of the role CR-1 over the case C1] will get the expected response as in [S-111.1_Get_Case_Roles_for_Case_C1_After_Remove].
 
   @S-111.2
-  @Ignore
+  @sateesh
   Scenario: must successfully remove multiple user and case roles for a specific case by a user calling through/from an authorised application
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
       And a user [Olawale - with an active solicitor profile],
       And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
       And a successful call [by Richard to create a case - C2] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
-      And a successful call [by Dil to add a Case Role - CR1 and CR2 on both C1 and C2 for Olawale] as in [the respective test data file],
-      And a successful call [to verify Olawale's reception of the roles CR1 and CR2 on both C1 and C2] as in [the respective test data file],
+      And a successful call [by Dil to add a Case Role - CR1 and CR2 on both C1 and C2 for Olawale] as in [S-111.2_Add_Case_Assigned_User_Roles_for_Case_C1_And_C2],
+      And a successful call [to verify Olawale's reception of the roles CR1 and CR2 on both C1 and C2] as in [S-111.2_Get_Case_Roles_for_Case_C1_And_C2_After_Add],
 
      When a request is prepared with appropriate values,
       And the request [is made from an authorised application by Dil, for four assignments that made as above],
@@ -38,7 +38,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify Olawale's eventual loss of all the assignments made before] will get the expected response as in [S-111.1_Get_Case_Roles_for_Case_C1].
+      And a call [to verify Olawale's eventual loss of all the assignments made before] will get the expected response as in [S-111.2_Get_Case_Roles_for_Case_C1_And_C2_After_Remove].
 
   @S-111.13
   @Ignore

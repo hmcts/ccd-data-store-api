@@ -19,7 +19,7 @@
   "request": {
     "_extends_": "Common_Request",
     "queryParams": {
-      "case_ids": "${}${[scenarioContext][siblingContexts][F-111_Add_Case_Assigned_User_Roles_for_Case_C1][testData][request][body][case_users][0][case_id]}"
+      "case_ids": "${}${[scenarioContext][siblingContexts][F-111_Add_Case_Assigned_User_Roles_for_Case_C1_Without_Organisation][testData][request][body][case_users][0][case_id]}"
     }
   },
 

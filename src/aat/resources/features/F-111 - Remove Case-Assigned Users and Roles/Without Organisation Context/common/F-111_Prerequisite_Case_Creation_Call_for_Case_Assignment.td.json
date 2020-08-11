@@ -3,7 +3,8 @@
   "_extends_": "F-111_Case_Data_Create_C1",
 
   "specs": [
-    "by Richard to create a case - C1"
+    "by Richard to create a case - C1",
+    "by Richard to create a case - C2"
   ],
 
   "prerequisites": [
