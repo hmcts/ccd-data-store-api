@@ -34,14 +34,17 @@ import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
-import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,6 +83,8 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     private static final String CASE_ID_2 = "6375837333991692";
     private static final String CASE_IDS = CASE_ID_1 + "," + CASE_ID_2;
 
+    private static final String CASE_ID_EXTRA = "1983927457663329";
+
     private static final String CASE_ROLE_1 = "[case-role-1]";
     private static final String CASE_ROLE_2 = "[case-role-2]";
     private static final String INVALID_CASE_ROLE = "bad-role";
@@ -90,6 +95,12 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     private static final String USER_IDS = USER_IDS_1 + "," + USER_IDS_2;
 
     private static final String INVALID_USER_IDS = USER_IDS_1 + ", ," + USER_IDS_2;
+
+    private static final String ORGANISATION_ID_1 = "OrgA";
+    private static final String ORGANISATION_ID_2 = "OrgB";
+    private static final String INVALID_ORGANISATION_ID = "";
+
+    private static final String ORGANISATION_ASSIGNED_USER_COUNTER_KEY = "orgs_assigned_users";
 
     private final String caseworkerCaa = "caseworker-caa";
     private final String getCaseAssignedUserRoles = "/case-users";
@@ -114,6 +125,9 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     @Inject @Qualifier(DefaultCaseUserRepository.QUALIFIER)
     private CaseUserRepository caseUserRepository;
+
+    @Inject @Qualifier("default")
+    private SupplementaryDataRepository supplementaryDataRepository;
 
     @Inject
     private WebApplicationContext wac;
@@ -169,14 +183,14 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10001"; // don't need the users to exist in the repository but want unique for each AC
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        caseUserRoles.add(caseUserRole1);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1)
+        );
 
         // ACT
         final MvcResult result = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isCreated())
             .andReturn();
@@ -205,16 +219,15 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10002"; // don't need the users to exist in the repository but want unique for each AC
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(null, userId, CASE_ROLE_1);
-        caseUserRoles.add(caseUserRole1);
-        caseUserRoles.add(caseUserRole2);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
+            new CaseAssignedUserRoleWithOrganisation(null, userId, CASE_ROLE_1)
+        );
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -238,16 +251,15 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10003"; // don't need the users to exist in the repository but want unique for each AC
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(INVALID_CASE_ID.toString(), userId, CASE_ROLE_1);
-        caseUserRoles.add(caseUserRole1);
-        caseUserRoles.add(caseUserRole2);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
+            new CaseAssignedUserRoleWithOrganisation(INVALID_CASE_ID.toString(), userId, CASE_ROLE_1)
+        );
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -271,16 +283,15 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10004"; // don't need the users to exist in the repository but want unique for each AC
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, null, CASE_ROLE_1);
-        caseUserRoles.add(caseUserRole1);
-        caseUserRoles.add(caseUserRole2);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, null, CASE_ROLE_1)
+        );
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -304,16 +315,15 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10005"; // don't need the users to exist in the repository but want unique for each AC
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, "", CASE_ROLE_1);
-        caseUserRoles.add(caseUserRole1);
-        caseUserRoles.add(caseUserRole2);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, "", CASE_ROLE_1)
+        );
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -341,14 +351,14 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         HttpHeaders httpHeaders = createHttpHeaders();
         httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, "Bearer " + MockUtils.generateDummyS2SToken(UNAUTHORISED_ADD_SERVICE));
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        caseUserRoles.add(caseUserRole1);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1)
+        );
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(httpHeaders))
             .andExpect(status().isForbidden())
             .andReturn().getResolvedException();
@@ -372,16 +382,15 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10007"; // don't need the users to exist in the repository but want unique for each AC
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, userId, INVALID_CASE_ROLE);
-        caseUserRoles.add(caseUserRole1);
-        caseUserRoles.add(caseUserRole2);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, INVALID_CASE_ROLE)
+        );
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -405,16 +414,15 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "10008"; // don't need the users to exist in the repository but want unique for each AC
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, userId, null);
-        caseUserRoles.add(caseUserRole1);
-        caseUserRoles.add(caseUserRole2);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, null)
+        );
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -440,7 +448,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(null)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(null)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -459,12 +467,12 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList();
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())
             .andReturn().getResolvedException();
@@ -485,14 +493,14 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         String userId = "1111"; // don't need the users to exist in the repository but want unique for each AC
         String caseReferenceValidButNonExistent = "1111222233334444";
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(caseReferenceValidButNonExistent, userId, CASE_ROLE_1);
-        caseUserRoles.add(caseUserRole1);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(caseReferenceValidButNonExistent, userId, CASE_ROLE_1)
+        );
 
         // ACT
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isNotFound())
             .andReturn().getResolvedException();
@@ -516,16 +524,15 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication);
         String userId = "2222"; // don't need the users to exist in the repository but want unique for each test
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        caseUserRoles.add(caseUserRole1);
-        caseUserRoles.add(caseUserRole2);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1)
+        );
 
         // ACT
         final MvcResult result = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(createHttpHeaders()))
             .andExpect(status().isCreated())
             .andReturn();
@@ -561,16 +568,15 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         HttpHeaders httpHeaders = createHttpHeaders();
         httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_2));
 
-        List<CaseAssignedUserRole> caseUserRoles = Lists.newArrayList();
-        CaseAssignedUserRole caseUserRole1 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_1);
-        CaseAssignedUserRole caseUserRole2 = new CaseAssignedUserRole(CASE_ID_1, userId, CASE_ROLE_2);
-        caseUserRoles.add(caseUserRole1);
-        caseUserRoles.add(caseUserRole2);
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_2)
+        );
 
         // ACT
         final MvcResult result = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesResource(caseUserRoles)))
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
             .headers(httpHeaders))
             .andExpect(status().isCreated())
             .andReturn();
@@ -590,6 +596,205 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(caseRoles, hasItems(CASE_ROLE_2));
 
         verifyAuditForAddCaseUserRoles(HttpStatus.CREATED, caseUserRoles);
+    }
+
+    // RDM-8842: AC-1
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
+    @DisplayName(
+        "addCaseUserRoles: RDM-8442.AC-1: must successfully increment Assigned User Count when assigning a user and case role for a specific case"
+    )
+    void addCaseUserRoles_shouldIncrementOrganisationUserCountForNewRelationships() throws Exception {
+        // ARRANGE
+        MockUtils.setSecurityAuthorities(authentication);
+        String userId1 = "8842-001-1"; // don't need the users to exist in the repository but want unique for each AC
+        String userId2 = "8842-001-2";
+
+        final List<CaseAssignedUserRoleWithOrganisation> caseUserRoles1 = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId1, CASE_ROLE_1, ORGANISATION_ID_1)
+        );
+        final List<CaseAssignedUserRoleWithOrganisation> caseUserRoles2 = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId2, CASE_ROLE_1, ORGANISATION_ID_1)
+        );
+
+        // ACT
+        // initial user count
+        final long prerequisiteCounter = getOrgUserCountFromSupData(CASE_ID_1, ORGANISATION_ID_1);
+        // first call
+        mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles1)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isCreated())
+            .andReturn();
+        // first verify counter
+        final long verifyCounter1 = getOrgUserCountFromSupData(CASE_ID_1, ORGANISATION_ID_1);
+        // second call (repeat)
+        mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles1)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isCreated())
+            .andReturn();
+        // second verify counter
+        final long verifyCounter2 = getOrgUserCountFromSupData(CASE_ID_1, ORGANISATION_ID_1);
+        // third call (different user)
+        mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles2)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isCreated())
+            .andReturn();
+        // third verify counter
+        final long verifyCounter3 = getOrgUserCountFromSupData(CASE_ID_1, ORGANISATION_ID_1);
+
+        // ASSERT
+        assertEquals(prerequisiteCounter + 1L, verifyCounter1); // incremented
+        assertEquals(verifyCounter1, verifyCounter2); // unchanged
+        assertEquals(verifyCounter2 + 1L, verifyCounter3); // incremented
+
+        // check data has been saved
+        List<String> caseRoles1 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId1);
+        assertEquals(1, caseRoles1.size());
+        assertThat(caseRoles1, hasItems(CASE_ROLE_1));
+        List<String> caseRoles2 = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId2);
+        assertEquals(1, caseRoles2.size());
+        assertThat(caseRoles2, hasItems(CASE_ROLE_1));
+    }
+
+    // RDM-8842: AC-2
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql",
+        "classpath:sql/insert_case_users_valid_case_ids.sql"
+    })
+    @DisplayName(
+        "addCaseUserRoles: RDM-8442.AC-2: Must not increment Assigned User Count when assigning a user and case role"
+            + " for a specific case if there was already a case user role assignment with the respective values in the request"
+    )
+    void addCaseUserRoles_shouldNotIncrementOrganisationUserCountForExistingRelationship() throws Exception {
+        // ARRANGE
+        MockUtils.setSecurityAuthorities(authentication);
+        String userId = "8842-002"; // don't need the users to exist in the repository but want unique for each AC
+
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1, ORGANISATION_ID_2)
+        );
+
+        // NB: CASE_ID_EXTRA has existing role assigned for user defined in SQL file
+
+        // ACT
+        // initial user count
+        final long prerequisiteCounter = getOrgUserCountFromSupData(CASE_ID_EXTRA, ORGANISATION_ID_2);
+        // make test call
+        mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isCreated())
+            .andReturn();
+        // verify counter
+        final long verifyCounter = getOrgUserCountFromSupData(CASE_ID_EXTRA, ORGANISATION_ID_2);
+
+        // ASSERT
+        assertEquals(prerequisiteCounter, verifyCounter); // unchanged
+
+        // check data has been saved
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId);
+        assertEquals(2, caseRoles.size()); // i.e. 1 + 1: one added + one existing
+        assertThat(caseRoles, hasItems(CASE_ROLE_1));
+    }
+
+    // RDM-8842: AC-3
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
+    @DisplayName(
+        "addCaseUserRoles: RDM-8442.AC-3: No organisation ID is provided by the user"
+    )
+    void addCaseUserRoles_shouldNotIncrementOrganisationUserCountersWhenNoOrganisationSpecified() throws Exception {
+        // ARRANGE
+        MockUtils.setSecurityAuthorities(authentication);
+        String userId = "8842-003"; // don't need the users to exist in the repository but want unique for each AC
+
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1)
+        );
+
+        // set a default count for any organisation
+        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2), 0L);
+
+        // ACT
+        // initial user counters
+        final Object orgUserCountersBefore = supplementaryDataRepository.findSupplementaryData(CASE_ID_EXTRA, null)
+            .getResponse().getOrDefault(ORGANISATION_ASSIGNED_USER_COUNTER_KEY, null);
+        // make test call
+        mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isCreated())
+            .andReturn();
+        // verify counters
+        final Object orgUserCountersAfter = supplementaryDataRepository.findSupplementaryData(CASE_ID_EXTRA, null)
+            .getResponse().getOrDefault(ORGANISATION_ASSIGNED_USER_COUNTER_KEY, null);
+
+        // ASSERT
+        assertEquals(orgUserCountersBefore, orgUserCountersAfter); // unchanged
+
+        // check data has been saved
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId);
+        assertEquals(1, caseRoles.size());
+        assertThat(caseRoles, hasItems(CASE_ROLE_1));
+    }
+
+    // RDM-8842: AC-4
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
+    @DisplayName(
+        "addCaseUserRoles: RDM-8442.AC-4: Invalid Organisation ID provided"
+    )
+    void addCaseUserRoles_shouldThrowExceptionWhenInvalidOrganisationIDPassed() throws Exception {
+        // ARRANGE
+        MockUtils.setSecurityAuthorities(authentication);
+        String userId = "8442-004"; // don't need the users to exist in the repository but want unique for each AC
+
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1, INVALID_ORGANISATION_ID)
+        );
+
+        // set a default count for any organisation
+        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2), 0L);
+
+        // ACT
+        // initial user counters
+        final Object orgUserCountersBefore = supplementaryDataRepository.findSupplementaryData(CASE_ID_EXTRA, null)
+            .getResponse().getOrDefault(ORGANISATION_ASSIGNED_USER_COUNTER_KEY, null);
+        // make test call
+        Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new AddCaseAssignedUserRolesRequest(caseUserRoles)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isBadRequest())
+            .andReturn().getResolvedException();
+        // verify counters
+        final Object orgUserCountersAfter = supplementaryDataRepository.findSupplementaryData(CASE_ID_EXTRA, null)
+            .getResponse().getOrDefault(ORGANISATION_ASSIGNED_USER_COUNTER_KEY, null);
+
+        // ASSERT
+        assertNotNull(exception);
+        assertThat(exception.getMessage(), containsString(V2.Error.ORGANISATION_ID_INVALID));
+
+        assertEquals(orgUserCountersBefore, orgUserCountersAfter); // unchanged
+
+        // check data has not been saved
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        assertEquals(0, caseRoles.size());
     }
 
     // AC-1
@@ -838,7 +1043,7 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         return headers;
     }
 
-    private void verifyAuditForAddCaseUserRoles(HttpStatus status, List<CaseAssignedUserRole> caseUserRoles) {
+    private void verifyAuditForAddCaseUserRoles(HttpStatus status, List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
@@ -848,11 +1053,11 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.POST.name()));
 
         if (caseUserRoles != null) {
-            String caseIds = caseUserRoles.stream().map(CaseAssignedUserRole::getCaseDataId)
+            String caseIds = caseUserRoles.stream().map(CaseAssignedUserRoleWithOrganisation::getCaseDataId)
                 .collect(Collectors.joining(CASE_ID_SEPARATOR));
-            String caseRoles = caseUserRoles.stream().map(CaseAssignedUserRole::getCaseRole)
+            String caseRoles = caseUserRoles.stream().map(CaseAssignedUserRoleWithOrganisation::getCaseRole)
                 .collect(Collectors.joining(CASE_ID_SEPARATOR));
-            String userIds = caseUserRoles.stream().map(CaseAssignedUserRole::getUserId)
+            String userIds = caseUserRoles.stream().map(CaseAssignedUserRoleWithOrganisation::getUserId)
                 .collect(Collectors.joining(CASE_ID_SEPARATOR));
 
             assertThat(captor.getValue().getCaseId(), is(caseIds));
@@ -882,6 +1087,23 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         return Arrays.stream(csvInput.split(CASE_ID_SEPARATOR))
             .map(String::trim)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
+    }
+
+    private String getOrgUserCountSupDataKey(String organisationId) {
+        return String.format("%s.%s", ORGANISATION_ASSIGNED_USER_COUNTER_KEY,  organisationId);
+    }
+
+    private long getOrgUserCountFromSupData(String caseId, String organisationId) {
+        String orgCountSupDataKey = getOrgUserCountSupDataKey(organisationId);
+
+        try {
+            return Long.parseLong(
+                supplementaryDataRepository.findSupplementaryData(caseId, Collections.singleton(orgCountSupDataKey))
+                    .getResponse().getOrDefault(orgCountSupDataKey, 0L).toString()
+            );
+        } catch (IllegalArgumentException e) {
+            return 0L;
+        }
     }
 
 }
