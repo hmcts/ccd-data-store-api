@@ -3,11 +3,13 @@
   "_extends_": "F-111_Check_Orgs_Assigned_Users_Base",
 
   "specs": [
-    "to check the number of users having access to C1 in its supplementary data"
+    "As a prerequisite"
   ],
 
   "prerequisites": [
-    "F-111_Get_Organisation_Identifier_Olawale"
+    "F-111_Get_Organisation_Identifier_Olawale",
+    "F-111_Get_Organisation_Identifier_Hemanth",
+    "F-111_Get_Organisation_Identifier_Dil"
   ],
 
   "expectedResponse": {

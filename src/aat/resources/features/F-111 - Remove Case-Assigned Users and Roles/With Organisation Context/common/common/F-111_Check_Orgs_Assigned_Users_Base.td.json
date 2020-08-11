@@ -19,11 +19,11 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "cid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+      "cid": "${}${[scenarioContext][parentContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}"
     },
     "body": {
       "supplementary_data_updates": {
-        "$inc": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.F-105_Prerequisite_Counter_Check_Call.childContexts.F-105_Get_Organisation_Identifier_Olawale]}"
+        "$inc": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.F-111_Prerequisite_Counter_Check_Call.childContexts.F-111_Get_Organisation_Identifier_Olawale]}"
       }
     }
   },

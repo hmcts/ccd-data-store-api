@@ -1,0 +1,12 @@
+{
+  "title": "Retrieve user's in Dil's organisation (+ organisationIdentifier)",
+
+  "_guid_": "F-111_Get_Organisation_Identifier_Dil",
+  "_extends_": "F-111_Get_Organisation_Identifier_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "F-111_User_Dil"
+    }
+  }
+}
