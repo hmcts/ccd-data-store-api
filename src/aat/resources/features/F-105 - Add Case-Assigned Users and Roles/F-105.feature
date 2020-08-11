@@ -21,6 +21,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
 
   # RDM-8606/8806 AC-2
   @S-105.2
+  @gareth
   Scenario: Must return an error response for a missing Case ID
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],

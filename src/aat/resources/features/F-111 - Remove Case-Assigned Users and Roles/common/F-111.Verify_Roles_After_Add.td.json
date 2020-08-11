@@ -1,9 +1,10 @@
 {
-  "_guid_": "S-111.1_Get_Case_Roles_for_Case_C1_After_Add",
+  "_guid_": "F-111_Get_Case_Roles_for_Case_C1_After_Add",
   "_extends_": "F-111_Get_Case_Roles_for_Case_C1_Base",
 
   "specs": [
-    "to verify Olawale's reception of the role CR-1 over the case C1"
+    "to verify Olawale's reception of the role CR-1 over the case C1",
+    "to verify that Olawale hasn't lost the role CR-1 over the case C1"
   ],
 
   "users": {

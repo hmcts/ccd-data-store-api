@@ -5,7 +5,8 @@
   "_extends_": "F-111_Add_Case_Assigned_User_Roles_Base",
 
   "specs": [
-    "by Dil, without an organisation context, to add a Case Role - CR1 on C1 for Olawale"
+    "by Dil, without an organisation context, to add a Case Role - CR1 on C1 for Olawale",
+    "by Dil to add a Case Role - CR1 on C1 for Olawale"
   ],
 
   "users": {
