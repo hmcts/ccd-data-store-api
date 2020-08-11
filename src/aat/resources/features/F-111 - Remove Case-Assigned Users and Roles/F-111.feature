@@ -4,7 +4,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-111.1 @sateesh
+  @S-111.1
   Scenario: must successfully remove a user and case role for a specific case by a user calling through/from an authorised application
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -22,7 +22,6 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify Olawale's eventual loss of the role CR-1 over the case C1] will get the expected response as in [S-111.1_Get_Case_Roles_for_Case_C1_After_Remove].
 
   @S-111.2
-  @sateesh
   Scenario: must successfully remove multiple user and case roles for a specific case by a user calling through/from an authorised application
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
