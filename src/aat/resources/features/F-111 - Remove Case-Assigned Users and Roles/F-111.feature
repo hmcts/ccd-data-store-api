@@ -251,7 +251,6 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
 
   @S-111.10
-  @Ignore
   Scenario: must return an error response for missing case_users list
     Given a user [Dil - who is to add some case role assignment for a case],
 
@@ -263,7 +262,6 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And the response has all the details as expected.
 
   @S-111.11
-  @Ignore
   Scenario: must return an error response for empty case_users list
     Given a user [Dil - who is to add some case role assignment for a case],
 
