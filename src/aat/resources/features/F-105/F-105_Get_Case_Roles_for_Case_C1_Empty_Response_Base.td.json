@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-105_Get_Case_Roles_for_Case_C1_Empty_Response_Base",
+  "_extends_": "F-105_Get_Case_Roles_for_Case_C1_Base",
+
+  "expectedResponse": {
+    "body": {
+      "case_users": []
+    }
+  }
+}
