@@ -92,7 +92,7 @@ withPipeline(type, product, component) {
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
     }
-    if (env.BRANCH_NAME == 'PR-687') {
+    if (env.BRANCH_NAME == 'PR-1048') {
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
     }
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
