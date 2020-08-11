@@ -212,7 +212,7 @@ public class ApplicationParams {
     }
 
     public String displaySearchCasesResultDefURL(final String caseTypeId, final String useCase) {
-        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?usecase=" + useCase;
+        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?use_case=" + useCase;
     }
 
     public String displayCaseTabCollection(final String caseTypeId) {

@@ -11,7 +11,7 @@
   ],
   "request": {
     "queryParams": {
-      "usecase": "ORGCASES"
+      "use_case": "ORGCASES"
     },
     "body": {
       "_source" : ["reference", "data.MoneyGBPField"],
