@@ -7,18 +7,25 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.security.idam.IdamRepository;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import com.auth0.jwt.JWT;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import uk.gov.hmcts.ccd.security.idam.IdamRepository;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 @Service
 public class SecurityUtils {
+    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
     private static final String AUD_CLAIM = "aud";
+    private static final String BEARER = "Bearer ";
+
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
 
@@ -30,7 +37,7 @@ public class SecurityUtils {
 
     public HttpHeaders authorizationHeaders() {
         final HttpHeaders headers = new HttpHeaders();
-        headers.add("ServiceAuthorization", authTokenGenerator.generate());
+        headers.add(SERVICE_AUTHORIZATION, authTokenGenerator.generate());
         headers.add("user-id", getUserId());
         headers.add("user-roles", getUserRolesHeader());
 
@@ -64,7 +71,7 @@ public class SecurityUtils {
     }
 
     private String getUserBearerToken() {
-        return "Bearer " + getUserToken();
+        return BEARER + getUserToken();
     }
 
     public String getUserRolesHeader() {
@@ -78,5 +85,19 @@ public class SecurityUtils {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<String> claims = jwt.getClaimAsStringList(AUD_CLAIM);
         return CollectionUtils.isNotEmpty(claims) ? claims.get(0) : null;
+    }
+
+    public String getServiceNameFromS2SToken(String serviceAuthenticationToken) {
+        // NB: this grabs the servce name straight from the token under the assumption
+        // that the S2S token has already been verified elsewhere
+        return JWT.decode(removeBearerFromToken(serviceAuthenticationToken)).getSubject();
+    }
+
+    private String removeBearerFromToken(String token) {
+        if (!token.startsWith(BEARER)) {
+            return token;
+        } else {
+            return token.substring(BEARER.length());
+        }
     }
 }

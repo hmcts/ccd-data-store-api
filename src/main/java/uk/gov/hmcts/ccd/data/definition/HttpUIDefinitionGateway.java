@@ -17,14 +17,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 /**
@@ -53,16 +47,16 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public SearchResult getSearchResult(int version, String caseTypeId) {
+    public SearchResultDefinition getSearchResult(int version, String caseTypeId) {
         try {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            final SearchResult
+            final SearchResultDefinition
                     searchResult =
                     restTemplate.exchange(withVersionQueryParam(applicationParams.displaySearchResultDefURL(caseTypeId), version),
                             HttpMethod.GET,
                             requestEntity,
-                            SearchResult.class).getBody();
+                            SearchResultDefinition.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             LOG.debug("Rest API getSearchResultGetHttp called for {}, finished in {}",
                     caseTypeId,
@@ -70,7 +64,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             return searchResult;
         } catch (final Exception e) {
             throw new ServiceException(String.format(
-                    "Problem getting SearchResult definition for case type: %s because of %s",
+                    "Problem getting SearchResultDefinition definition for case type: %s because of %s",
                     caseTypeId,
                     e.getMessage()));
         }
@@ -159,16 +153,16 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
-    public SearchResult getWorkBasketResult(int version, String caseTypeId) {
+    public SearchResultDefinition getWorkBasketResult(int version, String caseTypeId) {
         try {
             final Instant start = Instant.now();
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            final SearchResult
+            final SearchResultDefinition
                     searchResult =
                     restTemplate.exchange(withVersionQueryParam(applicationParams.displayWorkbasketDefURL(caseTypeId), version),
                             HttpMethod.GET,
                             requestEntity,
-                            SearchResult.class).getBody();
+                            SearchResultDefinition.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             LOG.debug("Rest API getWorkBasketResultGetHttp called for {}, finished in {}",
                     caseTypeId,
@@ -179,6 +173,30 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                     "Problem getting WorkBasketResult definition for case type: %s because of %s",
                     caseTypeId,
                     e.getMessage()));
+        }
+    }
+
+    @Override
+    public SearchResultDefinition getSearchCasesResultDefinition(int version, String caseTypeId, String useCase) {
+        try {
+            Instant start = Instant.now();
+            HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            SearchResultDefinition
+                searchResult =
+                restTemplate.exchange(withVersionQueryParam(applicationParams.displaySearchCasesResultDefURL(caseTypeId, useCase), version),
+                    HttpMethod.GET,
+                    requestEntity,
+                    SearchResultDefinition.class).getBody();
+            Duration duration = Duration.between(start, Instant.now());
+            LOG.debug("Rest API getSearchCasesResultGetHttp called for {}, finished in {}",
+                caseTypeId,
+                duration.toMillis());
+            return searchResult;
+        } catch (Exception e) {
+            throw new ServiceException(String.format(
+                "Problem getting SearchCasesResult definition for case type: %s because of %s",
+                caseTypeId,
+                e.getMessage()));
         }
     }
 

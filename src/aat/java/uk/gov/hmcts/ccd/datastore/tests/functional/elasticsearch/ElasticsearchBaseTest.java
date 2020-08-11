@@ -68,7 +68,7 @@ public abstract class ElasticsearchBaseTest extends BaseTest {
             .given()
             .log()
             .body()
-            .queryParam(CASE_TYPE_ID_PARAM, caseTypes)
+            .queryParam(CASE_TYPE_ID_PARAM, String.join(",", caseTypes))
             .contentType(ContentType.JSON)
             .body(jsonSearchRequest)
             .when()

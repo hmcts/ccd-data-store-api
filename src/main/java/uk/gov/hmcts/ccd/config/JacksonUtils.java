@@ -42,4 +42,9 @@ public final class JacksonUtils {
         return new TypeReference<HashMap<String, JsonNode>>() {
         };
     }
+
+    public static HashMap<String, Object> convertJsonNode(Object from) {
+        return MAPPER.convertValue(from, new TypeReference<HashMap<String, Object>>() {
+        });
+    }
 }
