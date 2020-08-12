@@ -79,6 +79,9 @@
       "case_types_results" : [{
         "total" : 1,
         "case_type_id" : "AAT_PRIVATE"
+      },{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE2"
       }]
     }
   }

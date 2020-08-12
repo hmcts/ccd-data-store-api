@@ -1,0 +1,48 @@
+{
+  "title": "Invalid Organisation ID provided",
+
+  "_guid_": "S-105.17",
+  "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - who is to add some case role assignment for a case",
+    "Olawale - with an active solicitor profile",
+    "Hemanth - with an active solicitor profile",
+    "is made from an authorised application, by Dil for 2 assignments each containing the Case ID of C1, User ID of Olawale and Hemanth and proper Case Role CR-1",
+    "contains a valid Organisation ID in one entry and an improper Organisation ID in the other"
+  ],
+
+  "users": {
+    "_extends_": "F-105_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]",
+          "organisation_id": "${[scenarioContext][childContexts][F-105_Prerequisite_Counter_Check_Call][childContexts][F-105_Get_Organisation_Identifier_Olawale][testData][actualResponse][body][organisationIdentifier]}"
+        },
+        {
+          "case_id": "${[scenarioContext][childContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userHemanth][id]}",
+          "case_role": "[CR-1]",
+          "organisation_id": ""
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-105_Add_Case_Assigned_User_Roles_400_response",
+    "body": {
+      "message": "Invalid data provided for the following inputs to the request:\nOrganisation ID is not valid"
+    }
+  }
+}

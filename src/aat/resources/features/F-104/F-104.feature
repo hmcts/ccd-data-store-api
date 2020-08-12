@@ -5,13 +5,13 @@ Feature: F-104: External Search API
     Given an appropriate test context as detailed in the test data source
 
     #possitive request scenario of each type
-  @S-625
+  @S-625 @estest
   Scenario: Usecase request using SearchResultsFields useCase returns correct fields
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
-    And the request [is using the query parameter usecase=search],
+    And the request [is using the query parameter use_case=search],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,
@@ -27,7 +27,7 @@ Feature: F-104: External Search API
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
-    And the request [is using the query parameter usecase=workbasket],
+    And the request [is using the query parameter use_case=workbasket],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,
@@ -43,7 +43,7 @@ Feature: F-104: External Search API
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
-    And the request [is using the query parameter usecase=orgcases],
+    And the request [is using the query parameter use_case=orgcases],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,
@@ -91,7 +91,7 @@ Feature: F-104: External Search API
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created case via exact match],
     When the request [is configured to return specific fields],
-    And the request [is using the query parameter usecase=orgcases],
+    And the request [is using the query parameter use_case=orgcases],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,
@@ -102,12 +102,12 @@ Feature: F-104: External Search API
 
 
   @S-631 #senior no access to number field due to role in caseAuth
-  Scenario: usecase request with no access to field via user role in CaseAuthTab
+  Scenario: use_case request with no access to field via user role in CaseAuthTab
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a caseworker-autotest1-senior role],
     When the request [is configured to search for the previously created case via exact match],
-    And the request [is using the query parameter usecase=search],
+    And the request [is using the query parameter use_case=search],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,
@@ -117,14 +117,14 @@ Feature: F-104: External Search API
 
 
   @S-632 #senior role only has access to money field through user rol on result tab (workbasket )
-  Scenario: usecase request with no access to field via user role in Result Fields config tab
+  Scenario: use_case request with no access to field via user role in Result Fields config tab
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a caseworker-autotest1-senior role],
     And a request is prepared with appropriate values,
     When the request [is configured to search for the previously created case via exact match],
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
-    And the request [is using the query parameter usecase=workbasket],
+    And the request [is using the query parameter use_case=workbasket],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,
@@ -134,12 +134,12 @@ Feature: F-104: External Search API
 
 
   @S-633 #private user cant see email field
-  Scenario: usecase request with no access to field via Security Classification
+  Scenario: use_case request with no access to field via Security Classification
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a role with security classification of PRIVATE],
     When the request [is configured to search for the previously created case via exact match],
-    And the request [is using the query parameter usecase=orgcases],
+    And the request [is using the query parameter use_case=orgcases],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,
@@ -172,7 +172,7 @@ Feature: F-104: External Search API
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created cases],
-    And the request [is using the query parameter usecase=orgcases],
+    And the request [is using the query parameter use_case=orgcases],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,
@@ -188,7 +188,7 @@ Feature: F-104: External Search API
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for the previously created cases],
-    And the request [is using the query parameter usecase=orgcases],
+    And the request [is using the query parameter use_case=orgcases],
     And the request [is configured to return cases opposite from the default],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
@@ -225,10 +225,10 @@ Feature: F-104: External Search API
     And the response has all other details as expected.
 
   @S-639
-  Scenario: configured CaseType Headers are returned even if no cases are found for a usecase search
+  Scenario: configured CaseType Headers are returned even if no cases are found for a use_case search
     And a user with [a valid user profile],
     When the request [is configured to search for a case that doesn't exist],
-    And the request [is using the query parameter usecase=orgcases],
+    And the request [is using the query parameter use_case=orgcases],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,
@@ -246,7 +246,7 @@ Feature: F-104: External Search API
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid user profile],
     When the request [is configured to search for previously created cases using pagination criteria],
-    And the request [is using the query parameter usecase=orgcases],
+    And the request [is using the query parameter use_case=orgcases],
     And a request is prepared with appropriate values,
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then a positive response is received,

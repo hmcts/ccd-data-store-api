@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.cauroles.rolevalidator.CaseAssignedUserRoleValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -23,7 +24,7 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
         this.cauRoleValidator = cauRoleValidator;
     }
 
-    public void addCaseUserRoles(List<CaseAssignedUserRole> caseUserRoles) {
+    public void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
         // NB: Although there are no user based authorisation steps performed here ...
         // ... there are additional s2s authorisation steps performed in the controller.
         this.cauRolesOperation.addCaseUserRoles(caseUserRoles);
