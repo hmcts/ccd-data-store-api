@@ -1,6 +1,6 @@
 {
-	"_guid_": "S-new.1",
-	"_extends_": "F-109_Test_Data_Base",
+	"_guid_": "S-110.1",
+	"_extends_": "F-110_Test_Data_Base",
 
 	"title": "must validate date in a right format",
 
