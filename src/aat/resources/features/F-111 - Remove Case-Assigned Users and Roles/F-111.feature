@@ -273,23 +273,22 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And the response has all the details as expected.
 
   @S-111.12
-  @Ignore
   Scenario: must return an error response when the case does not exist
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
       And a user [Olawale - with an active solicitor profile],
       And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
-      And a successful call [by Dil to add a Case Role - CR1 on C1 for Olawale] as in [the respective test data file],
-      And a successful call [to verify Olawale's reception of the role CR-1 over the case C1] as in [the respective test data file],
+      And a successful call [by Dil to add a Case Role - CR1 on C1 for Olawale] as in [F-111_Add_Case_Assigned_User_Roles_for_Case_C1_Without_Organisation],
+      And a successful call [to verify Olawale's reception of the role CR-1 over the case C1] as in [F-111_Get_Case_Roles_for_Case_C1_After_Add],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1],
-      And the request [contains the Case ID of C1 in one entry and a well-formed but non-existant case ID in the other],
+      And the request [contains the Case ID of C1 in one entry and a well-formed but non-existent case ID in the other],
       And it is submitted to call the [Remove Case-Assigned Users and Roles] operation of [CCD Data Store Api],
 
      Then a negative response is received,
       And the response has all the details as expected,
-      And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [S-111.11_Get_Case_Roles_for_Case_C1].
+      And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
 
   @S-111.16
   @Ignore
