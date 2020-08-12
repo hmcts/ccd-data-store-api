@@ -47,7 +47,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
     And a user [Hemanth - with an active solicitor profile],
     And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     And a successful call [by Dil, within the context of his organisation, to add a Case Role - CR1 on C1 for Olawale and Hemanth] as in [S-111.13_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation],
-    And a successful call [to verify Olawale's and Hemanth's reception of the role CR-1 over the case C1] as in [S-111.3_Get_Case_Roles_for_Case_C1_After_Add],
+    And a successful call [to verify Olawale's and Hemanth's reception of the role CR-1 over the case C1] as in [S-111.13_Get_Case_Roles_for_Case_C1_After_Add],
     And a successful call [to verify number of users in Dil's organisation accessing C1] as in [S-111.13_Verify_Counter_1],
 
     When a request is prepared with appropriate values,
@@ -56,7 +56,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
 
     Then a positive response is received,
     And the response has all the details as expected,
-    And a call [to verify Olawale's loss of the role CR-1 over the case C1] will get the expected response as in [S-111.3_Get_Case_Roles_for_Case_C1_After_Remove],
+    And a call [to verify Olawale's loss of the role CR-1 over the case C1] will get the expected response as in [S-111.13_Get_Case_Roles_for_Case_C1_After_Remove],
     And a call [to verify the count of users assigned to C1 has decreased by 1] will get the expected response as in [S-111.13_Verify_Counter_2],
     And a call [to repeat the same request as above] will get the expected response as in [S-111.13_Repeat_Call_to_Remove_For_Ola],
     And a call [to verify the count of users unassigned to C1 has NOT changed] will get the expected response as in [S-111.13_Verify_Counter_3],
