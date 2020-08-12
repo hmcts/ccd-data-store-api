@@ -1,0 +1,44 @@
+{
+  "title": "Must return an error response when the request is made from an un-authorised application",
+  "_guid_": "S-105.6",
+  "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - with an active profile",
+    "Olawale - who is not a privileged user and is calling from an un-authorised application",
+    "is made by Olawale with the Case ID of C1 & Dil's User ID and a proper Case Role CR-1"
+  ],
+
+  "s2sClientId": "ccd_gw",
+
+  "users": {
+    "_extends_": "F-105_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userOlawale][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userDil][id]}",
+          "case_role": "[CR-1]"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException",
+      "message": "Client service not authorised to perform operation",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
