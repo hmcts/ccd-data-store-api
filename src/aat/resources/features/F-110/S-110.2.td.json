@@ -1,5 +1,5 @@
 {
-	"_guid_": "S-new.2",
+	"_guid_": "S-110.2",
 	"_extends_": "F-109_Test_Data_Base",
 
 	"title": "must return an error for date value with invalid format",
