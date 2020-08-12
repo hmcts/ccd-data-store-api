@@ -39,7 +39,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And the response has all the details as expected,
       And a call [to verify Olawale's eventual loss of all the assignments made before] will get the expected response as in [S-111.2_Get_Case_Roles_for_Case_C1_And_C2_After_Remove].
 
-  @S-111.13 @sateesh
+  @S-111.13
   Scenario: must successfully decrease Assigned User Count when removing a user and case role for a specific case
     Given a user [Richard - who can create a case],
     And a user [Dil - who is to add and remove some case role assignment for a case],
