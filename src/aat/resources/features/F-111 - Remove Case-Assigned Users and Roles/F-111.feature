@@ -39,7 +39,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And the response has all the details as expected,
       And a call [to verify Olawale's eventual loss of all the assignments made before] will get the expected response as in [S-111.2_Get_Case_Roles_for_Case_C1_And_C2_After_Remove].
 
-  @S-111.13
+  @S-111.13 @sateesh
   Scenario: must successfully decrease Assigned User Count when removing a user and case role for a specific case
     Given a user [Richard - who can create a case],
     And a user [Dil - who is to add and remove some case role assignment for a case],
@@ -48,7 +48,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
     And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     And a successful call [by Dil, within the context of his organisation, to add a Case Role - CR1 on C1 for Olawale and Hemanth] as in [S-111.13_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation],
     And a successful call [to verify Olawale's and Hemanth's reception of the role CR-1 over the case C1] as in [S-111.3_Get_Case_Roles_for_Case_C1_After_Add],
-    # And a successful call [to verify number of users in Dil's organisation accessing C1] as in [S-111.13_Verify_Counter_1],
+    And a successful call [to verify number of users in Dil's organisation accessing C1] as in [S-111.13_Verify_Counter_1],
 
     When a request is prepared with appropriate values,
     And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and the Organisation ID of Olawale],
@@ -56,13 +56,12 @@ Feature: F-111: Remove Case-Assigned Users and Roles
 
     Then a positive response is received,
     And the response has all the details as expected,
-# TOD0
-#      And a call [to verify Olawale's loss of the role CR-1 over the case C1] will get the expected response as in [S-111.14_Verify_Case_Roles_for_Case_C1],
-#      And a call [to verify the count of users assigned to C1 has decreased by 1] will get the expected response as in [S-111.14_Verify_Counter_1],
-#      And a call [to repeat the same request as above] will get the expected response as in [S-111.14_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles],
-#      And a call [to verify the count of users unassigned to C1 has NOT changed] will get the expected response as in [S-111.14_Verify_Counter_2],
-#      And a call [to repeat the same request as above this time with a different user, Hemanth] will get the expected response as in [S-111.14_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles_Hemanth],
-#      And a call [to verify the count of users assigned to a case has decreased by 1] will get the expected response as in [S-111.14_Verify_Counter_3].
+    And a call [to verify Olawale's loss of the role CR-1 over the case C1] will get the expected response as in [S-111.3_Get_Case_Roles_for_Case_C1_After_Remove],
+    And a call [to verify the count of users assigned to C1 has decreased by 1] will get the expected response as in [S-111.13_Verify_Counter_2],
+    And a call [to repeat the same request as above] will get the expected response as in [S-111.13_Repeat_Call_to_Remove_For_Ola],
+    And a call [to verify the count of users unassigned to C1 has NOT changed] will get the expected response as in [S-111.13_Verify_Counter_3],
+    And a call [to repeat the same request as above this time with a different user, Hemanth] will get the expected response as in [S-111.13_Repeat_Call_to_Remove_For_Hemanth],
+    And a call [to verify the count of users assigned to a case has decreased by 1] will get the expected response as in [S-111.13_Verify_Counter_4].
 
   @S-111.14
   @Ignore
