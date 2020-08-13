@@ -203,9 +203,8 @@ public class CaseAccessOperation {
             caseUserRepository.findCaseUserRoles(caseIds, userIds).stream()
                 .collect(Collectors.groupingBy(
                     caseUserEntity -> caseUserEntity.getCasePrimaryKey().getCaseDataId(),
-                    Collectors.groupingBy(
-                            caseUserEntity -> caseUserEntity.getCasePrimaryKey().getUserId(),
-                            Collectors.toList()
+                        Collectors.groupingBy(
+                            caseUserEntity -> caseUserEntity.getCasePrimaryKey().getUserId(), Collectors.toList()
                         )
                     ));
 
@@ -220,9 +219,9 @@ public class CaseAccessOperation {
                     .collect(Collectors.groupingBy(
                             CaseAssignedUserRoleWithOrganisation::getOrganisationId,
                             Collectors.collectingAndThen(
-                                    Collectors.toList(),
-                                    cauRolesForOrganisation -> cauRolesForOrganisation.stream()
-                                            .map(CaseAssignedUserRoleWithOrganisation::getUserId).distinct().count())));
+                                Collectors.toList(),
+                                cauRolesForOrganisation -> cauRolesForOrganisation.stream()
+                                        .map(CaseAssignedUserRoleWithOrganisation::getUserId).distinct().count())));
 
             // skip if no organisations have any new relationships
             if (!relationshipCounts.isEmpty()) {
