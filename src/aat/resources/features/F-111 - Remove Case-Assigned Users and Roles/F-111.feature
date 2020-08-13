@@ -64,24 +64,23 @@ Feature: F-111: Remove Case-Assigned Users and Roles
     And a call [to verify the count of users assigned to a case has decreased by 1] will get the expected response as in [S-111.13_Verify_Counter_4].
 
   @S-111.14
-  @Ignore
   Scenario: must not decrease Assigned User Count when unassigning a user and case role for a specific case if there was already a different case user role assignment
     Given a user [Richard - who can create a case],
-      And a user [Dil - who is to add and remove some case role assignment for a case],
-      And a user [Olawale - with an active solicitor profile],
-      And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
-      And a successful call [by Dil, within the context of his organisation, to add 2 Case Roles CR1 and CR2 on C1 for Olawale] as in [the respective test data file],
-      And a successful call [to verify Olawale's reception of CR1 and CR2 over the case C1] as in [the respective test data file],
-      And a successful call [to verify that 1 user has access to C1 in Dil's organisation ] as in [the respective test data file],
+    And a user [Dil - who is to add and remove some case role assignment for a case],
+    And a user [Olawale - with an active solicitor profile],
+    And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
+    And a successful call [by Dil, within the context of his organisation, to add 2 Case Roles CR1 and CR2 on C1 for Olawale] as in [S-111.14_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation],
+    And a successful call [to verify Olawale's reception of CR1 and CR2 over the case C1] as in [S-111.3_Get_Case_Roles_for_Case_C1_After_Add],
+    And a successful call [to verify that 1 user has access to C1 in Dil's organisation] as in [S-111.14_Verify_User_Count_Assigned_To_Case_Equals_1],
 
-     When a request is prepared with appropriate values,
-      And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-2 and the Organisation ID of Olawale],
-      And it is submitted to call the [Remove Case-Assigned Users and Roles] operation of [CCD Data Store Api],
+    When a request is prepared with appropriate values,
+    And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-2 and the Organisation ID of Olawale],
+    And it is submitted to call the [Remove Case-Assigned Users and Roles] operation of [CCD Data Store Api],
 
-     Then a positive response is received,
-      And the response has all the details as expected,
-      And a call [to verify Olawale's loss of the role CR-2 over the case C1] will get the expected response as in [S-105.15_Verify_Case_Roles_for_Case_C1],
-      And a call [to verify the count of users unassigned to C1 has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
+    Then a positive response is received,
+    And the response has all the details as expected,
+    And a call [to verify Olawale's loss of the role CR-2 over the case C1] will get the expected response as in [S-111.14_Get_Case_Roles_for_Case_C2_After_Remove],
+    And a call [to verify the count of users unassigned to C1 has NOT changed] will get the expected response as in [S-111.14_Verify_User_Count_Assigned_To_Case_Equals_1].
 
   @S-111.15
   @Ignore
