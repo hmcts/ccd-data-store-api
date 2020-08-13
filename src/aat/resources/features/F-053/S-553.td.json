@@ -17,7 +17,7 @@
     "body": {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "error" : "Not Found",
-       "message" : "Resource not found when getting case type version for 'non-existing case type ID'.",
+       "message" : "Error when getting case type version. Unknown case type 'non-existing case type ID'.",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
