@@ -93,7 +93,7 @@ public class ElasticsearchTestHelper {
     public static final String CASEWORKER_CAA = "caseworker-caa";
 
     private static final String CASE_TYPE_ID_PARAM = "ctid";
-    private static final String USE_CASE_PARAM = "usecase";
+    private static final String USE_CASE_PARAM = "use_case";
 
     private ElasticsearchTestHelper() { }
 

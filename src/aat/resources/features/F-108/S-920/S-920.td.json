@@ -1,0 +1,90 @@
+{
+  "_guid_": "S-920",
+  "_extends_": "F-108_Test_Data_Base",
+  "specs": [
+    "is configured to search for exact money field value from previously created case",
+    "contains the previously created case",
+    "a valid profile"
+  ],
+
+  "request": {
+    "body": {
+      "query": {
+        "match": {
+          "data.MoneyGBPField": "66"
+        }
+      }
+    }
+  },
+
+
+  "expectedResponse": {
+    "body": {
+      "total": 1,
+      "cases": [{
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-920_Create_Case_Private_Autotest1]}",
+        "jurisdiction": "AUTOTEST1",
+        "state": "TODO",
+        "version": null,
+        "case_type_id": "AAT_PRIVATE",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PRIVATE",
+        "case_data": {
+          "FixedListField": "VALUE1",
+          "MoneyGBPField": "66",
+          "AddressUKField": {
+            "PostCode": "SW1H 9AJ",
+            "AddressLine2": "",
+            "PostTown": "London",
+            "AddressLine3": "",
+            "County": "",
+            "AddressLine1": "102 Petty France",
+            "Country": ""
+          },
+          "ComplexField": {
+            "ComplexTextField": "text inside complex",
+            "ComplexNestedField": {
+              "NestedNumberField": "20",
+              "NestedCollectionTextField": [
+                {
+                  "value": "collection text inside complex",
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            },
+            "ComplexFixedListField": "VALUE2"
+          },
+          "DateTimeField": "1989-09-19T14:30:01.000",
+          "PhoneUKField": "02033343555",
+          "NumberField": "1",
+          "MultiSelectListField": [
+            "OPTION1"
+          ],
+          "YesOrNoField": "Yes",
+          "TextField": "text",
+          "DateField": "1989-09-19",
+          "TextAreaField": "text area",
+          "CollectionField": [
+            {
+              "value": "collection text",
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        },
+        "data_classification": "[[ANYTHING_PRESENT]]",
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": "[[ANYTHING_PRESENT]]"
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE"
+      }]
+    }
+  }
+}

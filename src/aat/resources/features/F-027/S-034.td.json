@@ -3,8 +3,10 @@
   "_guid_": "S-034",
   "_extends_": "F-027_Test_Data_Base",
 
-  "specs": ["no profile in CCD",
-    "has the 403 return code"],
+  "specs": [
+    "no profile in CCD",
+    "has the 403 return code"
+  ],
   "request": {
     "pathVariables": {
       "uid": "some id",

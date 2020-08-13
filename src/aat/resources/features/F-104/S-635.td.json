@@ -4,12 +4,12 @@
   "specs": [
     "a valid user profile",
     "is configured to search for the previously created cases",
-    "is using the query parameter usecase=orgcases",
+    "is using the query parameter use_case=orgcases",
     "contains cases ordered as per definition configuration"
   ],
   "request": {
     "queryParams": {
-      "usecase": "ORGCASES"
+      "use_case": "ORGCASES"
     },
     "body": {
       "query": {
@@ -46,6 +46,11 @@
                 "max": null,
                 "regular_expression": null,
                 "fixed_list_items": [
+                  {
+                    "code" : "VALUE4",
+                    "label" : "Value 4",
+                    "order" : null
+                  },
                   {
                     "code": "VALUE3",
                     "label": "Value 3",
