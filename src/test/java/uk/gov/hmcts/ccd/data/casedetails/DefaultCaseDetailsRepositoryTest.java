@@ -143,6 +143,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         );
     }
 
+
     @Test
     public void sanitisesInputsCountQuery() {
         String evil = "foo');insert into case users values(1,2,3);--";
@@ -452,6 +453,16 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void findByReferenceWithoutJurisdiction() {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(REFERENCE.toString());
+
+        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
+
+        assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByReferenceWithNoAccessControl() {
+        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReferenceWithNoAccessControl(REFERENCE.toString());
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
 
