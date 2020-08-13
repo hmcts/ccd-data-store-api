@@ -102,25 +102,6 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify Olawale's loss of the role CR-1 over the case C1] will get the expected response as in [S-105.16_Verify_Case_Roles_for_Case_C1],
       And a call [to verify the count of users unassigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
-  @S-111.17
-  @Ignore
-  Scenario: must not decrease the Assigned User Count to the case when removing only some but not all of the roles for a user
-    Given a user [Richard - who can create a case],
-      And a user [Dil - who is to add and remove some case role assignment for a case],
-      And a user [Olawale - with an active solicitor profile],
-      And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
-      And a successful call [by Dil to add a Case Role - CR1 anc CR2 on C1 for Olawale] as in [the respective test data file],
-      And a successful call [to verify Olawale's reception of the role CR-1 and CR2 over the case C1] as in [the respective test data file],
-      And a successful call [to verify that 1 user has access to C1 in Dil's organisation ] as in [the respective test data file],
-
-     When a request is prepared with appropriate values,
-      And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale and proper Case Role CR-2],
-      And it is submitted to call the [Remove Case-Assigned Users and Roles] operation of [CCD Data Store Api],
-
-     Then a negative response is received,
-      And the response has all the details as expected,
-      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
-
   @S-111.3
   Scenario: must return an error response for a missing Case ID
     Given a user [Richard - who can create a case],
