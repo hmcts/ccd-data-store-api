@@ -108,7 +108,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case type definition for " + caseTypeId
                     + " because of " + e.getMessage());
             } else {
@@ -127,7 +127,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving base types", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Problem getting base types definition from definition store because of " + e.getMessage());
             } else {
                 throw new ServiceException("Problem getting base types definition from definition store because of " + e.getMessage());
@@ -147,7 +147,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             ).getBody();
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 LOG.debug("No classification found for user role {} because of ", userRole, e);
                 return null;
             } else {
@@ -187,13 +187,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         try {
             final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
             CaseTypeDefinitionVersion version = restTemplate.exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId),
-                HttpMethod.GET, requestEntity, CaseTypeDefinitionVersion.class).getBody();
+                    HttpMethod.GET, requestEntity, CaseTypeDefinitionVersion.class).getBody();
             LOG.debug("retrieved latest version for case type: {}: {}", caseTypeId, version);
             return version;
 
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type version", e);
-            if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+            if (e instanceof HttpClientErrorException && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(
                     "Error when getting case type version. Unknown case type '" + caseTypeId + "'.", e);
             } else {
