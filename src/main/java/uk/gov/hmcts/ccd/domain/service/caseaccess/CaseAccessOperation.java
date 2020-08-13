@@ -98,7 +98,7 @@ public class CaseAccessOperation {
 
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
 
-        Map<String, Map<String, Long>> newUserCounts = getUserCountByCaseAndOrganisation(cauRolesByCaseId, true);
+        Map<String, Map<String, Long>> newUserCounts = getUserCountByCaseAndOrganisation(cauRolesByCaseId);
 
         cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
@@ -118,13 +118,13 @@ public class CaseAccessOperation {
 
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
 
-        Map<String, Map<String, Long>> removeUserCounts = getUserCountByCaseAndOrganisation(cauRolesByCaseId, false);
-
         cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
                 requestedAssignments.forEach(requestedAssignment ->
                         caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(), requestedAssignment.getCaseRole())
                 )
         );
+
+        Map<String, Map<String, Long>> removeUserCounts = getUserCountByCaseAndOrganisation(cauRolesByCaseId);
 
         removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
                 orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
@@ -169,7 +169,7 @@ public class CaseAccessOperation {
     }
 
     private Map<String, Map<String, Long>> getUserCountByCaseAndOrganisation(
-            Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId, boolean isAddOperation) {
+            Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
         Map<String, Map<String, Long>> result = new HashMap<>();
 
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId = cauRolesByCaseId.entrySet().stream()
@@ -214,8 +214,8 @@ public class CaseAccessOperation {
             List<String> existingUsersForCase = existingCaseUserRelationships.getOrDefault(caseId, new ArrayList<>());
 
             Map<String, Long> relationshipCounts = requestedAssignments.stream()
-                // filter out relationships based on add/remove flag
-                .filter(cauRole -> shouldIncludeInTheCount(cauRole.getUserId(), existingUsersForCase, isAddOperation))
+                // filter out any existing relationships
+                .filter(cauRole -> !existingUsersForCase.contains(cauRole.getUserId()))
                 // count unique users for each organisation
                 .collect(Collectors.groupingBy(
                     CaseAssignedUserRoleWithOrganisation::getOrganisationId,
@@ -231,10 +231,6 @@ public class CaseAccessOperation {
         });
 
         return result;
-    }
-
-    private boolean shouldIncludeInTheCount(String userId, List<String> existingUsersForCase, boolean isAddOperation) {
-        return isAddOperation ? !existingUsersForCase.contains(userId) : existingUsersForCase.contains(userId);
     }
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {
