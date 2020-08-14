@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.util.set.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -99,7 +98,7 @@ public class CaseAccessOperation {
 
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
 
-        Map<String, Map<String, Long>> newUserCounts = getUserCountByCaseAndOrganisation(cauRolesByCaseId, true);
+        Map<String, Map<String, Long>> newUserCounts = getUserCountByCaseAndOrganisation(cauRolesByCaseId);
 
         cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
                 requestedAssignments.forEach(requestedAssignment ->
@@ -119,13 +118,15 @@ public class CaseAccessOperation {
 
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
 
-        Map<String, Map<String, Long>> removeUserCounts = getUserCountByCaseAndOrganisation(cauRolesByCaseId, false);
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseId = filterUnknownCauRoles(cauRolesByCaseId);
 
-        cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
+        filteredCauRolesByCaseId.forEach((caseId, requestedAssignments) ->
                 requestedAssignments.forEach(requestedAssignment ->
                         caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(), requestedAssignment.getCaseRole())
                 )
         );
+
+        Map<String, Map<String, Long>> removeUserCounts = getUserCountByCaseAndOrganisation(filteredCauRolesByCaseId);
 
         removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
                 orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
@@ -133,6 +134,20 @@ public class CaseAccessOperation {
                                 ORGS_ASSIGNED_USERS_PAH + organisationId, Math.negateExact(removeUserCount))
                 )
         );
+    }
+
+    private Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filterUnknownCauRoles(
+            Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
+
+        return cauRolesByCaseId.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> filterCauRoles(entry.getKey(), entry.getValue())));
+    }
+
+    private List<CaseAssignedUserRoleWithOrganisation> filterCauRoles(
+            Long caseId, List<CaseAssignedUserRoleWithOrganisation> roles) {
+        return roles.stream()
+                .filter(cauRole -> caseUserRepository.find(caseId, cauRole.getUserId(), cauRole.getCaseRole()).isPresent())
+                .collect(Collectors.toList());
     }
 
     private Map<Long, List<CaseAssignedUserRoleWithOrganisation>> getMapOfCaseAssignedUserRolesByCaseId(
@@ -170,7 +185,7 @@ public class CaseAccessOperation {
     }
 
     private Map<String, Map<String, Long>> getUserCountByCaseAndOrganisation(
-            Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId, boolean isAddOperation) {
+            Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
         Map<String, Map<String, Long>> result = new HashMap<>();
 
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId = cauRolesByCaseId.entrySet().stream()
@@ -199,29 +214,31 @@ public class CaseAccessOperation {
                 .collect(Collectors.toList());
 
         // find existing Case-User relationships for all the relevant cases + users found
-        Map<Long, Map<String, List<CaseUserEntity>>> existingCaseUserRelationships =
-            caseUserRepository.findCaseUserRoles(caseIds, userIds).stream()
-                .collect(Collectors.groupingBy(
-                    caseUserEntity -> caseUserEntity.getCasePrimaryKey().getCaseDataId(),
-                        Collectors.groupingBy(
-                            caseUserEntity -> caseUserEntity.getCasePrimaryKey().getUserId(), Collectors.toList()
-                        )
-                    ));
+        Map<Long, List<String>> existingCaseUserRelationships =
+                caseUserRepository.findCaseUserRoles(caseIds, userIds).stream()
+                        .collect(Collectors.groupingBy(
+                                caseUserEntity -> caseUserEntity.getCasePrimaryKey().getCaseDataId(),
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        userRoles -> userRoles.stream()
+                                                .map(caseUserEntity -> caseUserEntity.getCasePrimaryKey().getUserId())
+                                                .distinct().collect(Collectors.toList())
+                                )));
 
         // for each case: count new Case-User relationships by Organisation
         caseUserRolesWhichHaveAnOrgId.forEach((caseId, requestedAssignments) -> {
-            Map<String, List<CaseUserEntity>> existingUsersForCase = existingCaseUserRelationships.getOrDefault(caseId, new HashMap<>());
+            List<String> existingUsersForCase = existingCaseUserRelationships.getOrDefault(caseId, new ArrayList<>());
 
             Map<String, Long> relationshipCounts = requestedAssignments.stream()
-                    // filter out relationships based on add/remove flag
-                    .filter(cauRole -> shouldIncludeInTheCount(cauRole.getUserId(), existingUsersForCase, requestedAssignments, isAddOperation))
+                    // filter out any existing relationships
+                    .filter(cauRole -> !existingUsersForCase.contains(cauRole.getUserId()))
                     // count unique users for each organisation
                     .collect(Collectors.groupingBy(
                             CaseAssignedUserRoleWithOrganisation::getOrganisationId,
                             Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                cauRolesForOrganisation -> cauRolesForOrganisation.stream()
-                                        .map(CaseAssignedUserRoleWithOrganisation::getUserId).distinct().count())));
+                                    Collectors.toList(),
+                                    cauRolesForOrganisation -> cauRolesForOrganisation.stream()
+                                            .map(CaseAssignedUserRoleWithOrganisation::getUserId).distinct().count())));
 
             // skip if no organisations have any new relationships
             if (!relationshipCounts.isEmpty()) {
@@ -230,26 +247,6 @@ public class CaseAccessOperation {
         });
 
         return result;
-    }
-
-    private boolean shouldIncludeInTheCount(String userId, Map<String, List<CaseUserEntity>> existingUsersForCase,
-                                            List<CaseAssignedUserRoleWithOrganisation> requestedAssignments, boolean isAddOperation) {
-        if (isAddOperation) {
-            return !existingUsersForCase.containsKey(userId);
-        } else {
-            List<CaseUserEntity> dbEntities = existingUsersForCase.get(userId);
-            if (CollectionUtils.isEmpty(dbEntities)) {
-                return false;
-            }
-            return dbEntities.stream()
-                    .allMatch(entity -> {
-                        CaseUserEntity.CasePrimaryKey casePrimaryKey = entity.getCasePrimaryKey();
-                        return requestedAssignments.stream()
-                                .anyMatch(assignment ->
-                                        assignment.getUserId().equalsIgnoreCase(casePrimaryKey.getUserId())
-                                                && assignment.getCaseRole().equalsIgnoreCase(casePrimaryKey.getCaseRole()));
-                    });
-        }
     }
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {

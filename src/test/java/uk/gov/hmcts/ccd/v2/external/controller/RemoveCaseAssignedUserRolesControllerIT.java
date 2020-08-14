@@ -372,7 +372,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
     @DisplayName(
         "AC-13: must successfully decrease Assigned User Count when removing a user and case role for a specific case"
     )
-    void addCaseUserRoles_shouldIncrementOrganisationUserCountForNewRelationships() throws Exception {
+    void removeCaseUserRoles_shouldIncrementOrganisationUserCountForNewRelationships() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
         String userId1 = "8842-001-1"; // don't need the users to exist in the repository but want unique for each AC
