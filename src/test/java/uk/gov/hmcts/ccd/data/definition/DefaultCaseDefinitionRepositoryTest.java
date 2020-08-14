@@ -55,6 +55,12 @@ public class DefaultCaseDefinitionRepositoryTest {
         caseDefinitionRepository = new DefaultCaseDefinitionRepository(applicationParams, securityUtils, restTemplate);
     }
 
+    @Test
+    public void shouldGeEmptyGetCaseTypesIDsByJurisdictions() {
+        List<String> caseTypes = caseDefinitionRepository.getCaseTypesIDsByJurisdictions(new ArrayList<>());
+        assertEquals(0, caseTypes.size());
+    }
+
     @Test(expected = ResourceNotFoundException.class)
     public void shouldThrowResourceNotFoundExceptionWhenGetCaseTypesForJurisdictionIsCalledAndResourceIsNotFound() {
         HttpClientErrorException exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
