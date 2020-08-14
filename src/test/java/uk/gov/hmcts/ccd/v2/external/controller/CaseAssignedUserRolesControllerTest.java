@@ -95,7 +95,7 @@ class CaseAssignedUserRolesControllerTest {
         @BeforeEach
         void setUp() {
             // setup happy authorised s2s service path
-            when(applicationParams.getAuthorisedServicesForAddUserCaseRoles()).thenReturn(
+            when(applicationParams.getAuthorisedServicesForUserCaseRoles()).thenReturn(
                 Lists.newArrayList(ADD_SERVICE_GOOD)
             );
             doReturn(ADD_SERVICE_GOOD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_GOOD);
@@ -441,7 +441,7 @@ class CaseAssignedUserRolesControllerTest {
 
         @BeforeEach
         void setUp() {
-            when(applicationParams.getAuthorisedServicesForAddUserCaseRoles()).thenReturn(List.of(ADD_SERVICE_GOOD));
+            when(applicationParams.getAuthorisedServicesForUserCaseRoles()).thenReturn(List.of(ADD_SERVICE_GOOD));
             doReturn(ADD_SERVICE_GOOD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_GOOD);
         }
 
