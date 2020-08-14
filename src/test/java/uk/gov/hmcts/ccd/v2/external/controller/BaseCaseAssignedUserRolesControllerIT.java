@@ -123,7 +123,7 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
         ReflectionTestUtils.setField(
             applicationParams,
-            "authorisedServicesForAddUserCaseRoles",
+            "authorisedServicesForUserCaseRoles",
             Lists.newArrayList(AUTHORISED_ADD_SERVICE_1, AUTHORISED_ADD_SERVICE_2)
         );
         // disable suppression of audit logs
