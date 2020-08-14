@@ -86,6 +86,6 @@ public class UserService {
     }
 
     public List<String> getUserRolesJurisdictions() {
-        return userRepository.getUserRolesJurisdictions();
+        return userRepository.getCaseworkerUserRolesJurisdictions();
     }
 }

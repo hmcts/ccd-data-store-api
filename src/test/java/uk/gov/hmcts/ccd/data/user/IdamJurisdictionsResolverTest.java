@@ -25,6 +25,6 @@ public class IdamJurisdictionsResolverTest {
     public void shouldDelegateToUserRepository() {
         jurisdictionsResolver.getJurisdictions();
 
-        verify(userRepoMock).getUserRolesJurisdictions();
+        verify(userRepoMock).getCaseworkerUserRolesJurisdictions();
     }
 }
