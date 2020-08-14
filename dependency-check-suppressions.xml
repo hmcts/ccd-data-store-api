@@ -412,5 +412,4 @@
    <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
    <cve>CVE-2020-13935</cve>
 </suppress>
-  
 </suppressions>

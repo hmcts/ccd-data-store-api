@@ -19,7 +19,7 @@
   "request": {
     "_extends_": "Common_Request",
     "queryParams": {
-      "case_ids": "${[scenarioContext][siblingContexts][F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}"
+      "case_ids": "${[scenarioContext][parentContext][testData][request][body][case_users][0][case_id]}"
     }
   },
 
