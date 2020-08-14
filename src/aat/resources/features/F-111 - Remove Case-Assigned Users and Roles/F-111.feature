@@ -70,7 +70,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
     And a user [Olawale - with an active solicitor profile],
     And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
     And a successful call [by Dil, within the context of his organisation, to add 2 Case Roles CR1 and CR2 on C1 for Olawale] as in [S-111.14_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation],
-    And a successful call [to verify Olawale's reception of CR1 and CR2 over the case C1] as in [S-111.3_Get_Case_Roles_for_Case_C1_After_Add],
+    And a successful call [to verify Olawale's reception of CR1 and CR2 over the case C1] as in [S-111.14_Get_Case_Roles_for_Case_C1_After_Add],
     And a successful call [to verify that 1 user has access to C1 in Dil's organisation] as in [S-111.14_Verify_User_Count_Assigned_To_Case_Equals_1],
 
     When a request is prepared with appropriate values,
@@ -83,15 +83,14 @@ Feature: F-111: Remove Case-Assigned Users and Roles
     And a call [to verify the count of users unassigned to C1 has NOT changed] will get the expected response as in [S-111.14_Verify_User_Count_Assigned_To_Case_Equals_1].
 
   @S-111.15
-  @Ignore
   Scenario: must not decrease Assigned User Count when when no organisation ID is provided
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
       And a user [Olawale - with an active solicitor profile],
       And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
-      And a successful call [by Dil, within the context of his organisation, to add a Case Role - CR1 on C1 for Olawale] as in [the respective test data file],
-      And a successful call [to verify Olawale's reception of the role CR-1 over the case C1] as in [the respective test data file],
-      And a successful call [to verify that 1 user has access to C1 in Dil's organisation ] as in [the respective test data file],
+      And a successful call [by Dil, within the context of his organisation, to add a Case Role - CR1 on C1 for Olawale] as in [S-111.15_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation],
+      And a successful call [to verify Olawale's reception of the role CR-1 over the case C1] as in [S-111.15_Get_Case_Roles_for_Case_C1_After_Add],
+      And a successful call [to verify that 1 user has access to C1 in Dil's organisation] as in [S-111.15_Verify_User_Count_Assigned_To_Case_Equals_1],
 
      When a request is prepared with appropriate values,
       And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and no Organisation ID],
@@ -99,8 +98,8 @@ Feature: F-111: Remove Case-Assigned Users and Roles
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify Olawale's loss of the role CR-1 over the case C1] will get the expected response as in [S-105.16_Verify_Case_Roles_for_Case_C1],
-      And a call [to verify the count of users unassigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
+      And a call [to verify Olawale's loss of the role CR-1 over the case C1] will get the expected response as in [S-111.15_Get_Case_Roles_for_Case_C1_After_Remove],
+      And a call [to verify the count of users unassigned to a case has NOT changed] will get the expected response as in [S-111.15_Verify_User_Count_Assigned_To_Case_Equals_1].
 
   @S-111.3
   Scenario: must return an error response for a missing Case ID
