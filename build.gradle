@@ -616,8 +616,6 @@ jacocoTestReport {
             fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**',
                                         '**/service/doclink/**',
                                         '**/domain/model/definition/CaseEventFieldComplex**',
-                                        '**/domain/service/caseaccess/CaseAccessOperation**',
-                                        '**/controller/CaseAssignedUserRolesController**',
                                         '**/domain/model/definition/DisplayContext**'])
         }))
     }
