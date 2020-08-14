@@ -46,11 +46,11 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     private CaseDefinitionRepository caseDefinitionRepository;
 
-    private final static String JURISDICTIONS_URL = "https://domain/api/data/jurisdictions";
-    private final static String JURISDICTIONS_CASE_URL = "https://domain/api/data/jurisdictions/case";
-    private final static String BASE_TYPES_URL = "/api/base-types";
-    private final static String USER_ROLE_URL = "/api/user-role?role={userRole}";
-    private final static String CASE_TYPE_URL = "/api/data/case-type/veesion";
+    private static final String JURISDICTIONS_URL = "https://domain/api/data/jurisdictions";
+    private static final String JURISDICTIONS_CASE_URL = "https://domain/api/data/jurisdictions/case";
+    private static final String BASE_TYPES_URL = "/api/base-types";
+    private static final String USER_ROLE_URL = "/api/user-role?role={userRole}";
+    private static final String CASE_TYPE_URL = "/api/data/case-type/veesion";
 
 
     @Before
