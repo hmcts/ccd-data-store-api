@@ -1,58 +1,24 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.MockUtils;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditEntry;
-import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
-import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
-import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItems;
@@ -60,115 +26,13 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
-import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.ccd.v2.V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.ADD_SUCCESS_MESSAGE;
 
-class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
-
-    private static final Long INVALID_CASE_ID = 222L;
-
-    private static final String AUTHORISED_ADD_SERVICE_1 = "ADD_SERVICE_1";
-    private static final String AUTHORISED_ADD_SERVICE_2 = "ADD_SERVICE_2";
-    private static final String UNAUTHORISED_ADD_SERVICE = "UNAUTHORISED_ADD_SERVICE";
-
-    private static final String CASE_ID_1 = "7578590391163133";
-    private static final String CASE_ID_2 = "6375837333991692";
-    private static final String CASE_IDS = CASE_ID_1 + "," + CASE_ID_2;
-
-    private static final String CASE_ID_EXTRA = "1983927457663329";
-
-    private static final String CASE_ROLE_1 = "[case-role-1]";
-    private static final String CASE_ROLE_2 = "[case-role-2]";
-    private static final String INVALID_CASE_ROLE = "bad-role";
-
-    private static final String USER_IDS_1 = "89000";
-    private static final String USER_IDS_2 = "89001";
-    private static final String USER_IDS_3 = "89002";
-    private static final String USER_IDS = USER_IDS_1 + "," + USER_IDS_2;
-
-    private static final String INVALID_USER_IDS = USER_IDS_1 + ", ," + USER_IDS_2;
-
-    private static final String ORGANISATION_ID_1 = "OrgA";
-    private static final String ORGANISATION_ID_2 = "OrgB";
-    private static final String INVALID_ORGANISATION_ID = "";
-
-    private static final String ORGANISATION_ASSIGNED_USER_COUNTER_KEY = "orgs_assigned_users";
-
-    private final String caseworkerCaa = "caseworker-caa";
-    private final String getCaseAssignedUserRoles = "/case-users";
-    private final String postCaseAssignedUserRoles = "/case-users";
-
-    private static final String PARAM_CASE_IDS = "case_ids";
-    private static final String PARAM_USER_IDS = "user_ids";
-
-    @Inject
-    private ApplicationParams applicationParams;
-
-    @SpyBean @Inject
-    private AuditRepository auditRepository;
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
-
-    private MockMvc mockMvc;
-
-    @Inject @Qualifier(DefaultCaseUserRepository.QUALIFIER)
-    private CaseUserRepository caseUserRepository;
-
-    @Inject @Qualifier("default")
-    private SupplementaryDataRepository supplementaryDataRepository;
-
-    @Inject
-    private WebApplicationContext wac;
-
-    @BeforeEach
-    void setUp() throws IOException {
-        super.initMock();
-        MockitoAnnotations.initMocks(this);
-
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
-        ReflectionTestUtils.setField(
-            applicationParams,
-            "authorisedServicesForAddUserCaseRoles",
-            Lists.newArrayList(AUTHORISED_ADD_SERVICE_1, AUTHORISED_ADD_SERVICE_2)
-        );
-        // disable suppression of audit logs
-        ReflectionTestUtils.setField(
-            applicationParams,
-            "auditLogIgnoreStatuses",
-            Lists.newArrayList()
-        );
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        String userJson = "{\n"
-            + "          \"sub\": \"Cloud.Strife@test.com\",\n"
-            + "          \"uid\": \"89000\",\n"
-            + "          \"roles\": [\n"
-            + "            \"caseworker\",\n"
-            + "            \"caseworker-probate-public\"\n"
-            + "          ],\n"
-            + "          \"name\": \"Cloud Strife\"\n"
-            + "        }";
-        stubFor(WireMock.get(urlMatching("/o/userinfo"))
-            .willReturn(okJson(userJson).withStatus(200)));
-    }
+class CaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesControllerIT {
 
     // RDM-8606: AC-1
     @Test
@@ -1033,77 +897,6 @@ class CaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), containsString(OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED));
 
         verifyAuditForGetCaseUserRoles(HttpStatus.FORBIDDEN, CASE_IDS, USER_IDS);
-    }
-
-    private HttpHeaders createHttpHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(AUTHORIZATION, "Bearer user1");
-        String s2SToken = MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_1);
-        headers.add(SERVICE_AUTHORIZATION, "Bearer " + s2SToken);
-        return headers;
-    }
-
-    private void verifyAuditForAddCaseUserRoles(HttpStatus status, List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES.getLabel()));
-        assertThat(captor.getValue().getHttpStatus(), is(status.value()));
-        assertThat(captor.getValue().getPath(), is(postCaseAssignedUserRoles));
-        assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.POST.name()));
-
-        if (caseUserRoles != null) {
-            String caseIds = caseUserRoles.stream().map(CaseAssignedUserRoleWithOrganisation::getCaseDataId)
-                .collect(Collectors.joining(CASE_ID_SEPARATOR));
-            String caseRoles = caseUserRoles.stream().map(CaseAssignedUserRoleWithOrganisation::getCaseRole)
-                .collect(Collectors.joining(CASE_ID_SEPARATOR));
-            String userIds = caseUserRoles.stream().map(CaseAssignedUserRoleWithOrganisation::getUserId)
-                .collect(Collectors.joining(CASE_ID_SEPARATOR));
-
-            assertThat(captor.getValue().getCaseId(), is(caseIds));
-            assertThat(StringUtils.join(captor.getValue().getTargetCaseRoles(), CASE_ID_SEPARATOR), is(caseRoles));
-            assertThat(captor.getValue().getTargetIdamId(), is(userIds));
-        }
-    }
-
-    private void verifyAuditForGetCaseUserRoles(HttpStatus status, String caseIds, String userIds) {
-        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
-        verify(auditRepository).save(captor.capture());
-
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.GET_CASE_ASSIGNED_USER_ROLES.getLabel()));
-        assertThat(captor.getValue().getHttpStatus(), is(status.value()));
-        assertThat(captor.getValue().getPath(), is(getCaseAssignedUserRoles));
-        assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.GET.name()));
-
-        if (caseIds != null) {
-            assertThat(captor.getValue().getCaseId(), is(trimSpacesFromCsvValues(caseIds)));
-        }
-        if (userIds != null) {
-            assertThat(captor.getValue().getTargetIdamId(), is(trimSpacesFromCsvValues(userIds)));
-        }
-    }
-
-    private String trimSpacesFromCsvValues(String csvInput) {
-        return Arrays.stream(csvInput.split(CASE_ID_SEPARATOR))
-            .map(String::trim)
-            .collect(Collectors.joining(CASE_ID_SEPARATOR));
-    }
-
-    private String getOrgUserCountSupDataKey(String organisationId) {
-        return String.format("%s.%s", ORGANISATION_ASSIGNED_USER_COUNTER_KEY,  organisationId);
-    }
-
-    private long getOrgUserCountFromSupData(String caseId, String organisationId) {
-        String orgCountSupDataKey = getOrgUserCountSupDataKey(organisationId);
-
-        try {
-            return Long.parseLong(
-                supplementaryDataRepository.findSupplementaryData(caseId, Collections.singleton(orgCountSupDataKey))
-                    .getResponse().getOrDefault(orgCountSupDataKey, 0L).toString()
-            );
-        } catch (IllegalArgumentException e) {
-            return 0L;
-        }
     }
 
 }

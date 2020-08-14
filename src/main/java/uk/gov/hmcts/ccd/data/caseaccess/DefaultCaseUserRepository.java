@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -37,6 +38,17 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
             em.remove(caseUser);
             auditRepo.auditRevoke(caseId, userId, caseRole);
         }
+    }
+
+    public void revokeAccessForRemove(Long caseId, String userId, String caseRole) {
+        CaseUserEntity primaryKey = new CaseUserEntity(caseId, userId, caseRole);
+        em.remove(primaryKey);
+    }
+
+    @Override
+    public Optional<CaseUserEntity> find(Long caseId, String userId, String caseRole) {
+        CaseUserEntity primaryKey = new CaseUserEntity(caseId, userId, caseRole);
+        return Optional.ofNullable(em.find(CaseUserEntity.class, primaryKey.getCasePrimaryKey()));
     }
 
     public List<Long> findCasesUserIdHasAccessTo(final String userId) {
