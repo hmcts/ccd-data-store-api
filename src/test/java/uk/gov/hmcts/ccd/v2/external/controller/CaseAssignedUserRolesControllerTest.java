@@ -95,7 +95,7 @@ class CaseAssignedUserRolesControllerTest {
         @BeforeEach
         void setUp() {
             // setup happy authorised s2s service path
-            when(applicationParams.getAuthorisedServicesForUserCaseRoles()).thenReturn(
+            when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(
                 Lists.newArrayList(ADD_SERVICE_GOOD)
             );
             doReturn(ADD_SERVICE_GOOD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_GOOD);
@@ -441,12 +441,12 @@ class CaseAssignedUserRolesControllerTest {
 
         @BeforeEach
         void setUp() {
-            when(applicationParams.getAuthorisedServicesForUserCaseRoles()).thenReturn(List.of(ADD_SERVICE_GOOD));
+            when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(List.of(ADD_SERVICE_GOOD));
             doReturn(ADD_SERVICE_GOOD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_GOOD);
         }
 
         @Test
-        void removeCaseUserRoles_shouldCallAddWhenValidSingleGoodCaseUserRoleSupplied() {
+        void removeCaseUserRoles_shouldCallRemoveWhenValidSingleGoodCaseUserRoleSupplied() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                     new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD)
@@ -467,7 +467,7 @@ class CaseAssignedUserRolesControllerTest {
         }
 
         @Test
-        void removeCaseUserRoles_shouldCallAddWhenValidSingleGoodCaseUserRoleSupplied_withOrganisation() {
+        void removeCaseUserRoles_shouldCallRemoveWhenValidSingleGoodCaseUserRoleSupplied_withOrganisation() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                     new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
@@ -489,7 +489,7 @@ class CaseAssignedUserRolesControllerTest {
         }
 
         @Test
-        void removeCaseUserRoles_shouldCallAddWhenValidMultipleGoodCaseUserRolesSupplied() {
+        void removeCaseUserRoles_shouldCallRemoveWhenValidMultipleGoodCaseUserRolesSupplied() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                     new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD),

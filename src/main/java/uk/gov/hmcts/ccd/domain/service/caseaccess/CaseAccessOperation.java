@@ -36,7 +36,7 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Service
 public class CaseAccessOperation {
 
-    public static final String ORGS_ASSIGNED_USERS_PAH = "orgs_assigned_users.";
+    public static final String ORGS_ASSIGNED_USERS_PATH = "orgs_assigned_users.";
 
     private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -108,7 +108,7 @@ public class CaseAccessOperation {
 
         newUserCounts.forEach((caseReference, orgNewUserCountMap) ->
             orgNewUserCountMap.forEach((organisationId, newUserCount) ->
-                supplementaryDataRepository.incrementSupplementaryData(caseReference, ORGS_ASSIGNED_USERS_PAH + organisationId, newUserCount)
+                supplementaryDataRepository.incrementSupplementaryData(caseReference, ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount)
             )
         );
     }
@@ -119,7 +119,7 @@ public class CaseAccessOperation {
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
 
         // Ignore case user role mappings that are NOT exist in the database silently. Also they shouldn't effect counters.
-        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseId = filterUnknownCauRoles(cauRolesByCaseId);
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseId = filterExistingCauRoles(cauRolesByCaseId);
 
         filteredCauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
@@ -133,12 +133,12 @@ public class CaseAccessOperation {
         removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
             orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
                 supplementaryDataRepository.incrementSupplementaryData(caseReference,
-                    ORGS_ASSIGNED_USERS_PAH + organisationId, Math.negateExact(removeUserCount))
+                    ORGS_ASSIGNED_USERS_PATH + organisationId, Math.negateExact(removeUserCount))
             )
         );
     }
 
-    private Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filterUnknownCauRoles(
+    private Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filterExistingCauRoles(
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
 
         List<Long> caseIds = new ArrayList<>(cauRolesByCaseId.keySet());
@@ -231,12 +231,7 @@ public class CaseAccessOperation {
         List<Long> caseIds = new ArrayList<>(caseUserRolesWhichHaveAnOrgId.keySet());
 
         // get distinct list of user ids
-        List<String> userIds = caseUserRolesWhichHaveAnOrgId.values().stream()
-            .map(requestedAssignments -> requestedAssignments.stream()
-                .map(CaseAssignedUserRoleWithOrganisation::getUserId).collect(Collectors.toList()))
-            .flatMap(List::stream)
-            .distinct()
-            .collect(Collectors.toList());
+        List<String> userIds = getUserIds(cauRolesByCaseId);
 
         // find existing Case-User relationships for all the relevant cases + users found
         Map<Long, List<String>> existingCaseUserRelationships =

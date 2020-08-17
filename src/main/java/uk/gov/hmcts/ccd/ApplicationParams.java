@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toList;
 public class ApplicationParams {
 
     @Value("#{'${ccd.s2s-authorised.services.case_user_roles}'.split(',')}")
-    private List<String> authorisedServicesForUserCaseRoles;
+    private List<String> authorisedServicesForCaseUserRoles;
 
     @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")
     private List<String> writeToCCDCaseTypesOnly;
@@ -159,8 +159,8 @@ public class ApplicationParams {
         }
     }
 
-    public List<String> getAuthorisedServicesForUserCaseRoles() {
-        return authorisedServicesForUserCaseRoles;
+    public List<String> getAuthorisedServicesForCaseUserRoles() {
+        return authorisedServicesForCaseUserRoles;
     }
 
     public boolean isWildcardSearchAllowed() {

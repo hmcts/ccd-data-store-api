@@ -330,7 +330,7 @@ public class CaseAssignedUserRolesController {
     private void validateRequest(String clientS2SToken, CaseAssignedUserRolesRequest request) {
 
         String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
-        if (applicationParams.getAuthorisedServicesForUserCaseRoles().contains(clientServiceName)) {
+        if (applicationParams.getAuthorisedServicesForCaseUserRoles().contains(clientServiceName)) {
             validateRequestParams(request);
         } else {
             throw new CaseRoleAccessException(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
