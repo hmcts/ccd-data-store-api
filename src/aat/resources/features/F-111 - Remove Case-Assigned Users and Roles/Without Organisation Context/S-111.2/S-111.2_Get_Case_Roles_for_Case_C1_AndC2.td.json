@@ -19,8 +19,7 @@
   "request": {
     "_extends_": "Common_Request",
     "queryParams": {
-      "case_ids": "${}${[scenarioContext][siblingContexts][S-111.2_Add_Case_Assigned_User_Roles_for_Case_C1_And_C2][testData][request][body][case_users][0][case_id]}",
-      "case_ids": "${}${[scenarioContext][siblingContexts][S-111.2_Add_Case_Assigned_User_Roles_for_Case_C1_And_C2][testData][request][body][case_users][1][case_id]}"
+      "case_ids": "${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment_C2][testData][actualResponse][body][id]}"
     }
   },
 

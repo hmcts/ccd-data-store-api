@@ -27,7 +27,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a user [Dil - who is to add and remove some case role assignment for a case],
       And a user [Olawale - with an active solicitor profile],
       And a successful call [by Richard to create a case - C1] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
-      And a successful call [by Richard to create a case - C2] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment],
+      And a successful call [by Richard to create a case - C2] as in [F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment_C2],
       And a successful call [by Dil to add a Case Role - CR1 and CR2 on both C1 and C2 for Olawale] as in [S-111.2_Add_Case_Assigned_User_Roles_for_Case_C1_And_C2],
       And a successful call [to verify Olawale's reception of the roles CR1 and CR2 on both C1 and C2] as in [S-111.2_Get_Case_Roles_for_Case_C1_And_C2_After_Add],
 
@@ -79,7 +79,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
 
     Then a positive response is received,
     And the response has all the details as expected,
-    And a call [to verify Olawale's loss of the role CR-2 over the case C1] will get the expected response as in [S-111.14_Get_Case_Roles_for_Case_C2_After_Remove],
+    And a call [to verify Olawale's loss of the role CR-2 over the case C1] will get the expected response as in [S-111.14_Get_Case_Roles_for_Case_C1_After_Remove],
     And a call [to verify the count of users unassigned to C1 has NOT changed] will get the expected response as in [S-111.14_Verify_User_Count_Assigned_To_Case_Equals_1].
 
   @S-111.15

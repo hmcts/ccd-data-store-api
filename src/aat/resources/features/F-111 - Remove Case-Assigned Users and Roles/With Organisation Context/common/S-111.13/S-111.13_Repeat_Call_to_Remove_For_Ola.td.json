@@ -15,14 +15,7 @@
       "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
     },
     "body": {
-      "case_users": [
-        {
-          "case_id": "${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
-          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
-          "case_role": "[CR-1]",
-          "organisation_id": "${[scenarioContext][siblingContexts][S-111.13_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation][childContexts][F-111_Prerequisite_Counter_Check_Call][childContexts][F-111_Get_Organisation_Identifier_Dil][testData][actualResponse][body][organisationIdentifier]}"
-        }
-      ]
+      "case_users": "${[scenarioContext][parentContext][testData][request][body][case_users]}"
     }
   },
 
