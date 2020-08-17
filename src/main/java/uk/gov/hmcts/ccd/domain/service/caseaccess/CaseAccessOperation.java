@@ -36,7 +36,7 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Service
 public class CaseAccessOperation {
 
-    public static final String ORGS_ASSIGNED_USERS_PAH = "orgs_assigned_users.";
+    public static final String ORGS_ASSIGNED_USERS_PATH = "orgs_assigned_users.";
 
     private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -108,7 +108,7 @@ public class CaseAccessOperation {
 
         newUserCounts.forEach((caseReference, orgNewUserCountMap) ->
             orgNewUserCountMap.forEach((organisationId, newUserCount) ->
-                supplementaryDataRepository.incrementSupplementaryData(caseReference, ORGS_ASSIGNED_USERS_PAH + organisationId, newUserCount)
+                supplementaryDataRepository.incrementSupplementaryData(caseReference, ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount)
             )
         );
     }
@@ -133,7 +133,7 @@ public class CaseAccessOperation {
         removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
             orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
                 supplementaryDataRepository.incrementSupplementaryData(caseReference,
-                    ORGS_ASSIGNED_USERS_PAH + organisationId, Math.negateExact(removeUserCount))
+                    ORGS_ASSIGNED_USERS_PATH + organisationId, Math.negateExact(removeUserCount))
             )
         );
     }
