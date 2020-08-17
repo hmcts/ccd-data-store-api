@@ -11,6 +11,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,14 +69,6 @@ public class DefaultCaseDefinitionRepositoryTest {
         caseDefinitionRepository = new DefaultCaseDefinitionRepository(applicationParams, securityUtils, restTemplate);
     }
 
-    @Test
-    public void shouldGeEmptyGetCaseTypesIDsByJurisdictions() throws URISyntaxException {
-        mockGetJurisdictionsFromDefinitionStore(Collections.emptyList(), JURISDICTIONS_URL + "?ids=jurisdiction1,jurisdiction2");
-        final List<String> jurisdictions = newArrayList("jurisdiction1", "jurisdiction2");
-        List<String> caseTypes = caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
-        assertEquals(0, caseTypes.size());
-    }
-
     private void mockGetJurisdictionsFromDefinitionStore(List<JurisdictionDefinition> jurisdictionDefinitions,
                                                          String endpoint) throws URISyntaxException {
         ResponseEntity<List<JurisdictionDefinition>> myEntity =
@@ -86,6 +80,57 @@ public class DefaultCaseDefinitionRepositoryTest {
             Matchers.<HttpEntity<List<JurisdictionDefinition>>>any(),
             Matchers.<ParameterizedTypeReference<List<JurisdictionDefinition>>>any())
         ).thenReturn(myEntity);
+    }
+
+    private List<JurisdictionDefinition> getJurisdictionDefinition() {
+
+        List<JurisdictionDefinition> jurisdictionDefinition = new ArrayList<>();
+        JurisdictionDefinition jurisdictionDefinition1 = new JurisdictionDefinition ();
+        JurisdictionDefinition jurisdictionDefinition2 = new JurisdictionDefinition ();
+
+        jurisdictionDefinition1.setId("jurisdiction1");
+        jurisdictionDefinition1.setDescription("kia1");
+        jurisdictionDefinition1.setCaseTypeDefinitions(getCaseTypeDefinition("caseId1"));
+
+        jurisdictionDefinition2.setId("jurisdiction2");
+        jurisdictionDefinition2.setDescription("kia2");
+        jurisdictionDefinition2.setCaseTypeDefinitions(getCaseTypeDefinition("caseId2"));
+
+        jurisdictionDefinition.add(jurisdictionDefinition1);
+        jurisdictionDefinition.add(jurisdictionDefinition2);
+        return jurisdictionDefinition;
+    }
+
+    private List<CaseTypeDefinition> getCaseTypeDefinition(String id1){
+        List<CaseTypeDefinition> caseTypeDefinition = new ArrayList<>();
+
+        CaseTypeDefinition caseTypeDefinition1 = new CaseTypeDefinition();
+        caseTypeDefinition1.setId(id1);
+        caseTypeDefinition.add(caseTypeDefinition1);
+        return caseTypeDefinition;
+    }
+
+    @Test
+    public void shouldGeEmptyGetCaseTypesIDsByJurisdictions() throws URISyntaxException {
+        mockGetJurisdictionsFromDefinitionStore(Collections.emptyList(), JURISDICTIONS_URL + "?ids=jurisdiction1,jurisdiction2");
+        final List<String> jurisdictions = newArrayList("jurisdiction1", "jurisdiction2");
+        List<String> caseTypes = caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
+        assertEquals(0, caseTypes.size());
+    }
+
+    @Test
+    public void getCaseTypesIDsByJurisdictions() throws URISyntaxException {
+        mockGetJurisdictionsFromDefinitionStore(getJurisdictionDefinition(), JURISDICTIONS_URL + "?ids=jurisdiction1,jurisdiction2");
+        final List<String> jurisdictions = newArrayList("jurisdiction1", "jurisdiction2");
+        List<String> caseTypes = caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
+        assertEquals(2, caseTypes.size());
+    }
+
+    @Test
+    public void getgetAllCaseTypesIDs() throws URISyntaxException {
+        mockGetJurisdictionsFromDefinitionStore(getJurisdictionDefinition(), JURISDICTIONS_URL);
+        List<String> caseTypes = caseDefinitionRepository.getAllCaseTypesIDs();
+        assertEquals(2, caseTypes.size());
     }
 
     @Test(expected = ResourceNotFoundException.class)
