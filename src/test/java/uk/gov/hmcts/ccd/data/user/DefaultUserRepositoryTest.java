@@ -109,6 +109,9 @@ class DefaultUserRepositoryTest {
         initSecurityContext();
 
         mockUserInfo("userId");
+
+        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(singletonList(ROLE_CASEWORKER_CAA));
+        when(applicationParams.getCcdAccessControlCaseworkerRoleRegex()).thenReturn("caseworker.+");
     }
 
     @Nested
@@ -160,7 +163,6 @@ class DefaultUserRepositoryTest {
             @DisplayName("should only consider roles for given jurisdiction")
             void shouldOnlyConsiderRolesForJurisdiction() {
                 asCaseworkerCaa();
-                when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(Arrays.asList(ROLE_CASEWORKER_CAA));
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
@@ -412,8 +414,8 @@ class DefaultUserRepositoryTest {
     }
 
     @Nested
-    @DisplayName("getUserRolesJurisdictions()")
-    class GetUserRolesJurisdictions {
+    @DisplayName("getCaseworkerUserRolesJurisdictions()")
+    class GetCaseworkerUserRolesJurisdictions {
 
         @Test
         @DisplayName("test empty list of jurisdictions")
@@ -423,7 +425,7 @@ class DefaultUserRepositoryTest {
 
             mockUserInfo("userId", roles);
 
-            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+            final List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
 
             assertAll(
                 () -> assertThat(jurisdictions, hasSize(0))
@@ -446,7 +448,7 @@ class DefaultUserRepositoryTest {
 
             mockUserInfo("userId", roles);
 
-            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+            final List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
 
             assertAll(
                 () -> assertThat(jurisdictions, hasSize(2)),
@@ -463,15 +465,44 @@ class DefaultUserRepositoryTest {
                 "caseworker-autotest1",
                 "caseworker-autotest2",
                 "otherRole-autotest1",
-                "otherRole-autotest2");
+                "otherRole-autotest2",
+                ROLE_CASEWORKER_CAA);
 
             mockUserInfo("userId", roles);
 
-            final List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+            final List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
 
             assertAll(
                 () -> assertThat(jurisdictions, hasSize(2)),
                 () -> assertThat(jurisdictions, hasItems("autotest1", "autotest2"))
+            );
+        }
+
+        @Test
+        @DisplayName("It should ignore roles defined as cross-jurisdiction")
+        void shouldIgnoreCrossJurisdictionRoles() {
+            List<String> roles = singletonList(ROLE_CASEWORKER_CAA);
+
+            mockUserInfo("userId", roles);
+
+            final List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
+
+            assertAll(
+                () -> assertThat(jurisdictions, hasSize(0))
+            );
+        }
+
+        @Test
+        @DisplayName("It should ignore non-specific roles")
+        void shouldIgnoreNonSpecificRoles() {
+            List<String> roles = newArrayList("pui-case-manager", "citizen", "caseworker");
+
+            mockUserInfo("userId", roles);
+
+            final List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
+
+            assertAll(
+                () -> assertThat(jurisdictions, hasSize(0))
             );
         }
     }
@@ -495,7 +526,7 @@ class DefaultUserRepositoryTest {
         doReturn(newAuthorities(ROLE_CASEWORKER_CAA)).when(authentication)
             .getAuthorities();
     }
-    
+
     private void mockUserInfo(String userId) {
         mockUserInfo(userId, emptyList());
     }
