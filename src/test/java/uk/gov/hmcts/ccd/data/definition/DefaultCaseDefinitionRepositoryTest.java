@@ -83,10 +83,10 @@ public class DefaultCaseDefinitionRepositoryTest {
     }
 
     private List<JurisdictionDefinition> getJurisdictionDefinition() {
-        List<JurisdictionDefinition> jurisdictionDefinition = new ArrayList<>();
-        JurisdictionDefinition jurisdictionDefinition1 = new JurisdictionDefinition();
-        JurisdictionDefinition jurisdictionDefinition2 = new JurisdictionDefinition();
 
+        final List<JurisdictionDefinition> jurisdictionDefinition = new ArrayList<>();
+        final JurisdictionDefinition jurisdictionDefinition1 = new JurisdictionDefinition();
+        final JurisdictionDefinition jurisdictionDefinition2 = new JurisdictionDefinition();
         jurisdictionDefinition1.setId("jurisdiction1");
         jurisdictionDefinition1.setDescription("kia1");
         jurisdictionDefinition1.setCaseTypeDefinitions(getCaseTypeDefinition("caseId1"));
