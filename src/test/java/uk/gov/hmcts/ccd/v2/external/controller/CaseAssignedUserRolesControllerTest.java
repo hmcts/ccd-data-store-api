@@ -489,7 +489,7 @@ class CaseAssignedUserRolesControllerTest {
         }
 
         @Test
-        void removeCaseUserRoles_shouldCallAddWhenValidMultipleGoodCaseUserRolesSupplied() {
+        void removeCaseUserRoles_shouldCallRemoveWhenValidMultipleGoodCaseUserRolesSupplied() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                     new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD),

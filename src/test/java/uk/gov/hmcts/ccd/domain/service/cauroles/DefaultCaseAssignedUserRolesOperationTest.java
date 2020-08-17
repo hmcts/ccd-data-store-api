@@ -61,9 +61,9 @@ class DefaultCaseAssignedUserRolesOperationTest {
                 new CaseAssignedUserRoleWithOrganisation()
         );
 
-        caseAssignedUserRolesOperation.addCaseUserRoles(caseUserRoles);
+        caseAssignedUserRolesOperation.removeCaseUserRoles(caseUserRoles);
 
-        verify(caseAccessOperation).addCaseUserRoles(caseUserRoles);
+        verify(caseAccessOperation).removeCaseUserRoles(caseUserRoles);
     }
 
     private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {
