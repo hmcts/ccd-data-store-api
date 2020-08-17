@@ -83,10 +83,9 @@ public class DefaultCaseDefinitionRepositoryTest {
     }
 
     private List<JurisdictionDefinition> getJurisdictionDefinition() {
-
         List<JurisdictionDefinition> jurisdictionDefinition = new ArrayList<>();
-        JurisdictionDefinition jurisdictionDefinition1 = new JurisdictionDefinition ();
-        JurisdictionDefinition jurisdictionDefinition2 = new JurisdictionDefinition ();
+        JurisdictionDefinition jurisdictionDefinition1 = new JurisdictionDefinition();
+        JurisdictionDefinition jurisdictionDefinition2 = new JurisdictionDefinition();
 
         jurisdictionDefinition1.setId("jurisdiction1");
         jurisdictionDefinition1.setDescription("kia1");
@@ -101,7 +100,7 @@ public class DefaultCaseDefinitionRepositoryTest {
         return jurisdictionDefinition;
     }
 
-    private List<CaseTypeDefinition> getCaseTypeDefinition(String id1){
+    private List<CaseTypeDefinition> getCaseTypeDefinition(String id1) {
         List<CaseTypeDefinition> caseTypeDefinition = new ArrayList<>();
 
         CaseTypeDefinition caseTypeDefinition1 = new CaseTypeDefinition();
