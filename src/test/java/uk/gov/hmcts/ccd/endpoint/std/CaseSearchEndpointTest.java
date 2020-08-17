@@ -55,7 +55,7 @@ class CaseSearchEndpointTest {
 
     @Test
     void searchCaseDetailsInvokesOperation() throws JsonProcessingException {
-        CaseSearchResult result = mock(CaseSearchResult.class);
+        final CaseSearchResult result = mock(CaseSearchResult.class);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
         JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
@@ -64,25 +64,15 @@ class CaseSearchEndpointTest {
         List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
 
         final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest);
-
-        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
-        verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
-            assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
-            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
-            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().get(0), is(CASE_TYPE_ID));
-            assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
-            assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
-            return true;
-        }));
-        assertThat(caseSearchResult, is(result));
+        verifyFields(searchRequest, searchRequestNode, result, caseSearchResult);
     }
 
     @Test
     void searchInAllCaseTypesWithWildCard() throws JsonProcessingException {
-        CaseSearchResult result = mock(CaseSearchResult.class);
+        final CaseSearchResult result = mock(CaseSearchResult.class);
         ArrayList<String> getAllCaseTypesIDs = new ArrayList();
         getAllCaseTypesIDs.add(CASE_TYPE_ID);
-        mockAttributes(new ArrayList<>(), true, getAllCaseTypesIDs);
+        mockControllerAttributes(new ArrayList<>(), true, getAllCaseTypesIDs);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
         JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
@@ -90,6 +80,38 @@ class CaseSearchEndpointTest {
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
         List<String> caseTypeIds = singletonList(ElasticsearchRequest.WILDCARD);
         final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest);
+        verifyFields(searchRequest, searchRequestNode, result, caseSearchResult);
+    }
+
+    @Test
+    void searchInAllCaseTypesWithWildCardGetRoleFromIDam() throws JsonProcessingException {
+        final CaseSearchResult result = mock(CaseSearchResult.class);
+        ArrayList<String> getAllCaseTypesIDs = new ArrayList();
+        getAllCaseTypesIDs.add(CASE_TYPE_ID);
+
+        when(userRepository.getUserRolesJurisdictions()).thenReturn(getAllCaseTypesIDs);
+        when(caseDefinitionRepository.getCaseTypesIDsByJurisdictions(anyList())).thenReturn(getAllCaseTypesIDs);
+
+        mockControllerAttributes(new ArrayList<>(), false, getAllCaseTypesIDs);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
+        String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
+        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
+        when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
+        List<String> caseTypeIds = singletonList(ElasticsearchRequest.WILDCARD);
+        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest);
+        verifyFields(searchRequest, searchRequestNode, result, caseSearchResult);
+    }
+
+    private void mockControllerAttributes(List<String> applicationParamsMock, boolean anyRoleEqualsAnyOf, List<String> getAllCaseTypesIDs) {
+
+        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(applicationParamsMock);
+        when(userRepository.anyRoleEqualsAnyOf(any(List.class))).thenReturn(anyRoleEqualsAnyOf);
+        when(caseDefinitionRepository.getAllCaseTypesIDs()).thenReturn(getAllCaseTypesIDs);
+    }
+
+    private void verifyFields(String searchRequest, JsonNode searchRequestNode, CaseSearchResult result,
+                              CaseSearchResult caseSearchResult) {
 
         verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
@@ -101,12 +123,5 @@ class CaseSearchEndpointTest {
             return true;
         }));
         assertThat(caseSearchResult, is(result));
-    }
-
-    private void mockAttributes(List<String> applicationParamsMock, boolean anyRoleEqualsAnyOf, List<String> getAllCaseTypesIDs) {
-
-        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(applicationParamsMock);
-        when(userRepository.anyRoleEqualsAnyOf(any(List.class))).thenReturn(anyRoleEqualsAnyOf);
-        when(caseDefinitionRepository.getAllCaseTypesIDs()).thenReturn(getAllCaseTypesIDs);
     }
 }
