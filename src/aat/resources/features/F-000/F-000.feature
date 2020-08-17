@@ -5,7 +5,7 @@ Feature: [SAMPLE] Get default settings for user
     Given an appropriate test context as detailed in the test data source
 
   @S-000
-  Scenario: [SAMPLE] must return default user setting successfully for a user having a profile in CCD
+  Scenario: [SAMPLE] must  return default user setting successfully for a user having a profile in CCD
     Given a successful call [to retrieve a user profile] as in [S-000-Prerequisite],
     And a user with [a detailed profile in CCD],
     And a case that has just been created as in [Befta_Default_Full_Case_Creation_Data],
