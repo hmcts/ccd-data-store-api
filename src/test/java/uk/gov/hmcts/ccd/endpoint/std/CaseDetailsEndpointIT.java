@@ -695,7 +695,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
         assertTrue("Incorrect Case Reference", uidService.validateUID(captor.getValue().getCaseId()));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
@@ -722,7 +722,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
         assertTrue("Incorrect Case Reference", uidService.validateUID(captor.getValue().getCaseId()));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
@@ -1052,7 +1052,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
@@ -1167,7 +1167,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1504259907353529"));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
@@ -1947,7 +1947,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(caseReference));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
@@ -1992,7 +1992,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(caseReference));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));

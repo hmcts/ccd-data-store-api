@@ -109,8 +109,8 @@ public class DefaultUserRepository implements UserRepository {
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toSet());
 
-        String email = getUser().getEmail();
-        LOG.info("Retrieved roles for user={} roles={}", email, userRoles);
+        String userId = getUser().getId();
+        LOG.info("Retrieved roles for userId={} roles={}", userId, userRoles);
 
         return userRoles;
     }
@@ -133,7 +133,6 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public UserDefault getUserDefaultSettings(final String userId) {
         try {
-            LOG.debug("retrieving default user settings for user {}", userId);
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("uid", ApplicationParams.encode(userId.toLowerCase()));
