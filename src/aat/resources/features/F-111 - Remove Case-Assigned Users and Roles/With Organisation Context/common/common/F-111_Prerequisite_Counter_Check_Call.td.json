@@ -8,8 +8,7 @@
 
   "prerequisites": [
     "F-111_Get_Organisation_Identifier_Dil",
-    "F-111_Get_Organisation_Identifier_Olawale",
-    "F-111_Get_Organisation_Identifier_Hemanth"
+    "F-111_Get_Organisation_Identifier_Olawale"
   ],
 
   "expectedResponse": {
