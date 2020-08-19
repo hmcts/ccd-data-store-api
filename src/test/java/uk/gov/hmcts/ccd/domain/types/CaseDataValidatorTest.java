@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mock;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,8 @@ import java.util.Map;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class CaseDataValidatorTest extends WireMockBaseTest {
@@ -31,6 +35,10 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     @Inject
     private CaseDataValidator caseDataValidator;
     private List<CaseFieldDefinition> caseFields;
+
+    @Mock
+    private TextCaseReferenceCaseLinkValidator textCaseReferenceCaseLinkValidator;
+
 
     @BeforeClass
     public static void setUpClass() {
@@ -336,6 +344,77 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final ValidationResult result1 = results.get(1);
         assertThat(result1.getFieldId(), equalTo("Initials.1"));
+    }
+
+    @Test
+    public void shouldFailForPredefinedType() throws Exception {
+        final String DATA = "{\n" +
+            "        \"CaseReference\": \"1596XXXXX1048-4059XXXOOOO\"\n" +
+            "      }";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        assertEquals(results.toString(), 1, results.size());
+
+        final ValidationResult result0 = results.get(0);
+        assertThat(result0.getFieldId(), equalTo("CaseReference"));
+        assertThat(result0.getErrorMessage(),
+            equalTo("The data entered is not valid for this type of field, please delete and re-enter using only valid data")
+        );
+    }
+
+    @Test
+    public void shouldInvokeForPredefinedTypea() throws Exception {
+        List<FieldValidator> fieldValidators = new ArrayList<>();
+        fieldValidators.add(textCaseReferenceCaseLinkValidator);
+        CaseDataValidator caseDataValidator = new CaseDataValidator(fieldValidators);
+
+        when(textCaseReferenceCaseLinkValidator.getPredefinedFieldId()).thenReturn("TextCaseReference");
+
+        final String DATA = "{\n" +
+            "        \"CaseReference\": \"1596104840593131\"\n" +
+            "      }";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
+        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+
+        assertEquals(results.toString(), 0, results.size());
+        verify(textCaseReferenceCaseLinkValidator).validate(anyString(),any(JsonNode.class),any(CaseFieldDefinition.class));
+    }
+
+    @Test
+    public void shouldInvokeForPredefinedTypea2() throws Exception {
+        List<FieldValidator> fieldValidators = new ArrayList<>();
+        fieldValidators.add(textCaseReferenceCaseLinkValidator);
+        fieldValidators.add(new CollectionValidator());
+        CaseDataValidator caseDataValidator = new CaseDataValidator(fieldValidators);
+
+        when(textCaseReferenceCaseLinkValidator.getPredefinedFieldId()).thenReturn("TextCaseReference");
+
+        final String DATA =
+            "{\n" +
+                "  \"CaseLink\" : [\n" +
+                "    {\n" +
+                "      \"value\": " +
+                "        {\n" +
+                "          \"CaseLink1\": \"1596104840593131\",\n" +
+                "          \"CaseLink2\": \"1596104840593131\"\n" +
+                "        }\n" +
+                "    }" +
+                "  ]\n" +
+                "}";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
+        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+
+        assertEquals(results.toString(), 0, results.size());
+        verify(textCaseReferenceCaseLinkValidator,times(2))
+            .validate(
+                anyString(),
+                any(JsonNode.class),
+                any(CaseFieldDefinition.class)
+            );
     }
 
     @Test
