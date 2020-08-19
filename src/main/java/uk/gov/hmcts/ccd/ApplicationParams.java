@@ -140,6 +140,9 @@ public class ApplicationParams {
     @Value("#{'${ccd.access-control.citizen-roles}'.split(',')}")
     private List<String> ccdAccessControlCitizenRoles;
 
+    @Value("${ccd.access-control.caseworker.role.regex}")
+    private String ccdAccessControlCaseworkerRoleRegex;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -377,6 +380,10 @@ public class ApplicationParams {
 
     public List<String> getCcdAccessControlCrossJurisdictionRoles() {
         return ccdAccessControlCrossJurisdictionRoles;
+    }
+
+    public String getCcdAccessControlCaseworkerRoleRegex() {
+        return ccdAccessControlCaseworkerRoleRegex;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {

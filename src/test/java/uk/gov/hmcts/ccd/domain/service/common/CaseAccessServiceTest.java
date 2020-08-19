@@ -561,7 +561,7 @@ class CaseAccessServiceTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(Lists.newArrayList("PROBATE", "DIVORCE")).when(userRepository).getUserRolesJurisdictions();
+            doReturn(Lists.newArrayList("PROBATE", "DIVORCE")).when(userRepository).getCaseworkerUserRolesJurisdictions();
         }
 
         @Test
