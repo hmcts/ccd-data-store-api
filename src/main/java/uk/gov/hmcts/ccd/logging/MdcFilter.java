@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.logging;
 
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -14,18 +15,21 @@ import java.util.UUID;
 @WebFilter
 public class MdcFilter extends HttpFilter {
 
+    @Autowired
+    private CorrelationIDHttpExtractor correlationIDHttpExtractor;
+
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws IOException, ServletException {
         try {
-            MDC.put("CorrelationId", getCorrelationId());
+            MDC.put("CorrelationId", getCorrelationId(request));
             filterChain.doFilter(request, response);
         } finally {
             MDC.remove("CorrelationId");
         }
     }
 
-    private String getCorrelationId() {
-        return UUID.randomUUID().toString();
+    private String getCorrelationId(HttpServletRequest request) {
+        return correlationIDHttpExtractor.getCorrelationID(request);
     }
 }
