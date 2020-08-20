@@ -1,23 +1,22 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import static com.google.common.collect.Maps.newHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import static com.google.common.collect.Maps.newHashMap;
 
 @Service
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -92,9 +91,20 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
+    public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
+        return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictionIds);
+    }
+
+    @Override
+    public List<String> getAllCaseTypesIDs() {
+        return caseDefinitionRepository.getAllCaseTypesIDs();
+    }
+
+    @Override
     public List<FieldTypeDefinition> getBaseTypes() {
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }
+
 
     public CaseDefinitionRepository getCaseDefinitionRepository() {
         return caseDefinitionRepository;

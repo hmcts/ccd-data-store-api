@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +23,20 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
-@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
+@SuppressWarnings("checkstyle:SummaryJavadoc")
+// partial javadoc attributes added prior to checkstyle implementation in module
 @Service
 @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
 public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository {
@@ -58,7 +62,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     /**
-     *
      * @deprecated current implementation has serious performance issues
      */
     @Deprecated
@@ -75,7 +78,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving base type", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:" + jurisdictionId
                     + " because of " + e.getMessage());
             } else {
@@ -192,7 +195,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Error while retrieving case type version", e);
             if (e instanceof HttpClientErrorException && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(
-                        "Resource not found when getting case type version for '" + caseTypeId + "'.", e);
+                    "Error when getting case type version. Unknown case type '" + caseTypeId + "'.", e);
             } else {
                 throw new ServiceException("Problem getting case type version for '" + caseTypeId + "'.", e);
             }
@@ -206,31 +209,60 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Arrays.asList(jurisdictionId));
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
+            Optional.of(Arrays.asList(jurisdictionId))
+        );
         if (jurisdictionDefinitions.isEmpty()) {
             return null;
         }
         return jurisdictionDefinitions.get(0);
     }
 
-    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(List<String> jurisdictionIds) {
+    @Override
+    public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
+
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Optional.of(jurisdictionIds));
+        if (jurisdictionDefinitions.isEmpty()) {
+            LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
+            return Collections.emptyList();
+        }
+        List<String> caseTypes = getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+        return caseTypes;
+    }
+
+    @Override
+    public List<String> getAllCaseTypesIDs() {
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Optional.ofNullable(null));
+        return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+    }
+
+    private List<String> getCaseTypeIdFromJurisdictionDefinition(List<JurisdictionDefinition> jurisdictionDefinitions) {
+        return jurisdictionDefinitions.stream().flatMap(
+            jurisdictionDefinition -> jurisdictionDefinition.getCaseTypesIDs().stream()
+        ).distinct().collect(Collectors.toList());
+    }
+
+    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
+            if (jurisdictionIds.isPresent()) {
+                builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
+            }
             LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
-                    jurisdictionIds);
+                jurisdictionIds.orElse(Collections.emptyList()));
             HttpEntity<List<JurisdictionDefinition>> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
-                    .queryParam("ids", String.join(",", jurisdictionIds));
+
             List<JurisdictionDefinition> jurisdictionDefinitionList = restTemplate.exchange(builder.build().encode().toUri(),
-                    HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
-                    }).getBody();
+                HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
+                }).getBody();
             LOG.debug("Retrieved jurisdiction object(s) from definition store: {}.", jurisdictionDefinitionList);
             return jurisdictionDefinitionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
-                        jurisdictionIds);
+                    jurisdictionIds.orElse(Collections.emptyList()));
                 return new ArrayList<>();
             } else {
                 throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
