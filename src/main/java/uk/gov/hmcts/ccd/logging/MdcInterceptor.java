@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 public class MdcInterceptor implements HandlerInterceptor {
 
     private CorrelationIDExtractor correlationIDExtractor;
-    private final static String CORRELATION_ID ="CorrelationId";
+    private static final String CORRELATION_ID = "CorrelationId";
 
     public MdcInterceptor(CorrelationIDExtractor correlationIDHttpExtractor) {
         this.correlationIDExtractor = correlationIDHttpExtractor;
