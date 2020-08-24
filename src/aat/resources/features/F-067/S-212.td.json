@@ -2,14 +2,16 @@
   "_guid_": "S-212",
   "_extends_": "F-067_Test_Data_Base",
   "title": "should retrieve case view with response code HTTP 200 when the case reference and case event exists",
+
   "specs": [
     "an active profile in CCD",
     "contains the reference of the case just created and the event id valid for that case",
     "contains HTTP 200 Ok"
   ],
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "headers" : {
+    "headers": {
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
     },
     "body": {

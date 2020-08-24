@@ -1,44 +1,46 @@
 {
+  "_guid_": "S-182",
+  "_extends_": "F-066_Test_Data_Base",
   "title": "should retrieve trigger when the case and event exists",
-	"_guid_": "S-182",
-	"_extends_": "F-066_Test_Data_Base",
 
-	"specs": [
-		"an active profile in CCD",
-		"includes the event start trigger for the case just created, along with a HTTP 200 OK"
-	],
-	"request": {
+  "specs": [
+    "an active profile in CCD",
+    "includes the event start trigger for the case just created, along with a HTTP 200 OK"
+  ],
+
+  "request": {
     "pathVariables": {
       "cid": "[[DEFAULT_AUTO_VALUE]]"
     }
-	},
-	"expectedResponse": {
-    "responseCode" : 200,
-    "responseMessage" : "OK",
-    "headers":{
+  },
+
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
       "_extends_": "Common_Response_Headers",
-      "Content-Encoding" : "gzip",
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-start-event-trigger.v2+json;charset=UTF-8",
-      "Vary" : "Accept-Encoding"
+      "Vary": "Accept-Encoding"
     },
-    "body" : {
-      "id" : "[[ANYTHING_PRESENT]]",
-      "name" : "[[ANYTHING_PRESENT]]",
-      "description" : null,
-      "case_id" : "[[ANYTHING_PRESENT]]",
-      "case_fields" : [ ],
-      "event_token" : "[[ANYTHING_PRESENT]]",
-      "wizard_pages" : [ ],
-      "show_summary" : true,
-      "show_event_notes" : null,
-      "end_button_label" : null,
-      "can_save_draft" : null,
-      "_links" : {
-        "self" : {
-          "href" : "[[ANYTHING_PRESENT]]"
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "name": "[[ANYTHING_PRESENT]]",
+      "description": null,
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_fields": [],
+      "event_token": "[[ANYTHING_PRESENT]]",
+      "wizard_pages": [],
+      "show_summary": true,
+      "show_event_notes": null,
+      "end_button_label": null,
+      "can_save_draft": null,
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
         }
       }
     }
-	}
+  }
 }

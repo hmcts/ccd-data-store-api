@@ -1,23 +1,25 @@
 {
-  "title": "must return case view when the case reference exists",
   "_guid_": "S-165",
   "_extends_": "F-065_Test_Data_Base",
+  "title": "must return case view when the case reference exists",
 
   "specs": [
     "an active profile in CCD",
     "contains a case that has just been created as in Standard_Full_Case_Creation_Data",
     "contains details of the case just created, along with an HTTP-200 OK"
   ],
+
   "request": {
     "pathVariables": {
       "cid": "[[DEFAULT_AUTO_VALUE]]"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Vary" : "Accept-Encoding",
-      "Transfer-Encoding" : "chunked",
+      "Vary": "Accept-Encoding",
+      "Transfer-Encoding": "chunked",
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
     },
     "body": {
@@ -62,7 +64,6 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "acls": [
-
           ],
           "default_value": null
         },
@@ -80,10 +81,8 @@
             "max": null,
             "regular_expression": null,
             "fixed_list_items": [
-
             ],
             "complex_fields": [
-
             ],
             "collection_field_type": null
           },
@@ -97,7 +96,6 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "acls": [
-
           ],
           "default_value": null
         },
@@ -115,10 +113,8 @@
             "max": null,
             "regular_expression": null,
             "fixed_list_items": [
-
             ],
             "complex_fields": [
-
             ],
             "collection_field_type": null
           },
@@ -132,7 +128,6 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "acls": [
-
           ],
           "default_value": null
         },
@@ -150,10 +145,8 @@
             "max": null,
             "regular_expression": null,
             "fixed_list_items": [
-
             ],
             "complex_fields": [
-
             ],
             "collection_field_type": null
           },
@@ -167,7 +160,6 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "acls": [
-
           ],
           "default_value": null
         },
@@ -185,10 +177,8 @@
             "max": null,
             "regular_expression": null,
             "fixed_list_items": [
-
             ],
             "complex_fields": [
-
             ],
             "collection_field_type": null
           },
@@ -202,7 +192,6 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "acls": [
-
           ],
           "default_value": null
         },
@@ -220,10 +209,8 @@
             "max": null,
             "regular_expression": null,
             "fixed_list_items": [
-
             ],
             "complex_fields": [
-
             ],
             "collection_field_type": null
           },
@@ -237,7 +224,6 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "acls": [
-
           ],
           "default_value": null
         },
@@ -255,10 +241,8 @@
             "max": null,
             "regular_expression": null,
             "fixed_list_items": [
-
             ],
             "complex_fields": [
-
             ],
             "collection_field_type": null
           },
@@ -272,7 +256,6 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "acls": [
-
           ],
           "default_value": null
         },
@@ -290,10 +273,8 @@
             "max": null,
             "regular_expression": null,
             "fixed_list_items": [
-
             ],
             "complex_fields": [
-
             ],
             "collection_field_type": null
           },
@@ -307,7 +288,6 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "acls": [
-
           ],
           "default_value": null
         }
