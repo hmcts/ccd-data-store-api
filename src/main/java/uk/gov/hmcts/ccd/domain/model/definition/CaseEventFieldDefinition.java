@@ -1,15 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @ToString
 @ApiModel(description = "")
@@ -23,6 +22,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     private Integer showSummaryContentOption = null;
     private String label = null;
     private String hintText = null;
+    private Boolean retainHiddenValue;
     private String defaultValue;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
 
@@ -130,6 +130,16 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    @ApiModelProperty(value = "whether this field is data should be retained, dependant on show_condition being populated")
+    @JsonProperty("retain_hidden_value")
+    public Boolean getRetainHiddenValue() {
+        return retainHiddenValue;
+    }
+
+    public void setRetainHiddenValue(Boolean retainHiddenValue) {
+        this.retainHiddenValue = retainHiddenValue;
     }
 
 }
