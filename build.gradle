@@ -720,7 +720,7 @@ sourceSets {
         }
     }
 }
-//task smoke(type: Test) {
+task smoke(type: Test) {
 //    setTestClassesDirs(sourceSets.aat.output.classesDirs)
 //    setClasspath(sourceSets.aat.runtimeClasspath)
 //    include "uk/gov/hmcts/ccd/datastore/befta/**"
@@ -738,8 +738,8 @@ sourceSets {
 //            jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
 //        }
 //    }
-//
-//}
+
+}
 
 task functional(type: Test) {
     systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
