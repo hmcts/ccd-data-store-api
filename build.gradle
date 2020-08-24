@@ -728,6 +728,12 @@ task smoke(type: Test) {
         includeTags 'smoke'
     }
 
+    new File("$buildDir/test-results/test").mkdirs()
+    copy{
+        from "src/aat/resources/DummyTest.xml"
+        into "$buildDir/test-results/test"
+    }
+
     doLast {
         generateCucumberReports.enabled = true
         javaexec {
@@ -739,6 +745,14 @@ task smoke(type: Test) {
         }
     }
 
+    finalizedBy {
+        generateCucumberReports {
+            doLast{
+                new File("${rootDir}/befta-reports/smoke/cucumber").mkdirs()
+                file("${rootDir}/target/cucumber").renameTo(file("${rootDir}/befta-reports/smoke/cucumber"))
+            }
+        }
+    }
 }
 
 task functional(type: Test) {
@@ -757,6 +771,12 @@ task functional(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
 
+    new File("$buildDir/test-results/test").mkdirs()
+    copy{
+        from "src/aat/resources/DummyTest.xml"
+        into "$buildDir/test-results/test"
+    }
+
     doFirst {
         generateCucumberReports.enabled = true
         javaexec {
@@ -765,6 +785,17 @@ task functional(type: Test) {
             args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue', "uk.gov.hmcts.ccd.datastore.befta",
                     '--glue','uk.gov.hmcts.befta.player', 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+        }
+    }
+
+    finalizedBy {
+        generateCucumberReports
+        file("${rootDir}/target/cucumber").renameTo(file("${rootDir}/befta-reports/functional/cucumber"))
+        generateCucumberReports {
+            doLast{
+                new File("${rootDir}/befta-reports/functional/cucumber").mkdirs()
+                file("${rootDir}/target/cucumber").renameTo(file("${rootDir}/befta-reports/functional/cucumber"))
+            }
         }
     }
 }
