@@ -43,6 +43,8 @@ public class CaseViewField implements CommonField {
     private Boolean showSummaryChangeOption;
     @JsonProperty("show_summary_content_option")
     private Integer showSummaryContentOption;
+    @JsonProperty("retain_hidden_value")
+    private Boolean retainHiddenValue;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     private boolean metadata;
@@ -169,6 +171,13 @@ public class CaseViewField implements CommonField {
         this.displayContextParameter = displayContextParameter;
     }
 
+    public Boolean getRetainHiddenValue() {
+        return retainHiddenValue;
+    }
+
+    public void setRetainHiddenValue(Boolean retainHiddenValue) {
+        this.retainHiddenValue = retainHiddenValue;
+    }
 
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;
@@ -206,6 +215,7 @@ public class CaseViewField implements CommonField {
         caseViewField.setAccessControlLists(caseFieldDefinition.getAccessControlLists());
         caseViewField.setValue(data.get(caseFieldDefinition.getId()));
         caseViewField.setMetadata(caseFieldDefinition.isMetadata());
+        caseViewField.setRetainHiddenValue(caseFieldDefinition.getRetainHiddenValue());
 
         return caseViewField;
     }
