@@ -720,26 +720,26 @@ sourceSets {
         }
     }
 }
-task smoke(type: Test) {
-    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-    setClasspath(sourceSets.aat.runtimeClasspath)
-    include "uk/gov/hmcts/ccd/datastore/befta/**"
-    useJUnitPlatform {
-        includeTags 'smoke'
-    }
-
-    doLast {
-        generateCucumberReports.enabled = true
-        javaexec {
-            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
-            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '@Smoke', '--glue',
-                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
-            jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
-        }
-    }
-
-}
+//task smoke(type: Test) {
+//    setTestClassesDirs(sourceSets.aat.output.classesDirs)
+//    setClasspath(sourceSets.aat.runtimeClasspath)
+//    include "uk/gov/hmcts/ccd/datastore/befta/**"
+//    useJUnitPlatform {
+//        includeTags 'smoke'
+//    }
+//
+//    doLast {
+//        generateCucumberReports.enabled = true
+//        javaexec {
+//            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+//            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+//            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '@Smoke', '--glue',
+//                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
+//            jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+//        }
+//    }
+//
+//}
 
 task functional(type: Test) {
     systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
