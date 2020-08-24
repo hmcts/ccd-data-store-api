@@ -81,6 +81,7 @@ public class CaseViewFieldBuilderTest {
         EVENT_FIELD.setShowCondition("ShowCondition");
         EVENT_FIELD.setShowSummaryChangeOption(Boolean.TRUE);
         EVENT_FIELD.setShowSummaryContentOption(3);
+        EVENT_FIELD.setRetainHiddenValue(true);
 
         EVENT_FIELD_2.setCaseFieldId("PersonLastName");
         EVENT_FIELD_3.setCaseFieldId("State");
@@ -116,6 +117,7 @@ public class CaseViewFieldBuilderTest {
             assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
             assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
             assertThat(field.getShowSummaryContentOption(), is(3));
+            assertThat(field.getRetainHiddenValue(), is(Boolean.TRUE));
             assertThat(field.isMetadata(), is(false));
             assertThat(field.getFormattedValue(), is(CASE_FIELD.getFormattedValue()));
 

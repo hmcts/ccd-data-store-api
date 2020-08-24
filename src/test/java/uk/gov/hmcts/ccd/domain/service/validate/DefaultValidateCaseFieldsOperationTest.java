@@ -25,13 +25,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
@@ -44,6 +41,28 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE;
 
 class DefaultValidateCaseFieldsOperationTest {
 
@@ -269,6 +288,7 @@ class DefaultValidateCaseFieldsOperationTest {
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition.setDefaultValue(defaultValue);
+        caseEventFieldComplexDefinition.setRetainHiddenValue(Boolean.FALSE);
         caseEventFieldComplexDefinition.setReference(ORGANISATION_POLICY_ROLE);
 
         caseEventFieldComplexDefinitions.add(caseEventFieldComplexDefinition);
@@ -319,6 +339,7 @@ class DefaultValidateCaseFieldsOperationTest {
 
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition1 = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition1.setDefaultValue(defaultValue1);
+        caseEventFieldComplexDefinition1.setRetainHiddenValue(Boolean.FALSE);
         caseEventFieldComplexDefinition1.setReference(reference1);
 
         caseEventFieldComplexDefinitions1.add(caseEventFieldComplexDefinition1);
@@ -333,6 +354,7 @@ class DefaultValidateCaseFieldsOperationTest {
 
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition2 = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition2.setDefaultValue(defaultValue2);
+        caseEventFieldComplexDefinition2.setRetainHiddenValue(Boolean.FALSE);
         caseEventFieldComplexDefinition2.setReference(reference2);
         caseEventFieldComplexDefinitions2.add(caseEventFieldComplexDefinition2);
         caseEventFieldDefinition2.setCaseEventFieldComplexDefinitions(caseEventFieldComplexDefinitions2);
