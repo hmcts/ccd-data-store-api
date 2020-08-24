@@ -24,7 +24,7 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
     public CaseEventFieldComplexDefinition(String reference,
                                            Integer order,
                                            String defaultValue,
-                                           boolean retainHiddenValue) {
+                                           Boolean retainHiddenValue) {
         this.reference = reference;
         this.order = order;
         this.defaultValue = defaultValue;
@@ -34,7 +34,7 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
     public CaseEventFieldComplexDefinition(String reference,
                                  Integer order,
                                  String displayContextParameter,
-                                 String defaultValue, boolean retainHiddenValue) {
+                                 String defaultValue, Boolean retainHiddenValue) {
 
         this.reference = reference;
         this.order = order;
