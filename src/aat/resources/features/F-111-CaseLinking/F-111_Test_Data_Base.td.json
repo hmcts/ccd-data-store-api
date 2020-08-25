@@ -29,38 +29,59 @@
 			"ctid": "FT_MasterCaseType"
 		},
 		"body": {
-			"data": {
-        "TextField": "textField1",
-        "TextAreaField": "textAreaField1",
-        "AddressField": {
-          "AddressLine1": "102 Petty France",
-          "AddressLine2": "CCD",
-          "AddressLine3": "c/o HMCTS Reform",
-          "Country": "UK"
+      "data": {
+        "TextField": null,
+        "TextAreaField": null,
+        "DateField": null,
+        "PhoneField": null,
+        "NumberField": null,
+        "YesNoField": null,
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
         },
+        "MarritalStatus": null,
+        "MoneyField": "008",
+        "EmailField": null,
+        "MultiSelectField": [],
         "OrganisationPolicyField1": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
-          "OrgPolicyReference": "ref",
+          "OrgPolicyReference": null,
           "Organisation": {
-            "OrganisationID": "orgID1",
-            "OrganisationName": "orgName1"
+            "OrganisationID": null,
+            "OrganisationName": null
           }
         },
         "OrganisationPolicyField2": {
           "OrgPolicyCaseAssignedRole": "[Defendant]",
-          "OrgPolicyReference": "ref",
+          "OrgPolicyReference": null,
           "Organisation": {
-            "OrganisationID": "orgID2",
-            "OrganisationName": "orgName2"
+            "OrganisationID": null,
+            "OrganisationName": null
           }
+        },
+        "CaseLinkField": {
+          "CaseReference": null
+        },
+        "AddressField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
         }
-			},
+      },
 			"event": {
 				"id": "createCase",
 				"summary": "",
 				"description": ""
 			},
-			"event_token": "${[scenarioContext][childContexts][F-107_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
+			"event_token": "${[scenarioContext][childContexts][F-111_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
 			"ignore_warning": false,
 			"draft_id": null
 		}
