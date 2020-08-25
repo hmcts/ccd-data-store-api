@@ -120,7 +120,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
 
   @S-111.4
-  Scenario: must return an error response for a malformed Case ID
+  Scenario: must return an error response for a empty Case ID
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
       And a user [Olawale - with an active solicitor profile],
@@ -130,7 +130,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1],
-      And the request [contains the Case ID of C1 in one entry and a malformed case ID in the other],
+      And the request [contains the Case ID of C1 in one entry and a empty case ID in the other],
       And it is submitted to call the [Remove Case-Assigned Users and Roles] operation of [CCD Data Store Api],
 
      Then a negative response is received,
@@ -268,7 +268,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
 
   @S-111.16
-  Scenario: must reject request when an invalid Organisation ID is provided
+  Scenario: must reject request when an empty Organisation ID is provided
     Given a user [Richard - who can create a case],
       And a user [Dil - who is to add and remove some case role assignment for a case],
       And a user [Olawale - with an active solicitor profile],
@@ -279,7 +279,7 @@ Feature: F-111: Remove Case-Assigned Users and Roles
 
      When a request is prepared with appropriate values,
       And the request [is made from an authorised application, by Dil for 2 assignments each containing the Case ID of C1, User ID of Olawale and Hemanth and proper Case Role CR-1],
-      And the request [contains a valid Organisation ID in one entry and an improper Organisation ID in the other],
+      And the request [contains a valid Organisation ID in one entry and an empty Organisation ID in the other],
       And it is submitted to call the [Remove Case-Assigned Users and Roles] operation of [CCD Data Store Api],
 
      Then a negative response is received,

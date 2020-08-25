@@ -10,7 +10,7 @@
     "Olawale - with an active solicitor profile",
     "Hemanth - with an active solicitor profile",
     "is made from an authorised application, by Dil for 2 assignments each containing the Case ID of C1, User ID of Olawale and Hemanth and proper Case Role CR-1",
-    "contains a valid Organisation ID in one entry and an improper Organisation ID in the other"
+    "contains a valid Organisation ID in one entry and an empty Organisation ID in the other"
   ],
 
   "users": {

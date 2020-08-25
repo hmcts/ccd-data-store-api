@@ -9,7 +9,7 @@
     "Dil - who is to add and remove some case role assignment for a case",
     "Olawale - with an active solicitor profile",
     "is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1",
-    "contains the Case ID of C1 in one entry and a malformed case ID in the other"
+    "contains the Case ID of C1 in one entry and a empty case ID in the other"
   ],
 
   "users": {
