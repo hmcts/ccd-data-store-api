@@ -54,6 +54,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -98,6 +99,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -142,6 +144,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -186,6 +189,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -230,6 +234,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -274,6 +279,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -318,6 +324,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -362,6 +369,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -406,6 +414,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -466,6 +475,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -533,12 +543,16 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
-          "formatted_value": [ "OPTION2", "OPTION4" ],
+          "formatted_value": [
+            "OPTION2",
+            "OPTION4"
+          ],
           "display_context": "OPTIONAL",
           "display_context_parameter": null,
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -595,18 +609,22 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
-          "formatted_value": [ {
-            "id" : "CollectionField1",
-            "value" : "Alias 1"
-          }, {
-            "id" : "CollectionField2",
-            "value" : "Alias 2"
-          } ],
+          "formatted_value": [
+            {
+              "id": "CollectionField1",
+              "value": "Alias 1"
+            },
+            {
+              "id": "CollectionField2",
+              "value": "Alias 2"
+            }
+          ],
           "display_context": "OPTIONAL",
           "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -686,6 +704,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -748,6 +767,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -808,6 +828,7 @@
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": null,
+                      "retain_hidden_value": null,
                       "formatted_value": null,
                       "default_value": null
                     },
@@ -861,6 +882,7 @@
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
+                      "retain_hidden_value": null,
                       "formatted_value": null,
                       "default_value": null
                     }
@@ -892,6 +914,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               }
@@ -910,6 +933,7 @@
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -992,6 +1016,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -1036,6 +1061,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -1080,6 +1106,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -1124,6 +1151,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -1168,6 +1196,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -1212,6 +1241,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -1256,6 +1286,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               }
@@ -1279,6 +1310,7 @@
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -1323,6 +1355,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
