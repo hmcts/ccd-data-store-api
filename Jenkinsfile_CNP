@@ -133,18 +133,18 @@ withPipeline(type, product, component) {
     }
 
     after('smoketest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/befta-reports/smoke/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
 
     after('smoketest:aat') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/befta-reports/smoke/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
 
     after('functionalTest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/befta-reports/functional/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
 
     after('functionalTest:aat') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/befta-reports/functional/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
 }
