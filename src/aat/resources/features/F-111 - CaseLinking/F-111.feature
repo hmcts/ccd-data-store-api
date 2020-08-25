@@ -39,7 +39,7 @@ Feature: F-111: Validate case reference in CaseLink field
     @S-111.4 @Ignore
     Scenario: must successfully save CaseLink when a user adds the case reference of a case he/she does not have the required permissions to access
       Given a user with [an active profile in CCD]
-      And a case that has just been created as in [S-111.3_Create_Case_Data]
+      And a case that has just been created as in [S-111.4_Create_Case_Data]
       When a request is prepared with appropriate values
       And the request [contains a case reference for an existing case for which they have no access]
       And it is submitted to call the [Submit Case Creation as Caseworker] operation of [CCD data store]
