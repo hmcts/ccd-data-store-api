@@ -12,7 +12,7 @@
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "1596104840593121"
+          "CaseReference": "9596104840593121"
         }
       }
     }
@@ -36,7 +36,7 @@
       "details" : {
         "field_errors" : [ {
           "id" : "CaseLinkField.CaseReference",
-          "message" : "1596104840593121 does not correspond to an existing CCD case."
+          "message" : "9596104840593121 does not correspond to an existing CCD case."
         } ]
       },
       "callbackErrors" : null,

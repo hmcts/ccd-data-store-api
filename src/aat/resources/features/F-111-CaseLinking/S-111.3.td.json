@@ -5,14 +5,14 @@
 
 	"specs": [
 		"an active profile in CCD",
-		"contains a case reference for an existing case"
+		"contains a case reference for an existing case to which the user has access"
 	],
 
   "request": {
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "${[scenarioContext][siblingContexts][S-111.3_Create_Case_Data][testData][actualResponse][body][id]}"
+          "CaseReference": "${[scenarioContext][childContexts][S-111.3_Create_Case_Data][testData][actualResponse][body][id]}"
         }
       }
     }
