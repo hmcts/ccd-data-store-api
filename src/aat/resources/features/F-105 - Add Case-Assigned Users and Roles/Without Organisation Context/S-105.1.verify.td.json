@@ -3,7 +3,8 @@
   "_extends_": "F-105_Get_Case_Roles_for_Case_C1_Base",
 
   "specs": [
-    "to verify Olawale's reception of the role CR-1 over the case C1"
+    "to verify Olawale's reception of the role CR-1 over the case C1",
+    "to verify Olawale's reception of the role CR-1 over the case C1 by an admin"
   ],
 
   "users": {
