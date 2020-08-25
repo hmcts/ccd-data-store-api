@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import lombok.NonNull;
@@ -21,7 +22,7 @@ public class ElasticsearchRequest {
     public static final String QUERY = "query";
     public static final String CASE_DATA_PREFIX = "data.";
     public static final String COLLECTION_VALUE_SUFFIX = ".value";
-    public static final String SOURCE_WILDCARD = "*";
+    public static final String WILDCARD = "*";
 
     @NonNull
     private JsonNode searchRequest;
@@ -38,10 +39,14 @@ public class ElasticsearchRequest {
         ((ObjectNode) searchRequest).set(SORT, sortNode);
     }
 
-    public boolean hasSource() {
-        // If a source is empty or only has a wildcard element, then equivalent to no provided source
+    public boolean hasSourceFields() {
+        // If a source is empty, boolean or only has a wildcard element, then equivalent to no provided source
+        if (this.getSource() instanceof BooleanNode) {
+            return false;
+        }
+
         return searchRequest.has(SOURCE) && !getSource().isEmpty()
-               && !(getSource().size() == 1 && getSource().get(0).asText().equals(SOURCE_WILDCARD));
+            && !(getSource().size() == 1 && getSource().get(0).asText().equals(WILDCARD));
     }
 
     public JsonNode getSource() {
@@ -49,7 +54,7 @@ public class ElasticsearchRequest {
     }
 
     public List<String> getRequestedFields() {
-        if (hasSource() && getSource().isArray()) {
+        if (hasSourceFields() && getSource().isArray()) {
             return StreamSupport.stream(getSource().spliterator(), false)
                 .map(JsonNode::asText)
                 .map(this::getFieldId)

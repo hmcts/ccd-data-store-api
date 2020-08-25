@@ -20,7 +20,7 @@
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "timestamp" : "[[ANYTHING_PRESENT]]",
-      "message" : "Resource not found when getting case type version for 'abc'.",
+      "message" : "Error when getting case type version. Unknown case type 'abc'.",
       "path" : "/case-types/abc/validate",
       "details" : null,
       "callbackErrors" : null,
