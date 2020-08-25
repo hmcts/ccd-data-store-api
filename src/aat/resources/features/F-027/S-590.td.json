@@ -239,7 +239,7 @@
           "id": "[CASE_REFERENCE]",
           "label": "Case Reference",
           "hidden": false,
-          "value": 1598348113213713,
+          "value": "[[ANY_NUMBER_NOT_NULLABLE]]",
           "metadata": true,
           "hint_text": null,
           "field_type": {
