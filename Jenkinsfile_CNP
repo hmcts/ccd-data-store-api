@@ -132,11 +132,11 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
 
-    after('smokeTest:preview') {
+    after('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/befta-reports/smoke/**/*'
     }
 
-    after('smokeTest:aat') {
+    after('smoketest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/befta-reports/smoke/**/*'
     }
 
