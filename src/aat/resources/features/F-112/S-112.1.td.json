@@ -1,7 +1,6 @@
 {
   "_guid_": "S-112.1",
   "_extends_": "F-112-TestData_Base",
-  "title" : "befta sucks should be called null pointer exception framework",
   "specs": [
     "an active profile in CCD",
     "with a non searchable 'Homeless' field",
