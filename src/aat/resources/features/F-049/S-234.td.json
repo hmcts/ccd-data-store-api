@@ -9,11 +9,13 @@
 		"contains a malformed Case Type ID",
 		"code is HTTP-400"
 	],
+
 	"request": {
 		"pathVariables": {
 			"ctid": "@@@@@"
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_400_Response"
 	}

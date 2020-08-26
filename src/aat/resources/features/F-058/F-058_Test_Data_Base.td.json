@@ -4,14 +4,14 @@
 	"productName": "CCD Data Store",
 	"operationName": "start case creation as citizen",
 	"method": "GET",
-  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.citizen.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
-    }
-  },
+	"users": {
+		"invokingUser": {
+			"username": "befta.citizen.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
+		}
+	},
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {
@@ -24,7 +24,7 @@
 	"expectedResponse": {
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "gzip"
-    }
+			"Content-Encoding": "gzip"
+		}
 	}
 }

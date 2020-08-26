@@ -35,7 +35,7 @@
 			"Content-Encoding": "gzip",
 			"vary": "accept-encoding",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
-    },
+		},
 		"body": {
 			"id": "[[ANYTHING_PRESENT]]",
 			"state": "TODO",

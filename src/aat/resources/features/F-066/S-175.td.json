@@ -1,5 +1,5 @@
 {
-  "title": "must return negative response when request does not provide valid authentication credentials",
+	"title": "must return negative response when request does not provide valid authentication credentials",
 	"_guid_": "S-175",
 	"_extends_": "F-066_Test_Data_Base",
 
@@ -8,17 +8,17 @@
 		"does not provide valid authentication credentials",
 		"includes a HTTP 403 Forbidden"
 	],
-  "request": {
-    "headers": {
-      "Authorization": "eyJhbGciOiJIUzI1NiJ9"
-    }
-  },
+	"request": {
+		"headers": {
+			"Authorization": "eyJhbGciOiJIUzI1NiJ9"
+		}
+	},
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Length" : "[[ANYTHING_PRESENT]]"
-    },
+		},
 		"body": {
 			"message": "Access Denied"
 		}

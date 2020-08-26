@@ -14,6 +14,7 @@
 		"uses the invalid authorization",
 		"has the 403 return code"
 	],
+
 	"request": {
 		"headers": {
 			"Authorization": "TESTAUTH"
@@ -22,6 +23,7 @@
 			"uid": "some id"
 		}
 	},
+
 	"expectedResponse": {
 		"headers": {
 			"Content-Encoding": "gzip",

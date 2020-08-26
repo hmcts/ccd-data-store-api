@@ -14,6 +14,7 @@
 		"uses the invalid authorization",
 		"has the 403 return code"
 	],
+
 	"request": {
 		"headers": {
 			"Authorization": "TEST"
@@ -22,6 +23,7 @@
 			"uid": "[[DEFAULT_AUTO_VALUE]]"
 		}
 	},
+
 	"expectedResponse": {
 		"headers": {
 			"Content-Encoding": "gzip",

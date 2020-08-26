@@ -1,5 +1,5 @@
 {
-  "title": "must return negative response when request provides authentic credentials without authorised access",
+	"title": "must return negative response when request provides authentic credentials without authorised access",
 	"_guid_": "S-176",
 	"_extends_": "F-066_Test_Data_Base",
 
@@ -8,17 +8,17 @@
 		"does not provide an authorised access to the operation",
 		"includes a HTTP 403 Forbidden"
 	],
-  "request": {
-    "headers": {
-      "ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
-    }
-  },
+	"request": {
+		"headers": {
+			"ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
+		}
+	},
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Length" : "[[ANYTHING_PRESENT]]"
-    },
+		},
 		"body": {
 			"message": "Access Denied"
 		}

@@ -8,6 +8,7 @@
 		"an active profile in CCD",
 		"has the 200 return code"
 	],
+
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {

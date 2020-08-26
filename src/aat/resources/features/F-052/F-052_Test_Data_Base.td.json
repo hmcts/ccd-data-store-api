@@ -6,26 +6,27 @@
 	"method": "GET",
 	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.citizen.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
-    }
-  },
+	"users": {
+		"invokingUser": {
+			"username": "befta.citizen.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
+		}
+	},
 
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_JURISDICTION_3",
-      "ctid": "BEFTA_CASETYPE_3_2"
-    }
+			"jid": "BEFTA_JURISDICTION_3",
+			"ctid": "BEFTA_CASETYPE_3_2"
+		}
 	},
-  "expectedResponse": {
-    "headers": {
-      "Content-Type": "[[ANYTHING_PRESENT]]",
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
-    }
-  }
+
+	"expectedResponse": {
+		"headers": {
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding" : "gzip"
+		}
+	}
 }

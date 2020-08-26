@@ -8,19 +8,19 @@
 		"_extends_": "Common_User_For_Request"
 	},
 	"request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "experimental": true
-    },
-    "pathVariables": {
-      "ctid": "AAT"
-    }
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+			"experimental": true
+		},
+		"pathVariables": {
+			"ctid": "AAT"
+		}
 	},
-  "expectedResponse": {
-    "headers": {
-      "Content-Type": "[[ANYTHING_PRESENT]]",
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Strict-Transport-Security": "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"expectedResponse": {
+		"headers": {
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Length" : "[[ANYTHING_PRESENT]]",
+			"Strict-Transport-Security": "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

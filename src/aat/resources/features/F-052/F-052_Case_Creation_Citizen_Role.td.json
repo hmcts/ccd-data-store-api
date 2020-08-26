@@ -1,11 +1,11 @@
 {
 	"_guid_": "F-052_Case_Creation_Citizen_Role",
-  "_extends_": "Standard_Full_Case_Creation_Data",
+	"_extends_": "Standard_Full_Case_Creation_Data",
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.citizen.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
-    }
-  }
+	"users": {
+		"invokingUser": {
+			"username": "befta.citizen.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
+		}
+	}
 }

@@ -9,11 +9,13 @@
 		"does not provide valid authentication credentials",
 		"contains an HTTP 401 Forbidden"
 	],
-  "request": {
-    "headers": {
-      "Authorization": "eyJhbGciOiJIUzI1NiJ9"
-    }
-  },
+
+	"request": {
+		"headers": {
+			"Authorization": "eyJhbGciOiJIUzI1NiJ9"
+		}
+	},
+
 	"expectedResponse": {
 		"_extends_": "Common_401_Response"
 	}

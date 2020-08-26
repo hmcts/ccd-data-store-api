@@ -13,6 +13,7 @@
 		"contains an invalid security classification",
 		"contains an error message : unknown security classification"
 	],
+
 	"request": {
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
@@ -23,8 +24,9 @@
 			"security_classification": "someInvalidSecurityClassification"
 		}
 	},
+
 	"expectedResponse": {
-    "_extends_": "Common_400_Response",
+		"_extends_": "Common_400_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Length": "[[ANYTHING_PRESENT]]"

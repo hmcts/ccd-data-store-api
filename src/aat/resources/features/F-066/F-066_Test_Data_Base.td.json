@@ -10,18 +10,18 @@
 	},
 
 	"request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "experimental": true
-    },
-    "pathVariables": {
-      "cid": "15737516488407031",
-      "etid": "START_PROGRESS"
-    }
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+			"experimental": true
+		},
+		"pathVariables": {
+			"cid": "15737516488407031",
+			"etid": "START_PROGRESS"
+		}
 	},
-  "expectedResponse": {
-    "headers": {
-      "Content-Type": "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"expectedResponse": {
+		"headers": {
+			"Content-Type": "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

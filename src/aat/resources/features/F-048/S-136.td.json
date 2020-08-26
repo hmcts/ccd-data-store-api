@@ -13,6 +13,7 @@
 		"is prepared with valid Jurisdiction, Case ID and User ID",
 		"returns the pagination metadata"
 	],
+
 	"request": {
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
@@ -20,6 +21,7 @@
 			"ctid": "AAT"
 		}
 	},
+
 	"expectedResponse": {
 		"headers": {
 			"Content-Encoding": "gzip",
