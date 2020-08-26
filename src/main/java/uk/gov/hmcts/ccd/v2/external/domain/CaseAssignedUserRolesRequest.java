@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class AddCaseAssignedUserRolesRequest {
+public class CaseAssignedUserRolesRequest {
 
     @JsonProperty("case_users")
     private List<CaseAssignedUserRoleWithOrganisation> caseAssignedUserRoles;

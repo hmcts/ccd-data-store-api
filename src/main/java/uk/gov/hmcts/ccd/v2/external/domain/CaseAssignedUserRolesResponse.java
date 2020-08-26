@@ -10,9 +10,9 @@ import uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController;
 @Data
 @NoArgsConstructor
 @ApiModel("Add Case-Assigned User Roles Response")
-public class AddCaseAssignedUserRolesResponse {
+public class CaseAssignedUserRolesResponse {
 
-    public AddCaseAssignedUserRolesResponse(String status) {
+    public CaseAssignedUserRolesResponse(String status) {
         this.status = status;
     }
 
