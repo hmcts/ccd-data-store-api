@@ -1,6 +1,6 @@
 #==========================================================
 @F-065
-  Feature: F-065: Retrieve a case by ID for dynamic display
+  Feature: F-065: Retrieve a Case by ID for Dynamic Display
 #==========================================================
 
 Background: Load test data for the scenario

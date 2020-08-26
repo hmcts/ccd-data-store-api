@@ -1,6 +1,6 @@
 #================================================================
 @F-063
-Feature: F-063: Retrieve search input details for dynamic display
+Feature: F-063: Retrieve Search Input Details for Dynamic Display
 #================================================================
 
 Background:

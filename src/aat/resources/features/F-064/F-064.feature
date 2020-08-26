@@ -1,7 +1,7 @@
-#====================================================================
+#=====================================================================
 @F-064
-Feature: F-064: Retrieve workbasket input details for dynamic display
-#====================================================================
+Feature: F-064: Retrieve Work Basket Input Details for Dynamic Display
+#=====================================================================
 
 Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source

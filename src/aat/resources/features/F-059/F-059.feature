@@ -1,6 +1,6 @@
 #==================================================
 @F-059
-Feature: F-059: Validate a set of fields as Citizen
+Feature: F-059: Validate a Set of Fields as Citizen
 #==================================================
 
 Background: Load test data for the scenario
@@ -103,5 +103,6 @@ Scenario: must return an error for date value with invalid format
      Then a negative response is received,
       And the response [has the 422 return code],
       And the response has all other details as expected.
+
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

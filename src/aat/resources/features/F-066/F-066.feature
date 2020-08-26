@@ -1,6 +1,6 @@
 #=======================================================================
 @F-066
-Feature: F-066: Retrieve a start event trigger by ID for dynamic display
+Feature: F-066: Retrieve a Start Event Trigger by ID for Dynamic Display
 #=======================================================================
 
 Background: Load test data for the scenario

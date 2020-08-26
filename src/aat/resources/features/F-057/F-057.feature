@@ -1,6 +1,6 @@
 #=============================================================================
 @F-057
-Feature: F-057: Get the pagination metadata for a case data search for Citizen
+Feature: F-057: Get the Pagination Metadata for a Case Data Search for Citizen
 #=============================================================================
 
 Background: Load test data for the scenario

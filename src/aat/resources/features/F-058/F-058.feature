@@ -1,6 +1,6 @@
 #=============================================
 @F-058
-Feature: F-058: start case creation as citizen
+Feature: F-058: Start Case Creation as Citizen
 #=============================================
 
 Background: Load test data for the scenario

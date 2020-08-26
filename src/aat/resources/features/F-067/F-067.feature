@@ -1,7 +1,7 @@
-#=================================================================================
+#==================================================================================
 @F-067
-Feature: F-067: Retrieve a CaseView Event by case and event id for dynamic display
-#=================================================================================
+Feature: F-067: Retrieve a Case View Event by Case and Event ID for Dynamic Display
+#==================================================================================
 
 Background:
     Given an appropriate test context as detailed in the test data source

@@ -1,6 +1,6 @@
 #=================================================
 @F-056
-Feature: F-056: Submit event creation as a Citizen
+Feature: F-056: Submit Event Creation as a Citizen
 #=================================================
 
 Background: Load test data for the scenario
