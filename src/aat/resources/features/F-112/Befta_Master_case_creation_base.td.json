@@ -8,7 +8,10 @@
 
   "specs": [
     "by a privileged user with full ACL to create a case of this case type",
-    "to create a full case"
+    "to create a full case",
+    "with a searchable collection of Child complex but a non searchable 'ChildFullName' field",
+    "with a searchable collection of Child complex containing a searchable 'ChildFullName' field"
+
   ],
 
   "request": {

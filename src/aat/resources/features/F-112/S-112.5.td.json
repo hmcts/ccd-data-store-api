@@ -1,18 +1,19 @@
 {
-  "_guid_": "S-112.3",
+  "_guid_": "S-112.5",
   "_extends_": "F-112-TestData_Base",
+  "title" : "befta sucks should be called null pointer exception framework",
   "specs": [
     "an active profile in CCD",
-    "is searching for the previously created case by the 'FatherFullName' field",
-    "with a searchable Family complex and a searchable 'FatherFullName' field",
-    "with a searchable Family complex and a searchable 'FatherFullName' field",
-    "contains the previously created case"
+    "with a searchable collection of Child complex containing a searchable 'ChildFullName' field",
+    "is searching for the previously created case by the 'ChildFullName' field",
+    "contains the previously created case",
+    "with a searchable collection of Child complex containing a searchable 'ChildFullName' field"
   ],
   "request": {
     "body": {
-      "query": {
-        "match": {
-          "data.FamilyDetails.FatherFullName": "Ted"
+      "query" : {
+        "match" : {
+          "data.Children.value.ChildGender" : "FEMALE"
         }
       }
     }
@@ -43,7 +44,7 @@
               {
                 "value": {
                   "ChildFullName": "child1",
-                  "ChildGender": "MALE",
+                  "ChildGender": "FEMALE",
                   "ChildDOB": null,
                   "ChildAddress": {
                     "AddressLine1": null,
@@ -76,7 +77,8 @@
               "MotherFullName": "Mother Teresa",
               "Children": [],
               "MotherAge": "21",
-              "FatherFullName": "Ted",
+              "FatherFullName": "Father Brown",
+              "FatherFullName": "Father Brown",
               "FatherAge": "82"
             }
           },

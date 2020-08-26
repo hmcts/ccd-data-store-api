@@ -30,6 +30,19 @@ Feature: Allow ignoring fields in ES by declaring them non searchable
     And the response [contains no cases]
     And the response has all the details as expected
 
+  @S-112.4
+  Scenario: No results returned when searching by non searchable field within a collection
+    Given a user with [an active profile in CCD]
+    And a case that has just been created as in [F-112-Befta_Master_ComplexCollectionComplex_Case_Creation]
+    And a case [with a searchable collection of Child complex but a non searchable 'ChildFullName' field] created as in [F-112-Befta_Master_ComplexCollectionComplex_Case_Creation]
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    When a request is prepared with appropriate values
+    And the request [is searching for the previously created case by the 'ChildFullName' field]
+    And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
+    Then a positive response is received
+    And the response [contains no cases]
+    And the response has all the details as expected
+
   @S-112.3
   Scenario: results returned when searching by searchable complex child field
     Given a user with [an active profile in CCD]
@@ -42,3 +55,17 @@ Feature: Allow ignoring fields in ES by declaring them non searchable
     Then a positive response is received
     And the response [contains the previously created case]
     And the response has all the details as expected
+
+  @S-112.5
+  Scenario: results returned when searching by searchable field within a collection
+    Given a user with [an active profile in CCD]
+    And a case that has just been created as in [F-112.5-Befta_Master_ComplexCollectionComplex_Case_Creation]
+    And a case [with a searchable collection of Child complex containing a searchable 'ChildFullName' field] created as in [F-112-Befta_Master_ComplexCollectionComplex_Case_Creation]
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    When a request is prepared with appropriate values
+    And the request [is searching for the previously created case by the 'ChildFullName' field]
+    And it is submitted to call the [/searchCases] operation of [CCD Data Store api]
+    Then a positive response is received
+    And the response [contains the previously created case]
+    And the response has all the details as expected
+

@@ -1,12 +1,14 @@
 {
-  "_guid_": "F-112-Befta_Master_ComplexCollectionComplex_Case_Creation",
+  "_guid_": "F-112.5-Befta_Master_ComplexCollectionComplex_Case_Creation",
   "_extends_": "Befta_Master_Case_Creation_Base_Data",
   "specs": [
     "with a non searchable 'Homeless' field",
     "with a searchable Family complex but a non searchable 'MotherFullName' field",
     "with a searchable Family complex and a searchable 'FatherFullName' field",
     "with a searchable collection of Child complex but a non searchable 'ChildFullName' field",
-    "with a searchable collection of Child complex containing a searchable 'ChildFullName' field"
+    "with a searchable collection of Child complex containing a searchable 'ChildFullName' field",
+    "is searching for the previously created case by the 'ChildFullName' field",
+    "contains the previously created case",
   ],
   "users": {
     "invokingUser": {
@@ -25,7 +27,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][F-112-Befta_Master_ComplexCollectionComplex_Case_Creation_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-112.5-Befta_Master_ComplexCollectionComplex_Case_Creation_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
         "FamilyDetails": {
           "MotherFullName": "Mother Teresa",
@@ -49,7 +51,7 @@
             "id": null,
             "value": {
               "ChildFullName": "child1",
-              "ChildGender": "MALE",
+              "ChildGender": "FEMALE",
               "ChildDOB": null,
               "ChildAddress": {
                 "AddressLine1": null,
@@ -93,7 +95,7 @@
         "Children" : [ {
           "value" : {
             "ChildFullName" : "child1",
-            "ChildGender" : "MALE",
+            "ChildGender" : "FEMALE",
             "ChildDOB" : null,
             "ChildAddress" : {
               "AddressLine1" : null,
