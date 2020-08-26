@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
@@ -14,6 +15,7 @@ public class CaseSearchResult {
 
     private Long total;
     private List<CaseDetails> cases;
+    @JsonIgnore
     @JsonProperty("case_types_results")
     private List<CaseTypeResults> caseTypesResults;
 
