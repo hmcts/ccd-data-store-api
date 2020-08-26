@@ -12,7 +12,7 @@
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "${[scenarioContext][childContexts][S-111.3_Create_Case_Data][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][childContexts][S-111.3_Create_Case_Data][testData][actualResponse][body][id]}"
         }
       }
     }
