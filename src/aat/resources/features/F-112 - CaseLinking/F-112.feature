@@ -1,5 +1,5 @@
 @F-112
-Feature: F-111: Validate case reference in CaseLink field
+Feature: F-112: Validate case reference in CaseLink field
 
     Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
