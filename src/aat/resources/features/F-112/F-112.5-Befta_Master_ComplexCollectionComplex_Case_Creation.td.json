@@ -8,7 +8,7 @@
     "with a searchable collection of Child complex but a non searchable 'ChildFullName' field",
     "with a searchable collection of Child complex containing a searchable 'ChildFullName' field",
     "is searching for the previously created case by the 'ChildFullName' field",
-    "contains the previously created case",
+    "contains the previously created case"
   ],
   "users": {
     "invokingUser": {
