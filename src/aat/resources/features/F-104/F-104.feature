@@ -1,11 +1,11 @@
-@F-104 @elasticsearch @Ignore # Fix for LAST_STATE_MODIFIED_DATE coming in 19.1
+@F-104 @elasticsearch
 Feature: F-104: External Search API
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
     #possitive request scenario of each type
-  @S-625 @estest
+  @S-625
   Scenario: Usecase request using SearchResultsFields useCase returns correct fields
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
