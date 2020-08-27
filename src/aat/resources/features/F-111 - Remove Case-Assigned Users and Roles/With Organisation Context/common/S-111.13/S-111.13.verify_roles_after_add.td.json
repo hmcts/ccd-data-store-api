@@ -1,0 +1,40 @@
+{
+  "_guid_": "S-111.13_Get_Case_Roles_for_Case_C1_After_Add",
+  "_extends_": "F-111_Get_Case_Roles_for_Case_C1_Base",
+
+  "specs": [
+    "to verify Olawale's and Hemanth's reception of the role CR-1 over the case C1"
+  ],
+
+  "users": {
+    "_extends_": "F-111_Users"
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "case_ids": "${}${[scenarioContext][siblingContexts][S-111.13_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation][testData][request][body][case_users][0][case_id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_users": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "case_id,user_id,case_role"
+        },
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        },
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userHemanth][id]}",
+          "case_role": "[CR-1]"
+        }
+      ]
+    }
+  }
+}
