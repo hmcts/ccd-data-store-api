@@ -1,14 +1,32 @@
 {
-	"_guid_": "S-111.3_Create_Case_Data",
-  "_extends_": "F-111_Test_Data_Base",
+	"title": "must successfully save CaseLink when a valid reference is entered",
+	"_guid_": "S-112.3",
+	"_extends_": "F-112_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a case reference for an existing case to which the user has access"
+	],
+
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][S-111.3_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}"
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][childContexts][S-112.3_Create_Case_Data][testData][actualResponse][body][id]}"
+        }
+      }
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Vary": "accept-encoding",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
+    },
     "body" : {
       "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "BEFTA_MASTER",
@@ -62,7 +80,7 @@
           }
         },
         "CaseLinkField" : {
-          "CaseReference" : null
+          "CaseReference" : "[[ANY_STRING_NOT_NULLABLE]]"
         },
         "CollectionField" : [ ]
       },

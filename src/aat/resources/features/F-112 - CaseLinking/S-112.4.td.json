@@ -1,18 +1,18 @@
 {
-	"title": "must successfully save CaseLink when a valid reference is entered",
-	"_guid_": "S-111.3",
-	"_extends_": "F-111_Test_Data_Base",
+	"title": "must successfully save CaseLink when a user adds the case reference of a case he/she does not have the required permissions to access",
+	"_guid_": "S-112.4",
+	"_extends_": "F-112_Test_Data_Base",
 
 	"specs": [
 		"an active profile in CCD",
-		"contains a case reference for an existing case to which the user has access"
+		"contains a case reference for an existing case to which the user has no access"
 	],
 
   "request": {
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][childContexts][S-111.3_Create_Case_Data][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
         }
       }
     }

@@ -1,32 +1,14 @@
 {
-	"title": "must successfully save CaseLink when a user adds the case reference of a case he/she does not have the required permissions to access",
-	"_guid_": "S-111.4",
-	"_extends_": "F-111_Test_Data_Base",
-
-	"specs": [
-		"an active profile in CCD",
-		"contains a case reference for an existing case to which the user has no access"
-	],
-
+	"_guid_": "S-112.3_Create_Case_Data",
+  "_extends_": "F-112_Test_Data_Base",
   "request": {
     "body": {
-      "data": {
-        "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
-        }
-      }
+      "event_token": "${[scenarioContext][siblingContexts][S-112.3_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "gzip",
-      "Vary": "accept-encoding",
-      "Keep-Alive": "[[ANYTHING_PRESENT]]",
-      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
-    },
     "body" : {
       "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "BEFTA_MASTER",
@@ -80,7 +62,7 @@
           }
         },
         "CaseLinkField" : {
-          "CaseReference" : "[[ANY_STRING_NOT_NULLABLE]]"
+          "CaseReference" : null
         },
         "CollectionField" : [ ]
       },
