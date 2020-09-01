@@ -1,0 +1,14 @@
+{
+  "_guid_": "S-111.2_Get_Case_Roles_for_Case_C1_And_C2_After_Remove",
+  "_extends_": "S-111.2_Get_Case_Roles_for_Case_C1_And_C2",
+
+  "specs": [
+    "to verify Olawale's eventual loss of all the assignments made before"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "case_users": []
+    }
+  }
+}

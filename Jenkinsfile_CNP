@@ -15,6 +15,11 @@ def type = "java"
 def product = "ccd"
 def component = "data-store-api"
 
+// Variables to switch pipeline logic and wiring per type of build
+def definitionStoreDevelopPr = "PR-575" // This doesn't change frequently, but when it does, only change this value.
+def dataStoreApiDevelopPr    = "PR-601" // This doesn't change frequently, but when it does, only change this value.
+def prsToUseAaat             = "PR-1063" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+
 def secrets = [
     'ccd-${env}': [
         secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
@@ -50,7 +55,8 @@ def secrets = [
         secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
         secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_PWD'),
         secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
-        secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD')
+        secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD'),
+        secret('ccd-befta-master-solicitor4-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_4_PWD')
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
@@ -71,24 +77,28 @@ def vaultOverrides = [
     'preview' : 'aat',
     'spreview': 'saat'
 ]
-// Vars needed for functional and smoke tests run against AKS
+// vars needed for functional tests
+// Assume a feature build branched off 'develop', with dependencies develop-to-develop.
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+
+// Other env variables needed for BEFTA.
 env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
 env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
-env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
+env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN" // Temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.ELASTIC_SEARCH_FTA_ENABLED = "false"
 
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
     }
-    if (env.BRANCH_NAME == 'PR-601') {
+    if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
         enableSlackNotifications('#ccd-develop-builds')
+        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
     }
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')
@@ -96,10 +106,20 @@ withPipeline(type, product, component) {
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
     }
-    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'PR-601') {
+
+    // Check if the build should be wired to an environment higher than 'preview'.
+    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAaat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
+        environmentOfDependencies = env.BRANCH_NAME
+        // use aat environment for dependencies of master and CI/CD builds.
+        if (env.BRANCH_NAME.startsWith("PR") || env.BRANCH_NAME == 'master') {
+            environmentOfDependencies = "aat"
+        }
+        env.DEFINITION_STORE_HOST      = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
     }
+
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
+    echo "FTA will use Definition Store: ${env.DEFINITION_STORE_HOST}"
 
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()
@@ -113,15 +133,19 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
 
+    after('smoketest:preview') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+    }
+
+    after('smoketest:aat') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+    }
+
     after('functionalTest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
 
     after('functionalTest:aat') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
-    }
-
-    after('smokeTest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
 }

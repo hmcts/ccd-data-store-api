@@ -1,0 +1,24 @@
+{
+  "_guid_": "F-111_Remove_Case_Assigned_User_Roles_Base",
+
+  "productName": "CCD Data Store Api",
+  "operationName": "Remove Case-Assigned Users and Roles",
+
+  "method": "DELETE",
+  "uri": "/case-users",
+
+  "s2sClientId": "aac_manage_case_assignment",
+  
+  "request": {
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse": {
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-111.13_Repeat_Call_to_Remove_For_Hemanth",
+  "_extends_": "F-111_Remove_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "to repeat the same request as above this time with a different user, Hemanth"
+  ],
+
+  "users": {
+    "_extends_": "F-111_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userHemanth][id]}",
+          "case_role": "[CR-1]",
+          "organisation_id": "${[scenarioContext][siblingContexts][S-111.13_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation][childContexts][F-111_Prerequisite_Counter_Check_Call][childContexts][F-111_Get_Organisation_Identifier_Dil][testData][actualResponse][body][organisationIdentifier]}"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-111_Remove_Case_Assigned_User_Roles_200_response"
+  }
+}
