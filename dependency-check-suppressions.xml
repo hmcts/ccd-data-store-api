@@ -384,6 +384,7 @@
     <cve>CVE-2020-8022</cve>
     <cve>CVE-2020-7019</cve>
     <cve>CVE-2020-24616</cve>
+    <cve>CVE-2017-18640</cve>
 </suppress>
 
 	<suppress>
