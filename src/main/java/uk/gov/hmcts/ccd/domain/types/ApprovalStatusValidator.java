@@ -18,8 +18,8 @@ public class ApprovalStatusValidator extends NumberValidator {
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
-        if (!APPROVAL_STATUS.equalsIgnoreCase(caseFieldDefinition.getId()) ||
-            isNullOrEmpty(dataValue)) {
+        if (!APPROVAL_STATUS.equalsIgnoreCase(caseFieldDefinition.getId())
+            || isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
 
