@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_CLASSIFICATION_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_TYPE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
@@ -204,7 +205,35 @@ class ElasticsearchRequestTest {
 
             assertAll(
                 () -> assertThat(sourceFields.size(), is(10)),
+                () -> assertThat(sourceFields, hasItem(DATA_COL)),
+                () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CREATED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CASE_TYPE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(JURISDICTION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(STATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(DATA_CLASSIFICATION_COL))
+            );
+        }
+
+        @Test
+        void shouldSetSourceFieldsWhenSupplementaryDataIsProvidedInRequest() throws Exception {
+            String query = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}";
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(mapper.readTree(query));
+
+            String result = elasticsearchRequest.toJson();
+
+            JsonNode jsonResult = mapper.readTree(result);
+            JsonNode sourceNode = jsonResult.get("_source");
+            List<String> sourceFields = new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+
+            assertAll(
+                () -> assertThat(sourceFields.size(), is(12)),
                 () -> assertThat(sourceFields, hasItem("data")),
+                () -> assertThat(sourceFields, hasItem("supplementary_data.Field1")),
+                () -> assertThat(sourceFields, hasItem("supplementary_data.Field2")),
                 () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),
                 () -> assertThat(sourceFields, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
                 () -> assertThat(sourceFields, hasItem(CREATED_DATE.getDbColumnName())),
