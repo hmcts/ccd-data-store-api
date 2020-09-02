@@ -1,25 +1,28 @@
 {
-  "_guid_": "S-564",
-  "_extends_": "F-054_Base_Test_Data",
-  "title": "must return negative response HTTP-404 when request contains a non-existing case reference ID",
-  "specs": [
-    "an active profile in CCD",
-    "contains a non-existing case reference ID",
-    "code is HTTP-404"
-  ],
-  "request": {
-    "pathVariables": {
-      "cid": "4929751530762572"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_404_Response",
-    "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message" : "No case found",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
-    }
-  }
+	"_guid_": "S-564",
+	"_extends_": "F-054_Base_Test_Data",
+	"title": "must return negative response HTTP-404 when request contains a non-existing case reference ID",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing case reference ID",
+		"code is HTTP-404"
+	],
+
+	"request": {
+		"pathVariables": {
+			"cid": "4929751530762572"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+		"body" : {
+			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+			"message" : "No case found",
+			"details" : null,
+			"callbackErrors" : null,
+			"callbackWarnings" : null
+		}
+	}
 }

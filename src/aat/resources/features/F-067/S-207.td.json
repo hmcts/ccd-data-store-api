@@ -2,13 +2,11 @@
 	"_guid_": "S-207",
 	"_extends_": "F-067_Test_Data_Base",
 	"title": "must return negative response when request does not provide valid authentication credentials",
-
 	"specs": [
 		"an active profile in CCD",
 		"does not provide valid authentication credentials",
 		"includes a HTTP 403 Forbidden"
 	],
-
 	"request": {
 		"headers": {
 			"Authorization": "eyJhbGciOiJIUzI1NiJ9"
@@ -18,7 +16,6 @@
 			"eventId": "SomeEventID"
 		}
 	},
-
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
 		"body": {

@@ -1,21 +1,24 @@
 {
-  "_guid_": "S-048.01_GetToken",
-  "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
-  "specs": [
-    "to create a token for case creation"
-  ],
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
-    }
-  },
-  "request": {
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_JURISDICTION_3",
-      "ctid": "BEFTA_CASETYPE_3_4",
-      "etid": "CREATE"
-    }
-  }
+	"_guid_": "S-048.01_GetToken",
+	"_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+
+	"specs": [
+		"to create a token for case creation"
+	],
+
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+		}
+	},
+
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_JURISDICTION_3",
+			"ctid": "BEFTA_CASETYPE_3_4",
+			"etid": "CREATE"
+		}
+	}
 }

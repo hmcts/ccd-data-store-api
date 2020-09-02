@@ -9,6 +9,7 @@
 		"uses a value that exceeds the field's max limit",
 		"has the 422 return code"
 	],
+
 	"request": {
 		"body": {
 			"data": {
@@ -16,6 +17,7 @@
 			}
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_422_Response",
 		"headers": {

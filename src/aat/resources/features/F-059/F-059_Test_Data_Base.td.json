@@ -1,9 +1,7 @@
 {
 	"_guid_": "F-059_Test_Data_Base",
-
 	"productName": "CCD Data Store",
 	"operationName": "validation of a set of fields as Citizen",
-
 	"method": "POST",
 	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
 
@@ -11,17 +9,16 @@
 		"username": "befta.citizen.3@gmail.com",
 		"password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
 	},
-
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
-			"jid": "BEFTA_JURISDICTION_3",
-			"ctid": "BEFTA_CASETYPE_3_2"
+			"jid" : "AUTOTEST1",
+			"ctid" : "AAT"
 		},
-		"body": {
+		"body" : {
 			"data": {
-				"_extends_": "F-059_Case_Data_Base"
+				"_extends_": "F-059_Common_Data_In_Body"
 			},
 			"event": {
 				"id": "CREATE",

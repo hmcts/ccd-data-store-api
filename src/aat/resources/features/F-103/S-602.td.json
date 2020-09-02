@@ -6,7 +6,7 @@
 	"_extends_": "F-103_Case_Assigned_User_Roles_Base",
 	"specs": [
 		"Dil - with a valid User ID",
-		"Jamal -  who is a privileged user with permissions to access the case assignments of other users",
+		"Jamal - who is a privileged user with permissions to access the case assignments of other users",
 		"is made by Jamal with a malformed Case ID & Dil's User ID"
 	],
 	"request": {

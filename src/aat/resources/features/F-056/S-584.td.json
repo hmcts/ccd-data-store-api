@@ -1,7 +1,7 @@
 {
-	"_guid_": "S-584",
-	"_extends_": "S-584_Update_Case_For_Citizen_Data_Base",
 	"title": "must update successfully the respective fields with ACL permissions for a Citizen",
+	"_extends_": "S-584_Update_Case_For_Citizen_Data_Base",
+	"_guid_": "S-584",
 
 	"specs": [
 		"an active citizen profile in CCD with update permissions for certain fields but not for others in a given case type",

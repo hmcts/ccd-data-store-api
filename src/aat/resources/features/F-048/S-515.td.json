@@ -13,6 +13,7 @@
 		"contains case fields that do not start with case.",
 		"contains an error message : unknown metadata search parameters"
 	],
+
 	"request": {
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
@@ -23,8 +24,9 @@
 			"caseInvalidCaseParam.PersonFirstName": "someInvalidParam"
 		}
 	},
+
 	"expectedResponse": {
-    "_extends_": "Common_400_Response",
+		"_extends_": "Common_400_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Length": "[[ANYTHING_PRESENT]]"

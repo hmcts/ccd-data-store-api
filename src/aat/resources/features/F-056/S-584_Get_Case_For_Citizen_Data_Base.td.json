@@ -3,7 +3,6 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Get Case for Citizen",
-
 	"method": "GET",
 	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
 
@@ -27,7 +26,7 @@
 			"_extends_": "Common_200_Response",
 			"headers": {
 				"Content-Encoding": "gzip"
-			},
+				},
 			"body": {
 				"id": "[[ANYTHING_PRESENT]]",
 				"jurisdiction": "BEFTA_JURISDICTION_2",

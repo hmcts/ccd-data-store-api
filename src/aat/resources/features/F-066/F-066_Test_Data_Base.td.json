@@ -1,9 +1,7 @@
 {
 	"_guid_": "F-066_Test_Data_Base",
-
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve a start event trigger by ID for dynamic display",
-
 	"method": "GET",
 	"uri": "/internal/cases/{cid}/event-triggers/{etid}",
 
@@ -21,7 +19,6 @@
 			"etid": "START_PROGRESS"
 		}
 	},
-
 	"expectedResponse": {
 		"headers": {
 			"Content-Type": "[[ANYTHING_PRESENT]]"

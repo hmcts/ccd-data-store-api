@@ -9,11 +9,13 @@
 		"contains a malformed user id",
 		"code is HTTP-403"
 	],
+
 	"request": {
 		"pathVariables": {
 			"uid": "@@@@@@@@@@"
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
 		"headers": {

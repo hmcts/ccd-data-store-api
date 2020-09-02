@@ -8,6 +8,7 @@
 		"an active profile in CCD",
 		"code is HTTP-200"
 	],
+
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {

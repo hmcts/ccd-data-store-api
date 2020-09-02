@@ -10,6 +10,7 @@
 		"uses a dummy authorization token",
 		"has the 403 return code"
 	],
+
 	"request": {
 		"headers": {
 			"Authorization": "InvalidAuthorization"
@@ -18,6 +19,7 @@
 			"uid": "xxxxxxxx"
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
 		"headers": {

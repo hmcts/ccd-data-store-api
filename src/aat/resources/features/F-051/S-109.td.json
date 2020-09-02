@@ -2,24 +2,29 @@
 	"_guid_": "S-109",
 	"title": "must return appropriate user setting from idam role for a user not having a profile in CCD",
 	"_extends_": "Base_Expecting_200",
+
 	"productName": "CCD Data Store",
 	"operationName": "Get default settings for user",
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/profile",
+
 	"specs": [
 		"no profile in CCD",
 		"uses the Case ID of the case just created",
 		"has the 200 return code"
 	],
+
 	"user": {
 		"username": "befta.caseworker.1.noprofile@gmail.com",
 		"password": "[[$CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD]]"
 	},
+
 	"request": {
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]"
 		}
 	},
+
 	"expectedResponse": {
 		"headers": {
 			"Content-Encoding": "gzip",

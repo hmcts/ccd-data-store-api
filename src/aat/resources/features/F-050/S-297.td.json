@@ -9,6 +9,7 @@
 		"uses an existing CMC External Id",
 		"has the 409 return code"
 	],
+
 	"expectedResponse": {
 		"_extends_": "Common_409_Response"
 	}
