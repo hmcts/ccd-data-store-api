@@ -293,6 +293,7 @@ public class CaseDetails implements Cloneable {
     }
 
     @JsonIgnore
+    @SuppressWarnings("java:S2259")
     public void setAfterSubmitCallbackResponseEntity(final ResponseEntity<AfterSubmitCallbackResponse>
                                                          callBackResponse) {
         if (SC_OK == callBackResponse.getStatusCodeValue()) {
