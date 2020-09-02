@@ -223,7 +223,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
 
         List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(Optional.of(jurisdictionIds));
-        if (jurisdictionDefinitions.isEmpty()) {
+        if (jurisdictionDefinitions == null || jurisdictionDefinitions.isEmpty()) {
             LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
             return Collections.emptyList();
         }
