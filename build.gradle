@@ -768,7 +768,7 @@ task functional() {
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${rootDir}/target/cucumber.json", '--tags', '@S-113.1', '--glue',
+            args = ['--plugin', "json:${rootDir}/target/cucumber.json", '--tags', '--glue',
                     'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
