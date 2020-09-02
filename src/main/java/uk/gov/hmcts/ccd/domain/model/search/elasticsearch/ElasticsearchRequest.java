@@ -19,7 +19,6 @@ import java.util.stream.StreamSupport;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_CLASSIFICATION_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_COL;
-import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.SUPPLEMENTARY_DATA_LAST_MODIFIED_COL;
 
 @Data
 public class ElasticsearchRequest {
@@ -138,7 +137,6 @@ public class ElasticsearchRequest {
         if (hasSupplementaryData()) {
             StreamSupport.stream(getSupplementaryData().spliterator(), false)
                 .forEach(field -> sourceFields.add(new TextNode(SUPPLEMENTARY_DATA_PREFIX + field.asText())));
-            sourceFields.add(new TextNode(SUPPLEMENTARY_DATA_LAST_MODIFIED_COL));
         }
 
         return sourceFields;

@@ -23,7 +23,6 @@ import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -31,7 +30,8 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDEX_TYPE;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDICES;
-import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.*;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SORT;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 
 public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
 
