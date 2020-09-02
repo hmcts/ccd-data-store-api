@@ -168,8 +168,7 @@ public class UICaseSearchController {
             return response.getBody().getCases().stream().limit(MAX_CASE_IDS_LIST)
                 .map(SearchResultViewItem::getCaseId)
                 .collect(Collectors.joining(CASE_ID_SEPARATOR));
-        }
-        else {
+        } else {
             return null;
         }
     }
