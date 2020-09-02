@@ -164,6 +164,7 @@ public class UICaseSearchController {
         return ResponseEntity.ok(new CaseSearchResultViewResource(caseSearchResultView));
     }
 
+    @SuppressWarnings("java:S2259")
     public static String buildCaseIds(ResponseEntity<CaseSearchResultViewResource> response) {
         return response.getBody().getCases().stream().limit(MAX_CASE_IDS_LIST)
             .map(SearchResultViewItem::getCaseId)
