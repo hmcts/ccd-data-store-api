@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -236,7 +237,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
     }
 
-    private List<String> getCaseTypeIdFromJurisdictionDefinition(List<JurisdictionDefinition> jurisdictionDefinitions) {
+    private List<String> getCaseTypeIdFromJurisdictionDefinition(@Nonnull List<JurisdictionDefinition> jurisdictionDefinitions) {
         return jurisdictionDefinitions.stream().flatMap(
             jurisdictionDefinition -> jurisdictionDefinition.getCaseTypesIDs().stream()
         ).distinct().collect(Collectors.toList());
