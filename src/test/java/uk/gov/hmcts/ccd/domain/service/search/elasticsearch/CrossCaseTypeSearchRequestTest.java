@@ -53,7 +53,7 @@ class CrossCaseTypeSearchRequestTest {
                 .build();
 
             assertThat(request.isMultiCaseTypeSearch(), is(false));
-            assertThat(request.getSearchRequestJsonNode(), is(elasticsearchRequest.getSearchRequest()));
+            assertThat(request.getSearchRequestJsonNode(), is(elasticsearchRequest.getNativeSearchRequest()));
             assertThat(request.getCaseTypeIds(), hasSize(1));
             assertThat(request.getAliasFields().isEmpty(), is(true));
         }
@@ -71,7 +71,7 @@ class CrossCaseTypeSearchRequestTest {
                 .build();
 
             assertThat(request.isMultiCaseTypeSearch(), is(true));
-            assertThat(request.getSearchRequestJsonNode(), is(elasticsearchRequest.getSearchRequest()));
+            assertThat(request.getSearchRequestJsonNode(), is(elasticsearchRequest.getNativeSearchRequest()));
             assertThat(request.getCaseTypeIds(), is(caseTypeIds));
             assertThat(request.getAliasFields(), hasItem("name"));
         }
@@ -93,7 +93,7 @@ class CrossCaseTypeSearchRequestTest {
 
             assertAll(
                 () -> assertThat(request.isMultiCaseTypeSearch(), is(false)),
-                () -> assertThat(request.getSearchRequestJsonNode(), is(elasticsearchRequest.getSearchRequest())),
+                () -> assertThat(request.getSearchRequestJsonNode(), is(elasticsearchRequest.getNativeSearchRequest())),
                 () -> assertThat(request.getCaseTypeIds(), is(caseTypeIds)),
                 () -> assertThat(sourceFields, hasItem("data.name")),
                 () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),

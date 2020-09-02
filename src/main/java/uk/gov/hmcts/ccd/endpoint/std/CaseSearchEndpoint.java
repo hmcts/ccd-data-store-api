@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.config.JacksonViews;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
@@ -70,6 +72,7 @@ public class CaseSearchEndpoint {
     }
 
     @PostMapping(value = "/searchCases")
+    @JsonView(JacksonViews.Elasticsearch.class)
     @ApiOperation("Search cases according to the provided ElasticSearch query. Supports searching across multiple case types.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search request")

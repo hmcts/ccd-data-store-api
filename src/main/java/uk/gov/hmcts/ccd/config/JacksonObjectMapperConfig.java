@@ -23,11 +23,13 @@ public class JacksonObjectMapperConfig {
     @Primary
     @Bean(name = "DefaultObjectMapper")
     public ObjectMapper defaultObjectMapper() {
-        return new ObjectMapper()
+        ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new Jdk8Module())
             .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
             .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
+        objectMapper.setConfig(objectMapper.getSerializationConfig().withView(Object.class));
+        return objectMapper;
     }
 
     @Bean(name = "SimpleObjectMapper")

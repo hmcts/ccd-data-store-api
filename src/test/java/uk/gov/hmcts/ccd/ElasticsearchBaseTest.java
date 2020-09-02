@@ -1,10 +1,14 @@
 package uk.gov.hmcts.ccd;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.Builder;
 import lombok.Singular;
 import org.apache.commons.io.IOUtils;
@@ -19,6 +23,7 @@ import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -81,6 +86,8 @@ public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
         private Integer size;
         @JsonProperty
         private Integer from;
+        @JsonIgnore
+        private List<String> supplementaryData;
 
         private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -90,7 +97,20 @@ public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
         }
 
         public String toJsonString() throws JsonProcessingException {
-            return objectMapper.writeValueAsString(this);
+            if (supplementaryData == null) {
+                return objectMapper.writeValueAsString(this);
+            }
+
+            return toJsonStringWithSupplementaryData();
+        }
+
+        private String toJsonStringWithSupplementaryData() throws JsonProcessingException {
+            ArrayNode supplementaryDataNode = objectMapper.createArrayNode();
+            supplementaryData.forEach(sd -> supplementaryDataNode.add(new TextNode(sd)));
+            ObjectNode request = objectMapper.createObjectNode();
+            request.set("native_es_query", objectMapper.readTree(objectMapper.writeValueAsString(this)));
+            request.set("supplementary_data", supplementaryDataNode);
+            return request.toString();
         }
     }
 }

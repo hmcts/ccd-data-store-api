@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.config.JacksonViews;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 
@@ -69,6 +71,10 @@ public class CaseDetails implements Cloneable {
     @JsonProperty("data_classification")
     @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
     private Map<String, JsonNode> dataClassification;
+
+    @JsonView(JacksonViews.Elasticsearch.class)
+    @JsonProperty("supplementary_data")
+    private Map<String, JsonNode> supplementaryData;
 
     /**
      * Attribute passed to UI layer, does not need persistence.
@@ -224,6 +230,14 @@ public class CaseDetails implements Cloneable {
 
     public void setDataClassification(Map<String, JsonNode> dataClassification) {
         this.dataClassification = dataClassification;
+    }
+
+    public Map<String, JsonNode> getSupplementaryData() {
+        return supplementaryData;
+    }
+
+    public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
+        this.supplementaryData = supplementaryData;
     }
 
     public AfterSubmitCallbackResponse getAfterSubmitCallbackResponse() {

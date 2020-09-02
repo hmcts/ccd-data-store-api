@@ -84,15 +84,15 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
         Collection<Search> securedSearches = request.getCaseTypeIds()
             .stream()
-            .map(caseTypeId -> createSecuredSearch(caseTypeId, request.getSearchRequestJsonNode()))
+            .map(caseTypeId -> createSecuredSearch(caseTypeId, request))
             .collect(toList());
 
         return new MultiSearch.Builder(securedSearches).build();
     }
 
-    private Search createSecuredSearch(String caseTypeId, JsonNode searchRequestJsonNode) {
+    private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
-            new CaseSearchRequest(caseTypeId, new ElasticsearchRequest(searchRequestJsonNode)));
+            new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()));
         return new Search.Builder(securedSearchRequest.toJsonString())
             .addIndex(getCaseIndexName(caseTypeId))
             .addType(getCaseIndexType())

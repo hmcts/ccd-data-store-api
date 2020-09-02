@@ -87,7 +87,7 @@ class ElasticsearchQueryHelperTest {
         ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(), is(searchRequest))
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(), is(searchRequest))
         );
     }
 

@@ -64,6 +64,7 @@ public class CaseDetailsEntity {
     public static final String SECURITY_CLASSIFICATION_FIELD_COL = "security_classification";
     public static final String DATA_COL = "data";
     public static final String DATA_CLASSIFICATION_COL = "data_classification";
+    public static final String SUPPLEMENTARY_DATA_COL = "supplementary_data";
 
 
 
@@ -95,6 +96,9 @@ public class CaseDetailsEntity {
     @Column(name = DATA_CLASSIFICATION_COL, nullable = false)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
+    @Column(name = SUPPLEMENTARY_DATA_COL, nullable = false)
+    @Convert(converter = JsonDataConverter.class)
+    private JsonNode supplementaryData;
 
     @Version
     private Integer version;
@@ -177,6 +181,14 @@ public class CaseDetailsEntity {
 
     public void setDataClassification(JsonNode dataClassification) {
         this.dataClassification = dataClassification;
+    }
+
+    public JsonNode getSupplementaryData() {
+        return supplementaryData;
+    }
+
+    public void setSupplementaryData(JsonNode supplementaryData) {
+        this.supplementaryData = supplementaryData;
     }
 
     public Integer getVersion() {

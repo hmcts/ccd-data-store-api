@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 public class CaseSearchRequest {
 
     private final String caseTypeId;
-    ElasticsearchRequest elasticsearchRequest;
+    private ElasticsearchRequest elasticsearchRequest;
 
     public CaseSearchRequest(String caseTypeId, ElasticsearchRequest elasticsearchRequest) {
         this.caseTypeId = caseTypeId;

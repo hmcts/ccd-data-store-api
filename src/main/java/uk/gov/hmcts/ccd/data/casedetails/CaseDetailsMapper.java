@@ -34,6 +34,9 @@ public class CaseDetailsMapper {
             caseDetails.setData(JacksonUtils.convertValue(caseDetailsEntity.getData()));
             caseDetails.setDataClassification(JacksonUtils.convertValue(caseDetailsEntity.getDataClassification()));
         }
+        if (caseDetailsEntity.getSupplementaryData() != null) {
+            caseDetails.setSupplementaryData(JacksonUtils.convertValue(caseDetailsEntity.getSupplementaryData()));
+        }
         return caseDetails;
     }
 

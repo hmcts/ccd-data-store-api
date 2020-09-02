@@ -103,6 +103,20 @@ class ElasticsearchRequestTest {
         assertTrue(requestedFields.isEmpty());
     }
 
+    @Test
+    void shouldHandleWrappedQueryFormatWithSupplementaryData() throws JsonProcessingException {
+        JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"_source\":[\"data.CaseDataField\",\"reference\",\"state\","
+            + "\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}},\"supplementary_data\":[\"SupDataField\"]}");
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+
+        assertAll(
+            () -> assertThat(elasticsearchRequest.getQuery().toString(), is("{\"match_all\":{}}")),
+            () -> assertThat(elasticsearchRequest.getRequestedFields().size(), is(4)),
+            () -> assertThat(elasticsearchRequest.hasSupplementaryData(), is(true)),
+            () -> assertThat(elasticsearchRequest.getSupplementaryData().toString(), is("[\"SupDataField\"]"))
+        );
+    }
+
     private JsonNode queryAsJsonNode(String query) throws JsonProcessingException {
         return mapper.readTree(query);
     }

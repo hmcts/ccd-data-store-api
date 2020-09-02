@@ -16,15 +16,20 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.ElasticsearchBaseTest;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.test.ElasticsearchTestHelper;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -152,7 +157,50 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                 () -> assertExampleCaseMetadata(caseDetails),
-                () -> assertExampleCaseData(caseDetails)
+                () -> assertExampleCaseData(caseDetails),
+                () -> assertThat(caseDetails.getSupplementaryData(), is(nullValue()))
+            );
+        }
+
+        @Test
+        void shouldSupportRequestsWithRequestedSupplementaryData() throws Exception {
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+                .supplementaryData(Arrays.asList("SDField2", "SDField3"))
+                .build();
+
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_A);
+
+            CaseDetails caseDetails = caseSearchResult.getCases().get(0);
+            assertAll(
+                () -> assertThat(caseSearchResult.getTotal(), is(1L)),
+                () -> assertExampleCaseMetadata(caseDetails),
+                () -> assertExampleCaseData(caseDetails),
+                () -> assertThat(caseDetails.getSupplementaryData().size(), is(2)),
+                () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
+                () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+            );
+        }
+
+        @Test
+        void shouldReturnAllSupplementaryDataWhenWildcardIsUsed() throws Exception {
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+                .supplementaryData(Collections.singletonList("*"))
+                .build();
+            String ignoreMe = searchRequest.toJsonString();
+
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_A);
+
+            CaseDetails caseDetails = caseSearchResult.getCases().get(0);
+            assertAll(
+                () -> assertThat(caseSearchResult.getTotal(), is(1L)),
+                () -> assertExampleCaseMetadata(caseDetails),
+                () -> assertExampleCaseData(caseDetails),
+                () -> assertThat(caseDetails.getSupplementaryData().size(), is(3)),
+                () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
+                () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
+                () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
             );
         }
 
@@ -184,24 +232,22 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
         public void assertExampleCaseData(CaseDetails caseDetails) {
             Map<String, JsonNode> data = caseDetails.getData();
             assertAll(
-                () -> assertThat(data.get(ADDRESS_FIELD).toString(),
-                    is("{\"AddressLine1\":\"StreetValue\","
-                       + "\"AddressLine2\":\"AddressLine2Value\","
-                       + "\"AddressLine3\":\"AddressLine3Value\","
-                       + "\"Country\":\"CountryValue\","
-                       + "\"County\":\"CountyValue\","
-                       + "\"PostCode\":\"PST CDE\","
-                       + "\"PostTown\":\"TownValue\"}")),
+                () -> assertThat(data.get(ADDRESS_FIELD).get(ADDRESS_LINE_1).asText(), is(STREET_VALUE)),
+                () -> assertThat(data.get(ADDRESS_FIELD).get(ADDRESS_LINE_2).asText(), is(ADDRESS_LINE_2_VALUE)),
+                () -> assertThat(data.get(ADDRESS_FIELD).get(ADDRESS_LINE_3).asText(), is(ADDRESS_LINE_3_VALUE)),
+                () -> assertThat(data.get(ADDRESS_FIELD).get(COUNTRY_NESTED_FIELD).asText(), is(COUNTRY_VALUE)),
+                () -> assertThat(data.get(ADDRESS_FIELD).get(COUNTY_FIELD).asText(), is(COUNTY_VALUE)),
+                () -> assertThat(data.get(ADDRESS_FIELD).get(POST_CODE_FIELD).asText(), is(POST_CODE_VALUE)),
+                () -> assertThat(data.get(ADDRESS_FIELD).get(TOWN_FIELD).asText(), is(TOWN_VALUE)),
                 () -> assertThat(data.get(COLLECTION_FIELD).toString(),
                     is("[{\"id\":\"2c6da07c-1dfb-4765-88f6-96cd5d5f33b1\",\"value\":\"CollectionTextValue2\"},"
                        + "{\"id\":\"f7d67f03-172d-4adb-85e5-ca958ad442ce\",\"value\":\"CollectionTextValue1\"}]")),
-                () -> assertThat(data.get(COMPLEX_FIELD).toString(),
-                    is("{\"ComplexFixedListField\":\"VALUE3\""
-                       + ",\"ComplexNestedField\":{\"NestedCollectionTextField\":"
-                       + "[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\",\"value\":\"NestedCollectionTextValue1\"},"
-                       + "{\"id\":\"95f337e8-5f17-4b25-a795-b7f84f4b2855\",\"value\":\"NestedCollectionTextValue2\"}],"
-                       + "\"NestedNumberField\":\"567\"},"
-                       + "\"ComplexTextField\":\"ComplexTextValue\"}")),
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_TEXT_FIELD).asText(), is(COMPLEX_TEXT_VALUE)),
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_FIXED_LIST_FIELD).asText(), is(COMPLEX_FIXED_LIST_VALUE)),
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_NUMBER_FIELD).asText(), is(NESTED_NUMBER_FIELD_VALUE)),
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_COLLECTION_TEXT_FIELD).toString(),
+                    is("[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\",\"value\":\"NestedCollectionTextValue1\"},"
+                        + "{\"id\":\"95f337e8-5f17-4b25-a795-b7f84f4b2855\",\"value\":\"NestedCollectionTextValue2\"}]")),
                 () -> assertThat(data.get(DATE_FIELD).asText(), is(DATE_VALUE)),
                 () -> assertThat(data.get(DATE_TIME_FIELD).asText(), is(DATE_TIME_VALUE)),
                 () -> assertThat(data.get(EMAIL_FIELD).asText(), is(EMAIL_VALUE)),

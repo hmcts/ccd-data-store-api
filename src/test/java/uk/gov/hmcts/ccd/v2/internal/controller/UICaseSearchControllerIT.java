@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -25,6 +27,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -381,6 +384,45 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
             () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
             () -> assertThat(caseDetails.getFieldsFormatted().containsKey(COMPLEX_FIELD), is(true))
+        );
+    }
+
+    @Test
+    void shouldSupportRequestsWithRequestedSupplementaryData() throws Exception {
+        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .supplementaryData(Arrays.asList("SDField2", "SDField3"))
+            .build();
+        String ignoreMe = searchRequest.toJsonString();
+
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(10)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(16)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(2)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+        );
+    }
+
+    @Test
+    void shouldReturnAllSupplementaryDataWhenWildcardIsUsed() throws Exception {
+        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .supplementaryData(Collections.singletonList("*"))
+            .build();
+        String ignoreMe = searchRequest.toJsonString();
+
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(3)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
         );
     }
 

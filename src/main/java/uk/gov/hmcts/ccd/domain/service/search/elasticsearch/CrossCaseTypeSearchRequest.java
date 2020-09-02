@@ -1,22 +1,17 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_CLASSIFICATION_COL;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 
 /**
@@ -50,7 +45,6 @@ public class CrossCaseTypeSearchRequest {
         this.elasticsearchRequest = elasticsearchRequest;
         this.multiCaseTypeSearch = multiCaseTypeSearch;
         this.aliasFields.addAll(aliasFields);
-        addMetadataSourceFields();
         validateJsonSearchRequest();
     }
 
@@ -63,7 +57,7 @@ public class CrossCaseTypeSearchRequest {
     }
 
     public JsonNode getSearchRequestJsonNode() {
-        return elasticsearchRequest.getSearchRequest();
+        return elasticsearchRequest.getNativeSearchRequest();
     }
 
     public boolean isMultiCaseTypeSearch() {
@@ -82,17 +76,6 @@ public class CrossCaseTypeSearchRequest {
 
     public boolean hasAliasField(SearchAliasField searchAliasField) {
         return aliasFields.stream().anyMatch(aliasField -> aliasField.equalsIgnoreCase(searchAliasField.getId()));
-    }
-
-    private void addMetadataSourceFields() {
-        if (elasticsearchRequest.hasSourceFields()) {
-            // when fields are explicitly specified in _source, we need to add metadata fields explicitly to the response.
-            // Otherwise, we don't need because all case data including metadata fields are in the response already
-            ArrayNode sourceNode = (ArrayNode) elasticsearchRequest.getSource();
-            Arrays.stream(MetaData.CaseField.values())
-                .forEach(field -> sourceNode.add(new TextNode(field.getDbColumnName())));
-            sourceNode.add(new TextNode(DATA_CLASSIFICATION_COL));
-        }
     }
 
     public static class Builder {
@@ -128,7 +111,7 @@ public class CrossCaseTypeSearchRequest {
         }
 
         private void setSourceFilterAliasFields() {
-            if (multiCaseTypeSearch && elasticsearchRequest.getSearchRequest() != null) {
+            if (multiCaseTypeSearch && elasticsearchRequest.getNativeSearchRequest() != null) {
                 JsonNode multiCaseTypeSearchSourceNode = elasticsearchRequest.getSource();
                 if (multiCaseTypeSearchSourceNode != null && multiCaseTypeSearchSourceNode.isArray()) {
                     sourceFilterAliasFields.addAll(sourceFilterToAliasFields(multiCaseTypeSearchSourceNode));
@@ -146,7 +129,7 @@ public class CrossCaseTypeSearchRequest {
         }
 
         private void removeSourceFilter() {
-            ((ObjectNode) this.elasticsearchRequest.getSearchRequest()).remove(SOURCE);
+            ((ObjectNode) this.elasticsearchRequest.getNativeSearchRequest()).remove(SOURCE);
         }
 
         public CrossCaseTypeSearchRequest build() {
