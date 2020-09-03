@@ -37,10 +37,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+@SuppressWarnings("checkstyle:SummaryJavadoc")
 // partial javadoc attributes added prior to checkstyle implementation in module
 @Service
 @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
-@SuppressWarnings({"checkstyle:SummaryJavadoc", "java:S2259"})
 public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDefinitionRepository.class);

@@ -53,7 +53,6 @@ import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
         + "returning extra information required by the UI for display purposes on a UI.")
 })
 @Slf4j
-@SuppressWarnings("java:S2259")
 public class UICaseSearchController {
 
     private final CaseSearchOperation caseSearchOperation;
@@ -168,7 +167,6 @@ public class UICaseSearchController {
         return ResponseEntity.ok(new CaseSearchResultViewResource(caseSearchResultView));
     }
 
-    @SuppressWarnings("java:S2259")
     public static String buildCaseIds(ResponseEntity<CaseSearchResultViewResource> response) {
         CaseSearchResultViewResource body = response.getBody();
         return body == null ? null

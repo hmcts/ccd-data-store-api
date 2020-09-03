@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -71,6 +72,8 @@ class CaseSearchResultViewGeneratorTest {
     private static final String CASE_FIELD_3 = "Case field 3";
     private static final String CASE_FIELD_4 = "Case field 4";
     private static final String CASE_FIELD_5 = "Case field 5";
+    private static final String SUPPLEMENTARY_DATA_FIELD_1 = "Supplementary data field 1";
+    private static final String SUPPLEMENTARY_DATA_FIELD_2 = "Supplementary data field 2";
     private static final String ROLE_IN_USER_ROLE_1 = "Role 1";
     private static final String ROLE_IN_USER_ROLE_2 = "Role 2";
     private static final String ROLE_NOT_IN_USER_ROLE = "Role X";
@@ -126,6 +129,7 @@ class CaseSearchResultViewGeneratorTest {
     private CaseSearchResultViewGenerator classUnderTest;
 
     private Map<String, JsonNode> dataMap;
+    private Map<String, JsonNode> supplementaryDataMap;
     private JurisdictionDefinition jurisdiction;
     private CaseSearchResult caseSearchResult;
 
@@ -136,6 +140,7 @@ class CaseSearchResultViewGeneratorTest {
             caseTypeService, searchResultDefinitionService, securityClassificationService);
 
         dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3, CASE_FIELD_4, CASE_FIELD_5);
+        supplementaryDataMap = buildData(SUPPLEMENTARY_DATA_FIELD_1, SUPPLEMENTARY_DATA_FIELD_2);
         ObjectNode familyDetails = (ObjectNode) new ObjectMapper().readTree(FAMILY_DETAILS_VALUE);
         dataMap.put(FAMILY_DETAILS, familyDetails);
 
@@ -147,6 +152,7 @@ class CaseSearchResultViewGeneratorTest {
             .withLastModified(LAST_MODIFIED_DATE)
             .withLastStateModified(LAST_STATE_MODIFIED_DATE)
             .withSecurityClassification(SECURITY_CLASSIFICATION)
+            .withSupplementaryData(supplementaryDataMap)
             .build();
         CaseDetails caseDetails2 = caseDetails()
             .withReference(1000L)
@@ -321,7 +327,14 @@ class CaseSearchResultViewGeneratorTest {
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_REFERENCE]"), is(999L)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[SECURITY_CLASSIFICATION]"), is(SECURITY_CLASSIFICATION)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_TYPE]"), is(CASE_TYPE_ID_1)),
-            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[LAST_MODIFIED_DATE]"), is(LAST_MODIFIED_DATE))
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[LAST_MODIFIED_DATE]"), is(LAST_MODIFIED_DATE)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData().size(), is(2)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData().get(SUPPLEMENTARY_DATA_FIELD_1).asText(),
+                is(SUPPLEMENTARY_DATA_FIELD_1)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData().get(SUPPLEMENTARY_DATA_FIELD_2).asText(),
+                is(SUPPLEMENTARY_DATA_FIELD_2)),
+            () -> assertThat(caseSearchResultView.getCases().get(1).getSupplementaryData(), is(nullValue())),
+            () -> assertThat(caseSearchResultView.getCases().get(2).getSupplementaryData(), is(nullValue()))
         );
     }
 
