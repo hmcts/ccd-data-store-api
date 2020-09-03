@@ -5,22 +5,23 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 @ApiModel(description = "")
-public class CaseTypeTabField implements Serializable {
-    private CaseField caseField = null;
+public class CaseTypeTabField implements Serializable, CommonDCPModel {
+    private CaseFieldDefinition caseFieldDefinition = null;
     private Integer displayOrder = null;
     private String showCondition = null;
     private String displayContextParameter;
 
     @ApiModelProperty(value = "")
     @JsonProperty("case_field")
-    public CaseField getCaseField() {
-        return caseField;
+    public CaseFieldDefinition getCaseFieldDefinition() {
+        return caseFieldDefinition;
     }
 
-    public void setCaseField(final CaseField caseField) {
-        this.caseField = caseField;
+    public void setCaseFieldDefinition(final CaseFieldDefinition caseFieldDefinition) {
+        this.caseFieldDefinition = caseFieldDefinition;
     }
 
     @ApiModelProperty(value = "")

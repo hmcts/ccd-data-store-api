@@ -1,31 +1,13 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.SwaggerDefinition;
-import io.swagger.annotations.Tag;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -34,6 +16,10 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
+
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
 
 @RestController
 @RequestMapping(path = "/",
@@ -76,7 +62,7 @@ public class DraftsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Event Trigger ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @RequestBody final CaseDataContent caseDataContent) {
 
         return upsertDraftOperation.executeSave(caseTypeId, caseDataContent);
@@ -99,7 +85,7 @@ public class DraftsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Event Trigger ID", required = true)
-        @PathVariable("etid") final String eventTriggerId,
+        @PathVariable("etid") final String eventId,
         @ApiParam(value = "Event Trigger ID", required = true)
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {

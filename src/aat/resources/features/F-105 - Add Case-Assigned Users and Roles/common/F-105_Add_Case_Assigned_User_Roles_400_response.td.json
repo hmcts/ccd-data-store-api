@@ -1,0 +1,11 @@
+  {
+  "_guid_": "F-105_Add_Case_Assigned_User_Roles_400_response",
+  "_extends_": "Common_400_Response",
+
+  "body": {
+    "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+    "details": null,
+    "callbackErrors": null,
+    "callbackWarnings": null
+  }
+}

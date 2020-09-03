@@ -1,0 +1,48 @@
+{
+  "title": "must reject request when an invalid Organisation ID is provided",
+
+  "_guid_": "S-111.16",
+  "_extends_": "F-111_Remove_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - who is to add and remove some case role assignment for a case",
+    "Olawale - with an active solicitor profile",
+    "Hemanth - with an active solicitor profile",
+    "is made from an authorised application, by Dil for 2 assignments each containing the Case ID of C1, User ID of Olawale and Hemanth and proper Case Role CR-1",
+    "contains a valid Organisation ID in one entry and an empty Organisation ID in the other"
+  ],
+
+  "users": {
+    "_extends_": "F-111_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]",
+          "organisation_id": "${[scenarioContext][childContexts][S-111.16_Add_Case_Assigned_User_Roles_for_Case_C1][childContexts][F-111_Prerequisite_Counter_Check_Call][childContexts][F-111_Get_Organisation_Identifier_Dil][testData][actualResponse][body][organisationIdentifier]}"
+        },
+        {
+          "case_id": "${[scenarioContext][childContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userHemanth][id]}",
+          "case_role": "[CR-1]",
+          "organisation_id": ""
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-111_Remove_Case_Assigned_User_Roles_400_response",
+    "body": {
+      "message": "Invalid data provided for the following inputs to the request:\nOrganisation ID is not valid"
+    }
+  }
+}

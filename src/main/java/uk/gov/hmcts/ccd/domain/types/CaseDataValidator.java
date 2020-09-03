@@ -1,51 +1,57 @@
 package uk.gov.hmcts.ccd.domain.types;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 @Named
 @Singleton
 public class CaseDataValidator {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
 
-    private List<BaseTypeValidator> validators;
+    private List<FieldValidator> validators;
 
     @Inject
-    public CaseDataValidator(final List<BaseTypeValidator> validators) {
+    public CaseDataValidator(final List<FieldValidator> validators) {
         this.validators = validators;
     }
 
     public List<ValidationResult> validate(final Map<String, JsonNode> data,
-                                           final List<CaseField> caseFieldDefinitions) {
+                                           final List<CaseFieldDefinition> caseFieldDefinitions) {
         return validate(data, caseFieldDefinitions, CaseDataValidator.EMPTY_STRING);
     }
 
     public List<ValidationResult> validate(final Map<String, JsonNode> data,
-                                           final List<CaseField> caseFieldDefinitions,
+                                           final List<CaseFieldDefinition> caseFieldDefinitions,
                                            final String fieldIdPrefix) {
-        return (data == null) ?
-            new ArrayList<>() :
-            data.entrySet().stream()
+        return (data == null)
+            ? new ArrayList<>()
+            : data.entrySet().stream()
                 .map(caseDataPair -> caseFieldDefinitions.stream()
                     .filter(caseField -> caseField.getId().equalsIgnoreCase(caseDataPair.getKey()))
                     .findAny()
-                    .map(caseField -> validateField(caseDataPair.getKey(), caseDataPair.getValue(), caseField, fieldIdPrefix))
+                    .map(caseField -> validateField(
+                        caseDataPair.getKey(),
+                        caseDataPair.getValue(),
+                        caseField,
+                        fieldIdPrefix
+                    ))
                     .orElseGet(() -> Collections.singletonList(
                         new ValidationResult("Field is not recognised", fieldIdPrefix + caseDataPair.getKey()))))
                 .flatMap(List::stream)
@@ -54,9 +60,9 @@ public class CaseDataValidator {
 
     private List<ValidationResult> validateField(final String dataFieldId,
                                                  final JsonNode dataValue,
-                                                 final CaseField caseFieldDefinition,
+                                                 final CaseFieldDefinition caseFieldDefinition,
                                                  final String fieldIdPrefix) {
-        final String caseFieldType = caseFieldDefinition.getFieldType().getType();
+        final String caseFieldType = caseFieldDefinition.getFieldTypeDefinition().getType();
 
         if (!BaseType.contains(caseFieldType)) {
             return Collections.singletonList(new ValidationResult("Unknown Type:" + caseFieldType, dataFieldId));
@@ -66,8 +72,8 @@ public class CaseDataValidator {
 
         if (BaseType.get(COMPLEX) == fieldType) {
             return validate(
-                MAPPER.convertValue(dataValue, STRING_JSON_MAP),
-                caseFieldDefinition.getFieldType().getComplexFields(),
+                JacksonUtils.convertValue(dataValue),
+                caseFieldDefinition.getFieldTypeDefinition().getComplexFields(),
                 fieldIdPrefix + dataFieldId + FIELD_SEPARATOR);
         } else if (BaseType.get(COLLECTION) == fieldType) {
             final List<ValidationResult> validationResults = validateSimpleField(dataFieldId, dataValue, caseFieldDefinition, fieldIdPrefix, fieldType);
@@ -77,7 +83,7 @@ public class CaseDataValidator {
             while (collectionIterator.hasNext()) {
                 final JsonNode itemValue = collectionIterator.next();
 
-                validationResults.addAll(validateCollectionItem(caseFieldDefinition.getFieldType().getCollectionFieldType(),
+                validationResults.addAll(validateCollectionItem(caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition(),
                     itemValue,
                     fieldIdPrefix + dataFieldId + FIELD_SEPARATOR,
                     index.toString())
@@ -93,21 +99,45 @@ public class CaseDataValidator {
 
     private List<ValidationResult> validateSimpleField(final String dataFieldId,
                                                        final JsonNode dataValue,
-                                                       final CaseField caseFieldDefinition,
+                                                       final CaseFieldDefinition caseFieldDefinition,
                                                        final String fieldIdPrefix,
                                                        final BaseType fieldType) {
-        return validators.stream()
-            .filter(validator -> validator.getType() == fieldType)
-            .findAny()
-            .map(baseTypeValidator -> baseTypeValidator
-                .validate(dataFieldId, dataValue, caseFieldDefinition)
+
+        Optional<FieldValidator> predefinedFieldValidator = validators.stream().filter(
+            validator -> isPredefinedTypeFieldValidator(validator, caseFieldDefinition.getFieldTypeDefinition().getId())
+        ).findAny();
+
+        Optional<FieldValidator> baseTypeValidator = validators.stream().filter(validator ->
+            isBaseTypeValidator(validator, fieldType)
+        ).findAny();
+
+        //if a PredefinedTypeFieldValidator is configured, the field type BaseTypeValidator is not executed. The PredefinedTypeFieldValidator
+        // can execute it if needed
+        Optional<FieldValidator> validatorToExecute = predefinedFieldValidator.or(() -> baseTypeValidator);
+
+        return validatorToExecute.map(validator -> validator.validate(dataFieldId, dataValue, caseFieldDefinition)
                 .stream()
                 .map(result -> new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
                 .collect(Collectors.toList()))
-            .orElseThrow(() -> new RuntimeException("System error: No validator found for " + fieldType.getType()));
+                .orElseThrow(() -> new RuntimeException("System error: No validator found for " + fieldType.getType()));
     }
 
-    private List<ValidationResult> validateCollectionItem(FieldType fieldType, JsonNode item, String fieldIdPrefix, String index) {
+    private boolean isPredefinedTypeFieldValidator(FieldValidator validator, String fieldID) {
+        if (validator instanceof PredefinedTypeFieldValidator) {
+            String predefinedId = ((PredefinedTypeFieldValidator) validator).getPredefinedFieldId();
+            return predefinedId.equals(fieldID);
+        }
+        return false;
+    }
+
+    private boolean isBaseTypeValidator(FieldValidator validator, BaseType fieldType) {
+        if (validator instanceof BaseTypeValidator) {
+            return ((BaseTypeValidator) validator).getType() == fieldType;
+        }
+        return false;
+    }
+
+    private List<ValidationResult> validateCollectionItem(FieldTypeDefinition fieldTypeDefinition, JsonNode item, String fieldIdPrefix, String index) {
         final String itemFieldId = fieldIdPrefix + index;
 
         final JsonNode itemValue = item.get(CollectionValidator.VALUE);
@@ -116,29 +146,29 @@ public class CaseDataValidator {
             return Collections.emptyList();
         }
 
-        if (shouldTreatAsValueNode(fieldType, itemValue)) {
-            if (!BaseType.contains(fieldType.getType())) {
-                return Collections.singletonList(new ValidationResult("Unknown Type:" + fieldType.getType(), itemFieldId));
+        if (shouldTreatAsValueNode(fieldTypeDefinition, itemValue)) {
+            if (!BaseType.contains(fieldTypeDefinition.getType())) {
+                return Collections.singletonList(new ValidationResult("Unknown Type:" + fieldTypeDefinition.getType(), itemFieldId));
             }
 
-            final BaseType baseType = BaseType.get(fieldType.getType());
+            final BaseType baseType = BaseType.get(fieldTypeDefinition.getType());
 
-            final CaseField caseField = new CaseField();
-            caseField.setFieldType(fieldType);
-            caseField.setId(index);
-            return validateSimpleField(index, itemValue, caseField, fieldIdPrefix, baseType);
+            final CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+            caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+            caseFieldDefinition.setId(index);
+            return validateSimpleField(index, itemValue, caseFieldDefinition, fieldIdPrefix, baseType);
         } else if (itemValue.isObject()) {
             return validate(
-                MAPPER.convertValue(itemValue, STRING_JSON_MAP),
-                fieldType.getComplexFields(),
+                JacksonUtils.convertValue(itemValue),
+                fieldTypeDefinition.getComplexFields(),
                 itemFieldId + FIELD_SEPARATOR);
         }
 
         return Collections.singletonList(new ValidationResult("Unsupported collection item:" + itemValue.toString(), itemFieldId));
     }
 
-    private boolean shouldTreatAsValueNode(FieldType fieldType, JsonNode itemValue) {
-        return itemValue.isValueNode() || fieldType.getType().equalsIgnoreCase(DocumentValidator.TYPE_ID);
+    private boolean shouldTreatAsValueNode(FieldTypeDefinition fieldTypeDefinition, JsonNode itemValue) {
+        return itemValue.isValueNode() || fieldTypeDefinition.getType().equalsIgnoreCase(DocumentValidator.TYPE_ID);
     }
 }
 

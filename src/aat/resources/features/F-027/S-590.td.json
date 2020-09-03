@@ -24,13 +24,16 @@
     "headers": {
       "Content-Length" : "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json",
       "Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
       "Strict-Transport-Security":"[[ANY_STRING_NULLABLE]]"
     },
     "body" : {
       "tabs" : "[[ANYTHING_PRESENT]]",
       "metadataFields": [
+        {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
         {
           "id": "[STATE]",
           "label": "State",
@@ -42,6 +45,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": null,
           "display_context_parameter": null,
           "show_condition": null,
@@ -49,7 +53,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[LAST_STATE_MODIFIED_DATE]",
@@ -59,8 +64,8 @@
           "metadata": true,
           "hint_text": null,
           "field_type": {
-            "id": "Date",
-            "type": "Date",
+            "id": "DateTime",
+            "type": "DateTime",
             "min": null,
             "max": null,
             "regular_expression": null,
@@ -75,6 +80,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": null,
           "display_context_parameter": null,
           "show_condition": null,
@@ -82,7 +88,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[JURISDICTION]",
@@ -108,6 +115,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": null,
           "display_context_parameter": null,
           "show_condition": null,
@@ -115,7 +123,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[CASE_TYPE]",
@@ -141,6 +150,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": null,
           "display_context_parameter": null,
           "show_condition": null,
@@ -148,7 +158,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[SECURITY_CLASSIFICATION]",
@@ -174,6 +185,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": null,
           "display_context_parameter": null,
           "show_condition": null,
@@ -181,7 +193,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[CASE_REFERENCE]",
@@ -207,6 +220,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": null,
           "display_context_parameter": null,
           "show_condition": null,
@@ -214,7 +228,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[CREATED_DATE]",
@@ -224,8 +239,8 @@
           "metadata": true,
           "hint_text": null,
           "field_type": {
-            "id": "Date",
-            "type": "Date",
+            "id": "DateTime",
+            "type": "DateTime",
             "min": null,
             "max": null,
             "regular_expression": null,
@@ -240,6 +255,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": null,
           "display_context_parameter": null,
           "show_condition": null,
@@ -247,7 +263,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         },
         {
           "id": "[LAST_MODIFIED_DATE]",
@@ -257,8 +274,8 @@
           "metadata": true,
           "hint_text": null,
           "field_type": {
-            "id": "Date",
-            "type": "Date",
+            "id": "DateTime",
+            "type": "DateTime",
             "min": null,
             "max": null,
             "regular_expression": null,
@@ -273,6 +290,7 @@
           "validation_expr": null,
           "security_label": "PUBLIC",
           "order": null,
+          "formatted_value": null,
           "display_context": null,
           "display_context_parameter": null,
           "show_condition": null,
@@ -280,7 +298,8 @@
           "show_summary_content_option": null,
           "acls": [
 
-          ]
+          ],
+          "default_value" : null
         }
       ],
       "state" : {

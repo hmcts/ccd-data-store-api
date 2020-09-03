@@ -7,7 +7,8 @@
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 
 	"specs": [
-		"by a privileged user with full ACL to create a case of this case type"
+		"by a privileged user with full ACL to create a case of this case type",
+    "to create a full case"
 	],
 
 	"request": {
@@ -33,7 +34,6 @@
 		"_extends_": "Common_201_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json",
 			"vary": "accept-encoding",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
     },

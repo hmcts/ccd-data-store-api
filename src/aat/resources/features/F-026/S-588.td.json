@@ -19,7 +19,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_JURISDICTION_3",
       "ctid": "BEFTA_CASETYPE_3_4",
-      "date": "2020-02-21"
+      "date": "${[scenarioContext][customValues][today]}"
     }
   },
 	"expectedResponse": {
@@ -34,15 +34,16 @@
           "metadata" : true,
           "case_field_id" : "[LAST_STATE_MODIFIED_DATE]",
           "case_field_type" : {
-            "id" : "Date",
-            "type" : "Date",
+            "id" : "DateTime",
+            "type" : "DateTime",
             "min" : null,
             "max" : null,
             "regular_expression" : null,
             "fixed_list_items" : [ ],
             "complex_fields" : [ ],
             "collection_field_type" : null
-          }
+          },
+          "display_context_parameter" : null
         }, {
           "label" : "`Text` field",
           "order" : 2,
@@ -57,7 +58,8 @@
             "fixed_list_items" : [ ],
             "complex_fields" : [ ],
             "collection_field_type" : null
-          }
+          },
+          "display_context_parameter" : null
         }, {
           "label" : "`Number` field",
           "order" : 3,
@@ -72,7 +74,8 @@
             "fixed_list_items" : [ ],
             "complex_fields" : [ ],
             "collection_field_type" : null
-          }
+          },
+          "display_context_parameter" : null
         }, {
           "label" : "`YesOrNo` field",
           "order" : 4,
@@ -87,7 +90,8 @@
             "fixed_list_items" : [ ],
             "complex_fields" : [ ],
             "collection_field_type" : null
-          }
+          },
+          "display_context_parameter" : null
         } ],
         "results": "[[ANYTHING_PRESENT]]",
 			  "result_error": null

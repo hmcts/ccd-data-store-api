@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -16,11 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
@@ -44,8 +44,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 class MidEventCallbackTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
-    };
     private static final String JURISDICTION_ID = "jurisdictionId";
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
@@ -66,9 +64,9 @@ class MidEventCallbackTest {
     private CaseService caseService;
 
     @Mock
-    private CaseEvent caseEvent;
+    private CaseEventDefinition caseEventDefinition;
     @Mock
-    private CaseType caseType;
+    private CaseTypeDefinition caseTypeDefinition;
     private Event event;
     private final Map<String, JsonNode> data = new HashMap<>();
     private CaseDetails caseDetails;
@@ -81,9 +79,9 @@ class MidEventCallbackTest {
         event = new Event();
         event.setEventId("createCase");
 
-        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseType);
-        given(eventTriggerService.findCaseEvent(caseType, event.getEventId())).willReturn(caseEvent);
-        given(caseType.getJurisdictionId()).willReturn(JURISDICTION_ID);
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
+        given(eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId())).willReturn(caseEventDefinition);
+        given(caseTypeDefinition.getJurisdictionId()).willReturn(JURISDICTION_ID);
         caseDetails = caseDetails(data);
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
@@ -103,8 +101,8 @@ class MidEventCallbackTest {
         when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
 
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
-            caseEvent,
+            caseTypeDefinition,
+                caseEventDefinition,
             existingCaseDetails,
             caseDetails,
             IGNORE_WARNINGS)).willReturn(caseDetails);
@@ -118,8 +116,8 @@ class MidEventCallbackTest {
         );
 
         verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
-            caseEvent,
+            caseTypeDefinition,
+                caseEventDefinition,
             existingCaseDetails,
             caseDetails,
             IGNORE_WARNINGS);
@@ -129,18 +127,18 @@ class MidEventCallbackTest {
     @DisplayName("should update data from MidEvent callback")
     void shouldUpdateCaseDetailsFromMidEventCallback() throws Exception {
 
-        final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+        final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}"));
         CaseDetails updatedCaseDetails = caseDetails(data);
         CaseDataContent content = newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS)
             .build();
         when(caseService.clone(updatedCaseDetails)).thenReturn(updatedCaseDetails);
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
-            caseEvent,
+            caseTypeDefinition,
+                caseEventDefinition,
             null,
             caseDetails,
             IGNORE_WARNINGS)).willReturn(updatedCaseDetails);
@@ -178,11 +176,11 @@ class MidEventCallbackTest {
     @DisplayName("should pass event data to MidEvent callback when available")
     void shouldPassEventDataToMidEventCallback() throws Exception {
 
-        Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
+        Map<String, JsonNode> eventData = JacksonUtils.convertValue((MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}")));
         CaseDetails updatedCaseDetails = caseDetails(eventData);
 
         CaseDataContent content = newCaseDataContent()
@@ -193,8 +191,8 @@ class MidEventCallbackTest {
             .build();
 
         when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
-            caseEvent,
+            caseTypeDefinition,
+                caseEventDefinition,
             null,
             caseDetails,
             IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
@@ -214,7 +212,12 @@ class MidEventCallbackTest {
 
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
-            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, caseDetails, IGNORE_WARNINGS),
+            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
+                caseTypeDefinition,
+                caseEventDefinition,
+                null,
+                caseDetails,
+                IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
             () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData));
     }
@@ -223,23 +226,23 @@ class MidEventCallbackTest {
     @DisplayName("should include data from existing case reference during a midevent callback")
     void shouldContainAllDataFromExistingCaseReferenceDuringAMidEventCallback() throws Exception {
 
-        Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
+        Map<String, JsonNode> eventData = JacksonUtils.convertValue((MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}")));
 
-        Map<String, JsonNode> existingData = MAPPER.convertValue(MAPPER.readTree(
+        Map<String, JsonNode> existingData = JacksonUtils.convertValue((MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonMiddleName\": \"Middle Name\"\n"
-                + "}"), STRING_JSON_MAP);
-        Map<String, JsonNode> combineData = MAPPER.convertValue(MAPPER.readTree(
+                + "}")));
+        Map<String, JsonNode> combineData = JacksonUtils.convertValue((MAPPER.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
                 + "  \"PersonLastName\": \"Last Name\",\n"
                 + "  \"PersonMiddleName\": \"Middle Name\"\n"
-                + "}"), STRING_JSON_MAP);
+                + "}")));
         CaseDetails existingCaseDetails = caseDetails(existingData);
         CaseDetails combineCaseDetails = caseDetails(combineData);
         CaseDataContent content = newCaseDataContent()
@@ -251,8 +254,8 @@ class MidEventCallbackTest {
             .build();
 
         when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
-            caseEvent,
+            caseTypeDefinition,
+                caseEventDefinition,
             existingCaseDetails,
             combineCaseDetails,
             IGNORE_WARNINGS)).thenReturn(combineCaseDetails);
@@ -277,7 +280,10 @@ class MidEventCallbackTest {
 
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
-            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, existingCaseDetails, combineCaseDetails, IGNORE_WARNINGS),
+            () -> verify(callbackInvoker)
+                .invokeMidEventCallback(wizardPageWithCallback,
+                                            caseTypeDefinition, caseEventDefinition, existingCaseDetails,
+                                            combineCaseDetails, IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, combineData));
     }
 
@@ -286,20 +292,20 @@ class MidEventCallbackTest {
     void shouldCallFilterCaseDataContentWhenWizardPageOrderExists() {
         given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
             .willReturn(asList(wizardPageWithCallback));
-        CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
-            .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
         CaseDetails existingCaseDetails = caseDetails(data);
         when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE)).thenReturn(existingCaseDetails);
         when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
         wizardPageWithCallback.setOrder(1);
 
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
-            caseEvent,
+            caseTypeDefinition,
+            caseEventDefinition,
             existingCaseDetails,
             caseDetails,
             IGNORE_WARNINGS)).willReturn(caseDetails);
 
+        CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
+            .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
         given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails)).willReturn(caseDetails);
 
 
@@ -309,8 +315,8 @@ class MidEventCallbackTest {
         );
 
         verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
-            caseEvent,
+            caseTypeDefinition,
+            caseEventDefinition,
             existingCaseDetails,
             caseDetails,
             IGNORE_WARNINGS);
@@ -321,26 +327,26 @@ class MidEventCallbackTest {
     void shouldFilterCaseDataContentWhenWizardPageOrderExists() {
         WizardPage wizardPageWithoutCallback = createWizardPage("createCase2");
         wizardPageWithoutCallback.setOrder(2);
-        Map<String, JsonNode> data = createData();
         WizardPageField pageField = createWizardPageField("createCase2_field1");
         pageField.setComplexFieldOverrides(Lists.newArrayList(createComplexFieldOverrides("createCase2_field1_complex1")));
         wizardPageWithoutCallback.setWizardPageFields(Lists.newArrayList(pageField));
         given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
             .willReturn(asList(wizardPageWithCallback, wizardPageWithoutCallback));
-        CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
-            .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
+        Map<String, JsonNode> data = createData();
         CaseDetails existingCaseDetails = caseDetails(data);
         when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE)).thenReturn(existingCaseDetails);
         when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
         wizardPageWithCallback.setOrder(1);
 
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
-            caseEvent,
+            caseTypeDefinition,
+            caseEventDefinition,
             existingCaseDetails,
             caseDetails,
             IGNORE_WARNINGS)).willReturn(caseDetails);
 
+        CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
+            .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
         given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails)).willReturn(caseDetails);
 
 
@@ -350,8 +356,8 @@ class MidEventCallbackTest {
         );
 
         verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
-            caseType,
-            caseEvent,
+            caseTypeDefinition,
+            caseEventDefinition,
             existingCaseDetails,
             caseDetails,
             IGNORE_WARNINGS);

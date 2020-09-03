@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd;
 
+import com.hazelcast.config.EvictionPolicy;
+import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
@@ -9,13 +13,12 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-import com.hazelcast.config.EvictionPolicy;
-import org.springframework.beans.factory.annotation.Value;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
 @Named
 @Singleton
 public class ApplicationParams {
+
+    @Value("#{'${ccd.s2s-authorised.services.case_user_roles}'.split(',')}")
+    private List<String> authorisedServicesForCaseUserRoles;
 
     @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")
     private List<String> writeToCCDCaseTypesOnly;
@@ -52,9 +55,6 @@ public class ApplicationParams {
 
     @Value("${ccd.ui-definition.host}")
     private String uiDefinitionHost;
-
-    @Value("${auth.idam.client.baseUrl}")
-    private String idamHost;
 
     @Value("${ccd.case.search.wildcards.allowed}")
     private boolean wildcardSearchAllowed;
@@ -113,6 +113,12 @@ public class ApplicationParams {
     @Value("${search.cases.index.name.format}")
     private String casesIndexNameFormat;
 
+    @Value("${search.cases.index.name.case-type-id.group}")
+    private String casesIndexNameCaseTypeIdGroup;
+
+    @Value("${search.cases.index.name.case-type-id.group.position}")
+    private Integer casesIndexNameCaseTypeIdGroupPosition;
+
     @Value("${search.cases.index.name.type}")
     private String casesIndexType;
 
@@ -124,6 +130,21 @@ public class ApplicationParams {
 
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
+
+    @Value("#{'${audit.log.ignore.statues}'.split(',')}")
+    private List<Integer> auditLogIgnoreStatuses;
+
+    @Value("#{'${ccd.access-control.cross-jurisdictional-roles}'.split(',')}")
+    private List<String> ccdAccessControlCrossJurisdictionRoles;
+
+    @Value("#{'${ccd.access-control.citizen-roles}'.split(',')}")
+    private List<String> ccdAccessControlCitizenRoles;
+
+    @Value("${ccd.access-control.caseworker.role.regex}")
+    private String ccdAccessControlCaseworkerRoleRegex;
+
+    @Value("${audit.log.enabled:true}")
+    private boolean auditLogEnabled;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -139,6 +160,10 @@ public class ApplicationParams {
         } catch (UnsupportedEncodingException e) {
             throw new ServiceException(e.getMessage());
         }
+    }
+
+    public List<String> getAuthorisedServicesForCaseUserRoles() {
+        return authorisedServicesForCaseUserRoles;
     }
 
     public boolean isWildcardSearchAllowed() {
@@ -189,12 +214,16 @@ public class ApplicationParams {
         return uiDefinitionHost + "/api/display/search-result-definition/" + encode(caseTypeId);
     }
 
+    public String displaySearchCasesResultDefURL(final String caseTypeId, final String useCase) {
+        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?use_case=" + useCase;
+    }
+
     public String displayCaseTabCollection(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/tab-structure/" + encode(caseTypeId);
     }
 
-    public String displayWizardPageCollection(final String caseTypeId, final String eventTriggerId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventTriggerId);
+    public String displayWizardPageCollection(final String caseTypeId, final String eventId) {
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + eventId;
     }
 
     public String jurisdictionDefURL() {
@@ -204,9 +233,9 @@ public class ApplicationParams {
     public String bannersURL() {
         return uiDefinitionHost + "/api/display/banners";
     }
-    
+
     public String jurisdictionUiConfigsURL() {
-    	return uiDefinitionHost + "/api/display/jurisdiction-ui-configs";
+        return uiDefinitionHost + "/api/display/jurisdiction-ui-configs";
     }
 
     public String searchInputDefinition(final String caseTypeId) {
@@ -219,10 +248,6 @@ public class ApplicationParams {
 
     public String baseTypesURL() {
         return caseDefinitionHost + "/api/base-types";
-    }
-
-    public String idamUserProfileURL() {
-        return idamHost + "/details";
     }
 
     public String caseRolesURL() {
@@ -343,5 +368,33 @@ public class ApplicationParams {
 
     public Integer getElasticSearchRequestTimeout() {
         return elasticSearchRequestTimeout;
+    }
+
+    public List<Integer> getAuditLogIgnoreStatuses() {
+        return auditLogIgnoreStatuses;
+    }
+
+    public boolean isAuditLogEnabled() {
+        return auditLogEnabled;
+    }
+
+    public List<String> getCcdAccessControlCrossJurisdictionRoles() {
+        return ccdAccessControlCrossJurisdictionRoles;
+    }
+
+    public String getCcdAccessControlCaseworkerRoleRegex() {
+        return ccdAccessControlCaseworkerRoleRegex;
+    }
+
+    public List<String> getCcdAccessControlCitizenRoles() {
+        return ccdAccessControlCitizenRoles;
+    }
+
+    public String getCasesIndexNameCaseTypeIdGroup() {
+        return casesIndexNameCaseTypeIdGroup;
+    }
+
+    public Integer getCasesIndexNameCaseTypeIdGroupPosition() {
+        return casesIndexNameCaseTypeIdGroupPosition;
     }
 }

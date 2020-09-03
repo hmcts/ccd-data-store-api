@@ -24,8 +24,8 @@ import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIDraftResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.DraftViewResource;
 
 class UIDraftsControllerTest {
     private static final String CASE_REFERENCE = "1234123412341238";
@@ -61,7 +61,7 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should return 201 and draft response as body when draft saved")
         void shouldReturn201AndDraftResponseAsBodyWhenDraftSaved() {
-            ResponseEntity<UIDraftResource> draftResponse = draftsController.saveDraft(CASE_TYPE_ID, CASE_DATA_CONTENT);
+            ResponseEntity<DraftViewResource> draftResponse = draftsController.saveDraft(CASE_TYPE_ID, CASE_DATA_CONTENT);
 
             assertAll(
                 () -> assertThat(draftResponse.getStatusCode(), is(HttpStatus.CREATED)),
@@ -85,7 +85,7 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should return 200 when draft updated")
         void shouldReturn200WhenDraftUpdated() {
-            ResponseEntity<UIDraftResource> draftResponse = draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT);
+            ResponseEntity<DraftViewResource> draftResponse = draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT);
 
             assertAll(
                 () -> assertThat(draftResponse.getStatusCode(), is(HttpStatus.OK)),
@@ -109,7 +109,7 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should return 200 when draft is retrieved")
         void shouldReturn200WhenDraftIsRetrieved() {
-            ResponseEntity<UICaseViewResource> draftResponse = draftsController.findDraft(DRAFT_ID);
+            ResponseEntity<CaseViewResource> draftResponse = draftsController.findDraft(DRAFT_ID);
 
             assertAll(
                 () -> assertThat(draftResponse.getStatusCode(), is(HttpStatus.OK)),

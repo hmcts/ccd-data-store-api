@@ -5,8 +5,10 @@
 	"method": "GET",
 	"uri": "/cases/{cid}",
 
-	"user": {
-		"_extends_": "Common_User_For_Request"
+	"users": {
+		"invokingUser": {
+			"_extends_": "Common_User_For_Request"
+		}
 	},
 
 	"request": {
@@ -22,7 +24,6 @@
 	"expectedResponse": {
 		"headers": {
 			"_extends_": "Common_Response_Headers",
-			"Content-Type": "application/json",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		}
 	}

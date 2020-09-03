@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
  */
 public interface AATCaseType {
     String JURISDICTION = "AUTOTEST1";
-    String JURISDICTION_AUTOTEST2 = "AUTOTEST2" ;
+    String JURISDICTION_AUTOTEST2 = "AUTOTEST2";
     String CASE_TYPE = "AAT";
     String PAGE_ID = "1";
     String AAT_PRIVATE_CASE_TYPE = "AAT_PRIVATE";

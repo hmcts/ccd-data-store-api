@@ -1,0 +1,45 @@
+{
+  "title": "Must successfully assign a user and case role for a specific case by a user, with caseworker-caa role, calling through/from an authorised application",
+
+  "_guid_": "S-105.1.2",
+  "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Olawale - with an active solicitor profile",
+    "Admin - who has only caseworker-caa role",
+    "is made from an authorised application, by Admin, with the Case ID of C1, User ID of Olawale and a proper Case Role CR-1"
+
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.caa@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_CAA_PWD]]"
+    },
+    "userRichard": {
+      "_extends_": "F-105_User_Richard"
+    },
+    "userOlawale": {
+      "_extends_": "F-105_User_Olawale"
+    }
+
+  },
+
+  "request": {
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-105_Add_Case_Assigned_User_Roles_201_response"
+  }
+}
+

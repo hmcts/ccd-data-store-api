@@ -1,12 +1,17 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
-import org.apache.commons.lang3.StringUtils;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CriteriaInput {
+import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
+
+public class CriteriaInput implements CommonDCPModel {
     private String label;
     private int order;
     private Field field;
     private String role;
+    @JsonProperty("display_context_parameter")
+    private String displayContextParameter;
 
     public String getLabel() {
         return label;
@@ -46,5 +51,13 @@ public class CriteriaInput {
                 this.field.getId() + '.' + this.field.getElementPath();
         }
         return null;
+    }
+
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
+    }
+
+    public void setDisplayContextParameter(String displayContextParameter) {
+        this.displayContextParameter = displayContextParameter;
     }
 }

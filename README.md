@@ -1,6 +1,8 @@
 # ccd-data-store-api 
-[![API v1](https://img.shields.io/badge/API%20Docs-v1-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v1.json)
-[![API v2 (beta)](https://img.shields.io/badge/API%20Docs-v2%20%28beta%29-4286f4.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v2.json)
+[![API v1_internal](https://img.shields.io/badge/API%20Docs-v1_internal-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v1_internal.json)
+[![API v1_external](https://img.shields.io/badge/API%20Docs-v1_external-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v1_external.json)
+[![API v2_internal (beta)](https://img.shields.io/badge/API%20Docs-v2_internal%20%28beta%29-4286f4.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v2_internal.json)
+[![API v2_external (beta)](https://img.shields.io/badge/API%20Docs-v2_external%20%28beta%29-4286f4.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v2_external.json)
 [![Build Status](https://travis-ci.org/hmcts/ccd-data-store-api.svg?branch=master)](https://travis-ci.org/hmcts/ccd-data-store-api)
 [![Docker Build Status](https://img.shields.io/docker/build/hmcts/ccd-data-store-api.svg)](https://hub.docker.com/r/hmcts/ccd-data-store-api)
 [![codecov](https://codecov.io/gh/hmcts/ccd-data-store-api/branch/master/graph/badge.svg)](https://codecov.io/gh/hmcts/ccd-data-store-api)
@@ -55,6 +57,15 @@ To build project please execute the following:
 ```bash
 ./gradlew clean build
 ```
+
+If integration tests fail due to failure of embedded postgres db initialisation process 
+on Mac OS, the shmmni configuration value for kernel should be set to at least 64 for 
+remediation. This can be done by having the below line in the file `/etc/sysctl.conf`:
+```
+kern.sysv.shmmni=64
+```
+If the file doesn't exist it should be added. The change will take effect upon restart 
+of the local machine.
 
 ### Running
 

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -25,7 +25,7 @@ public class PostCodeValidator implements BaseTypeValidator {
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
-                                           final CaseField caseFieldDefinition) {
+                                           final CaseFieldDefinition caseFieldDefinition) {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
@@ -41,21 +41,21 @@ public class PostCodeValidator implements BaseTypeValidator {
             return Collections.singletonList(new ValidationResult("post code is empty", dataFieldId));
         }
 
-        if (!checkMax(caseFieldDefinition.getFieldType().getMax(), value)) {
+        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
             return Collections.singletonList(new ValidationResult("Post code '" + value + "' exceeds maximum length "
-                + caseFieldDefinition.getFieldType().getMax(), dataFieldId));
+                + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId));
         }
 
-        if (!checkMin(caseFieldDefinition.getFieldType().getMin(), value)) {
+        if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
             return Collections.singletonList(new ValidationResult("Post code '" + value + "' requires minimum length "
-                + caseFieldDefinition.getFieldType().getMin(), dataFieldId));
+                + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId));
         }
 
-        final String userRegex = caseFieldDefinition.getFieldType().getRegularExpression();
+        final String userRegex = caseFieldDefinition.getFieldTypeDefinition().getRegularExpression();
         if (userRegex != null && userRegex.length() > 0) {
-            return (value.matches(userRegex)) ?
-                Collections.emptyList() :
-                Collections.singletonList((new ValidationResult(REGEX_GUIDANCE, dataFieldId)));
+            return (value.matches(userRegex))
+                ? Collections.emptyList()
+                : Collections.singletonList((new ValidationResult(REGEX_GUIDANCE, dataFieldId)));
         }
 
         final String baseTypeRegex = getType().getRegularExpression();

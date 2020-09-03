@@ -4,11 +4,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.util.UriUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
@@ -99,6 +103,29 @@ public class HttpErrorTest {
     }
 
     @Test
+    public void shouldExtractPathFromRequest_useEncoding() {
+
+        // test to confirm RequestURI is encoded: to avoid Sonar java security issue 'S5131' when returning HttpError as
+        // a ResponseEntity in the RestExceptionHandler.
+
+        // ARRANGE
+        String encoding = StandardCharsets.UTF_8.toString();
+        String pathNeedsEncoding = "/this/path changes/when/encoded";
+        String pathAfterEncoding = UriUtils.encodePath(pathNeedsEncoding, encoding);
+
+        HttpServletRequest testRequest = mock(HttpServletRequest.class);
+        doReturn(pathNeedsEncoding).when(testRequest).getRequestURI();
+
+        // ACT
+        final HttpError error = new HttpError(new IllegalArgumentException(MESSAGE), testRequest);
+
+        // ASSERT
+        assertThat(error.getPath(), is(not(equalTo(pathNeedsEncoding)))); // check returned value different from original
+        assertThat(error.getPath(), is(equalTo(pathAfterEncoding))); // check returned value matches expected encoded path
+        assertThat(UriUtils.decode(error.getPath(), encoding), is(equalTo(pathNeedsEncoding))); // check decoded returned value is same as original
+    }
+
+    @Test
     public void shouldTakeOptionalDetails() {
         final HttpError<String> error = new HttpError<String>(new IllegalArgumentException(MESSAGE), request)
             .withDetails(DETAILS);
@@ -107,12 +134,18 @@ public class HttpErrorTest {
     }
 
     @ResponseStatus(code = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-    class TestCodeStatusException extends RuntimeException {}
+    class TestCodeStatusException extends RuntimeException {
+
+    }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    class TestValueStatusException extends RuntimeException {}
+    class TestValueStatusException extends RuntimeException {
+
+    }
 
     @ResponseStatus(reason = "Some error reason")
-    class TestReasonException extends RuntimeException {}
+    class TestReasonException extends RuntimeException {
+
+    }
 
 }

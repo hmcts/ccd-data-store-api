@@ -1,0 +1,50 @@
+{
+  "title": "Must return an error response when the case does not exist",
+
+  "_guid_": "S-105.11",
+  "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - who is to add some case role assignment for a case",
+    "Olawale - with an active solicitor profile and valid User ID",
+    "is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1",
+    "contains the Case ID of C1 in one entry and a well formed but non-existant case ID in the other"
+  ],
+
+  "users": {
+    "_extends_": "F-105_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-105_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        },
+        {
+          "case_id": "4444333322221111",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "message": "No case found for reference: 4444333322221111",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
