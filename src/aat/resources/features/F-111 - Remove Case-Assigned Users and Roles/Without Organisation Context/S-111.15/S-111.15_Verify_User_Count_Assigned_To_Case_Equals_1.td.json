@@ -1,0 +1,15 @@
+{
+  "_guid_": "S-111.15_Verify_User_Count_Assigned_To_Case_Equals_1",
+  "_extends_": "S-111.15_Check_Orgs_assigned_Users_Base",
+
+  "specs": [
+    "to verify that 1 user has access to C1 in Dil's organisation",
+    "to verify the count of users unassigned to a case has NOT changed"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.S-111\\.15_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation.childContexts.F-111_Prerequisite_Counter_Check_Call.childContexts.F-111_Get_Organisation_Identifier_Dil|siblingContexts.S-111\\.15_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation.childContexts.F-111_Prerequisite_Counter_Check_Call|1]}"
+    }
+  }
+}
