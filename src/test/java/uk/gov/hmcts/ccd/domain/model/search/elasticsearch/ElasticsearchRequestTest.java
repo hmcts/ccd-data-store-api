@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
 class ElasticsearchRequestTest {
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
     void hasSourceFieldsShouldReturnFalseWhenSourceIsMissing() throws JsonProcessingException {
@@ -154,12 +156,45 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void shouldIgnoreSupplementaryDataInIncorrectFormat() throws Exception {
-        String query = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":{\"unknown\":\"object\"}}}";
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(mapper.readTree(query));
+    void shouldErrorWhenSupplementaryDataIsNotAnArray() throws Exception {
+        String query = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":{\"object\":\"value\"}}}";
+
+        BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
+            new ElasticsearchRequest(mapper.readTree(query)));
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.hasSupplementaryData(), is(false))
+            () -> assertThat(exception.getMessage(), is("Provided supplementary_data must be an array of text fields."))
+        );
+    }
+
+    @Test
+    void shouldErrorWhenSupplementaryDataIsAnArrayOfNonTextFields() throws Exception {
+        String query = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[{\"array\":\"object\"}]}}";
+
+        BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
+            new ElasticsearchRequest(mapper.readTree(query)));
+
+        assertAll(
+            () -> assertThat(exception.getMessage(), is("Provided supplementary_data must be an array of text fields."))
+        );
+    }
+
+    @Test
+    void shouldSetMetadataFieldsArrayNode() throws Exception {
+        ArrayNode result = ElasticsearchRequest.METADATA_FIELDS;
+
+        List<String> resultAsList = new ObjectMapper().readValue(result.traverse(), new TypeReference<ArrayList<String>>(){});
+        assertAll(
+            () -> assertThat(result.size(), is(9)),
+            () -> assertThat(resultAsList, hasItem(CASE_REFERENCE.getDbColumnName())),
+            () -> assertThat(resultAsList, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
+            () -> assertThat(resultAsList, hasItem(CREATED_DATE.getDbColumnName())),
+            () -> assertThat(resultAsList, hasItem(CASE_TYPE.getDbColumnName())),
+            () -> assertThat(resultAsList, hasItem(JURISDICTION.getDbColumnName())),
+            () -> assertThat(resultAsList, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
+            () -> assertThat(resultAsList, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
+            () -> assertThat(resultAsList, hasItem(STATE.getDbColumnName())),
+            () -> assertThat(resultAsList, hasItem(DATA_CLASSIFICATION_COL))
         );
     }
 
