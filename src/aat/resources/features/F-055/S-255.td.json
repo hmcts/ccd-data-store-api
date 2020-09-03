@@ -1,8 +1,7 @@
 {
-	"title": "must return 422 when start event trigger has failed",
-
 	"_guid_": "S-255",
 	"_extends_": "F-055_Base_Test_Data",
+	"title": "must return 422 when start event trigger has failed",
 
 	"specs": [
 		"an active profile in CCD",

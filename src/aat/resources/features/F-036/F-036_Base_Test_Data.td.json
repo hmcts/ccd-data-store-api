@@ -3,6 +3,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve a trigger for case by ID",
+
 	"method": "GET",
 	"uri": "cases/{caseId}/event-triggers/{triggerId}",
 

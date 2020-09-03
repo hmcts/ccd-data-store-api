@@ -4,6 +4,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Create event token",
+
 	"method": "GET",
 	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 

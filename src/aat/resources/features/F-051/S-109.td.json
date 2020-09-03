@@ -1,10 +1,11 @@
 {
 	"_guid_": "S-109",
-	"title": "must return appropriate user setting from idam role for a user not having a profile in CCD",
 	"_extends_": "Base_Expecting_200",
+	"title": "must return appropriate user setting from idam role for a user not having a profile in CCD",
 
 	"productName": "CCD Data Store",
 	"operationName": "Get default settings for user",
+
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/profile",
 

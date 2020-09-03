@@ -3,6 +3,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Start event creation as Citizen",
+
 	"method": "GET",
 	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 

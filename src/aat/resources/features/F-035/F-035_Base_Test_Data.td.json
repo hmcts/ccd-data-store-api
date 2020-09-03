@@ -3,6 +3,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "retrieve a case by id",
+
 	"method": "GET",
 	"uri": "/cases/{cid}",
 

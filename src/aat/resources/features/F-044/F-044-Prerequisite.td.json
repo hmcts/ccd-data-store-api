@@ -4,8 +4,8 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve update token for an existing case",
-	"method": "GET",
 
+	"method": "GET",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
 
 	"specs": [
@@ -32,13 +32,13 @@
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-			"Content-Encoding" : "gzip",
+			"Content-Encoding": "gzip",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
-		"body" : {
-			"token" : "[[ANYTHING_PRESENT]]",
-			"case_details" : "[[ANYTHING_PRESENT]]",
-			"event_id" : "UPDATE"
+		"body": {
+			"token": "[[ANYTHING_PRESENT]]",
+			"case_details": "[[ANYTHING_PRESENT]]",
+			"event_id": "UPDATE"
 		}
 	}
 }

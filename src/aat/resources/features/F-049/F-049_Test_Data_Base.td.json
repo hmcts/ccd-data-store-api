@@ -3,6 +3,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Start case creation as Case worker",
+
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 

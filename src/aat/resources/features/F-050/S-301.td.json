@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-301",
 	"_extends_": "F-050_Test_Data_Base",
-
 	"title": "must validate when all fields are valid",
 
 	"specs": [

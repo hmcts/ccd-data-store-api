@@ -1,7 +1,7 @@
 {
-	"title": "Update the case by Solicitor",
 	"_extends_": "S-579-Update_Case_For_Solicitor_Data_Base",
 	"_guid_": "S-579_Later_Case_Update_By_Solicitor_3",
+	"title": "Update the case by Solicitor",
 
 	"specs": [
 		"to update the same case by Solicitor 3"
@@ -11,6 +11,7 @@
 		"username": "befta.caseworker.2.solicitor.3@gmail.com",
 		"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
 	},
+
 	"request": {
 		"pathVariables": {
 			"cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"

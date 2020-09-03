@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-231",
 	"_extends_": "F-049_Test_Data_Base",
-
 	"title": "must return 401 when request provides invalid authentication credentials",
 
 	"specs": [

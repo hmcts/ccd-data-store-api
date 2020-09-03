@@ -2,9 +2,10 @@
 	"_guid_": "Befta_Default_Token_Creation_Data_For_Case_Creation",
 
 	"productName": "CCD Data Store",
-		"operationName": "Start event creation as Case worker",
-		"method": "GET",
-		"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+	"operationName": "Start event creation as Case worker",
+
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
 	"specs": [
 		"to create a token for case creation"
@@ -59,5 +60,4 @@
 			"event_id" : "CREATE"
 		}
 	}
-
 }

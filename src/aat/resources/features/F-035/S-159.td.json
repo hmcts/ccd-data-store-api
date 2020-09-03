@@ -1,7 +1,7 @@
 {
-	"title": "should retrieve case when the case reference exists",
 	"_guid_": "S-159",
 	"_extends_": "F-035_Base_Test_Data",
+	"title": "should retrieve case when the case reference exists",
 
 	"specs": [
 		"an active profile in CCD",

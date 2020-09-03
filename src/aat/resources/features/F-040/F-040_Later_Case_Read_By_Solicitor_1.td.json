@@ -1,7 +1,7 @@
 {
-	"title": "Get the case for read by a caseworker",
 	"_extends_": "F-040_Test_Data_Base",
 	"_guid_": "F-040_Later_Case_Read_By_Solicitor_1",
+	"title": "Get the case for read by a caseworker",
 
 	"specs": [
 		"to get the same case by Solicitor 1"

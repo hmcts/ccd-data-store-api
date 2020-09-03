@@ -1,12 +1,14 @@
 {
 	"_guid_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
 	"_extends_": "Befta_Jurisdiction2_Case_Creation_Base_Data_Solicitor_1",
+
 	"users": {
 		"invokingUser": {
 			"username": "befta.caseworker.2.solicitor.1@gmail.com",
 			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
 		}
 	},
+
 	"request": {
 		"headers": {
 			"_extends_": "Common_Request_Headers"
@@ -21,6 +23,7 @@
 			}
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_201_Response",
 		"headers": {

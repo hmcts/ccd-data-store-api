@@ -1,5 +1,6 @@
 {
 	"_guid_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification_Solicitor_1",
+
 	"DocumentField4": "PUBLIC",
 	"MoneyGBPField": "PUBLIC",
 	"AddressUKField": {
@@ -14,7 +15,6 @@
 		},
 		"classification": "PUBLIC"
 	},
-
 	"FixedListField" : "PUBLIC",
 	"FixedRadioListField": "PUBLIC",
 	"DateTimeField": "PUBLIC",
@@ -32,6 +32,3 @@
 		"classification": "PUBLIC"
 	}
 }
-
-
-

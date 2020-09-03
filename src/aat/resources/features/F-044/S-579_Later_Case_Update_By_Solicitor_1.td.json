@@ -1,7 +1,7 @@
 {
-	"title": "Update the case by Solicitor",
 	"_extends_": "S-579-Update_Case_For_Solicitor_Data_Base",
 	"_guid_": "S-579_Later_Case_Update_By_Solicitor_1",
+	"title": "Update the case by Solicitor",
 
 	"specs": [
 		"to update the same case by Solicitor 1, who doesn't have UPDATE permission"

@@ -2,9 +2,10 @@
 	"_guid_": "Standard_Token_Creation_Data_For_Case_Creation",
 
 	"productName": "CCD Data Store",
-		"operationName": "Start event creation as Case worker",
-		"method": "GET",
-		"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+	"operationName": "Start event creation as Case worker",
+
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
 	"specs": [
 		"to create a token for case creation"
@@ -18,7 +19,7 @@
 	},
 
 	"request": {
-		"headers":{
+		"headers": {
 			"_extends_": "Common_Request_Headers"
 		},
 		"pathVariables": {
@@ -31,13 +32,13 @@
 
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
-		"headers" : {
-			"Content-Encoding" : "gzip",
+		"headers": {
+			"Content-Encoding": "gzip",
 			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
 		},
-		"body" : {
-			"token" : "[[ANY_STRING_NOT_NULLABLE]]",
-			"case_details" : {
+		"body": {
+			"token": "[[ANY_STRING_NOT_NULLABLE]]",
+			"case_details": {
 				"id": null,
 				"jurisdiction": "[[ANYTHING_PRESENT]]",
 				"state": null,
@@ -56,8 +57,7 @@
 				"delete_draft_response_status": null,
 				"security_classifications": {}
 			},
-			"event_id" : "CREATE"
+			"event_id": "CREATE"
 		}
 	}
-
 }

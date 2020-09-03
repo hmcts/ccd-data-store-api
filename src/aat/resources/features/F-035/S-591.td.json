@@ -1,7 +1,7 @@
 {
-	"title": "must return status 200 along with the CaseView object successfully",
 	"_guid_": "S-591",
 	"_extends_": "F-035_Base_Test_Data",
+	"title": "must return status 200 along with the CaseView object successfully",
 
 	"specs": [
 		"an active profile in CCD",

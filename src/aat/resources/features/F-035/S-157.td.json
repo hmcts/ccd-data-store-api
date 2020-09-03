@@ -1,7 +1,7 @@
 {
-	"title": "should get 400 when case reference invalid",
 	"_guid_": "S-157",
 	"_extends_": "F-035_Base_Test_Data",
+	"title": "should get 400 when case reference invalid",
 
 	"specs": [
 		"an active profile in CCD",

@@ -1,7 +1,7 @@
 {
-	"title": "must return 422 when event submission has failed",
 	"_guid_": "S-283",
 	"_extends_": "F-044_Test_Data_Base",
+	"title": "must return 422 when event submission has failed",
 
 	"specs": [
 		"an active profile in CCD",

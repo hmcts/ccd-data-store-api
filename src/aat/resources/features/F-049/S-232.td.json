@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-232",
 	"_extends_": "F-049_Test_Data_Base",
-
 	"title": "must return 403 when the request contains a jurisdiction id user is unauthorised to access",
 
 	"specs": [

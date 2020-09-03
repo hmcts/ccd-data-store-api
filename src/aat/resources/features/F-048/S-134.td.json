@@ -10,7 +10,9 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Get the pagination metadata for a case data search for Case Worker",
+
 	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
 
 	"user": {
 		"username": "auto.test.cnp_invalid@gmail.com",
@@ -18,8 +20,6 @@
 		"token": "fakeToken",
 		"uid": "dummyval"
 	},
-
-	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
 
 	"request": {
 		"pathVariables": {

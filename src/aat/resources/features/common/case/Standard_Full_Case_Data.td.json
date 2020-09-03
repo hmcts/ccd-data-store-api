@@ -11,14 +11,20 @@
 	"DateTimeField": "1988-07-07T22:20:00",
 	"TextAreaField": "Line1\nLine2",
 	"FixedListField": "VALUE3",
-	"MultiSelectListField": [ "OPTION2", "OPTION4" ],
-	"CollectionField": [{
-		"id": "CollectionField1",
-		"value": "Alias 1"
-	}, {
-		"id": "CollectionField2",
-		"value": "Alias 2"
-	}],
+	"MultiSelectListField": [
+		"OPTION2",
+		"OPTION4"
+	],
+	"CollectionField": [
+		{
+			"id": "CollectionField1",
+			"value": "Alias 1"
+		},
+		{
+			"id": "CollectionField2",
+			"value": "Alias 2"
+		}
+	],
 	"ComplexField": {
 		"ComplexTextField": "Nested text",
 		"ComplexFixedListField": "VALUE2"

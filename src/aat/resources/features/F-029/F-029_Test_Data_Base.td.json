@@ -3,6 +3,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Fetch an event trigger in the context of a case type for Case Worker",
+
 	"method": "GET",
 	"uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}",
 

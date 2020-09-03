@@ -1,7 +1,7 @@
 {
-	"title": "must return 404 when case id is structurally valid but not existing in CCD",
 	"_guid_": "S-152",
 	"_extends_": "F-045_Test_Data_Base",
+	"title": "must return 404 when case id is structurally valid but not existing in CCD",
 
 	"specs": [
 		"an active profile in CCD",

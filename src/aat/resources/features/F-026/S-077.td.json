@@ -1,7 +1,7 @@
 {
-	"title": "must return an empty SearchResultView envelope and status code 200 if case type has no associated cases",
 	"_guid_": "S-077",
 	"_extends_": "F-026_Test_Data_Base",
+	"title": "must return an empty SearchResultView envelope and status code 200 if case type has no associated cases",
 
 	"specs": [
 		"an active profile in CCD",

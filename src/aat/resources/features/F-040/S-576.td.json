@@ -1,7 +1,8 @@
 {
-	"title": "must return successfully all and only the respective fields with READ access for a Case Worker and a Solicitor",
-	"_extends_": "F-040_Test_Data_Base",
 	"_guid_": "S-576",
+	"_extends_": "F-040_Test_Data_Base",
+	"title": "must return successfully all and only the respective fields with READ access for a Case Worker and a Solicitor",
+
 
 	"specs": [
 		"an active Solicitor profile in CCD with a specific variation of ACLs on a case type",

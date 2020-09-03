@@ -1,7 +1,7 @@
 {
-	"title": "must return negative response when request contains a non-existing Event-Id",
 	"_guid_": "S-027",
 	"_extends_": "F-037_Test_Data_Base",
+	"title": "must return negative response when request contains a non-existing Event-Id",
 
 	"specs": [
 		"an active profile in CCD",

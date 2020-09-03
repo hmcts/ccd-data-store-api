@@ -1,7 +1,7 @@
 {
-	"title": "must return status 200 along with the CaseView object successfully",
 	"_guid_": "S-590",
 	"_extends_": "F-027_Test_Data_Base",
+	"title": "must return status 200 along with the CaseView object successfully",
 
 	"specs": [
 		"an active profile in CCD",
@@ -10,8 +10,8 @@
 	],
 
 	"user": {
-			"username": "befta.caseworker.3@gmail.com",
-			"password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+		"username": "befta.caseworker.3@gmail.com",
+		"password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
 	},
 
 	"request": {
@@ -26,13 +26,13 @@
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-			"Content-Length" : "[[ANYTHING_PRESENT]]",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Encoding": "gzip",
 			"Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
-			"Strict-Transport-Security":"[[ANY_STRING_NULLABLE]]"
+			"Strict-Transport-Security": "[[ANY_STRING_NULLABLE]]"
 		},
-		"body" : {
-			"tabs" : "[[ANYTHING_PRESENT]]",
+		"body": {
+			"tabs": "[[ANYTHING_PRESENT]]",
 			"metadataFields": [
 				{
 					"__operator__": "equivalent",
@@ -56,9 +56,8 @@
 					"show_summary_change_option": null,
 					"show_summary_content_option": null,
 					"acls": [
-
 					],
-					"default_value" : null
+					"default_value": null
 				},
 				{
 					"id": "[LAST_STATE_MODIFIED_DATE]",
@@ -74,10 +73,8 @@
 						"max": null,
 						"regular_expression": null,
 						"fixed_list_items": [
-
 						],
 						"complex_fields": [
-
 						],
 						"collection_field_type": null
 					},
@@ -91,9 +88,8 @@
 					"show_summary_change_option": null,
 					"show_summary_content_option": null,
 					"acls": [
-
 					],
-					"default_value" : null
+					"default_value": null
 				},
 				{
 					"id": "[JURISDICTION]",
@@ -109,10 +105,8 @@
 						"max": null,
 						"regular_expression": null,
 						"fixed_list_items": [
-
 						],
 						"complex_fields": [
-
 						],
 						"collection_field_type": null
 					},
@@ -126,9 +120,8 @@
 					"show_summary_change_option": null,
 					"show_summary_content_option": null,
 					"acls": [
-
 					],
-					"default_value" : null
+					"default_value": null
 				},
 				{
 					"id": "[CASE_TYPE]",
@@ -144,10 +137,8 @@
 						"max": null,
 						"regular_expression": null,
 						"fixed_list_items": [
-
 						],
 						"complex_fields": [
-
 						],
 						"collection_field_type": null
 					},
@@ -161,9 +152,8 @@
 					"show_summary_change_option": null,
 					"show_summary_content_option": null,
 					"acls": [
-
 					],
-					"default_value" : null
+					"default_value": null
 				},
 				{
 					"id": "[SECURITY_CLASSIFICATION]",
@@ -179,10 +169,8 @@
 						"max": null,
 						"regular_expression": null,
 						"fixed_list_items": [
-
 						],
 						"complex_fields": [
-
 						],
 						"collection_field_type": null
 					},
@@ -196,9 +184,8 @@
 					"show_summary_change_option": null,
 					"show_summary_content_option": null,
 					"acls": [
-
 					],
-					"default_value" : null
+					"default_value": null
 				},
 				{
 					"id": "[CASE_REFERENCE]",
@@ -214,10 +201,8 @@
 						"max": null,
 						"regular_expression": null,
 						"fixed_list_items": [
-
 						],
 						"complex_fields": [
-
 						],
 						"collection_field_type": null
 					},
@@ -231,9 +216,8 @@
 					"show_summary_change_option": null,
 					"show_summary_content_option": null,
 					"acls": [
-
 					],
-					"default_value" : null
+					"default_value": null
 				},
 				{
 					"id": "[CREATED_DATE]",
@@ -249,10 +233,8 @@
 						"max": null,
 						"regular_expression": null,
 						"fixed_list_items": [
-
 						],
 						"complex_fields": [
-
 						],
 						"collection_field_type": null
 					},
@@ -266,9 +248,8 @@
 					"show_summary_change_option": null,
 					"show_summary_content_option": null,
 					"acls": [
-
 					],
-					"default_value" : null
+					"default_value": null
 				},
 				{
 					"id": "[LAST_MODIFIED_DATE]",
@@ -284,10 +265,8 @@
 						"max": null,
 						"regular_expression": null,
 						"fixed_list_items": [
-
 						],
 						"complex_fields": [
-
 						],
 						"collection_field_type": null
 					},
@@ -301,59 +280,64 @@
 					"show_summary_change_option": null,
 					"show_summary_content_option": null,
 					"acls": [
-
 					],
-					"default_value" : null
+					"default_value": null
 				}
 			],
-			"state" : {
-				"id" : "TODO",
-				"name" : "To do",
-				"description" : null,
-				"title_display" : null
+			"state": {
+				"id": "TODO",
+				"name": "To do",
+				"description": null,
+				"title_display": null
 			},
-			"channels" : "[[ANYTHING_PRESENT]]",
-			"triggers" : [ {
-				"id" : "[[ANYTHING_PRESENT]]",
-				"name" : "[[ANYTHING_PRESENT]]",
-				"description" : null,
-				"order" : "[[ANYTHING_PRESENT]]"
-			}, {
-				"id" : "[[ANYTHING_PRESENT]]",
-				"name" : "[[ANYTHING_PRESENT]]",
-				"description" : null,
-				"order" : "[[ANYTHING_PRESENT]]"
-			}, {
-				"id" : "[[ANYTHING_PRESENT]]",
-				"name" : "[[ANYTHING_PRESENT]]",
-				"description" : null,
-				"order" : "[[ANYTHING_PRESENT]]"
-			} ],
-			"events" : [ {
-				"id" : "[[ANYTHING_PRESENT]]",
-				"timestamp" : "[[ANYTHING_PRESENT]]",
-				"summary" : "[[ANYTHING_PRESENT]]",
-				"comment" : "[[ANYTHING_PRESENT]]",
-				"event_id" : "[[ANYTHING_PRESENT]]",
-				"event_name" : "[[ANYTHING_PRESENT]]",
-				"user_id" : "[[ANYTHING_PRESENT]]",
-				"user_last_name" : "[[ANYTHING_PRESENT]]",
-				"user_first_name" : "[[ANYTHING_PRESENT]]",
-				"state_name" : "[[ANYTHING_PRESENT]]",
-				"state_id" : "[[ANYTHING_PRESENT]]",
-				"significant_item" : null
-			} ],
-			"case_id" : "[[ANYTHING_PRESENT]]",
-			"case_type" : {
-				"id" : "[[ANYTHING_PRESENT]]",
-				"name" : "[[ANYTHING_PRESENT]]",
-				"description" : "[[ANYTHING_PRESENT]]",
-				"jurisdiction" : {
-					"id" : "[[ANYTHING_PRESENT]]",
-					"name" : "[[ANYTHING_PRESENT]]",
-					"description" : "[[ANYTHING_PRESENT]]"
+			"channels": "[[ANYTHING_PRESENT]]",
+			"triggers": [
+				{
+					"id": "[[ANYTHING_PRESENT]]",
+					"name": "[[ANYTHING_PRESENT]]",
+					"description": null,
+					"order": "[[ANYTHING_PRESENT]]"
 				},
-				"printEnabled" : false
+				{
+					"id": "[[ANYTHING_PRESENT]]",
+					"name": "[[ANYTHING_PRESENT]]",
+					"description": null,
+					"order": "[[ANYTHING_PRESENT]]"
+				},
+				{
+					"id": "[[ANYTHING_PRESENT]]",
+					"name": "[[ANYTHING_PRESENT]]",
+					"description": null,
+					"order": "[[ANYTHING_PRESENT]]"
+				}
+			],
+			"events": [
+				{
+					"id": "[[ANYTHING_PRESENT]]",
+					"timestamp": "[[ANYTHING_PRESENT]]",
+					"summary": "[[ANYTHING_PRESENT]]",
+					"comment": "[[ANYTHING_PRESENT]]",
+					"event_id": "[[ANYTHING_PRESENT]]",
+					"event_name": "[[ANYTHING_PRESENT]]",
+					"user_id": "[[ANYTHING_PRESENT]]",
+					"user_last_name": "[[ANYTHING_PRESENT]]",
+					"user_first_name": "[[ANYTHING_PRESENT]]",
+					"state_name": "[[ANYTHING_PRESENT]]",
+					"state_id": "[[ANYTHING_PRESENT]]",
+					"significant_item": null
+				}
+			],
+			"case_id": "[[ANYTHING_PRESENT]]",
+			"case_type": {
+				"id": "[[ANYTHING_PRESENT]]",
+				"name": "[[ANYTHING_PRESENT]]",
+				"description": "[[ANYTHING_PRESENT]]",
+				"jurisdiction": {
+					"id": "[[ANYTHING_PRESENT]]",
+					"name": "[[ANYTHING_PRESENT]]",
+					"description": "[[ANYTHING_PRESENT]]"
+				},
+				"printEnabled": false
 			}
 		}
 	}

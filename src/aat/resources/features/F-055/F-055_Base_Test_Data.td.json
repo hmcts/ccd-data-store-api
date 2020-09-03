@@ -1,17 +1,18 @@
 {
 	"_guid_": "F-055_Base_Test_Data",
 
+	"productName": "CCD Data Store",
+	"operationName": "start event creation as citizen",
+
+	"method": "GET",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
 	"users": {
 		"invokingUser": {
 			"username": "befta.citizen.3@gmail.com",
 			"password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
 		}
 	},
-
-	"productName": "CCD Data Store",
-	"operationName": "start event creation as citizen",
-	"method": "GET",
-	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
 
 	"request": {
 		"_extends_": "Common_Request",

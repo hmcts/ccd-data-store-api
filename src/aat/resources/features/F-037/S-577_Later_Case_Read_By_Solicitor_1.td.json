@@ -1,7 +1,7 @@
 {
-	"title": "Get the case for read by a solicitor",
 	"_extends_": "S-577_Get_Case_For_Case_Worker_Data_Base",
 	"_guid_": "S-577_Later_Case_Read_By_Solicitor_1",
+	"title": "Get the case for read by a solicitor",
 
 	"specs": [
 		"to get the same case by Solicitor 1"

@@ -3,6 +3,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "get case data for a given case type for citizen",
+
 	"method": "GET",
 	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 

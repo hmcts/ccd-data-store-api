@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-297",
 	"_extends_": "F-050_Test_Data_Base",
-
 	"title": "must not validate when CMC ExternalID is not unique or already exists",
 
 	"specs": [

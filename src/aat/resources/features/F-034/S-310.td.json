@@ -1,7 +1,7 @@
 {
-	"title": "must return 404 when case type does not exist",
 	"_guid_": "S-310",
 	"_extends_": "F-034_Test_Data_Base",
+	"title": "must return 404 when case type does not exist",
 
 	"specs": [
 		"an active profile in CCD",
@@ -20,7 +20,7 @@
 		"body" : {
 			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
 			"timestamp" : "[[ANYTHING_PRESENT]]",
-			"message" : "Resource not found when getting case type version for 'abc'.",
+			"message" : "Error when getting case type version. Unknown case type 'abc'.\"",
 			"path" : "/case-types/abc/validate",
 			"details" : null,
 			"callbackErrors" : null,

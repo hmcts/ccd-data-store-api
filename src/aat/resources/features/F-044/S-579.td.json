@@ -1,7 +1,8 @@
 {
-	"title": "must submit the event creation successfully for correct inputs",
 	"_guid_": "S-579",
 	"_extends_": "S-579-Update_Case_For_Solicitor_Data_Base",
+	"title": "must submit the event creation successfully for correct inputs",
+
 
 	"specs": [
 		"an active Solicitor profile in CCD with a specific variation of ACLs on a case type",

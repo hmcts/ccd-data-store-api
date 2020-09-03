@@ -15,11 +15,11 @@
 			"Country": "PUBLIC"
 		}
 	},
-	"ComplexField" : {
-		"classification" : "PUBLIC",
-		"value" : {
-			"ComplexTextField" : "PUBLIC",
-			"ComplexFixedListField" : "PUBLIC"
+	"ComplexField": {
+		"classification": "PUBLIC",
+		"value": {
+			"ComplexTextField": "PUBLIC",
+			"ComplexFixedListField": "PUBLIC"
 		}
 	},
 	"DateTimeField": "PUBLIC",

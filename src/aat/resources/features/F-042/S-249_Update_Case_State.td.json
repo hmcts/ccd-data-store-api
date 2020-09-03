@@ -1,7 +1,7 @@
 {
-	"title": "Fire a CREATE event on the case just created",
 	"_guid_": "S-249_Update_Case_State",
 	"_extends_": "F-042_Test_Data_Base",
+	"title": "Fire a CREATE event on the case just created",
 
 	"productName": "CCD Data Store",
 

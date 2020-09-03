@@ -1,17 +1,18 @@
 {
 	"_guid_": "F-032_Base_Test_Data",
 
+	"productName": "CCD Data Store",
+	"operationName": "get printable documents",
+
+	"method": "POST",
+	"uri": "/callback/jurisdictions/{jid}/case-types/{ctid}/documents",
+
 	"users": {
 		"invokingUser": {
 			"username":"[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
 			"password":"[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
 		}
 	},
-
-	"productName": "CCD Data Store",
-	"operationName": "get printable documents",
-	"method": "POST",
-	"uri": "/callback/jurisdictions/{jid}/case-types/{ctid}/documents",
 
 	"request": {
 		"_extends_": "Common_Request",

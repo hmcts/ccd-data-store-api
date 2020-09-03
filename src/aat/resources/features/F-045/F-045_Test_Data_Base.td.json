@@ -3,6 +3,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Grant access to case",
+
 	"method": "POST",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
 

@@ -1,7 +1,9 @@
 {
 	"_guid_": "Befta_Jurisdiction2_Citizen_Case_Creation_Base_Data",
+
 	"productName": "CCD Data Store",
 	"operationName": "Submit case creation as Case worker",
+
 	"method": "POST",
 	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 

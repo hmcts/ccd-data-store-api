@@ -3,6 +3,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "submit event for an existing case (V2)",
+
 	"method": "POST",
 	"uri": "/cases/{cid}/events",
 

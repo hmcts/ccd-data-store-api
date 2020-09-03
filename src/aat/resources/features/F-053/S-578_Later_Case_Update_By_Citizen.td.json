@@ -1,7 +1,7 @@
 {
-	"title": "Update the case by Citizen",
-	"_extends_": "S-578_Update_Case_For_Citizen_Data_Base",
 	"_guid_": "S-578_Later_Case_Update_By_Citizen",
+	"_extends_": "S-578_Update_Case_For_Citizen_Data_Base",
+	"title": "Update the case by Citizen",
 
 	"specs": [
 		"to update the DocumentField4 of same case by Citizen who doesn't have privilege to update DocumentField4",

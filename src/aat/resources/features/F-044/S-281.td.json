@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-281",
 	"_extends_": "F-044_Test_Data_Base",
-
 	"title": "must return negative response when request contains a non-existing case reference",
 
 	"specs": [

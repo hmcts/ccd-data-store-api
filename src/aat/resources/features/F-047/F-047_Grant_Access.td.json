@@ -4,12 +4,12 @@
 	"productName": "CCD Data Store",
 	"operationName": "to grant access on a case",
 
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+
 	"specs": [
 		"to grant access on the case just created"
 	],
-
-	"method": "POST",
-	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
 
 	"user": {
 		"_extends_": "Common_User_For_Request"
