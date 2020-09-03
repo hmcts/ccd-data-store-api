@@ -83,7 +83,7 @@ class ApprovalStatusValidatorTest {
     }
 
     @Test
-    void shouldReturnEmptyErrorListValidateForEmptyData() {
+    void shouldReturnEmptyErrorListValidateForEmptyDataForOtherFieldId() {
         final JsonNode data = NODE_FACTORY.textNode("");
         List<ValidationResult> validationResults =
             this.validator.validate("OrganisationToAdd", data, caseFieldDefinition);
@@ -92,7 +92,7 @@ class ApprovalStatusValidatorTest {
     }
 
     @Test
-    void shouldReturnEmptyErrorListValidateForNullData() {
+    void shouldReturnEmptyErrorListValidateForNullDataForOtherFieldId() {
         final JsonNode data = null;
         List<ValidationResult> validationResults =
             this.validator.validate("OrganisationToAdd", data, caseFieldDefinition);
