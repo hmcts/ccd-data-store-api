@@ -5,7 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains some ChangeOrganisationRequest Complex Fields with all correct values]"
+    "contains some ChangeOrganisationRequest Complex Fields with all correct values"
   ],
 
   "expectedResponse": {
