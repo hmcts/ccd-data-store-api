@@ -1,25 +1,25 @@
 {
-	"_guid_": "S-307",
-	"_extends_": "F-059_Test_Data_Base",
-	"title": "must validate when all fields are valid",
+  "_guid_": "S-307",
+  "_extends_": "F-059_Test_Data_Base",
+  "title": "must validate when all fields are valid",
 
-	"specs": [
-		"an active profile in CCD",
-		"has the 200 return code"
-	],
+  "specs": [
+    "an active profile in CCD",
+    "has the 200 return code"
+  ],
 
-	"expectedResponse": {
-		"_extends_": "Common_200_Response",
-		"headers": {
-			"Content-Length": "[[ANYTHING_PRESENT]]",
-			"Content-Encoding": "gzip"
-		},
-		"body": {
-			"data": {
-				"_extends_": "F-059_Case_Data_Base",
-				"FormattedDateField": "1970-01-21",
-				"FormattedDateTimeField": "2019-01-21T00:05:00.000"
-			}
-		}
-	}
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "data": {
+        "_extends_": "F-059_Case_Data_Base",
+        "FormattedDateField": "1970-01-21",
+        "FormattedDateTimeField": "2019-01-21T00:05:00.000"
+      }
+    }
+  }
 }

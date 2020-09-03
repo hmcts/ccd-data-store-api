@@ -1,12 +1,16 @@
 {
 	"_guid_": "S-578_Update_Case_For_Citizen_Data_Base",
+
 	"productName": "CCD Data Store",
 	"operationName": "submit event for an existing case (V2)",
+
 	"method": "POST",
 	"uri": "/cases/{cid}/events",
+
 	"user": {
 		"_extends_": "Common_User_For_Request"
 	},
+
 	"request": {
 		"headers": {
 			"_extends_": "Common_Request_Headers",
@@ -33,6 +37,7 @@
 			"ignore_warning": false
 		}
 	},
+
 	"expectedResponse": {
 		"headers": {
 			"_extends_": "Common_Response_Headers",
