@@ -11,15 +11,12 @@ import java.util.stream.Collectors;
 import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
-import uk.gov.hmcts.ccd.domain.model.std.CaseValidationError;
 import uk.gov.hmcts.ccd.domain.types.CaseDataValidator;
 import uk.gov.hmcts.ccd.domain.types.ValidationResult;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
@@ -31,7 +28,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 public class CaseTypeService {
     private final CaseDataValidator caseDataValidator;
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private static final Logger LOG = LoggerFactory.getLogger(CaseTypeService.class);
 
     @Inject
     public CaseTypeService(final CaseDataValidator caseDataValidator,
@@ -62,12 +58,10 @@ public class CaseTypeService {
                              final CaseTypeDefinition caseTypeDefinition) {
         final List<ValidationResult> dataValidationResults = caseDataValidator.validate(data, caseTypeDefinition.getCaseFieldDefinitions());
         if (!dataValidationResults.isEmpty()) {
-            LOG.warn("There have been validation errors={}", dataValidationResults);
             final List<CaseFieldValidationError> fieldErrors = dataValidationResults.stream()
                 .map(validationResult -> new CaseFieldValidationError(validationResult.getFieldId(), validationResult.getErrorMessage()))
                 .collect(Collectors.toList());
-            throw new CaseValidationException()
-                .withDetails(new CaseValidationError(fieldErrors));
+            throw new CaseValidationException(fieldErrors);
         }
     }
 

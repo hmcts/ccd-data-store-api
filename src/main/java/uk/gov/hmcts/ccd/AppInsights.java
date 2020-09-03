@@ -2,9 +2,13 @@ package uk.gov.hmcts.ccd;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
+import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
+import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class AppInsights {
@@ -31,6 +35,26 @@ public class AppInsights {
 
     public void trackException(Exception e) {
         telemetry.trackException(e);
+    }
+
+    /**
+     * Sends an exception record to Application Insights. Appears in "exceptions" in Analytics and Search.
+     * @param exception The exception to log information about.
+     * @param customProperties Named string values you can use to search and classify trace messages.
+     * @param severityLevel Sets the SeverityLevel property
+     */
+    public void trackException(Exception exception, Map<String, String> customProperties, SeverityLevel severityLevel) {
+        ExceptionTelemetry exceptionTelemetry = new ExceptionTelemetry(exception);
+
+        if (severityLevel != null) {
+            exceptionTelemetry.setSeverityLevel(severityLevel);
+        }
+
+        if (customProperties != null && !customProperties.isEmpty()) {
+            exceptionTelemetry.getContext().getProperties().putAll(customProperties);
+        }
+
+        telemetry.trackException(exceptionTelemetry);
     }
 
     public void trackDependency(String dependencyName, String commandName, long duration, boolean success) {
