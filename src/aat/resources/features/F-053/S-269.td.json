@@ -78,8 +78,6 @@
 						"AddressLine3": "PUBLIC"
 					}
 				},
-				"FormattedDateTimeField" : "PUBLIC",
-				"FormattedDateField" : "PUBLIC",
 				"ComplexField": {
 					"classification": "PUBLIC",
 					"value": {
