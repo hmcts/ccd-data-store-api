@@ -1,0 +1,100 @@
+{
+  "title": "must successfully create a case with a case type containing ChangeOrganisationRequest Complex Fields",
+  "_guid_": "S-113.1",
+  "_extends_": "F-113_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains some ChangeOrganisationRequest Complex Fields with all correct values]"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Vary": "accept-encoding",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "id": "1598630239215676",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_ComplexOrganisation",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "data": {
+        "ChangeOrganisationRequestField": {
+          "CaseRoleId": "[[ANYTHING_PRESENT]]",
+          "Reason": "[[ANYTHING_PRESENT]]",
+          "RequestTimestamp": "",
+          "ApprovalStatus": "1",
+          "ApprovalRejectionTimestamp": null,
+          "NotesReason": "[[ANYTHING_PRESENT]]",
+          "OrganisationToAdd": {
+            "OrganisationID": "[[ANYTHING_PRESENT]]",
+            "OrganisationName": "[[ANYTHING_PRESENT]]"
+          },
+          "OrganisationToRemove": {
+            "OrganisationID": "[[ANYTHING_PRESENT]]",
+            "OrganisationName": "[[ANYTHING_PRESENT]]"
+          }
+        },
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": "[[ANYTHING_PRESENT]]",
+          "Organisation": {
+            "OrganisationID": "[[ANYTHING_PRESENT]]",
+            "OrganisationName": "[[ANYTHING_PRESENT]]"
+          }
+        },
+        "OrganisationField": {
+          "OrganisationID": "[[ANYTHING_PRESENT]]",
+          "OrganisationName": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "data_classification": {
+        "ChangeOrganisationRequestField": {
+          "classification": "PUBLIC",
+          "value": {
+            "CaseRoleId": "PUBLIC",
+            "Reason": "PUBLIC",
+            "RequestTimestamp": "PUBLIC",
+            "ApprovalStatus": "PUBLIC",
+            "ApprovalRejectionTimestamp": "PUBLIC",
+            "NotesReason": "PUBLIC",
+            "OrganisationToAdd": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              }
+            },
+            "OrganisationToRemove": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              }
+            }
+          }
+        },
+        "OrganisationField": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrganisationID": "PUBLIC",
+            "OrganisationName": "PUBLIC"
+          }
+        }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}
