@@ -4,7 +4,7 @@ Feature: F-113: ChangeOrganisationRequest Complex Base Type
     Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-113.1
+  @S-COR
   Scenario: must successfully create a case with a case type containing ChangeOrganisationRequest Complex Fields
     Given a user with [an active profile in CCD]
     And a successful call [to create a token for case creation] as in [F-113_Case_Data_Create_Token_Creation]

@@ -1,6 +1,6 @@
 {
 	"title": "must successfully create a case with a case type containing ChangeOrganisationRequest Complex Fields",
-	"_guid_": "S-113.1",
+	"_guid_": "S-COR",
 	"_extends_": "F-113_Test_Data_Base",
 
 	"specs": [
