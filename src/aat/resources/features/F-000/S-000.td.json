@@ -4,7 +4,7 @@
 	"title": "must return default user setting successfully for a user having a profile in CCD",
 
 	"productName": "CCD Data Store",
-	"operationName": "Get default settings for user",
+	"operationName": "Get Default Settings for User",
 
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/profile",

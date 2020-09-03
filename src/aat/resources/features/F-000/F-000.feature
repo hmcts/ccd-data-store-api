@@ -1,6 +1,6 @@
 #=====================================
 @F-000
-Feature: Get default settings for user
+Feature: Get Default Settings for User
 #=====================================
 
 Background:
@@ -8,7 +8,7 @@ Background:
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-000 @Smoke
-Scenario: [SAMPLE] must return default user setting successfully for a user having a profile in CCD
+Scenario: must return default user setting successfully for a user having a profile in CCD
 
     Given a successful call [to retrieve a user profile] as in [S-000-Prerequisite],
       And a user with [a detailed profile in CCD],
@@ -16,7 +16,7 @@ Scenario: [SAMPLE] must return default user setting successfully for a user havi
 
      When a request is prepared with appropriate values,
       And the request [uses a uid that exists in IDAM],
-      And it is submitted to call the [Get default settings for user] operation of [CCD Data Store],
+      And it is submitted to call the [Get Default Settings for User] operation of [CCD Data Store],
 
      Then a positive response is received,
       And the response has all the details as expected.
