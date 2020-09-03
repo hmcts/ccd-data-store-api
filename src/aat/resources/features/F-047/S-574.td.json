@@ -1,18 +1,21 @@
 {
-  "_guid_": "S-574",
-  "_extends_": "F-047_Test_Data_Base",
-  "title": "must return negative response HTTP-404 when request contains a non-existing case type ID",
-  "specs": [
-    "an active profile in CCD",
-    "contains a non-existing case type ID",
-    "code is HTTP-404"
-  ],
-  "request": {
-    "pathVariables": {
-      "ctid": "non-existing case type ID"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_404_Response"
-  }
+	"_guid_": "S-574",
+	"_extends_": "F-047_Test_Data_Base",
+	"title": "must return negative response HTTP-404 when request contains a non-existing case type ID",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing case type ID",
+		"code is HTTP-404"
+	],
+
+	"request": {
+		"pathVariables": {
+			"ctid": "non-existing case type ID"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_404_Response"
+	}
 }

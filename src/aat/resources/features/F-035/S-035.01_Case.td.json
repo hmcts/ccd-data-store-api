@@ -16,7 +16,7 @@
 			"ctid": "BEFTA_CASETYPE_3_4"
 		},
 		"body": {
-			"event_token": "${[scenarioContext][parentContext][childContexts][S-035.01_Case_Token_Creation][testData][actualResponse][body][token]}"
+			"event_token": "${[scenarioContext][parentContext][childContexts][S-035.01_GetToken][testData][actualResponse][body][token]}"
 		}
 	},
 
@@ -31,20 +31,14 @@
 			"last_modified": "[[ANYTHING_PRESENT]]",
 			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
 			"security_classification": "PUBLIC",
-			"case_data": {
-				
-			},
-			"data_classification": {
-				
-			},
+			"case_data": {},
+			"data_classification": {},
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,
 			"delete_draft_response_status_code": null,
 			"delete_draft_response_status": null,
-			"security_classifications": {
-				
-			}
+			"security_classifications": {}
 		}
 	}
 }

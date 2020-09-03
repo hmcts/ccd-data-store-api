@@ -1,21 +1,21 @@
 {
-	"_guid_": "S-213",
-	"_extends_": "F-063_Base_Test_Data",
-	"title": "must return 401 when request does not provide valid authentication credentials",
+  "_guid_": "S-213",
+  "_extends_": "F-063_Base_Test_Data",
+  "title": "must return 401 when request does not provide valid authentication credentials",
 
-	"specs": [
-		"an active profile in CCD",
-		"contains an invalid user authentication token",
-		"contains a HTTP 401 Unauthorised"
-	],
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid user authentication token",
+    "contains a HTTP 401 Unauthorised"
+  ],
 
-	"request": {
-		"headers": {
-			"Authorization": "invalid user token"
-		}
-	},
+  "request": {
+    "headers": {
+      "Authorization": "invalid user token"
+    }
+  },
 
-	"expectedResponse": {
-		"_extends_": "Common_401_Response"
-	}
+  "expectedResponse": {
+    "_extends_": "Common_401_Response"
+  }
 }

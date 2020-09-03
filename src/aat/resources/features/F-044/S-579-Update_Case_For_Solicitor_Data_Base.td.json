@@ -1,45 +1,50 @@
 {
-  "_guid_": "S-579-Update_Case_For_Solicitor_Data_Base",
-  "productName": "CCD Data Store",
-  "operationName": "submit event creation as case worker",
-  "method": "POST",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
-  "user": {
-    "username": "befta.caseworker.2.solicitor.2@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
-  },
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_JURISDICTION_2",
-      "ctid": "BEFTA_CASETYPE_2_1",
-      "cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
-    },
-    "body": {
-      "data": {
-        "DocumentField2":{
-          "document_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-          "document_filename":"Elastic Search test Case.png"
-        }
-      },
-      "event": {
-        "id": "UPDATE",
-        "summary": "",
-        "description": ""
-      },
-      "event_token": "${[scenarioContext][childContexts][S-579-Prerequisite_Solicitor_2_Token_For_Update_Case][testData][actualResponse][body][token]}",
-      "ignore_warning": false
-    }
-  },
-  "expectedResponse": {
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Content-Type": "[[ANYTHING_PRESENT]]",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"_guid_": "S-579-Update_Case_For_Solicitor_Data_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "submit event creation as case worker",
+
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+
+	"user": {
+		"username": "befta.caseworker.2.solicitor.2@gmail.com",
+		"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_JURISDICTION_2",
+			"ctid": "BEFTA_CASETYPE_2_1",
+			"cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+		},
+		"body": {
+			"data": {
+				"DocumentField2":{
+					"document_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+					"document_binary_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+					"document_filename":"Elastic Search test Case.png"
+				}
+			},
+			"event": {
+				"id": "UPDATE",
+				"summary": "",
+				"description": ""
+			},
+			"event_token": "${[scenarioContext][childContexts][S-579-Prerequisite_Solicitor_2_Token_For_Update_Case][testData][actualResponse][body][token]}",
+			"ignore_warning": false
+		}
+	},
+
+	"expectedResponse": {
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

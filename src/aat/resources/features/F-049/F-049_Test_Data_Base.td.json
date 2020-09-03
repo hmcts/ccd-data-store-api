@@ -3,12 +3,14 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Start case creation as Case worker",
+
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
 	"user": {
 		"_extends_": "Common_User_For_Request"
 	},
+
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {
@@ -18,6 +20,7 @@
 			"etid": "CREATE"
 		}
 	},
+
 	"expectedResponse": {
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",

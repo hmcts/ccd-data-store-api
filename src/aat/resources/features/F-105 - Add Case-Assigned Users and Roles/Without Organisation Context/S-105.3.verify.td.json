@@ -1,8 +1,8 @@
 {
-  "_guid_": "S-105.3_Get_Case_Roles_for_Case_C1",
-  "_extends_": "F-105_Get_Case_Roles_for_Case_C1_Empty_Response_Base",
+	"_guid_": "S-105.3_Get_Case_Roles_for_Case_C1",
+	"_extends_": "F-105_Get_Case_Roles_for_Case_C1_Empty_Response_Base",
 
-  "specs": [
-    "to verify that Olawale hasn't received the role CR-1 over the case C1"
-  ]
+	"specs": [
+		"to verify that Olawale hasn't received the role CR-1 over the case C1"
+	]
 }
