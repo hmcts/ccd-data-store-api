@@ -164,12 +164,11 @@ public class UICaseSearchController {
     }
 
     public static String buildCaseIds(ResponseEntity<CaseSearchResultViewResource> response) {
-        if (response.getBody() == null) {
-            return null;
-        } else {
-            return response.getBody().getCases().stream().limit(MAX_CASE_IDS_LIST)
+        CaseSearchResultViewResource body = response.getBody();
+        return body == null ? null
+                : body.getCases().stream().limit(
+                        MAX_CASE_IDS_LIST)
                 .map(SearchResultViewItem::getCaseId)
                 .collect(Collectors.joining(CASE_ID_SEPARATOR));
-        }
     }
 }
