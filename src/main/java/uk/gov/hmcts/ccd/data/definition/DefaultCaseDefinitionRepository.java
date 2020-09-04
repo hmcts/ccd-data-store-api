@@ -35,10 +35,10 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
+@SuppressWarnings("checkstyle:SummaryJavadoc")
 // partial javadoc attributes added prior to checkstyle implementation in module
 @Service
 @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
-@SuppressWarnings({"checkstyle:SummaryJavadoc", "java:S2259"})
 public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDefinitionRepository.class);
