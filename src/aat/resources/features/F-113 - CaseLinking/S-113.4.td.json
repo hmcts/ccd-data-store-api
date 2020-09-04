@@ -1,7 +1,7 @@
 {
 	"title": "must successfully save CaseLink when a user adds the case reference of a case he/she does not have the required permissions to access",
-	"_guid_": "S-112.4",
-	"_extends_": "F-112_Test_Data_Base",
+	"_guid_": "S-113.4",
+	"_extends_": "F-113_Test_Data_Base",
 
 	"specs": [
 		"an active profile in CCD",
