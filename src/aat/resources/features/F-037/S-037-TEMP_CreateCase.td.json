@@ -276,7 +276,6 @@
 				"DateField": "PUBLIC",
 				"DateTimeField": "PUBLIC"
 			},
-			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,

@@ -53,7 +53,6 @@
 				"DocumentField6": "PUBLIC",
 				"DocumentField1": "PUBLIC"
 			},
-			"supplementary_data": null,
 			"security_classifications": {
 				"_extends_": "S-577_Response_Data_Classification",
 				"DocumentField4": "PUBLIC",
