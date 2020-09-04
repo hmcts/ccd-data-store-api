@@ -99,4 +99,4 @@ Feature: F-109: Role-Based Authorisation of Caseworker CAAs
     And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a positive response is received,
     And the response has all the details as expected,
-    And a call [to verify Olawale's reception of the role CR-1 over the case C1 by an admin] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
+    And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
