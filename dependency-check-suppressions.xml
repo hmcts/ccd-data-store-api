@@ -303,6 +303,8 @@
         <cve>CVE-2020-13935</cve>
         <cve>CVE-2020-7019</cve>
         <cve>CVE-2020-24616</cve>
+        <cve>CVE-2020-10518</cve>
+        <cve>CVE-2020-10517</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
