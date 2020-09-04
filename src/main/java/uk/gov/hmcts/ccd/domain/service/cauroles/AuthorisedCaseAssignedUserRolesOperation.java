@@ -30,6 +30,11 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
         this.cauRolesOperation.addCaseUserRoles(caseUserRoles);
     }
 
+    @Override
+    public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+        this.cauRolesOperation.removeCaseUserRoles(caseUserRoles);
+    }
+
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
         if (this.cauRoleValidator.canAccessUserCaseRoles(userIds)) {
             return this.cauRolesOperation.findCaseUserRoles(caseIds, userIds);

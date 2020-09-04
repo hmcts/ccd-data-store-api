@@ -14,6 +14,7 @@ public class CaseSearchResult {
 
     private Long total;
     private List<CaseDetails> cases;
+
     @JsonProperty("case_types_results")
     private List<CaseTypeResults> caseTypesResults;
 

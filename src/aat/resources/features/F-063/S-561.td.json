@@ -1,8 +1,7 @@
 {
-  "title": "must return 404 when case type does not exist",
-
   "_guid_": "S-561",
   "_extends_": "F-063_Base_Test_Data",
+  "title": "must return 404 when case type does not exist",
 
   "specs": [
     "an active profile in CCD",

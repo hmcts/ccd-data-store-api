@@ -22,8 +22,8 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesRequest;
-import uk.gov.hmcts.ccd.v2.external.domain.AddCaseAssignedUserRolesResponse;
+import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
+import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,11 +39,25 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.ADD_SUCCESS_MESSAGE;
+import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.REMOVE_SUCCESS_MESSAGE;
 
 class CaseAssignedUserRolesControllerTest {
 
     private static final String CASE_ID_GOOD = "4444333322221111";
     private static final String CASE_ID_BAD = "1234";
+
+    private static final String ADD_SERVICE_GOOD = "ADD_SERVICE_GOOD";
+    private static final String ADD_SERVICE_BAD = "ADD_SERVICE_BAD";
+
+    private static final String CLIENT_S2S_TOKEN_GOOD = "good_s2s_token";
+    private static final String CLIENT_S2S_TOKEN_BAD = "bad_s2s_token";
+
+    private static final String CASE_ROLE_GOOD = "[CASE_ROLE_GOOD]";
+    private static final String CASE_ROLE_BAD = "CASE_ROLE_BAD";
+    private static final String ORGANISATION_ID_GOOD = "ORGANISATION_ID_GOOD";
+    private static final String ORGANISATION_ID_BAD = "";
+    private static final String USER_ID_1 = "123";
+    private static final String USER_ID_2 = "321";
 
     @Mock
     private ApplicationParams applicationParams;
@@ -78,23 +92,10 @@ class CaseAssignedUserRolesControllerTest {
     @DisplayName("POST /case-users")
     class AddCaseUserRoles {
 
-        private static final String ADD_SERVICE_GOOD = "ADD_SERVICE_GOOD";
-        private static final String ADD_SERVICE_BAD = "ADD_SERVICE_BAD";
-
-        private static final String CLIENT_S2S_TOKEN_GOOD = "good_s2s_token";
-        private static final String CLIENT_S2S_TOKEN_BAD = "bad_s2s_token";
-
-        private static final String CASE_ROLE_GOOD = "[CASE_ROLE_GOOD]";
-        private static final String CASE_ROLE_BAD = "CASE_ROLE_BAD";
-        private static final String ORGANISATION_ID_GOOD = "ORGANISATION_ID_GOOD";
-        private static final String ORGANISATION_ID_BAD = "";
-        private static final String USER_ID_1 = "123";
-        private static final String USER_ID_2 = "321";
-
         @BeforeEach
         void setUp() {
             // setup happy authorised s2s service path
-            when(applicationParams.getAuthorisedServicesForAddUserCaseRoles()).thenReturn(
+            when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(
                 Lists.newArrayList(ADD_SERVICE_GOOD)
             );
             doReturn(ADD_SERVICE_GOOD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_GOOD);
@@ -107,10 +108,10 @@ class CaseAssignedUserRolesControllerTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT
-            ResponseEntity<AddCaseAssignedUserRolesResponse> response =
+            ResponseEntity<CaseAssignedUserRolesResponse> response =
                 controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest);
 
             // ASSERT
@@ -128,10 +129,10 @@ class CaseAssignedUserRolesControllerTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT
-            ResponseEntity<AddCaseAssignedUserRolesResponse> response =
+            ResponseEntity<CaseAssignedUserRolesResponse> response =
                 controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest);
 
             // ASSERT
@@ -151,10 +152,10 @@ class CaseAssignedUserRolesControllerTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD, ORGANISATION_ID_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT
-            ResponseEntity<AddCaseAssignedUserRolesResponse> response =
+            ResponseEntity<CaseAssignedUserRolesResponse> response =
                 controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest);
 
             // ASSERT
@@ -197,7 +198,7 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void addCaseUserRoles_throwsExceptionWhenNullCaseUserRolesListPassed() {
             // ARRANGE
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(null);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(null);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -214,7 +215,7 @@ class CaseAssignedUserRolesControllerTest {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList();
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -234,7 +235,7 @@ class CaseAssignedUserRolesControllerTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -254,7 +255,7 @@ class CaseAssignedUserRolesControllerTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -274,7 +275,7 @@ class CaseAssignedUserRolesControllerTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_BAD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -294,7 +295,7 @@ class CaseAssignedUserRolesControllerTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_BAD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -319,7 +320,7 @@ class CaseAssignedUserRolesControllerTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_BAD)
             );
 
-            AddCaseAssignedUserRolesRequest addCaseUserRolesRequest = new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
 
             // ACT / ASSERT
             BadRequestException exception = assertThrows(BadRequestException.class,
@@ -435,6 +436,259 @@ class CaseAssignedUserRolesControllerTest {
     }
 
     @Nested
+    @DisplayName("DELETE /case-users")
+    class RemoveCaseUserRoles {
+
+        @BeforeEach
+        void setUp() {
+            when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(List.of(ADD_SERVICE_GOOD));
+            doReturn(ADD_SERVICE_GOOD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_GOOD);
+        }
+
+        @Test
+        void removeCaseUserRoles_shouldCallRemoveWhenValidSingleGoodCaseUserRoleSupplied() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT
+            ResponseEntity<CaseAssignedUserRolesResponse> response =
+                    controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request);
+
+            // ASSERT
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(REMOVE_SUCCESS_MESSAGE, response.getBody().getStatus());
+            verify(caseAssignedUserRolesOperation, times(1)).removeCaseUserRoles(caseUserRoles);
+        }
+
+        @Test
+        void removeCaseUserRoles_shouldCallRemoveWhenValidSingleGoodCaseUserRoleSupplied_withOrganisation() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
+                            ORGANISATION_ID_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT
+            ResponseEntity<CaseAssignedUserRolesResponse> response =
+                    controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request);
+
+            // ASSERT
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(REMOVE_SUCCESS_MESSAGE, response.getBody().getStatus());
+            verify(caseAssignedUserRolesOperation, times(1)).removeCaseUserRoles(caseUserRoles);
+        }
+
+        @Test
+        void removeCaseUserRoles_shouldCallRemoveWhenValidMultipleGoodCaseUserRolesSupplied() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD),
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD),
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD,
+                            ORGANISATION_ID_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT
+            ResponseEntity<CaseAssignedUserRolesResponse> response =
+                    controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request);
+
+            // ASSERT
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(REMOVE_SUCCESS_MESSAGE, response.getBody().getStatus());
+            verify(caseAssignedUserRolesOperation, times(1)).removeCaseUserRoles(caseUserRoles);
+        }
+
+        @Test
+        void removeCaseUserRoles_throwsExceptionWhenClientServiceNotAuthorised() {
+            // ARRANGE
+            doReturn(ADD_SERVICE_BAD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_BAD);
+
+            // ACT / ASSERT
+            CaseRoleAccessException exception = assertThrows(CaseRoleAccessException.class,
+                () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_BAD, null));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION))
+            );
+        }
+
+        @Test
+        void removeCaseUserRoles_throwsExceptionWhenNullPassed() {
+            // ARRANGE
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, null));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
+            );
+        }
+
+        @Test
+        void removeCaseUserRoles_throwsExceptionWhenNullCaseUserRolesListPassed() {
+            // ARRANGE
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(null);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
+            );
+        }
+
+        @Test
+        void removeCaseUserRoles_throwsExceptionWhenEmptyCaseUserRolesListPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList();
+
+            CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.EMPTY_CASE_USER_ROLE_LIST))
+            );
+        }
+
+        @Test
+        void removeCaseUserRoles_throwsExceptionWhenInvalidCaseIdPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                    // case_id: has to be a valid 16-digit Luhn number
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.CASE_ID_INVALID))
+            );
+        }
+
+        @Test
+        void removeCaseUserRoles_throwsExceptionWhenInvalidUserIdPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                    // user_id: has to be a string of length > 0
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.USER_ID_INVALID))
+            );
+        }
+
+        @Test
+        void removeCaseUserRoles_throwsExceptionWhenInvalidCaseRolePassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                    // case_role: has to be a none-empty string in square brackets
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_BAD)
+            );
+
+            CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.CASE_ROLE_FORMAT_INVALID))
+            );
+        }
+
+        @Test
+        void removeCaseUserRoles_throwsExceptionWhenInvalidOrganisationIdPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                    // organisation_id: has to be a non-empty string, when present
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
+                            ORGANISATION_ID_BAD)
+            );
+
+            CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.ORGANISATION_ID_INVALID))
+            );
+        }
+
+        @Test
+        void removeCaseUserRoles_throwsExceptionWhenMultipleErrorsPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                    // case_id: has to be a valid 16-digit Luhn number
+                    // case_role: has to be a none-empty string in square brackets
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_BAD),
+                    // user_id: has to be a string of length > 0
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD),
+                    // organisation_id: has to be a non-empty string, when present
+                    new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD,
+                            ORGANISATION_ID_BAD)
+            );
+
+            CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> controller.removeCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, request));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.CASE_ID_INVALID)),
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.USER_ID_INVALID)),
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.CASE_ROLE_FORMAT_INVALID)),
+                () -> assertThat(exception.getMessage(),
+                            containsString(V2.Error.ORGANISATION_ID_INVALID))
+            );
+        }
+
+    }
+
+    @Nested
     @DisplayName("Build ID lists for LogAudit")
     class BuildIdListsForLogAudit {
 
@@ -455,11 +709,11 @@ class CaseAssignedUserRolesControllerTest {
         void buildIdLists_shouldReturnEmptyStringWhenNullListPassed() {
             // ACT
             String resultBuildCaseIds =
-                CaseAssignedUserRolesController.buildCaseIds(new AddCaseAssignedUserRolesRequest(null));
+                CaseAssignedUserRolesController.buildCaseIds(new CaseAssignedUserRolesRequest(null));
             String resultBuildUserIds =
-                CaseAssignedUserRolesController.buildUserIds(new AddCaseAssignedUserRolesRequest(null));
+                CaseAssignedUserRolesController.buildUserIds(new CaseAssignedUserRolesRequest(null));
             String resultBuildCaseRoles =
-                CaseAssignedUserRolesController.buildCaseRoles(new AddCaseAssignedUserRolesRequest(null));
+                CaseAssignedUserRolesController.buildCaseRoles(new CaseAssignedUserRolesRequest(null));
 
             // ASSERT
             assertEquals("", resultBuildCaseIds);
@@ -584,7 +838,7 @@ class CaseAssignedUserRolesControllerTest {
             assertEquals("1,2,3,4,5,6,7,8,9,10", resultBuildOptionalIds);
         }
 
-        private AddCaseAssignedUserRolesRequest createAddCaseAssignedUserRolesRequest(int numberRequired) {
+        private CaseAssignedUserRolesRequest createAddCaseAssignedUserRolesRequest(int numberRequired) {
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList();
 
             for (int i = 1; i <= numberRequired; i++) {
@@ -596,7 +850,7 @@ class CaseAssignedUserRolesControllerTest {
                 ));
             }
 
-            return new AddCaseAssignedUserRolesRequest(caseUserRoles);
+            return new CaseAssignedUserRolesRequest(caseUserRoles);
         }
 
     }

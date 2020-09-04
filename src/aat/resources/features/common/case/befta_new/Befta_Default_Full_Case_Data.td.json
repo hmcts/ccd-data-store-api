@@ -1,10 +1,10 @@
 {
-  "_guid_": "Befta_Default_Full_Case_Data",
+	"_guid_": "Befta_Default_Full_Case_Data",
 
-  "TextField": "Some Text",
-  "NumberField": "164528",
-  "YesOrNoField": "Yes",
-  "PhoneUKField": "07123456789",
-  "EmailField": "ccd@hmcts.net",
-  "MoneyGBPField": "4200"
+	"TextField": "Some Text",
+	"NumberField": "164528",
+	"YesOrNoField": "Yes",
+	"PhoneUKField": "07123456789",
+	"EmailField": "ccd@hmcts.net",
+	"MoneyGBPField": "4200"
 }

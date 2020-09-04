@@ -1,74 +1,75 @@
 {
-  "_guid_": "Befta_Jurisdiction2_Default_Full_Case_Data",
-  "DocumentField4": {
-    "document_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
-    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary",
-    "document_filename": "Screenshot 2019-11-14 at 1.57.32 pm.png"
-  },
-  "MoneyGBPField": "111100",
-  "FixedListField": "VALUE3",
-  "DocumentField3": {
-    "document_url": "{{DM_STORE_BASE_URL}}/documents/68c9f85f-1d0c-4d02-b082-502a87c1ac6c",
-    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/68c9f85f-1d0c-4d02-b082-502a87c1ac6c/binary",
-    "document_filename": "Screenshot 2019-11-13 at 9.52.02 am.png"
-  },
-  "AddressUKField": {
-    "AddressLine1": null,
-    "AddressLine2": null,
-    "AddressLine3": null,
-    "PostTown": null,
-    "County": null,
-    "PostCode": null,
-    "Country": null
-  },
-  "DocumentField6": {
-    "document_url": "{{DM_STORE_BASE_URL}}/documents/76976634-374f-472b-a819-a3a938b4cc83",
-    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/76976634-374f-472b-a819-a3a938b4cc83/binary",
-    "document_filename": "Screenshot 2019-11-13 at 11.25.45 am.png"
-  },
-  "DocumentField5": {
-    "document_url": "{{DM_STORE_BASE_URL}}/documents/f96735a6-8764-4778-978c-e7612a610a94",
-    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/f96735a6-8764-4778-978c-e7612a610a94/binary",
-    "document_filename": "Screenshot 2019-11-18 at 10.20.24 am.png"
-  },
-  "DocumentField2": {
-    "document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-    "document_filename": "Elastic Search test Case.png"
-  },
-  "DocumentField1": {
-    "document_url": "{{DM_STORE_BASE_URL}}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4",
-    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4/binary",
-    "document_filename": "Screenshot 2019-11-13 at 3.24.26 pm.png"
-  },
-  "ComplexField": {
-    "ComplexTextField": null,
-    "ComplexFixedListField": null,
-    "ComplexNestedField": {
-      "NestedNumberField": null,
-      "NestedCollectionTextField": []
-    }
-  },
-  "FixedRadioListField": "RADIOVALUE2",
-  "DateTimeField": null,
-  "PhoneUKField": null,
-  "DocumentField7": {
-    "document_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311",
-    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311/binary",
-    "document_filename": "Screenshot 2019-12-24 at 3.41.04 pm.png"
-  },
-  "NumberField": "111111222222",
-  "MultiSelectListField": [
-    "OPTION5",
-    "OPTION4",
-    "OPTION3"
-  ],
-  "YesOrNoField": "Yes",
-  "EmailField": "testemail@gmail.com",
-  "TextField": "sometextfield",
-  "DateField": "2222-01-02",
-  "TextAreaField": "textarea",
-  "CollectionField": []
+	"_guid_": "Befta_Jurisdiction2_Default_Full_Case_Data",
+
+	"DocumentField4": {
+		"document_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
+		"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary",
+		"document_filename": "Screenshot 2019-11-14 at 1.57.32 pm.png"
+	},
+	"MoneyGBPField": "111100",
+	"FixedListField": "VALUE3",
+	"DocumentField3": {
+		"document_url": "{{DM_STORE_BASE_URL}}/documents/68c9f85f-1d0c-4d02-b082-502a87c1ac6c",
+		"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/68c9f85f-1d0c-4d02-b082-502a87c1ac6c/binary",
+		"document_filename": "Screenshot 2019-11-13 at 9.52.02 am.png"
+	},
+	"AddressUKField": {
+		"AddressLine1": null,
+		"AddressLine2": null,
+		"AddressLine3": null,
+		"PostTown": null,
+		"County": null,
+		"PostCode": null,
+		"Country": null
+	},
+	"DocumentField6": {
+		"document_url": "{{DM_STORE_BASE_URL}}/documents/76976634-374f-472b-a819-a3a938b4cc83",
+		"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/76976634-374f-472b-a819-a3a938b4cc83/binary",
+		"document_filename": "Screenshot 2019-11-13 at 11.25.45 am.png"
+	},
+	"DocumentField5": {
+		"document_url": "{{DM_STORE_BASE_URL}}/documents/f96735a6-8764-4778-978c-e7612a610a94",
+		"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/f96735a6-8764-4778-978c-e7612a610a94/binary",
+		"document_filename": "Screenshot 2019-11-18 at 10.20.24 am.png"
+	},
+	"DocumentField2": {
+		"document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+		"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+		"document_filename": "Elastic Search test Case.png"
+	},
+	"DocumentField1": {
+		"document_url": "{{DM_STORE_BASE_URL}}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4",
+		"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4/binary",
+		"document_filename": "Screenshot 2019-11-13 at 3.24.26 pm.png"
+	},
+	"ComplexField": {
+		"ComplexTextField": null,
+		"ComplexFixedListField": null,
+		"ComplexNestedField": {
+			"NestedNumberField": null,
+			"NestedCollectionTextField": []
+		}
+	},
+	"FixedRadioListField": "RADIOVALUE2",
+	"DateTimeField": null,
+	"PhoneUKField": null,
+	"DocumentField7": {
+		"document_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311",
+		"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311/binary",
+		"document_filename": "Screenshot 2019-12-24 at 3.41.04 pm.png"
+	},
+	"NumberField": "111111222222",
+	"MultiSelectListField": [
+		"OPTION5",
+		"OPTION4",
+		"OPTION3"
+	],
+	"YesOrNoField": "Yes",
+	"EmailField": "testemail@gmail.com",
+	"TextField": "sometextfield",
+	"DateField": "2222-01-02",
+	"TextAreaField": "textarea",
+	"CollectionField": []
 }
 
 

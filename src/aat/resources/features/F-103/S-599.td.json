@@ -1,5 +1,5 @@
 {
-	"title": "when no User ID is supplied for a specific case ID, then the case roles relating to all  users with access to that case must be returned",
+	"title": "when no User ID is supplied for a specific case ID, then the case roles relating to all users with access to that case must be returned",
 	"_guid_": "S-599",
 	"productName": "CCD Data Store api",
 	"operationName": "Get Case-Assigned Users and Roles",
@@ -8,7 +8,7 @@
 		"Richard - who can create a case",
 		"Dil - with an active profile",
 		"Steve - with an active profile",
-		"Jamal -  who is a privileged user with permissions to access the case assignments of other users",
+		"Jamal - who is a privileged user with permissions to access the case assignments of other users",
 		"is made by Jamal with the Case ID of C1 & no User ID",
 		"contains the list of case roles just granted to Dil & Steve, as per above"
 	],

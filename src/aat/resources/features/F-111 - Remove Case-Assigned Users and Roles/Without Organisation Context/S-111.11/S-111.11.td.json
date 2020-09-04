@@ -1,0 +1,33 @@
+{
+  "title": "must return an error response for empty case_users list",
+  "_guid_": "S-111.11",
+  "_extends_": "F-111_Remove_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Dil - who is to add some case role assignment for a case",
+    "is made from an authorised application by Dil, with an empty list of case assigned users and roles supplied"
+  ],
+
+  "users": {
+    "userDil": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": []
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-111_Remove_Case_Assigned_User_Roles_400_response",
+    "body": {
+      "message": "Invalid data provided for the following inputs to the request:\nCase user roles list is empty"
+    }
+  }
+}
