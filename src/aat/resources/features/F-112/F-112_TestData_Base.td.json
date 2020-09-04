@@ -1,0 +1,22 @@
+{
+  "_guid_": "F-112-TestData_Base",
+  "title": "External Elastic Search Endpoint",
+  "productName": "CCD Data Store api",
+  "operationName": "/searchCases",
+  "method": "POST",
+  "uri": "/searchCases",
+  "user" : {
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ctid": "FT_ComplexCollectionComplex"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
+}
