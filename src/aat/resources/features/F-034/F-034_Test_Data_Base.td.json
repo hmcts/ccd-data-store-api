@@ -31,7 +31,6 @@
 			"data_classification": {
 				"_extends_" : "Standard_Full_Case_Data_Classification"
 			},
-			"supplementary_data": null,
 			"security_classification": "PUBLIC",
 			"event_token": "testToken",
 			"ignore_warning": true

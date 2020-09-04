@@ -120,6 +120,7 @@
 			"security_classification": "PRIVATE",
 			"security_classifications": "[[ANYTHING_PRESENT]]",
 			"data_classification" : "[[ANYTHING_PRESENT]]",
+			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,
