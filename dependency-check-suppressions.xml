@@ -158,6 +158,8 @@
         <cve>CVE-2020-5408</cve>
         <cve>CVE-2020-9484</cve>
         <cve>CVE-2020-13692</cve>
+        <cve>CVE-2020-10517</cve>
+        <cve>CVE-2020-10518</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
