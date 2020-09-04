@@ -12,9 +12,9 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.types.BaseTypeValidator.REGEX_GUIDANCE;
 
 class ApprovalStatusValidatorTest {
 
@@ -83,7 +83,7 @@ class ApprovalStatusValidatorTest {
     }
 
     @Test
-    void shouldReturnEmptyErrorListValidateForEmptyData() {
+    void shouldReturnEmptyErrorListValidateForEmptyDataForOtherFieldId() {
         final JsonNode data = NODE_FACTORY.textNode("");
         List<ValidationResult> validationResults =
             this.validator.validate("OrganisationToAdd", data, caseFieldDefinition);
@@ -92,7 +92,7 @@ class ApprovalStatusValidatorTest {
     }
 
     @Test
-    void shouldReturnEmptyErrorListValidateForNullData() {
+    void shouldReturnEmptyErrorListValidateForNullDataForOtherFieldId() {
         final JsonNode data = null;
         List<ValidationResult> validationResults =
             this.validator.validate("OrganisationToAdd", data, caseFieldDefinition);
