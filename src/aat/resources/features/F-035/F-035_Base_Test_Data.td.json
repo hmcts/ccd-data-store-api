@@ -1,7 +1,9 @@
 {
 	"_guid_": "F-035_Base_Test_Data",
+
 	"productName": "CCD Data Store",
 	"operationName": "retrieve a case by id",
+
 	"method": "GET",
 	"uri": "/cases/{cid}",
 
