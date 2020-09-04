@@ -36,6 +36,8 @@
 					"AddressLine2": "CCD",
 					"AddressLine3": "c/o HMCTS Reform"
 				},
+				"FormattedDateTimeField" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+				"FormattedDateField" : "[[ANY_DATE_NOT_NULLABLE]]",
 				"ComplexField": {
 					"ComplexTextField": "Nested text",
 					"ComplexFixedListField": "VALUE2"
@@ -78,6 +80,8 @@
 						"AddressLine3": "PUBLIC"
 					}
 				},
+				"FormattedDateTimeField": "PUBLIC",
+				"FormattedDateField": "PUBLIC",
 				"ComplexField": {
 					"classification": "PUBLIC",
 					"value": {

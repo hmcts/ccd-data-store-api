@@ -33,7 +33,7 @@
     "body": {
       "total": 0,
       "cases": [],
-      "case_types_results" : []
+      "case_types_results" : "[[ANY_NULLABLE]]"
     }
   }
 }
