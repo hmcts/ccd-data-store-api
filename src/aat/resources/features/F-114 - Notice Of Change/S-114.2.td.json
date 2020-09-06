@@ -1,7 +1,7 @@
 {
   "title": "must return negative response for a case creation attempt with an invalid data in ChangeOrganisationRequest Complex Fields",
-  "_guid_": "S-113.2",
-  "_extends_": "F-113_Test_Data_Base",
+  "_guid_": "S-114.2",
+  "_extends_": "F-114_Test_Data_Base",
 
   "specs": [
     "an active profile in CCD",

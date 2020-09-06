@@ -1,7 +1,7 @@
 {
 	"title": "must successfully create a case with a case type containing ChangeOrganisationRequest Complex Fields",
-	"_guid_": "S-COR",
-	"_extends_": "F-113_Test_Data_Base",
+	"_guid_": "S-114.1",
+	"_extends_": "F-114_Test_Data_Base",
 
 	"specs": [
 		"an active profile in CCD",
@@ -18,7 +18,7 @@
       "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "id": "1598630239215676",
+      "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
       "case_type": "FT_ComplexOrganisation",
       "created_on": "[[ANYTHING_PRESENT]]",
