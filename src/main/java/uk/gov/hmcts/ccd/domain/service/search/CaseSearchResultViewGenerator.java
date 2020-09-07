@@ -61,9 +61,9 @@ public class CaseSearchResultViewGenerator {
         );
     }
 
-    public CaseDetails filterUnauthorisedFieldsByUseCaseAndUserRole(String useCase, CaseDetails caseDetails, String caseTypeId, List<String> requestedFields) {
+    public CaseDetails filterUnauthorisedFieldsByUseCaseAndUserRole(String useCase, CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, List<String> requestedFields) {
         caseDetails.getData().entrySet().removeIf(
-            caseField -> !caseSearchesViewAccessControl.filterResultsBySearchResultsDefinition(useCase, caseTypeId, requestedFields, caseField.getKey()));
+            caseField -> !caseSearchesViewAccessControl.filterResultsBySearchResultsDefinition(useCase, caseTypeDefinition, requestedFields, caseField.getKey()));
         return caseDetails;
     }
 
@@ -78,7 +78,7 @@ public class CaseSearchResultViewGenerator {
 
         List<SearchResultViewItem> items = new ArrayList<>();
         caseSearchResult.getCases().forEach(caseDetails -> {
-            filterUnauthorisedFieldsByUseCaseAndUserRole(useCase, caseDetails, caseTypeId, requestedFields);
+            filterUnauthorisedFieldsByUseCaseAndUserRole(useCase, caseDetails, caseTypeDefinition, requestedFields);
             items.add(buildSearchResultViewItem(caseDetails, caseTypeDefinition, searchResultDefinition));
         });
         return items;
