@@ -721,7 +721,7 @@ sourceSets {
     }
 }
 
-task smoke(type: Test) {
+task smoke() {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
 
@@ -756,7 +756,7 @@ task smoke(type: Test) {
     outputs.upToDateWhen { false }
 }
 
-task functional(type: Test) {
+task functional() {
     description = 'Executes functional tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
 
