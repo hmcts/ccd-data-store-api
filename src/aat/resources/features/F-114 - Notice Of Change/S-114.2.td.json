@@ -11,7 +11,9 @@
   "request": {
     "body": {
       "data": {
-        "ApprovalStatus": "22"
+        "ChangeOrganisationRequestField": {
+          "ApprovalStatus": "22"
+        }
       }
     }
   },
