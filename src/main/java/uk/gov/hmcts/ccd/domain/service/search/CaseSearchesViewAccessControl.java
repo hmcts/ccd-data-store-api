@@ -26,7 +26,8 @@ public class CaseSearchesViewAccessControl {
         this.securityClassificationService = securityClassificationService;
     }
 
-    public Boolean filterResultsBySearchResultsDefinition(String useCase, CaseTypeDefinition caseTypeDefinition, List<String> requestedFields, String caseFieldId) {
+    public Boolean filterResultsBySearchResultsDefinition(String useCase, CaseTypeDefinition caseTypeDefinition,
+                                                          List<String> requestedFields, String caseFieldId) {
         Set<String> roles = userRepository.getUserRoles();
         SearchResultDefinition searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
 

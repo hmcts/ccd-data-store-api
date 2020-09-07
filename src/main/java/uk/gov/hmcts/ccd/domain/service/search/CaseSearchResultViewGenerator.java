@@ -61,9 +61,11 @@ public class CaseSearchResultViewGenerator {
         );
     }
 
-    public CaseDetails filterUnauthorisedFieldsByUseCaseAndUserRole(String useCase, CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, List<String> requestedFields) {
+    public CaseDetails filterUnauthorisedFieldsByUseCaseAndUserRole(String useCase, CaseDetails caseDetails,
+                                                                    CaseTypeDefinition caseTypeDefinition, List<String> requestedFields) {
         caseDetails.getData().entrySet().removeIf(
-            caseField -> !caseSearchesViewAccessControl.filterResultsBySearchResultsDefinition(useCase, caseTypeDefinition, requestedFields, caseField.getKey()));
+            caseField -> !caseSearchesViewAccessControl.filterResultsBySearchResultsDefinition(
+                useCase, caseTypeDefinition, requestedFields, caseField.getKey()));
         return caseDetails;
     }
 
