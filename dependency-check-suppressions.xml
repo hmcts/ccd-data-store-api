@@ -411,4 +411,18 @@
    <cve>CVE-2020-13935</cve>
 </suppress>
 
+<suppress>
+    <notes><![CDATA[
+file name: hazelcast-3.12.6.jar (shaded: org.snakeyaml:snakeyaml-engine:1.0)
+]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.snakeyaml/snakeyaml-engine@.*$</packageUrl>
+    <cve>CVE-2017-18640</cve>
+</suppress>
+<suppress>
+    <notes><![CDATA[
+file name: hazelcast-3.12.6.jar (shaded: com.fasterxml.jackson.core:jackson-core:2.9.7)
+]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-core@.*$</packageUrl>
+    <cve>CVE-2020-24616</cve>
+</suppress>
 </suppressions>
