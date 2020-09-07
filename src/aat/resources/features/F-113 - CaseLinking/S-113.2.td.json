@@ -1,18 +1,18 @@
 {
-	"title": "must return validation error when an invalid case reference is entered",
-	"_guid_": "S-112.1",
-	"_extends_": "F-112_Test_Data_Base",
+	"title": "must return validation error when no case exists for the CaseLink provided",
+	"_guid_": "S-113.2",
+	"_extends_": "F-113_Test_Data_Base",
 
 	"specs": [
 		"an active profile in CCD",
-		"contains an invalid case reference"
+		"contains a case reference for a non-existent case"
 	],
 
   "request": {
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "XYYY8****"
+          "CaseReference": "5555104840597777"
         }
       }
     }
@@ -36,7 +36,7 @@
       "details" : {
         "field_errors" : [ {
           "id" : "CaseLinkField.CaseReference",
-          "message" : "The data entered is not valid for this type of field, please delete and re-enter using only valid data"
+          "message" : "5555104840597777 does not correspond to an existing CCD case."
         } ]
       },
       "callbackErrors" : null,
