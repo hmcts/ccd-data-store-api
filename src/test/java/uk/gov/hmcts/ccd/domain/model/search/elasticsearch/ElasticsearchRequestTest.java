@@ -27,6 +27,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_S
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
+@SuppressWarnings("PMD")
 class ElasticsearchRequestTest {
 
     private ObjectMapper mapper = new ObjectMapper();
