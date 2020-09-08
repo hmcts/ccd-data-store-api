@@ -1,25 +1,29 @@
 {
-  "title": "Get the case for read by a caseworker",
   "_extends_": "F-065_Test_Data_Base",
   "_guid_": "F-065_Later_Case_Read_By_Solicitor_1",
+  "title": "Get the case for read by a caseworker",
+
   "specs": [
     "to get the same case by Solicitor 1"
   ],
+
   "user": {
     "username": "befta.caseworker.2.solicitor.1@gmail.com",
     "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
   },
+
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Transfer-Encoding" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
-      "Vary" : "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]",
+      "Vary": "[[ANYTHING_PRESENT]]",
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
     },
     "body": {
@@ -47,5 +51,4 @@
       "events": "[[ANYTHING_PRESENT]]"
     }
   }
-
 }

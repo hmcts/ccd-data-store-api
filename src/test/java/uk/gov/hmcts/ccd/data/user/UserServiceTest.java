@@ -19,7 +19,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
@@ -123,13 +124,5 @@ public class UserServiceTest {
         j2.setDescription("Desc2");
         unknownJurisdictionDefinition = new JurisdictionDefinition();
         unknownJurisdictionDefinition.setId("J3");
-    }
-
-    @Test
-    public void testGetUserRolesJurisdictions() {
-        final List<String> jurisdictions = newArrayList("jurisdiction1", "jurisdiction2");
-        when(userRepoMock.getUserRolesJurisdictions()).thenReturn(jurisdictions);
-        List<String> result = userService.getUserRolesJurisdictions();
-        assertEquals(2, result.size());
     }
 }

@@ -1,45 +1,45 @@
 {
 	"title": "must return 400 error response for invalid case id",
 	"_guid_": "S-528",
-  "productName": "CCD Data Store",
-  "operationName": "Grant access to a case",
+	"productName": "CCD Data Store",
+	"operationName": "Grant access to a case",
 	"_extends_": "F-101_Test_Data_Base",
 
 	"specs": [
 		"an active solicitor profile in CCD",
-    "another active solicitor profile in CCD",
-    "uses a case id that is not valid",
+		"another active solicitor profile in CCD",
+		"uses a case id that is not valid",
 		"has the 400 return code"
 	],
-  "request": {
-    "pathVariables": {
-      "cid": "1234"
-    },
-    "body": {
-      "case_roles": [
-        "[DEFENDANT]"
-      ]
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_400_Response",
-    "responseCode" : 400,
-    "headers" : {
-      "Cache-Control": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "[[ANYTHING_PRESENT]]",
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Type": "[[ANYTHING_PRESENT]]"
-    },
-    "body" : {
-      "exception" : "[[ANYTHING_PRESENT]]",
-      "timestamp" : "[[ANYTHING_PRESENT]]",
-      "status" : 400,
-      "error" : "Bad Request",
-      "message" : "Case ID is not valid",
-      "path" : "[[ANYTHING_PRESENT]]",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
-    }
-  }
+	"request": {
+		"pathVariables": {
+			"cid": "1234"
+		},
+		"body": {
+			"case_roles": [
+				"[DEFENDANT]"
+			]
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_400_Response",
+		"responseCode" : 400,
+		"headers" : {
+			"Cache-Control": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "[[ANYTHING_PRESENT]]",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]"
+		},
+		"body" : {
+			"exception" : "[[ANYTHING_PRESENT]]",
+			"timestamp" : "[[ANYTHING_PRESENT]]",
+			"status" : 400,
+			"error" : "Bad Request",
+			"message" : "Case ID is not valid",
+			"path" : "[[ANYTHING_PRESENT]]",
+			"details" : null,
+			"callbackErrors" : null,
+			"callbackWarnings" : null
+		}
+	}
 }

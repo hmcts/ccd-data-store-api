@@ -1,7 +1,9 @@
 {
   "_guid_": "F-065_Test_Data_Base",
+
   "productName": "CCD Data Store",
   "operationName": "Retrieve a case by ID for dynamic display",
+
   "method": "GET",
   "uri": "/internal/cases/{cid}",
 
@@ -18,10 +20,11 @@
       "cid": "1234567890123456"
     }
   },
+
   "expectedResponse": {
     "headers": {
       "_extends_": "Common_Response_Headers",
-      "Content-Type" : "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip"
     }
   }

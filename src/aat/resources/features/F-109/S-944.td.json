@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-944",
+  "_extends_": "F-109_test_Data_Base_ES_external",
+  "specs": [
+    "with access to create case for Befta_Jurisdiction3",
+    "with only the 'caseworker-caa' role is not configured with the required CRUD permissions for Befta_Jurisdiction3",
+    "is made to query the previously created case Befta_Jurisdiction3_Case_Type1",
+    "contains no results"
+  ],
+  "request": {
+    "queryParams": {
+      "ctid": "BEFTA_CASETYPE_3_1"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][F-109-Befta_Jurisdiction3_Case_Type1_Creation][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "total": 0,
+      "cases": [],
+      "case_types_results" : "[[ANY_NULLABLE]]"
+    }
+  }
+
+}

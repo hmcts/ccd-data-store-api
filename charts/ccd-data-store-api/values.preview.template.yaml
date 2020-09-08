@@ -19,7 +19,7 @@ java:
     USER_PROFILE_HOST: http://ccd-user-profile-api-pr-224.service.core-compute-preview.internal/
     ENABLE_DB_MIGRATE: true
 
-    ELASTIC_SEARCH_ENABLED: false # enable whenever ES required on a particular PR
+    ELASTIC_SEARCH_ENABLED: true # enable whenever ES required on a particular PR
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"

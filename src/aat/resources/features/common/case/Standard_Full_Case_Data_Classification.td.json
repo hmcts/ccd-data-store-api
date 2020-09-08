@@ -1,47 +1,47 @@
 {
-  "_guid_": "Standard_Full_Case_Data_Classification",
+	"_guid_": "Standard_Full_Case_Data_Classification",
 
-  "MoneyGBPField": "PUBLIC",
-  "FixedListField": "PUBLIC",
-  "AddressUKField": {
-    "classification": "PUBLIC",
-    "value": {
-      "AddressLine1": "PUBLIC",
-      "AddressLine2": "PUBLIC",
-      "AddressLine3": "PUBLIC",
-      "PostTown": "PUBLIC",
-      "County": "PUBLIC",
-      "PostCode": "PUBLIC",
-      "Country": "PUBLIC"
-    }
-  },
-  "ComplexField" : {
-    "classification" : "PUBLIC",
-    "value" : {
-      "ComplexTextField" : "PUBLIC",
-      "ComplexFixedListField" : "PUBLIC"
-    }
-  },
-  "DateTimeField": "PUBLIC",
-  "PhoneUKField": "PUBLIC",
-  "NumberField": "PUBLIC",
-  "MultiSelectListField": "PUBLIC",
-  "YesOrNoField": "PUBLIC",
-  "EmailField": "PUBLIC",
-  "TextField": "PUBLIC",
-  "DateField": "PUBLIC",
-  "TextAreaField": "PUBLIC",
-  "CollectionField": {
-    "classification": "PUBLIC",
-    "value": [
-      {
-        "id": "CollectionField1",
-        "classification": "PUBLIC"
-      },
-      {
-        "id": "CollectionField2",
-        "classification": "PUBLIC"
-      }
-    ]
-  }
+	"MoneyGBPField": "PUBLIC",
+	"FixedListField": "PUBLIC",
+	"AddressUKField": {
+		"classification": "PUBLIC",
+		"value": {
+			"AddressLine1": "PUBLIC",
+			"AddressLine2": "PUBLIC",
+			"AddressLine3": "PUBLIC",
+			"PostTown": "PUBLIC",
+			"County": "PUBLIC",
+			"PostCode": "PUBLIC",
+			"Country": "PUBLIC"
+		}
+	},
+	"ComplexField": {
+		"classification": "PUBLIC",
+		"value": {
+			"ComplexTextField": "PUBLIC",
+			"ComplexFixedListField": "PUBLIC"
+		}
+	},
+	"DateTimeField": "PUBLIC",
+	"PhoneUKField": "PUBLIC",
+	"NumberField": "PUBLIC",
+	"MultiSelectListField": "PUBLIC",
+	"YesOrNoField": "PUBLIC",
+	"EmailField": "PUBLIC",
+	"TextField": "PUBLIC",
+	"DateField": "PUBLIC",
+	"TextAreaField": "PUBLIC",
+	"CollectionField": {
+		"classification": "PUBLIC",
+		"value": [
+			{
+				"id": "CollectionField1",
+				"classification": "PUBLIC"
+			},
+			{
+				"id": "CollectionField2",
+				"classification": "PUBLIC"
+			}
+		]
+	}
 }

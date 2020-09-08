@@ -1,0 +1,20 @@
+{
+  "_guid_": "F-111_Case_Data_Create_C1_Token_Creation",
+  "_extends_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation",
+
+  "specs": [
+    "to create a token for case creation"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "F-111_User_Richard"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "${[scenarioContext][parentContext][testData][users][userRichard][id]}"
+    }
+  }
+}
