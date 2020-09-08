@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -81,13 +82,25 @@ class ElasticsearchQueryHelperTest {
     }
 
     @Test
-    void shouldConvertQueryToElasticSearchRequest() {
+    void shouldConvertNativeQueryToElasticSearchRequest() {
         String searchRequest = "{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}";
 
         ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(), is(searchRequest))
+        );
+    }
+
+    @Test
+    void shouldConvertWrappedQueryToElasticSearchRequest() {
+        String searchRequest = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}}";
+
+        ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
+
+        assertAll(
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(), is("{\"query\":{}}")),
+            () -> assertThat(elasticsearchRequest.hasRequestedSupplementaryData(), is(true))
         );
     }
 
@@ -100,6 +113,30 @@ class ElasticsearchQueryHelperTest {
 
         assertAll(
             () -> assertThat(exception.getMessage(), is("Query of type 'query_string' is not allowed"))
+        );
+    }
+
+    @Test
+    void shouldErrorWhenSupplementaryDataIsNotAnArray() throws Exception {
+        String searchRequest = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":{\"object\":\"value\"}}}";
+
+        BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
+            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
+
+        assertAll(
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an array of text fields."))
+        );
+    }
+
+    @Test
+    void shouldErrorWhenSupplementaryDataIsAnArrayOfNonTextFields() throws Exception {
+        String searchRequest = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[{\"array\":\"object\"}]}}";
+
+        BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
+            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
+
+        assertAll(
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an array of text fields."))
         );
     }
 

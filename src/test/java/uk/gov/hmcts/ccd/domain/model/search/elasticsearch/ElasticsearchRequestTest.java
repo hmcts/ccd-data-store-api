@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.*;
@@ -128,54 +128,42 @@ class ElasticsearchRequestTest {
         assertAll(
             () -> assertThat(elasticsearchRequest.getQuery().toString(), is("{\"match_all\":{}}")),
             () -> assertThat(elasticsearchRequest.getRequestedFields().size(), is(4)),
-            () -> assertThat(elasticsearchRequest.hasSupplementaryData(), is(true)),
-            () -> assertThat(elasticsearchRequest.getSupplementaryData().toString(), is("[\"SupDataField\"]"))
+            () -> assertThat(elasticsearchRequest.hasRequestedSupplementaryData(), is(true)),
+            () -> assertThat(elasticsearchRequest.getRequestedSupplementaryData().toString(), is("[\"SupDataField\"]"))
+        );
+    }
+
+    @Test
+    void shouldHandleWrappedQueryFormatWithoutSupplementaryData() throws Exception {
+        JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"query\":{\"match_all\": {}}}}");
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+
+        assertAll(
+            () -> assertThat(elasticsearchRequest.getQuery().toString(), is("{\"match_all\":{}}")),
+            () -> assertThat(elasticsearchRequest.hasRequestedSupplementaryData(), is(false)),
+            () -> assertThat(elasticsearchRequest.getRequestedSupplementaryData(), is(nullValue()))
         );
     }
 
     @Test
     void shouldSetNativeQueryWhenProvidedInWrapperObject() throws Exception {
-        String query = "{\"native_es_query\":{\"_source\":[\"data.name\"], \"query\":{}}}";
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(mapper.readTree(query));
+        JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"_source\":[\"data.name\"], \"query\":{}}}");
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(), is("{\"_source\":[\"data.name\"],\"query\":{}}")),
-            () -> assertThat(elasticsearchRequest.hasSupplementaryData(), is(false))
+            () -> assertThat(elasticsearchRequest.hasRequestedSupplementaryData(), is(false))
         );
     }
 
     @Test
     void shouldSetSupplementaryData() throws Exception {
-        String query = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}";
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(mapper.readTree(query));
+        JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}");
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.hasSupplementaryData(), is(true)),
-            () -> assertThat(elasticsearchRequest.getSupplementaryData().toString(), is("[\"Field1\",\"Field2\"]"))
-        );
-    }
-
-    @Test
-    void shouldErrorWhenSupplementaryDataIsNotAnArray() throws Exception {
-        String query = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":{\"object\":\"value\"}}}";
-
-        BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
-            new ElasticsearchRequest(mapper.readTree(query)));
-
-        assertAll(
-            () -> assertThat(exception.getMessage(), is("Provided supplementary_data must be an array of text fields."))
-        );
-    }
-
-    @Test
-    void shouldErrorWhenSupplementaryDataIsAnArrayOfNonTextFields() throws Exception {
-        String query = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[{\"array\":\"object\"}]}}";
-
-        BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
-            new ElasticsearchRequest(mapper.readTree(query)));
-
-        assertAll(
-            () -> assertThat(exception.getMessage(), is("Provided supplementary_data must be an array of text fields."))
+            () -> assertThat(elasticsearchRequest.hasRequestedSupplementaryData(), is(true)),
+            () -> assertThat(elasticsearchRequest.getRequestedSupplementaryData().toString(), is("[\"Field1\",\"Field2\"]"))
         );
     }
 
@@ -199,14 +187,14 @@ class ElasticsearchRequestTest {
     }
 
     @Nested
-    class ToJsonTest {
+    class ToFinalRequestTest {
 
         @Test
         void shouldSetSourceFieldsWhenSourceIsProvidedInRequest() throws Exception {
-            String query = "{\"_source\":[\"data.name\"], \"query\":{}}";
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(mapper.readTree(query));
+            JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.name\"], \"query\":{}}");
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toJson();
+            String result = elasticsearchRequest.toFinalRequest();
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
@@ -229,10 +217,10 @@ class ElasticsearchRequestTest {
 
         @Test
         void shouldSetSourceFieldsWhenSourceIsNotProvidedInRequest() throws Exception {
-            String query = "{\"query\":{}}";
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(mapper.readTree(query));
+            JsonNode queryNode = queryAsJsonNode("{\"query\":{}}");
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toJson();
+            String result = elasticsearchRequest.toFinalRequest();
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
@@ -255,10 +243,10 @@ class ElasticsearchRequestTest {
 
         @Test
         void shouldSetSourceFieldsWhenSupplementaryDataIsProvidedInRequest() throws Exception {
-            String query = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}";
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(mapper.readTree(query));
+            JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}");
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toJson();
+            String result = elasticsearchRequest.toFinalRequest();
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");

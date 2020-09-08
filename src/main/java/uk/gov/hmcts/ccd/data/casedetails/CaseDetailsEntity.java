@@ -96,7 +96,7 @@ public class CaseDetailsEntity {
     @Column(name = DATA_CLASSIFICATION_COL, nullable = false)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
-    @Column(name = SUPPLEMENTARY_DATA_COL, nullable = false)
+    @Column(name = SUPPLEMENTARY_DATA_COL)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode supplementaryData;
 

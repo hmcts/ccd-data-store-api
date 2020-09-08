@@ -8,9 +8,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.Data;
 import lombok.NonNull;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -36,13 +34,13 @@ public class ElasticsearchRequest {
     public static final ArrayNode METADATA_FIELDS;
 
     private JsonNode nativeSearchRequest;
-    private ArrayNode supplementaryData;
+    private ArrayNode requestedSupplementaryData;
 
     static {
         METADATA_FIELDS = MAPPER.createArrayNode();
-        Arrays.stream(MetaData.CaseField.values())
-            .map(field -> new TextNode(field.getDbColumnName()))
-            .forEach(METADATA_FIELDS::add);
+        for (String metadata : MetaData.CaseField.getColumnNames()) {
+            METADATA_FIELDS.add(new TextNode(metadata));
+        }
         METADATA_FIELDS.add(new TextNode(DATA_CLASSIFICATION_COL));
     }
 
@@ -53,9 +51,7 @@ public class ElasticsearchRequest {
     private void initRequest(JsonNode searchRequest) {
         if (searchRequest.has(NATIVE_ES_QUERY)) {
             setNativeSearchRequest(searchRequest.get(NATIVE_ES_QUERY));
-            if (searchRequest.has(SUPPLEMENTARY_DATA)) {
-                setSupplementaryData(searchRequest.get(SUPPLEMENTARY_DATA));
-            }
+            setRequestedSupplementaryData((ArrayNode) searchRequest.get(SUPPLEMENTARY_DATA));
         } else {
             setNativeSearchRequest(searchRequest);
         }
@@ -107,20 +103,8 @@ public class ElasticsearchRequest {
         return nativeSearchRequest.get(QUERY);
     }
 
-    public boolean hasSupplementaryData() {
-        return supplementaryData != null && supplementaryData.isArray();
-    }
-
-    public JsonNode getSupplementaryData() {
-        return supplementaryData;
-    }
-
-    public void setSupplementaryData(JsonNode node) {
-        if (node.isArray() && arrayContainsOnlyText((ArrayNode) node)) {
-            this.supplementaryData = (ArrayNode) node;
-        } else {
-            throw new BadSearchRequest("Provided supplementary_data must be an array of text fields.");
-        }
+    public boolean hasRequestedSupplementaryData() {
+        return requestedSupplementaryData != null;
     }
 
     /**
@@ -128,7 +112,7 @@ public class ElasticsearchRequest {
      * Custom properties supported by CCD will be merged appropriately to generate a native Elasticsearch request.
      * @return JSON string representing the Elasticsearch request object.
      */
-    public String toJson() {
+    public String toFinalRequest() {
         JsonNode mergedRequest = nativeSearchRequest.deepCopy();
 
         ((ObjectNode) mergedRequest).set(SOURCE, mergedSourceFields());
@@ -145,8 +129,8 @@ public class ElasticsearchRequest {
             sourceFields.add(new TextNode(DATA_COL));
         }
 
-        if (hasSupplementaryData()) {
-            StreamSupport.stream(getSupplementaryData().spliterator(), false)
+        if (hasRequestedSupplementaryData()) {
+            StreamSupport.stream(getRequestedSupplementaryData().spliterator(), false)
                 .forEach(field -> sourceFields.add(new TextNode(SUPPLEMENTARY_DATA_PREFIX + field.asText())));
         }
 
@@ -163,10 +147,5 @@ public class ElasticsearchRequest {
                 return null;
             }
         }
-    }
-
-    private boolean arrayContainsOnlyText(ArrayNode node) {
-        return StreamSupport.stream(node.spliterator(), false)
-            .allMatch(JsonNode::isTextual);
     }
 }
