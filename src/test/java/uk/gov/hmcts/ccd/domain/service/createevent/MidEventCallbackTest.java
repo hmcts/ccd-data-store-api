@@ -2,6 +2,11 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,15 +22,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
@@ -282,6 +285,101 @@ class MidEventCallbackTest {
                                             caseTypeDefinition, caseEventDefinition, existingCaseDetails,
                                             combineCaseDetails, IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, combineData));
+    }
+
+    @Test
+    @DisplayName("should call filter case data content when wizard page order exists")
+    void shouldCallFilterCaseDataContentWhenWizardPageOrderExists() {
+        given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
+            .willReturn(asList(wizardPageWithCallback));
+        CaseDetails existingCaseDetails = caseDetails(data);
+        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE)).thenReturn(existingCaseDetails);
+        when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
+        wizardPageWithCallback.setOrder(1);
+
+        given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
+            caseTypeDefinition,
+            caseEventDefinition,
+            existingCaseDetails,
+            caseDetails,
+            IGNORE_WARNINGS)).willReturn(caseDetails);
+
+        CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
+            .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
+        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails)).willReturn(caseDetails);
+
+
+        midEventCallback.invoke(CASE_TYPE_ID,
+            build,
+            "createCase1"
+        );
+
+        verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
+            caseTypeDefinition,
+            caseEventDefinition,
+            existingCaseDetails,
+            caseDetails,
+            IGNORE_WARNINGS);
+    }
+
+    @Test
+    @DisplayName("should filter case data content when wizard page order exists")
+    void shouldFilterCaseDataContentWhenWizardPageOrderExists() {
+        WizardPage wizardPageWithoutCallback = createWizardPage("createCase2");
+        wizardPageWithoutCallback.setOrder(2);
+        WizardPageField pageField = createWizardPageField("createCase2_field1");
+        pageField.setComplexFieldOverrides(Lists.newArrayList(createComplexFieldOverrides("createCase2_field1_complex1")));
+        wizardPageWithoutCallback.setWizardPageFields(Lists.newArrayList(pageField));
+        given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
+            .willReturn(asList(wizardPageWithCallback, wizardPageWithoutCallback));
+        Map<String, JsonNode> data = createData();
+        CaseDetails existingCaseDetails = caseDetails(data);
+        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE)).thenReturn(existingCaseDetails);
+        when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
+        wizardPageWithCallback.setOrder(1);
+
+        given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
+            caseTypeDefinition,
+            caseEventDefinition,
+            existingCaseDetails,
+            caseDetails,
+            IGNORE_WARNINGS)).willReturn(caseDetails);
+
+        CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
+            .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
+        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails)).willReturn(caseDetails);
+
+
+        midEventCallback.invoke(CASE_TYPE_ID,
+            build,
+            "createCase1"
+        );
+
+        verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
+            caseTypeDefinition,
+            caseEventDefinition,
+            existingCaseDetails,
+            caseDetails,
+            IGNORE_WARNINGS);
+    }
+
+    private Map<String, JsonNode> createData() {
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("createCase2_field1", new TextNode("test1"));
+        data.put("createCase2_field1_complex1", new TextNode("complex1"));
+        return data;
+    }
+
+    private WizardPageField createWizardPageField(String caseFieldId) {
+        WizardPageField wizardPageField = new WizardPageField();
+        wizardPageField.setCaseFieldId(caseFieldId);
+        return wizardPageField;
+    }
+
+    private WizardPageComplexFieldOverride createComplexFieldOverrides(String elementId) {
+        WizardPageComplexFieldOverride wizardPageComplexFieldOverride = new WizardPageComplexFieldOverride();
+        wizardPageComplexFieldOverride.setComplexFieldElementId(elementId);
+        return wizardPageComplexFieldOverride;
     }
 
     private CaseDetails caseDetails(Map<String, JsonNode> data) {
