@@ -26,7 +26,12 @@
       "error" : "Unprocessable Entity",
       "message" : "[[ANYTHING_PRESENT]]",
       "path" : "[[ANYTHING_PRESENT]]",
-      "details" : null,
+      "details" : {
+        "field_errors" : [ {
+          "id" : "ChangeOrganisationRequestField.ApprovalStatus",
+          "message" : "Invalid Approval Status Value, Valid values are 0,1 and 2. 0 = ‘Not considered’, 1 = ‘Approved’, 2 = ‘Rejected’"
+        } ]
+      },
       "callbackErrors" : null,
       "callbackWarnings" : null
     }
