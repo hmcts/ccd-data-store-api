@@ -6,25 +6,6 @@
         <cve>CVE-2018-1258</cve>
     </suppress>
 
-    <!-- THIS CVEs should not be removed until the elastic search client is updated to 7.
-    Before updating the elastic client make sure that the server has been updated to 7 -->
-
-    <suppress>
-        <notes><![CDATA[
-            A permission issue was found in Elasticsearch versions before 5.6.15 and 6.6.1 when Field Level Security and Document Level
-            Security are disabled and the _aliases, _shrink, or _split endpoints are used . If the elasticsearch.yml file has xpack.security.dls_fls.enabled set to false,
-            certain permission checks are skipped when users perform one of the actions mentioned above, to make existing data available under a new index/alias name.
-            This could result in an attacker gaining additional permissions against a restricted index.
-            https://www.elastic.co/community/security
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-        <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-        <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-        <!-- Temporary suppression to ignore until it's fixed in master -->
-        <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-    </suppress>
-
     <!--  This has been fixed in RDM-8001-->
     <suppress>
         <notes><![CDATA[file name: liquibase-core-3.6.3.jar: bootstrap.*]]></notes>
@@ -205,27 +186,6 @@
 </suppress>
     <suppress>
    <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
    file name: dom4j-2.1.1.jar
    ]]></notes>
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
@@ -350,27 +310,6 @@
    ]]></notes>
    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
    <cve>CVE-2018-1258</cve>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
 </suppress>
     <suppress>
    <notes><![CDATA[
