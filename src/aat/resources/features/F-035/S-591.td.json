@@ -1,52 +1,56 @@
 {
-  "title": "must return status 200 along with the CaseView object successfully",
-  "_guid_": "S-591",
-  "_extends_": "F-035_Base_Test_Data",
-  "specs": [
-    "an active profile in CCD",
-    "uses the case-reference of the case just created",
-    "contains Last State Modified Date metadata field"
-  ],
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
-    }
-  },
-  "request": {
-    "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][S-035.01_Case][testData][actualResponse][body][id]}"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
-      "Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
-      "Strict-Transport-Security":"[[ANY_STRING_NULLABLE]]"
-    },
-    "body" : {
-      "_links" : {
-        "self" : {
-          "href" : "[[ANYTHING_PRESENT]]"
-        }
-      },
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "BEFTA_JURISDICTION_3",
-      "case_type" : "BEFTA_CASETYPE_3_4",
-      "created_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "last_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "state" : "TODO",
-      "security_classification" : "PUBLIC",
-      "data" : { },
-      "data_classification" : { },
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
-    }
-  }
+	"_guid_": "S-591",
+	"_extends_": "F-035_Base_Test_Data",
+	"title": "must return status 200 along with the CaseView object successfully",
+
+	"specs": [
+		"an active profile in CCD",
+		"uses the case-reference of the case just created",
+		"contains Last State Modified Date metadata field"
+	],
+
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+		}
+	},
+
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][childContexts][S-035.01_Case][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
+			"Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
+			"Strict-Transport-Security":"[[ANY_STRING_NULLABLE]]"
+		},
+		"body" : {
+			"_links" : {
+				"self" : {
+					"href" : "[[ANYTHING_PRESENT]]"
+				}
+			},
+			"id" : "[[ANYTHING_PRESENT]]",
+			"jurisdiction" : "BEFTA_JURISDICTION_3",
+			"case_type" : "BEFTA_CASETYPE_3_4",
+			"created_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"last_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"state" : "TODO",
+			"security_classification" : "PUBLIC",
+			"data" : { },
+			"data_classification" : { },
+			"after_submit_callback_response" : null,
+			"callback_response_status_code" : null,
+			"callback_response_status" : null,
+			"delete_draft_response_status_code" : null,
+			"delete_draft_response_status" : null
+		}
+	}
 }

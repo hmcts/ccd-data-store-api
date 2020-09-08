@@ -9,14 +9,16 @@
 	"MoneyGBPField": "4200",
 	"DateField": "2017-02-13",
 	"DateTimeField": "1988-07-07T22:20:00",
-	"FormattedDateField": "21",
-	"FormattedDateTimeField": "2019-05-21",
-	"TextAreaField": "Line1\nLine2",
+  "FormattedDateField": "21",
+  "FormattedDateTimeField": "2019-05-21",
+  "TextAreaField": "Line1\nLine2",
 	"FixedListField": "VALUE3",
+
 	"MultiSelectListField": [
 		"OPTION2",
 		"OPTION4"
 	],
+
 	"CollectionField": [
 		{
 			"id": "CollectionField1",
@@ -27,10 +29,12 @@
 			"value": "Alias 2"
 		}
 	],
+
 	"ComplexField": {
 		"ComplexTextField": "Nested text",
 		"ComplexFixedListField": "VALUE2"
 	},
+
 	"AddressUKField": {
 		"AddressLine1": "102 Petty France",
 		"AddressLine2": "CCD",
