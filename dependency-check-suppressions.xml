@@ -327,7 +327,6 @@
         <cve>CVE-2017-18365</cve>
     </suppress>
 
-<<<<<<< HEAD
 <suppress> <!-- Temporary suppressions to allow continued development -->
     <cve>CVE-2019-14900</cve>
     <cve>CVE-2020-13934</cve>
@@ -404,6 +403,5 @@
         <cve>CVE-2020-10518</cve>
         <cve>CVE-2020-10517</cve>
     </suppress>
-=======
->>>>>>> refs/heads/release-cut-19.2
+
 </suppressions>
