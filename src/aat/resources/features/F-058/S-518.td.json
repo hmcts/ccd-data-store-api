@@ -11,18 +11,18 @@
 
 	"request": {
 		"pathVariables": {
-			"ctid": "eyJhbGciOiJIUzUxMiJ9"
-		}
-	},
+		  "ctid": "eyJhbGciOiJIUzUxMiJ9"
+    }
+  },
 
-	"expectedResponse": {
-		"_extends_": "Common_404_Response",
-		"body": {
-			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message": "Error when getting case type version. Unknown case type 'eyJhbGciOiJIUzUxMiJ9'.",
-			"details": null,
-			"callbackErrors": null,
-			"callbackWarnings": null
-		}
-	}
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "Error when getting case type version. Unknown case type 'eyJhbGciOiJIUzUxMiJ9'.",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
 }

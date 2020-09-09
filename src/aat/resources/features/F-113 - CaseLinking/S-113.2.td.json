@@ -1,0 +1,46 @@
+{
+	"title": "must return validation error when no case exists for the CaseLink provided",
+	"_guid_": "S-113.2",
+	"_extends_": "F-113_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a case reference for a non-existent case"
+	],
+
+  "request": {
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": "5555104840597777"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Vary": "accept-encoding",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "status" : 422,
+      "error" : "Unprocessable Entity",
+      "message" : "Case data validation failed",
+      "path" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "details" : {
+        "field_errors" : [ {
+          "id" : "CaseLinkField.CaseReference",
+          "message" : "5555104840597777 does not correspond to an existing CCD case."
+        } ]
+      },
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

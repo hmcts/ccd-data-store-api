@@ -6,25 +6,6 @@
         <cve>CVE-2018-1258</cve>
     </suppress>
 
-    <!-- THIS CVEs should not be removed until the elastic search client is updated to 7.
-    Before updating the elastic client make sure that the server has been updated to 7 -->
-
-    <suppress>
-        <notes><![CDATA[
-            A permission issue was found in Elasticsearch versions before 5.6.15 and 6.6.1 when Field Level Security and Document Level
-            Security are disabled and the _aliases, _shrink, or _split endpoints are used . If the elasticsearch.yml file has xpack.security.dls_fls.enabled set to false,
-            certain permission checks are skipped when users perform one of the actions mentioned above, to make existing data available under a new index/alias name.
-            This could result in an attacker gaining additional permissions against a restricted index.
-            https://www.elastic.co/community/security
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-        <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-        <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-        <!-- Temporary suppression to ignore until it's fixed in master -->
-        <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-    </suppress>
-
     <!--  This has been fixed in RDM-8001-->
     <suppress>
         <notes><![CDATA[file name: liquibase-core-3.6.3.jar: bootstrap.*]]></notes>
@@ -36,7 +17,7 @@
     </suppress>
     <suppress>
         <notes><![CDATA[file name: liquibase-core-3.6.3.jar: jquery-1.11.0.min.js]]></notes>
-        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <packageUrl regex="true">^pkg:jasvascript/jquery@.*$</packageUrl>
         <cve>CVE-2019-11358</cve>
         <cve>CVE-2015-9251</cve>
     </suppress>
@@ -158,6 +139,8 @@
         <cve>CVE-2020-5408</cve>
         <cve>CVE-2020-9484</cve>
         <cve>CVE-2020-13692</cve>
+        <cve>CVE-2020-10517</cve>
+        <cve>CVE-2020-10518</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -173,6 +156,7 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
         <cpe>cpe:/a:security-framework_project:security-framework</cpe>
     </suppress>
+
     <suppress>
    <notes><![CDATA[
    file name: spring-security-config-5.3.2.RELEASE.jar
@@ -201,27 +185,7 @@
    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-crypto@.*$</packageUrl>
    <cve>CVE-2018-1258</cve>
 </suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-</suppress>
+
     <suppress>
    <notes><![CDATA[
    file name: dom4j-2.1.1.jar
@@ -285,22 +249,29 @@
     <suppress>
         <notes>Temporary suppression for on-going developments.</notes>
         <cve>CVE-2020-1938</cve>
-        <cve>CVE-2020-8840</cve>
         <cve>CVE-2020-9547</cve>
-        <cve>CVE-2020-9548</cve>
         <cve>CVE-2020-9546</cve>
-        <cve>CVE-2020-10673</cve>
         <cve>CVE-2020-10672</cve>
         <cve>CVE-2020-11619</cve>
+        <cve>CVE-2020-5408</cve>
+        <cve>CVE-2020-8840</cve>
+        <cve>CVE-2020-9548</cve>
+        <cve>CVE-2020-10673</cve>
         <cve>CVE-2020-11620</cve>
         <cve>CVE-2020-10683</cve>
         <cve>CVE-2020-5407</cve>
-        <cve>CVE-2020-5408</cve>
         <cve>CVE-2020-9484</cve>
         <cve>CVE-2020-13692</cve>
 		<cve>CVE-2019-14900</cve>
         <cve>CVE-2020-13934</cve>
         <cve>CVE-2020-13935</cve>
+        <cve>CVE-2020-7019</cve>
+        <cve>CVE-2020-24616</cve>
+        <cve>CVE-2020-8022</cve>
+        <cve>CVE-2017-18640</cve>
+        <cve>CVE-2017-18365</cve>
+        <cve>CVE-2020-10518</cve>
+        <cve>CVE-2020-10517</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -347,27 +318,6 @@
 </suppress>
     <suppress>
    <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
    file name: dom4j-2.1.1.jar
    ]]></notes>
    <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
@@ -382,6 +332,7 @@
     <cve>CVE-2020-13934</cve>
     <cve>CVE-2020-13935</cve>
     <cve>CVE-2020-8022</cve>
+    <cve>CVE-2017-18640</cve>
 </suppress>
 
 	<suppress>
@@ -412,4 +363,45 @@
    <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
    <cve>CVE-2020-13935</cve>
 </suppress>
+
+    <!-- FIXME RDM-9475 -->
+    <suppress>
+        <notes><![CDATA[
+    file name: hazelcast-3.12.6.jar (shaded: org.snakeyaml:snakeyaml-engine:1.0)
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.snakeyaml/snakeyaml-engine@.*$</packageUrl>
+        <cve>CVE-2017-18640</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: hazelcast-3.12.6.jar (shaded: com.fasterxml.jackson.core:jackson-core:2.9.7)
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-core@.*$</packageUrl>
+        <cve>CVE-2020-24616</cve>
+    </suppress>
+    <!--
+    These CVEs (2020-10517/2020-10518) do not effect application as they are for GitHub pages site
+     on the GitHub Enterprise Server.
+    -->
+    <suppress>
+        <notes><![CDATA[
+            CVE-2020-10518
+            A remote code execution vulnerability was identified in GitHub Enterprise Server that could be exploited when
+            building a GitHub Pages site. User-controlled configuration of the underlying parsers used by GitHub Pages were
+            not sufficiently restricted and made it possible to execute commands on the GitHub Enterprise Server instance.
+            To exploit this vulnerability, an attacker would need permission to create and build a GitHub Pages site on the
+            GitHub Enterprise Server instance. This vulnerability affected all versions of GitHub Enterprise Server prior
+            to 2.22 and was fixed in 2.21.6, 2.20.15, and 2.19.21. The underlying issues contributing to this vulnerability
+            were identified both internally and through the GitHub Security Bug Bounty program.
+            CVE-2020-10517
+            An improper access control vulnerability was identified in GitHub Enterprise Server that allowed authenticated
+            users of the instance to determine the names of unauthorized private repositories given their numerical IDs. This
+            vulnerability did not allow unauthorized access to any repository content besides the name. This vulnerability
+            affected all versions of GitHub Enterprise Server prior to 2.22 and was fixed in versions 2.21.6, 2.20.15,
+            and 2.19.21. This vulnerability was reported via the GitHub Bug Bounty program.
+   ]]></notes>
+        <cve>CVE-2020-10518</cve>
+        <cve>CVE-2020-10517</cve>
+    </suppress>
+
 </suppressions>

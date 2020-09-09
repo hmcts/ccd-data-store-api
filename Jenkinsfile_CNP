@@ -16,9 +16,9 @@ def product = "ccd"
 def component = "data-store-api"
 
 // Variables to switch pipeline logic and wiring per type of build
-def definitionStoreDevelopPr = "PR-575" // This doesn't change frequently, but when it does, only change this value.
-def dataStoreApiDevelopPr    = "PR-601" // This doesn't change frequently, but when it does, only change this value.
-def prsToUseAaat             = "PR-1063" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
+def dataStoreApiDevelopPr    = "PR-601"  // This doesn't change frequently, but when it does, only change this value.
+def prsToUseAaat             = "PR-1097" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
     'ccd-${env}': [
@@ -55,7 +55,8 @@ def secrets = [
         secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
         secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_PWD'),
         secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
-        secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD')
+        secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD'),
+        secret('ccd-befta-master-solicitor4-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_4_PWD')
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),

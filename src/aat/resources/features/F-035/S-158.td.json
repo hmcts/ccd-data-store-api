@@ -1,33 +1,32 @@
 {
-  "title": "should get 404 when case reference does not exist",
+	"_guid_": "S-158",
+	"_extends_": "F-035_Base_Test_Data",
+	"title": "should get 404 when case reference does not exist",
 
-  "_guid_": "S-158",
-  "_extends_": "F-035_Base_Test_Data",
+	"specs": [
+		"an active profile in CCD",
+		"contains a case reference that does not exist",
+		"contains an HTTP-404 Not Found"
+	],
 
-  "specs": [
-    "an active profile in CCD",
-    "contains a case reference that does not exist",
-    "contains an HTTP-404 Not Found"
-  ],
+	"request": {
+		"pathVariables": {
+			"cid": "1234123412341238"
+		}
+	},
 
-  "request": {
-    "pathVariables": {
-      "cid": "1234123412341238"
-    }
-  },
-
-  "expectedResponse": {
-    "_extends_": "Common_404_Response",
-    "headers": {
-      "Content-Encoding": "gzip"
-    },
-    "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "No case found",
-      "path": "/cases/1234123412341238",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
-  }
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+		"headers": {
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+			"message": "No case found",
+			"path": "/cases/1234123412341238",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
 }

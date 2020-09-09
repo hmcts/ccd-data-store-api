@@ -1,20 +1,21 @@
 {
 	"_guid_": "S-301",
 	"_extends_": "F-050_Test_Data_Base",
-
 	"title": "must validate when all fields are valid",
 
 	"specs": [
 		"an active profile in CCD",
 		"has the 200 return code"
 	],
-  "request":{
-    "body": {
-      "data": {
-        "_extends_": "F-050_Common_Data_In_Body"
-      }
-    }
-  },
+
+	"request":{
+		"body": {
+			"data": {
+				"_extends_": "F-050_Common_Data_In_Body"
+			}
+		}
+	},
+
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {

@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/event-callback/mid-event.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "data": {
+        "PersonFirstName": "George",
+        "PersonLastName": "Roof"
+      }
+    }
+  }
+}

@@ -7,7 +7,7 @@
 	"specs": [
 		"Richard - who can create a case",
 		"Dil - with an active profile",
-		"Jamal -  who is a privileged user with permissions to access the case assignments of other users",
+		"Jamal - who is a privileged user with permissions to access the case assignments of other users",
 		"is made by Jamal with the Case ID of C1 & Dil's User ID",
 		"contains the list of case roles just granted to Dil, as per above"
 	],
