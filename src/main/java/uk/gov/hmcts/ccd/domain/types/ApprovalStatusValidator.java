@@ -26,14 +26,14 @@ public class ApprovalStatusValidator extends NumberValidator {
             || isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
-        LOG.info("Validating approval status field id " + caseFieldDefinition.getId());
+        LOG.info("Validating approval status field id {}", caseFieldDefinition.getId());
 
         List<ValidationResult> validationResults = super.validate(dataFieldId, dataValue, caseFieldDefinition);
 
         if (validationResults.isEmpty()) {
             final String value = dataValue.textValue();
             final int numberValue = new BigDecimal(value).intValue();
-            LOG.info("Approval status field text value & number value " + value + " & " + numberValue);
+            LOG.info("Approval status field text value {} & number value {}", value, numberValue);
             if (numberValue < 0 || numberValue > 2) {
                 return Collections.singletonList(
                     new ValidationResult("Invalid Approval Status Value, Valid values are 0,1 and 2. "

@@ -105,7 +105,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 caseTypeDefinition.getCaseFieldDefinitions().stream()
                         .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
             }
-            LOG.info("Retrieved case type definition for case type: {} : {}", caseTypeId, caseTypeDefinition);
             return caseTypeDefinition;
 
         } catch (Exception e) {
