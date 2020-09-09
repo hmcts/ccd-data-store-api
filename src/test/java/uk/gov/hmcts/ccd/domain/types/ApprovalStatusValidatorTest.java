@@ -42,13 +42,13 @@ class ApprovalStatusValidatorTest {
         when(numberBaseType.getType()).thenReturn(NumberValidator.TYPE_ID);
         BaseType.register(numberBaseType);
 
-        validator = new ApprovalStatusValidator();
+        validator = new ApprovalStatusValidator(new NumberValidator());
 
         caseFieldDefinition = caseField(FIELD_ID).build();
     }
 
     private CaseFieldDefinitionBuilder caseField(String fieldId) {
-        return new CaseFieldDefinitionBuilder(fieldId).withType(ApprovalStatusValidator.TYPE_ID);
+        return new CaseFieldDefinitionBuilder(fieldId).withType("Number");
     }
 
     @Test
@@ -98,10 +98,5 @@ class ApprovalStatusValidatorTest {
             this.validator.validate("OrganisationToAdd", data, caseFieldDefinition);
         assertNotNull(validationResults);
         assertEquals(0, validationResults.size());
-    }
-
-    @Test
-    void getType() {
-        assertEquals(validator.getType(), BaseType.get("Number"), "Type is incorrect");
     }
 }

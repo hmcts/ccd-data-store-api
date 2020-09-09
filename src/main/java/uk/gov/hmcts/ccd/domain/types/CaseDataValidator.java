@@ -1,13 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -15,6 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
@@ -104,7 +103,9 @@ public class CaseDataValidator {
                                                        final BaseType fieldType) {
 
         Optional<FieldValidator> predefinedFieldValidator = validators.stream().filter(
-            validator -> isPredefinedTypeFieldValidator(validator, caseFieldDefinition.getFieldTypeDefinition().getId())
+            validator -> isPredefinedTypeFieldValidator(validator,
+                caseFieldDefinition.getFieldTypeDefinition().getId(),
+                caseFieldDefinition.getId())
         ).findAny();
 
         Optional<FieldValidator> baseTypeValidator = validators.stream().filter(validator ->
@@ -122,10 +123,10 @@ public class CaseDataValidator {
                 .orElseThrow(() -> new RuntimeException("System error: No validator found for " + fieldType.getType()));
     }
 
-    private boolean isPredefinedTypeFieldValidator(FieldValidator validator, String fieldID) {
+    private boolean isPredefinedTypeFieldValidator(FieldValidator validator, String fieldTypeId, String fieldDefId) {
         if (validator instanceof PredefinedTypeFieldValidator) {
             String predefinedId = ((PredefinedTypeFieldValidator) validator).getPredefinedFieldId();
-            return predefinedId.equals(fieldID);
+            return predefinedId.equals(fieldTypeId) || predefinedId.equalsIgnoreCase(fieldDefId);
         }
         return false;
     }
