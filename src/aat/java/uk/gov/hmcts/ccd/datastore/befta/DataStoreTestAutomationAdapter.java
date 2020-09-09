@@ -8,6 +8,7 @@ import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -20,12 +21,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
-    private static String uniqueString;
-
-    @Before
-    public void createUID() {
-        uniqueString = UUID.randomUUID().toString();
-    }
+    private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
@@ -73,7 +69,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                                                                         previousValueContextPath,
                                                                         incrementBy);
         } else if (key.toString().equals("UniqueString")) {
-            return uniqueString;
+            return uniqueStringsPerTestData
+                    .computeIfAbsent(scenarioContext.getContextId(), k ->
+                    UUID.randomUUID().toString());
         }
         return super.calculateCustomValue(scenarioContext, key);
     }
