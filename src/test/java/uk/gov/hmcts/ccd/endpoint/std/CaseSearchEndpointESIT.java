@@ -30,7 +30,6 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -223,12 +222,15 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                 () -> assertExampleCaseMetadata(caseDetails),
                 () -> assertExampleCaseData(caseDetails),
-                () -> assertThat(caseDetails.getSupplementaryData(), is(nullValue()))
+                () -> assertThat(caseDetails.getSupplementaryData().size(), is(3)),
+                () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
+                () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
+                () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
             );
         }
 
         @Test
-        void shouldSupportRequestsWithRequestedSupplementaryData() throws Exception {
+        void shouldReturnRequestedSupplementaryData() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
                 .supplementaryData(Arrays.asList("SDField2", "SDField3"))
@@ -253,7 +255,6 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
                 .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
                 .supplementaryData(Collections.singletonList("*"))
                 .build();
-            String ignoreMe = searchRequest.toJsonString();
 
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_A);
 

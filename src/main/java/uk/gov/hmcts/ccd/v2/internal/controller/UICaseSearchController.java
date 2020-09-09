@@ -152,6 +152,10 @@ public class UICaseSearchController {
         elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCaseUppercase);
         List<String> requestedFields = searchRequest.getRequestedFields();
 
+        if (useCaseUppercase == null && !searchRequest.hasRequestedSupplementaryData()) {
+            searchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
+        }
+
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(Collections.singletonList(caseTypeId))
             .withSearchRequest(searchRequest)

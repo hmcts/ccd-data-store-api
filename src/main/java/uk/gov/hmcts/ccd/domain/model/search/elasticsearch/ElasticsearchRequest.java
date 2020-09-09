@@ -107,6 +107,17 @@ public class ElasticsearchRequest {
         return requestedSupplementaryData != null;
     }
 
+    public void setRequestedSupplementaryData(ArrayNode requestedSupplementaryData) {
+        this.requestedSupplementaryData = requestedSupplementaryData;
+    }
+
+    public void setRequestedSupplementaryData(String... requestedSupplementaryDataFields) {
+        requestedSupplementaryData = MAPPER.createArrayNode();
+        for (String field : requestedSupplementaryDataFields) {
+            requestedSupplementaryData.add(new TextNode(field));
+        }
+    }
+
     /**
      * Creates a JSON string representing the Elasticsearch request object.
      * Custom properties supported by CCD will be merged appropriately to generate a native Elasticsearch request.

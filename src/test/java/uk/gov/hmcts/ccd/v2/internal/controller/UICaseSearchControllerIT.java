@@ -386,12 +386,11 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    void shouldSupportRequestsWithRequestedSupplementaryData() throws Exception {
+    void shouldReturnRequestedSupplementaryDataForUseCaseRequest() throws Exception {
         ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
             .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
             .supplementaryData(Arrays.asList("SDField2", "SDField3"))
             .build();
-        String ignoreMe = searchRequest.toJsonString();
 
         CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
 
@@ -411,9 +410,39 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
             .supplementaryData(Collections.singletonList("*"))
             .build();
-        String ignoreMe = searchRequest.toJsonString();
 
         CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(3)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+        );
+    }
+
+    @Test
+    void shouldReturnNoSupplementaryDataWhenNotRequestedForUseCaseRequest() throws Exception {
+        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .build();
+
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData(), is(nullValue()))
+        );
+    }
+
+    @Test
+    void shouldReturnAllSupplementaryDataByDefaultForStandardRequest() throws Exception {
+        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .build();
+
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
 
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
