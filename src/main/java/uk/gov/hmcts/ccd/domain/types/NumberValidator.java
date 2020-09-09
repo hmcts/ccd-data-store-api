@@ -4,16 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
-@Named
-@Singleton
 public class NumberValidator implements BaseTypeValidator {
     private static final Logger LOG = LoggerFactory.getLogger(NumberValidator.class);
 
