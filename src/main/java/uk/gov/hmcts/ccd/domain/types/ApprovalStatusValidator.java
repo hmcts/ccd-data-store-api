@@ -6,32 +6,24 @@ import java.util.Collections;
 import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 @Named
 @Singleton
-public class ApprovalStatusValidator implements PredefinedTypeFieldValidator {
-    private static final String APPROVAL_STATUS = "ApprovalStatus";
-    private NumberValidator numberValidator;
+public class ApprovalStatusValidator extends NumberValidator {
 
-    @Autowired
-    ApprovalStatusValidator(NumberValidator numberValidator) {
-        this.numberValidator = numberValidator;
-    }
+    private static final String APPROVAL_STATUS = "ApprovalStatus";
 
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
-        if (!APPROVAL_STATUS.equalsIgnoreCase(caseFieldDefinition.getId())
-            || this.numberValidator.isNullOrEmpty(dataValue)) {
+        if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
+        List<ValidationResult> validationResults = super.validate(dataFieldId, dataValue, caseFieldDefinition);
 
-        List<ValidationResult> validationResults = this.numberValidator.validate(dataFieldId, dataValue, caseFieldDefinition);
-
-        if (validationResults.isEmpty()) {
+        if (validationResults.isEmpty() && APPROVAL_STATUS.equalsIgnoreCase(caseFieldDefinition.getId())) {
             final String value = dataValue.textValue();
             final int numberValue = new BigDecimal(value).intValue();
             if (numberValue < 0 || numberValue > 2) {
@@ -46,8 +38,4 @@ public class ApprovalStatusValidator implements PredefinedTypeFieldValidator {
         return validationResults;
     }
 
-    @Override
-    public String getPredefinedFieldId() {
-        return APPROVAL_STATUS;
-    }
 }
