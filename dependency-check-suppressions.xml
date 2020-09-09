@@ -141,6 +141,8 @@
         <cve>CVE-2020-13692</cve>
         <cve>CVE-2020-10517</cve>
         <cve>CVE-2020-10518</cve>
+        <cve>CVE-2020-7019</cve>
+        <cve>CVE-2017-18640</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
