@@ -28,7 +28,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '5.1.0'
     id 'com.github.spotbugs' version '4.4.4'
     id 'net.ltgt.apt' version '0.21'
-    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.14'
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.22'
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.1.0"
@@ -818,4 +818,5 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 cucumberReports {
     outputDir = file("${projectDir}/target/cucumber")
     reports = files("${projectDir}/target/cucumber.json")
+    notFailingStatuses = ["skipped", "passed"]
 }
