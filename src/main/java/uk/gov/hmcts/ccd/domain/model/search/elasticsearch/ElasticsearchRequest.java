@@ -142,7 +142,7 @@ public class ElasticsearchRequest {
 
         if (hasRequestedSupplementaryData()) {
             StreamSupport.stream(getRequestedSupplementaryData().spliterator(), false)
-                .forEach(field -> sourceFields.add(new TextNode(SUPPLEMENTARY_DATA_PREFIX + field.asText())));
+                .forEach(sd -> sourceFields.add(new TextNode(SUPPLEMENTARY_DATA_PREFIX + sd.asText())));
         }
 
         return sourceFields;
