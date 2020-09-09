@@ -233,7 +233,6 @@ class CaseServiceTest {
                     + "}"));
 
             CaseDataContent caseDataContent = newCaseDataContent()
-                .withData(data)
                 .withCaseReference(CASE_REFERENCE)
                 .withEventData(eventData)
                 .build();

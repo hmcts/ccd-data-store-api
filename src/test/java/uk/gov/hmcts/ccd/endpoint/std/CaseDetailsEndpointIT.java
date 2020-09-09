@@ -1,8 +1,17 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,18 +36,20 @@ import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -66,12 +77,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 
 @SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE = "TestAddressBookCase";
+    private static final String CASE_TYPE_VALIDATE = "TestAddressBookCaseValidate";
+    private static final String CASE_TYPE_VALIDATE_MULTI_PAGE = "TestAddressBookCaseValidateMultiPage";
     private static final String CASE_TYPE_NO_CREATE_CASE_ACCESS = "TestAddressBookCaseNoCreateCaseAccess";
     private static final String CASE_TYPE_NO_UPDATE_CASE_ACCESS = "TestAddressBookCaseNoUpdateCaseAccess";
     private static final String CASE_TYPE_NO_CREATE_EVENT_ACCESS = "TestAddressBookCaseNoCreateEventAccess";
@@ -80,16 +95,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String CASE_TYPE_NO_READ_FIELD_ACCESS = "TestAddressBookCaseNoReadFieldAccess";
     private static final String CASE_TYPE_NO_READ_CASE_TYPE_ACCESS = "TestAddressBookCaseNoReadCaseTypeAccess";
     private static final String JURISDICTION = "PROBATE";
-    private static final String TEST_JURISDICTION = "TEST";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String CREATE_EVENT_ID = "Create2";
     private static final String PRE_STATES_EVENT_ID = "HAS_PRE_STATES_EVENT";
     private static final String FAKE_EVENT_ID = "FAKE_EVENT";
     private static final String GET_CASES_AS_CASEWORKER = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
     private static final String GET_PAGINATED_SEARCH_METADATA = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
-    private static final String GET_PAGINATED_SEARCH_METADATA_CITIZENS
-        = "/citizens/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
+    private static final String GET_PAGINATED_SEARCH_METADATA_CITIZENS =
+        "/citizens/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
+    private static final String TEST_JURISDICTION = "PROBATE";
     private static final String TEST_STATE = "CaseCreated";
     private static final String UID = "123";
     private static final String DRAFT_ID = "5";
@@ -101,6 +116,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private static final String LONG_COMMENT = "A very long comment.......";
     private static final String SHORT_COMMENT = "Short comment";
+
+    private static final String MID_EVENT_CALL_BACK = "/event-callback/mid-event";
+    private static final String MID_EVENT_CALL_BACK_MULTI_PAGE = "/event-callback/multi-page-mid-event";
 
     @Inject
     private WebApplicationContext wac;
@@ -4119,35 +4137,270 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private String exampleDataWithInvalidPostcode() {
-        return "{" +
-            "\"PersonAddress\":{" +
-            "\"Country\":\"_ Wales\"," +
-            "\"Postcode\":\"W11225DF\"," +
-            "\"AddressLine1\":\"_ Flat 9\"," +
-            "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
-            "\"AddressLine3\":\"_ ButtonVillie\"}," +
-            "\"PersonLastName\":\"_ Roof\"," +
-            "\"PersonFirstName\":\"_ George\"," +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}" +
-            "}";
+        return "{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"W11225DF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine2\":\"_ 2 Hubble Avenue\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
     }
 
     private String exampleData() {
-        return "{" +
-            "\"PersonAddress\":{" +
-            "\"Country\":\"_ Wales\"," +
-            "\"Postcode\":\"W11 5DF\"," +
-            "\"AddressLine1\":\"_ Flat 9\"," +
-            "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
-            "\"AddressLine3\":\"_ ButtonVillie\"}," +
-            "\"PersonLastName\":\"_ Roof\"," +
-            "\"PersonFirstName\":\"_ George\"," +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}" +
-            "}";
+        return "{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"W11 5DF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine2\":\"_ 2 Hubble Avenue\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+            "}"
+            + "}";
+    }
+
+    @Test
+    public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageId() throws Exception {
+        final JsonNode data = mapper.readTree(exampleCaseData());
+        final JsonNode eventData = mapper.readTree(exampleEventData());
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK);
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(summary)
+                .withDescription(description)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_VALIDATE + "/validate?pageId=createCaseInfoPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK)));
+        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK))
+                                              .withRequestBody(equalToJson(requestBodyJson())));
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseData() + "}");
+        final String exptextedResponseValue = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            exptextedResponseValue,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
+    public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
+        final JsonNode data = mapper.readTree(secondPageData());
+        final JsonNode eventData = mapper.readTree(exampleEventDataMultiPages());
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_MULTI_PAGE);
+
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseThirdPage",
+                "CaseField31",
+                "CaseField32", 3, MID_EVENT_CALL_BACK_MULTI_PAGE));
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseFourthPage",
+                "CaseField41",
+                "CaseField42", 4, MID_EVENT_CALL_BACK_MULTI_PAGE));
+
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(summary)
+                .withDescription(description)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_MULTI_PAGE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/"
+            + JURISDICTION + "/case-types/"
+            + CASE_TYPE_VALIDATE_MULTI_PAGE
+            + "/validate?pageId=createCaseNextPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE)));
+        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE))
+            .withRequestBody(equalToJson(requestBodyJsonMultiPage())));
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseDataMultiPage() + "}");
+        final String expectedResponseValue = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            expectedResponseValue,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    private String requestBodyJsonMultiPage() {
+        return "{\n"
+            + "  \"case_details\" : {\n"
+            + "    \"id\" : null,\n"
+            + "    \"jurisdiction\" : \"PROBATE\",\n"
+            + "    \"state\" : null,\n"
+            + "    \"version\" : null,\n"
+            + "    \"case_type_id\" : \"TestAddressBookCaseValidateMultiPage\",\n"
+            + "    \"created_date\" : null,\n"
+            + "    \"last_modified\" : null,\n"
+            + "    \"last_state_modified_date\" : null,\n"
+            + "    \"security_classification\" : null,\n"
+            + "    \"case_data\" : {\n"
+            + "      \"PersonLastName\" : \"_ Roof\",\n"
+            + "      \"CaseNumber\" : \"_ 1234567\",\n"
+            + "      \"PersonFirstName\" : \"_ George\",\n"
+            + "      \"TelephoneNumber\" : \"_ 07865645667\",\n"
+            + "      \"D8Document\" : {\n"
+            + "        \"document_url\" : \"http://localhost:" + this.getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"\n"
+            + "      }\n"
+            + "    },\n"
+            + "    \"data_classification\" : null,\n"
+            + "    \"after_submit_callback_response\" : null,\n"
+            + "    \"callback_response_status_code\" : null,\n"
+            + "    \"callback_response_status\" : null,\n"
+            + "    \"delete_draft_response_status_code\" : null,\n"
+            + "    \"delete_draft_response_status\" : null,\n"
+            + "    \"security_classifications\" : null\n"
+            + "  },\n"
+            + "  \"case_details_before\" : null,\n"
+            + "  \"event_id\" : \"TEST_EVENT\",\n"
+            + "  \"ignore_warning\" : false\n"
+            + "}";
+    }
+
+    private String requestBodyJson() {
+        return "{\"case_details\":{\"id\":null,\"jurisdiction\":\"PROBATE\",\"state\":null,\"version\":null,"
+            + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
+            + "\"last_state_modified_date\":null,\"security_classification\":null,\"case_data\":{\"PersonLastName"
+            + "\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
+            + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}},"
+            + "\"data_classification\":null,\"after_submit_callback_response\":null,"
+            + "\"callback_response_status_code\":null,\"callback_response_status\":null,"
+            + "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null,"
+            + "\"security_classifications\":null},\"case_details_before\":null,"
+            + "\"event_id\":\"TEST_EVENT\",\"ignore_warning\":false}";
+    }
+
+    private WizardPageCollection createWizardPageCollection(String eventCallBackURI) {
+        WizardPageCollection wizardPageCollection = new WizardPageCollection();
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseInfoPage",
+                "PersonFirstName",
+                "PersonLastName", 1, eventCallBackURI));
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseNextPage",
+                "CaseNumber",
+                "TelephoneNumber", 2, eventCallBackURI));
+        return wizardPageCollection;
+    }
+
+    private WizardPage createWizardPage(String pageName, String caseFieldName1, String caseFieldName2, Integer pageOrder, String eventCallBackURI) {
+        final CaseViewField caseViewField1 = aViewField()
+            .withId(caseFieldName1)
+            .withOrder(1)
+            .build();
+        final CaseViewField caseViewField2 = aViewField()
+            .withId(caseFieldName2)
+            .withOrder(2)
+            .build();
+
+        return newWizardPage()
+            .withId(pageName)
+            .withOrder(pageOrder)
+            .withField(caseViewField1)
+            .withField(caseViewField2)
+            .withCallBackURLMidEvent("http://localhost:" + getPort() + eventCallBackURI)
+            .build();
+    }
+
+    private String expectedCaseData() {
+        return "{"
+            + "\"PersonLastName\":\"Roof\","
+            + "\"PersonFirstName\":\"George\""
+            + "}";
+    }
+
+    private String expectedCaseDataMultiPage() {
+        return "{\n"
+            + "\t\"PersonLastName\": \"Roof\",\n"
+            + "\t\"CaseNumber\": \"1234567\",\n"
+            + "\t\"PersonFirstName\": \"George\",\n"
+            + "\t\"TelephoneNumber\": \"07865645667\"\n"
+            + "}";
+    }
+
+    private String secondPageData() {
+        return "{"
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String exampleEventDataMultiPages() {
+        return "{"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"CaseField31\":\"_ Test123\","
+            + "\"CaseField32\":\"_ Test765\","
+            + "\"CaseField41\":\"_ Test987\","
+            + "\"CaseField42\":\"_ Test567\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String exampleCaseData() {
+        return "{"
+            + "\"PersonLastName\":\"Roof\","
+            + "\"PersonFirstName\":\"George\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String exampleEventData() {
+        return "{"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
     }
 
     private static Event createEvent(String eventId, String summary, String description) {
