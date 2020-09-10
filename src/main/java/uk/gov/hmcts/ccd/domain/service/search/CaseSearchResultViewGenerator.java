@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -81,7 +80,7 @@ public class CaseSearchResultViewGenerator {
         List<SearchResultViewItem> items = new ArrayList<>();
         caseSearchResult.getCases().forEach(caseDetails -> {
             filterUnauthorisedFieldsByUseCaseAndUserRole(useCase, caseDetails, caseTypeDefinition, requestedFields);
-            items.add(buildSearchResultViewItem(caseDetails, caseTypeDefinition, searchResultDefinition));
+            items.add(buildSearchResultViewItem(caseDetails, searchResultDefinition));
         });
         return items;
     }
@@ -173,13 +172,11 @@ public class CaseSearchResultViewGenerator {
     }
 
     private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseDetails,
-                                                           CaseTypeDefinition caseTypeDefinition,
                                                            SearchResultDefinition searchResult) {
         Map<String, Object> caseFields = prepareData(
             searchResult,
             caseDetails.getData(),
-            caseDetails.getMetadata(),
-            caseTypeDefinition.getLabelsFromCaseFields()
+            caseDetails.getMetadata()
         );
 
         return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields));
@@ -187,8 +184,7 @@ public class CaseSearchResultViewGenerator {
 
     private Map<String, Object> prepareData(SearchResultDefinition searchResult,
                                             Map<String, JsonNode> caseData,
-                                            Map<String, Object> metadata,
-                                            Map<String, TextNode> labels) {
+                                            Map<String, Object> metadata) {
         Map<String, Object> newResults = new HashMap<>();
 
         searchResult.getFieldsWithPaths().forEach(searchResultField -> {
@@ -200,7 +196,6 @@ public class CaseSearchResultViewGenerator {
         });
 
         newResults.putAll(caseData);
-        newResults.putAll(labels);
         newResults.putAll(metadata);
         return newResults;
     }
