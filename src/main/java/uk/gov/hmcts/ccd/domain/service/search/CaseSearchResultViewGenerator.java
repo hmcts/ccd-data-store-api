@@ -80,7 +80,7 @@ public class CaseSearchResultViewGenerator {
         List<SearchResultViewItem> items = new ArrayList<>();
         caseSearchResult.getCases().forEach(caseDetails -> {
             filterUnauthorisedFieldsByUseCaseAndUserRole(useCase, caseDetails, caseTypeDefinition, requestedFields);
-            items.add(buildSearchResultViewItem(caseDetails, caseTypeDefinition, searchResultDefinition));
+            items.add(buildSearchResultViewItem(caseDetails, searchResultDefinition));
         });
         return items;
     }
@@ -171,7 +171,8 @@ public class CaseSearchResultViewGenerator {
             : searchResultField.getDisplayContextParameter();
     }
 
-    private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseDetails, SearchResultDefinition searchResult) {
+    private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseDetails,
+                                                           SearchResultDefinition searchResult) {
         Map<String, Object> caseFields = prepareData(
             searchResult,
             caseDetails.getData(),
