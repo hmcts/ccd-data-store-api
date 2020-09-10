@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Service
 @Qualifier(DefaultDraftGateway.QUALIFIER)
+@SuppressWarnings({"java:S2259", "javasecurity:S5144"})
 public class DefaultDraftGateway implements DraftGateway {
 
     public static final String QUALIFIER = "default";

@@ -136,6 +136,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     @Override
+    @SuppressWarnings("java:S2259")
     public List<WizardPage> getWizardPageCollection(int version, String caseTypeId, String eventId) {
         final Instant start = Instant.now();
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
