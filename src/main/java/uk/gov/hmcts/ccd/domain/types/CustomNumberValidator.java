@@ -10,22 +10,20 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 @Named
 @Singleton
-public class ApprovalStatusValidator extends NumberValidator {
+public class CustomNumberValidator extends NumberValidator {
 
-    private static final String APPROVAL_STATUS = "ApprovalStatus";
+    private static final String FIELD_TO_VALIDATE = "ApprovalStatus";
 
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
-        if (!APPROVAL_STATUS.equalsIgnoreCase(caseFieldDefinition.getId())
-            || isNullOrEmpty(dataValue)) {
+        if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
-
         List<ValidationResult> validationResults = super.validate(dataFieldId, dataValue, caseFieldDefinition);
 
-        if (validationResults.isEmpty()) {
+        if (validationResults.isEmpty() && FIELD_TO_VALIDATE.equalsIgnoreCase(caseFieldDefinition.getId())) {
             final String value = dataValue.textValue();
             final int numberValue = new BigDecimal(value).intValue();
             if (numberValue < 0 || numberValue > 2) {
