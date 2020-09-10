@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
-class ApprovalStatusValidatorTest {
+class CustomNumberValidatorTest {
 
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
     private static final String FIELD_ID = "ApprovalStatus";
@@ -28,7 +28,7 @@ class ApprovalStatusValidatorTest {
     @Mock
     private CaseDefinitionRepository definitionRepository;
 
-    private ApprovalStatusValidator validator;
+    private CustomNumberValidator validator;
     private CaseFieldDefinition caseFieldDefinition;
 
     @BeforeEach
@@ -42,13 +42,13 @@ class ApprovalStatusValidatorTest {
         when(numberBaseType.getType()).thenReturn(NumberValidator.TYPE_ID);
         BaseType.register(numberBaseType);
 
-        validator = new ApprovalStatusValidator();
+        validator = new CustomNumberValidator();
 
         caseFieldDefinition = caseField(FIELD_ID).build();
     }
 
     private CaseFieldDefinitionBuilder caseField(String fieldId) {
-        return new CaseFieldDefinitionBuilder(fieldId).withType(ApprovalStatusValidator.TYPE_ID);
+        return new CaseFieldDefinitionBuilder(fieldId).withType(CustomNumberValidator.TYPE_ID);
     }
 
     @Test
