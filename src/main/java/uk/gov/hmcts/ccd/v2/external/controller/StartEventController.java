@@ -93,7 +93,10 @@ public class StartEventController {
         ),
         @ApiResponse(
             code = 422,
-            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document for case field or missing user roles"
+            message = "One of the following reasons:\n"
+                + "1. Case event has no pre states\n"
+                + "2. Callback validation errors\n"
+                + "3. Missing user roles"
         ),
         @ApiResponse(
             code = 400,
