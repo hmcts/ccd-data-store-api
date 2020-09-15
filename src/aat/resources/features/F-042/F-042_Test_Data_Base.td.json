@@ -1,23 +1,27 @@
 {
-  "_guid_": "F-042_Test_Data_Base",
-  "productName": "CCD Data Store",
-  "operationName": "Start the event creation process for a new case for a Case Worker",
-  "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.1@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
-    }
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_JURISDICTION_1",
-      "ctid": "BEFTA_CASETYPE_1_1",
-      "etid": "START_PROGRESS",
-      "cid": "${[scenarioContext][childContexts][Case_Creation_Using_Caseworker1_Role][testData][actualResponse][body][id]}"
-    }
-  }
+	"_guid_": "F-042_Test_Data_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Start the event creation process for a new case for a Case Worker",
+
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.1@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
+		}
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_JURISDICTION_1",
+			"ctid": "BEFTA_CASETYPE_1_1",
+			"etid": "START_PROGRESS",
+			"cid": "${[scenarioContext][childContexts][Case_Creation_Using_Caseworker1_Role][testData][actualResponse][body][id]}"
+		}
+	}
 }

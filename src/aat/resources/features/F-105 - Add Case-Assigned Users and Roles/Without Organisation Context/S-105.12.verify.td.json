@@ -1,16 +1,16 @@
 {
-  "_guid_": "S-105.12_Get_Case_Roles_for_Case_C1",
-  "_extends_": "F-105_Get_Case_Roles_for_Case_C1_Base",
+	"_guid_": "S-105.12_Get_Case_Roles_for_Case_C1",
+	"_extends_": "F-105_Get_Case_Roles_for_Case_C1_Base",
 
-  "specs": [
-    "to verify Olawale's reception of the role CR-1 over the case C1"
-  ],
+	"specs": [
+		"to verify Olawale's reception of the role CR-1 over the case C1"
+	],
 
-  "users": {
-    "_extends_": "F-105_Users"
-  },
+	"users": {
+		"_extends_": "F-105_Users"
+	},
 
-  "expectedResponse": {
+	"expectedResponse": {
 		"body": {
 			"case_users": [
 				{
@@ -24,5 +24,5 @@
 				}
 			]
 		}
-  }
+	}
 }
