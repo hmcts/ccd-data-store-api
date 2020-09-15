@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-233",
 	"_extends_": "F-049_Test_Data_Base",
-
 	"title": "must return 403 when request contains a malformed user ID",
 
 	"specs": [
@@ -9,11 +8,13 @@
 		"contains a malformed user id",
 		"code is HTTP-403"
 	],
+
 	"request": {
 		"pathVariables": {
 			"uid": "@@@@@@@@@@"
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
 		"headers": {

@@ -1,74 +1,79 @@
 {
-  "_guid_": "F-037_Test_Data_Base",
-  "productName": "CCD data store",
-  "operationName": "submit event for an existing case (V2)",
-  "method": "POST",
-  "uri": "/cases/{cid}/events",
-  "user": {
-    "_extends_": "Common_User_For_Request"
-  },
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
-      "experimental": true
-    },
-    "pathVariables": {
-      "cid": "1234567890123456"
-    },
-    "body": {
-      "data": {
-        "MoneyGBPField": "4200",
-        "FixedListField": "VALUE3",
-        "AddressUKField": {
-          "County": "Greater London",
-          "Country": "UK",
-          "PostCode": "SW1H 9AJ",
-          "PostTown": "Westminster",
-          "AddressLine1": "102 Petty France",
-          "AddressLine2": "CCD",
-          "AddressLine3": "c/o HMCTS Reform"
-        },
-        "ComplexField": {
-          "ComplexTextField": "Nested text",
-          "ComplexFixedListField": "VALUE2"
-        },
-        "DateTimeField": "1988-07-07T22:20:00",
-        "PhoneUKField": "07123456789",
-        "NumberField": "164528",
-        "MultiSelectListField": [
-          "OPTION2",
-          "OPTION4"
-        ],
-        "YesOrNoField": "Yes",
-        "EmailField": "ccd@hmcts.net",
-        "TextField": "Some Text",
-        "DateField": "2017-02-13",
-        "TextAreaField": "Line1\nLine2",
-        "CollectionField": [
-          {
-            "id": "4926d94c-1fa3-4c16-b5ba-5a122d8c622d",
-            "value": "Alias 1"
-          },
-          {
-            "id": "936b6a65-a179-474f-bdff-1d4f961e9a8c",
-            "value": "Alias 2"
-          }
-        ]
-      },
-      "event": {
-        "id": "UPDATE",
-        "summary": "",
-        "description": ""
-      },
-      "event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJrNHZpNHZwMGhyNmk4MTNoZmZnYWpncmJrdiIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTYzMTQ5MiwiY2FzZS1pZCI6IjI0NTEiLCJldmVudC1pZCI6IlNUQVJUX1BST0dSRVNTIiwiY2FzZS10eXBlLWlkIjoiQUFUX0FVVEhfMTUiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjE1NDQ1NGIxYTJmNzczYTg0NjU5YmVjYzc3ZjYyODdjNDVlYTE4MzgiLCJlbnRpdHktdmVyc2lvbiI6MH0.gwKtIzJ-JGp-luGbTDXBBlbQ6iqbHY-dcAJaubhrBRM",
-      "ignore_warning": false
-    }
-  },
-  "expectedResponse": {
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
-    }
-  }
+	"_guid_": "F-037_Test_Data_Base",
+
+	"productName": "CCD data store",
+	"operationName": "submit event for an existing case (V2)",
+
+	"method": "POST",
+	"uri": "/cases/{cid}/events",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+			"experimental": true
+		},
+		"pathVariables": {
+			"cid": "1234567890123456"
+		},
+		"body": {
+			"data": {
+				"MoneyGBPField": "4200",
+				"FixedListField": "VALUE3",
+				"AddressUKField": {
+					"County": "Greater London",
+					"Country": "UK",
+					"PostCode": "SW1H 9AJ",
+					"PostTown": "Westminster",
+					"AddressLine1": "102 Petty France",
+					"AddressLine2": "CCD",
+					"AddressLine3": "c/o HMCTS Reform"
+				},
+				"ComplexField": {
+					"ComplexTextField": "Nested text",
+					"ComplexFixedListField": "VALUE2"
+				},
+				"DateTimeField": "1988-07-07T22:20:00",
+				"PhoneUKField": "07123456789",
+				"NumberField": "164528",
+				"MultiSelectListField": [
+					"OPTION2",
+					"OPTION4"
+				],
+				"YesOrNoField": "Yes",
+				"EmailField": "ccd@hmcts.net",
+				"TextField": "Some Text",
+				"DateField": "2017-02-13",
+				"TextAreaField": "Line1\nLine2",
+				"CollectionField": [
+					{
+						"id": "4926d94c-1fa3-4c16-b5ba-5a122d8c622d",
+						"value": "Alias 1"
+					},
+					{
+						"id": "936b6a65-a179-474f-bdff-1d4f961e9a8c",
+						"value": "Alias 2"
+					}
+				]
+			},
+			"event": {
+				"id": "UPDATE",
+				"summary": "",
+				"description": ""
+			},
+			"event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJrNHZpNHZwMGhyNmk4MTNoZmZnYWpncmJrdiIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTYzMTQ5MiwiY2FzZS1pZCI6IjI0NTEiLCJldmVudC1pZCI6IlNUQVJUX1BST0dSRVNTIiwiY2FzZS10eXBlLWlkIjoiQUFUX0FVVEhfMTUiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjE1NDQ1NGIxYTJmNzczYTg0NjU5YmVjYzc3ZjYyODdjNDVlYTE4MzgiLCJlbnRpdHktdmVyc2lvbiI6MH0.gwKtIzJ-JGp-luGbTDXBBlbQ6iqbHY-dcAJaubhrBRM",
+			"ignore_warning": false
+		}
+	},
+
+	"expectedResponse": {
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding" : "gzip"
+		}
+	}
 }

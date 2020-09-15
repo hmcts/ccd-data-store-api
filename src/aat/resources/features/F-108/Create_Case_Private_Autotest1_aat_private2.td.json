@@ -1,17 +1,17 @@
 {
-  "_guid_": "Private_Case_Creation_Autotest1_AAT_PRIVATE_B_Data",
-  "productName": "CCD Data Store",
-  "operationName": "Submit case creation as Case worker",
-  "method": "POST",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
-  "specs": [
-    "a role with security classification of PRIVATE",
-    "contains a case that has just been created as in F-032_Case_Creation_Of_Private_Case",
-    "a case that has just been created as in [F-103-Test_AAT_PRIVATE]",
-    "a user with [a role with security classification of PRIVATE]",
-    "a user with a role with security classification of PRIVATE",
-    "a case that has just been created as in Private_Case_Creation_Data",
-    "a case that has just been created as in [Private_Case_Creation_Data]",
+	"_guid_": "Private_Case_Creation_Autotest1_AAT_PRIVATE_B_Data",
+	"productName": "CCD Data Store",
+	"operationName": "Submit case creation as Case worker",
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+	"specs": [
+		"a role with security classification of PRIVATE",
+		"contains a case that has just been created as in F-032_Case_Creation_Of_Private_Case",
+		"a case that has just been created as in [F-103-Test_AAT_PRIVATE]",
+		"a user with [a role with security classification of PRIVATE]",
+		"a user with a role with security classification of PRIVATE",
+		"a case that has just been created as in Private_Case_Creation_Data",
+		"a case that has just been created as in [Private_Case_Creation_Data]",
     "to create a full case"
   ],
   "users": {
