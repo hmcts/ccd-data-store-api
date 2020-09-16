@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 
+import static uk.gov.hmcts.ccd.v2.V2.Error.AUTHENTICATION_TOKEN_INVALID;
 import static uk.gov.hmcts.ccd.v2.V2.Error.EVENT_TRIGGER_NOT_FOUND;
 
 @RestController
@@ -73,17 +74,15 @@ public class StartEventController {
     }
 
     @GetMapping(
-        path = "/cases/{caseId}/event-triggers/{triggerId}",
-        headers = {
-            V2.EXPERIMENTAL_HEADER
-        },
+        path = "/cases/{caseId}/event-triggers/{eventId}",
         produces = {
             V2.MediaType.START_EVENT
         }
     )
     @ApiOperation(
-        value = "Retrieve a trigger for case by ID",
-        notes = V2.EXPERIMENTAL_WARNING
+        value = "Retrieve an Event Trigger for a Case by Event ID",
+        notes = "This operation creates an event token for a specific event to be started for a case and returns the "
+        + "token, along with the visible case details to the invoking user as per their configured access levels."
     )
     @ApiResponses({
         @ApiResponse(
@@ -92,30 +91,39 @@ public class StartEventController {
             response = StartEventResource.class
         ),
         @ApiResponse(
-            code = 422,
-            message = "One of the following reasons:\n"
-                + "1. Case event has no pre states\n"
-                + "2. Callback validation errors\n"
-                + "3. Missing user roles"
-        ),
-        @ApiResponse(
             code = 400,
             message = ERROR_CASE_ID_INVALID
         ),
         @ApiResponse(
+            code = 401,
+            message = AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = V2.Error.UNAUTHORISED_S2S_SERVICE
+        ),
+        @ApiResponse(
             code = 404,
             message = EVENT_TRIGGER_NOT_FOUND
-        )
+        ),
+        @ApiResponse(
+            code = 422,
+            message = "One of the following reasons:\n"
+                + "1. Case event has no pre states\n"
+                + "2. Callback validation errors\n"
+                + "3. Unable to sanitize document for case field\n"
+                + "4. Missing user roles"
+        ),
     })
     public ResponseEntity<StartEventResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
-                                                                   @PathVariable("triggerId") String triggerId,
+                                                                   @PathVariable("eventId") String eventId,
                                                                    @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }
 
         final StartEventResult startEventResult = this.startEventOperation.triggerStartForCase(caseId,
-                                                                                                 triggerId,
+                                                                                                 eventId,
                                                                                                  ignoreWarning);
 
         return ResponseEntity.ok(new StartEventResource(startEventResult, ignoreWarning, true));
