@@ -1,0 +1,8 @@
+{
+  "_guid_": "F-111_Remove_Case_Assigned_User_Roles_200_response",
+  "_extends_": "Common_200_Response",
+
+  "body": {
+    "status_message": "Case-User-Role assignments removed successfully"
+  }
+}

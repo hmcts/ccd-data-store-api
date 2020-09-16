@@ -5,6 +5,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Get the pagination metadata for a case data search for Case Worker",
+
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
 
@@ -13,6 +14,7 @@
 		"contains an invalid Sort Direction",
 		"contains an error message : Unknown sort direction"
 	],
+
 	"request": {
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
@@ -23,8 +25,9 @@
 			"sortDirection": "someInvalidSortDirection"
 		}
 	},
+
 	"expectedResponse": {
-    "_extends_": "Common_400_Response",
+		"_extends_": "Common_400_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Length": "[[ANYTHING_PRESENT]]"

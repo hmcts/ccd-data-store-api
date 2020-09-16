@@ -1,42 +1,47 @@
 {
-  "_guid_": "F-034_Test_Data_Base",
-  "productName": "CCD Data Store",
-  "operationName": "Validate case data",
-  "method": "POST",
-  "uri": "/case-types/{ctid}/validate",
-  "user": {
-    "_extends_": "Common_User_For_Request"
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "headers": {
-      "experimental": true
-    },
-    "pathVariables": {
-      "ctid": "AAT"
-    },
-    "body": {
-      "event": {
-        "id": "UPDATE",
-        "summary": "",
-        "description": ""
-      },
-      "data": {
-        "_extends_": "Standard_Full_Case_Data"
-      },
-      "data_classification": {
-        "_extends_" : "Standard_Full_Case_Data_Classification"
-      },
-      "security_classification": "PUBLIC",
-      "event_token": "testToken",
-      "ignore_warning": true
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "gzip"
-    }
-  }
+	"_guid_": "F-034_Test_Data_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Validate case data",
+
+	"method": "POST",
+	"uri": "/case-types/{ctid}/validate",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"headers": {
+			"experimental": true
+		},
+		"pathVariables": {
+			"ctid": "AAT"
+		},
+		"body": {
+			"event": {
+				"id": "UPDATE",
+				"summary": "",
+				"description": ""
+			},
+			"data": {
+				"_extends_": "Standard_Full_Case_Data"
+			},
+			"data_classification": {
+				"_extends_" : "Standard_Full_Case_Data_Classification"
+			},
+			"security_classification": "PUBLIC",
+			"event_token": "testToken",
+			"ignore_warning": true
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		}
+	}
 }

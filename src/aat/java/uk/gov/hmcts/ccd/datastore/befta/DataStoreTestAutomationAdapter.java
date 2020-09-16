@@ -1,16 +1,19 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import io.cucumber.java.Before;
+import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
-import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
 
@@ -18,11 +21,17 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
+    private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
+
+    @Before("@elasticsearch")
+    public void skipElasticSearchTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("ELASTIC_SEARCH_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("Elastic Search not Enabled");
+        }
+    }
+
     @Override
     public void doLoadTestData() {
-        if (elasticSearchEnabled()) {
-            new ElasticsearchTestDataLoaderExtension().deleteIndexesIfPresent();
-        }
         loader.addCcdRoles();
         loader.importDefinitions();
     }
@@ -60,7 +69,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                                                                         previousValueContextPath,
                                                                         incrementBy);
         } else if (key.toString().equals("UniqueString")) {
-            return ScenarioData.getUniqueString();
+            return uniqueStringsPerTestData
+                    .computeIfAbsent(scenarioContext.getContextId(), k ->
+                    UUID.randomUUID().toString());
         }
         return super.calculateCustomValue(scenarioContext, key);
     }

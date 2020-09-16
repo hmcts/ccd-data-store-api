@@ -2,27 +2,30 @@
   "_guid_": "S-557",
   "_extends_": "F-064_Test_Data_Base",
   "title": "must return a negative response when request contains a malformed case type id",
-		"specs": [
-		"an active profile in CCD",
-		"contains a malformed case type id",
-		"code is HTTP-400"
-	],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a malformed case type id",
+    "code is HTTP-400"
+  ],
+
   "request": {
     "pathVariables": {
-      "ctid": "!@@£ $%%^^  &&  # €"
+      "ctid": "!@@ £$% %^^&  &#€"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "Content-Encoding" : "gzip"
+      "Content-Encoding": "gzip"
     },
-    "body" : {
-      "exception" : "[[ANYTHING_PRESENT]]",
-      "message" : "Error when getting case type version. Unknown case type '!@@£ $%%^^  &&  # € because of 404'.",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+    "body": {
+      "exception": "[[ANYTHING_PRESENT]]",
+      "message": "Error when getting case type version. Unknown case type '!@@£$%%^^&&#€ because of 404'.",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }

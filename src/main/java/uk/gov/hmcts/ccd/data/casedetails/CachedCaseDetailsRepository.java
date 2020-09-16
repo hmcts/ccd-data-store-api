@@ -79,6 +79,11 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
+        return referenceToCaseDetails.computeIfAbsent(reference, key -> caseDetailsRepository.findByReferenceWithNoAccessControl(reference));
+    }
+
+    @Override
     public CaseDetails findUniqueCase(final String jurisdictionId, final String caseTypeId, final String caseReference) {
         return findHashToCaseDetails.computeIfAbsent(format(FIND_HASH_FORMAT, jurisdictionId, caseTypeId, caseReference),
             hash -> caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
