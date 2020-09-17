@@ -8,8 +8,8 @@
              endDelimiter="\nGO"
              splitStatements="true"
              stripComments="true">
-            DROP INDEX idx_case_data__generated_dob;
-            DROP INDEX idx_case_data_generatedemail;
+            DROP INDEX IF EXISTS idx_case_data__generated_dob;
+            DROP INDEX IF EXISTS idx_case_data_generatedemail;
             CREATE INDEX IF NOT EXISTS idx_case_data_appeal_appellant_identity_lastName_region ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{appeal,appellant,name,lastName}'::text[]))), btrim(upper((data #>> '{region}'::text[]))));
             CREATE INDEX IF NOT EXISTS idx_case_data_documentSentToDwp ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{documentSentToDwp}'::text[]))));
             CREATE INDEX IF NOT EXISTS idx_case_data_isscottishcase_documentSentToDwp ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{isScottishCase}'::text[]))), btrim(upper((data #>> '{documentSentToDwp}'::text[]))));
