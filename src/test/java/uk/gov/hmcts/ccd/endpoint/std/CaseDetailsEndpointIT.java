@@ -80,7 +80,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -99,8 +100,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String CREATE_EVENT_ID = "Create2";
     private static final String PRE_STATES_EVENT_ID = "HAS_PRE_STATES_EVENT";
     private static final String FAKE_EVENT_ID = "FAKE_EVENT";
-    private static final String GET_CASES_AS_CASEWORKER = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
-    private static final String GET_PAGINATED_SEARCH_METADATA = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
+    private static final String GET_CASES_AS_CASEWORKER =
+        "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
+    private static final String GET_PAGINATED_SEARCH_METADATA =
+        "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
     private static final String GET_PAGINATED_SEARCH_METADATA_CITIZENS =
         "/citizens/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
@@ -204,7 +207,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCaseworker() throws Exception {
+    public void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCaseworker()
+                                                                                                    throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
@@ -234,7 +238,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCitizen() throws Exception {
+    public void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCitizen()
+                                                                                                    throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
@@ -276,7 +281,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  },\n" +
                 "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
                 "  \"D8Document\":{" +
-                "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}" +
+                "    \"document_url\": \"http://localhost:" + getPort()
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}" +
                 "}\n"
         );
         final JsonNode sanitizedData = mapper.readTree(
@@ -289,8 +295,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  },\n" +
                 "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
                 "  \"D8Document\":{\n" +
-                "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
-                "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
+                "    \"document_url\": \"http://localhost:" + getPort()
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
+                "    \"document_binary_url\": \"http://localhost:[port]/documents/"
+                + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
                 "    \"document_filename\": \"Seagulls_Square.jpg\"" +
                 "}\n" +
                 "}\n"
@@ -310,17 +318,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andReturn();
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
-        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData.entrySet())));
+        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
+            .toString(), Map.class);
+        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
+            .entrySet())));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(
+            sanitizedDataMap.entrySet())));
         assertEquals("Incorrect security classification size", 5, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
                                                               "  \"PersonAddress\":{" +
@@ -335,9 +347,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                                               "  \"Aliases\": {" +
                                                               "    \"classification\": \"PUBLIC\"," +
                                                               "    \"value\": [" +
-                                                              "      { \"id\": \"1\", \"classification\": \"PUBLIC\" }," +
-                                                              "      { \"id\": \"2\", \"classification\": \"PUBLIC\" }" +
-                                                              "    ]" +
+                                                              "      { \"id\": \"1\", \"classification\": \"PUBLIC\" },"
+                                                             + "      { \"id\": \"2\", \"classification\": \"PUBLIC\" }"
+                                                             + "    ]" +
                                                               "  }," +
                                                               "  \"D8Document\":\"PUBLIC\"" +
                                                               "}");

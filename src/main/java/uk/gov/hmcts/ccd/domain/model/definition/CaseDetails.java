@@ -30,7 +30,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_PAYMENT_HISTORY_VIEWER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
-@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
+// partial javadoc attributes added prior to checkstyle implementation in module
+@SuppressWarnings("checkstyle:SummaryJavadoc")
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
@@ -67,7 +68,8 @@ public class CaseDetails implements Cloneable {
     private Map<String, JsonNode> data;
 
     @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
+    @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
+        + "as field's value.")
     private Map<String, JsonNode> dataClassification;
 
     /**
@@ -251,8 +253,10 @@ public class CaseDetails implements Cloneable {
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
-        return caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(LABEL)
-            || caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
+        return caseTypeTabField.getCaseFieldDefinition()
+            .getFieldTypeDefinition().getType().equals(LABEL)
+            || caseTypeTabField.getCaseFieldDefinition()
+            .getFieldTypeDefinition().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
     }
 
     @JsonIgnore

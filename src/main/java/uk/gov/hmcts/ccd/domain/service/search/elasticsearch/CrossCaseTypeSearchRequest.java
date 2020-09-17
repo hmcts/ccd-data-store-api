@@ -44,7 +44,9 @@ public class CrossCaseTypeSearchRequest {
     private final boolean multiCaseTypeSearch;
     private final List<String> aliasFields = new ArrayList<>();
 
-    private CrossCaseTypeSearchRequest(List<String> caseTypeIds, ElasticsearchRequest elasticsearchRequest, boolean multiCaseTypeSearch,
+    private CrossCaseTypeSearchRequest(List<String> caseTypeIds,
+                                       ElasticsearchRequest elasticsearchRequest,
+                                       boolean multiCaseTypeSearch,
                                        List<String> aliasFields) {
         this.caseTypeIds.addAll(caseTypeIds);
         this.elasticsearchRequest = elasticsearchRequest;
@@ -86,8 +88,9 @@ public class CrossCaseTypeSearchRequest {
 
     private void addMetadataSourceFields() {
         if (elasticsearchRequest.hasSourceFields()) {
-            // when fields are explicitly specified in _source, we need to add metadata fields explicitly to the response.
-            // Otherwise, we don't need because all case data including metadata fields are in the response already
+            // when fields are explicitly specified in _source, we need to add metadata fields explicitly to the
+            // response. Otherwise, we don't need because all case data including metadata fields are in
+            // the response already
             ArrayNode sourceNode = (ArrayNode) elasticsearchRequest.getSource();
             Arrays.stream(MetaData.CaseField.values())
                 .forEach(field -> sourceNode.add(new TextNode(field.getDbColumnName())));
@@ -151,7 +154,8 @@ public class CrossCaseTypeSearchRequest {
 
         public CrossCaseTypeSearchRequest build() {
             setSourceFilterAliasFields();
-            return new CrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, multiCaseTypeSearch, sourceFilterAliasFields);
+            return new CrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, multiCaseTypeSearch,
+                                                  sourceFilterAliasFields);
         }
 
     }

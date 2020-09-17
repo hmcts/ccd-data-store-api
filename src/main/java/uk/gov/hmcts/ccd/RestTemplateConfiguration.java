@@ -55,7 +55,8 @@ class RestTemplateConfiguration {
     @Bean(name = "restTemplate")
     public RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(getHttpClient());
+        HttpComponentsClientHttpRequestFactory requestFactory =
+            new HttpComponentsClientHttpRequestFactory(getHttpClient());
         requestFactory.setReadTimeout(readTimeout);
         LOG.info("readTimeout: {}", readTimeout);
         restTemplate.setRequestFactory(requestFactory);
@@ -66,7 +67,8 @@ class RestTemplateConfiguration {
     public RestTemplate documentRestTemplate() {
 
         final RestTemplate restTemplate = new RestTemplate();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(getHttpClient());
+        HttpComponentsClientHttpRequestFactory requestFactory =
+            new HttpComponentsClientHttpRequestFactory(getHttpClient());
         requestFactory.setReadTimeout(readTimeout);
         LOG.info("readTimeout: {}", readTimeout);
         restTemplate.setRequestFactory(requestFactory);
@@ -86,14 +88,16 @@ class RestTemplateConfiguration {
     @Bean(name = "createDraftRestTemplate")
     public RestTemplate createDraftsRestTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsCreateConnectionTimeout)));
+        restTemplate.setRequestFactory(
+            new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsCreateConnectionTimeout)));
         return restTemplate;
     }
 
     @Bean(name = "draftsRestTemplate")
     public RestTemplate draftsRestTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsConnectionTimeout)));
+        restTemplate.setRequestFactory(
+            new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsConnectionTimeout)));
         return restTemplate;
     }
 

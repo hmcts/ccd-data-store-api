@@ -23,7 +23,8 @@ public class SecurityClassificationUtils {
     }
 
     public static Predicate<CaseDetails> caseHasClassificationEqualOrLowerThan(SecurityClassification classification) {
-        return cd -> Optional.ofNullable(classification).map(sc -> sc.higherOrEqualTo(cd.getSecurityClassification())).orElse(false);
+        return cd -> Optional.ofNullable(classification).map(sc ->
+            sc.higherOrEqualTo(cd.getSecurityClassification())).orElse(false);
     }
 
     public static Optional<SecurityClassification> getSecurityClassification(JsonNode dataNode) {

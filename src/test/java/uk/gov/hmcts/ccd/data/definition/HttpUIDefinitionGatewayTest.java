@@ -24,7 +24,8 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
 
     @Test
     public void getDefinition() {
-        final SearchResultDefinition workBasketResult = httpUIDefinitionGateway.getWorkBasketResult(VERSION,"TestAddressBookCase");
+        final SearchResultDefinition workBasketResult =
+            httpUIDefinitionGateway.getWorkBasketResult(VERSION,"TestAddressBookCase");
         assertThat(workBasketResult.getFields().length, is(3));
     }
 
@@ -48,14 +49,16 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
     @DisplayName("should Return jurisdiction UI configs")
     public void shouldReturnJurisdictionUiConfigs() {
         List<String> jurisdictionIds = Lists.newArrayList("PROBATE", "DIVORCE");
-        final JurisdictionUiConfigResult configResult = httpUIDefinitionGateway.getJurisdictionUiConfigs(jurisdictionIds);
+        final JurisdictionUiConfigResult configResult =
+            httpUIDefinitionGateway.getJurisdictionUiConfigs(jurisdictionIds);
         assertThat(configResult.getConfigs().size(), is(2));
     }
 
     @Test
     @DisplayName("should Return search cases result fields")
     public void shouldReturnSearchCasesResultFields() {
-        final SearchResultDefinition searchResult = httpUIDefinitionGateway.getSearchCasesResultDefinition(VERSION, "TestAddressBookCase", ORG_CASES);
+        final SearchResultDefinition searchResult =
+            httpUIDefinitionGateway.getSearchCasesResultDefinition(VERSION, "TestAddressBookCase", ORG_CASES);
         assertAll(
             () -> assertThat(searchResult.getFields().length, is(7)),
             () -> assertThat(searchResult.getFields()[0].getUseCase(), is(ORG_CASES))

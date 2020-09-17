@@ -21,13 +21,15 @@ public class HalConfig {
 
     public static final String APPLICATION_JSON_EXTENDED_VALUE = "application/*+json";
     public static final MediaType APPLICATION_JSON_EXTENDED = MediaType.valueOf(APPLICATION_JSON_EXTENDED_VALUE);
-    public static final String APPLICATION_JSON_EXTENDED_UTF8_VALUE = APPLICATION_JSON_EXTENDED_VALUE + ";charset=UTF-8";
+    public static final String APPLICATION_JSON_EXTENDED_UTF8_VALUE =
+        APPLICATION_JSON_EXTENDED_VALUE + ";charset=UTF-8";
     public static final MediaType APPLICATION_JSON_EXTENDED_UTF8 = MediaType.valueOf(
         APPLICATION_JSON_EXTENDED_UTF8_VALUE);
-
     public static final String APPLICATION_HAL_JSON_EXTENDED_VALUE = "application/*+hal+json";
-    public static final MediaType APPLICATION_HAL_JSON_EXTENDED = MediaType.valueOf(APPLICATION_HAL_JSON_EXTENDED_VALUE);
-    public static final String APPLICATION_HAL_JSON_EXTENDED_UTF8_VALUE = APPLICATION_HAL_JSON_EXTENDED_VALUE + ";charset=UTF-8";
+    public static final MediaType APPLICATION_HAL_JSON_EXTENDED =
+        MediaType.valueOf(APPLICATION_HAL_JSON_EXTENDED_VALUE);
+    public static final String APPLICATION_HAL_JSON_EXTENDED_UTF8_VALUE =
+        APPLICATION_HAL_JSON_EXTENDED_VALUE + ";charset=UTF-8";
     public static final MediaType APPLICATION_HAL_JSON_EXTENDED_UTF8 = MediaType.valueOf(
         APPLICATION_HAL_JSON_EXTENDED_UTF8_VALUE);
 
@@ -45,9 +47,10 @@ public class HalConfig {
     }
 
     /**
-     * Given Spring HATEOAS v0.25.0.RELEASE does not support HAL with vendor media types, those have to be enabled manually.
-     * This is adding the following media types to HAL: application/*+json, application/*+json;charset=UTF-8,
-     * application/*+hal+json and application/*+hal+json;charset=UTF-8.
+     * Given Spring HATEOAS v0.25.0.RELEASE does not support HAL with vendor media types,
+     * those have to be enabled manually. This is adding the following media types to HAL:
+     * application/*+json, application/*+json;charset=UTF-8, application/*+hal+json
+     * and application/*+hal+json;charset=UTF-8.
      */
     class HalConverterPostProcessor implements BeanPostProcessor {
 
@@ -79,9 +82,11 @@ public class HalConfig {
                 });
         }
 
-        private Stream<MappingJackson2HttpMessageConverter> findHalConverters(List<HttpMessageConverter<?>> converters) {
+        private Stream<MappingJackson2HttpMessageConverter> findHalConverters(
+            List<HttpMessageConverter<?>> converters) {
             return converters.stream()
-                             .filter(converter -> converter instanceof TypeConstrainedMappingJackson2HttpMessageConverter
+                             .filter(converter ->
+                                 converter instanceof TypeConstrainedMappingJackson2HttpMessageConverter
                                  && converter.canWrite(RepresentationModel.class, MediaTypes.HAL_JSON))
                              .map(converter -> (MappingJackson2HttpMessageConverter) converter);
         }

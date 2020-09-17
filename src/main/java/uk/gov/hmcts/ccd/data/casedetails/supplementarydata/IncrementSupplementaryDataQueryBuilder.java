@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Qualifier("increment")
 public class IncrementSupplementaryDataQueryBuilder implements SupplementaryDataQueryBuilder {
 
+    //CHECKSTYLE:OFF
     private static final String INC_UPDATE_QUERY = "UPDATE case_data SET "
         + "supplementary_data= (CASE"
         + "        WHEN COALESCE(supplementary_data, '{}') = '{}' "
@@ -19,10 +20,12 @@ public class IncrementSupplementaryDataQueryBuilder implements SupplementaryData
         + "        THEN jsonb_set(COALESCE(supplementary_data, '{}'), :leaf_node_key, :value\\:\\:TEXT\\:\\:jsonb)"
         + "        WHEN jsonb_extract_path_text(COALESCE(supplementary_data, '{}'), :node_path) IS NOT NULL"
         + "        THEN jsonb_set(COALESCE(supplementary_data, '{}'), :leaf_node_key,"
-        + "             (jsonb_extract_path_text(supplementary_data, :node_path)\\:\\:INT + :value) \\:\\:TEXT\\:\\:jsonb, false)"
+        + "             (jsonb_extract_path_text(supplementary_data, :node_path)\\:\\:INT + "
+        +                       ":value) \\:\\:TEXT\\:\\:jsonb, false)"
         + "    END), "
         + "supplementary_data_last_modified = :current_time "
         + "WHERE reference = :reference";
+    //CHECKSTYLE:ON
 
     @Override
     public Query build(EntityManager entityManager,

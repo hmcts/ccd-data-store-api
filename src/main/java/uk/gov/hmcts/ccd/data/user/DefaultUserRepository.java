@@ -64,7 +64,8 @@ public class DefaultUserRepository implements UserRepository {
 
     @Autowired
     public DefaultUserRepository(ApplicationParams applicationParams,
-                                 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                                 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                     CaseDefinitionRepository caseDefinitionRepository,
                                  SecurityUtils securityUtils,
                                  @Qualifier("restTemplate") RestTemplate restTemplate,
                                  AuthCheckerConfiguration authCheckerConfiguration) {
@@ -91,7 +92,8 @@ public class DefaultUserRepository implements UserRepository {
     public Set<String> getUserRoles() {
         LOG.debug("retrieving user roles");
 
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        Collection<? extends GrantedAuthority> authorities =
+            SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         Set<String> userRoles = authorities.stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toSet());

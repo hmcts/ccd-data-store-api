@@ -6,7 +6,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.hateoas.RepresentationModel;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.v2.internal.controller.UICaseController;
 
 import java.util.List;

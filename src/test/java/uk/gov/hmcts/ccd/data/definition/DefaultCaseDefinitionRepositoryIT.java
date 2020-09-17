@@ -47,14 +47,16 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldGetCaseTypesForJurisdiction() {
-        final List<CaseTypeDefinition> caseTypeDefinitions = caseDefinitionRepository.getCaseTypesForJurisdiction("probate");
+        final List<CaseTypeDefinition> caseTypeDefinitions =
+            caseDefinitionRepository.getCaseTypesForJurisdiction("probate");
         assertEquals("HTTP call results failed", 2, caseTypeDefinitions.size());
 
     }
 
     @Test
     public void shouldGetCaseType() {
-        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType("TestAddressBookCase");
+        final CaseTypeDefinition caseTypeDefinition =
+            caseDefinitionRepository.getCaseType("TestAddressBookCase");
         assertEquals("Incorrect Case Type", "TestAddressBookCase", caseTypeDefinition.getId());
     }
 
@@ -117,7 +119,8 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldGetJurisdictionsDefinition() {
-        List<JurisdictionDefinition> allJurisdictionDefinitions = newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
+        List<JurisdictionDefinition> allJurisdictionDefinitions =
+            newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
                 .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
 
         assertAll(
@@ -129,15 +132,18 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldFailToGetCaseTypesForJurisdiction() {
-        stubMapping = stubFor(WireMock.get(urlMatching("/api/data/jurisdictions/server_error/case-type")).willReturn(serverError()));
+        stubMapping = stubFor(WireMock.get(urlMatching("/api/data/jurisdictions/server_error/case-type"))
+            .willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getCaseTypesForJurisdiction("server_error"));
-        assertThat(exception.getMessage(), startsWith("Problem getting case types for the Jurisdiction:server_error because of "));
+        assertThat(exception.getMessage(), startsWith("Problem getting case types for the Jurisdiction:server_error "
+            + "because of "));
     }
 
     @Test
     public void shouldFailToGetCaseType() {
-        stubMapping = stubFor(WireMock.get(urlMatching("/api/data/case-type/anything")).willReturn(serverError()));
+        stubMapping =
+            stubFor(WireMock.get(urlMatching("/api/data/case-type/anything")).willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getCaseType("anything"));
         assertThat(exception.getMessage(), startsWith("Problem getting case type definition for anything because of "));
@@ -149,13 +155,15 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
         stubMapping = stubFor(WireMock.get(urlMatching("/api/base-types")).willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getBaseTypes());
-        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store because of "));
+        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store "
+            + "because of "));
     }
 
     @Test
     public void shouldFailToGetClassificationsForUserRoleList() {
         List<String> userRoles = Arrays.asList("neither_defined", "nor_defined");
-        stubMapping = stubFor(WireMock.get(urlMatching("/api/user-roles/neither_defined,nor_defined")).willReturn(serverError()));
+        stubMapping = stubFor(WireMock.get(urlMatching("/api/user-roles/neither_defined,nor_defined"))
+            .willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getClassificationsForUserRoleList(userRoles));
         Assert.assertThat(exception.getMessage(),

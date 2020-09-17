@@ -186,7 +186,8 @@ public class AppInsightsTest {
 
         // ASSERT
         ArgumentCaptor<Duration> durationCaptor = ArgumentCaptor.forClass(Duration.class);
-        verify(telemetryClient, times(1)).trackDependency(eq(dependencyName), eq(commandName), durationCaptor.capture(), eq(true));
+        verify(telemetryClient, times(1)).trackDependency(eq(dependencyName), eq(commandName),
+            durationCaptor.capture(), eq(true));
         assertThat(durationCaptor.getValue().getTotalMilliseconds(), is(equalTo(duration)));
     }
 
@@ -203,7 +204,8 @@ public class AppInsightsTest {
 
         // ASSERT
         ArgumentCaptor<Duration> durationCaptor = ArgumentCaptor.forClass(Duration.class);
-        verify(telemetryClient, times(1)).trackDependency(eq(dependencyName), eq(commandName), durationCaptor.capture(), eq(false));
+        verify(telemetryClient, times(1)).trackDependency(eq(dependencyName), eq(commandName),
+            durationCaptor.capture(), eq(false));
         assertThat(durationCaptor.getValue().getTotalMilliseconds(), is(equalTo(duration)));
     }
 

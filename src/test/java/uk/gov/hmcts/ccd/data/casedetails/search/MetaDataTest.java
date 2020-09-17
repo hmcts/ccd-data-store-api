@@ -113,7 +113,8 @@ class MetaDataTest {
 
         assertAll(
             () -> assertThat(exception.getMessage(),
-                is("No getter method with Optional<String> return value found for 'jurisdiction'; looking for 'getJurisdiction()'"))
+                is("No getter method with Optional<String> return value found for 'jurisdiction'; looking for "
+                    + "'getJurisdiction()'"))
         );
     }
 

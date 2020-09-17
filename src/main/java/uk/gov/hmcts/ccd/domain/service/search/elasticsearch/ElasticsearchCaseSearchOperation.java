@@ -158,13 +158,17 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             return caseTypeIds.stream().filter(
                 caseTypeId -> caseTypeId.equalsIgnoreCase(m.group(caseTypeIdGroupPosition))
             ).findFirst().orElseThrow(() -> {
-                log.error("Cannot match any known case type id from index '{}' extracted case type id : {}", index, m.group(caseTypeIdGroupPosition));
-                throw new ServiceException("Cannot determine case type id from ES index name - unknown extracted case type id");
+                log.error("Cannot match any known case type id from index '{}' extracted case type id : {}",
+                           index, m.group(caseTypeIdGroupPosition));
+                throw new ServiceException("Cannot determine case type id from ES index name - unknown "
+                    + "extracted case type id");
             });
         } else {
-            log.error("Cannot determine case type id from index name: '{}'. No capturing group configured or capturing group not matching: '{}'.",
+            log.error("Cannot determine case type id from index name: '{}'. No capturing group configured or capturing"
+                + " group not matching: '{}'.",
                 index, caseTypeIdGroupRegex);
-            throw new ServiceException("Cannot determine case type id from ES index name - cannot extract case type id");
+            throw new ServiceException("Cannot determine case type id from ES index name - cannot extract"
+                + " case type id");
         }
     }
 
@@ -177,7 +181,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {
         return cases
             .stream()
-            .map(Unchecked.function(caseDetail -> objectMapper.readValue(caseDetail, ElasticSearchCaseDetailsDTO.class)))
+            .map(Unchecked.function(caseDetail
+                -> objectMapper.readValue(caseDetail, ElasticSearchCaseDetailsDTO.class)))
             .collect(toList());
     }
 

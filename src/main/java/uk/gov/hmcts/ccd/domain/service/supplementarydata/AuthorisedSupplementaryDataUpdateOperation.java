@@ -25,16 +25,20 @@ public class AuthorisedSupplementaryDataUpdateOperation implements Supplementary
     private final CaseDetailsRepository caseDetailsRepository;
 
     @Autowired
-    public AuthorisedSupplementaryDataUpdateOperation(final @Qualifier("default") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
-                                                      final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
-                                                      final @Qualifier("default") EndpointAuthorisationService authorisationService) {
+    public AuthorisedSupplementaryDataUpdateOperation(final @Qualifier("default") SupplementaryDataUpdateOperation
+                                                              supplementaryDataUpdateOperation,
+                                                      final @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                                          CaseDetailsRepository caseDetailsRepository,
+                                                      final @Qualifier("default")
+                                                              EndpointAuthorisationService authorisationService) {
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.authorisationService = authorisationService;
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
     @Override
-    public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest supplementaryData) {
+    public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest
+        supplementaryData) {
         Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(caseReference);
         if (caseDetails.isPresent()) {
             if (this.authorisationService.isAccessAllowed(caseDetails.get())) {

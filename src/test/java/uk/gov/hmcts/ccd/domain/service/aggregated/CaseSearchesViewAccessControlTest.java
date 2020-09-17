@@ -1,30 +1,45 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.node.*;
-import com.google.common.collect.*;
-import org.junit.jupiter.api.*;
-import org.mockito.*;
-import uk.gov.hmcts.ccd.data.casedetails.*;
-import uk.gov.hmcts.ccd.data.user.*;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.service.common.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Sets;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
-import uk.gov.hmcts.ccd.domain.service.search.*;
+import uk.gov.hmcts.ccd.domain.service.search.CaseSearchesViewAccessControl;
+import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 
-import java.io.*;
-import java.time.*;
-import java.util.*;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class CaseSearchesViewAccessControlTest {
 

@@ -6,7 +6,11 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -54,7 +58,8 @@ public class StartEventController {
         ),
         @ApiResponse(
             code = 422,
-            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document for case field or missing user roles"
+            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document"
+                + " for case field or missing user roles"
         ),
         @ApiResponse(
             code = 404,
@@ -63,7 +68,8 @@ public class StartEventController {
     })
     public ResponseEntity<StartEventResource> getStartCaseEvent(@PathVariable("caseTypeId") String caseTypeId,
                                                                 @PathVariable("triggerId") String triggerId,
-                                                                @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+                                                                @RequestParam(value = "ignore-warning",
+                                                                    required = false) final Boolean ignoreWarning) {
 
         final StartEventResult startEventResult = this.startEventOperation.triggerStartForCaseType(caseTypeId,
                                                                                                      triggerId,
@@ -93,7 +99,8 @@ public class StartEventController {
         ),
         @ApiResponse(
             code = 422,
-            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document for case field or missing user roles"
+            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document "
+                + "for case field or missing user roles"
         ),
         @ApiResponse(
             code = 400,
@@ -106,7 +113,8 @@ public class StartEventController {
     })
     public ResponseEntity<StartEventResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
                                                                    @PathVariable("triggerId") String triggerId,
-                                                                   @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+                                                                   @RequestParam(value = "ignore-warning",
+                                                                       required = false) final Boolean ignoreWarning) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(ERROR_CASE_ID_INVALID);
         }

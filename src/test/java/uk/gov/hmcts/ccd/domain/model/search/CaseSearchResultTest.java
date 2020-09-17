@@ -9,7 +9,8 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CaseSearchResultTest {
 
@@ -38,7 +39,8 @@ class CaseSearchResultTest {
 
     @Test
     void shouldReturnEmptyListWhenNoCasesFound() {
-        CaseSearchResult caseSearchResult = new CaseSearchResult(1L, Collections.singletonList(caseDetails(CASE_TYPE_A, 111L)));
+        CaseSearchResult caseSearchResult =
+            new CaseSearchResult(1L, Collections.singletonList(caseDetails(CASE_TYPE_A, 111L)));
 
         final List<String> result = caseSearchResult.getCaseReferences(CASE_TYPE_B);
 

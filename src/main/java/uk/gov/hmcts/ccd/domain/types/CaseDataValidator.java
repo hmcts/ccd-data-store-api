@@ -76,17 +76,17 @@ public class CaseDataValidator {
                 caseFieldDefinition.getFieldTypeDefinition().getComplexFields(),
                 fieldIdPrefix + dataFieldId + FIELD_SEPARATOR);
         } else if (BaseType.get(COLLECTION) == fieldType) {
-            final List<ValidationResult> validationResults = validateSimpleField(dataFieldId, dataValue, caseFieldDefinition, fieldIdPrefix, fieldType);
+            final List<ValidationResult> validationResults =
+                validateSimpleField(dataFieldId, dataValue, caseFieldDefinition, fieldIdPrefix, fieldType);
             final Iterator<JsonNode> collectionIterator = dataValue.iterator();
 
             Integer index = 0;
             while (collectionIterator.hasNext()) {
                 final JsonNode itemValue = collectionIterator.next();
 
-                validationResults.addAll(validateCollectionItem(caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition(),
-                    itemValue,
-                    fieldIdPrefix + dataFieldId + FIELD_SEPARATOR,
-                    index.toString())
+                validationResults.addAll(validateCollectionItem(caseFieldDefinition.getFieldTypeDefinition()
+                        .getCollectionFieldTypeDefinition(), itemValue,
+                    fieldIdPrefix + dataFieldId + FIELD_SEPARATOR, index.toString())
                 );
 
                 index++;
@@ -111,15 +111,17 @@ public class CaseDataValidator {
             isBaseTypeValidator(validator, fieldType)
         ).findAny();
 
-        //if a PredefinedTypeFieldValidator is configured, the field type BaseTypeValidator is not executed. The PredefinedTypeFieldValidator
-        // can execute it if needed
+        //if a PredefinedTypeFieldValidator is configured, the field type BaseTypeValidator is not executed.
+        // The PredefinedTypeFieldValidator can execute it if needed
         Optional<FieldValidator> validatorToExecute = predefinedFieldValidator.or(() -> baseTypeValidator);
 
         return validatorToExecute.map(validator -> validator.validate(dataFieldId, dataValue, caseFieldDefinition)
                 .stream()
-                .map(result -> new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
+                .map(result ->
+                    new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
                 .collect(Collectors.toList()))
-                .orElseThrow(() -> new RuntimeException("System error: No validator found for " + fieldType.getType()));
+                .orElseThrow(() ->
+                    new RuntimeException("System error: No validator found for " + fieldType.getType()));
     }
 
     private boolean isPredefinedTypeFieldValidator(FieldValidator validator, String fieldID) {
@@ -137,7 +139,8 @@ public class CaseDataValidator {
         return false;
     }
 
-    private List<ValidationResult> validateCollectionItem(FieldTypeDefinition fieldTypeDefinition, JsonNode item, String fieldIdPrefix, String index) {
+    private List<ValidationResult> validateCollectionItem(FieldTypeDefinition fieldTypeDefinition, JsonNode item,
+                                                          String fieldIdPrefix, String index) {
         final String itemFieldId = fieldIdPrefix + index;
 
         final JsonNode itemValue = item.get(CollectionValidator.VALUE);
@@ -148,7 +151,8 @@ public class CaseDataValidator {
 
         if (shouldTreatAsValueNode(fieldTypeDefinition, itemValue)) {
             if (!BaseType.contains(fieldTypeDefinition.getType())) {
-                return Collections.singletonList(new ValidationResult("Unknown Type:" + fieldTypeDefinition.getType(), itemFieldId));
+                return Collections.singletonList(new ValidationResult("Unknown Type:"
+                    + fieldTypeDefinition.getType(), itemFieldId));
             }
 
             final BaseType baseType = BaseType.get(fieldTypeDefinition.getType());
@@ -164,7 +168,8 @@ public class CaseDataValidator {
                 itemFieldId + FIELD_SEPARATOR);
         }
 
-        return Collections.singletonList(new ValidationResult("Unsupported collection item:" + itemValue.toString(), itemFieldId));
+        return Collections.singletonList(new ValidationResult("Unsupported collection item:" + itemValue
+            .toString(), itemFieldId));
     }
 
     private boolean shouldTreatAsValueNode(FieldTypeDefinition fieldTypeDefinition, JsonNode itemValue) {

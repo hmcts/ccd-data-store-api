@@ -220,7 +220,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private static void propagateACLsToNestedFields(CommonField caseField, List<AccessControlList> acls) {
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().forEach(nestedField -> {
-                final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
+                final List<AccessControlList> cloneACLs =
+                    acls.stream().map(AccessControlList::duplicate).collect(toList());
                 nestedField.setAccessControlLists(cloneACLs);
                 propagateACLsToNestedFields(nestedField, acls);
             });
@@ -229,7 +230,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     private void applyComplexACLs() {
         this.complexACLs.forEach(complexACL -> {
-            final CaseFieldDefinition nestedField = (CaseFieldDefinition) this.getComplexFieldNestedField(complexACL.getListElementCode())
+            final CaseFieldDefinition nestedField =
+                (CaseFieldDefinition) this.getComplexFieldNestedField(complexACL.getListElementCode())
                 .orElseThrow(() -> new RuntimeException(
                     format("CaseField %s has no nested elements with code %s.",
                     this.getId(), complexACL.getListElementCode())));
@@ -243,7 +245,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     private void clearACLsForMissingComplexACLs() {
         if (this.isCompoundFieldType()) {
-            final List<String> allPaths = buildAllDottedComplexFieldPossibilities(this.getFieldTypeDefinition().getChildren());
+            final List<String> allPaths =
+                buildAllDottedComplexFieldPossibilities(this.getFieldTypeDefinition().getChildren());
             this.complexACLs.forEach(complexACL -> {
                 Optional<String> parentPath = getParentPath(complexACL.getListElementCode());
                 List<String> siblings;
@@ -260,8 +263,10 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private void removeACLS(final List<String> siblingsWithNoComplexACLs, final String role) {
         siblingsWithNoComplexACLs.stream().forEach(s -> {
             final CaseFieldDefinition nestedElement = (CaseFieldDefinition) this.getComplexFieldNestedField(s)
-                .orElseThrow(() -> new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), s)));
-            nestedElement.getAccessControlListByRole(role).ifPresent(acl -> nestedElement.getAccessControlLists().remove(acl));
+                .orElseThrow(() -> new RuntimeException(
+                    format("CaseField %s has no nested elements with code %s.", this.getId(), s)));
+            nestedElement.getAccessControlListByRole(role)
+                .ifPresent(acl -> nestedElement.getAccessControlLists().remove(acl));
             propagateACLsToNestedFields(nestedElement, nestedElement.getAccessControlLists());
         });
     }
@@ -269,7 +274,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private List<String> findSiblingsWithNoComplexACLs(final List<String> siblings) {
         return siblings
             .stream()
-            .filter(s -> this.complexACLs.stream().noneMatch(complexACL -> complexACL.getListElementCode().equalsIgnoreCase(s)))
+            .filter(s -> this.complexACLs.stream()
+                .noneMatch(complexACL -> complexACL.getListElementCode().equalsIgnoreCase(s)))
             .collect(toList());
     }
 
@@ -326,7 +332,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
             if (caseField.getFieldTypeDefinition() == null) {
                 complexFields = Collections.emptyList();
             } else if (isCollection(caseField)) {
-                complexFields = caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields();
+                complexFields =
+                    caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields();
             } else {
                 complexFields = caseField.getFieldTypeDefinition().getComplexFields();
             }

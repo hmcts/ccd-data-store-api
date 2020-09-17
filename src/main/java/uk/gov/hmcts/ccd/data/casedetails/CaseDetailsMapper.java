@@ -62,7 +62,8 @@ public class CaseDetailsMapper {
             newCaseDetailsEntity.setData(MAPPER.createObjectNode());
         } else {
             newCaseDetailsEntity.setData(JacksonUtils.convertValueJsonNode(caseDetails.getData()));
-            newCaseDetailsEntity.setDataClassification(JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()));
+            newCaseDetailsEntity.setDataClassification(
+                JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()));
         }
         return newCaseDetailsEntity;
     }

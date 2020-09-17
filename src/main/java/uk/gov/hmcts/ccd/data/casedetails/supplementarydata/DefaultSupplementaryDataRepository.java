@@ -73,6 +73,7 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
         return this.queryBuilders.stream()
             .filter(builder -> builder.operationType() == supplementaryDataOperation)
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("Operation Type " + supplementaryDataOperation.getOperationName() + " Not Supported"));
+            .orElseThrow(() -> new RuntimeException("Operation Type " + supplementaryDataOperation.getOperationName()
+                + " Not Supported"));
     }
 }
