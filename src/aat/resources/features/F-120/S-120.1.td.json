@@ -1,0 +1,111 @@
+{
+  "_guid_": "S-120.1",
+  "title": "External Elastic Search Endpoint",
+  "productName": "CCD Data Store Elastic Search API",
+  "operationName": "External Elastic Search Endpoint",
+  "method": "POST",
+  "uri": "/searchCases",
+  "specs": [
+    "a valid profile",
+    "is configured to search for the previously created case",
+    "does not explicitly request supplementary_data",
+    "contains the previously created case",
+    "contains supplementary data"
+  ],
+  "user" : {
+    "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+    "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ctid": "AAT_PRIVATE"
+    },
+    "body": {
+      "native_es_query" : {
+        "query": {
+          "match": {
+            "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "total": 1,
+      "cases": [{
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+        "jurisdiction": "AUTOTEST1",
+        "state": "TODO",
+        "version": null,
+        "case_type_id": "AAT_PRIVATE",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PRIVATE",
+        "case_data": {
+          "FixedListField": "VALUE1",
+          "MoneyGBPField": "1000",
+          "AddressUKField": {
+            "PostCode": "SW1H 9AJ",
+            "AddressLine2": "",
+            "PostTown": "London",
+            "AddressLine3": "",
+            "County": "",
+            "AddressLine1": "102 Petty France",
+            "Country": ""
+          },
+          "ComplexField": {
+            "ComplexTextField": "text inside complex",
+            "ComplexNestedField": {
+              "NestedNumberField": "20",
+              "NestedCollectionTextField": [
+                {
+                  "value": "collection text inside complex",
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            },
+            "ComplexFixedListField": "VALUE2"
+          },
+          "DateTimeField": "[[ANYTHING_PRESENT]]",
+          "PhoneUKField": "02033343555",
+          "NumberField": "1",
+          "MultiSelectListField": [
+            "OPTION1"
+          ],
+          "YesOrNoField": "Yes",
+          "TextField": "text",
+          "DateField": "1989-09-19",
+          "TextAreaField": "text area",
+          "CollectionField": [
+            {
+              "value": "collection text",
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        },
+        "data_classification": "[[ANYTHING_PRESENT]]",
+        "supplementary_data" : {
+          "orgs_assigned_users" : {
+            "OrgA" : 22,
+            "OrgB" : 1
+          }
+        },
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": "[[ANYTHING_PRESENT]]"
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE"
+      }]
+    }
+  }
+}
