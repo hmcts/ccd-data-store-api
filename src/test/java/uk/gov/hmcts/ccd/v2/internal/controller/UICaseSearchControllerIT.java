@@ -361,14 +361,17 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             .source("INVALID")
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "SEARCH");
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            "SEARCH");
 
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(3)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(TEXT_FIELD)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(nestedFieldId)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(0).getCaseFieldId(),
+                is(TEXT_FIELD)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(1).getCaseFieldId(),
+                is(nestedFieldId)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                 is(MetaData.CaseField.CASE_REFERENCE.getReference())),
             () -> assertThat(caseDetails.getFields().size(), is(11)),
@@ -388,7 +391,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     void shouldReturnErrorWithUnsupportedUseCase() throws Exception {
         ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-        JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, "INVALID", 400);
+        JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, "INVALID",
+            400);
 
         assertAll(
             () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
@@ -424,10 +428,12 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     }
 
     private void assertDefaultUseCaseHeaders(List<SearchResultViewHeaderGroup> headers) {
-        List<String> expectedFields = Arrays.asList(HISTORY_COMPONENT_FIELD, FIXED_RADIO_LIST_FIELD, DOCUMENT_FIELD, ADDRESS_FIELD, COMPLEX_FIELD,
+        List<String> expectedFields = Arrays.asList(HISTORY_COMPONENT_FIELD, FIXED_RADIO_LIST_FIELD, DOCUMENT_FIELD,
+            ADDRESS_FIELD, COMPLEX_FIELD,
             COLLECTION_FIELD, MULTI_SELECT_LIST_FIELD, FIXED_LIST_FIELD, TEXT_AREA_FIELD, DATE_TIME_FIELD, DATE_FIELD,
             EMAIL_FIELD, PHONE_FIELD, YES_OR_NO_FIELD, NUMBER_FIELD, TEXT_FIELD,
-            MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference(), MetaData.CaseField.LAST_MODIFIED_DATE.getReference(),
+            MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference(), MetaData.CaseField.LAST_MODIFIED_DATE
+                .getReference(),
             MetaData.CaseField.CREATED_DATE.getReference(), MetaData.CaseField.JURISDICTION.getReference(),
             MetaData.CaseField.CASE_TYPE.getReference(), MetaData.CaseField.SECURITY_CLASSIFICATION.getReference(),
             MetaData.CaseField.CASE_REFERENCE.getReference(), MetaData.CaseField.STATE.getReference());
@@ -439,7 +445,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(headers.get(0).getCases().size(), is(1)),
             () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(headers.get(0).getFields().size(), is(24)),
-            () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
+            () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID,
+                is(f)))))
         );
     }
 
@@ -454,12 +461,14 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(headers.get(0).getCases().size(), is(1)),
             () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(headers.get(0).getFields().size(), is(5)),
-            () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
+            () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID,
+                is(f)))))
         );
     }
 
     private void assertOrgCasesUseCaseHeaders(List<SearchResultViewHeaderGroup> headers) {
-        List<String> expectedFields = Arrays.asList(TEXT_FIELD, EMAIL_FIELD, FIXED_LIST_FIELD, COLLECTION_FIELD, COMPLEX_FIELD, DATE_FIELD,
+        List<String> expectedFields = Arrays.asList(TEXT_FIELD, EMAIL_FIELD, FIXED_LIST_FIELD, COLLECTION_FIELD,
+            COMPLEX_FIELD, DATE_FIELD,
             DATE_TIME_FIELD, COMPLEX_FIELD + ".ComplexTextField", MetaData.CaseField.CREATED_DATE.getReference(),
             MetaData.CaseField.STATE.getReference());
 
@@ -470,7 +479,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(headers.get(0).getCases().size(), is(1)),
             () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(headers.get(0).getFields().size(), is(10)),
-            () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
+            () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID,
+                is(f)))))
         );
     }
 
@@ -479,7 +489,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(0).get(VALUE), is(COLLECTION_VALUE)),
             () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE), is("CollectionTextValue1")),
             () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_FIXED_LIST_FIELD), is("VALUE3")),
-            () -> assertThat(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD)).get(NESTED_NUMBER_FIELD), is(NESTED_NUMBER_FIELD_VALUE)),
+            () -> assertThat(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD)).get(NESTED_NUMBER_FIELD),
+                is(NESTED_NUMBER_FIELD_VALUE)),
             () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_TEXT_FIELD), is(COMPLEX_TEXT_VALUE)),
             () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
                 .get(NESTED_COLLECTION_TEXT_FIELD)).get(0).get(VALUE), is("NestedCollectionTextValue1")),
@@ -508,12 +519,17 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         assertAll(
             () -> assertThat(data.get(MetaData.CaseField.JURISDICTION.getReference()), is(AUTOTEST_1)),
             () -> assertThat(data.get(MetaData.CaseField.CASE_TYPE.getReference()), is(CASE_TYPE_A)),
-            () -> assertThat(data.get(MetaData.CaseField.CREATED_DATE.getReference()), is(formatted ? "07 05 2020" : CREATED_DATE_VALUE)),
-            () -> assertThat(data.get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()), is(LAST_MODIFIED_DATE_VALUE)),
-            () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()), is(LAST_STATE_MODIFIED_DATE_VALUE)),
-            () -> assertThat(data.get(MetaData.CaseField.CASE_REFERENCE.getReference()), is(Long.parseLong(DEFAULT_CASE_REFERENCE))),
+            () -> assertThat(data.get(MetaData.CaseField.CREATED_DATE.getReference()),
+                is(formatted ? "07 05 2020" : CREATED_DATE_VALUE)),
+            () -> assertThat(data.get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()),
+                is(LAST_MODIFIED_DATE_VALUE)),
+            () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()),
+                is(LAST_STATE_MODIFIED_DATE_VALUE)),
+            () -> assertThat(data.get(MetaData.CaseField.CASE_REFERENCE.getReference()),
+                is(Long.parseLong(DEFAULT_CASE_REFERENCE))),
             () -> assertThat(data.get(MetaData.CaseField.STATE.getReference()), is(STATE_VALUE)),
-            () -> assertThat(data.get(MetaData.CaseField.SECURITY_CLASSIFICATION.getReference()), is(SecurityClassification.PUBLIC.name()))
+            () -> assertThat(data.get(MetaData.CaseField.SECURITY_CLASSIFICATION.getReference()),
+                is(SecurityClassification.PUBLIC.name()))
         );
     }
 
@@ -525,17 +541,21 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         return (List<Map<String, Object>>) obj;
     }
 
-    private CaseSearchResultViewResource executeRequest(ElasticsearchTestRequest searchRequest, String caseTypeParam, String useCase) throws Exception {
-        MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, useCase);
+    private CaseSearchResultViewResource executeRequest(ElasticsearchTestRequest searchRequest, String caseTypeParam,
+                                                        String useCase) throws Exception {
+        MockHttpServletRequestBuilder postRequest =
+            createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, useCase);
 
-        return ElasticsearchTestHelper.executeRequest(postRequest, 200, mapper, mockMvc, CaseSearchResultViewResource.class);
+        return ElasticsearchTestHelper.executeRequest(postRequest, 200, mapper, mockMvc,
+            CaseSearchResultViewResource.class);
     }
 
     private JsonNode executeErrorRequest(ElasticsearchTestRequest searchRequest,
                                          String caseTypeParam,
                                          String useCase,
                                          int expectedErrorCode) throws Exception {
-        MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, useCase);
+        MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam,
+            useCase);
 
         return ElasticsearchTestHelper.executeRequest(postRequest, expectedErrorCode, mapper, mockMvc, JsonNode.class);
     }

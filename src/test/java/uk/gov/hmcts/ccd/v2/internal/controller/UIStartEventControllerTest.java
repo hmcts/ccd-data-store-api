@@ -87,8 +87,10 @@ class UIStartEventControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(caseUpdateViewEvent);
-        when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(caseUpdateViewEvent);
+        when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING))
+            .thenReturn(caseUpdateViewEvent);
+        when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING))
+            .thenReturn(caseUpdateViewEvent);
         when(getEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE_WARNING)).thenReturn(caseUpdateViewEvent);
         when(caseReferenceService.validateUID(CASE_ID)).thenReturn(true);
     }
@@ -101,7 +103,8 @@ class UIStartEventControllerTest {
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
             final ResponseEntity<CaseUpdateViewEventResource> response =
-                uiStartTriggerController.getCaseUpdateViewEventByCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+                uiStartTriggerController.getCaseUpdateViewEventByCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -109,28 +112,33 @@ class UIStartEventControllerTest {
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getName(), is(NAME)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getDescription(), is(DESCRIPTION)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseId(), is(CASE_ID)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(),
+                    hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldOverrides().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0).getComplexFieldOverrides().get(0),
                     hasProperty("complexFieldElementId", CoreMatchers.is(FIELD_ID))),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldOverrides().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0).getComplexFieldOverrides().get(0),
                     hasProperty("displayContext", CoreMatchers.is("MANDATORY"))),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldOverrides().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0).getComplexFieldOverrides().get(0),
                     hasProperty("label", CoreMatchers.is(FIELD_LABEL))),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldOverrides().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0).getComplexFieldOverrides().get(0),
                     hasProperty("hintText", CoreMatchers.is(FIELD_HINT_TEXT))),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldOverrides().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0).getComplexFieldOverrides().get(0),
                     hasProperty("showCondition", CoreMatchers.nullValue())),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(),
+                    equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(),
+                    equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEndButtonLabel(),
+                    equalTo(END_BUTTON_LABEL)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
@@ -138,9 +146,11 @@ class UIStartEventControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
+            when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING))
+                .thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> uiStartTriggerController.getCaseUpdateViewEventByCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () -> uiStartTriggerController.getCaseUpdateViewEventByCaseType(CASE_TYPE_ID,
+                EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
     }
@@ -152,7 +162,8 @@ class UIStartEventControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<CaseUpdateViewEventResource> response = uiStartTriggerController.getCaseUpdateViewEvent(
+            final ResponseEntity<CaseUpdateViewEventResource> response =
+                uiStartTriggerController.getCaseUpdateViewEvent(
                 CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
@@ -161,13 +172,18 @@ class UIStartEventControllerTest {
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getName(), is(NAME)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getDescription(), is(DESCRIPTION)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseId(), is(CASE_ID)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty(
+                    "id", CoreMatchers.is(FIELD_ID)))),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(),
+                    equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(),
+                    equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEndButtonLabel(),
+                    equalTo(END_BUTTON_LABEL)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
@@ -175,9 +191,11 @@ class UIStartEventControllerTest {
         @Test
         @DisplayName("should propagate exception from downstream operation")
         void shouldPropagateExceptionFromOperationWhenThrown() {
-            when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
+            when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING))
+                .thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> uiStartTriggerController.getCaseUpdateViewEvent(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () -> uiStartTriggerController.getCaseUpdateViewEvent(CASE_ID,
+                EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
         @Test
@@ -185,7 +203,8 @@ class UIStartEventControllerTest {
         void shouldFailWithBadRequestException() {
             when(caseReferenceService.validateUID(CASE_ID)).thenReturn(false);
 
-            assertThrows(BadRequestException.class, () -> uiStartTriggerController.getCaseUpdateViewEvent(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(BadRequestException.class, () -> uiStartTriggerController.getCaseUpdateViewEvent(CASE_ID,
+                EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
     }
@@ -197,7 +216,8 @@ class UIStartEventControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<CaseUpdateViewEventResource> response = uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, IGNORE_WARNING);
+            final ResponseEntity<CaseUpdateViewEventResource> response =
+                uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -205,13 +225,17 @@ class UIStartEventControllerTest {
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getName(), is(NAME)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getDescription(), is(DESCRIPTION)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseId(), is(CASE_ID)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty(
+                    "id", CoreMatchers.is(FIELD_ID)))),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(),
+                    equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(),
+                    equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEndButtonLabel(),
+                    equalTo(END_BUTTON_LABEL)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
@@ -221,7 +245,8 @@ class UIStartEventControllerTest {
         void shouldPropagateExceptionFromOperationWhenThrown() {
             when(getEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () ->
+                uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, IGNORE_WARNING));
         }
 
     }

@@ -379,7 +379,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn201WhenPostCreateCaseWithEmptyDataClassificationForCitizen() throws Exception {
 
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
+        final String URL =
+            "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
         final JsonNode DATA = mapper.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
@@ -389,7 +390,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}"
+                + "\"document_url\": \"http://localhost:" + getPort()
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}"
                 + "}\n"
         );
         final JsonNode sanitizedData = mapper.readTree(
@@ -401,8 +403,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "  \"D8Document\":{\n"
-                + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
-                + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
+                + "    \"document_url\": \"http://localhost:" + getPort()
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+                + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
+                + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
                 + "    \"document_filename\": \"Seagulls_Square.jpg\""
                 + "}\n"
                 + "}\n"
@@ -423,17 +427,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andReturn();
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
-        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData.entrySet())));
+        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
+            .toString(), Map.class);
+        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
+            .entrySet())));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(
+            sanitizedDataMap.entrySet())));
         assertEquals("Incorrect security classification size", 4, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
             "  \"PersonAddress\":{" +
@@ -485,7 +493,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
+                + "\"document_url\": \"http://localhost:" + getPort()
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
                 + "}\n"
         );
 
@@ -510,7 +519,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn422WhenPostCreateCaseWithMissingDocumentBinaryLinkForCitizen() throws Exception {
 
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases?ignore-warning=true";
         final JsonNode DATA = mapper.readTree(
             "{\n"
                 + "  \"PersonFirstName\": \"First Name\",\n"
@@ -520,7 +530,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
+                + "\"document_url\": \"http://localhost:" + getPort()
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
                 + "}\n"
         );
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -582,7 +593,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidDocumentUrlDomainForCitizen() throws Exception {
 
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases?ignore-warning=true";
         final JsonNode DATA = mapper.readTree(
             "{\n" +
                 "  \"PersonFirstName\": \"First Name\",\n" +
@@ -625,13 +637,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
+        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
         assertEquals("state3", savedCaseDetails.getState());
@@ -670,13 +684,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
+        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
         assertEquals("state3", savedCaseDetails.getState());
@@ -718,7 +734,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())));
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
@@ -761,7 +778,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseTypeForCaseworker() throws Exception {
+    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseTypeForCaseworker()
+                                                                                                    throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseType("caseworkers");
     }
 
@@ -992,7 +1010,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
         {
             final MvcResult result = mockMvc
-                .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353529")
+                .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                    + "/cases/1504259907353529")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andReturn();
@@ -1021,23 +1040,31 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals(4, caseDetails.getDataClassification().size());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine1").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine2").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine3").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Country").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Postcode").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification")
+                .asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine1").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine2").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine3").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Country").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Postcode").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asText());
         }
 
         {
             final MvcResult result = mockMvc
-                .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353537")
+                .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                    + "/cases/1504259907353537")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andReturn();
 
-            final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+            final CaseDetails caseDetails =
+                mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
             assertEquals(1504259907353537L, caseDetails.getReference().longValue());
 
@@ -1055,12 +1082,18 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals(3, caseDetails.getDataClassification().size());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine1").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine2").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine3").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Country").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Postcode").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification")
+                .asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine1").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine2").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine3").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Country").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Postcode").asText());
         }
     }
 
@@ -1068,7 +1101,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void findCaseDetailsForCaseworkerShouldLogAudit() throws Exception {
         final MvcResult result = mockMvc
-            .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353529")
+            .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                + "/cases/1504259907353529")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is(200))
             .andReturn();
@@ -1095,7 +1129,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         mockMvc
             .perform(
-                get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353545")
+                get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                    + "/cases/1504259907353545")
                     .contentType(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().is(404))
@@ -1110,12 +1145,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         {
             final MvcResult result = mockMvc
-                .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353529")
+                .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                    + "/cases/1504259907353529")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andReturn();
 
-            final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+            final CaseDetails caseDetails =
+                mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
             assertEquals(1504259907353529L, caseDetails.getReference().longValue());
 
@@ -1139,20 +1176,25 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals(4, caseDetails.getDataClassification().size());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine1").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification")
+                .asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine1").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress")
+                .get("classification").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asText());
         }
 
         {
             final MvcResult result = mockMvc
-                .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353537")
+                .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                    + "/cases/1504259907353537")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andReturn();
 
-            final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+            final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(),
+                CaseDetails.class);
 
             assertEquals(1504259907353537L, caseDetails.getReference().longValue());
 
@@ -1170,11 +1212,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals(3, caseDetails.getDataClassification().size());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine1").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine2").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine3").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Country").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Postcode").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine1").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine2").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("AddressLine3").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Country").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
+                .get("Postcode").asText());
         }
     }
 
@@ -1183,7 +1230,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void findCaseDetailsForCitizenShouldLogAudit() throws Exception {
 
         final MvcResult result = mockMvc
-            .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353529")
+            .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                + "/cases/1504259907353529")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is(200))
             .andReturn();
@@ -1225,7 +1273,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         {
             mockMvc
-                .perform(get("/caseworkers/0/jurisdictions/" + TEST_JURISDICTION + "/case-types/" + TEST_CASE_TYPE + "/cases/1504259907353528")
+                .perform(get("/caseworkers/0/jurisdictions/" + TEST_JURISDICTION + "/case-types/"
+                    + TEST_CASE_TYPE + "/cases/1504259907353528")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400))
                 .andReturn();
@@ -1242,7 +1291,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         {
             mockMvc
-                .perform(get("/citizens/0/jurisdictions/" + TEST_JURISDICTION + "/case-types/" + TEST_CASE_TYPE + "/cases/1504259907353528")
+                .perform(get("/citizens/0/jurisdictions/" + TEST_JURISDICTION + "/case-types/"
+                    + TEST_CASE_TYPE + "/cases/1504259907353528")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400))
                 .andReturn();
@@ -1258,7 +1308,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         mockMvc
-            .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/9999999999999995")
+            .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                + "/cases/9999999999999995")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is(404));
     }
@@ -1270,7 +1321,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         mockMvc
-            .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/9999999999999995")
+            .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                + "/cases/9999999999999995")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is(404));
     }
@@ -1279,7 +1331,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoDataForCaseworker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -1329,10 +1382,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .orElse(null);
         assertNotNull(savedCaseDetails);
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        assertEquals("Incorrect Data content: Data should not have changed", JacksonUtils.convertValue(DATA), savedCaseDetails.getData());
+        assertEquals("Incorrect Data content: Data should not have changed", JacksonUtils.convertValue(DATA),
+            savedCaseDetails.getData());
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
         JSONAssert.assertEquals(expectedClassificationString,
-            JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification()).toString(), JSONCompareMode.LENIENT);
+            JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification()).toString(),
+            JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
@@ -1352,7 +1407,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
         JSONAssert.assertEquals(expectedClassificationString,
-            JacksonUtils.convertValueJsonNode(caseAuditEvent.getDataClassification()).toString(), JSONCompareMode.LENIENT);
+            JacksonUtils.convertValueJsonNode(caseAuditEvent.getDataClassification()).toString(),
+            JSONCompareMode.LENIENT);
     }
 
 
@@ -1360,7 +1416,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoDataForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode DATA = mapper.readTree("{" +
@@ -1413,7 +1470,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             JacksonUtils.convertValue(DATA), savedCaseDetails.getData());
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
         JSONAssert.assertEquals(expectedClassificationString,
-            JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification()).toString(), JSONCompareMode.LENIENT);
+            JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification()).toString(),
+            JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
@@ -1433,18 +1491,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
         JSONAssert.assertEquals(expectedClassificationString,
-            JacksonUtils.convertValueJsonNode(caseAuditEvent.getDataClassification()).toString(), JSONCompareMode.LENIENT);
+            JacksonUtils.convertValueJsonNode(caseAuditEvent.getDataClassification()).toString(),
+            JSONCompareMode.LENIENT);
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldUpdateLastStateModifiedTimeWhenAnEventTriggeredStateTransition() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
-        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = " + caseReference, this::mapCaseData);
+        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
+            + caseReference, this::mapCaseData);
         assertEquals("CaseCreated", initialCaseDetails.getState());
         assertNotNull(initialCaseDetails.getLastStateModifiedDate());
 
@@ -1457,7 +1518,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = " + caseReference, this::mapCaseData);
+        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
+            + caseReference, this::mapCaseData);
         assertNotNull(updatedCaseDetails);
         assertEquals("state4", updatedCaseDetails.getState());
         assertNotEquals(initialCaseDetails.getLastStateModifiedDate(), updatedCaseDetails.getLastStateModifiedDate());
@@ -1476,7 +1538,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
 
-        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = " + caseReference, this::mapCaseData);
+        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
+            + caseReference, this::mapCaseData);
         assertEquals("CaseCreated", initialCaseDetails.getState());
         assertNotNull(initialCaseDetails.getLastStateModifiedDate());
 
@@ -1486,7 +1549,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = " + caseReference, this::mapCaseData);
+        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
+            + caseReference, this::mapCaseData);
         assertNotNull(updatedCaseDetails);
         assertEquals("CaseCreated", updatedCaseDetails.getState());
         assertEquals(initialCaseDetails.getLastStateModifiedDate(), updatedCaseDetails.getLastStateModifiedDate());
@@ -1522,11 +1586,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseEventWithNoPreStateCheckForCaseworker() throws Exception {
         final String urlPortionForCaseType = "bookcase-default-pre-state-test";
         final String caseReference = "1557850043804031";
-        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
-            + "/cases/" + caseReference + "/events";
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + urlPortionForCaseType + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
-        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference,
+            TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final JsonNode DATA = mapper.readTree("{" +
             "\"PersonAddress\":{" +
@@ -1589,11 +1654,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseEventWithNoPreStateCheckForCitizen() throws Exception {
         final String urlPortionForCaseType = "bookcase-default-pre-state-test";
         final String caseReference = "1557850043804031";
-        final String url = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
-            + "/cases/" + caseReference + "/events";
+        final String url = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + urlPortionForCaseType + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
-        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference,
+            TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final JsonNode DATA = mapper.readTree("{" +
             "\"PersonAddress\":{" +
@@ -1656,10 +1722,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseEventWithNoChangesToPostStateForCaseworker() throws Exception {
         final String caseTypeUrlPortion = "bookcase-default-post-state";
         final String caseReference = "1557845948403939";
-        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
-            + "/cases/" + caseReference + "/events";
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + caseTypeUrlPortion + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference,
+            TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode data = mapper.readTree("{" +
@@ -1727,7 +1794,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
-        final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference,
+            TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode data = mapper.readTree("{" +
@@ -1788,28 +1856,32 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCaseworker() throws Exception {
+    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCaseworker()
+                                                                                                    throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCitizen() throws Exception {
+    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCitizen()
+                                                                                                    throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCaseworker() throws Exception {
+    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCaseworker()
+                                                                                                    throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCitizen() throws Exception {
+    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCitizen()
+                                                                                                    throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccess("citizens");
     }
 
@@ -1873,7 +1945,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, null, DESCRIPTION));
 
@@ -1908,7 +1981,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, null, DESCRIPTION));
 
@@ -1944,7 +2018,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseEventWithBlankSummaryForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String summary = "        ";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, summary, DESCRIPTION));
 
@@ -1990,7 +2065,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseEventWithBlankSummaryForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String summary = "        ";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, summary, DESCRIPTION));
         final String token = generateEventToken(template,
@@ -2035,7 +2111,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn422WhenPostCreateCaseEventWithSummaryTooLongForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String summary = new String(new char[1025]).replace("\0", "-");
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, summary, DESCRIPTION));
 
@@ -2071,7 +2148,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn422WhenPostCreateCaseEventWithSummaryTooLongForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String summary = new String(new char[1025]).replace("\0", "-");
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, summary, DESCRIPTION));
 
@@ -2107,7 +2185,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn422WhenPostCreateCaseEventWithDescriptionTooLongForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String description = new String(new char[65666]).replace("\0", "-");
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, description));
 
@@ -2143,7 +2222,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn422WhenPostCreateCaseEventWithDescriptionTooLongForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String description = new String(new char[65666]).replace("\0", "-");
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, description));
 
@@ -2178,7 +2258,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventIdForCaseworker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(null, SUMMARY, DESCRIPTION));
 
@@ -2213,7 +2294,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventIdForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(null, SUMMARY, DESCRIPTION));
 
@@ -2248,7 +2330,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
         final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, "ANY_EVENT");
@@ -2281,7 +2364,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
         final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, "ANY_EVENT");
@@ -2314,7 +2398,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNonExistentCaseIdForCaseWorker() throws Exception {
         final String caseReference = "9999999999999995";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2338,7 +2423,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithNonExistentCaseIdForCitizen() throws Exception {
         final String caseReference = "9999999999999995";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2363,7 +2449,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn400WhenPostCreateCaseEventWithInvalidCaseIdForCaseWorker() throws Exception {
         final String caseReference = "invalidReference";
         final String hasPreStatesEvent = "HAS_PRE_STATES_EVENT";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(hasPreStatesEvent, SUMMARY, DESCRIPTION));
 
@@ -2388,7 +2475,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn400WhenPostCreateCaseEventWithInvalidCaseIdForCitizen() throws Exception {
         final String caseReference = "invalidReference";
         final String hasPreStatesEvent = "HAS_PRE_STATES_EVENT";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(hasPreStatesEvent, SUMMARY, DESCRIPTION));
 
@@ -2412,7 +2500,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithUnknownFieldsForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode invalidData = mapper.readTree("{ \"XXX\": \"YYY\" }");
@@ -2462,7 +2551,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn404WhenPostCreateCaseEventWithUnknownFieldsForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode invalidData = mapper.readTree("{ \"XXX\": \"YYY\" }");
@@ -2512,7 +2602,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn409WhenPostCreateCaseEventWithCaseVersionConflictForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2539,7 +2630,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn409WhenPostCreateCaseEventWithCaseVersionConflictForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2566,7 +2658,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2574,7 +2667,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
-        // Simulate case state alteration by other actor to fail event token version check - no effect since it's checked at save step
+        // Simulate case state alteration by other actor to fail event token version check - no effect since it's
+        // checked at save step
         template.update("UPDATE case_data SET state = 'CaseStopped', version = 2 WHERE reference = ?", caseReference);
 
         mockMvc.perform(post(URL)
@@ -2593,7 +2687,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2699,7 +2794,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private void shouldReturn404WhenPostCreateCaseWithNoCreateFieldAccess(String userRole) throws Exception {
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_FIELD_ACCESS + "/cases";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_CREATE_FIELD_ACCESS + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
@@ -2729,7 +2825,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(role, CASE_TYPE_NO_CREATE_CASE_ACCESS);
     }
 
-    private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role, String caseType) throws Exception {
+    private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role, String caseType)
+                                                                                                    throws Exception {
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -2742,8 +2839,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
     }
 
-    private void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccess(String userRole) throws Exception {
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases";
+    private void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccess(String userRole)
+                                                                                                    throws Exception {
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(CREATE_EVENT_ID, SUMMARY, DESCRIPTION));
@@ -2760,7 +2859,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         );
         Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_NO_READ_FIELD_ACCESS, CREATE_EVENT_ID);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_NO_READ_FIELD_ACCESS,
+            CREATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
 
@@ -2787,7 +2887,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertAll(() -> assertThat("Incorrect Response Content",
             actualData.entrySet(),
             everyItem(isIn(expectedSanitizedData.entrySet()))),
-            () -> assertThat("Response contains filtered out data", caseData.has("PersonFirstName"), is(false)),
+            () -> assertThat("Response contains filtered out data", caseData.has("PersonFirstName"),
+                is(false)),
             () -> assertThat(dataClassification.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(dataClassification.has("PersonLastName"), CoreMatchers.is(true)),
             () -> assertThat(dataClassification.has("PersonAddress"), CoreMatchers.is(true))
@@ -2796,7 +2897,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
     private void shouldReturn404WhenPostCreateCaseWithNoCreateEventAccess(String role) throws Exception {
-        final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_EVENT_ACCESS + "/cases";
+        final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_CREATE_EVENT_ACCESS + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
@@ -2809,7 +2911,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseType(String role) throws Exception {
-        final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases";
+        final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(CREATE_EVENT_ID, SUMMARY, DESCRIPTION));
@@ -2839,9 +2942,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(mvcResult.getResponse().getContentAsString(), CoreMatchers.is(isEmptyString()));
     }
 
-    private void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess(String userRole) throws Exception {
+    private void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess(String userRole)
+                                                                                                    throws Exception {
         final String caseReference = "1504259907353610";
-        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
+        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -2870,9 +2975,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
 
-    private void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccess(String userRole) throws Exception {
+    private void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccess(String userRole)
+                                                                                                    throws Exception {
         final String caseReference = "1504259907353628";
-        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS
+        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_READ_FIELD_ACCESS
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -2917,11 +3024,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             () -> assertThat(nodeClassification.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(nodeClassification.has("PersonLastName"), CoreMatchers.is(true)),
             () -> assertThat(nodeClassification.has("PersonAddress"), CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("Country"), CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("Postcode"), CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine1"), CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine2"), CoreMatchers.is(true)),
-            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine3"), CoreMatchers.is(true))
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("Country"),
+                CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("Postcode"),
+                CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine1"),
+                CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine2"),
+                CoreMatchers.is(true)),
+            () -> assertThat(nodeClassification.get("PersonAddress").get("value").has("AddressLine3"),
+                CoreMatchers.is(true))
         );
     }
 
@@ -3020,7 +3132,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertAll(
             () -> JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT),
             () -> assertThat("Token is not present", MAPPER.readTree(actual).has("token"), is(true)),
-            () -> assertThat("Created_date is not present", MAPPER.readTree(actual).get("case_details").has("created_date"), is(true))
+            () -> assertThat("Created_date is not present", MAPPER.readTree(actual).get("case_details")
+                .has("created_date"), is(true))
         );
     }
 
@@ -3115,8 +3228,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenGetCaseWithNoCaseTypeReadAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353610";
-        final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
-            + "/cases/" + caseReference;
+        final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases/" + caseReference;
 
         mockMvc.perform(get(url)
             .contentType(JSON_CONTENT_TYPE)
@@ -3130,7 +3243,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         {
             final MvcResult result = mockMvc
-                .perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/1504259907353628")
+                .perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
+                    + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/1504259907353628")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andReturn();
@@ -3144,27 +3258,43 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 () -> assertThat(nodeData.has("PersonFirstName"), CoreMatchers.is(false)),
                 () -> assertThat(nodeData.get("PersonLastName"), CoreMatchers.is(getTextNode("Parker"))),
                 () -> assertThat(nodeData.has("PersonAddress"), CoreMatchers.is(true)),
-                () -> assertThat(nodeData.get("PersonAddress").get("Country"), CoreMatchers.is(getTextNode("England"))),
-                () -> assertThat(nodeData.get("PersonAddress").get("Postcode"), CoreMatchers.is(getTextNode("HX08 5TG"))),
-                () -> assertThat(nodeData.get("PersonAddress").get("AddressLine1"), CoreMatchers.is(getTextNode("123"))),
-                () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"), CoreMatchers.is(getTextNode("Fake Street"))),
-                () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"), CoreMatchers.is(getTextNode("Hexton"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("Country"), CoreMatchers.
+                    is(getTextNode("England"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("Postcode"), CoreMatchers
+                    .is(getTextNode("HX08 5TG"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("AddressLine1"), CoreMatchers
+                    .is(getTextNode("123"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"), CoreMatchers
+                    .is(getTextNode("Fake Street"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"), CoreMatchers
+                    .is(getTextNode("Hexton"))),
                 () -> assertThat(nodeData.has("D8Document"), CoreMatchers.is(true)),
-                () -> assertThat(nodeData.get("D8Document").get("document_url"), CoreMatchers.is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"))),
-                () -> assertThat(nodeData.get("D8Document").get("document_binary_url"), CoreMatchers.is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary"))),
-                () -> assertThat(nodeData.get("D8Document").get("document_filename"), CoreMatchers.is(getTextNode("Seagulls_Square.jpg")))
+                () -> assertThat(nodeData.get("D8Document").get("document_url"), CoreMatchers
+                    .is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"))),
+                () -> assertThat(nodeData.get("D8Document").get("document_binary_url"), CoreMatchers
+                    .is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"
+                        + "/binary"))),
+                () -> assertThat(nodeData.get("D8Document").get("document_filename"), CoreMatchers
+                    .is(getTextNode("Seagulls_Square.jpg")))
             );
             JsonNode nodeClassification = JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification());
             assertAll(
                 () -> assertThat(nodeClassification.has("PersonFirstName"), CoreMatchers.is(false)),
-                () -> assertThat(nodeClassification.get("PersonLastName"), CoreMatchers.is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonLastName"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
                 () -> assertThat(nodeClassification.has("PersonAddress"), CoreMatchers.is(true)),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("classification"), CoreMatchers.is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Country"), CoreMatchers.is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Postcode"), CoreMatchers.is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine1"), CoreMatchers.is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine2"), CoreMatchers.is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine3"), CoreMatchers.is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("classification"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Country"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("Postcode"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine1"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine2"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
+                () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine3"), CoreMatchers
+                    .is(getTextNode("PUBLIC"))),
                 () -> assertThat(nodeClassification.get("D8Document"), CoreMatchers.is(getTextNode("PUBLIC")))
             );
         }
@@ -3172,7 +3302,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn201WhenPostCreateCaseEventWithValidData(String userRole) throws Exception {
         final String caseReference = "1504259907353545";
-        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -3187,8 +3318,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
             "\"D8Document\":{" +
-            "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
-            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\"," +
+            "    \"document_url\": \"http://localhost:" + getPort()
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+            + "/binary\"," +
             "    \"document_filename\": \"Seagulls_Square.jpg\"" +
             "}" +
             "}");
@@ -3237,7 +3370,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
         JSONAssert.assertEquals(expectedClassificationString,
-            mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
+            mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
+                .LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
@@ -3262,7 +3396,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinary(String userRole) throws Exception {
         final String caseReference = "1504259907353529";
-        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -3288,7 +3423,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"D8Document\":{" +
             "    \"document_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"," +
             "    \"document_filename\": \"Seagulls_Square.jpg\"," +
-            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary\"" +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"
+            + "/binary\"" +
             "}" +
             "}");
         caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
@@ -3372,7 +3508,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         assertEquals("Expected field validation error is not there",
             "\"PersonAddress.Postcode\"",
-            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("details").get("field_errors").get(0).get("id").toString());
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("details").get("field_errors").get(0)
+                .get("id").toString());
         assertEquals("Incorrect Response Content",
             "\"Case data validation failed\"",
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").toString());
@@ -3430,7 +3567,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         assertEquals("Expected field validation error is not there",
             "\"PersonAddress.Postcode\"",
-            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("details").get("field_errors").get(0).get("id").toString());
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("details").get("field_errors").get(0)
+                .get("id").toString());
         assertEquals("Incorrect Response Content",
             "\"Case data validation failed\"",
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").toString());
@@ -3497,7 +3635,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(result.getResponse().getContentAsString(), containsString("Fake Street"));
         assertThat(result.getResponse().getContentAsString(), containsString("Hexton"));
         assertThat(result.getResponse().getContentAsString(), containsString("HX08 5TG"));
-        assertThat(result.getResponse().getContentAsString(), containsString("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
+        assertThat(result.getResponse().getContentAsString(), containsString("http://localhost:[port]/"
+            + "documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
     }
 
     @Test
@@ -3589,7 +3728,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         responseAsString = result.getResponse().getContentAsString();
         caseDetails = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
         assertThat(caseDetails, hasSize(2));
-        assertThat(caseDetails, (everyItem(hasProperty("securityClassification", is(SecurityClassification.valueOf("PUBLIC"))))));
+        assertThat(caseDetails, (everyItem(hasProperty("securityClassification", is(SecurityClassification
+            .valueOf("PUBLIC"))))));
 
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
@@ -3841,7 +3981,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        List<CaseDetails> caseDetails = Arrays.asList(mapper.readValue(result.getResponse().getContentAsString(), CaseDetails[].class));
+        List<CaseDetails> caseDetails = Arrays.asList(mapper.readValue(result.getResponse().getContentAsString(),
+            CaseDetails[].class));
 
         assertThat(caseDetails, empty());
     }
@@ -3890,7 +4031,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         responseAsString = result.getResponse().getContentAsString();
         List<CaseDetails> caseDetailsPage3 = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
-        assertThat(caseDetailsPage3, hasSize(2)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
+        //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
+        assertThat(caseDetailsPage3, hasSize(2));
         allPages.addAll(caseDetailsPage3);
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
@@ -3906,7 +4048,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseDetailsPage4, hasSize(0));
 
         Set<Long> references = allPages.stream().map(cd -> cd.getReference()).collect(Collectors.toSet());
-        assertThat(references, hasSize(6)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
+        //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
+        assertThat(references, hasSize(6));
     }
 
     @Test
@@ -4033,7 +4176,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE
+            + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
@@ -4048,13 +4192,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
+        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
         assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
         assertEquals("state3", savedCaseDetails.getState());
@@ -4080,7 +4226,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCitizen() throws Exception {
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE
+            + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
@@ -4095,13 +4242,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
+        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
         assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
         assertEquals("state3", savedCaseDetails.getState());
@@ -4127,12 +4276,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCaseworker() throws Exception {
-        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("caseworkers", CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
+        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("caseworkers",
+            CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCitizen() throws Exception {
-        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens", CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
+        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens",
+            CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }
 
     /**
@@ -4175,8 +4326,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"PersonLastName\":\"_ Roof\","
             + "\"PersonFirstName\":\"_ George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
             + "}";
     }
 
@@ -4202,7 +4353,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .withIgnoreWarning(Boolean.FALSE)
             .build();
 
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_VALIDATE + "/validate?pageId=createCaseInfoPage";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_VALIDATE
+            + "/validate?pageId=createCaseInfoPage";
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(caseDetailsToValidate))
@@ -4289,7 +4441,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "      \"PersonFirstName\" : \"_ George\",\n"
             + "      \"TelephoneNumber\" : \"_ 07865645667\",\n"
             + "      \"D8Document\" : {\n"
-            + "        \"document_url\" : \"http://localhost:" + this.getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"\n"
+            + "        \"document_url\" : \"http://localhost:" + this.getPort()
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"\n"
             + "      }\n"
             + "    },\n"
             + "    \"data_classification\" : null,\n"
@@ -4311,7 +4464,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
             + "\"last_state_modified_date\":null,\"security_classification\":null,\"case_data\":{\"PersonLastName"
             + "\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
-            + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}},"
+            + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort()
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}},"
             + "\"data_classification\":null,\"after_submit_callback_response\":null,"
             + "\"callback_response_status_code\":null,\"callback_response_status\":null,"
             + "\"delete_draft_response_status_code\":null,\"delete_draft_response_status\":null,"
@@ -4332,7 +4486,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         return wizardPageCollection;
     }
 
-    private WizardPage createWizardPage(String pageName, String caseFieldName1, String caseFieldName2, Integer pageOrder, String eventCallBackURI) {
+    private WizardPage createWizardPage(String pageName, String caseFieldName1, String caseFieldName2,
+                                        Integer pageOrder, String eventCallBackURI) {
         final CaseViewField caseViewField1 = aViewField()
             .withId(caseFieldName1)
             .withOrder(1)

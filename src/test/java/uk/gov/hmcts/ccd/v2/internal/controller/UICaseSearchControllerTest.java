@@ -81,7 +81,8 @@ class UICaseSearchControllerTest {
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
         }));
-        verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET), eq(Collections.emptyList()));
+        verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET),
+            eq(Collections.emptyList()));
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
             () -> assertThat(response.getBody().getHeaders(), is(caseSearchResultView.getHeaders())),
