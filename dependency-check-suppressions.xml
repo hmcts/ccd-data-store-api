@@ -410,5 +410,67 @@
    <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
    <cve>CVE-2020-13935</cve>
 </suppress>
-
+	<suppress>
+   <notes><![CDATA[
+   file name: elasticsearch-6.4.2.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
+   <vulnerabilityName>CVE-2020-7019</vulnerabilityName>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: waffle-jna-1.9.1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/com\.github\.waffle/waffle-jna@.*$</packageUrl>
+   <cve>CVE-2020-10517</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: waffle-jna-1.9.1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/com\.github\.waffle/waffle-jna@.*$</packageUrl>
+   <cve>CVE-2020-10518</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: snakeyaml-1.25.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+   <cve>CVE-2017-18640</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: jcip-annotations-1.0-1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/com\.github\.stephenc\.jcip/jcip-annotations@.*$</packageUrl>
+   <cve>CVE-2020-10517</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: jcip-annotations-1.0-1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/com\.github\.stephenc\.jcip/jcip-annotations@.*$</packageUrl>
+   <cve>CVE-2020-10518</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: caffeine-2.8.1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/com\.github\.ben-manes\.caffeine/caffeine@.*$</packageUrl>
+   <cve>CVE-2020-10517</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: caffeine-2.8.1.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/com\.github\.ben-manes\.caffeine/caffeine@.*$</packageUrl>
+   <cve>CVE-2020-10518</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: hazelcast-3.12.6.jar (shaded: org.snakeyaml:snakeyaml-engine:1.0)
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.snakeyaml/snakeyaml-engine@.*$</packageUrl>
+   <cve>CVE-2017-18640</cve>
+</suppress>
 </suppressions>
