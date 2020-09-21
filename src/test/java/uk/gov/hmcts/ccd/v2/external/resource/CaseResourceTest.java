@@ -62,48 +62,7 @@ class CaseResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final CaseResource caseResource = new CaseResource(caseDetails);
-
-            assertAll(
-                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
-                () -> assertThat(caseResource.getCreatedOn(), equalTo(CREATED_ON)),
-                () -> assertThat(caseResource.getLastModifiedOn(), equalTo(LAST_MODIFIED_ON)),
-                () -> assertThat(caseResource.getJurisdiction(), equalTo(JURISDICTION)),
-                () -> assertThat(caseResource.getCaseType(), equalTo(CASE_TYPE)),
-                () -> assertThat(caseResource.getState(), equalTo(STATE)),
-                () -> assertThat(caseResource.getSecurityClassification(), equalTo(SECURITY_CLASSIFICATION)),
-                () -> assertThat(caseResource.getData(), equalTo(DATA)),
-                () -> assertThat(caseResource.getDataClassification(), equalTo(DATA_CLASSIFICATION)),
-                () -> assertThat(caseResource.getAfterSubmitCallbackResponse(), equalTo(CALLBACK_BODY)),
-                () -> assertThat(caseResource.getCallbackResponseStatusCode(), equalTo(AFTER_SUBMIT_CALLBACK_RESPONSE.
-                    getStatusCodeValue())),
-                () -> assertThat(caseResource.getCallbackResponseStatus(), equalTo(CALLBACK_COMPLETED)),
-                () -> assertThat(caseResource.getDeleteDraftResponseStatusCode(), equalTo(DELETE_DRAFT_RESPONSE
-                    .getStatusCodeValue())),
-                () -> assertThat(caseResource.getDeleteDraftResponseStatus(), equalTo(DELETE_DRAFT_COMPLETED))
-            );
-        }
-
-        @Test
-        @DisplayName("should link to itself")
-        void shouldLinkToSelf() {
-            final CaseResource caseResource = new CaseResource(caseDetails);
-
-            Optional<Link> self = caseResource.getLink("self");
-            assertThat(self.get().getHref(), equalTo(linkSelf));
-        }
-    }
-
-    @Nested
-    @DisplayName("Create event")
-    class CreateEvent {
-
-        private final String linkSelf = String.format("/cases/%s/events", REFERENCE);
-
-        @Test
-        @DisplayName("should copy case details")
-        void shouldCopyCaseDetails() {
-            final CaseResource caseResource = new CaseResource(caseDetails, caseDataContent);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails);
 
             assertAll(
                 () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
@@ -128,7 +87,48 @@ class CaseResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final CaseResource caseResource = new CaseResource(caseDetails, caseDataContent);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails);
+
+            Optional<Link> self = caseResource.getLink("self");
+            assertThat(self.get().getHref(), equalTo(linkSelf));
+        }
+    }
+
+    @Nested
+    @DisplayName("Create event")
+    class CreateEvent {
+
+        private final String linkSelf = String.format("/cases/%s/events", REFERENCE);
+
+        @Test
+        @DisplayName("should copy case details")
+        void shouldCopyCaseDetails() {
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent);
+
+            assertAll(
+                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
+                () -> assertThat(caseResource.getCreatedOn(), equalTo(CREATED_ON)),
+                () -> assertThat(caseResource.getLastModifiedOn(), equalTo(LAST_MODIFIED_ON)),
+                () -> assertThat(caseResource.getJurisdiction(), equalTo(JURISDICTION)),
+                () -> assertThat(caseResource.getCaseType(), equalTo(CASE_TYPE)),
+                () -> assertThat(caseResource.getState(), equalTo(STATE)),
+                () -> assertThat(caseResource.getSecurityClassification(), equalTo(SECURITY_CLASSIFICATION)),
+                () -> assertThat(caseResource.getData(), equalTo(DATA)),
+                () -> assertThat(caseResource.getDataClassification(), equalTo(DATA_CLASSIFICATION)),
+                () -> assertThat(caseResource.getAfterSubmitCallbackResponse(), equalTo(CALLBACK_BODY)),
+                () -> assertThat(caseResource.getCallbackResponseStatusCode(), equalTo(AFTER_SUBMIT_CALLBACK_RESPONSE
+                    .getStatusCodeValue())),
+                () -> assertThat(caseResource.getCallbackResponseStatus(), equalTo(CALLBACK_COMPLETED)),
+                () -> assertThat(caseResource.getDeleteDraftResponseStatusCode(), equalTo(DELETE_DRAFT_RESPONSE
+                    .getStatusCodeValue())),
+                () -> assertThat(caseResource.getDeleteDraftResponseStatus(), equalTo(DELETE_DRAFT_COMPLETED))
+            );
+        }
+
+        @Test
+        @DisplayName("should link to itself")
+        void shouldLinkToSelf() {
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent);
 
             Optional<Link> self = caseResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelf));
@@ -145,7 +145,7 @@ class CaseResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final CaseResource caseResource = new CaseResource(caseDetails, caseDataContent, IGNORE_WARNING);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
@@ -170,7 +170,7 @@ class CaseResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final CaseResource caseResource = new CaseResource(caseDetails, caseDataContent, IGNORE_WARNING);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent, IGNORE_WARNING);
 
             Optional<Link> self = caseResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelf));

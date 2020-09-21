@@ -56,7 +56,7 @@ class UIStartEventControllerTest {
     private UIDService caseReferenceService;
 
     @InjectMocks
-    private UIStartTriggerController uiStartTriggerController;
+    private uk.gov.hmcts.ccd.v2.internal.controller.UIStartTriggerController uiStartTriggerController;
 
     private CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent()
         .withId(EVENT_ID)
@@ -228,8 +228,8 @@ class UIStartEventControllerTest {
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty(
                     "id", CoreMatchers.is(FIELD_ID)))),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
-                                 hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
+                                .getWizardPageFields().get(0), hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowSummary(),
                     equalTo(IS_SHOW_SUMMARY)),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getShowEventNotes(),

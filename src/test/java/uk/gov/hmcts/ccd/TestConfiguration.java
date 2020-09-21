@@ -97,6 +97,7 @@ class TestConfiguration extends ContextCleanupListener {
             + "    \"type\": \"Document\"\n"
             + "  }\n"
             + "]";
+
     @Autowired
     TestConfiguration(final ApplicationParams applicationParams, final PostgresUtil postgresUtil) {
         this.applicationParams = applicationParams;

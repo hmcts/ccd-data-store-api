@@ -27,9 +27,12 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.inject.Inject;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 
 import static org.junit.Assert.assertEquals;
@@ -95,7 +98,8 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         assertNotNull("Content Should not be null", content);
         CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
-        assertEquals("Should not contain events with case role access", 1, savedCaseResource.getCaseViewEvents().length);
+        assertEquals("Should not contain events with case role access", 1,
+                savedCaseResource.getCaseViewEvents().length);
     }
 
     @Test

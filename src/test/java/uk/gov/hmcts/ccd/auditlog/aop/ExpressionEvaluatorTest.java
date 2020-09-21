@@ -77,8 +77,7 @@ public class ExpressionEvaluatorTest {
         CaseRoleDefinition caseRole = new CaseRoleDefinition();
         caseRole.setName("citizen");
         EvaluationContext context =
-            evaluator.createEvaluationContext(this, SampleMethods.class, method, new Object[] {
-            "test", caseRole});
+            evaluator.createEvaluationContext(this, SampleMethods.class, method, new Object[] {"test", caseRole});
         AnnotatedElementKey elementKey = new AnnotatedElementKey(method, SampleMethods.class);
 
         Exception exception = assertThrows(SpelEvaluationException.class, () -> {

@@ -138,7 +138,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             () -> assertThat(byReference.getData().get("PersonFirstName").asText(), is("Janet")),
             () -> assertThat(byReference.getData().get("PersonLastName").asText(), is("Parker")),
             () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
-            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine2").asText(), is("Fake Street")),
+            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine2").asText(),
+                    is("Fake Street")),
             () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton"))
         );
     }
@@ -147,7 +148,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Test
     public void sanitisesInputsCountQuery() {
         String evil = "foo');insert into case users values(1,2,3);--";
-        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE",
+                "TestAddressBookCase", CAN_READ))
             .thenReturn(asList(evil));
 
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
@@ -167,7 +169,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 //    @Test(expected = IllegalArgumentException.class)
 //    public void validateInputsMainQuerySortOrder() {
 //        String evil = "foo');insert into case users values(1,2,3);--";
-//        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+//        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase",
+//        CAN_READ))
 //            .thenReturn(asList(evil));
 //
 //        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
