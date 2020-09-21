@@ -35,14 +35,15 @@ class SearchResultDefinitionServiceTest {
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
     private static final String CASE_FIELD_ID_1_3_NESTED = "NESTED_FIELD_1";
-    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withCaseTypeId(CASE_TYPE_ID)
-        .withFieldLabelText("Label1").withMetadata(true).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withCaseTypeId(CASE_TYPE_ID)
-        .withFieldLabelText("Label2").withMetadata(true).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).withCaseTypeId(CASE_TYPE_ID)
-        .withFieldLabelText("Label3").withMetadata(false).withFieldType(
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1)
+        .withCaseTypeId(CASE_TYPE_ID).withFieldLabelText("Label1").withMetadata(true).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2)
+        .withCaseTypeId(CASE_TYPE_ID).withFieldLabelText("Label2").withMetadata(true).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3)
+        .withCaseTypeId(CASE_TYPE_ID).withFieldLabelText("Label3").withMetadata(false).withFieldType(
             aFieldType().withType("Complex").withComplexField(
-                newCaseField().withId(CASE_FIELD_ID_1_3_NESTED).withCaseTypeId(CASE_TYPE_ID).withFieldLabelText("NestedLabel3").build()
+                newCaseField().withId(CASE_FIELD_ID_1_3_NESTED).withCaseTypeId(CASE_TYPE_ID)
+                    .withFieldLabelText("NestedLabel3").build()
             ).build()
         ).build();
     private static final String ORG_CASES = "ORGCASES";
@@ -75,7 +76,8 @@ class SearchResultDefinitionServiceTest {
             .build();
         when(uiDefinitionRepository.getWorkBasketResult(CASE_TYPE_ID)).thenReturn(searchResult);
 
-        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, WORKBASKET, Collections.emptyList());
+        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition,
+            WORKBASKET, Collections.emptyList());
 
         verify(uiDefinitionRepository).getWorkBasketResult(eq(CASE_TYPE_ID));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -91,7 +93,8 @@ class SearchResultDefinitionServiceTest {
             .build();
         when(uiDefinitionRepository.getSearchResult(CASE_TYPE_ID)).thenReturn(searchResult);
 
-        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, SEARCH, Collections.emptyList());
+        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition,
+            SEARCH, Collections.emptyList());
 
         verify(uiDefinitionRepository).getSearchResult(eq(CASE_TYPE_ID));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -107,7 +110,8 @@ class SearchResultDefinitionServiceTest {
             .build();
         when(uiDefinitionRepository.getSearchCasesResult(CASE_TYPE_ID, ORG_CASES)).thenReturn(searchResult);
 
-        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition, ORG_CASES, Collections.emptyList());
+        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition,
+            ORG_CASES, Collections.emptyList());
 
         verify(uiDefinitionRepository).getSearchCasesResult(eq(CASE_TYPE_ID), eq(ORG_CASES));
         verifyNoMoreInteractions(uiDefinitionRepository);
@@ -123,7 +127,8 @@ class SearchResultDefinitionServiceTest {
             .withField(CASE_FIELD_1_1)
             .build();
 
-        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, "", Collections.emptyList());
+        SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition,
+            "", Collections.emptyList());
 
         verifyNoMoreInteractions(uiDefinitionRepository);
         assertAll(
@@ -138,7 +143,8 @@ class SearchResultDefinitionServiceTest {
     @Test
     void shouldGetSearchResultDefinitionForDefaultUseCaseWithRequestedFields() {
         SearchResultDefinition result = searchResultDefinitionService
-            .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, CASE_FIELD_ID_1_3 + "." + CASE_FIELD_ID_1_3_NESTED));
+            .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1,
+                CASE_FIELD_ID_1_3 + "." + CASE_FIELD_ID_1_3_NESTED));
 
         verifyNoMoreInteractions(uiDefinitionRepository);
         assertAll(
@@ -159,7 +165,8 @@ class SearchResultDefinitionServiceTest {
     @Test
     void shouldIgnoreRequestedFieldsThatDoNotExist() {
         SearchResultDefinition result = searchResultDefinitionService
-            .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1, "INVALID"));
+            .getSearchResultDefinition(testCaseTypeDefinition, null, Arrays.asList(CASE_FIELD_ID_1_1,
+                "INVALID"));
 
         verifyNoMoreInteractions(uiDefinitionRepository);
         assertAll(

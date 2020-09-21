@@ -136,7 +136,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 .must(matchQuery(STATE, STATE_VALUE))) // Metadata
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            null);
 
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
         assertAll(
@@ -161,7 +162,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 .must(matchQuery(STATE, STATE_VALUE))) // Metadata
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            null);
 
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
         assertAll(
@@ -186,7 +188,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 .must(matchQuery(STATE, STATE_VALUE))) // Metadata
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            null);
 
         assertThat(caseSearchResultViewResource.getCases().size(),is(0));
     }
@@ -206,7 +209,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 .must(matchQuery(STATE, STATE_VALUE))) // Metadata
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            null);
 
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
         assertAll(
@@ -221,7 +225,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     void shouldReturnAllHeaderInfoForDefaultUseCase() throws Exception {
         ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            null);
 
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -233,7 +238,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserRoleColumnIsPopulated() throws Exception {
         ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "TEST");
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            "TEST");
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -247,17 +253,21 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserHasSomeAuthorisationOnCaseFields() throws Exception {
         ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782");
+        CaseSearchResultViewResource caseSearchResultViewResource =
+            executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782");
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
 
         List<String> expectedFields = Arrays.asList(EMAIL_FIELD);
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().size(), is(1)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getJurisdiction(), is(AUTOTEST_1)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getJurisdiction(),
+                is(AUTOTEST_1)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(),
+                is(CASE_TYPE_A)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
+                is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(1)),
             () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields(),
                 hasItem(hasProperty(CASE_FIELD_ID, is(f))))),
@@ -272,15 +282,19 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUseHaveNoAuthorisationOnCaseField() throws Exception {
         ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782NOACCESS");
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            "RDM-8782NOACCESS");
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
 
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getHeaders().size(), is(1)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getJurisdiction(), is(AUTOTEST_1)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(), is(CASE_TYPE_A)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getJurisdiction(),
+                is(AUTOTEST_1)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getMetadata().getCaseTypeId(),
+                is(CASE_TYPE_A)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().size(), is(1)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
+                is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
             () -> assertThat(caseDetails.getFields().size(), is(8)),
             () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
@@ -291,7 +305,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     void shouldReturnAllHeaderInfoForSpecifiedUseCase() throws Exception {
         ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            "orgcases");
 
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -303,7 +318,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     void shouldReturnAllFormattedCaseDetails() throws Exception {
         ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "ORGCASES");
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            "ORGCASES");
 
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
         assertAll(
@@ -327,14 +343,17 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             .source("INVALID")
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+            null);
 
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(3)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(0).getCaseFieldId(), is(TEXT_FIELD)),
-            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(1).getCaseFieldId(), is(nestedFieldId)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(0).getCaseFieldId(),
+                is(TEXT_FIELD)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(1).getCaseFieldId(),
+                is(nestedFieldId)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                 is(MetaData.CaseField.CASE_REFERENCE.getReference())),
             () -> assertThat(caseDetails.getFields().size(), is(11)),

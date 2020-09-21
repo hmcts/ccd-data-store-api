@@ -72,9 +72,11 @@ class DateTimeEntryProcessorTest {
     void shouldReturnProcessedNodeForSimpleField() throws IOException {
         String json = "{\"DateTimeField\":\"13/03/2020\"}";
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
-        CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
+        CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)",
+            fieldType());
         when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
-        when(dateTimeFormatParser.valueToTextNode(eq("13/03/2020"), eq(BaseType.get(DATETIME)), any(), eq("dd/MM/yyyy"), eq(true)))
+        when(dateTimeFormatParser.valueToTextNode(eq("13/03/2020"), eq(BaseType.get(DATETIME)), any(),
+            eq("dd/MM/yyyy"), eq(true)))
             .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
@@ -94,7 +96,8 @@ class DateTimeEntryProcessorTest {
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
         CaseViewField caseViewField = caseViewField(ID, null, fieldType());
         when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
-        when(dateTimeFormatParser.valueToTextNode(eq("2020-03-13T00:00:00.000"), eq(BaseType.get(DATETIME)), any(), eq(null), eq(false)))
+        when(dateTimeFormatParser.valueToTextNode(eq("2020-03-13T00:00:00.000"), eq(BaseType.get(DATETIME)), any(),
+            eq(null), eq(false)))
             .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
@@ -112,9 +115,11 @@ class DateTimeEntryProcessorTest {
     void shouldReturnProcessedNodeForSimpleFieldIncorrectDisplayContextParameter() throws IOException {
         String json = "{\"DateTimeField\":\"2020-03-13T00:00:00.000\"}";
         JsonNode node = MAPPER.readTree(json).get("DateTimeField");
-        CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)", fieldType());
+        CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)",
+            fieldType());
         when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
-        when(dateTimeFormatParser.valueToTextNode(eq("2020-03-13T00:00:00.000"), eq(BaseType.get(DATETIME)), any(), eq("dd/MM/yyyy"), eq(true)))
+        when(dateTimeFormatParser.valueToTextNode(eq("2020-03-13T00:00:00.000"), eq(BaseType.get(DATETIME)), any(),
+            eq("dd/MM/yyyy"), eq(true)))
             .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
@@ -130,7 +135,8 @@ class DateTimeEntryProcessorTest {
 
     @Test
     void shouldReturnProcessedNodeForCollectionField() throws IOException {
-        String json = "{\"CollectionField\":[{\"id\":\"id1\",\"value\":\"13/03/2020\"},{\"id\":\"id2\",\"value\":\"25/12/1995\"}]}";
+        String json = "{\"CollectionField\":[{\"id\":\"id1\",\"value\":\"13/03/2020\"},{\"id\":\"id2\",\"value\":"
+            + "\"25/12/1995\"}]}";
         JsonNode node = MAPPER.readTree(json).get("CollectionField");
         CaseViewField caseViewField = caseViewField(ID, "#DATETIMEENTRY(dd/MM/yyyy)",
             fieldType("Collection", "Collection", Collections.EMPTY_LIST, fieldType(
@@ -138,9 +144,11 @@ class DateTimeEntryProcessorTest {
             ))
         );
         when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
-        when(dateTimeFormatParser.valueToTextNode(eq("13/03/2020"), eq(BaseType.get(DATETIME)), any(), eq("dd/MM/yyyy"), eq(true)))
+        when(dateTimeFormatParser.valueToTextNode(eq("13/03/2020"), eq(BaseType.get(DATETIME)), any(),
+            eq("dd/MM/yyyy"), eq(true)))
             .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
-        when(dateTimeFormatParser.valueToTextNode(eq("25/12/1995"), eq(BaseType.get(DATETIME)), any(), eq("dd/MM/yyyy"), eq(true)))
+        when(dateTimeFormatParser.valueToTextNode(eq("25/12/1995"), eq(BaseType.get(DATETIME)), any(),
+            eq("dd/MM/yyyy"), eq(true)))
             .thenReturn(new TextNode("1995-12-25T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
@@ -173,15 +181,18 @@ class DateTimeEntryProcessorTest {
         CaseFieldDefinition caseField1 = newCaseField().withId("ComplexDateTimeField")
             .withFieldType(fieldType()).withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build();
         CaseFieldDefinition caseField2 = newCaseField().withId("NestedDateField")
-            .withFieldType(fieldType("Date", "Date", null, null)).withDisplayContextParameter("#DATETIMEENTRY(MM)").build();
+            .withFieldType(fieldType("Date", "Date", null, null))
+            .withDisplayContextParameter("#DATETIMEENTRY(MM)").build();
         CaseFieldDefinition caseField3 = newCaseField().withId("NestedCollectionTextField")
             .withFieldType(fieldType("Collection", "Collection", null, fieldType())).build();
         CaseFieldDefinition caseField4 = newCaseField().withId("LabelField")
             .withFieldType(fieldType("Label", "Label", null, null)).build();
         CaseFieldDefinition caseField5 = newCaseField().withId("ComplexNestedField")
-            .withFieldType(fieldType("Complex", "Complex", Arrays.asList(caseField2, caseField3, caseField4), null)).build();
+            .withFieldType(fieldType("Complex", "Complex", Arrays.asList(caseField2, caseField3, caseField4),
+                null)).build();
         CaseFieldDefinition caseField6 = newCaseField().withId("ComplexField")
-            .withFieldType(fieldType("Complex", "Complex", Arrays.asList(caseField1, caseField5), null)).build();
+            .withFieldType(fieldType("Complex", "Complex", Arrays.asList(caseField1, caseField5),
+                null)).build();
         CaseViewField caseViewField = caseViewField(ID, null,
             fieldType("Complex", "Complex", Arrays.asList(caseField1, caseField5), null)
         );
@@ -192,7 +203,8 @@ class DateTimeEntryProcessorTest {
         when(dateTimeFormatParser.valueToTextNode(eq("12"), eq(BaseType.get(DATE)), any(), eq("MM"), eq(true)))
             .thenReturn(new TextNode("1970-12-01"));
 
-        JsonNode result = dateTimeEntryProcessor.execute(node, caseField6, new CaseEventFieldDefinition(), wizardPageField(ID, Collections.EMPTY_LIST));
+        JsonNode result = dateTimeEntryProcessor.execute(node, caseField6, new CaseEventFieldDefinition(),
+            wizardPageField(ID, Collections.EMPTY_LIST));
 
         assertAll(
             () -> assertThat(result.isObject(), is(true)),
@@ -225,7 +237,8 @@ class DateTimeEntryProcessorTest {
         return caseViewField;
     }
 
-    private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields, FieldTypeDefinition collectionFieldType) {
+    private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields,
+                                          FieldTypeDefinition collectionFieldType) {
         FieldTypeDefinition fieldType = new FieldTypeDefinition();
         fieldType.setId(id);
         fieldType.setType(type);
