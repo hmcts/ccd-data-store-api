@@ -121,7 +121,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response, "searchResult", searchResult);
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
+                .thenReturn(caseDetailsDTO);
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
@@ -130,7 +131,8 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(request);
 
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
@@ -143,9 +145,11 @@ class ElasticsearchCaseSearchOperationTest {
         }
 
         @Test
-        @DisplayName("should return ServiceError when ES index case type id capturing group is not matching the ES index")
+        @DisplayName("should return ServiceError when ES index case type id capturing group is not matching the ES "
+            + "index")
         void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotMatching() throws IOException {
-            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("a_regex_with_not_matching_(capturing)_group");
+            when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("a_regex_with_not_matching_"
+                + "(capturing)_group");
 
             MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
             when(multiSearchResult.isSucceeded()).thenReturn(true);
@@ -157,7 +161,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response, "searchResult", searchResult);
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
+                .thenReturn(caseDetailsDTO);
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
@@ -166,7 +171,8 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(request);
 
             assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }
@@ -186,7 +192,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response, "searchResult", searchResult);
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
+                .thenReturn(caseDetailsDTO);
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
@@ -195,14 +202,17 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(request);
 
             assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }
 
         @Test
-        @DisplayName("should return ServiceError when ES index case type id capturing group is not associated to any case type")
-        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotAssociatedToAnyCaseType() throws IOException {
+        @DisplayName("should return ServiceError when ES index case type id capturing group is not associated to any "
+            + "case type")
+        void searchShouldReturnServiceErrorWhenESIndexCaseTypeIdCapturingGroudNotAssociatedToAnyCaseType()
+                                                                                                throws IOException {
             when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
 
             MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
@@ -215,7 +225,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response, "searchResult", searchResult);
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
+                .thenReturn(caseDetailsDTO);
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
@@ -224,7 +235,8 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList("aaa"))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(request);
 
             assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }
@@ -257,7 +269,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult.getJsonObject()).thenReturn(convertedObject);
             Whitebox.setInternalState(response, "searchResult", searchResult);
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
+                .thenReturn(caseDetailsDTO);
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
@@ -266,12 +279,14 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList("casetypeid1_cases"))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(request);
 
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
             assertAll(
-                () -> assertThat(caseSearchResult.getCaseTypesResults().get(0).getCaseTypeId(), equalTo("casetypeid1_cases"))
+                () -> assertThat(caseSearchResult.getCaseTypesResults().get(0).getCaseTypeId(),
+                    equalTo("casetypeid1_cases"))
             );
         }
     }
@@ -301,7 +316,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult2.getJsonObject()).thenReturn(convertedObject);
             when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
+                .thenReturn(caseDetailsDTO);
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
@@ -311,7 +327,8 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request1, request2);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(request1, request2);
 
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
@@ -320,7 +337,8 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(20L)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
-                () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(
+                    any(CaseSearchRequest.class)));
         }
 
     }

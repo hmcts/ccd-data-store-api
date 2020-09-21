@@ -48,10 +48,14 @@ public class CaseViewFieldBuilderTest {
     private static final String FIRST_NAME = "Patrick";
     private static final String LAST_NAME = "Smith";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
-    private static final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true).withUpdate(false).withDelete(true).build();
-    private static final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false).withUpdate(true).withDelete(false).build();
-    private static final FieldTypeDefinition TEXT_FIELD_TYPE_DEFINITION = aFieldType().withId("Text").withType("Text").build();
+    private static final AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true)
+        .withUpdate(true).withDelete(false).build();
+    private static final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true)
+        .withUpdate(false).withDelete(true).build();
+    private static final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false)
+        .withUpdate(true).withDelete(false).build();
+    private static final FieldTypeDefinition TEXT_FIELD_TYPE_DEFINITION = aFieldType().withId("Text").withType("Text")
+        .build();
     private static final CaseFieldDefinition CASE_FIELD = newCaseField()
         .withFieldType(TEXT_FIELD_TYPE_DEFINITION)
         .withId("PersonFirstName")
@@ -59,7 +63,8 @@ public class CaseViewFieldBuilderTest {
         .withAcl(acl2)
         .withAcl(acl3)
         .build();
-    private static final CaseFieldDefinition CASE_FIELD_3 = newCaseField().withFieldType(TEXT_FIELD_TYPE_DEFINITION).withId("STATE").build();
+    private static final CaseFieldDefinition CASE_FIELD_3 = newCaseField().withFieldType(TEXT_FIELD_TYPE_DEFINITION)
+        .withId("STATE").build();
     private static final String TEXT_TYPE = "Text";
 
     static {
@@ -178,7 +183,8 @@ public class CaseViewFieldBuilderTest {
             assertThat(fields, contains(expectedField));
 
             verify(fieldBuilder).build(CASE_FIELD, EVENT_FIELD, data.get("PersonFirstName"));
-            verify(fieldBuilder, times(1)).build(Mockito.any(CaseFieldDefinition.class), Mockito.any(CaseEventFieldDefinition.class), any());
+            verify(fieldBuilder, times(1)).build(Mockito.any(CaseFieldDefinition.class),
+                Mockito.any(CaseEventFieldDefinition.class), any());
         }
 
         @Test
@@ -199,7 +205,8 @@ public class CaseViewFieldBuilderTest {
             assertThat(fields, contains(expectedField));
 
             verify(fieldBuilder).build(CASE_FIELD, EVENT_FIELD, data.get("PersonFirstName"));
-            verify(fieldBuilder, times(1)).build(Mockito.any(CaseFieldDefinition.class), Mockito.any(CaseEventFieldDefinition.class), any());
+            verify(fieldBuilder, times(1)).build(Mockito.any(CaseFieldDefinition.class),
+                Mockito.any(CaseEventFieldDefinition.class), any());
         }
 
         @Test
@@ -255,7 +262,8 @@ public class CaseViewFieldBuilderTest {
         private static final String POSTCODE = "Post Code";
         private static final String FAMILY_NAME = "Family Name";
 
-        private final CaseFieldDefinition name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
+        private final CaseFieldDefinition name = newCaseField().withId(NAME).withFieldType(aFieldType()
+            .withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
         private final CaseFieldDefinition surname = newCaseField()
             .withId(SURNAME)
             .withFieldType(aFieldType()
@@ -277,20 +285,24 @@ public class CaseViewFieldBuilderTest {
             .withComplexField(surname)
             .withComplexField(adult)
             .build();
-        private final CaseFieldDefinition person = newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
+        private final CaseFieldDefinition person =
+            newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
         private final FieldTypeDefinition membersFieldTypeDefinition = aFieldType()
             .withId(MEMBERS + "-some-uid-value")
             .withType(COLLECTION)
             .withCollectionField(person)
             .build();
-        private final CaseFieldDefinition members = newCaseField().withId(MEMBERS).withFieldType(membersFieldTypeDefinition).build();
+        private final CaseFieldDefinition members =
+            newCaseField().withId(MEMBERS).withFieldType(membersFieldTypeDefinition).build();
 
         private final CaseFieldDefinition addressLine = newCaseField()
             .withId(ADDRESS_LINE)
             .withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
             .build();
-        private final FieldTypeDefinition addressLinesType = aFieldType().withId(ADDRESS_LINES).withType(COLLECTION).withCollectionField(addressLine).build();
-        private final CaseFieldDefinition addressLines = newCaseField().withId(ADDRESS_LINES).withFieldType(addressLinesType).build();
+        private final FieldTypeDefinition addressLinesType =
+            aFieldType().withId(ADDRESS_LINES).withType(COLLECTION).withCollectionField(addressLine).build();
+        private final CaseFieldDefinition addressLines =
+            newCaseField().withId(ADDRESS_LINES).withFieldType(addressLinesType).build();
         private final CaseFieldDefinition postCode = newCaseField()
             .withId(POSTCODE)
             .withFieldType(aFieldType()
@@ -304,7 +316,8 @@ public class CaseViewFieldBuilderTest {
             .withId(ADDRESS)
             .withType(COMPLEX)
             .build();
-        private final CaseFieldDefinition address = newCaseField().withId(ADDRESS).withFieldType(addressFieldTypeDefinition).build();
+        private final CaseFieldDefinition address =
+            newCaseField().withId(ADDRESS).withFieldType(addressFieldTypeDefinition).build();
 
         private final CaseFieldDefinition familyName = newCaseField()
             .withId(FAMILY_NAME)
@@ -312,15 +325,21 @@ public class CaseViewFieldBuilderTest {
             .build();
         private final FieldTypeDefinition nameFieldTypeDefinition =
             aFieldType().withId(NAME + "-some-uid-value").withType(COLLECTION).withCollectionField(familyName).build();
-        private final CaseFieldDefinition familyNames = newCaseField().withId(FAMILY_NAME).withFieldType(nameFieldTypeDefinition).build();
+        private final CaseFieldDefinition familyNames =
+            newCaseField().withId(FAMILY_NAME).withFieldType(nameFieldTypeDefinition).build();
 
-        // A complex family field formed of members collection of complex person - text name, text surname and yesNo adult fields,
-        // family name(text) and an address (complex address type - collection of text address lines and a text postCode)
+        // A complex family field formed of members collection of complex person - text name, text surname and yesNo
+        // adult fields,family name(text) and an address (complex address type - collection of text address lines and
+        // a text postCode)
         private final FieldTypeDefinition familyFieldTypeDefinition =
-            aFieldType().withId(FAMILY).withType(COMPLEX).withComplexField(familyNames).withComplexField(members).withComplexField(address).build();
-        private final AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
-        private final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true).withUpdate(false).withDelete(true).build();
-        private final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false).withUpdate(true).withDelete(false).build();
+            aFieldType().withId(FAMILY).withType(COMPLEX).withComplexField(familyNames).withComplexField(members)
+                .withComplexField(address).build();
+        private final AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true)
+            .withUpdate(true).withDelete(false).build();
+        private final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true)
+            .withUpdate(false).withDelete(true).build();
+        private final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false)
+            .withUpdate(true).withDelete(false).build();
         private final CaseFieldDefinition family = newCaseField()
             .withId(FAMILY)
             .withFieldType(familyFieldTypeDefinition)
@@ -345,8 +364,8 @@ public class CaseViewFieldBuilderTest {
                 () -> assertThat(caseViewField.getFieldTypeDefinition()
                     .getComplexFields().get(0).getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldTypeDefinition()
-                    .getComplexFields().get(0).getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().get(0)
-                    .getAccessControlLists().size(), is(3)),
+                    .getComplexFields().get(0).getFieldTypeDefinition().getCollectionFieldTypeDefinition()
+                    .getComplexFields().get(0).getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldTypeDefinition()
                     .getComplexFields().get(2).getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldTypeDefinition()

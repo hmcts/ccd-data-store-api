@@ -77,7 +77,8 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+                defaultDataClassification);
 
             Assert.assertThat(caseDetails.getSecurityClassification(), is(PRIVATE));
         }
@@ -106,11 +107,13 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+                defaultDataClassification);
 
             assertAll(
                 () -> Assert.assertThat(caseDetails.getDataClassification().size(), is(1)),
-                () -> Assert.assertThat(caseDetails.getDataClassification(), hasEntry("field1", getTextNode("RESTRICTED")))
+                () -> Assert.assertThat(caseDetails.getDataClassification(), hasEntry("field1",
+                    getTextNode("RESTRICTED")))
             );
         }
 
@@ -239,14 +242,18 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+                defaultDataClassification);
 
             assertAll(
                 () -> Assert.assertThat(caseDetails.getDataClassification().size(), is(1)),
                 () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").size(), is(2)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("classification"), is(getTextNode("RESTRICTED"))),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value").size(), is(1)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value").get("field2"), is(getTextNode("RESTRICTED")))
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("classification"),
+                    is(getTextNode("RESTRICTED"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value").size(),
+                    is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value")
+                    .get("field2"), is(getTextNode("RESTRICTED")))
             );
         }
 
@@ -630,7 +637,8 @@ class SecurityValidationServiceTest {
                                                               aClassificationBuilder()
                                                                   .withData("value",
                                                                             aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("RESTRICTED"))
+                                                                                .withData("field2",
+                                                                                    getTextNode("RESTRICTED"))
                                                                                 .buildAsNode())
                                                                   .withData("id", getTextNode("someId1"))
                                                                   .buildAsMap()))
@@ -638,15 +646,20 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails,
+                defaultDataClassification);
 
             assertAll(
                 () -> Assert.assertThat(caseDetails.getDataClassification().size(), is(1)),
                 () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").size(), is(2)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("classification"), is(getTextNode("RESTRICTED"))),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").size(), is(1)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").get(0).get("id"), is(getTextNode("someId1"))),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").get(0).get("value").get("field2"),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1")
+                    .get("classification"), is(getTextNode("RESTRICTED"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value")
+                    .size(), is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value")
+                    .get(0).get("id"), is(getTextNode("someId1"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value")
+                        .get(0).get("value").get("field2"),
                                         is(getTextNode("RESTRICTED")))
             );
         }
@@ -664,14 +677,16 @@ class SecurityValidationServiceTest {
                                                               aClassificationBuilder()
                                                                   .withData("value",
                                                                             aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("PRIVATE"))
+                                                                                .withData("field2",
+                                                                                    getTextNode("PRIVATE"))
                                                                                 .buildAsNode())
                                                                   .withData("id", getTextNode("someId1"))
                                                                   .buildAsMap(),
                                                               aClassificationBuilder()
                                                                   .withData("value",
                                                                             aClassificationBuilder()
-                                                                                .withData("field3", getTextNode("PRIVATE"))
+                                                                                .withData("field3",
+                                                                                    getTextNode("PRIVATE"))
                                                                                 .buildAsNode())
                                                                   .withData("id", getTextNode("someId2"))
                                                                   .buildAsMap()))
@@ -688,7 +703,8 @@ class SecurityValidationServiceTest {
                                                               aClassificationBuilder()
                                                                   .withData("value",
                                                                             aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("PRIVATE"))
+                                                                                .withData("field2",
+                                                                                    getTextNode("PRIVATE"))
                                                                                 .buildAsNode())
                                                                   .withData("id", getTextNode("someId1"))
                                                                   .buildAsMap(),
@@ -715,8 +731,10 @@ class SecurityValidationServiceTest {
                                                               aClassificationBuilder()
                                                                   .withData("value",
                                                                             aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("PRIVATE"))
-                                                                                .withData("missingField3", getTextNode("RESTRICTED"))
+                                                                                .withData("field2",
+                                                                                    getTextNode("PRIVATE"))
+                                                                                .withData("missingField3",
+                                                                                    getTextNode("RESTRICTED"))
                                                                                 .buildAsNode())
                                                                   .withData("id", getTextNode("someId1"))
                                                                   .buildAsMap()))
@@ -733,7 +751,8 @@ class SecurityValidationServiceTest {
                                                               aClassificationBuilder()
                                                                   .withData("value",
                                                                             aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("RESTRICTED"))
+                                                                                .withData("field2",
+                                                                                    getTextNode("RESTRICTED"))
                                                                                 .buildAsNode())
                                                                   .withData("id", getTextNode("someId1"))
                                                                   .buildAsMap()))
@@ -755,7 +774,8 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
                                                                                .buildAsNode())
                                                                            .withData("id", getTextNode("someId1"))
                                                                            .buildAsMap()))
@@ -770,10 +790,13 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .withData("extraField3", getTextNode("RESTRICTED"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
+                                                                               .withData("extraField3",
+                                                                                   getTextNode("RESTRICTED"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -793,10 +816,13 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .withData("field3", getTextNode("RESTRICTED"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
+                                                                               .withData("field3",
+                                                                                   getTextNode("RESTRICTED"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -809,17 +835,23 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
-                                                                               .withData("field3", getTextNode("RESTRICTED"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
+                                                                               .withData("field3",
+                                                                                   getTextNode("RESTRICTED"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap(),
                                                                        aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("extraField1", getTextNode("PRIVATE"))
-                                                                               .withData("extraField2", getTextNode("RESTRICTED"))
+                                                                               .withData("extraField1",
+                                                                                   getTextNode("PRIVATE"))
+                                                                               .withData("extraField2",
+                                                                                   getTextNode("RESTRICTED"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("extraItemId"))
+                                                                           .withData("id",
+                                                                               getTextNode("extraItemId"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -839,9 +871,11 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -854,9 +888,11 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -876,9 +912,11 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -891,9 +929,11 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PLOP"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PLOP"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -913,9 +953,11 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -928,9 +970,11 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PUBLIC"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PUBLIC"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -950,9 +994,11 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -965,9 +1011,11 @@ class SecurityValidationServiceTest {
                                                 .withData("value",
                                                           newArrayList(aClassificationBuilder()
                                                                            .withData("value", aClassificationBuilder()
-                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("field2",
+                                                                                   getTextNode("PRIVATE"))
                                                                                .buildAsNode())
-                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .withData("id",
+                                                                               getTextNode("someId1"))
                                                                            .buildAsMap()))
                                                 .buildAsNode())
                                             .buildAsMap())
@@ -977,13 +1025,15 @@ class SecurityValidationServiceTest {
         }
     }
 
-    private void assertThrowsSecurityValidationDueToClassificationException(CaseDetails caseDetails, CallbackResponse callbackResponse) {
+    private void assertThrowsSecurityValidationDueToClassificationException(CaseDetails caseDetails,
+                                                                            CallbackResponse callbackResponse) {
         final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
         ValidationException validationException = assertThrows(ValidationException.class,
             () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
                 caseDetails,
                 defaultDataClassification));
-        assertEquals("The event cannot be complete due to a callback returned data validation error (c)", validationException.getMessage());
+        assertEquals("The event cannot be complete due to a callback returned data validation error (c)",
+            validationException.getMessage());
     }
 
     private JsonNode getTextNode(String value) {

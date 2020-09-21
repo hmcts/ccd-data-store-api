@@ -197,7 +197,8 @@ public class CallbackTest extends WireMockBaseTest {
         DATA = mapper.readTree(DATA_JSON_STRING);
         DATA_CLASSIFICATION = mapper.readTree(DATA_CLASSIFICATION_JSON_STRING);
         CALLBACK_DATA_CLASSIFICATION = mapper.readTree(CALLBACK_DATA_CLASSIFICATION_JSON_STRING);
-        CALLBACK_DATA_WITH_MISSING_CLASSIFICATION = mapper.readTree(CALLBACK_DATA_WITH_MISSING_CLASSIFICATION_JSON_STRING);
+        CALLBACK_DATA_WITH_MISSING_CLASSIFICATION =
+            mapper.readTree(CALLBACK_DATA_WITH_MISSING_CLASSIFICATION_JSON_STRING);
         INVALID_CALLBACK_DATA = mapper.readTree(INVALID_CALLBACK_DATA_JSON_STRING);
         MODIFIED_CORRUPTED_DATA = mapper.readTree(MODIFIED_CORRUPTED_DATA_JSON_STRING);
 
@@ -300,8 +301,8 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
-            .toString(), Map.class);
+        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").toString(), Map.class);
         assertThat("Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData
             .entrySet()));
 
@@ -316,7 +317,8 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals("CaseCreated", savedCaseDetails.getState());
         assertThat(savedCaseDetails.getSecurityClassification(), Matchers.equalTo(PUBLIC));
 
-        final List<AuditEvent> caseAuditEventList = jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
+        final List<AuditEvent> caseAuditEventList =
+            jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
 
         // Assertion belows are for creation event
@@ -373,8 +375,9 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
-            .toString(), Map.class);
+        Map actualData =
+            mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
+                .toString(), Map.class);
         assertThat("Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData
             .entrySet()));
 
@@ -446,8 +449,8 @@ public class CallbackTest extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 422, mvcResult.getResponse().getStatus());
-        assertTrue(mvcResult.getResponse().getContentAsString().contains("Description should not be empty but also not "
-            + "more than 64 characters"));
+        assertTrue(mvcResult.getResponse().getContentAsString().contains("Description should not be empty but also not"
+            + " more than 64 characters"));
 
     }
 
@@ -480,8 +483,9 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
-            .toString(), Map.class);
+        Map actualData =
+            mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
+                .toString(), Map.class);
         assertThat("Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData
             .entrySet()));
 
@@ -496,7 +500,8 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals("CaseCreated", savedCaseDetails.getState());
 
-        final List<AuditEvent> caseAuditEventList = jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
+        final List<AuditEvent> caseAuditEventList =
+            jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
 
         // Assertion belows are for creation event
@@ -543,7 +548,8 @@ public class CallbackTest extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
+        Map actualData =
+            mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
             .toString(), Map.class);
         assertThat("Incorrect Response Data Content", actualData.entrySet().size(), equalTo(0));
         String actualDataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
@@ -562,7 +568,8 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals("CaseCreated", savedCaseDetails.getState());
         assertThat(savedCaseDetails.getSecurityClassification(), Matchers.equalTo(PUBLIC));
 
-        final List<AuditEvent> caseAuditEventList = jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
+        final List<AuditEvent> caseAuditEventList =
+            jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
 
         // Assertion belows are for creation event
@@ -863,7 +870,8 @@ public class CallbackTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseWithCallbackDataWithValidationErrorsForCitizen()
                                                                                                     throws Exception {
-        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token",
+        final String URL =
+            String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -898,7 +906,8 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn400WhenGetEventTokenForCaseWithInvalidCaseReferenceForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token",
+        final String URL =
+            String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, INVALID_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final MvcResult mvcResult = mockMvc
@@ -912,7 +921,8 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn200WhenGetEventTokenForCaseWithValidCallbackDataForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token",
+        final String URL =
+            String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -1102,7 +1112,8 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
+        Map actualData =
+            mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
             .toString(), Map.class);
         assertThat("Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData
             .entrySet()));
@@ -1117,7 +1128,8 @@ public class CallbackTest extends WireMockBaseTest {
             .entrySet()));
         assertEquals("CaseUpdated", savedCaseDetails.getState());
 
-        final List<AuditEvent> caseAuditEventList = jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
+        final List<AuditEvent> caseAuditEventList =
+            jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
 
         // Assertion belows are for creation event
@@ -1169,7 +1181,8 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
+        Map actualData =
+            mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
             .toString(), Map.class);
         assertThat("Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData
             .entrySet()));
@@ -1184,7 +1197,8 @@ public class CallbackTest extends WireMockBaseTest {
             .entrySet()));
         assertEquals("CaseUpdated", savedCaseDetails.getState());
 
-        final List<AuditEvent> caseAuditEventList = jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
+        final List<AuditEvent> caseAuditEventList =
+            jdbcTemplate.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
 
         // Assertion belows are for creation event
