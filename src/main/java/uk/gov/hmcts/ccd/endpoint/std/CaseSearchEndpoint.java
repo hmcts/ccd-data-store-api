@@ -93,6 +93,10 @@ public class CaseSearchEndpoint {
         validateCtid(caseTypeIds);
         ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
 
+        if (!elasticsearchRequest.hasRequestedSupplementaryData()) {
+            elasticsearchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
+        }
+
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(getCaseTypeIds(caseTypeIds))
             .withSearchRequest(elasticsearchRequest)

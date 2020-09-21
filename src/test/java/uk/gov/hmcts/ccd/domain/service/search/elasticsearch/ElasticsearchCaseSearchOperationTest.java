@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -101,7 +102,7 @@ class ElasticsearchCaseSearchOperationTest {
         when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
         when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
-        searchRequestJsonNode.set(QUERY, mock(ObjectNode.class));
+        searchRequestJsonNode.set(QUERY, new TextNode("queryVal"));
     }
 
     @Nested

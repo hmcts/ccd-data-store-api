@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -53,8 +54,8 @@ class CaseSearchResultViewTest {
 
     @Test
     void shouldFindCaseByReference() {
-        SearchResultViewItem item1 = new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
-        SearchResultViewItem item2 = new SearchResultViewItem("222", Collections.emptyMap(), Collections.emptyMap());
+        SearchResultViewItem item1 = new SearchResultViewItem("111", emptyMap(), emptyMap(), emptyMap());
+        SearchResultViewItem item2 = new SearchResultViewItem("222", emptyMap(), emptyMap(), emptyMap());
         CaseSearchResultView caseSearchResultView = new CaseSearchResultView(emptyList(), Arrays.asList(item1, item2), 0L);
 
         Optional<SearchResultViewItem> result = caseSearchResultView.findCaseByReference("222");
@@ -67,7 +68,7 @@ class CaseSearchResultViewTest {
 
     @Test
     void shouldNotFindNonExistingCase() {
-        SearchResultViewItem item = new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
+        SearchResultViewItem item = new SearchResultViewItem("111", emptyMap(), emptyMap(), emptyMap());
         CaseSearchResultView caseSearchResultView = new CaseSearchResultView(emptyList(), Collections.singletonList(item), 0L);
 
         Optional<SearchResultViewItem> result = caseSearchResultView.findCaseByReference("000");
@@ -79,9 +80,9 @@ class CaseSearchResultViewTest {
 
     @Test
     void shouldFindCasesByCaseType() {
-        SearchResultViewItem correctItem1 = new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
-        SearchResultViewItem correctItem2 = new SearchResultViewItem("222", Collections.emptyMap(), Collections.emptyMap());
-        SearchResultViewItem otherItem3 = new SearchResultViewItem("333", Collections.emptyMap(), Collections.emptyMap());
+        SearchResultViewItem correctItem1 = new SearchResultViewItem("111", emptyMap(), emptyMap(), emptyMap());
+        SearchResultViewItem correctItem2 = new SearchResultViewItem("222", emptyMap(), emptyMap(), emptyMap());
+        SearchResultViewItem otherItem3 = new SearchResultViewItem("333", emptyMap(), emptyMap(), emptyMap());
         SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
             new HeaderGroupMetadata(JURISDICTION, CASE_TYPE), emptyList(), Arrays.asList("111", "222")
         );

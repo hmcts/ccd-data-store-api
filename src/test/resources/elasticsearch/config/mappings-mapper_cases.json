@@ -1,6 +1,6 @@
 {
   "_doc": {
-    "dynamic": "strict",
+    "dynamic": "true",
     "properties": {
       "@timestamp": {
         "enabled": false,

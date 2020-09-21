@@ -78,6 +78,12 @@ public class MetaData {
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException(String.format("No MetaData field exists with column name '%s'", dbColumnName)));
         }
+
+        public static List<String> getColumnNames() {
+            return Arrays.stream(values())
+                .map(CaseField::getDbColumnName)
+                .collect(toList());
+        }
     }
 
     private final String caseTypeId;
