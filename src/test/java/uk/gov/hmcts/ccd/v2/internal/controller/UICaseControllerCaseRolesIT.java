@@ -58,13 +58,15 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
 
     @Before
     public void setUp() {
-        MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+        MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication,
+            MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldNotReturnEventHistoryDataForCitizenWhoHasNoAccessToEvents() throws Exception {
 
         UserInfo userInfo = UserInfo.builder()
@@ -97,7 +99,8 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -138,7 +141,8 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldGetEventById() throws Exception {
 
         UserInfo userInfo = UserInfo.builder()

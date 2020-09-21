@@ -72,8 +72,8 @@ class SearchResultDefinitionServiceTest {
     @Test
     void shouldGetSearchResultDefinitionForWorkbasket() {
         SearchResultDefinition searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "", ""))
-            .build();
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "",
+                "")).build();
         when(uiDefinitionRepository.getWorkBasketResult(CASE_TYPE_ID)).thenReturn(searchResult);
 
         SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition,
@@ -89,8 +89,8 @@ class SearchResultDefinitionServiceTest {
     @Test
     void shouldGetSearchResultDefinitionForSearch() {
         SearchResultDefinition searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "", ""))
-            .build();
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "",
+                "")).build();
         when(uiDefinitionRepository.getSearchResult(CASE_TYPE_ID)).thenReturn(searchResult);
 
         SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition,
@@ -106,8 +106,8 @@ class SearchResultDefinitionServiceTest {
     @Test
     void shouldGetSearchResultDefinitionForOrgCases() {
         SearchResultDefinition searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "", ""))
-            .build();
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_ID_1_1, "", CASE_FIELD_ID_1_1, "",
+                "")).build();
         when(uiDefinitionRepository.getSearchCasesResult(CASE_TYPE_ID, ORG_CASES)).thenReturn(searchResult);
 
         SearchResultDefinition result = searchResultDefinitionService.getSearchResultDefinition(testCaseTypeDefinition,

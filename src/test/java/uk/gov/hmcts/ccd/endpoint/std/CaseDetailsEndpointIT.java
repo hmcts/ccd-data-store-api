@@ -318,8 +318,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andReturn();
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
-            .toString(), Map.class);
+        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").toString(), Map.class);
         assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
             .entrySet())));
 
@@ -334,25 +334,27 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(
             sanitizedDataMap.entrySet())));
         assertEquals("Incorrect security classification size", 5, savedCaseDetails.getDataClassification().size());
-        JsonNode expectedClassification = mapper.readTree("{" +
-                                                              "  \"PersonAddress\":{" +
-                                                              "    \"classification\": \"PUBLIC\"," +
-                                                              "    \"value\": {" +
-                                                              "      \"AddressLine1\":\"PUBLIC\"," +
-                                                              "      \"AddressLine2\":\"PUBLIC\"" +
-                                                              "    }" +
-                                                              "  }," +
-                                                              "  \"PersonLastName\":\"PUBLIC\"," +
-                                                              "  \"PersonFirstName\":\"PUBLIC\"," +
-                                                              "  \"Aliases\": {" +
-                                                              "    \"classification\": \"PUBLIC\"," +
-                                                              "    \"value\": [" +
-                                                              "      { \"id\": \"1\", \"classification\": \"PUBLIC\" },"
-                                                             + "      { \"id\": \"2\", \"classification\": \"PUBLIC\" }"
-                                                             + "    ]" +
-                                                              "  }," +
-                                                              "  \"D8Document\":\"PUBLIC\"" +
-                                                              "}");
+        JsonNode expectedClassification = mapper.readTree(
+            "{" +
+                "  \"PersonAddress\":{" +
+                "    \"classification\": \"PUBLIC\"," +
+                "    \"value\": {" +
+                "      \"AddressLine1\":\"PUBLIC\"," +
+                "      \"AddressLine2\":\"PUBLIC\"" +
+                "    }" +
+                "  }," +
+                "  \"PersonLastName\":\"PUBLIC\"," +
+                "  \"PersonFirstName\":\"PUBLIC\"," +
+                "  \"Aliases\": {" +
+                "    \"classification\": \"PUBLIC\"," +
+                "    \"value\": [" +
+                "      { \"id\": \"1\", \"classification\": \"PUBLIC\" },"
+                + "      { \"id\": \"2\", \"classification\": \"PUBLIC\" }"
+                + "    ]" +
+                "  }," +
+                "  \"D8Document\":\"PUBLIC\"" +
+                "}"
+        );
         JsonNode actualClassification = JacksonUtils.convertValueJsonNode(savedCaseDetails.getDataClassification());
         assertEquals("Incorrect security classifications", expectedClassification, actualClassification);
         assertEquals("state3", savedCaseDetails.getState());
@@ -427,8 +429,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andReturn();
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
-            .toString(), Map.class);
+        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").toString(), Map.class);
         assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
             .entrySet())));
 
@@ -789,7 +791,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccessForCaseworker() throws Exception {
+    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccessForCaseworker()
+                                                                                                    throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccess("caseworkers");
     }
 
@@ -1016,7 +1019,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .andExpect(status().is(200))
                 .andReturn();
 
-            final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+            final CaseDetails caseDetails =
+                mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
             assertEquals(1504259907353529L, caseDetails.getReference().longValue());
 
@@ -1534,7 +1538,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference,
+            TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
 
@@ -2696,7 +2701,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
-        // Simulate case state alteration by other actor to fail event token version check - no effect since it's checked at save step
+        // Simulate case state alteration by other actor to fail event token version check - no effect
+        // since it's checked at save step
         template.update("UPDATE case_data SET state = 'CaseStopped', version = 2 WHERE reference = ?", caseReference);
 
         mockMvc.perform(post(URL)
@@ -2910,7 +2916,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
     }
 
-    private void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseType(String role) throws Exception {
+    private void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseType(String role)
+                                                                                                    throws Exception {
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/"
             + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases";
 
@@ -3237,7 +3244,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
     }
 
-    private void shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccess(String userRole) throws Exception {
+    private void shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccess(String userRole)
+                                                                                                    throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
 
@@ -3249,7 +3257,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .andExpect(status().is(200))
                 .andReturn();
 
-            final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+            final CaseDetails caseDetails =
+                mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
             assertEquals(1504259907353628L, caseDetails.getReference().longValue());
 

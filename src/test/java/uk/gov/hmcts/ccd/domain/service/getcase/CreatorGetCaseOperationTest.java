@@ -51,7 +51,8 @@ class CreatorGetCaseOperationTest {
         @DisplayName("Should return an Optional containing the case if the case is visible")
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsTrue_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(true);
-            assertCaseDetailsPresent(true, true,JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+            assertCaseDetailsPresent(true, true,JURISDICTION_ID, CASE_TYPE_ID,
+                CASE_REFERENCE);
             verify(caseAccessService).canUserAccess(same(caseDetails));
         }
 
@@ -59,7 +60,8 @@ class CreatorGetCaseOperationTest {
         @DisplayName("Should return an empty optional if case is not visible")
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsFalse_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(false);
-            assertCaseDetailsPresent(false, true,JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+            assertCaseDetailsPresent(false, true,JURISDICTION_ID, CASE_TYPE_ID,
+                CASE_REFERENCE);
             verify(caseAccessService).canUserAccess(same(caseDetails));
         }
 
@@ -67,7 +69,8 @@ class CreatorGetCaseOperationTest {
         @DisplayName("Should return an empty optional when GetCaseOperation returns an empty optional")
         void searchOperationReturnsCaseDetails_GetCaseOperationReturnsEmptyOptional_caseDetailsReturned() {
             when(getCaseOperation.execute(any(),any(),any())).thenReturn(Optional.empty());
-            assertCaseDetailsPresent(false, false, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+            assertCaseDetailsPresent(false, false, JURISDICTION_ID, CASE_TYPE_ID,
+                CASE_REFERENCE);
         }
 
     }
@@ -99,7 +102,8 @@ class CreatorGetCaseOperationTest {
 
     }
 
-    private void assertCaseDetailsPresent(boolean isPresent, boolean solicitorVisibilityServiceCalled, String... args)  {
+    private void assertCaseDetailsPresent(boolean isPresent,
+                                          boolean solicitorVisibilityServiceCalled, String... args)  {
 
         Optional<CaseDetails> result = (args.length == 1)
             ? classUnderTest.execute(args[0])

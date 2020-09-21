@@ -18,10 +18,14 @@ import static org.hamcrest.Matchers.not;
 // FIXME : RDM-7635 - has to mock opendId jwks responses with proper Key set (RS256 public / private key).
 public class IdamIT extends IntegrationTest {
 
-    private static final String CASE_URL = "/caseworkers/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
-    private static final String CASE_URL_CITIZEN = "/citizens/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
-    private static final String CASE_URL_WRONG_ID = "/caseworkers/456/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
-    private static final String CASE_URL_WRONG_ROLE = "/caseworkers/123/jurisdictions/PROBATE/case-types/TestAddressBook/cases/1234123412341238";
+    private static final String CASE_URL =
+        "/caseworkers/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
+    private static final String CASE_URL_CITIZEN =
+        "/citizens/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
+    private static final String CASE_URL_WRONG_ID =
+        "/caseworkers/456/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
+    private static final String CASE_URL_WRONG_ROLE =
+        "/caseworkers/123/jurisdictions/PROBATE/case-types/TestAddressBook/cases/1234123412341238";
 
     private static final String VALID_IDAM_TOKEN = "Bearer UserAuthToken";
     private static final String VALID_CITIZEN_TOKEN = "Bearer CitizenToken";

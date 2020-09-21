@@ -97,12 +97,18 @@ public class DefinitionsCachingIT {
 
     @Before
     public void setup() {
-        doReturn(caseTypeDefinitionVersion(VERSION_1)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_1);
-        doReturn(caseTypeDefinitionVersion(VERSION_2)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_2);
-        doReturn(caseTypeDefinitionVersion(VERSION_3)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_3);
-        doReturn(JURISDICTION_DEFINITION_1).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J1");
-        doReturn(JURISDICTION_DEFINITION_2).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J2");
-        doReturn(JURISDICTION_DEFINITION_3).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J3");
+        doReturn(caseTypeDefinitionVersion(VERSION_1)).when(this.caseDefinitionRepository)
+            .getLatestVersionFromDefinitionStore(ID_1);
+        doReturn(caseTypeDefinitionVersion(VERSION_2)).when(this.caseDefinitionRepository)
+            .getLatestVersionFromDefinitionStore(ID_2);
+        doReturn(caseTypeDefinitionVersion(VERSION_3)).when(this.caseDefinitionRepository)
+            .getLatestVersionFromDefinitionStore(ID_3);
+        doReturn(JURISDICTION_DEFINITION_1).when(this.caseDefinitionRepository)
+            .getJurisdictionFromDefinitionStore("J1");
+        doReturn(JURISDICTION_DEFINITION_2).when(this.caseDefinitionRepository)
+            .getJurisdictionFromDefinitionStore("J2");
+        doReturn(JURISDICTION_DEFINITION_3).when(this.caseDefinitionRepository)
+            .getJurisdictionFromDefinitionStore("J3");
         doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
     }
 
@@ -209,7 +215,8 @@ public class DefinitionsCachingIT {
     @Test
     public void testWorkbasketInputDefinitionsAreCached() {
 
-        doReturn(workbasketInputFieldsDefinition).when(this.httpUIDefinitionGateway).getWorkbasketInputFieldsDefinitions(VERSION_1, ID_1);
+        doReturn(workbasketInputFieldsDefinition).when(this.httpUIDefinitionGateway)
+            .getWorkbasketInputFieldsDefinitions(VERSION_1, ID_1);
 
         uiDefinitionRepository.getWorkbasketInputDefinitions(ID_1);
         uiDefinitionRepository.getWorkbasketInputDefinitions(ID_1);
@@ -257,7 +264,8 @@ public class DefinitionsCachingIT {
     @Test
     public void testSearchInputDefinitionsAreCached() {
 
-        doReturn(searchInputFieldsDefinition).when(this.httpUIDefinitionGateway).getSearchInputFieldDefinitions(VERSION_1, ID_1);
+        doReturn(searchInputFieldsDefinition).when(this.httpUIDefinitionGateway)
+            .getSearchInputFieldDefinitions(VERSION_1, ID_1);
 
         uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);
         uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);

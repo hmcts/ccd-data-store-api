@@ -40,15 +40,19 @@ class DefaultGetCaseTypesOperationTestDefinition {
         testCaseTypeDefinition2 = newCaseType().build();
         testCaseTypeDefinition3 = newCaseType().build();
         defaultGetCaseTypesOperation = new DefaultGetCaseTypesOperation(caseTypeService);
-        testCaseTypeDefinitions = Lists.newArrayList(testCaseTypeDefinition1, testCaseTypeDefinition2, testCaseTypeDefinition3);
+        testCaseTypeDefinitions = Lists.newArrayList(testCaseTypeDefinition1, testCaseTypeDefinition2,
+            testCaseTypeDefinition3);
         doReturn(testCaseTypeDefinitions).when(caseTypeService).getCaseTypesForJurisdiction(JURISDICTION_ID);
     }
 
     @Test
     void shouldReturnCaseTypesRegardlessOfAccessParam() {
-        List<CaseTypeDefinition> createCaseTypeDefinitions = defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
-        List<CaseTypeDefinition> readCaseTypeDefinitions = defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
-        List<CaseTypeDefinition> updateCaseTypeDefinitions = defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
+        List<CaseTypeDefinition> createCaseTypeDefinitions =
+            defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
+        List<CaseTypeDefinition> readCaseTypeDefinitions =
+            defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
+        List<CaseTypeDefinition> updateCaseTypeDefinitions =
+            defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
 
         assertAll(
             () -> assertThat(createCaseTypeDefinitions, is(equalTo(readCaseTypeDefinitions))),

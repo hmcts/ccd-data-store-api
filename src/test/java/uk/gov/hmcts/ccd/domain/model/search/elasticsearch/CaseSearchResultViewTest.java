@@ -27,7 +27,8 @@ class CaseSearchResultViewTest {
         SearchResultViewHeaderGroup otherHeader = new SearchResultViewHeaderGroup(
             new HeaderGroupMetadata(JURISDICTION, "Other Case Type"), emptyList(), emptyList()
         );
-        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(Arrays.asList(otherHeader, correctHeader), emptyList(), 0L);
+        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(Arrays.asList(otherHeader, correctHeader),
+            emptyList(), 0L);
 
         Optional<SearchResultViewHeaderGroup> result = caseSearchResultView.findHeaderByCaseType(CASE_TYPE);
 
@@ -42,7 +43,8 @@ class CaseSearchResultViewTest {
         SearchResultViewHeaderGroup header = new SearchResultViewHeaderGroup(
             new HeaderGroupMetadata(JURISDICTION, CASE_TYPE), emptyList(), emptyList()
         );
-        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(Collections.singletonList(header), emptyList(), 0L);
+        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(Collections.singletonList(header),
+            emptyList(), 0L);
 
         Optional<SearchResultViewHeaderGroup> result = caseSearchResultView.findHeaderByCaseType("Other Case Type");
 
@@ -55,7 +57,8 @@ class CaseSearchResultViewTest {
     void shouldFindCaseByReference() {
         SearchResultViewItem item1 = new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
         SearchResultViewItem item2 = new SearchResultViewItem("222", Collections.emptyMap(), Collections.emptyMap());
-        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(emptyList(), Arrays.asList(item1, item2), 0L);
+        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(emptyList(), Arrays.asList(item1, item2),
+            0L);
 
         Optional<SearchResultViewItem> result = caseSearchResultView.findCaseByReference("222");
 
@@ -68,7 +71,8 @@ class CaseSearchResultViewTest {
     @Test
     void shouldNotFindNonExistingCase() {
         SearchResultViewItem item = new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
-        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(emptyList(), Collections.singletonList(item), 0L);
+        CaseSearchResultView caseSearchResultView =
+            new CaseSearchResultView(emptyList(), Collections.singletonList(item), 0L);
 
         Optional<SearchResultViewItem> result = caseSearchResultView.findCaseByReference("000");
 
@@ -79,9 +83,12 @@ class CaseSearchResultViewTest {
 
     @Test
     void shouldFindCasesByCaseType() {
-        SearchResultViewItem correctItem1 = new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
-        SearchResultViewItem correctItem2 = new SearchResultViewItem("222", Collections.emptyMap(), Collections.emptyMap());
-        SearchResultViewItem otherItem3 = new SearchResultViewItem("333", Collections.emptyMap(), Collections.emptyMap());
+        SearchResultViewItem correctItem1 =
+            new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
+        SearchResultViewItem correctItem2 =
+            new SearchResultViewItem("222", Collections.emptyMap(), Collections.emptyMap());
+        SearchResultViewItem otherItem3 =
+            new SearchResultViewItem("333", Collections.emptyMap(), Collections.emptyMap());
         SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
             new HeaderGroupMetadata(JURISDICTION, CASE_TYPE), emptyList(), Arrays.asList("111", "222")
         );

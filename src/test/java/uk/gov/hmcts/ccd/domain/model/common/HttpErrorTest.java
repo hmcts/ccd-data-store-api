@@ -105,8 +105,8 @@ public class HttpErrorTest {
     @Test
     public void shouldExtractPathFromRequest_useEncoding() {
 
-        // test to confirm RequestURI is encoded: to avoid Sonar java security issue 'S5131' when returning HttpError as
-        // a ResponseEntity in the RestExceptionHandler.
+        // test to confirm RequestURI is encoded: to avoid Sonar java security issue 'S5131' when returning HttpError
+        // as a ResponseEntity in the RestExceptionHandler.
 
         // ARRANGE
         String encoding = StandardCharsets.UTF_8.toString();
@@ -120,9 +120,12 @@ public class HttpErrorTest {
         final HttpError error = new HttpError(new IllegalArgumentException(MESSAGE), testRequest);
 
         // ASSERT
-        assertThat(error.getPath(), is(not(equalTo(pathNeedsEncoding)))); // check returned value different from original
-        assertThat(error.getPath(), is(equalTo(pathAfterEncoding))); // check returned value matches expected encoded path
-        assertThat(UriUtils.decode(error.getPath(), encoding), is(equalTo(pathNeedsEncoding))); // check decoded returned value is same as original
+        // check returned value different from original
+        assertThat(error.getPath(), is(not(equalTo(pathNeedsEncoding))));
+        // check returned value matches expected encoded path
+        assertThat(error.getPath(), is(equalTo(pathAfterEncoding)));
+        // check decoded returned value is same as original
+        assertThat(UriUtils.decode(error.getPath(), encoding), is(equalTo(pathNeedsEncoding)));
     }
 
     @Test

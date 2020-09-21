@@ -79,7 +79,8 @@ class DefaultCreateEventOperationTest {
 
         event = buildEvent();
         data = buildJsonNodeData();
-        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN).withIgnoreWarning(IGNORE_WARNING).build();
+        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING).build();
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(JURISDICTION_ID);
         final Version version = new Version();
@@ -125,7 +126,8 @@ class DefaultCreateEventOperationTest {
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertAll(
-            () -> verify(callbackInvoker).invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore, this.caseDetails),
+            () -> verify(callbackInvoker).invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore,
+                this.caseDetails),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),

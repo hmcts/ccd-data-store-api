@@ -98,7 +98,8 @@ class TextValidatorTest {
                                                .withMax(5)
                                                .build();
         final JsonNode valid_value = NODE_FACTORY.textNode("12345");
-        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, valid_value, caseFieldDefinition);
+        final List<ValidationResult> validMinMaxResults =
+            validator.validate(FIELD_ID, valid_value, caseFieldDefinition);
 
         // Test value over
         final JsonNode over_value = NODE_FACTORY.textNode("123456");
@@ -106,7 +107,8 @@ class TextValidatorTest {
 
         // Test value under
         final JsonNode under_value = NODE_FACTORY.textNode("1234");
-        final List<ValidationResult> underMinMaxResults = validator.validate(FIELD_ID, under_value, caseFieldDefinition);
+        final List<ValidationResult> underMinMaxResults =
+            validator.validate(FIELD_ID, under_value, caseFieldDefinition);
 
         assertAll(
             () -> assertThat("Expected valid input", validMinMaxResults, hasSize(0)),
@@ -147,7 +149,8 @@ class TextValidatorTest {
     @Test
     @DisplayName("should be valid when input is null text node")
     void nullTextValue() {
-        final List<ValidationResult> validationResult = validator.validate(FIELD_ID, new TextNode(null), caseFieldDefinition);
+        final List<ValidationResult> validationResult =
+            validator.validate(FIELD_ID, new TextNode(null), caseFieldDefinition);
         assertThat(validationResult, hasSize(0));
     }
 

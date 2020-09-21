@@ -66,7 +66,8 @@ class TextAreaValidatorTest {
 
     @Test
     void validate_shouldBeValidWhenEmptyString() {
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode(""), caseFieldDefinition);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode(""),
+            caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
@@ -84,7 +85,8 @@ class TextAreaValidatorTest {
     void validate_shouldNotBeValidWhenMinimumLengthRequirementNotMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(4).build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx"), caseFieldDefinition);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx"),
+            caseFieldDefinition);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getFieldId(), equalTo(FIELD_ID));
@@ -94,7 +96,8 @@ class TextAreaValidatorTest {
     void validate_shouldBeValidWhenMinimumLengthRequirementMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(4).build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx4"), caseFieldDefinition);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx4"),
+            caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
@@ -103,7 +106,8 @@ class TextAreaValidatorTest {
     void validate_shouldNotBeValidWhenMaximumLengthRequirementNotMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMax(4).build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx45"), caseFieldDefinition);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx45"),
+            caseFieldDefinition);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getFieldId(), equalTo(FIELD_ID));
@@ -113,7 +117,8 @@ class TextAreaValidatorTest {
     void validate_shouldBeValidWhenMaximumLengthRequirementMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMax(4).build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx"), caseFieldDefinition);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx"),
+            caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
@@ -122,7 +127,8 @@ class TextAreaValidatorTest {
     void validate_shouldNotBeValidWhenRegexRequirementNotMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("3232"), caseFieldDefinition);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("3232"),
+            caseFieldDefinition);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getFieldId(), equalTo(FIELD_ID));
@@ -141,7 +147,8 @@ class TextAreaValidatorTest {
 
     @Test
     void validate_shouldBeInvalidWhenValueProvidedIsNotText() {
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.numberNode(2), caseFieldDefinition);
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.numberNode(2),
+            caseFieldDefinition);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getFieldId(), equalTo(FIELD_ID));

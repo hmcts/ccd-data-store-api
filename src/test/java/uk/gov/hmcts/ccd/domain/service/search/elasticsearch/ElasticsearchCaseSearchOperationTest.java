@@ -369,7 +369,8 @@ class ElasticsearchCaseSearchOperationTest {
             Whitebox.setInternalState(response2, "searchResult", searchResult2);
             when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
 
-            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
+            when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
+                .thenReturn(caseDetailsDTO);
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
@@ -379,7 +380,8 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request1, request2);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(request1, request2);
 
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
@@ -389,7 +391,8 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getCaseTypesResults().size(), equalTo(2)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
-                () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                () -> verify(caseSearchRequestSecurity, times(2))
+                    .createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
 
     }
@@ -409,7 +412,8 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(request);
 
             assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }
@@ -434,7 +438,8 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+                .thenReturn(request);
 
             assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }
