@@ -11,7 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
@@ -20,7 +26,7 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
     private static final String ORG_CASES = "ORGCASES";
 
     @Inject
-    private HttpUIDefinitionGateway httpUIDefinitionGateway;
+    private uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway httpUIDefinitionGateway;
 
     @Test
     public void getDefinition() {

@@ -24,7 +24,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
     @Inject
     @Qualifier("default")
-    private SupplementaryDataRepository supplementaryDataRepository;
+    private uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository supplementaryDataRepository;
 
     @BeforeEach
     void setUp() {
@@ -32,7 +32,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldReplaceExistingSupplementaryData() {
         assumeDataInitialised();
         supplementaryDataRepository.setSupplementaryData("1504259907353529",
