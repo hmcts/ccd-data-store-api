@@ -1,4 +1,4 @@
-@F-120 @elasticsearch @Ignore
+@F-120 @elasticsearch
 Feature: F-120 Additional supplementary data property returned by ES Search APIs
 
   Background: Load test data for the scenario
