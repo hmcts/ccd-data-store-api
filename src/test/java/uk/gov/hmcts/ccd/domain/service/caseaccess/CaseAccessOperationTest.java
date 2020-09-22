@@ -79,7 +79,7 @@ class CaseAccessOperationTest {
     private SupplementaryDataRepository supplementaryDataRepository;
 
     @InjectMocks
-    private CaseAccessOperation caseAccessOperation;
+    private uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation caseAccessOperation;
 
 
     @BeforeEach
@@ -392,7 +392,8 @@ class CaseAccessOperationTest {
                 // CASE_REFERENCE_OTHER/CASE_ID_OTHER
                 // (2 orgs with 1 user each with multiple roles >> 2 org counts incremented by 1)
                 // (however 2nd org count will not be required as existing relationship added below **)
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE,
+                        ORGANISATION),
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_OTHER,
                     ORGANISATION),
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE,

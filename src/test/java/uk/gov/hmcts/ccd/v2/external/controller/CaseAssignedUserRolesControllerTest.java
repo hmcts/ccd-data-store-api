@@ -696,9 +696,12 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void buildIdLists_shouldReturnEmptyStringWhenNullPassed() {
             // ACT
-            String resultBuildCaseIds = uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(null);
-            String resultBuildUserIds = uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(null);
-            String resultBuildCaseRoles = uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(null);
+            String resultBuildCaseIds =
+                    uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(null);
+            String resultBuildUserIds =
+                    uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(null);
+            String resultBuildCaseRoles =
+                    uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(null);
 
             // ASSERT
             assertEquals("", resultBuildCaseIds);
@@ -710,11 +713,14 @@ class CaseAssignedUserRolesControllerTest {
         void buildIdLists_shouldReturnEmptyStringWhenNullListPassed() {
             // ACT
             String resultBuildCaseIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(new CaseAssignedUserRolesRequest(null));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
+                        new CaseAssignedUserRolesRequest(null));
             String resultBuildUserIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(new CaseAssignedUserRolesRequest(null));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
+                        new CaseAssignedUserRolesRequest(null));
             String resultBuildCaseRoles =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(new CaseAssignedUserRolesRequest(null));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
+                        new CaseAssignedUserRolesRequest(null));
 
             // ASSERT
             assertEquals("", resultBuildCaseIds);
@@ -726,11 +732,14 @@ class CaseAssignedUserRolesControllerTest {
         void buildIdLists_shouldReturnEmptyStringWhenEmptyListPassed() {
             // ACT
             String resultBuildCaseIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(createAddCaseAssignedUserRolesRequest(0));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
+                        createAddCaseAssignedUserRolesRequest(0));
             String resultBuildUserIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(createAddCaseAssignedUserRolesRequest(0));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
+                        createAddCaseAssignedUserRolesRequest(0));
             String resultBuildCaseRoles =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(createAddCaseAssignedUserRolesRequest(0));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
+                        createAddCaseAssignedUserRolesRequest(0));
 
             // ASSERT
             assertEquals("", resultBuildCaseIds);
@@ -742,11 +751,14 @@ class CaseAssignedUserRolesControllerTest {
         void buildIdLists_shouldReturnSimpleStringWhenSingleListItemPassed() {
             // ACT
             String resultBuildCaseIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(createAddCaseAssignedUserRolesRequest(1));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
+                        createAddCaseAssignedUserRolesRequest(1));
             String resultBuildUserIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(createAddCaseAssignedUserRolesRequest(1));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
+                        createAddCaseAssignedUserRolesRequest(1));
             String resultBuildCaseRoles =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(createAddCaseAssignedUserRolesRequest(1));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
+                        createAddCaseAssignedUserRolesRequest(1));
 
             // ASSERT
             assertEquals("1", resultBuildCaseIds); // test data is: count up
@@ -758,11 +770,14 @@ class CaseAssignedUserRolesControllerTest {
         void buildIdLists_shouldReturnCsvStringWhenManyListItemsPassed() {
             // ACT
             String resultBuildCaseIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(createAddCaseAssignedUserRolesRequest(3));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
+                        createAddCaseAssignedUserRolesRequest(3));
             String resultBuildCaseRoles =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(createAddCaseAssignedUserRolesRequest(3));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
+                        createAddCaseAssignedUserRolesRequest(3));
             String resultBuildUserIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(createAddCaseAssignedUserRolesRequest(3));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
+                        createAddCaseAssignedUserRolesRequest(3));
 
             // ASSERT
             assertEquals("1,2,3", resultBuildCaseIds); // test data is: count up
@@ -775,11 +790,14 @@ class CaseAssignedUserRolesControllerTest {
             // ACT
             // NB: max list size is 10 (u.g.h.c.a.a.AuditContext.MAX_CASE_IDS_LIST)
             String resultBuildCaseIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(createAddCaseAssignedUserRolesRequest(11));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseIds(
+                        createAddCaseAssignedUserRolesRequest(11));
             String resultBuildCaseRoles =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(createAddCaseAssignedUserRolesRequest(11));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildCaseRoles(
+                        createAddCaseAssignedUserRolesRequest(11));
             String resultBuildUserIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(createAddCaseAssignedUserRolesRequest(11));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildUserIds(
+                        createAddCaseAssignedUserRolesRequest(11));
 
             // ASSERT
             assertEquals("1,2,3,4,5,6,7,8,9,10", resultBuildCaseIds); // test data is: count up
@@ -790,7 +808,8 @@ class CaseAssignedUserRolesControllerTest {
         @Test
         void buildOptionalIds_shouldReturnEmptyStringWhenEmptyPassed() {
             // ACT
-            String resultBuildOptionalIds = uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildOptionalIds(Optional.empty());
+            String resultBuildOptionalIds = uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController
+                    .buildOptionalIds(Optional.empty());
 
             // ASSERT
             assertEquals("", resultBuildOptionalIds);
@@ -800,7 +819,8 @@ class CaseAssignedUserRolesControllerTest {
         void buildOptionalIds_shouldReturnEmptyStringWhenEmptyListPassed() {
             // ACT
             String resultBuildOptionalIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildOptionalIds(Optional.of(new ArrayList<>()));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildOptionalIds(Optional.of(
+                        new ArrayList<>()));
 
             // ASSERT
             assertEquals("", resultBuildOptionalIds);
@@ -810,7 +830,8 @@ class CaseAssignedUserRolesControllerTest {
         void buildOptionalIds_shouldReturnSimpleStringWhenSingleListItemPassed() {
             // ACT
             String resultBuildOptionalIds =
-                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildOptionalIds(Optional.of(Lists.newArrayList("1")));
+                uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.buildOptionalIds(Optional.of(
+                        Lists.newArrayList("1")));
 
             // ASSERT
             assertEquals("1", resultBuildOptionalIds);

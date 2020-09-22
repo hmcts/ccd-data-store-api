@@ -313,6 +313,7 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
     public void handleCaseValidationException_shouldReturnHttpErrorResponse_withFieldErrors_returnsWithDetails_includeFieldNamesAndMessages() throws Exception {
 
         // ARRANGE
@@ -335,6 +336,7 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
     public void handleCaseValidationException_shouldLogExceptionAsWarning_withFieldErrors_includeFieldNamesButNotMessages() throws Exception {
 
         // ARRANGE
@@ -360,6 +362,7 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
     public void handleCaseValidationException_shouldTrackExceptionToAppInsightsAsWarning_withFieldErrors_includeFieldNamesButNotMessages() throws Exception {
 
         // ARRANGE

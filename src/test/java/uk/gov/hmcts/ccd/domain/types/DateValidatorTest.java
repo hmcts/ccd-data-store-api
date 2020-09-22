@@ -146,8 +146,8 @@ class DateValidatorTest {
         @Test
         @DisplayName("should not accept date: 2001-02-29Z")
         void shouldNotAcceptNotDayLeapYear() {
-            final List<ValidationResult> result = validator.validate(FIELD_ID,
-                                                                     NODE_FACTORY.textNode("2001-02-29Z"), caseFieldDefinition);
+            final List<ValidationResult> result =
+                    validator.validate(FIELD_ID, NODE_FACTORY.textNode("2001-02-29Z"), caseFieldDefinition);
             assertAll(
                 () -> assertEquals(1, result.size()),
                 () -> assertEquals("Date or Time entered is not valid", result.get(0).getErrorMessage())

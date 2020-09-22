@@ -1348,7 +1348,8 @@ class CompoundAccessControlServiceTest {
             String p2 = existingPersonStart + name + personEnd;
             JsonNode newData = generatePeopleDataWithPerson(p2); // i.e. with deleted BirthInfo
 
-            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES),
+                    is(true));
         }
 
         @Test

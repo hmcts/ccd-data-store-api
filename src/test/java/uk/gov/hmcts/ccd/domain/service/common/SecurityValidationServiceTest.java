@@ -17,7 +17,9 @@ import java.util.Map;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
@@ -619,7 +621,8 @@ class SecurityValidationServiceTest {
                                                               aClassificationBuilder()
                                                                   .withData("value",
                                                                             aClassificationBuilder()
-                                                                                .withData("field2", getTextNode("PRIVATE"))
+                                                                                .withData("field2",
+                                                                                        getTextNode("PRIVATE"))
                                                                                 .buildAsNode())
                                                                   .withData("id", getTextNode("someId1"))
                                                                   .buildAsMap()))

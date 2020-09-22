@@ -50,6 +50,7 @@ class CreatorGetCaseOperationTest {
 
         @Test
         @DisplayName("Should return an Optional containing the case if the case is visible")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsTrue_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(true);
             assertCaseDetailsPresent(true, true,JURISDICTION_ID, CASE_TYPE_ID,
@@ -59,6 +60,7 @@ class CreatorGetCaseOperationTest {
 
         @Test
         @DisplayName("Should return an empty optional if case is not visible")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsFalse_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(false);
             assertCaseDetailsPresent(false, true,JURISDICTION_ID, CASE_TYPE_ID,
@@ -82,6 +84,7 @@ class CreatorGetCaseOperationTest {
 
         @Test
         @DisplayName("Should return an Optional containing the case if the case is visible")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsTrue_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(true);
             assertCaseDetailsPresent(true, true, JURISDICTION_ID);
@@ -89,6 +92,7 @@ class CreatorGetCaseOperationTest {
 
         @Test
         @DisplayName("Should return an empty optional if case is not visible")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsFalse_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(false);
             assertCaseDetailsPresent(false, true, JURISDICTION_ID);

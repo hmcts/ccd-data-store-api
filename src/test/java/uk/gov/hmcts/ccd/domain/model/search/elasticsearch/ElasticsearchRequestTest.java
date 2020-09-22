@@ -9,7 +9,9 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ElasticsearchRequestTest {
 
@@ -18,7 +20,8 @@ class ElasticsearchRequestTest {
     @Test
     void hasSourceFieldsShouldReturnFalseWhenSourceIsMissing() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"query\":{\"match_all\": {}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -26,7 +29,8 @@ class ElasticsearchRequestTest {
     @Test
     void hasSourceFieldsShouldReturnTrueWhenSourceIsProvided() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.Field\"],\"query\":{\"match_all\": {}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertTrue(elasticsearchRequest.hasSourceFields());
     }
@@ -34,7 +38,8 @@ class ElasticsearchRequestTest {
     @Test
     void hasSourceFieldsShouldReturnFalseWhenSourceIsEmpty() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[],\"query\":{\"match_all\": {}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -42,7 +47,8 @@ class ElasticsearchRequestTest {
     @Test
     void hasSourceFieldsShouldReturnFalseWhenSourceOnlyHasWildcard() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"*\"],\"query\":{\"match_all\": {}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -50,7 +56,8 @@ class ElasticsearchRequestTest {
     @Test
     void hasSourceFieldsShouldReturnFalseWhenSourceIsFalse() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\": false,\"query\":{\"match_all\": {}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -58,7 +65,8 @@ class ElasticsearchRequestTest {
     @Test
     void hasSourceFieldsShouldReturnFalseWhenSourceIsTrue() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\": true,\"query\":{\"match_all\": {}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -67,7 +75,8 @@ class ElasticsearchRequestTest {
     void shouldReturnRequestedFieldsAsCaseFieldIds() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.CaseDataField\",\"reference\",\"state\","
                                              + "\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         List<String> requestedFields = elasticsearchRequest.getRequestedFields();
 
@@ -82,8 +91,10 @@ class ElasticsearchRequestTest {
 
     @Test
     void shouldOnlyReturnRequestedMetadataFieldsThatExist() throws JsonProcessingException {
-        JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"reference\",\"INVALID\"],\"query\":{\"match_all\": {}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+        JsonNode queryNode =
+                queryAsJsonNode("{\"_source\":[\"reference\",\"INVALID\"],\"query\":{\"match_all\": {}}}");
+        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         List<String> requestedFields = elasticsearchRequest.getRequestedFields();
 
@@ -96,7 +107,8 @@ class ElasticsearchRequestTest {
     @Test
     void shouldReturnNoRequestedFieldsWhenOnlyWildcardIsRequested() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"*\"],\"query\":{\"match_all\": {}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         List<String> requestedFields = elasticsearchRequest.getRequestedFields();
 

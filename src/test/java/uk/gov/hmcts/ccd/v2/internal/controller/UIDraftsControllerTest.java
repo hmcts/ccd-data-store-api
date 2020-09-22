@@ -101,7 +101,8 @@ class UIDraftsControllerTest {
             when(upsertDraftOperation.executeUpdate(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT))
                 .thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT));
+            assertThrows(Exception.class, () ->
+                    draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT));
         }
     }
 

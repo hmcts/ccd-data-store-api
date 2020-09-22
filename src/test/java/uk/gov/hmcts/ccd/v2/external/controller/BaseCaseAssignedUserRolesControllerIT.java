@@ -162,7 +162,8 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES.getLabel()));
+        assertThat(captor.getValue().getOperationType(),
+                is(AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES.getLabel()));
         assertThat(captor.getValue().getHttpStatus(), is(status.value()));
         assertThat(captor.getValue().getPath(), is(postCaseAssignedUserRoles));
         assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.POST.name()));

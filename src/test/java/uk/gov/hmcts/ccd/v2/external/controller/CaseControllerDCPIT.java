@@ -20,8 +20,6 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -99,7 +97,8 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
 
         assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
-        uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = mapper.readValue(content, uk.gov.hmcts.ccd.v2.external.resource.CaseResource.class);
+        uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                mapper.readValue(content, uk.gov.hmcts.ccd.v2.external.resource.CaseResource.class);
 
         Map<String, JsonNode> data = caseResource.getData();
 
@@ -133,7 +132,8 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
 
         assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
-        uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = mapper.readValue(content, uk.gov.hmcts.ccd.v2.external.resource.CaseResource.class);
+        uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                mapper.readValue(content, uk.gov.hmcts.ccd.v2.external.resource.CaseResource.class);
 
         Map<String, JsonNode> data = caseResource.getData();
 
@@ -185,7 +185,9 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
             .andReturn();
 
         String startTriggerContent = startTriggerResult.getResponse().getContentAsString();
-        uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource caseUpdateViewEventResource = mapper.readValue(startTriggerContent, uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.class);
+        uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource caseUpdateViewEventResource =
+                mapper.readValue(startTriggerContent,
+                        uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.class);
         return caseUpdateViewEventResource.getCaseUpdateViewEvent().getEventToken();
     }
 

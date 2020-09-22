@@ -1535,8 +1535,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String caseTypeUrlPortion = "bookcase-default-post-state";
         final String caseReference = "1557845948403939";
-        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
-            + "/cases/" + caseReference + "/events";
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+                + caseTypeUrlPortion + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference,
             TEST_EVENT_ID);
@@ -3267,8 +3267,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 () -> assertThat(nodeData.has("PersonFirstName"), CoreMatchers.is(false)),
                 () -> assertThat(nodeData.get("PersonLastName"), CoreMatchers.is(getTextNode("Parker"))),
                 () -> assertThat(nodeData.has("PersonAddress"), CoreMatchers.is(true)),
-                () -> assertThat(nodeData.get("PersonAddress").get("Country"), CoreMatchers.
-                    is(getTextNode("England"))),
+                () -> assertThat(nodeData.get("PersonAddress").get("Country"), CoreMatchers
+                    .is(getTextNode("England"))),
                 () -> assertThat(nodeData.get("PersonAddress").get("Postcode"), CoreMatchers
                     .is(getTextNode("HX08 5TG"))),
                 () -> assertThat(nodeData.get("PersonAddress").get("AddressLine1"), CoreMatchers

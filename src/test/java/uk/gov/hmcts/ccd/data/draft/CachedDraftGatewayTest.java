@@ -58,7 +58,8 @@ class CachedDraftGatewayTest {
         doReturn(draftResponse).when(defaultDraftGateway).update(updateCaseDraftRequest, draftIdS);
         doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
 
-        cachedDraftGateway = new uk.gov.hmcts.ccd.data.draft.CachedDraftGateway(defaultDraftGateway, draftResponseToCaseDetailsBuilder);
+        cachedDraftGateway = new uk.gov.hmcts.ccd.data.draft.CachedDraftGateway(defaultDraftGateway,
+                draftResponseToCaseDetailsBuilder);
     }
 
     @Nested

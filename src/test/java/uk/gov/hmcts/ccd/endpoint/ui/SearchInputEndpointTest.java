@@ -20,7 +20,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class SearchInputEndpointTest extends WireMockBaseTest {
-    private static final String URL = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/inputs";
+    private static final String URL =
+            "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/inputs";
 
     @Inject
     private WebApplicationContext wac;
@@ -44,7 +45,8 @@ public class SearchInputEndpointTest extends WireMockBaseTest {
                 .andExpect(status().is(200))
                 .andReturn();
 
-        final SearchInput[] searchInputs = mapper.readValue(result.getResponse().getContentAsString(), SearchInput[].class);
+        final SearchInput[] searchInputs =
+                mapper.readValue(result.getResponse().getContentAsString(), SearchInput[].class);
 
         assertEquals("First Name", searchInputs[0].getLabel());
         assertEquals(1, searchInputs[0].getOrder());

@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -34,70 +34,80 @@ public class HttpErrorTest {
 
     @Test
     public void shouldExtractExceptionNameFromException() {
-        final HttpError error = new HttpError(new IllegalArgumentException(), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(), request);
 
         assertThat(error.getException(), is(equalTo("java.lang.IllegalArgumentException")));
     }
 
     @Test
     public void shouldExtractTimestampFromException() {
-        final HttpError error = new HttpError(new IllegalArgumentException(), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(), request);
 
         assertThat(error.getTimestamp(), is(notNullValue()));
     }
 
     @Test
     public void shouldExtractStatusFromExceptionAnnotation_withCode() {
-        final HttpError error = new HttpError(new TestCodeStatusException(), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new TestCodeStatusException(), request);
 
         assertThat(error.getStatus(), is(equalTo(415)));
     }
 
     @Test
     public void shouldExtractStatusFromExceptionAnnotation_withValue() {
-        final HttpError error = new HttpError(new TestValueStatusException(), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new TestValueStatusException(), request);
 
         assertThat(error.getStatus(), is(equalTo(404)));
     }
 
     @Test
     public void shouldExtractStatusFromExceptionAnnotation_default() {
-        final HttpError error = new HttpError(new NullPointerException(), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new NullPointerException(), request);
 
-        assertThat(error.getStatus(), is(equalTo(HttpError.DEFAULT_STATUS)));
+        assertThat(error.getStatus(), is(equalTo(uk.gov.hmcts.ccd.domain.model.common.HttpError.DEFAULT_STATUS)));
     }
 
     @Test
     public void shouldExtractErrorFromExceptionAnnotation_withReason() {
-        final HttpError error = new HttpError(new TestReasonException(), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new TestReasonException(), request);
 
         assertThat(error.getError(), is(equalTo("Some error reason")));
     }
 
     @Test
     public void shouldExtractErrorFromExceptionAnnotation_withStatus() {
-        final HttpError error = new HttpError(new TestCodeStatusException(), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new TestCodeStatusException(), request);
 
         assertThat(error.getError(), is(equalTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase())));
     }
 
     @Test
     public void shouldExtractErrorFromExceptionAnnotation_default() {
-        final HttpError error = new HttpError(new IllegalArgumentException(), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(), request);
 
-        assertThat(error.getError(), is(equalTo(HttpError.DEFAULT_ERROR)));
+        assertThat(error.getError(), is(equalTo(uk.gov.hmcts.ccd.domain.model.common.HttpError.DEFAULT_ERROR)));
     }
 
     @Test
     public void shouldExtractMessageFromException() {
-        final HttpError error = new HttpError(new IllegalArgumentException(MESSAGE), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(MESSAGE), request);
 
         assertThat(error.getMessage(), is(equalTo(MESSAGE)));
     }
 
     @Test
     public void shouldExtractPathFromRequest() {
-        final HttpError error = new HttpError(new IllegalArgumentException(MESSAGE), request);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(MESSAGE), request);
 
         assertThat(error.getPath(), is(equalTo(PATH)));
     }
@@ -117,7 +127,8 @@ public class HttpErrorTest {
         doReturn(pathNeedsEncoding).when(testRequest).getRequestURI();
 
         // ACT
-        final HttpError error = new HttpError(new IllegalArgumentException(MESSAGE), testRequest);
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(MESSAGE), testRequest);
 
         // ASSERT
         // check returned value different from original
@@ -130,7 +141,9 @@ public class HttpErrorTest {
 
     @Test
     public void shouldTakeOptionalDetails() {
-        final HttpError<String> error = new HttpError<String>(new IllegalArgumentException(MESSAGE), request)
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError<String> error =
+                new uk.gov.hmcts.ccd.domain.model.common.HttpError<String>(new IllegalArgumentException(MESSAGE),
+                        request)
             .withDetails(DETAILS);
 
         assertThat(error.getDetails(), is(equalTo(DETAILS)));

@@ -54,7 +54,9 @@ class StartEventResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource = new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning, false);
+            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning,
+                            false);
 
             assertAll(
                 () -> assertThat(startEventResource.getEventId(), equalTo(EVENT_ID.toString())),
@@ -91,7 +93,8 @@ class StartEventResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource = new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning, true);
+            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning, true);
 
             assertAll(
                 () -> assertThat(startEventResource.getEventId(), equalTo(EVENT_ID.toString())),
@@ -103,7 +106,8 @@ class StartEventResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource = new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning, true);
+            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning, true);
 
             Optional<Link> self = startEventResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_EVENT));

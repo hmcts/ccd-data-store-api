@@ -26,11 +26,40 @@ import java.util.Map;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_LINE_1;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_PRIVATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_PUBLIC;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_RESTRICTED;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_SOLICITOR;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST2_PUBLIC;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST_1;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST_2;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_A;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_B;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_C;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_D;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_NESTED_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_TEXT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.EMAIL_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.IN_PROGRESS_STATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.MULTI_SELECT_LIST_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_COLLECTION_TEXT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.POST_CODE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseTypesParam;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
 
 class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 

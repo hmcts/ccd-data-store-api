@@ -183,7 +183,8 @@ class DateTimeSearchInputProcessorTest {
         when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020"))
             .thenReturn("2020-01-01T00:00:00.000");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result =
+                dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -299,7 +300,8 @@ class DateTimeSearchInputProcessorTest {
         queryParams.put("ComplexField.OtherNestedField", "2005-05-05");
         queryParams.put("CollectionField.0.value", "2006-06-06");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result =
+                dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         verifyNoMoreInteractions(dateTimeFormatParser);
         assertAll(

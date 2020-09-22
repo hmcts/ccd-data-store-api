@@ -62,7 +62,8 @@ class CaseResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails);
 
             assertAll(
                 () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
@@ -87,7 +88,8 @@ class CaseResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails);
 
             Optional<Link> self = caseResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelf));
@@ -103,7 +105,8 @@ class CaseResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent);
 
             assertAll(
                 () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
@@ -128,7 +131,8 @@ class CaseResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent);
 
             Optional<Link> self = caseResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelf));
@@ -145,7 +149,9 @@ class CaseResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent, IGNORE_WARNING);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent,
+                            IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
@@ -170,7 +176,9 @@ class CaseResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource = new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent, IGNORE_WARNING);
+            final uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent,
+                            IGNORE_WARNING);
 
             Optional<Link> self = caseResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(linkSelf));
