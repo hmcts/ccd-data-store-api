@@ -119,6 +119,11 @@
     "TextField": "PUBLIC",
     "YesOrNoField": "PUBLIC"
   },
+  "supplementary_data": {
+    "SDField1": "SDField1Value",
+    "SDField2": "SDField2Value",
+    "SDField3": "SDField3Value"
+  },
   "jurisdiction": "AUTOTEST1",
   "last_modified": "2020-06-09T13:17:06.542Z",
   "last_state_modified_date": "2020-05-07T17:42:00.527Z",

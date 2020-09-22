@@ -1,10 +1,14 @@
 package uk.gov.hmcts.ccd;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.Builder;
 import lombok.Singular;
 import org.apache.commons.io.IOUtils;
@@ -26,6 +30,8 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDEX_TYPE;
 import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDICES;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SORT;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SORT;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 
@@ -85,6 +91,8 @@ public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
         private Integer size;
         @JsonProperty
         private Integer from;
+        @JsonIgnore
+        private List<String> supplementaryData;
 
         private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -94,7 +102,20 @@ public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
         }
 
         public String toJsonString() throws JsonProcessingException {
-            return objectMapper.writeValueAsString(this);
+            if (supplementaryData == null) {
+                return objectMapper.writeValueAsString(this);
+            }
+
+            return toJsonStringWithSupplementaryData();
+        }
+
+        private String toJsonStringWithSupplementaryData() throws JsonProcessingException {
+            ArrayNode supplementaryDataNode = objectMapper.createArrayNode();
+            supplementaryData.forEach(sd -> supplementaryDataNode.add(new TextNode(sd)));
+            ObjectNode request = objectMapper.createObjectNode();
+            request.set("native_es_query", objectMapper.readTree(objectMapper.writeValueAsString(this)));
+            request.set("supplementary_data", supplementaryDataNode);
+            return request.toString();
         }
     }
 }

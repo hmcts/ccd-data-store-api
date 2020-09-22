@@ -4,11 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -26,6 +21,12 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -372,6 +373,7 @@ class DefaultValidateCaseFieldsOperationTest {
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition.setDefaultValue(defaultValue);
+        caseEventFieldComplexDefinition.setRetainHiddenValue(Boolean.FALSE);
         caseEventFieldComplexDefinition.setReference(ORGANISATION_POLICY_ROLE);
 
         caseEventFieldComplexDefinitions.add(caseEventFieldComplexDefinition);
@@ -422,6 +424,7 @@ class DefaultValidateCaseFieldsOperationTest {
 
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition1 = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition1.setDefaultValue(defaultValue1);
+        caseEventFieldComplexDefinition1.setRetainHiddenValue(Boolean.FALSE);
         caseEventFieldComplexDefinition1.setReference(reference1);
 
         caseEventFieldComplexDefinitions1.add(caseEventFieldComplexDefinition1);
@@ -436,6 +439,7 @@ class DefaultValidateCaseFieldsOperationTest {
 
         final CaseEventFieldComplexDefinition caseEventFieldComplexDefinition2 = new CaseEventFieldComplexDefinition();
         caseEventFieldComplexDefinition2.setDefaultValue(defaultValue2);
+        caseEventFieldComplexDefinition2.setRetainHiddenValue(Boolean.FALSE);
         caseEventFieldComplexDefinition2.setReference(reference2);
         caseEventFieldComplexDefinitions2.add(caseEventFieldComplexDefinition2);
         caseEventFieldDefinition2.setCaseEventFieldComplexDefinitions(caseEventFieldComplexDefinitions2);

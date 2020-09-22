@@ -203,7 +203,7 @@ public class CaseSearchResultViewGenerator {
             caseTypeDefinition.getLabelsFromCaseFields()
         );
 
-        return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields));
+        return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields), caseDetails.getSupplementaryData());
     }
 
     private Map<String, Object> prepareData(SearchResultDefinition searchResult,

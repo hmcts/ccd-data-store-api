@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 public class CaseSearchRequest {
 
     private final String caseTypeId;
-    ElasticsearchRequest elasticsearchRequest;
+    private ElasticsearchRequest elasticsearchRequest;
 
     public CaseSearchRequest(String caseTypeId, ElasticsearchRequest elasticsearchRequest) {
         this.caseTypeId = caseTypeId;
@@ -46,7 +46,7 @@ public class CaseSearchRequest {
     }
 
     public String toJsonString() {
-        String jsonString = elasticsearchRequest.toJson();
+        String jsonString = elasticsearchRequest.toFinalRequest();
         log.debug("json search request: {}", jsonString);
         return jsonString;
     }

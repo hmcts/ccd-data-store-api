@@ -1,18 +1,17 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService.ROOT;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService.ROOT;
 
 @Named
 @Singleton
@@ -38,6 +37,7 @@ public class CaseViewFieldBuilder {
         field.setShowCondition(eventFieldDefinition.getShowCondition());
         field.setShowSummaryChangeOption(eventFieldDefinition.getShowSummaryChangeOption());
         field.setShowSummaryContentOption(eventFieldDefinition.getShowSummaryContentOption());
+        field.setRetainHiddenValue(eventFieldDefinition.getRetainHiddenValue());
         field.setAccessControlLists(caseFieldDefinition.getAccessControlLists());
         field.setMetadata(caseFieldDefinition.isMetadata());
         field.setFormattedValue(caseFieldDefinition.getFormattedValue());

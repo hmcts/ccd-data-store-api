@@ -128,9 +128,8 @@ class ElasticsearchSortServiceTest {
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
-                is("{\"query\":{},\"sort\":[{\"jurisdiction.keyword\":\"ASC\"},{\"last_modified\":\"DESC\"},"
-                    + "\"created_date\"]}"))
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
+                is("{\"query\":{},\"sort\":[{\"jurisdiction.keyword\":\"ASC\"},{\"last_modified\":\"DESC\"},\"created_date\"]}"))
         );
     }
 
@@ -152,7 +151,7 @@ class ElasticsearchSortServiceTest {
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, WORKBASKET);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
                 is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"},{\"data.DateField\":\"DESC\"},"
                    + "{\"data.CollectionTextField.value.keyword\":\"DESC\"},"
                     + "{\"data.CollectionDateField.value\":\"ASC\"},\"created_date\"]}"))
@@ -170,7 +169,7 @@ class ElasticsearchSortServiceTest {
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
                 is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"},\"created_date\"]}"))
         );
     }
@@ -184,7 +183,7 @@ class ElasticsearchSortServiceTest {
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
                 is("{\"query\":{},\"sort\":[\"created_date\"]}"))
         );
     }

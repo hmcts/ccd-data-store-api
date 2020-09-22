@@ -65,6 +65,7 @@
 			"data_classification": {
 				"_extends_": "Standard_Full_Case_Data_Classification"
 			},
+			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,

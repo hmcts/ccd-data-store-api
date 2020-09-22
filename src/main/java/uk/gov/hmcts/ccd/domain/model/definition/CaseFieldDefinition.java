@@ -1,11 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,9 +14,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.swagger.annotations.ApiModel;
-import lombok.ToString;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @ToString
 @ApiModel(description = "")
@@ -52,6 +51,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private String displayContext;
     @JsonProperty("display_context_parameter")
     private String displayContextParameter;
+    @JsonProperty("retain_hidden_value")
+    private Boolean retainHiddenValue;
     @JsonProperty("formatted_value")
     private Object formattedValue;
     @JsonProperty("default_value")
@@ -198,6 +199,14 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     @Override
     public void setDisplayContextParameter(String displayContextParameter) {
         this.displayContextParameter = displayContextParameter;
+    }
+
+    public Boolean getRetainHiddenValue() {
+        return retainHiddenValue;
+    }
+
+    public void setRetainHiddenValue(Boolean retainHiddenValue) {
+        this.retainHiddenValue = retainHiddenValue;
     }
 
     @Override

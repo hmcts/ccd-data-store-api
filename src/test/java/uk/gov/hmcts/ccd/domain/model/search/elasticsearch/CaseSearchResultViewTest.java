@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -66,11 +67,9 @@ class CaseSearchResultViewTest {
 
     @Test
     void shouldFindCaseByReference() {
-        SearchResultViewItem item1 = new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
-        SearchResultViewItem item2 = new SearchResultViewItem("222", Collections.emptyMap(), Collections.emptyMap());
-        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView caseSearchResultView =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView(emptyList(),
-                        Arrays.asList(item1, item2), 0L);
+        SearchResultViewItem item1 = new SearchResultViewItem("111", emptyMap(), emptyMap(), emptyMap());
+        SearchResultViewItem item2 = new SearchResultViewItem("222", emptyMap(), emptyMap(), emptyMap());
+        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(emptyList(), Arrays.asList(item1, item2), 0L);
 
         Optional<SearchResultViewItem> result = caseSearchResultView.findCaseByReference("222");
 
@@ -82,10 +81,8 @@ class CaseSearchResultViewTest {
 
     @Test
     void shouldNotFindNonExistingCase() {
-        SearchResultViewItem item = new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
-        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView caseSearchResultView =
-            new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView(emptyList(),
-                    Collections.singletonList(item), 0L);
+        SearchResultViewItem item = new SearchResultViewItem("111", emptyMap(), emptyMap(), emptyMap());
+        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(emptyList(), Collections.singletonList(item), 0L);
 
         Optional<SearchResultViewItem> result = caseSearchResultView.findCaseByReference("000");
 
@@ -96,16 +93,11 @@ class CaseSearchResultViewTest {
 
     @Test
     void shouldFindCasesByCaseType() {
-        SearchResultViewItem correctItem1 =
-            new SearchResultViewItem("111", Collections.emptyMap(), Collections.emptyMap());
-        SearchResultViewItem correctItem2 =
-            new SearchResultViewItem("222", Collections.emptyMap(), Collections.emptyMap());
-        SearchResultViewItem otherItem3 =
-            new SearchResultViewItem("333", Collections.emptyMap(), Collections.emptyMap());
-        uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup correctHeader =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup(
-            new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
-                        emptyList(), Arrays.asList("111", "222")
+        SearchResultViewItem correctItem1 = new SearchResultViewItem("111", emptyMap(), emptyMap(), emptyMap());
+        SearchResultViewItem correctItem2 = new SearchResultViewItem("222", emptyMap(), emptyMap(), emptyMap());
+        SearchResultViewItem otherItem3 = new SearchResultViewItem("333", emptyMap(), emptyMap(), emptyMap());
+        SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
+            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE), emptyList(), Arrays.asList("111", "222")
         );
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup otherHeader =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup(

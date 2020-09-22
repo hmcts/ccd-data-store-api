@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.NATIVE_ES_QUERY;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,6 +48,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
                 objectMapperService);
         when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
+        when(searchRequestJsonNode.has(NATIVE_ES_QUERY)).thenReturn(false);
     }
 
     @Test

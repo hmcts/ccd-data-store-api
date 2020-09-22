@@ -34,6 +34,9 @@ public class CaseDetailsMapper {
             caseDetails.setData(JacksonUtils.convertValue(caseDetailsEntity.getData()));
             caseDetails.setDataClassification(JacksonUtils.convertValue(caseDetailsEntity.getDataClassification()));
         }
+        if (caseDetailsEntity.getSupplementaryData() != null) {
+            caseDetails.setSupplementaryData(JacksonUtils.convertValue(caseDetailsEntity.getSupplementaryData()));
+        }
         return caseDetails;
     }
 
@@ -64,6 +67,9 @@ public class CaseDetailsMapper {
             newCaseDetailsEntity.setData(JacksonUtils.convertValueJsonNode(caseDetails.getData()));
             newCaseDetailsEntity.setDataClassification(
                 JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()));
+        }
+        if (caseDetails.getSupplementaryData() != null) {
+            newCaseDetailsEntity.setSupplementaryData(JacksonUtils.convertValueJsonNode(caseDetails.getSupplementaryData()));
         }
         return newCaseDetailsEntity;
     }
