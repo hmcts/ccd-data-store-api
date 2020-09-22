@@ -47,7 +47,7 @@ elasticsearch:
       - es-${SERVICE_FQDN}
 logstash:
   image:
-    repository: hmcts/ccd-logstash
+    repository: hmctspublic.azurecr.io/ccd/logstash
     tag: latest
     pullPolicy: IfNotPresent
   logstashJavaOpts: -Xmx1g -Xms512M
