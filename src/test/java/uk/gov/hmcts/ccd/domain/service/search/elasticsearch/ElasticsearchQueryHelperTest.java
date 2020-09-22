@@ -136,7 +136,8 @@ class ElasticsearchQueryHelperTest {
             elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
 
         assertAll(
-            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an array of text fields."))
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an"
+                    + " array of text fields."))
         );
     }
 
@@ -148,7 +149,8 @@ class ElasticsearchQueryHelperTest {
             elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
 
         assertAll(
-            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an array of text fields."))
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an"
+                    + " array of text fields."))
         );
     }
 

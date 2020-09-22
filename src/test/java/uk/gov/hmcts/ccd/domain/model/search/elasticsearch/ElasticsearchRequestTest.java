@@ -133,8 +133,9 @@ class ElasticsearchRequestTest {
 
     @Test
     void shouldHandleWrappedQueryFormatWithSupplementaryData() throws JsonProcessingException {
-        JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"_source\":[\"data.CaseDataField\",\"reference\",\"state\","
-            + "\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}},\"supplementary_data\":[\"SupDataField\"]}");
+        JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"_source\":[\"data.CaseDataField\","
+              + "\"reference\",\"state\",\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}},"
+               + "\"supplementary_data\":[\"SupDataField\"]}");
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertAll(
@@ -163,19 +164,22 @@ class ElasticsearchRequestTest {
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(), is("{\"_source\":[\"data.name\"],\"query\":{}}")),
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
+                    is("{\"_source\":[\"data.name\"],\"query\":{}}")),
             () -> assertThat(elasticsearchRequest.hasRequestedSupplementaryData(), is(false))
         );
     }
 
     @Test
     void shouldSetSupplementaryData() throws Exception {
-        JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}");
+        JsonNode queryNode =
+                queryAsJsonNode("{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}");
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertAll(
             () -> assertThat(elasticsearchRequest.hasRequestedSupplementaryData(), is(true)),
-            () -> assertThat(elasticsearchRequest.getRequestedSupplementaryData().toString(), is("[\"Field1\",\"Field2\"]"))
+            () -> assertThat(elasticsearchRequest.getRequestedSupplementaryData().toString(),
+                    is("[\"Field1\",\"Field2\"]"))
         );
     }
 
@@ -183,7 +187,8 @@ class ElasticsearchRequestTest {
     void shouldSetMetadataFieldsArrayNode() throws Exception {
         ArrayNode result = ElasticsearchRequest.METADATA_FIELDS;
 
-        List<String> resultAsList = new ObjectMapper().readValue(result.traverse(), new TypeReference<ArrayList<String>>(){});
+        List<String> resultAsList =
+                new ObjectMapper().readValue(result.traverse(), new TypeReference<ArrayList<String>>(){});
         assertAll(
             () -> assertThat(result.size(), is(9)),
             () -> assertThat(resultAsList, hasItem(CASE_REFERENCE.getDbColumnName())),
@@ -210,7 +215,8 @@ class ElasticsearchRequestTest {
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
-            List<String> sourceFields = new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+            List<String> sourceFields =
+                    new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
 
             assertAll(
                 () -> assertThat(sourceFields.size(), is(10)),
@@ -236,7 +242,8 @@ class ElasticsearchRequestTest {
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
-            List<String> sourceFields = new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+            List<String> sourceFields =
+                    new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
 
             assertAll(
                 () -> assertThat(sourceFields.size(), is(10)),
@@ -255,14 +262,16 @@ class ElasticsearchRequestTest {
 
         @Test
         void shouldSetSourceFieldsWhenSupplementaryDataIsProvidedInRequest() throws Exception {
-            JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}");
+            JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"query\":{}},\"supplementary_data\":"
+                    + "[\"Field1\",\"Field2\"]}");
             ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
             String result = elasticsearchRequest.toFinalRequest();
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
-            List<String> sourceFields = new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+            List<String> sourceFields =
+                    new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
 
             assertAll(
                 () -> assertThat(sourceFields.size(), is(12)),

@@ -69,7 +69,8 @@ class CaseSearchResultViewTest {
     void shouldFindCaseByReference() {
         SearchResultViewItem item1 = new SearchResultViewItem("111", emptyMap(), emptyMap(), emptyMap());
         SearchResultViewItem item2 = new SearchResultViewItem("222", emptyMap(), emptyMap(), emptyMap());
-        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(emptyList(), Arrays.asList(item1, item2), 0L);
+        CaseSearchResultView caseSearchResultView =
+                new CaseSearchResultView(emptyList(), Arrays.asList(item1, item2), 0L);
 
         Optional<SearchResultViewItem> result = caseSearchResultView.findCaseByReference("222");
 
@@ -82,7 +83,8 @@ class CaseSearchResultViewTest {
     @Test
     void shouldNotFindNonExistingCase() {
         SearchResultViewItem item = new SearchResultViewItem("111", emptyMap(), emptyMap(), emptyMap());
-        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(emptyList(), Collections.singletonList(item), 0L);
+        CaseSearchResultView caseSearchResultView =
+                new CaseSearchResultView(emptyList(), Collections.singletonList(item), 0L);
 
         Optional<SearchResultViewItem> result = caseSearchResultView.findCaseByReference("000");
 

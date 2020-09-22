@@ -129,7 +129,8 @@ class ElasticsearchSortServiceTest {
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
-                is("{\"query\":{},\"sort\":[{\"jurisdiction.keyword\":\"ASC\"},{\"last_modified\":\"DESC\"},\"created_date\"]}"))
+                is("{\"query\":{},\"sort\":[{\"jurisdiction.keyword\":\"ASC\"},{\"last_modified\":\"DESC\"},"
+                        + "\"created_date\"]}"))
         );
     }
 

@@ -414,15 +414,18 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             .supplementaryData(Arrays.asList("SDField2", "SDField3"))
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                "orgcases");
 
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(10)),
             () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(16)),
             () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(2)),
-            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
-            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
+                    .asText(), is("SDField2Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3")
+                    .asText(), is("SDField3Value"))
         );
     }
 
@@ -433,14 +436,18 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             .supplementaryData(Collections.singletonList("*"))
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                "orgcases");
 
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(3)),
-            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
-            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
-            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1")
+                    .asText(), is("SDField1Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
+                    .asText(), is("SDField2Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3")
+                    .asText(), is("SDField3Value"))
         );
     }
 
@@ -450,7 +457,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                "orgcases");
 
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -464,14 +472,18 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                null);
 
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(3)),
-            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
-            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
-            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1")
+                    .asText(), is("SDField1Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
+                    .asText(), is("SDField2Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3")
+                    .asText(), is("SDField3Value"))
         );
     }
 
@@ -575,7 +587,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
     private void assertExampleCaseData(Map<String, Object> data, boolean formatted) {
         assertAll(
             () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(0).get(VALUE), is(COLLECTION_VALUE)),
-            () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE), is("CollectionTextValue1")),
+            () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE),
+                    is("CollectionTextValue1")),
             () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_FIXED_LIST_FIELD), is("VALUE3")),
             () -> assertThat(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD)).get(NESTED_NUMBER_FIELD),
                 is(NESTED_NUMBER_FIELD_VALUE)),
@@ -599,7 +612,8 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
             () -> assertThat(data.get(TEXT_FIELD), is(TEXT_VALUE)),
             () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(0).get(VALUE), is(COLLECTION_VALUE)),
-            () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE), is("CollectionTextValue1"))
+            () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE),
+                    is("CollectionTextValue1"))
         );
     }
 

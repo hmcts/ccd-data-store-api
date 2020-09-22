@@ -317,11 +317,16 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
                     is("[{\"id\":\"2c6da07c-1dfb-4765-88f6-96cd5d5f33b1\",\"value\":\"CollectionTextValue2\"},"
                        + "{\"id\":\"f7d67f03-172d-4adb-85e5-ca958ad442ce\",\"value\":\"CollectionTextValue1\"}]")),
                 () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_TEXT_FIELD).asText(), is(COMPLEX_TEXT_VALUE)),
-                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_FIXED_LIST_FIELD).asText(), is(COMPLEX_FIXED_LIST_VALUE)),
-                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_NUMBER_FIELD).asText(), is(NESTED_NUMBER_FIELD_VALUE)),
-                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_COLLECTION_TEXT_FIELD).toString(),
-                    is("[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\",\"value\":\"NestedCollectionTextValue1\"},"
-                        + "{\"id\":\"95f337e8-5f17-4b25-a795-b7f84f4b2855\",\"value\":\"NestedCollectionTextValue2\"}]")),
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_FIXED_LIST_FIELD).asText(),
+                        is(COMPLEX_FIXED_LIST_VALUE)),
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_NUMBER_FIELD).asText(),
+                        is(NESTED_NUMBER_FIELD_VALUE)),
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_COLLECTION_TEXT_FIELD)
+                                .toString(),
+                    is("[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\","
+                            + "\"value\":\"NestedCollectionTextValue1\"},"
+                        + "{\"id\":\"95f337e8-5f17-4b25-a795-b7f84f4b2855\","
+                            + "\"value\":\"NestedCollectionTextValue2\"}]")),
                 () -> assertThat(data.get(DATE_FIELD).asText(), is(DATE_VALUE)),
                 () -> assertThat(data.get(DATE_TIME_FIELD).asText(), is(DATE_TIME_VALUE)),
                 () -> assertThat(data.get(EMAIL_FIELD).asText(), is(EMAIL_VALUE)),
@@ -342,7 +347,8 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
         MockHttpServletRequestBuilder postRequest =
             createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, null);
 
-        return ElasticsearchTestHelper.executeRequest(postRequest, 200, mapper, mockMvc, CaseSearchResult.class);
+        return ElasticsearchTestHelper.executeRequest(postRequest, 200, mapper, mockMvc,
+                CaseSearchResult.class);
     }
 
     private JsonNode executeErrorRequest(ElasticsearchTestRequest searchRequest,

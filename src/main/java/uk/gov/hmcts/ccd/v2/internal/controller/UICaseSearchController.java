@@ -62,6 +62,8 @@ public class UICaseSearchController {
     private final ElasticsearchSortService elasticsearchSortService;
 
     @Autowired
+    @SuppressWarnings("checkstyle:LineLength") //don't want to break message
+
     public UICaseSearchController(
         @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
         ElasticsearchQueryHelper elasticsearchQueryHelper,
@@ -118,6 +120,7 @@ public class UICaseSearchController {
                       + "- Malformed JSON request."
         )
     })
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break message
     @ApiImplicitParams(
         @ApiImplicitParam(
             name = "jsonSearchRequest",

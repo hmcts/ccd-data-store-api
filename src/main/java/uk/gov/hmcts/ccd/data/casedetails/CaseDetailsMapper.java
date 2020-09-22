@@ -69,7 +69,8 @@ public class CaseDetailsMapper {
                 JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()));
         }
         if (caseDetails.getSupplementaryData() != null) {
-            newCaseDetailsEntity.setSupplementaryData(JacksonUtils.convertValueJsonNode(caseDetails.getSupplementaryData()));
+            newCaseDetailsEntity.setSupplementaryData(JacksonUtils.convertValueJsonNode(caseDetails
+                    .getSupplementaryData()));
         }
         return newCaseDetailsEntity;
     }

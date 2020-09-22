@@ -342,13 +342,17 @@ class CaseSearchResultViewGeneratorTest {
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CREATED_DATE]"),
                 is(CREATED_DATE)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_REFERENCE]"), is(999L)),
-            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[SECURITY_CLASSIFICATION]"), is(SECURITY_CLASSIFICATION)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[SECURITY_CLASSIFICATION]"),
+                    is(SECURITY_CLASSIFICATION)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_TYPE]"), is(CASE_TYPE_ID_1)),
-            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[LAST_MODIFIED_DATE]"), is(LAST_MODIFIED_DATE)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[LAST_MODIFIED_DATE]"),
+                    is(LAST_MODIFIED_DATE)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData().size(), is(2)),
-            () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData().get(SUPPLEMENTARY_DATA_FIELD_1).asText(),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData()
+                            .get(SUPPLEMENTARY_DATA_FIELD_1).asText(),
                 is(SUPPLEMENTARY_DATA_FIELD_1)),
-            () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData().get(SUPPLEMENTARY_DATA_FIELD_2).asText(),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData()
+                            .get(SUPPLEMENTARY_DATA_FIELD_2).asText(),
                 is(SUPPLEMENTARY_DATA_FIELD_2)),
             () -> assertThat(caseSearchResultView.getCases().get(1).getSupplementaryData(), is(nullValue())),
             () -> assertThat(caseSearchResultView.getCases().get(2).getSupplementaryData(), is(nullValue()))
@@ -655,8 +659,8 @@ class CaseSearchResultViewGeneratorTest {
             classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, "INVALID", Collections.emptyList()));
 
         assertAll(
-            () -> assertThat(exception.getMessage(), is("The provided use case 'INVALID' is unsupported for case type"
-                + " 'CASE_TYPE_1'."))
+            () -> assertThat(exception.getMessage(), is("The provided use case 'INVALID' is unsupported for "
+                   + "case type 'CASE_TYPE_1'."))
         );
     }
 
