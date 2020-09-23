@@ -132,19 +132,10 @@ configurations {
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
-//checkstyleMain {
-//     source 'src'
-// }
-
-
 //This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
 tasks.withType(Checkstyle) {
     exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
 }
-
-checkstyleMain.shouldRunAfter(compileJava)
-
-test.shouldRunAfter(checkstyleTest)
 
 dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging', version: reformLogging
