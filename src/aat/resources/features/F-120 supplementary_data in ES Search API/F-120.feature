@@ -1,5 +1,5 @@
 @F-120 @elasticsearch
-Feature: RDM-9374 Enhance search APIs to return supplementary data
+Feature: F-120 Additional supplementary data property returned by ES Search APIs
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
