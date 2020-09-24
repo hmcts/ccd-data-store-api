@@ -119,7 +119,7 @@ class UICaseSearchControllerTest {
     private List<SearchResultViewItem> searchResultViewItems(int numberOfEntries) {
         List<SearchResultViewItem> items = new ArrayList<>();
         IntStream.range(1, numberOfEntries + 1).forEach(idx ->
-            items.add(new SearchResultViewItem(Integer.toString(idx), emptyMap(), emptyMap()))
+            items.add(new SearchResultViewItem(Integer.toString(idx), emptyMap(), emptyMap(), emptyMap()))
         );
         return items;
     }

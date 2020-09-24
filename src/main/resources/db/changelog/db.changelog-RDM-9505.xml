@@ -1,0 +1,25 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-9505" runInTransaction="false" author="thomas.elliot@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+            DROP INDEX IF EXISTS idx_case_data__generated_dob;
+            DROP INDEX IF EXISTS idx_case_data_generatedemail;
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_appeal_appellant_identity_lastName_region ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{appeal,appellant,name,lastName}'::text[]))), btrim(upper((data #>> '{region}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_documentSentToDwp ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{documentSentToDwp}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_isscottishcase_documentSentToDwp ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{isScottishCase}'::text[]))), btrim(upper((data #>> '{documentSentToDwp}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_appeal_appellant_address_postcode ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{appeal,appellant,address,postcode}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_createdingapsfrom_dwpRegionalCentre ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{createdInGapsFrom}'::text[]))), btrim(upper((data #>> '{dwpRegionalCentre}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_subscriptions_appellantSubscription_mobile ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{subscriptions,appellantSubscription,mobile}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicationtype_evidencehandled_registrylocation_ ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{applicationType}'::text[]))),btrim(upper((data #>> '{evidenceHandled}'::text[]))),btrim(upper((data #>> '{registryLocation}'::text[]))),btrim(upper((data #>> '{caseType}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_latestGrantReissueDate ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{latestGrantReissueDate}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_deceasedDateOfDeath ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{deceasedDateOfDeath}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_welsh_DnOutcomeCase_SolHowToPay_ApplyForDA ON public.case_data USING BTREE (BTRIM(UPPER((data #>> '{{LanguagePreferenceWelsh}}'::text[]))),btrim(upper((data #>> '{DnOutcomeCase}'::text[]))),btrim(upper((data #>> '{SolPaymentHowToPay}'::text[]))),btrim(upper((data #>> '{ApplyForDecreeAbsolute}'::text[]))));
+        </sql>
+    </changeSet>
+</databaseChangeLog>

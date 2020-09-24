@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.CaseTypeResults;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
@@ -84,15 +82,15 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
         Collection<Search> securedSearches = request.getCaseTypeIds()
             .stream()
-            .map(caseTypeId -> createSecuredSearch(caseTypeId, request.getSearchRequestJsonNode()))
+            .map(caseTypeId -> createSecuredSearch(caseTypeId, request))
             .collect(toList());
 
         return new MultiSearch.Builder(securedSearches).build();
     }
 
-    private Search createSecuredSearch(String caseTypeId, JsonNode searchRequestJsonNode) {
+    private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
-            new CaseSearchRequest(caseTypeId, new ElasticsearchRequest(searchRequestJsonNode)));
+            new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()));
         return new Search.Builder(securedSearchRequest.toJsonString())
             .addIndex(getCaseIndexName(caseTypeId))
             .addType(getCaseIndexType())

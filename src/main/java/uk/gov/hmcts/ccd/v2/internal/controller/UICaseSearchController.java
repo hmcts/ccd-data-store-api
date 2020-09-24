@@ -90,7 +90,8 @@ public class UICaseSearchController {
                       + "- No case type query parameter `ctid` provided.\n"
                       + "- Query is missing required `query` field.\n"
                       + "- Query includes blacklisted type.\n"
-                      + "- Query has failed in ElasticSearch - for example, a sort is attempted on an unknown/unmapped field."
+                      + "- Query has failed in ElasticSearch - for example, a sort is attempted on an unknown/unmapped field.\n"
+                      + "- Query includes supplementary_data which is NOT an array of text values.\n"
         ),
         @ApiResponse(
             code = 401,
@@ -118,16 +119,19 @@ public class UICaseSearchController {
     @ApiImplicitParams(
         @ApiImplicitParam(
             name = "jsonSearchRequest",
-            value = "Native ElasticSearch Search API request as a JSON string. "
+            value = "A wrapped native ElasticSearch Search API request as a JSON string. "
                     + "Please refer to the following for further information:\n"
                     + "- [Official ElasticSearch Documentation - Search APIs]"
                     + "(https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)\n"
                     + "- [Official ElasticSearch Documentation - Query DSL]"
                     + "(https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)\n"
                     + "- [CCD ElasticSearch API LLD]"
-                    + "(https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=843514186)",
-            example = "{\n\t\"query\": { \n\t\t\"match_all\": {} \n\t},\n\t\"sort\": [\n\t\t{ \"reference.keyword\": \"asc\" }\n\t],"
-                      + "\n\t\"size\": 20,\n\t\"from\": 1\n}",
+                    + "(https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=843514186)\n\n"
+                    + "Note that for backward compatibility this API also supports unwrapped native ElasticSearch requests "
+                    + "(i.e. requests consisting of a native query instead of being wrapped in a `native_es_query` object).",
+            example = "{\n\t\"native_es_query\": {\n\t\t\"query\": { \n\t\t\t\"match_all\": {} \n\t\t},\n\t\t\"sort\": "
+                    + "[\n\t\t\t{ \"reference.keyword\": \"asc\" }\n\t\t],\n\t\t\"size\": 20,\n\t\t\"from\": 1\n\t},"
+                    + "\n\t\"supplementary_data\": [\n\t\t\"orgs_assigned_users\"\n\t]\n}",
             required = true
         )
     )
@@ -147,6 +151,10 @@ public class UICaseSearchController {
         String useCaseUppercase = Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields() ? null : useCase.toUpperCase();
         elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCaseUppercase);
         List<String> requestedFields = searchRequest.getRequestedFields();
+
+        if (useCaseUppercase == null && !searchRequest.hasRequestedSupplementaryData()) {
+            searchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
+        }
 
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(Collections.singletonList(caseTypeId))

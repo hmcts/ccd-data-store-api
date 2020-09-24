@@ -70,6 +70,9 @@ public class CaseDetails implements Cloneable {
     @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
     private Map<String, JsonNode> dataClassification;
 
+    @JsonProperty("supplementary_data")
+    private Map<String, JsonNode> supplementaryData;
+
     /**
      * Attribute passed to UI layer, does not need persistence.
      */
@@ -226,6 +229,14 @@ public class CaseDetails implements Cloneable {
         this.dataClassification = dataClassification;
     }
 
+    public Map<String, JsonNode> getSupplementaryData() {
+        return supplementaryData;
+    }
+
+    public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
+        this.supplementaryData = supplementaryData;
+    }
+
     public AfterSubmitCallbackResponse getAfterSubmitCallbackResponse() {
         return afterSubmitCallbackResponse;
     }
@@ -279,6 +290,7 @@ public class CaseDetails implements Cloneable {
     }
 
     @JsonIgnore
+    @SuppressWarnings("java:S2259")
     public void setAfterSubmitCallbackResponseEntity(final ResponseEntity<AfterSubmitCallbackResponse>
                                                          callBackResponse) {
         if (SC_OK == callBackResponse.getStatusCodeValue()) {

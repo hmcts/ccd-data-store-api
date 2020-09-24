@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -75,10 +76,10 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_NUMBER_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_NUMBER_FIELD_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PARTIAL_PHONE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE_WITH_SPACE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PARTIAL_PHONE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_AREA_FIELD;
@@ -381,6 +382,74 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
             () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
             () -> assertThat(caseDetails.getFieldsFormatted().containsKey(COMPLEX_FIELD), is(true))
+        );
+    }
+
+    @Test
+    void shouldReturnRequestedSupplementaryDataForUseCaseRequest() throws Exception {
+        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .supplementaryData(Arrays.asList("SDField2", "SDField3"))
+            .build();
+
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(10)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(16)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(2)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+        );
+    }
+
+    @Test
+    void shouldReturnAllSupplementaryDataWhenWildcardIsUsed() throws Exception {
+        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .supplementaryData(Collections.singletonList("*"))
+            .build();
+
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(3)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+        );
+    }
+
+    @Test
+    void shouldReturnNoSupplementaryDataWhenNotRequestedForUseCaseRequest() throws Exception {
+        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .build();
+
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, "orgcases");
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData(), is(nullValue()))
+        );
+    }
+
+    @Test
+    void shouldReturnAllSupplementaryDataByDefaultForStandardRequest() throws Exception {
+        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .build();
+
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+
+        assertAll(
+            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(3)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
         );
     }
 
