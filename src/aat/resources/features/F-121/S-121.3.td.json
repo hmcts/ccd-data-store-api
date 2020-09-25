@@ -655,6 +655,10 @@
               "page_column_no": null,
               "complex_field_overrides": [
                 {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered"
+                },
+                {
                   "complex_field_element_id": "Address1.AddressLine1",
                   "display_context": "MANDATORY",
                   "label": null,
@@ -717,6 +721,10 @@
               "order": null,
               "page_column_no": null,
               "complex_field_overrides": [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered"
+                },
                 {
                   "complex_field_element_id": "Address2.AddressLine3",
                   "display_context": "MANDATORY",

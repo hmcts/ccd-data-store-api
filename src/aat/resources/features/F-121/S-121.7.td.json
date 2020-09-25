@@ -732,6 +732,10 @@
               "page_column_no": null,
               "complex_field_overrides": [
                 {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered"
+                },
+                {
                   "complex_field_element_id": "RespondentDetails.RespAddress3",
                   "display_context": "MANDATORY",
                   "label": null,
