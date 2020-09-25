@@ -99,12 +99,12 @@ public class CaseAssignedUserRolesController {
         ),
         @ApiResponse(
             code = 401,
-            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+            message = V2.Error.AUTHENTICATION_TOKEN_INVALID
         ),
         @ApiResponse(
             code = 403,
             message = "One of the following reasons:\n"
-                + "1. Unauthorised S2S service \n"
+                + "1. " + V2.Error.UNAUTHORISED_S2S_SERVICE + "\n"
                 + "2. " + V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
         ),
         @ApiResponse(
