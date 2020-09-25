@@ -81,5 +81,7 @@ public final class V2 {
         public static final String MORE_THAN_ONE_NESTED_LEVEL = "Supplementary data properties with more than one nested level are currently not supported";
         public static final String UNKNOWN_SUPPLEMENTARY_UPDATE_OPERATION = "Unknown supplementary data update operation";
         public static final String ORGANISATION_ID_INVALID = "Organisation ID is not valid";
+        public static final String AUTHENTICATION_TOKEN_INVALID = "Authentication failure due to invalid / expired tokens (IDAM / S2S).";
+        public static final String UNAUTHORISED_S2S_SERVICE = "Unauthorised S2S service";
     }
 }
