@@ -8,14 +8,15 @@
   "uri": "/internal/case-types/{ctid}/event-triggers/{etid}?ignore-warning=false",
 
 	"user": {
-		"_extends_": "Common_User_For_Request"
+		"_extends_": "Common_User_For_Request",
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
 	},
 
 	"request": {
 		"_extends_": "Common_Request",
-		"pathVariables": {
-      "ctid": "FT_ComplexFieldsOrdering",
-      "etid": "CREATE1"
-		}
+    "headers": {
+      "experimental": "true"
+    }
 	}
 }
