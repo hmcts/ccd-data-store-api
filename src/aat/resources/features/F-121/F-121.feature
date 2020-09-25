@@ -1,6 +1,6 @@
 #======================================================
 @F-121
-Feature: F-121: Validate a set of fields as Case worker
+Feature: F-121: Order Complex fields in start event
 #======================================================
 
 Background: Load test data for the scenario
@@ -8,7 +8,7 @@ Background: Load test data for the scenario
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-501
-Scenario: must validate date in a right format
+Scenario: must order fields
 
     Given a user with [an active profile in CCD],
 
