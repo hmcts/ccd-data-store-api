@@ -1,58 +1,62 @@
 {
-  "_guid_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
-  "_extends_": "Befta_Jurisdiction2_Case_Creation_Base_Data_Solicitor_1",
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.2.solicitor.1@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
-    }
-  },
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
-    "pathVariables": {
-      "jid": "BEFTA_JURISDICTION_2",
-      "ctid": "BEFTA_CASETYPE_2_1"
-    },
-    "body": {
-      "data": {
-        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Solicitor_1"
-      }
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_201_Response",
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Vary": "Accept-Encoding"
+	"_guid_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
+	"_extends_": "Befta_Jurisdiction2_Case_Creation_Base_Data_Solicitor_1",
 
-    },
-    "body": {
-      "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "BEFTA_JURISDICTION_2",
-      "state": "TODO",
-      "version": "[[ANYTHING_PRESENT]]",
-      "case_type_id": "BEFTA_CASETYPE_2_1",
-      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-      "created_date": "[[ANYTHING_PRESENT]]",
-      "last_modified": "[[ANYTHING_PRESENT]]",
-      "security_classification": "PUBLIC",
-      "case_data": {
-        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Solicitor_1"
-      },
-      "data_classification": {
-        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification_Solicitor_1"
-      },
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null,
-      "security_classifications": {
-        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification_Solicitor_1"
-      }
-    }
-  }
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.2.solicitor.1@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+		}
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"jid": "BEFTA_JURISDICTION_2",
+			"ctid": "BEFTA_CASETYPE_2_1"
+		},
+		"body": {
+			"data": {
+				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Solicitor_1"
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Vary": "Accept-Encoding"
+
+		},
+		"body": {
+			"id": "[[ANYTHING_PRESENT]]",
+			"jurisdiction": "BEFTA_JURISDICTION_2",
+			"state": "TODO",
+			"version": "[[ANYTHING_PRESENT]]",
+			"case_type_id": "BEFTA_CASETYPE_2_1",
+			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+			"created_date": "[[ANYTHING_PRESENT]]",
+			"last_modified": "[[ANYTHING_PRESENT]]",
+			"security_classification": "PUBLIC",
+			"case_data": {
+				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Solicitor_1"
+			},
+			"data_classification": {
+				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification_Solicitor_1"
+			},
+			"supplementary_data": null,
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null,
+			"security_classifications": {
+				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification_Solicitor_1"
+			}
+		}
+	}
 }
 

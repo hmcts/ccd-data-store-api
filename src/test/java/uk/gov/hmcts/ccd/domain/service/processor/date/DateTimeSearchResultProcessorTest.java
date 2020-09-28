@@ -71,9 +71,11 @@ class DateTimeSearchResultProcessorTest {
         setUpBaseTypes();
 
         SearchResultViewColumn column1 = new SearchResultViewColumn(DATE_FIELD,
-            fieldType(DATE_FIELD_TYPE), null, 1, false, "#DATETIMEDISPLAY(dd/MM/yyyy)");
+            fieldType(DATE_FIELD_TYPE), null, 1, false,
+            "#DATETIMEDISPLAY(dd/MM/yyyy)");
         SearchResultViewColumn column2 = new SearchResultViewColumn(DATETIME_FIELD,
-            fieldType(DATETIME_FIELD_TYPE), null, 1, false, "#DATETIMEDISPLAY(ddMMyyyy)");
+            fieldType(DATETIME_FIELD_TYPE), null, 1, false,
+            "#DATETIMEDISPLAY(ddMMyyyy)");
         viewColumns.addAll(Arrays.asList(column1, column2));
 
         caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
@@ -111,10 +113,13 @@ class DateTimeSearchResultProcessorTest {
         final LocalDateTime localDateTime = LocalDateTime.of(2020, 10, 1, 12, 30, 0, 0);
         caseFields.put(metadataField, localDateTime);
         viewColumns.add(new SearchResultViewColumn(metadataField,
-            fieldType(DATE_FIELD_TYPE), null, 1, true, "#DATETIMEDISPLAY(dd/MM/yyyy)"));
-        when(dateTimeFormatParser.convertIso8601ToDateTime("dd/MM/yyyy", "2020-10-01T12:30:00.000"))
+            fieldType(DATE_FIELD_TYPE), null, 1, true,
+            "#DATETIMEDISPLAY(dd/MM/yyyy)"));
+        when(dateTimeFormatParser.convertIso8601ToDateTime("dd/MM/yyyy",
+            "2020-10-01T12:30:00.000"))
             .thenReturn("01/10/2020");
-        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields,
+            new HashMap<>(caseFields)));
 
         List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
 
@@ -122,7 +127,8 @@ class DateTimeSearchResultProcessorTest {
         assertAll(
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(itemResult.getFields().size(), is(4)),
-            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(metadataField)).asText(), is("01/10/2020")),
+            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(metadataField)).asText(),
+                is("01/10/2020")),
             () -> assertThat(itemResult.getFields().get(metadataField), is(localDateTime))
         );
     }
@@ -130,13 +136,17 @@ class DateTimeSearchResultProcessorTest {
     @Test
     void shouldProcessComplexTypesWithDCP() throws IOException {
         caseFields.put(COMPLEX_FIELD, MAPPER.readTree("{\"ComplexDateField\": \"2020-10-05\"}"));
-        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
-        CaseFieldDefinition complexField = caseField("ComplexDateField", fieldType("Date"), "#DATETIMEDISPLAY(MM-yyyy)");
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields,
+            new HashMap<>(caseFields)));
+        CaseFieldDefinition complexField = caseField("ComplexDateField", fieldType("Date"),
+            "#DATETIMEDISPLAY(MM-yyyy)");
         SearchResultViewColumn complexColumn = new SearchResultViewColumn(COMPLEX_FIELD,
-            fieldType(COMPLEX_FIELD_TYPE, COMPLEX_FIELD_TYPE, Collections.singletonList(complexField), null), null, 1, false, null);
+            fieldType(COMPLEX_FIELD_TYPE, COMPLEX_FIELD_TYPE, Collections.singletonList(complexField),
+                null), null, 1, false, null);
         viewColumns.add(complexColumn);
 
-        when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "2020-10-05")).thenReturn("10-2020");
+        when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "2020-10-05"))
+            .thenReturn("10-2020");
 
         List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
 
@@ -144,18 +154,23 @@ class DateTimeSearchResultProcessorTest {
         assertAll(
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(itemResult.getFields().size(), is(4)),
-            () -> assertThat(((ObjectNode)itemResult.getFieldsFormatted().get(COMPLEX_FIELD)).get("ComplexDateField").asText(), is("10-2020")),
-            () -> assertThat(((ObjectNode)itemResult.getFields().get(COMPLEX_FIELD)).get("ComplexDateField").asText(), is("2020-10-05"))
+            () -> assertThat(((ObjectNode)itemResult.getFieldsFormatted().get(COMPLEX_FIELD)).get("ComplexDateField")
+                .asText(), is("10-2020")),
+            () -> assertThat(((ObjectNode)itemResult.getFields().get(COMPLEX_FIELD)).get("ComplexDateField").asText(),
+                is("2020-10-05"))
         );
     }
 
     @Test
     void shouldProcessCollectionsWithDCP() throws IOException {
         caseFields.put(COLLECTION_FIELD,
-            MAPPER.readTree("[{\"id\": \"1\", \"value\": \"2020-10-05\"},{\"id\": \"2\", \"value\": \"1999-12-01\"}]"));
-        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
+            MAPPER.readTree("[{\"id\": \"1\", \"value\": \"2020-10-05\"},{\"id\": \"2\", \"value\":"
+                + " \"1999-12-01\"}]"));
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields,
+            new HashMap<>(caseFields)));
         SearchResultViewColumn collectionColumn = new SearchResultViewColumn(COLLECTION_FIELD,
-            fieldType(COLLECTION_FIELD_TYPE, COLLECTION_FIELD_TYPE, null, fieldType(DATE_FIELD_TYPE)), null, 1, false, "#DATETIMEDISPLAY(MM-yyyy)");
+            fieldType(COLLECTION_FIELD_TYPE, COLLECTION_FIELD_TYPE, null, fieldType(DATE_FIELD_TYPE)),
+            null, 1, false, "#DATETIMEDISPLAY(MM-yyyy)");
         viewColumns.add(collectionColumn);
 
         when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "2020-10-05"))
@@ -170,15 +185,19 @@ class DateTimeSearchResultProcessorTest {
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(itemResult.getFields().size(), is(4)),
             () -> assertThat(
-                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(),
+                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(0)
+                    .get(CollectionValidator.VALUE).asText(),
                 is("10-2020")
             ),
             () -> assertThat(
-                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(),
+                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(1)
+                    .get(CollectionValidator.VALUE).asText(),
                 is("12-1999")
             ),
-            () -> assertThat(((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).asText(), is("2020-10-05")),
-            () -> assertThat(((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).asText(), is("1999-12-01"))
+            () -> assertThat(((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(0)
+                .get(CollectionValidator.VALUE).asText(), is("2020-10-05")),
+            () -> assertThat(((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(1)
+                .get(CollectionValidator.VALUE).asText(), is("1999-12-01"))
         );
     }
 
@@ -187,11 +206,15 @@ class DateTimeSearchResultProcessorTest {
         caseFields.put(COLLECTION_FIELD,
             MAPPER.readTree("[{\"id\": \"1\", \"value\": {\"NestedDate\": \"2020-10-05\"}},"
                             + "{\"id\": \"2\", \"value\": {\"NestedDate\": \"1992-07-30\"}}]"));
-        CaseFieldDefinition nestedDateField = caseField("NestedDate", fieldType("Date"), "#DATETIMEDISPLAY(MM-yyyy)");
-        FieldTypeDefinition complexFieldType = fieldType(COMPLEX_FIELD_TYPE, COMPLEX_FIELD_TYPE, Collections.singletonList(nestedDateField), null);
+        CaseFieldDefinition nestedDateField = caseField("NestedDate", fieldType("Date"),
+            "#DATETIMEDISPLAY(MM-yyyy)");
+        FieldTypeDefinition complexFieldType = fieldType(COMPLEX_FIELD_TYPE, COMPLEX_FIELD_TYPE,
+            Collections.singletonList(nestedDateField), null);
         SearchResultViewColumn collectionColumn = new SearchResultViewColumn(COLLECTION_FIELD,
-            fieldType(COLLECTION_FIELD_TYPE, COLLECTION_FIELD_TYPE, null, complexFieldType), null, 1, false, null);
-        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
+            fieldType(COLLECTION_FIELD_TYPE, COLLECTION_FIELD_TYPE, null, complexFieldType), null,
+            1, false, null);
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields,
+            new HashMap<>(caseFields)));
         viewColumns.add(collectionColumn);
 
         when(dateTimeFormatParser.convertIso8601ToDate("MM-yyyy", "2020-10-05"))
@@ -206,19 +229,23 @@ class DateTimeSearchResultProcessorTest {
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(itemResult.getFields().size(), is(4)),
             () -> assertThat(
-                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(0)
+                    .get(CollectionValidator.VALUE).get("NestedDate").asText(),
                 is("10-2020")
             ),
             () -> assertThat(
-                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(1)
+                    .get(CollectionValidator.VALUE).get("NestedDate").asText(),
                 is("07-1992")
             ),
             () -> assertThat(
-                ((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                ((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE)
+                    .get("NestedDate").asText(),
                 is("2020-10-05")
             ),
             () -> assertThat(
-                ((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                ((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE)
+                    .get("NestedDate").asText(),
                 is("1992-07-30")
             )
         );
@@ -253,7 +280,8 @@ class DateTimeSearchResultProcessorTest {
             fieldType(MULTI_SELECT_LIST), null, 1, false, null);
         List<SearchResultViewColumn> columns = new ArrayList<>();
         columns.addAll(Arrays.asList(column1));
-        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields)));
+        viewItems = Collections.singletonList(new SearchResultViewItem("CaseId", caseFields,
+            new HashMap<>(caseFields)));
         viewColumns.add(column1);
 
         List<SearchResultViewItem> result = dateTimeSearchResultProcessor.execute(viewColumns, viewItems);
@@ -281,7 +309,8 @@ class DateTimeSearchResultProcessorTest {
         return caseField;
     }
 
-    private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields, FieldTypeDefinition collectionFieldType) {
+    private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields,
+                                          FieldTypeDefinition collectionFieldType) {
         FieldTypeDefinition fieldType = new FieldTypeDefinition();
         fieldType.setId(id);
         fieldType.setType(type);

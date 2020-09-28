@@ -1,158 +1,161 @@
 {
-  "_guid_": "S-199",
-  "_extends_": "F-036_Base_Test_Data",
-  "title": "must return 200 and a StartTriggerResource object when case id and event trigger id are provided",
-  "specs": [
-    "an active profile in CCD",
-    "contains HTTP 200 OK"
-  ],
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-event-trigger.v2+json;charset=UTF-8",
-      "Content-Encoding" : "gzip",
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Vary" : "[[ANYTHING_PRESENT]]"
-    },
-    "body": {
-      "token": "[[ANYTHING_PRESENT]]",
-      "_links": {
-        "self": {
-          "href": "[[ANYTHING_PRESENT]]"
-        }
-      },
-      "case_details": {
-        "id": "[[ANYTHING_PRESENT]]",
-        "jurisdiction": "AUTOTEST1",
-        "state": "TODO",
-        "version": 0,
-        "case_type_id": "AAT_AUTH_15",
-        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-        "created_date": "[[ANYTHING_PRESENT]]",
-        "last_modified": "[[ANYTHING_PRESENT]]",
-        "security_classification": "PUBLIC",
-        "case_data": {
-          "MoneyGBPField": "4200",
-          "FixedListField": "VALUE3",
-          "AddressUKField": {
-            "County": "Greater London",
-            "Country": "UK",
-            "PostCode": "SW1H 9AJ",
-            "PostTown": "Westminster",
-            "AddressLine1": "102 Petty France",
-            "AddressLine2": "CCD",
-            "AddressLine3": "c/o HMCTS Reform"
-          },
-          "ComplexField": {
-            "ComplexTextField": "Nested text",
-            "ComplexFixedListField": "VALUE2"
-          },
-          "DateTimeField": "[[ANYTHING_PRESENT]]",
-          "PhoneUKField": "07123456789",
-          "NumberField": "164528",
-          "MultiSelectListField": [
-            "OPTION2",
-            "OPTION4"
-          ],
-          "YesOrNoField": "Yes",
-          "EmailField": "ccd@hmcts.net",
-          "TextField": "Some Text",
-          "DateField": "2017-02-13",
-          "TextAreaField": "Line1\nLine2",
-          "CollectionField": [
-            {
-              "id": "[[ANYTHING_PRESENT]]",
-              "value": "Alias 1"
-            },
-            {
-              "id": "[[ANYTHING_PRESENT]]",
-              "value": "Alias 2"
-            }
-          ]
-        },
-        "data_classification": {
-          "MoneyGBPField": "PUBLIC",
-          "FixedListField": "PUBLIC",
-          "AddressUKField": {
-            "value": {
-              "County": "PUBLIC",
-              "Country": "PUBLIC",
-              "PostCode": "PUBLIC",
-              "PostTown": "PUBLIC",
-              "AddressLine1": "PUBLIC",
-              "AddressLine2": "PUBLIC",
-              "AddressLine3": "PUBLIC"
-            },
-            "classification": "PUBLIC"
-          },
-          "DateTimeField": "PUBLIC",
-          "PhoneUKField": "PUBLIC",
-          "NumberField": "PUBLIC",
-          "MultiSelectListField": "PUBLIC",
-          "YesOrNoField": "PUBLIC",
-          "EmailField": "PUBLIC",
-          "TextField": "PUBLIC",
-          "DateField": "PUBLIC",
-          "TextAreaField": "PUBLIC",
-          "CollectionField": {
-            "value": [
-              {
-                "id": "[[ANYTHING_PRESENT]]",
-                "classification": "PUBLIC"
-              },
-              {
-                "id": "[[ANYTHING_PRESENT]]",
-                "classification": "PUBLIC"
-              }
-            ],
-            "classification": "PUBLIC"
-          }
-        },
-        "after_submit_callback_response": null,
-        "callback_response_status_code": null,
-        "callback_response_status": null,
-        "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": {
-          "MoneyGBPField": "PUBLIC",
-          "FixedListField": "PUBLIC",
-          "AddressUKField": {
-            "value": {
-              "County": "PUBLIC",
-              "Country": "PUBLIC",
-              "PostCode": "PUBLIC",
-              "PostTown": "PUBLIC",
-              "AddressLine1": "PUBLIC",
-              "AddressLine2": "PUBLIC",
-              "AddressLine3": "PUBLIC"
-            },
-            "classification": "PUBLIC"
-          },
-          "DateTimeField": "PUBLIC",
-          "PhoneUKField": "PUBLIC",
-          "NumberField": "PUBLIC",
-          "MultiSelectListField": "PUBLIC",
-          "YesOrNoField": "PUBLIC",
-          "EmailField": "PUBLIC",
-          "TextField": "PUBLIC",
-          "DateField": "PUBLIC",
-          "TextAreaField": "PUBLIC",
-          "CollectionField": {
-            "value": [
-              {
-                "id": "[[ANYTHING_PRESENT]]",
-                "classification": "PUBLIC"
-              },
-              {
-                "id": "[[ANYTHING_PRESENT]]",
-                "classification": "PUBLIC"
-              }
-            ],
-            "classification": "PUBLIC"
-          }
-        }
-      },
-      "event_id": "START_PROGRESS"
-    }
-  }
+	"_guid_": "S-199",
+	"_extends_": "F-036_Base_Test_Data",
+	"title": "must return 200 and a StartTriggerResource object when case id and event trigger id are provided",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains HTTP 200 OK"
+	],
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-event-trigger.v2+json;charset=UTF-8",
+			"Content-Encoding" : "gzip",
+			"Content-Length" : "[[ANYTHING_PRESENT]]",
+			"Vary" : "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"token": "[[ANYTHING_PRESENT]]",
+			"_links": {
+				"self": {
+					"href": "[[ANYTHING_PRESENT]]"
+				}
+			},
+			"case_details": {
+				"id": "[[ANYTHING_PRESENT]]",
+				"jurisdiction": "AUTOTEST1",
+				"state": "TODO",
+				"version": 0,
+				"case_type_id": "AAT_AUTH_15",
+				"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+				"created_date": "[[ANYTHING_PRESENT]]",
+				"last_modified": "[[ANYTHING_PRESENT]]",
+				"security_classification": "PUBLIC",
+				"case_data": {
+					"MoneyGBPField": "4200",
+					"FixedListField": "VALUE3",
+					"AddressUKField": {
+						"County": "Greater London",
+						"Country": "UK",
+						"PostCode": "SW1H 9AJ",
+						"PostTown": "Westminster",
+						"AddressLine1": "102 Petty France",
+						"AddressLine2": "CCD",
+						"AddressLine3": "c/o HMCTS Reform"
+					},
+					"ComplexField": {
+						"ComplexTextField": "Nested text",
+						"ComplexFixedListField": "VALUE2"
+					},
+					"DateTimeField": "[[ANYTHING_PRESENT]]",
+					"PhoneUKField": "07123456789",
+					"NumberField": "164528",
+					"MultiSelectListField": [
+						"OPTION2",
+						"OPTION4"
+					],
+					"YesOrNoField": "Yes",
+					"EmailField": "ccd@hmcts.net",
+					"TextField": "Some Text",
+					"DateField": "2017-02-13",
+					"TextAreaField": "Line1\nLine2",
+					"CollectionField": [
+						{
+							"id": "[[ANYTHING_PRESENT]]",
+							"value": "Alias 1"
+						},
+						{
+							"id": "[[ANYTHING_PRESENT]]",
+							"value": "Alias 2"
+						}
+					]
+				},
+				"data_classification": {
+					"MoneyGBPField": "PUBLIC",
+					"FixedListField": "PUBLIC",
+					"AddressUKField": {
+						"value": {
+							"County": "PUBLIC",
+							"Country": "PUBLIC",
+							"PostCode": "PUBLIC",
+							"PostTown": "PUBLIC",
+							"AddressLine1": "PUBLIC",
+							"AddressLine2": "PUBLIC",
+							"AddressLine3": "PUBLIC"
+						},
+						"classification": "PUBLIC"
+					},
+					"DateTimeField": "PUBLIC",
+					"PhoneUKField": "PUBLIC",
+					"NumberField": "PUBLIC",
+					"MultiSelectListField": "PUBLIC",
+					"YesOrNoField": "PUBLIC",
+					"EmailField": "PUBLIC",
+					"TextField": "PUBLIC",
+					"DateField": "PUBLIC",
+					"TextAreaField": "PUBLIC",
+					"CollectionField": {
+						"value": [
+							{
+								"id": "[[ANYTHING_PRESENT]]",
+								"classification": "PUBLIC"
+							},
+							{
+								"id": "[[ANYTHING_PRESENT]]",
+								"classification": "PUBLIC"
+							}
+						],
+						"classification": "PUBLIC"
+					}
+				},
+				"supplementary_data": null,
+				"after_submit_callback_response": null,
+				"callback_response_status_code": null,
+				"callback_response_status": null,
+				"delete_draft_response_status_code": null,
+				"delete_draft_response_status": null,
+				"security_classifications": {
+					"MoneyGBPField": "PUBLIC",
+					"FixedListField": "PUBLIC",
+					"AddressUKField": {
+						"value": {
+							"County": "PUBLIC",
+							"Country": "PUBLIC",
+							"PostCode": "PUBLIC",
+							"PostTown": "PUBLIC",
+							"AddressLine1": "PUBLIC",
+							"AddressLine2": "PUBLIC",
+							"AddressLine3": "PUBLIC"
+						},
+						"classification": "PUBLIC"
+					},
+					"DateTimeField": "PUBLIC",
+					"PhoneUKField": "PUBLIC",
+					"NumberField": "PUBLIC",
+					"MultiSelectListField": "PUBLIC",
+					"YesOrNoField": "PUBLIC",
+					"EmailField": "PUBLIC",
+					"TextField": "PUBLIC",
+					"DateField": "PUBLIC",
+					"TextAreaField": "PUBLIC",
+					"CollectionField": {
+						"value": [
+							{
+								"id": "[[ANYTHING_PRESENT]]",
+								"classification": "PUBLIC"
+							},
+							{
+								"id": "[[ANYTHING_PRESENT]]",
+								"classification": "PUBLIC"
+							}
+						],
+						"classification": "PUBLIC"
+					}
+				}
+			},
+			"event_id": "START_PROGRESS"
+		}
+	}
 }

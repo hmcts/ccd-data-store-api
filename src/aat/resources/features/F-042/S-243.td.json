@@ -1,60 +1,64 @@
 {
-  "title": "Trigger the aboutToStart callback event for a caseworker for an existing case which has not started yet.",
-  "_guid_": "S-243",
-  "_extends_": "F-042_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "is prepared with a valid User ID, Jurisdiction, Case Type ID and Event Trigger ID and the Case ID just created",
-    "contains the HTTP 200 OK return code",
-    "returns the START_EVENT trigger along with the event token"
-  ],
-  "request": {
-    "_extends_": "Common_Request"
-  },
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "gzip"
-    },
-    "body": {
-      "token": "[[ANYTHING_PRESENT]]",
-      "case_details": {
-        "id": "[[ANYTHING_PRESENT]]",
-        "jurisdiction": "BEFTA_JURISDICTION_1",
-        "state": "TODO",
-        "version": 0,
-        "case_type_id": "BEFTA_CASETYPE_1_1",
-        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-        "created_date": "[[ANYTHING_PRESENT]]",
-        "last_modified": "[[ANYTHING_PRESENT]]",
-        "security_classification": "PUBLIC",
-        "case_data": {
-          "_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
-        },
-        "data_classification": {
-          "MoneyGBPField": "PUBLIC",
-          "YesOrNoField": "PUBLIC",
-          "EmailField": "PUBLIC",
-          "TextField": "PUBLIC",
-          "PhoneUKField": "PUBLIC",
-          "NumberField": "PUBLIC"
-        },
-        "after_submit_callback_response": null,
-        "callback_response_status_code": null,
-        "callback_response_status": null,
-        "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": {
-          "MoneyGBPField": "PUBLIC",
-          "YesOrNoField": "PUBLIC",
-          "EmailField": "PUBLIC",
-          "TextField": "PUBLIC",
-          "PhoneUKField": "PUBLIC",
-          "NumberField": "PUBLIC"
-        }
-      },
-      "event_id": "START_PROGRESS"
-    }
-  }
+	"_guid_": "S-243",
+	"_extends_": "F-042_Test_Data_Base",
+	"title": "Trigger the aboutToStart callback event for a caseworker for an existing case which has not started yet.",
+
+	"specs": [
+		"an active profile in CCD",
+		"is prepared with a valid User ID, Jurisdiction, Case Type ID and Event Trigger ID and the Case ID just created",
+		"contains the HTTP 200 OK return code",
+		"returns the START_EVENT trigger along with the event token"
+	],
+
+	"request": {
+		"_extends_": "Common_Request"
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"token": "[[ANYTHING_PRESENT]]",
+			"case_details": {
+				"id": "[[ANYTHING_PRESENT]]",
+				"jurisdiction": "BEFTA_JURISDICTION_1",
+				"state": "TODO",
+				"version": 0,
+				"case_type_id": "BEFTA_CASETYPE_1_1",
+				"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+				"created_date": "[[ANYTHING_PRESENT]]",
+				"last_modified": "[[ANYTHING_PRESENT]]",
+				"security_classification": "PUBLIC",
+				"case_data": {
+					"_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
+				},
+				"data_classification": {
+					"MoneyGBPField": "PUBLIC",
+					"YesOrNoField": "PUBLIC",
+					"EmailField": "PUBLIC",
+					"TextField": "PUBLIC",
+					"PhoneUKField": "PUBLIC",
+					"NumberField": "PUBLIC"
+				},
+				"supplementary_data": null,
+				"after_submit_callback_response": null,
+				"callback_response_status_code": null,
+				"callback_response_status": null,
+				"delete_draft_response_status_code": null,
+				"delete_draft_response_status": null,
+				"security_classifications": {
+					"MoneyGBPField": "PUBLIC",
+					"YesOrNoField": "PUBLIC",
+					"EmailField": "PUBLIC",
+					"TextField": "PUBLIC",
+					"PhoneUKField": "PUBLIC",
+					"NumberField": "PUBLIC"
+				}
+			},
+			"event_id": "START_PROGRESS"
+		}
+	}
 }

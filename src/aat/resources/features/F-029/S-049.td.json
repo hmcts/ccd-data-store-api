@@ -49,6 +49,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -86,6 +87,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -123,6 +125,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -160,6 +163,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -197,6 +201,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -234,6 +239,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -271,6 +277,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -308,6 +315,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -345,6 +353,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -398,6 +407,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -461,6 +471,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -507,6 +518,7 @@
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -568,6 +580,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -622,6 +635,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -675,6 +689,7 @@
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": null,
+                      "retain_hidden_value": null,
                       "formatted_value": null,
                       "default_value": null
                     },
@@ -721,6 +736,7 @@
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
+                      "retain_hidden_value": null,
                       "formatted_value": null,
                       "default_value": null
                     }
@@ -744,6 +760,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               }
@@ -759,6 +776,7 @@
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -819,6 +837,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -856,6 +875,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -893,6 +913,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -930,6 +951,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -967,6 +989,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -1004,6 +1027,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               },
@@ -1041,6 +1065,7 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
+                "retain_hidden_value": null,
                 "formatted_value": null,
                 "default_value": null
               }
@@ -1056,6 +1081,7 @@
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -1093,6 +1119,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -1146,6 +1173,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",

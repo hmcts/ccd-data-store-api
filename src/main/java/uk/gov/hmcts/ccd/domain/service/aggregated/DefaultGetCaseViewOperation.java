@@ -49,7 +49,8 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                                        ObjectMapperService objectMapperService,
                                        CompoundFieldOrderService compoundFieldOrderService,
                                        FieldProcessorService fieldProcessorService) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, compoundFieldOrderService, fieldProcessorService);
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService,
+              compoundFieldOrderService, fieldProcessorService);
         this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;
@@ -61,7 +62,8 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
 
-        final CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getJurisdiction(), caseDetails.getCaseTypeId());
+        final CaseTypeDefinition caseTypeDefinition =
+            getCaseType(caseDetails.getJurisdiction(), caseDetails.getCaseTypeId());
         final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
         final CaseTypeTabsDefinition caseTypeTabsDefinition = getCaseTabCollection(caseDetails.getCaseTypeId());
 

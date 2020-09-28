@@ -1,0 +1,69 @@
+{
+  "_guid_": "S-942",
+  "_extends_": "F-109_test_Data_Base_ES_external",
+  "specs": [
+    "with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2",
+    "with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of both previously created cases",
+    "is made to query the previously created case from Jurisdiction Befta_Jurisdiction1",
+    "contains the case type of Jurisdiction Befta_Jurisdiction1"
+  ],
+  "request": {
+    "queryParams": {
+      "ctid": "BEFTA_CASETYPE_1_1"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][F-109-Befta_Jurisdiction1_Case_Creation][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "total": 1,
+      "cases": [
+        {
+          "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
+          "jurisdiction": "BEFTA_JURISDICTION_1",
+          "state": "TODO",
+          "version": null,
+          "case_type_id": "BEFTA_CASETYPE_1_1",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "last_modified": "[[ANYTHING_PRESENT]]",
+          "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+          "security_classification": "PUBLIC",
+          "case_data": {
+           "_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
+          },
+          "data_classification" : {
+            "MoneyGBPField" : "PUBLIC",
+            "YesOrNoField" : "PUBLIC",
+            "EmailField" : "PUBLIC",
+            "TextField" : "PUBLIC",
+            "PhoneUKField" : "PUBLIC",
+            "NumberField" : "PUBLIC"
+          },
+          "supplementary_data": null,
+          "after_submit_callback_response" : null,
+          "callback_response_status_code" : null,
+          "callback_response_status" : null,
+          "delete_draft_response_status_code" : null,
+          "delete_draft_response_status" : null,
+          "security_classifications" : {
+            "MoneyGBPField" : "PUBLIC",
+            "YesOrNoField" : "PUBLIC",
+            "EmailField" : "PUBLIC",
+            "TextField" : "PUBLIC",
+            "PhoneUKField" : "PUBLIC",
+            "NumberField" : "PUBLIC"
+          }
+        }
+      ],
+      "case_types_results" : [ {
+        "total" : 1,
+        "case_type_id" : "BEFTA_CASETYPE_1_1"
+      } ]
+    }
+  }
+}

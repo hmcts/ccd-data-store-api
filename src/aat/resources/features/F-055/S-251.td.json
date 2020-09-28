@@ -1,45 +1,45 @@
 {
-  "title": "must return 200 if start event trigger is successful for a case",
+	"_guid_": "S-251",
+	"_extends_": "F-055_Base_Test_Data",
+	"title": "must return 200 if start event trigger is successful for a case",
 
-  "_guid_": "S-251",
-  "_extends_": "F-055_Base_Test_Data",
+	"specs": [
+		"an active profile in CCD",
+		"includes case data matching the case just created",
+		"contains an event token for the triggered event, along with a HTTP 200 OK"
+	],
 
-  "specs": [
-    "an active profile in CCD",
-    "includes case data matching the case just created",
-    "contains an event token for the triggered event, along with a HTTP 200 OK"
-  ],
-
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "body": {
-      "token": "[[ANYTHING_PRESENT]]",
-      "case_details": {
-        "id": "[[ANYTHING_PRESENT]]",
-        "jurisdiction": "BEFTA_JURISDICTION_3",
-        "state": "TODO",
-        "version": 0,
-        "case_type_id": "BEFTA_CASETYPE_3_2",
-        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-        "created_date": "[[ANYTHING_PRESENT]]",
-        "last_modified": "[[ANYTHING_PRESENT]]",
-        "security_classification": "PUBLIC",
-        "case_data": {
-          "_extends_": "Standard_Full_Case_Data"
-        },
-        "data_classification": {
-          "_extends_": "Standard_Full_Case_Data_Classification"
-        },
-        "after_submit_callback_response": null,
-        "callback_response_status_code": null,
-        "callback_response_status": null,
-        "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": {
-          "_extends_": "Standard_Full_Case_Data_Classification"
-        }
-      },
-      "event_id": "UPDATE"
-    }
-  }
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"body": {
+			"token": "[[ANYTHING_PRESENT]]",
+			"case_details": {
+				"id": "[[ANYTHING_PRESENT]]",
+				"jurisdiction": "BEFTA_JURISDICTION_3",
+				"state": "TODO",
+				"version": 0,
+				"case_type_id": "BEFTA_CASETYPE_3_2",
+				"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+				"created_date": "[[ANYTHING_PRESENT]]",
+				"last_modified": "[[ANYTHING_PRESENT]]",
+				"security_classification": "PUBLIC",
+				"case_data": {
+					"_extends_": "Standard_Full_Case_Data"
+				},
+				"data_classification": {
+					"_extends_": "Standard_Full_Case_Data_Classification"
+				},
+				"supplementary_data": null,
+				"after_submit_callback_response": null,
+				"callback_response_status_code": null,
+				"callback_response_status": null,
+				"delete_draft_response_status_code": null,
+				"delete_draft_response_status": null,
+				"security_classifications": {
+					"_extends_": "Standard_Full_Case_Data_Classification"
+				}
+			},
+			"event_id": "UPDATE"
+		}
+	}
 }

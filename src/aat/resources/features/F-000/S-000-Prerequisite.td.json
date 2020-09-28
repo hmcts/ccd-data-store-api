@@ -1,51 +1,53 @@
 {
-  "_guid_": "S-000-Prerequisite",
-  "_extends_": "S-000-Base-Success",
+	"_guid_": "S-000-Prerequisite",
+	"_extends_": "S-000-Base-Success",
 
-  "users": {
-    "invokingUser": {
-      "username":"[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
-      "password":"[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
-    }
-  },
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve a user profile",
 
-  "specs": [
-    "to retrieve a user profile"
-  ],
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/profile",
 
-  "productName": "CCD Data Store",
-  "operationName": "Retrieve a user profile",
-  "method": "GET",
-  "uri": "/caseworkers/{uid}/profile",
+	"users": {
+		"invokingUser": {
+			"username":"[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+			"password":"[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+		}
+	},
 
-  "request": {
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]"
-    }
-  },
-  "expectedResponse": {
-    "responseCode": 200,
-    "headers" : {
-      "X-Frame-Options" : "[[ANY_STRING_NOT_NULLABLE]]",
-      "Cache-Control" : "[[ANYTHING_PRESENT]]",
-      "X-Content-Type-Options" : "[[ANYTHING_PRESENT]]",
-      "X-XSS-Protection" : "[[ANY_STRING_NOT_NULLABLE]]",
-      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
-      "vary" : "[[ANY_STRING_NOT_NULLABLE]]",
-      "Expires" : "[[ANYTHING_PRESENT]]",
-      "Pragma" : "[[ANYTHING_PRESENT]]",
-      "Date" : "[[ANYTHING_PRESENT]]",
-      "Content-Type" : "[[ANYTHING_PRESENT]]",
-      "Content-Length": "[[ANY_INTEGER_NULLABLE]]",
-      "Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
-      "Strict-Transport-Security": "max-age=31536000 ; includeSubDomains",
-	  "Request-Context": "[[ANY_STRING_NULLABLE]]"
-    },
-    "body": {
-      "user": "[[ANY_OBJECT_NOT_NULLABLE]]",
-      "channels": null,
-      "jurisdictions": "[[ANYTHING_PRESENT]]",
-      "default": "[[ANY_OBJECT_NOT_NULLABLE]]"
-    }
-  }
+	"specs": [
+		"to retrieve a user profile"
+	],
+
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]"
+		}
+	},
+
+	"expectedResponse": {
+		"responseCode": 200,
+		"headers" : {
+			"X-Frame-Options" : "[[ANY_STRING_NOT_NULLABLE]]",
+			"Cache-Control" : "[[ANYTHING_PRESENT]]",
+			"X-Content-Type-Options" : "[[ANYTHING_PRESENT]]",
+			"X-XSS-Protection" : "[[ANY_STRING_NOT_NULLABLE]]",
+			"Content-Encoding" : "[[ANYTHING_PRESENT]]",
+			"vary" : "[[ANY_STRING_NOT_NULLABLE]]",
+			"Expires" : "[[ANYTHING_PRESENT]]",
+			"Pragma" : "[[ANYTHING_PRESENT]]",
+			"Date" : "[[ANYTHING_PRESENT]]",
+			"Content-Type" : "[[ANYTHING_PRESENT]]",
+			"Content-Length": "[[ANY_INTEGER_NULLABLE]]",
+			"Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
+			"Strict-Transport-Security": "max-age=31536000 ; includeSubDomains",
+		"Request-Context": "[[ANY_STRING_NULLABLE]]"
+		},
+		"body": {
+			"user": "[[ANY_OBJECT_NOT_NULLABLE]]",
+			"channels": null,
+			"jurisdictions": "[[ANYTHING_PRESENT]]",
+			"default": "[[ANY_OBJECT_NOT_NULLABLE]]"
+		}
+	}
 }

@@ -65,6 +65,8 @@ class CaseServiceTest {
         caseDetails = buildCaseDetails();
         caseDetails.setId(CASE_ID);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReferenceWithNoAccessControl(
+            CASE_REFERENCE);
 
         caseDataService = new CaseDataService();
         caseService = new CaseService(caseDataService, caseDetailsRepository, uidService);
@@ -98,9 +100,35 @@ class CaseServiceTest {
         void shoudThrowResourceNotFoundException() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
-            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
+            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION,
+                CASE_REFERENCE));
         }
     }
+
+    @Nested
+    @DisplayName("getCaseDetailsByCaseReference()")
+    class GetCaseDetailsByCaseReference {
+        @Test
+        @DisplayName("should return caseDetails")
+        void getCaseDetails() {
+
+            CaseDetails result = caseService.getCaseDetailsByCaseReference(CASE_REFERENCE);
+            assertAll(
+                () -> assertThat(result.getId(), is(caseDetails.getId())),
+                () -> verify(caseDetailsRepository).findByReferenceWithNoAccessControl(CASE_REFERENCE)
+            );
+        }
+
+        @Test
+        @DisplayName("should fail when case isn't found in the DB")
+        void shoudThrowResourceNotFoundException() {
+            doReturn(Optional.empty()).when(caseDetailsRepository).findByReferenceWithNoAccessControl(CASE_REFERENCE);
+
+            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetailsByCaseReference(
+                CASE_REFERENCE));
+        }
+    }
+
 
     @Nested
     @DisplayName("clone()")
@@ -208,7 +236,6 @@ class CaseServiceTest {
                     + "}"));
 
             CaseDataContent caseDataContent = newCaseDataContent()
-                .withData(data)
                 .withCaseReference(CASE_REFERENCE)
                 .withEventData(eventData)
                 .build();
@@ -235,7 +262,8 @@ class CaseServiceTest {
         void shoudThrowResourceNotFoundException() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
-            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
+            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION,
+                CASE_REFERENCE));
         }
     }
 

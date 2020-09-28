@@ -51,7 +51,7 @@ class UICaseControllerTest {
     private CaseHistoryView caseHistoryView;
 
     @InjectMocks
-    private UICaseController caseController;
+    private uk.gov.hmcts.ccd.v2.internal.controller.UICaseController caseController;
 
     @BeforeEach
     void setUp() {
@@ -108,7 +108,8 @@ class UICaseControllerTest {
         @Test
         @DisplayName("should return 200 when event found")
         void caseFound() {
-            final ResponseEntity<CaseHistoryViewResource> response = caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString());
+            final ResponseEntity<CaseHistoryViewResource> response =
+                    caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString());
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),

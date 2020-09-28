@@ -1,12 +1,16 @@
 {
   "_guid_": "S-584_Update_Case_For_Citizen_Data_Base",
+
   "productName": "CCD Data Store",
   "operationName": "Submit event creation as a Citizen",
+
   "method": "POST",
   "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+
   "user": {
     "_extends_": "Common_User_For_Request"
   },
+
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers"
@@ -19,10 +23,10 @@
     },
     "body": {
       "data": {
-        "DocumentField2":{
-          "document_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-          "document_filename":"Elastic Search test Case.png : Updated by Citizen"
+        "DocumentField2": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_filename": "Elastic Search test Case.png : Updated by Citizen"
         }
       },
       "event": {
@@ -34,6 +38,7 @@
       "ignore_warning": false
     }
   },
+
   "expectedResponse": {
     "headers": {
       "_extends_": "Common_Response_Headers",

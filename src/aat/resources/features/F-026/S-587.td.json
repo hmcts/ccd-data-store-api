@@ -1,97 +1,106 @@
 {
-	"title": "must return the list of cases and status code 200 for correct inputs",
 	"_guid_": "S-587",
 	"_extends_": "F-026_Test_Data_Base",
+	"title": "must return the list of cases and status code 200 for correct inputs",
+
 	"specs": [
-      "an active profile in CCD",
-      "contains details of existing cases associated, along with an HTTP-200 OK",
-      "contains Last State Modified Date as a column for UI layout"
+		"an active profile in CCD",
+		"contains details of existing cases associated, along with an HTTP-200 OK",
+		"contains Last State Modified Date as a column for UI layout"
 	],
-  "user": {
-      "username": "befta.caseworker.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_JURISDICTION_3",
-      "ctid": "BEFTA_CASETYPE_3_4"
-    }
-  },
+
+	"user": {
+		"username": "befta.caseworker.3@gmail.com",
+		"password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_JURISDICTION_3",
+			"ctid": "BEFTA_CASETYPE_3_4"
+		}
+	},
+
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
 			"Transfer-Encoding": "[[ANY_STRING_NULLABLE]]"
 		},
-    "body" : {
-        "columns" : [ {
-          "label" : "Last State Modified Date",
-          "order" : 1,
-          "metadata" : true,
-          "case_field_id" : "[LAST_STATE_MODIFIED_DATE]",
-          "case_field_type" : {
-            "id" : "DateTime",
-            "type" : "DateTime",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "display_context_parameter" : null
-        }, {
-          "label" : "`Text` field",
-          "order" : 2,
-          "metadata" : false,
-          "case_field_id" : "TextField",
-          "case_field_type" : {
-            "id" : "Text",
-            "type" : "Text",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "display_context_parameter" : null
-        }, {
-          "label" : "`Number` field",
-          "order" : 3,
-          "metadata" : false,
-          "case_field_id" : "NumberField",
-          "case_field_type" : {
-            "id" : "Number",
-            "type" : "Number",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "display_context_parameter" : null
-        }, {
-          "label" : "`YesOrNo` field",
-          "order" : 4,
-          "metadata" : false,
-          "case_field_id" : "YesOrNoField",
-          "case_field_type" : {
-            "id" : "YesOrNo",
-            "type" : "YesOrNo",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "display_context_parameter" : null
-        } ],
-        "results": "[[ANYTHING_PRESENT]]",
-			  "result_error": null
+		"body": {
+			"columns": [
+				{
+					"label": "Last State Modified Date",
+					"order": 1,
+					"metadata": true,
+					"case_field_id": "[LAST_STATE_MODIFIED_DATE]",
+					"case_field_type": {
+						"id": "DateTime",
+						"type": "DateTime",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"display_context_parameter": null
+				},
+				{
+					"label": "`Text` field",
+					"order": 2,
+					"metadata": false,
+					"case_field_id": "TextField",
+					"case_field_type": {
+						"id": "Text",
+						"type": "Text",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"display_context_parameter": null
+				},
+				{
+					"label": "`Number` field",
+					"order": 3,
+					"metadata": false,
+					"case_field_id": "NumberField",
+					"case_field_type": {
+						"id": "Number",
+						"type": "Number",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"display_context_parameter": null
+				},
+				{
+					"label": "`YesOrNo` field",
+					"order": 4,
+					"metadata": false,
+					"case_field_id": "YesOrNoField",
+					"case_field_type": {
+						"id": "YesOrNo",
+						"type": "YesOrNo",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"display_context_parameter": null
+				}
+			],
+			"results": "[[ANYTHING_PRESENT]]",
+			"result_error": null
 		}
 	}
 }

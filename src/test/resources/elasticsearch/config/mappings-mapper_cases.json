@@ -1,6 +1,6 @@
 {
   "_doc": {
-    "dynamic": "strict",
+    "dynamic": "true",
     "properties": {
       "@timestamp": {
         "enabled": false,
@@ -220,8 +220,7 @@
             "type": "text"
           },
           "PhoneUKField": {
-            "analyzer": "standard",
-            "search_analyzer": "phone_number_analyzer",
+            "analyzer": "phone_number_analyzer",
             "type": "text"
           },
           "TextAreaField": {

@@ -57,7 +57,8 @@ class GetCaseValidatorTest extends BaseTest {
                 .statusCode(422);
         }
 
-        private RequestSpecification callCaseDataValidate(String caseTypeId, Supplier<String> supplier) throws JsonProcessingException {
+        private RequestSpecification callCaseDataValidate(String caseTypeId, Supplier<String> supplier)
+                                                          throws JsonProcessingException {
             return asAutoTestCaseworker(FALSE)
                 .get()
                 .given()

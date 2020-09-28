@@ -25,37 +25,49 @@ public abstract class BaseTest {
     }
 
     protected Supplier<RequestSpecification> asAutoTestCaseworker(boolean withUserParam) {
-        return authenticateAndCreateRequestSpecification(aat.getCaseworkerAutoTestEmail(), aat.getCaseworkerAutoTestPassword(), withUserParam);
+        return authenticateAndCreateRequestSpecification(aat.getCaseworkerAutoTestEmail(),
+                                                         aat.getCaseworkerAutoTestPassword(),
+                                                         withUserParam);
     }
 
     protected Supplier<RequestSpecification> asPrivateCaseworker(boolean withUserParam) {
-        return authenticateAndCreateRequestSpecification(aat.getPrivateCaseworkerEmail(), aat.getPrivateCaseworkerPassword(), withUserParam);
+        return authenticateAndCreateRequestSpecification(aat.getPrivateCaseworkerEmail(),
+                                                         aat.getPrivateCaseworkerPassword(),
+                                                         withUserParam);
     }
 
     protected Supplier<RequestSpecification> asRestrictedCaseworker(boolean withUserParam) {
-        return authenticateAndCreateRequestSpecification(aat.getRestrictedCaseworkerEmail(), aat.getRestrictedCaseworkerPassword(), withUserParam);
+        return authenticateAndCreateRequestSpecification(aat.getRestrictedCaseworkerEmail(),
+                                                         aat.getRestrictedCaseworkerPassword(),
+                                                         withUserParam);
     }
 
     protected Supplier<RequestSpecification> asPrivateCaseworkerSolicitor(boolean withUserParam) {
-        return authenticateAndCreateRequestSpecification(aat.getPrivateCaseworkerSolicitorEmail(), aat.getPrivateCaseworkerSolicitorPassword(), withUserParam);
+        return authenticateAndCreateRequestSpecification(aat.getPrivateCaseworkerSolicitorEmail(),
+                                                         aat.getPrivateCaseworkerSolicitorPassword(),
+                                                         withUserParam);
     }
 
     protected Supplier<RequestSpecification> asPrivateCrossCaseTypeCaseworker(boolean withUserParam) {
-        return authenticateAndCreateRequestSpecification(aat.getPrivateCrossCaseTypeCaseworkerEmail(), aat.getPrivateCrossCaseTypeCaseworkerPassword(),
+        return authenticateAndCreateRequestSpecification(aat.getPrivateCrossCaseTypeCaseworkerEmail(),
+                                                         aat.getPrivateCrossCaseTypeCaseworkerPassword(),
                                                          withUserParam);
     }
 
     protected Supplier<RequestSpecification> asPrivateCrossCaseTypeSolicitor(boolean withUserParam) {
-        return authenticateAndCreateRequestSpecification(aat.getPrivateCrossCaseTypeSolicitorEmail(), aat.getPrivateCrossCaseTypeSolicitorPassword(),
+        return authenticateAndCreateRequestSpecification(aat.getPrivateCrossCaseTypeSolicitorEmail(),
+                                                         aat.getPrivateCrossCaseTypeSolicitorPassword(),
                                                          withUserParam);
     }
 
     protected Supplier<RequestSpecification> asRestrictedCrossCaseTypeCaseworker(boolean withUserParam) {
-        return authenticateAndCreateRequestSpecification(aat.getRestrictedCrossCaseTypeCaseworkerEmail(), aat.getRestrictedCrossCaseTypeCaseworkerPassword(),
+        return authenticateAndCreateRequestSpecification(aat.getRestrictedCrossCaseTypeCaseworkerEmail(),
+                                                         aat.getRestrictedCrossCaseTypeCaseworkerPassword(),
                                                          withUserParam);
     }
 
-    private Supplier<RequestSpecification> authenticateAndCreateRequestSpecification(String username, String password, Boolean withUserParam) {
+    private Supplier<RequestSpecification> authenticateAndCreateRequestSpecification(String username, String password,
+                                                                                     Boolean withUserParam) {
         AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(username, password);
         String s2sToken = aat.getS2SHelper().getToken();
 

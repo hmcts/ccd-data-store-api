@@ -95,12 +95,14 @@ public class CallbackInvoker {
         return new AboutToSubmitCallbackResponse();
     }
 
-    public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEventDefinition caseEventDefinition,
+    public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEventDefinition
+                                                                                   caseEventDefinition,
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
         ResponseEntity<AfterSubmitCallbackResponse> afterSubmitCallbackResponseEntity;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLSubmittedEvent())) {
-            afterSubmitCallbackResponseEntity = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLSubmittedEvent(),
+            afterSubmitCallbackResponseEntity =
+                callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLSubmittedEvent(),
                 caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -162,10 +164,12 @@ public class CallbackInvoker {
         }
     }
 
-    private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition caseTypeDefinition,
+    private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
+                                                                                      caseTypeDefinition,
                                                                                   final CaseDetails caseDetails,
                                                                                   final Boolean ignoreWarning,
-                                                                                  final CallbackResponse callbackResponse) {
+                                                                                  final CallbackResponse
+                                                                                      callbackResponse) {
 
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
@@ -191,7 +195,8 @@ public class CallbackInvoker {
 
 
     private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
-        return (callbackResponse.getSecurityClassification() != null && callbackResponse.getDataClassification() != null) ? true : false;
+        return (callbackResponse.getSecurityClassification() != null
+            && callbackResponse.getDataClassification() != null) ? true : false;
     }
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseTypeDefinition caseTypeDefinition,

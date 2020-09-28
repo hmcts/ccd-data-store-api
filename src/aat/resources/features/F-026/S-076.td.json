@@ -1,22 +1,24 @@
 {
-  "title": "must return 412 when the case type is not present in Definition store workbasket input fields",
-  "_guid_": "S-076",
-  "_extends_": "F-026_Test_Data_Base",
+	"_guid_": "S-076",
+	"_extends_": "F-026_Test_Data_Base",
+	"title": "must return 412 when the case type is not present in Definition store workbasket input fields",
 
-  "specs": [
-    "an active profile in CCD",
-    "uses case type which is not present in Definition store workbasket",
-    "has an HTTP-412 return code"
-  ],
-  "request": {
-    "pathVariables": {
-      "ctid": "BAT_AUTH_100"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_412_Response",
-    "body": {
-      "message": "Unknown at the moment"
-    }
-  }
+	"specs": [
+		"an active profile in CCD",
+		"uses case type which is not present in Definition store workbasket",
+		"has an HTTP-412 return code"
+	],
+
+	"request": {
+		"pathVariables": {
+			"ctid": "BAT_AUTH_100"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_412_Response",
+		"body": {
+			"message": "Unknown at the moment"
+		}
+	}
 }

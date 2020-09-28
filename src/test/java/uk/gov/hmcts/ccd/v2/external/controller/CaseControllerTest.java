@@ -92,7 +92,8 @@ class CaseControllerTest {
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseDetails));
         when(createEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT)).thenReturn(caseDetails);
-        when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING)).thenReturn(caseDetails);
+        when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING))
+            .thenReturn(caseDetails);
         List<AuditEvent> auditEvents = Lists.newArrayList(new AuditEvent(), new AuditEvent());
         when(getEventsOperation.getEvents(CASE_REFERENCE)).thenReturn(auditEvents);
     }
@@ -147,7 +148,8 @@ class CaseControllerTest {
         @Test
         @DisplayName("should return 201 when case event created")
         void caseEventCreated() {
-            final ResponseEntity<CaseResource> response = caseController.createEvent(CASE_REFERENCE, CASE_DATA_CONTENT);
+            final ResponseEntity<CaseResource> response =
+                caseController.createEvent(CASE_REFERENCE, CASE_DATA_CONTENT);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
@@ -167,7 +169,8 @@ class CaseControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(createEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT)).thenThrow(RuntimeException.class);
+            when(createEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT))
+                .thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class,
                 () -> caseController.createEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
@@ -184,7 +187,8 @@ class CaseControllerTest {
             LocalDateTime stateModified = LocalDateTime.now();
             when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
 
-            final ResponseEntity<CaseResource> response = caseController.createCase(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
+            final ResponseEntity<CaseResource> response =
+                caseController.createCase(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
@@ -196,7 +200,8 @@ class CaseControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING)).thenThrow(RuntimeException.class);
+            when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING))
+                .thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class,
                 () -> caseController.createCase(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING));
@@ -250,9 +255,11 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
             Map<String, Object> data = createResponseData();
             SupplementaryData supplementaryData = new SupplementaryData(data);
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject())).thenReturn(supplementaryData);
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+                .thenReturn(supplementaryData);
 
-            final ResponseEntity<SupplementaryDataResource> response = caseController.updateCaseSupplementaryData(CASE_REFERENCE, createRequestDataOrgA());
+            final ResponseEntity<SupplementaryDataResource> response =
+                caseController.updateCaseSupplementaryData(CASE_REFERENCE, createRequestDataOrgA());
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -268,7 +275,8 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest()));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE,
+                    new SupplementaryDataUpdateRequest()));
         }
 
         @Test
@@ -286,7 +294,8 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest(new HashMap<>())));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE,
+                    new SupplementaryDataUpdateRequest(new HashMap<>())));
         }
 
         @Test
@@ -304,7 +313,8 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE, new SupplementaryDataUpdateRequest()));
+                () -> caseController.updateCaseSupplementaryData(CASE_REFERENCE,
+                    new SupplementaryDataUpdateRequest()));
         }
 
         private Map<String, Object> createResponseData() {

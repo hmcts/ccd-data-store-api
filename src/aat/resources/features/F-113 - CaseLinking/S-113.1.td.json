@@ -1,0 +1,46 @@
+{
+	"title": "must return validation error when an invalid case reference is entered",
+	"_guid_": "S-113.1",
+	"_extends_": "F-113_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains an invalid case reference"
+	],
+
+  "request": {
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": "XYYY8****"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Vary": "accept-encoding",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "status" : 422,
+      "error" : "Unprocessable Entity",
+      "message" : "Case data validation failed",
+      "path" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "details" : {
+        "field_errors" : [ {
+          "id" : "CaseLinkField.CaseReference",
+          "message" : "The data entered is not valid for this type of field, please delete and re-enter using only valid data"
+        } ]
+      },
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

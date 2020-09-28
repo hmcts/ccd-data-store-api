@@ -66,6 +66,7 @@
 					]
 				}
 			},
+			"supplementary_data": null,
 			"security_classifications": {
 				"MoneyGBPField": "PUBLIC",
 				"FixedListField": "PUBLIC",

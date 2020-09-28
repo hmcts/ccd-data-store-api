@@ -1,18 +1,21 @@
 {
-  "title": "ust return negative response HTTP-400 when request contains a malformed jurisdiction ID",
-  "_guid_": "S-572",
-  "_extends_": "F-047_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "contains a malformed jurisdiction ID",
-    "code is HTTP-400"
-  ],
-  "request": {
-    "pathVariables": {
-      "jid": "@£$%  ^&*(@£$  %^&*("
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_400_Response"
-  }
+	"_guid_": "S-572",
+	"_extends_": "F-047_Test_Data_Base",
+	"title": "ust return negative response HTTP-400 when request contains a malformed jurisdiction ID",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a malformed jurisdiction ID",
+		"code is HTTP-400"
+	],
+
+	"request": {
+		"pathVariables": {
+			"jid": "@£$%  ^&*(@£$  %^&*("
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_400_Response"
+	}
 }

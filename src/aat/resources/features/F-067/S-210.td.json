@@ -2,16 +2,19 @@
   "_guid_": "S-210",
   "_extends_": "F-067_Test_Data_Base",
   "title": "should get 400 when request contains non-existing event Id",
+
   "specs": [
     "an active profile in CCD",
     "contains a non-existing event Id",
     "contains HTTP 400 Not Found"
   ],
+
   "request": {
     "pathVariables": {
       "eventId": "non-existing event Id"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "body": {
@@ -21,7 +24,7 @@
       "path": "[[ANYTHING_PRESENT]]",
       "details": null,
       "callbackErrors": null,
-      "callbackWarnings":  null
+      "callbackWarnings":	null
     }
   }
 }

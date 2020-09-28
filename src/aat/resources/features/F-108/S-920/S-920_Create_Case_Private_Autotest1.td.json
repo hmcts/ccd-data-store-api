@@ -1,0 +1,12 @@
+{
+	"_guid_": "S-920_Create_Case_Private_Autotest1",
+	"_extends_": "Private_Case_Creation_Autotest1_Data",
+	"request": {
+		"body": {
+			"event_token": "${[scenarioContext][parentContext][childContexts][S-920_Create_Case_Private_Autotest1_Token_Creation][testData][actualResponse][body][token]}",
+			"data": {
+				"MoneyGBPField": "66"
+			}
+		}
+	}
+}

@@ -1,57 +1,48 @@
 {
-  "_guid_": "Befta_Jurisdiction2_Default_Full_Case_Data_Solicitor_1",
-  "DocumentField4": {
-    "document_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
-    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary",
-    "document_filename": "Screenshot 2019-11-14 at 1.57.32 pm.png"
-  },
+	"_guid_": "Befta_Jurisdiction2_Default_Full_Case_Data_Solicitor_1",
 
-
-  "DocumentField7": {
-    "document_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311",
-    "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311/binary",
-    "document_filename": "Screenshot 2019-12-24 at 3.41.04 pm.png"
-  },
-
-  "MoneyGBPField": "111100",
-  "FixedListField": "VALUE3",
-
-  "AddressUKField": {
-    "AddressLine1": null,
-    "AddressLine2": null,
-    "AddressLine3": null,
-    "PostTown": null,
-    "County": null,
-    "PostCode": null,
-    "Country": null
-  },
-
-
-  "ComplexField": {
-    "ComplexTextField": null,
-    "ComplexFixedListField": null,
-    "ComplexNestedField": {
-      "NestedNumberField": null,
-      "NestedCollectionTextField": []
-    }
-  },
-  "FixedRadioListField": "RADIOVALUE2",
-  "DateTimeField": null,
-  "PhoneUKField": null,
-
-
-  "NumberField": "111111222222",
-  "MultiSelectListField": [
-    "OPTION5",
-    "OPTION4",
-    "OPTION3"
-  ],
-  "YesOrNoField": "Yes",
-  "EmailField": "testemail@gmail.com",
-  "TextField": "sometextfield",
-  "DateField": "2222-01-02",
-  "TextAreaField": "textarea",
-  "CollectionField": []
+	"DocumentField4": {
+		"document_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
+		"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary",
+		"document_filename": "Screenshot 2019-11-14 at 1.57.32 pm.png"
+	},
+	"DocumentField7": {
+		"document_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311",
+		"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/5c14f8ef-887b-41e0-ad01-23959c082311/binary",
+		"document_filename": "Screenshot 2019-12-24 at 3.41.04 pm.png"
+	},
+	"MoneyGBPField": "111100",
+	"FixedListField": "VALUE3",
+	"AddressUKField": {
+		"AddressLine1": null,
+		"AddressLine2": null,
+		"AddressLine3": null,
+		"PostTown": null,
+		"County": null,
+		"PostCode": null,
+		"Country": null
+	},
+	"ComplexField": {
+		"ComplexTextField": null,
+		"ComplexFixedListField": null,
+		"ComplexNestedField": {
+			"NestedNumberField": null,
+			"NestedCollectionTextField": []
+		}
+	},
+	"FixedRadioListField": "RADIOVALUE2",
+	"DateTimeField": null,
+	"PhoneUKField": null,
+	"NumberField": "111111222222",
+	"MultiSelectListField": [
+		"OPTION5",
+		"OPTION4",
+		"OPTION3"
+	],
+	"YesOrNoField": "Yes",
+	"EmailField": "testemail@gmail.com",
+	"TextField": "sometextfield",
+	"DateField": "2222-01-02",
+	"TextAreaField": "textarea",
+	"CollectionField": []
 }
-
-

@@ -14,17 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DefaultSettings;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
@@ -40,10 +38,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
@@ -1038,17 +1036,28 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public WizardPageBuilder withOrder(Integer order) {
+            wizardPage.setOrder(order);
+            return this;
+        }
+
+        public WizardPageBuilder withCallBackURLMidEvent(String callBackURLMidEvent) {
+            wizardPage.setCallBackURLMidEvent(callBackURLMidEvent);
+            return this;
+        }
+
         public WizardPageBuilder withField(CaseViewField caseField) {
             WizardPageField wizardPageField = new WizardPageField();
             wizardPageField.setCaseFieldId(caseField.getId());
             wizardPageField.setPageColumnNumber(1);
-            wizardPageField.setOrder(1);
+            wizardPageField.setOrder(caseField.getOrder() != null ? caseField.getOrder() : 1);
             wizardPageField.setComplexFieldOverrides(emptyList());
             wizardPageFields.add(wizardPageField);
             return this;
         }
 
-        public WizardPageBuilder withField(CaseViewField caseField, List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+        public WizardPageBuilder withField(CaseViewField caseField,
+                                           List<WizardPageComplexFieldOverride> complexFieldOverrides) {
             WizardPageField wizardPageField = new WizardPageField();
             wizardPageField.setCaseFieldId(caseField.getId());
             wizardPageField.setPageColumnNumber(1);
@@ -1234,6 +1243,16 @@ public class TestBuildersUtil {
 
         public CaseViewFieldBuilder withId(String id) {
             caseViewField.setId(id);
+            return this;
+        }
+
+        public CaseViewFieldBuilder withValue(Object value) {
+            caseViewField.setValue(value);
+            return this;
+        }
+
+        public CaseViewFieldBuilder withOrder(Integer order) {
+            caseViewField.setOrder(order);
             return this;
         }
 
@@ -1763,7 +1782,8 @@ public class TestBuildersUtil {
             return new UserProfileBuilder();
         }
 
-        public UserProfileBuilder withJurisdictionDisplayProperties(JurisdictionDisplayProperties[] jurisdictionDisplayProperties) {
+        public UserProfileBuilder withJurisdictionDisplayProperties(JurisdictionDisplayProperties[]
+                                                                            jurisdictionDisplayProperties) {
             userProfile.setJurisdictions(jurisdictionDisplayProperties);
             return this;
         }

@@ -46,12 +46,25 @@ class DefaultCaseAssignedUserRolesOperationTest {
 
     @Test
     void findCaseUserRoles() {
-        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(createCaseAssignedUserRoles());
+        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(
+                createCaseAssignedUserRoles());
 
         List<CaseAssignedUserRole> caseAssignedUserRoles = caseAssignedUserRolesOperation
             .findCaseUserRoles(Lists.newArrayList(), Lists.newArrayList());
 
         assertEquals(2, caseAssignedUserRoles.size());
+    }
+
+    @Test
+    void removeCaseUserRoles() {
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(),
+                new CaseAssignedUserRoleWithOrganisation()
+        );
+
+        caseAssignedUserRolesOperation.removeCaseUserRoles(caseUserRoles);
+
+        verify(caseAccessOperation).removeCaseUserRoles(caseUserRoles);
     }
 
     private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {
