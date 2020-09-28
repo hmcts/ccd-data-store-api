@@ -135,7 +135,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.SEARCH_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1535450291607660,1535450291607670"));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is("123"));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getListOfCaseTypes(), is("TestAddressBookCase,TestAddressBookCase4"));
