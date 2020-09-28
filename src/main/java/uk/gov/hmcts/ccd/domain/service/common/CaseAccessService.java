@@ -96,7 +96,7 @@ public class CaseAccessService {
 
     public boolean isJurisdictionAccessAllowed(String jurisdiction) {
         return this.userRepository
-            .getUserRolesJurisdictions()
+            .getCaseworkerUserRolesJurisdictions()
             .stream()
             .anyMatch(jurisdiction::equalsIgnoreCase);
     }

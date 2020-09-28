@@ -1,25 +1,29 @@
 {
-  "title": "must return 4xx when request does not provide valid authentication credentials",
-  "_guid_": "S-036",
-  "_extends_": "F-027_Test_Data_Base",
+	"_guid_": "S-036",
+	"_extends_": "F-027_Test_Data_Base",
+	"title": "must return 4xx when request does not provide valid authentication credentials",
 
-  "specs": ["an active profile in CCD",
-    "does not provide valid authentication credentials",
-    "has the 403 return code"],
-  "request": {
-    "pathVariables": {
-      "uid": "some id",
-      "cid": "1234567890"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_403_Response",
-    "headers" : {
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
-    },
-    "body" : {
-      "message" : "Access Denied"
-    }
-  }
+	"specs": [
+		"an active profile in CCD",
+		"does not provide valid authentication credentials",
+		"has the 403 return code"
+	],
+
+	"request": {
+		"pathVariables": {
+			"uid": "some id",
+			"cid": "1234567890"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"message": "Access Denied"
+		}
+	}
 }

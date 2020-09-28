@@ -2,11 +2,13 @@
   "_guid_": "S-208",
   "_extends_": "F-067_Test_Data_Base",
   "title": "must return negative response when request provides authentic credentials without authorised access",
-	"specs": [
-		"an active profile in CCD",
-		"does not provide an authorised access to the operation",
-		"includes a HTTP 403 Forbidden"
-	],
+
+  "specs": [
+    "an active profile in CCD",
+    "does not provide an authorised access to the operation",
+    "includes a HTTP 403 Forbidden"
+  ],
+
   "request": {
     "headers": {
       "ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
@@ -16,10 +18,11 @@
       "eventId": "SomeEventID"
     }
   },
-	"expectedResponse": {
-		"_extends_": "Common_403_Response",
-		"body": {
-			"message": "Access Denied"
-		}
-	}
+
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message": "Access Denied"
+    }
+  }
 }

@@ -1,22 +1,22 @@
 {
-  "title": "must return 404 for non-existing case type id",
+	"title": "must return 404 for non-existing case type id",
 
-  "_guid_": "S-127",
-  "_extends_": "F-032_Base_Test_Data",
+	"_guid_": "S-127",
+	"_extends_": "F-032_Base_Test_Data",
 
-  "specs": [
-    "an active profile in CCD",
-    "contains a non-existing case type id",
-    "contains a HTTP 404 Not Found"
-  ],
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing case type id",
+		"contains a HTTP 404 Not Found"
+	],
 
-  "request": {
-    "pathVariables": {
-      "jid": "abc"
-    }
-  },
+	"request": {
+		"pathVariables": {
+			"jid": "abc"
+		}
+	},
 
-  "expectedResponse": {
-    "_extends_": "Common_404_Response"
-  }
+	"expectedResponse": {
+		"_extends_": "Common_404_Response"
+	}
 }

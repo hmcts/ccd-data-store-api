@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment_Token_Creation",
+  "_extends_": "F-111_Case_Data_Create_C1_Token_Creation",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "uid": "${[scenarioContext][parentContext][parentContext][testData][users][userRichard][id]}"
+    }
+  }
+}

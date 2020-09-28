@@ -2,16 +2,19 @@
 	"_guid_": "S-560",
 	"_extends_": "F-044_Test_Data_Base",
 	"title": "must return 404 when request contains a non-existing case type",
+
 	"specs": [
 		"an active profile in CCD",
 		"contains a non-existing case type",
 		"contains an HTTP 404 'Not Found'"
 	],
+
 	"request": {
 		"pathVariables": {
-      "ctid": "Invalid_CaseType"
-    }
+			"ctid": "Invalid_CaseType"
+		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_404_Response",
 		"body": {

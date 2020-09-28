@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,9 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.util.Map;
-import java.util.Optional;
 
 // TODO CaseService and CaseDataService could probably be merged together.
 @Service
@@ -65,7 +64,6 @@ public class CaseService {
      * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
-
         content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
         return caseDetails;
     }
@@ -92,6 +90,11 @@ public class CaseService {
             throw new BadRequestException("Case reference is not valid");
         }
         final Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
+        return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
+    }
+
+    public CaseDetails getCaseDetailsByCaseReference(String caseReference) {
+        final Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReferenceWithNoAccessControl(caseReference);
         return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
     }
 
