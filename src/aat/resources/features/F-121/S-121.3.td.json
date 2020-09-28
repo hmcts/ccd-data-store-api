@@ -655,8 +655,8 @@
               "page_column_no": null,
               "complex_field_overrides": [
                 {
-                  "__operator__": "equivalent",
-                  "__ordering__": "unordered"
+                  "__ordering__": "unordered",
+                  "__elementId__": "complex_field_element_id"
                 },
                 {
                   "complex_field_element_id": "Address1.AddressLine1",
@@ -722,8 +722,8 @@
               "page_column_no": null,
               "complex_field_overrides": [
                 {
-                  "__operator__": "equivalent",
-                  "__ordering__": "unordered"
+                  "__ordering__": "unordered",
+                  "__elementId__": "complex_field_element_id"
                 },
                 {
                   "complex_field_element_id": "Address2.AddressLine3",
