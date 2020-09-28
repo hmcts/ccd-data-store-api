@@ -52,7 +52,8 @@ class DefaultObjectMapperServiceTest {
         @DisplayName("should throw exception for malformed json string conversion to object")
         void shouldThrowExceptionOnConvertStringToObject() {
             String json = "{\"testString\":\"test\" \"testInteger\":1}";
-            assertThrows(ServiceException.class, () -> objectMapperService.convertStringToObject(json, JsonTestDto.class));
+            assertThrows(ServiceException.class, () ->
+                    objectMapperService.convertStringToObject(json, JsonTestDto.class));
         }
 
     }
@@ -131,7 +132,8 @@ class DefaultObjectMapperServiceTest {
             node.put("field", "value");
             ObjectMapper objectMapper = mock(ObjectMapper.class);
             DefaultObjectMapperService service = new DefaultObjectMapperService(objectMapper);
-            doThrow(new IllegalArgumentException("")).when(objectMapper).convertValue(any(), Matchers.<TypeReference<HashMap<String, JsonNode>>>any());
+            doThrow(new IllegalArgumentException("")).when(objectMapper).convertValue(any(),
+                    Matchers.<TypeReference<HashMap<String, JsonNode>>>any());
 
             assertThrows(ServiceException.class, () -> service.convertJsonNodeToMap(node));
         }

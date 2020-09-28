@@ -60,7 +60,8 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE
+            + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
@@ -78,13 +79,15 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
+        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
         assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
         assertEquals("state3", savedCaseDetails.getState());
@@ -113,7 +116,8 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE
+            + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
@@ -131,13 +135,15 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
+        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
         assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
         assertEquals("state3", savedCaseDetails.getState());
@@ -163,12 +169,14 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCaseworker() throws Exception {
-        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("caseworkers", CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
+        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("caseworkers",
+            CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCitizen() throws Exception {
-        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens", CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
+        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens",
+            CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }
 
     @Test
@@ -201,7 +209,8 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         assertEquals("Incorrect case data size", NUMBER_OF_CASES, count);
     }
 
-    private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role, String caseType) throws Exception {
+    private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role, String caseType)
+                                                                                                    throws Exception {
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();

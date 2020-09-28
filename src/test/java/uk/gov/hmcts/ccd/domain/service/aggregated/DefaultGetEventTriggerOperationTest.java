@@ -54,11 +54,13 @@ class DefaultGetEventTriggerOperationTest {
     private static final String CASE_TYPE_ID = "Grant";
     private static final Boolean IGNORE = Boolean.TRUE;
     private static final String TOKEN = "testToken";
-    private final DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withEventId(EVENT_TRIGGER_ID).build()).build();
+    private final DraftResponse draftResponse =
+        newDraftResponse().withDocument(newCaseDraft().withEventId(EVENT_TRIGGER_ID).build()).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
     private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
     private final List<CaseEventFieldDefinition> eventFields = Lists.newArrayList();
-    private final StartEventResult startEventResult = newStartEventTrigger().withEventToken(TOKEN).withCaseDetails(caseDetails).build();
+    private final StartEventResult startEventResult =
+        newStartEventTrigger().withEventToken(TOKEN).withCaseDetails(caseDetails).build();
     private final CaseUpdateViewEvent caseUpdateViewEvent = newCaseUpdateViewEvent().build();
 
     @Mock
@@ -129,8 +131,10 @@ class DefaultGetEventTriggerOperationTest {
 
             assertAll(
                 () -> assertThat(result, sameInstance(caseUpdateViewEvent)),
-                () -> inOrder.verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE),
-                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventResult, CASE_TYPE_ID, EVENT_TRIGGER_ID, null)
+                () -> inOrder.verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                    IGNORE),
+                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventResult, CASE_TYPE_ID,
+                    EVENT_TRIGGER_ID, null)
             );
         }
     }
@@ -145,9 +149,8 @@ class DefaultGetEventTriggerOperationTest {
 
             doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
 
-            final Exception exception = assertThrows(BadRequestException.class, () -> defaultGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
-                                                                                                                                     EVENT_TRIGGER_ID,
-                                                                                                                                     IGNORE));
+            final Exception exception = assertThrows(BadRequestException.class, () ->
+                defaultGetEventTriggerOperation.executeForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE));
             assertThat(exception.getMessage(), startsWith("Case reference is not valid"));
         }
 
@@ -158,9 +161,8 @@ class DefaultGetEventTriggerOperationTest {
             doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
-            final Exception exception = assertThrows(CaseNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
-                                                                                                                                       EVENT_TRIGGER_ID,
-                                                                                                                                       IGNORE));
+            final Exception exception = assertThrows(CaseNotFoundException.class, () ->
+                defaultGetEventTriggerOperation.executeForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE));
             assertThat(exception.getMessage(), startsWith("No case found for reference: " + CASE_REFERENCE));
         }
 
@@ -187,8 +189,10 @@ class DefaultGetEventTriggerOperationTest {
                 () -> assertThat(result, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(uidService).validateUID(CASE_REFERENCE),
                 () -> inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE),
-                () -> inOrder.verify(startEventOperation).triggerStartForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE),
-                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventResult, CASE_TYPE_ID, EVENT_TRIGGER_ID, CASE_REFERENCE),
+                () -> inOrder.verify(startEventOperation).triggerStartForCase(CASE_REFERENCE, EVENT_TRIGGER_ID,
+                    IGNORE),
+                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventResult, CASE_TYPE_ID,
+                    EVENT_TRIGGER_ID, CASE_REFERENCE),
                 () -> inOrder.verifyNoMoreInteractions()
             );
         }
@@ -210,8 +214,8 @@ class DefaultGetEventTriggerOperationTest {
         void shouldFailIfNoDraft() {
             when(draftGateway.getCaseDetails(Draft.stripId(DRAFT_ID))).thenThrow(ResourceNotFoundException.class);
 
-            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
-                                                                                                                IGNORE));
+            assertThrows(ResourceNotFoundException.class, () ->
+                defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE));
         }
 
         @Test
@@ -219,8 +223,8 @@ class DefaultGetEventTriggerOperationTest {
         void shouldFailIfNoDraftDetails() {
             doThrow(ResourceNotFoundException.class).when(startEventOperation).triggerStartForDraft(DRAFT_ID,
                                                                                                     IGNORE);
-            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
-                                                                                                                IGNORE));
+            assertThrows(ResourceNotFoundException.class, () ->
+                defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE));
         }
 
         @Test
@@ -238,7 +242,8 @@ class DefaultGetEventTriggerOperationTest {
                 () -> assertThat(result, sameInstance(caseUpdateViewEvent)),
                 () -> inOrder.verify(draftGateway).getCaseDetails(Draft.stripId(DRAFT_ID)),
                 () -> inOrder.verify(startEventOperation).triggerStartForDraft(DRAFT_ID, IGNORE),
-                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventResult, CASE_TYPE_ID, EVENT_TRIGGER_ID, DRAFT_ID)
+                () -> inOrder.verify(caseUpdateViewEventBuilder).build(startEventResult, CASE_TYPE_ID,
+                    EVENT_TRIGGER_ID, DRAFT_ID)
             );
         }
     }

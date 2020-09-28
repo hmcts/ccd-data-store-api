@@ -78,7 +78,8 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(event).when(caseDataContent).getEvent();
         doReturn(eventId).when(caseDataContent).getEventId();
 
-        validateCaseFieldsOperation = new DefaultValidateCaseFieldsOperation(caseDefinitionRepository, caseTypeService, fieldProcessorService);
+        validateCaseFieldsOperation = new DefaultValidateCaseFieldsOperation(caseDefinitionRepository, caseTypeService,
+            fieldProcessorService);
     }
 
     @Test
@@ -86,10 +87,12 @@ class DefaultValidateCaseFieldsOperationTest {
 
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseType("default_role"));
 
-        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole("default_role");
+        final Map<String, JsonNode> organisationPolicyData =
+            buildJsonNodeDataWithOrganisationPolicyRole("default_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        final Map<String, JsonNode> result = validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
+        final Map<String, JsonNode> result =
+            validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
 
         assertAll(
             () -> assertThat(result, is(organisationPolicyData))
@@ -99,12 +102,15 @@ class DefaultValidateCaseFieldsOperationTest {
     @Test
     void shouldValidate_when_organisation_has_correct_roles() throws Exception {
 
-        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseTypeWithTwoDefaultValues("default_role1", "default_role2"));
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID))
+            .willReturn(buildCaseTypeWithTwoDefaultValues("default_role1", "default_role2"));
 
-        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
+        final Map<String, JsonNode> organisationPolicyData =
+            buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        final Map<String, JsonNode> result = validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
+        final Map<String, JsonNode> result =
+            validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
 
         assertAll(
             () -> assertThat(result, is(organisationPolicyData))
@@ -116,7 +122,8 @@ class DefaultValidateCaseFieldsOperationTest {
         CaseTypeDefinition caseTypeDefinition = buildCaseTypeWithTwoDefaultValues("default_role1", "default_role2");
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
 
-        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
+        final Map<String, JsonNode> organisationPolicyData =
+            buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
         validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent);
@@ -136,7 +143,8 @@ class DefaultValidateCaseFieldsOperationTest {
             "Class");
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
 
-        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
+        final Map<String, JsonNode> organisationPolicyData =
+            buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
 
         ObjectNode classNode = new ObjectMapper().createObjectNode();
         organisationPolicyData.keySet().forEach(key -> classNode.set(key, organisationPolicyData.get(key)));
@@ -163,7 +171,8 @@ class DefaultValidateCaseFieldsOperationTest {
             "Class",
             "Class"));
 
-        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
+        final Map<String, JsonNode> organisationPolicyData =
+            buildJsonNodeDataWithTwoOrganisationPolicyRole("default_role1", "default_role2");
 
         ObjectNode classNode = new ObjectMapper().createObjectNode();
         organisationPolicyData.keySet().forEach(key -> classNode.set(key, organisationPolicyData.get(key)));
@@ -174,7 +183,8 @@ class DefaultValidateCaseFieldsOperationTest {
         parentData.put("ParentNode", parentNode);
         doReturn(parentData).when(caseDataContent).getData();
 
-        final Map<String, JsonNode> result = validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
+        final Map<String, JsonNode> result =
+            validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
 
         assertAll(
             () -> assertThat(result, is(parentData))
@@ -190,7 +200,8 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
         BadRequestException exception =
-            assertThrows(BadRequestException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+            assertThrows(BadRequestException.class, () ->
+                validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
         assertThat(exception.getMessage(),
             containsString("has an incorrect value"));
@@ -201,11 +212,13 @@ class DefaultValidateCaseFieldsOperationTest {
 
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseType("default_role"));
 
-        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
+        final Map<String, JsonNode> organisationPolicyData =
+            buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
         BadRequestException exception =
-            assertThrows(BadRequestException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+            assertThrows(BadRequestException.class, () ->
+                validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
         assertThat(exception.getMessage(),
             containsString("incorrect value"));
@@ -216,7 +229,8 @@ class DefaultValidateCaseFieldsOperationTest {
         CaseTypeDefinition caseTypeDefinition = buildCaseType("default_role");
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
 
-        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole("default_role");
+        final Map<String, JsonNode> organisationPolicyData =
+            buildJsonNodeDataWithOrganisationPolicyRole("default_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
         validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent);
@@ -232,7 +246,8 @@ class DefaultValidateCaseFieldsOperationTest {
 
         BadRequestException exception =
             assertThrows(BadRequestException.class,
-                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent));
+                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition,
+                    caseDataContent));
 
         assertThat(exception.getMessage(),
             containsString("has an incorrect value"));
@@ -243,12 +258,14 @@ class DefaultValidateCaseFieldsOperationTest {
         CaseTypeDefinition caseTypeDefinition = buildCaseType("default_role");
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
 
-        final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
+        final Map<String, JsonNode> organisationPolicyData =
+            buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
         BadRequestException exception =
             assertThrows(BadRequestException.class,
-                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition, caseDataContent));
+                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition,
+                    caseDataContent));
 
         assertThat(exception.getMessage(),
             containsString("incorrect value"));
@@ -268,7 +285,8 @@ class DefaultValidateCaseFieldsOperationTest {
     @Test
     void shouldFailValidationIfNoContent() {
         ValidationException exception =
-            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, null));
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID,
+                null));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(any());
@@ -280,7 +298,8 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(null).when(caseDataContent).getEvent();
 
         ValidationException exception =
-            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID,
+                caseDataContent));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(any());
@@ -292,7 +311,8 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(null).when(caseDataContent).getEventId();
 
         ValidationException exception =
-            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID,
+                caseDataContent));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(any());
@@ -304,7 +324,8 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
         ValidationException exception =
-            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID,
+                caseDataContent));
         assertThat(exception.getMessage(),
             startsWith("Cannot find case type definition for " + CASE_TYPE_ID));
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
@@ -316,14 +337,16 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn("otherEvent").when(caseDataContent).getEventId();
 
         ValidationException exception =
-            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+            assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID,
+                caseDataContent));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event otherEvent is not found in case type definition"));
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(caseTypeService, never()).validateData(anyMap(), any());
     }
 
-    private Map<String, JsonNode> buildJsonNodeDataWithOrganisationPolicyRole(String organisationPolicyRole) throws IOException {
+    private Map<String, JsonNode> buildJsonNodeDataWithOrganisationPolicyRole(String organisationPolicyRole)
+                                                                                                throws IOException {
         final JsonNode node = new ObjectMapper().readTree("{\n"
             + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole + "\",\n"
             + "  \"OrgPolicyReference\": \"" + organisationPolicyRole + "\",\n"
@@ -441,7 +464,8 @@ class DefaultValidateCaseFieldsOperationTest {
     }
 
     private Map<String, JsonNode> buildJsonNodeDataWithTwoOrganisationPolicyRole(String organisationPolicyRole1,
-                                                                                 String organisationPolicyRole2) throws IOException {
+                                                                                 String organisationPolicyRole2)
+                                                                                                 throws IOException {
         final JsonNode node = new ObjectMapper().readTree("{\n"
             + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole1 + "\",\n"
             + "  \"OrgPolicyReference\": \"" + organisationPolicyRole1 + "\",\n"

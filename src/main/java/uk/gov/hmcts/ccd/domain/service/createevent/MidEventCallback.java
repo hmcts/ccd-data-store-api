@@ -40,7 +40,8 @@ public class MidEventCallback {
     public MidEventCallback(CallbackInvoker callbackInvoker,
                             UIDefinitionRepository uiDefinitionRepository,
                             EventTriggerService eventTriggerService,
-                            @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                            @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                    CaseDefinitionRepository caseDefinitionRepository,
                             CaseService caseService) {
         this.callbackInvoker = callbackInvoker;
         this.uiDefinitionRepository = uiDefinitionRepository;
@@ -68,16 +69,21 @@ public class MidEventCallback {
                 CaseDetails caseDetailsBefore = null;
                 CaseDetails currentOrNewCaseDetails;
                 if (StringUtils.isNotEmpty(content.getCaseReference())) {
-                    CaseDetails caseDetails = caseService.getCaseDetails(caseTypeDefinition.getJurisdictionId(), content.getCaseReference());
+                    CaseDetails caseDetails =
+                        caseService.getCaseDetails(caseTypeDefinition.getJurisdictionId(), content.getCaseReference());
                     caseDetailsBefore = caseService.clone(caseDetails);
-                    currentOrNewCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails);
+                    currentOrNewCaseDetails =
+                        caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails);
                 } else {
-                    currentOrNewCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(),
+                    currentOrNewCaseDetails =
+                        caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(),
                         content.getEventData() == null ? content.getData() : content.getEventData());
                 }
-                removeNextPageFieldData(currentOrNewCaseDetails, wizardPageOptional.get().getOrder(), caseTypeId, event.getEventId());
+                removeNextPageFieldData(currentOrNewCaseDetails, wizardPageOptional.get().getOrder(), caseTypeId,
+                    event.getEventId());
 
-                CaseDetails caseDetailsFromMidEventCallback = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
+                CaseDetails caseDetailsFromMidEventCallback =
+                    callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
                     caseTypeDefinition,
                         caseEventDefinition,
                     caseDetailsBefore,
@@ -90,7 +96,8 @@ public class MidEventCallback {
         return dataJsonNode(content.getData());
     }
 
-    private void removeNextPageFieldData(CaseDetails currentCaseDetails, Integer order, String caseTypeId, String eventId) {
+    private void removeNextPageFieldData(CaseDetails currentCaseDetails, Integer order,
+                                         String caseTypeId, String eventId) {
         if (order != null) {
             Set<String> wizardPageFields = uiDefinitionRepository
                 .getWizardPageCollection(caseTypeId, eventId)
@@ -119,9 +126,11 @@ public class MidEventCallback {
     }
 
     private CaseEventDefinition getCaseEvent(Event event, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
+        final CaseEventDefinition caseEventDefinition =
+            eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
         if (caseEventDefinition == null) {
-            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeDefinition.getId());
+            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type "
+                + caseTypeDefinition.getId());
         }
         return caseEventDefinition;
     }

@@ -24,7 +24,7 @@ public class MockUtils {
     public static final String CCD_GW = "ccd_gw";
 
     private MockUtils() {
-        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
+       // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     }
 
     public static final String ROLE_CASEWORKER_PUBLIC = "caseworker-probate-public";
@@ -49,7 +49,8 @@ public class MockUtils {
         setSecurityAuthorities("aJwtToken", authenticationMock, authorities);
     }
 
-    public static final void setSecurityAuthorities(String jwtToken, Authentication authenticationMock, String... authorities) {
+    public static final void setSecurityAuthorities(String jwtToken, Authentication authenticationMock,
+                                                    String... authorities) {
 
         Jwt jwt =   Jwt.withTokenValue(jwtToken)
             .claim("aClaim", "aClaim")

@@ -33,7 +33,8 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
         authorisedCaseAssignedUserRolesOperation = new AuthorisedCaseAssignedUserRolesOperation(
             defaultCaseAssignedUserRolesOperation,
             caseAssignedUserRoleValidator);
-        when(defaultCaseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(createCaseAssignedUserRoles());
+        when(defaultCaseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
+                .thenReturn(createCaseAssignedUserRoles());
     }
 
     @Test

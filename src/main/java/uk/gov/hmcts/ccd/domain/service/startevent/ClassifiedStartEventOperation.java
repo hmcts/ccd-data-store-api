@@ -30,7 +30,8 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     public ClassifiedStartEventOperation(@Qualifier("default") StartEventOperation startEventOperation,
                                          SecurityClassificationService classificationService,
-                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                         final CaseDefinitionRepository caseDefinitionRepository,
                                          final CaseDataService caseDataService,
                                          @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.startEventOperation = startEventOperation;
@@ -58,12 +59,12 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     public StartEventResult triggerStartForDraft(String draftReference,
                                                  Boolean ignoreWarning) {
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
-        return applyClassificationIfCaseDetailsExist(deduceDefaultClassificationsForDraft(startEventOperation.triggerStartForDraft(draftReference,
-                                                                                                                                   ignoreWarning),
-                                                                                          caseDetails.getCaseTypeId()));
+        return applyClassificationIfCaseDetailsExist(deduceDefaultClassificationsForDraft(startEventOperation
+                .triggerStartForDraft(draftReference, ignoreWarning), caseDetails.getCaseTypeId()));
     }
 
-    private StartEventResult deduceDefaultClassificationsForDraft(StartEventResult startEventResult, String caseTypeId) {
+    private StartEventResult deduceDefaultClassificationsForDraft(StartEventResult startEventResult,
+                                                                  String caseTypeId) {
         CaseDetails caseDetails = startEventResult.getCaseDetails();
         deduceDefaultClassificationIfCaseDetailsPresent(caseTypeId, caseDetails);
         return startEventResult;

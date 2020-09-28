@@ -42,29 +42,34 @@ public class DateTimeValidator implements BaseTypeValidator {
         try {
             dateTimeValue = LocalDateTime.parse(dataValue.asText(), ISO_DATE_TIME);
         } catch (DateTimeParseException e) {
-            return Collections.singletonList(new ValidationResult("Date or Time entered is not valid", dataFieldId));
+            return Collections.singletonList(new ValidationResult("Date or Time entered is not valid",
+                dataFieldId));
         }
 
         if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), dateTimeValue)) {
             return Collections.singletonList(new ValidationResult("The date time should be earlier than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMax())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition()
+                .getMax())), dataFieldId));
         }
 
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), dateTimeValue)) {
             return Collections.singletonList(new ValidationResult("The date time should be later than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMin())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition()
+                .getMin())), dataFieldId));
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataValue.asText())) {
             return Collections.singletonList(
                 new ValidationResult(dataValue.asText()
-                    + " Field Type Regex Failed:" + caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataFieldId)
+                    + " Field Type Regex Failed:" + caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(),
+                    dataFieldId)
             );
         }
 
         if (!checkRegex(getType().getRegularExpression(), dataValue.asText())) {
             return Collections.singletonList(
-                new ValidationResult(dataValue.asText() + " Date Time Type Regex Failed:" + getType().getRegularExpression(), dataFieldId)
+                new ValidationResult(dataValue.asText() + " Date Time Type Regex Failed:" + getType()
+                    .getRegularExpression(), dataFieldId)
             );
         }
 

@@ -39,8 +39,10 @@ public class DisplayContextParameter {
             return Collections.emptyList();
         }
         while (displayContextParameter.contains(MULTIPLE_PARAMETERS_STRING)) {
-            displayContextParameters.add(displayContextParameter.substring(0, (displayContextParameter.indexOf(MULTIPLE_PARAMETERS_STRING) + 1)));
-            displayContextParameter = displayContextParameter.substring((displayContextParameter.indexOf(MULTIPLE_PARAMETERS_STRING) + 2)).trim();
+            displayContextParameters.add(displayContextParameter.substring(0,
+                (displayContextParameter.indexOf(MULTIPLE_PARAMETERS_STRING) + 1)));
+            displayContextParameter = displayContextParameter.substring(
+                (displayContextParameter.indexOf(MULTIPLE_PARAMETERS_STRING) + 2)).trim();
         }
 
         displayContextParameters.add(displayContextParameter.trim());

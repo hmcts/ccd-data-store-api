@@ -41,7 +41,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
             try {
-                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
+                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext
+                                                                  + ".testData.actualResponse.body.id");
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
@@ -80,32 +81,38 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         return ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
     }
 
-    private Map<String, Object> calculateOrganisationsAssignedUsersPropertyWithValue(BackEndFunctionalTestScenarioContext scenarioContext,
-                                                                                     String organisationIdentifierContextPath,
-                                                                                     String previousValueContextPath,
-                                                                                     int incrementBy) {
-        String organisationIdentifierFieldPath = organisationIdentifierContextPath + ".testData.actualResponse.body.organisationIdentifier";
+    private Map<String, Object> calculateOrganisationsAssignedUsersPropertyWithValue(
+                                                    BackEndFunctionalTestScenarioContext scenarioContext,
+                                                    String organisationIdentifierContextPath,
+                                                    String previousValueContextPath,
+                                                    int incrementBy) {
+        String organisationIdentifierFieldPath = organisationIdentifierContextPath
+            + ".testData.actualResponse.body.organisationIdentifier";
 
         try {
-            String organisationIdentifier = ReflectionUtils.deepGetFieldInObject(scenarioContext, organisationIdentifierFieldPath).toString();
+            String organisationIdentifier = ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                organisationIdentifierFieldPath).toString();
             String propertyName = "orgs_assigned_users." + organisationIdentifier;
 
             int value = 0; // default
 
             // if path to previous value supplied : read it
             if (previousValueContextPath != null) {
-                String previousValueFieldPath = previousValueContextPath + ".testData.actualResponse.body.supplementary_data."
-                                                                         + propertyName.replace(".", "\\.");
+                String previousValueFieldPath = previousValueContextPath
+                                                + ".testData.actualResponse.body.supplementary_data."
+                                                + propertyName.replace(".", "\\.");
                 Object previousValue = ReflectionUtils.deepGetFieldInObject(scenarioContext, previousValueFieldPath);
                 if (previousValue != null) {
                     value = Integer.parseInt(previousValue.toString())  + incrementBy; // and increment
                 }  else {
-                    throw new FunctionalTestException("Cannot find previous supplementary data property: '" + previousValueFieldPath + "'");
+                    throw new FunctionalTestException("Cannot find previous supplementary data property: '"
+                                                        + previousValueFieldPath + "'");
                 }
             }
             return Collections.singletonMap(propertyName, value);
         } catch (Exception e) {
-            throw new FunctionalTestException("Problem generating 'orgs_assigned_users' supplementary data property.", e);
+            throw new FunctionalTestException("Problem generating 'orgs_assigned_users' supplementary data property.",
+                                                                                                                    e);
         }
     }
 }

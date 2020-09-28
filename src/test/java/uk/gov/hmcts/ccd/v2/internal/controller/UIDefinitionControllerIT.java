@@ -43,14 +43,16 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql" })
     public void shouldReturnWorkBasketInputDefinitions() throws Exception {
 
-        final MvcResult result = mockMvc.perform(get("/internal/case-types/TestAddressBookCase/work-basket-inputs")
+        final MvcResult result =
+            mockMvc.perform(get("/internal/case-types/TestAddressBookCase/work-basket-inputs")
             .contentType(MediaType.APPLICATION_JSON)
             .header(AUTHORIZATION, "Bearer user1")
             .header(V2.EXPERIMENTAL_HEADER, "true"))
             .andExpect(status().is(200))
             .andReturn();
 
-        WorkbasketInputsViewResource response = mapper.readValue(result.getResponse().getContentAsString(), WorkbasketInputsViewResource.class);
+        WorkbasketInputsViewResource response =
+            mapper.readValue(result.getResponse().getContentAsString(), WorkbasketInputsViewResource.class);
         WorkbasketInputsViewResource.WorkbasketInputView[] workbasketInputs = response.getWorkbasketInputs();
 
         assertThat(workbasketInputs[0].getLabel(), is("First Name"));
@@ -66,14 +68,16 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql" })
     public void shouldReturnWorkSearchInputDefinitions() throws Exception {
 
-        final MvcResult result = mockMvc.perform(get("/internal/case-types/TestAddressBookCase/search-inputs")
+        final MvcResult result =
+            mockMvc.perform(get("/internal/case-types/TestAddressBookCase/search-inputs")
             .contentType(MediaType.APPLICATION_JSON)
             .header(AUTHORIZATION, "Bearer user1")
             .header(V2.EXPERIMENTAL_HEADER, "true"))
             .andExpect(status().is(200))
             .andReturn();
 
-        SearchInputsViewResource response = mapper.readValue(result.getResponse().getContentAsString(), SearchInputsViewResource.class);
+        SearchInputsViewResource response =
+            mapper.readValue(result.getResponse().getContentAsString(), SearchInputsViewResource.class);
         SearchInputsViewResource.SearchInputView[] searchInputs = response.getSearchInputs();
 
         assertThat(searchInputs[0].getLabel(), is("First Name"));

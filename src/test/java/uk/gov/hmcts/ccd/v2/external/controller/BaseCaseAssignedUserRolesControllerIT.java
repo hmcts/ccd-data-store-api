@@ -157,11 +157,13 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         return headers;
     }
 
-    protected void verifyAuditForAddCaseUserRoles(HttpStatus status, List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+    protected void verifyAuditForAddCaseUserRoles(HttpStatus status,
+                                                  List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES.getLabel()));
+        assertThat(captor.getValue().getOperationType(),
+                is(AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES.getLabel()));
         assertThat(captor.getValue().getHttpStatus(), is(status.value()));
         assertThat(captor.getValue().getPath(), is(postCaseAssignedUserRoles));
         assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.POST.name()));
@@ -180,11 +182,13 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         }
     }
 
-    protected void verifyAuditForRemoveCaseUserRoles(HttpStatus status, List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+    protected void verifyAuditForRemoveCaseUserRoles(HttpStatus status,
+                                                     List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository, atLeastOnce()).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.REMOVE_CASE_ASSIGNED_USER_ROLES.getLabel()));
+        assertThat(captor.getValue().getOperationType(),
+            is(AuditOperationType.REMOVE_CASE_ASSIGNED_USER_ROLES.getLabel()));
         assertThat(captor.getValue().getHttpStatus(), is(status.value()));
         assertThat(captor.getValue().getPath(), is(postCaseAssignedUserRoles));
         assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.DELETE.name()));
@@ -207,7 +211,8 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.GET_CASE_ASSIGNED_USER_ROLES.getLabel()));
+        assertThat(captor.getValue().getOperationType(),
+            is(AuditOperationType.GET_CASE_ASSIGNED_USER_ROLES.getLabel()));
         assertThat(captor.getValue().getHttpStatus(), is(status.value()));
         assertThat(captor.getValue().getPath(), is(getCaseAssignedUserRoles));
         assertThat(captor.getValue().getHttpMethod(), is(HttpMethod.GET.name()));

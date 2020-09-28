@@ -43,17 +43,20 @@ public class DateValidator implements BaseTypeValidator {
         try {
             dateValue = LocalDate.parse(dataValue.asText(), ISO_DATE);
         } catch (DateTimeParseException e) {
-            return Collections.singletonList(new ValidationResult("Date or Time entered is not valid", dataFieldId));
+            return Collections.singletonList(new ValidationResult("Date or Time entered is not valid",
+                dataFieldId));
         }
 
         if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), dateValue)) {
             return Collections.singletonList(new ValidationResult("The date should be earlier than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMax())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition
+                .getFieldTypeDefinition().getMax())), dataFieldId));
         }
 
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), dateValue)) {
             return Collections.singletonList(new ValidationResult("The date should be later than "
-                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition.getFieldTypeDefinition().getMin())), dataFieldId));
+                + DATE_TIME_FORMATTER.format(epochTimeStampToLocalDate(caseFieldDefinition
+                .getFieldTypeDefinition().getMin())), dataFieldId));
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataValue.asText())) {

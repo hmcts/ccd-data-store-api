@@ -47,7 +47,8 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content, CaseAssignedUserRolesResource.class);
+        CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content,
+            CaseAssignedUserRolesResource.class);
         assertNotNull("Case Assigned User Roles should not be null", caseAssignedUserRolesResource);
 
         verifyAuditForGetCaseUserRoles(HttpStatus.OK, CASE_IDS, USER_IDS);
@@ -73,10 +74,12 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content, CaseAssignedUserRolesResource.class);
+        CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content,
+            CaseAssignedUserRolesResource.class);
         assertNotNull("Case Assigned User Roles should not be null", caseAssignedUserRolesResource);
         assertEquals(1, caseAssignedUserRolesResource.getCaseAssignedUserRoles().size());
-        assertEquals("7578590391163133", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getCaseDataId());
+        assertEquals("7578590391163133", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0)
+            .getCaseDataId());
         assertEquals("89000", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getUserId());
         assertEquals("[CREATOR]", caseAssignedUserRolesResource.getCaseAssignedUserRoles().get(0).getCaseRole());
 
@@ -102,7 +105,8 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content, CaseAssignedUserRolesResource.class);
+        CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content,
+            CaseAssignedUserRolesResource.class);
         assertNotNull("Case Assigned User Roles should not be null", caseAssignedUserRolesResource);
         assertEquals(3, caseAssignedUserRolesResource.getCaseAssignedUserRoles().size());
 
@@ -142,7 +146,8 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
-        CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content, CaseAssignedUserRolesResource.class);
+        CaseAssignedUserRolesResource caseAssignedUserRolesResource = mapper.readValue(content,
+            CaseAssignedUserRolesResource.class);
         assertNotNull("Case Assigned User Roles should not be null", caseAssignedUserRolesResource);
         assertEquals(4, caseAssignedUserRolesResource.getCaseAssignedUserRoles().size());
 

@@ -137,10 +137,10 @@ class AuthorisedCreateEventOperationTest {
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getUserRoles()).thenReturn(USER_ROLES);
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
-            true);
-        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
-            true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(USER_ROLES),
+            eq(CAN_UPDATE))).thenReturn(true);
+        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(USER_ROLES),
+            eq(CAN_UPDATE))).thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID),
             eq(events),
             eq(USER_ROLES),
@@ -176,8 +176,8 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail when no case found")
     void shouldFailWhenCaseNotFound() {
         doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-            CASE_DATA_CONTENT));
+        assertThrows(ResourceNotFoundException.class, () ->
+            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
 
     }
 
@@ -268,19 +268,21 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if no update case access")
     void shouldFailIfNoUpdateCaseAccess() {
 
-        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, USER_ROLES, CAN_UPDATE)).thenReturn(false);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, USER_ROLES, CAN_UPDATE))
+            .thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-            CASE_DATA_CONTENT));
+        assertThrows(ResourceNotFoundException.class, () ->
+            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
     }
 
     @Test
     @DisplayName("should fail when user has no state update access")
     void shouldFailWhenUserCannotUpdateState() {
-        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
+        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(USER_ROLES),
+            eq(CAN_UPDATE))).thenReturn(
             false);
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-            CASE_DATA_CONTENT));
+        assertThrows(ResourceNotFoundException.class, () ->
+            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
 
     }
 
@@ -288,8 +290,8 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if no event provided")
     void shouldFailIfNoEventProvided() {
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-            INVALID_CASE_DATA_CONTENT));
+        assertThrows(ResourceNotFoundException.class, () ->
+            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, INVALID_CASE_DATA_CONTENT));
     }
 
     @Test
@@ -301,8 +303,8 @@ class AuthorisedCreateEventOperationTest {
             eq(USER_ROLES),
             eq(CAN_CREATE))).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-            CASE_DATA_CONTENT));
+        assertThrows(ResourceNotFoundException.class, () ->
+            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
     }
 
     @Test
@@ -314,8 +316,8 @@ class AuthorisedCreateEventOperationTest {
             eq(caseFieldDefinitions),
             eq(USER_ROLES))).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-            CASE_DATA_CONTENT));
+        assertThrows(ResourceNotFoundException.class, () ->
+            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
     }
 
     @Test
