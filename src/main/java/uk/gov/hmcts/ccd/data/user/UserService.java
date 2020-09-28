@@ -74,7 +74,7 @@ public class UserService {
             workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
             userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
         } catch (ResourceNotFoundException ae) {
-            LOGGER.debug("User Profile not exists for userId {}", userId, ae);
+            LOGGER.debug("User Profile not exists for userId {}", idamProperties.getId(), ae);
         }
 
         return userProfile;
