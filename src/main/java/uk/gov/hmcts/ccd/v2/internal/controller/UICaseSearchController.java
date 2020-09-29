@@ -46,7 +46,8 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedC
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 @RestController
-@RequestMapping(path = "/internal/searchCases", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/internal/searchCases", consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = {"Elastic Based Search API"})
 @SwaggerDefinition(tags = {
     @Tag(name = "Elastic Based Search API", description = "Internal ElasticSearch based case search API, "
@@ -61,6 +62,8 @@ public class UICaseSearchController {
     private final ElasticsearchSortService elasticsearchSortService;
 
     @Autowired
+    @SuppressWarnings("checkstyle:LineLength") //don't want to break message
+
     public UICaseSearchController(
         @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
         ElasticsearchQueryHelper elasticsearchQueryHelper,
@@ -74,7 +77,8 @@ public class UICaseSearchController {
 
     @PostMapping(path = "")
     @ApiOperation(
-        value = "Search cases according to the provided ElasticSearch query. Supports searching a single case type and a use case."
+        value = "Search cases according to the provided ElasticSearch query. Supports searching a single case type and"
+            + " a use case."
     )
     @ApiResponses({
         @ApiResponse(
@@ -110,12 +114,13 @@ public class UICaseSearchController {
         ),
         @ApiResponse(
             code = 500,
-            message = "An unexpected situation that is not attributable to the user or API Client; or request is invalid. "
-                      + "For some other types HTTP code 400 is returned instead.\n"
+            message = "An unexpected situation that is not attributable to the user or API Client; "
+                      + "or request is invalid. For some other types HTTP code 400 is returned instead.\n"
                       + "Invalid request examples include:\n"
                       + "- Malformed JSON request."
         )
     })
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break message
     @ApiImplicitParams(
         @ApiImplicitParam(
             name = "jsonSearchRequest",
@@ -140,15 +145,16 @@ public class UICaseSearchController {
     public ResponseEntity<CaseSearchResultViewResource> searchCases(
                                      @ApiParam(value = "Case type ID for search.", required = true)
                                      @RequestParam(value = "ctid") String caseTypeId,
-                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` or `orgCases`. "
-                                         + "Used when the list of fields to return is configured in the CCD definition.\n"
-                                         + "If omitted, all case fields are returned.")
+                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` "
+                                         + "or `orgCases`. Used when the list of fields to return is configured in the "
+                                         + "CCD definition.\nIf omitted, all case fields are returned.")
                                      @RequestParam(value = "use_case", required = false) final String useCase,
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
-        String useCaseUppercase = Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields() ? null : useCase.toUpperCase();
+        String useCaseUppercase =
+            Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields() ? null : useCase.toUpperCase();
         elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCaseUppercase);
         List<String> requestedFields = searchRequest.getRequestedFields();
 

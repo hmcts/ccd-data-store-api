@@ -91,7 +91,8 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
         return verifyReadAccess(events, accessRoles, caseTypeDefinition);
     }
 
-    private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<String> userRoles, CaseTypeDefinition caseTypeDefinition) {
+    private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<String> userRoles,
+                                              CaseTypeDefinition caseTypeDefinition) {
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
             userRoles,

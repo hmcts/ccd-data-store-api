@@ -17,7 +17,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +65,8 @@ class TextCaseReferenceCaseLinkValidatorTest {
     @Test
     @DisplayName("should pass test against regular expression")
     void textRegexPass() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
+        final CaseFieldDefinition caseFieldDefinition =
+            caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
         final JsonNode validValue = NODE_FACTORY.textNode("1596-1048-4059-0000");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
 
@@ -80,7 +82,8 @@ class TextCaseReferenceCaseLinkValidatorTest {
     @Test
     @DisplayName("should fail test against regular expression")
     void textRegexFail() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
+        final CaseFieldDefinition caseFieldDefinition =
+            caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
         final JsonNode validValue = NODE_FACTORY.textNode("15xxxx00");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
 
@@ -97,7 +100,8 @@ class TextCaseReferenceCaseLinkValidatorTest {
     @Test
     @DisplayName("should fail test against due to resource not found")
     void failDueToResourceNotFound() {
-        final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
+        final CaseFieldDefinition caseFieldDefinition =
+            caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
         final String caseReference = "1596-1048-4059-0000";
         final JsonNode validValue = NODE_FACTORY.textNode(caseReference);
 

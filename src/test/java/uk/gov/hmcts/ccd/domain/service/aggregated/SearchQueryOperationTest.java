@@ -134,10 +134,13 @@ public class SearchQueryOperationTest {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(SEARCH), any());
-        doAnswer(i -> i.getArgument(2)).when(dateTimeSearchInputProcessor).executeQueryParams(Mockito.any(), Mockito.any(), Mockito.any());
-        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchInputProcessor).executeMetadata(Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(2)).when(dateTimeSearchInputProcessor).executeQueryParams(Mockito.any(),
+            Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchInputProcessor).executeMetadata(Mockito.any(),
+            Mockito.any());
 
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
@@ -174,7 +177,8 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(), eq(NO_ERROR)),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+                eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(2)),
             () -> assertThat(argument.getValue(), hasDraftItemInResults())
         );
@@ -193,7 +197,8 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(), eq(NO_ERROR)),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+                eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(1)),
             () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
         );
@@ -211,7 +216,8 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(), eq(NO_ERROR)),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+                eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(1)),
             () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
         );
@@ -229,7 +235,8 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), eq(cases), eq(DRAFT_STORE_DOWN_ERR_MESSAGE))
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), eq(cases),
+                eq(DRAFT_STORE_DOWN_ERR_MESSAGE))
         );
     }
 
@@ -253,7 +260,8 @@ public class SearchQueryOperationTest {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -288,7 +296,8 @@ public class SearchQueryOperationTest {
             .withSearchResultFields(nonSortField, sortField)
             .build();
 
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -307,7 +316,8 @@ public class SearchQueryOperationTest {
             .withSearchResultFields(sortField1, sortField2)
             .build();
 
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -327,13 +337,15 @@ public class SearchQueryOperationTest {
             .withSearchResultFields(sortField1, sortField2)
             .build();
 
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
         doReturn(true).when(userRepository).anyRoleEqualsTo(sortField2.getRole());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertThat(metadata.getSortOrderFields().size(), is(1));
-        assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_ID_1_2 + "." + CASE_FIELD_PATH));
+        assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(),
+            is(CASE_FIELD_ID_1_2 + "." + CASE_FIELD_PATH));
         assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC));
     }
 
@@ -342,7 +354,8 @@ public class SearchQueryOperationTest {
                                                           String role,
                                                           String sortDirection, Integer sortPriority) {
         SortOrder sortOrder = getSortOrder(sortDirection, sortPriority);
-        SearchResultField searchResultField = buildSearchResultField(CASE_TYPE_ID, caseFieldId, caseFieldPath, caseFieldId, "", "");
+        SearchResultField searchResultField =
+            buildSearchResultField(CASE_TYPE_ID, caseFieldId, caseFieldPath, caseFieldId, "", "");
         searchResultField.setSortOrder(sortOrder);
         searchResultField.setRole(role);
         return searchResultField;

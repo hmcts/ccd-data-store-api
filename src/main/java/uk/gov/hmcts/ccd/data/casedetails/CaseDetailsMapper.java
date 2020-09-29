@@ -65,10 +65,12 @@ public class CaseDetailsMapper {
             newCaseDetailsEntity.setData(MAPPER.createObjectNode());
         } else {
             newCaseDetailsEntity.setData(JacksonUtils.convertValueJsonNode(caseDetails.getData()));
-            newCaseDetailsEntity.setDataClassification(JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()));
+            newCaseDetailsEntity.setDataClassification(
+                JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()));
         }
         if (caseDetails.getSupplementaryData() != null) {
-            newCaseDetailsEntity.setSupplementaryData(JacksonUtils.convertValueJsonNode(caseDetails.getSupplementaryData()));
+            newCaseDetailsEntity.setSupplementaryData(JacksonUtils.convertValueJsonNode(caseDetails
+                    .getSupplementaryData()));
         }
         return newCaseDetailsEntity;
     }

@@ -110,7 +110,8 @@ class DefaultUserRepositoryTest {
 
         mockUserInfo("userId");
 
-        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(singletonList(ROLE_CASEWORKER_CAA));
+        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles())
+            .thenReturn(singletonList(ROLE_CASEWORKER_CAA));
         when(applicationParams.getCcdAccessControlCaseworkerRoleRegex()).thenReturn("caseworker.+");
     }
 
@@ -226,7 +227,8 @@ class DefaultUserRepositoryTest {
         assertThrows(ServiceException.class, () -> {
             when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
             HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, null);
-            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class))).thenThrow(response);
+            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class),
+                eq(UserDefault.class))).thenThrow(response);
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
             userRepository.getUserDefaultSettings("222");
@@ -238,7 +240,8 @@ class DefaultUserRepositoryTest {
         assertThrows(ResourceNotFoundException.class, () -> {
             when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
             HttpClientErrorException response = createErrorResponse(HttpStatus.NOT_FOUND, "some message");
-            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class))).thenThrow(response);
+            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class),
+                eq(UserDefault.class))).thenThrow(response);
 
             userRepository.getUserDefaultSettings("222");
         });
@@ -249,7 +252,8 @@ class DefaultUserRepositoryTest {
         assertThrows(BadRequestException.class, () -> {
             when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
             HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, "some message");
-            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class))).thenThrow(response);
+            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class),
+                eq(UserDefault.class))).thenThrow(response);
 
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
@@ -373,7 +377,8 @@ class DefaultUserRepositoryTest {
         @DisplayName("should return highest security classification for user")
         void shouldReturnHighestClassification() {
             asCaseworker();
-            when(applicationParams.getCcdAccessControlCitizenRoles()).thenReturn(Arrays.asList("citizen", "letter-holder"));
+            when(applicationParams.getCcdAccessControlCitizenRoles())
+                .thenReturn(Arrays.asList("citizen", "letter-holder"));
             UserRole userRole1 = new UserRole();
             userRole1.setSecurityClassification(SecurityClassification.PRIVATE.name());
             UserRole userRole2 = new UserRole();

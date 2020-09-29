@@ -28,39 +28,43 @@ class CaseDetailsTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_DETAIL_FIELD = "dataTestField1";
 
-    private CaseDetails caseDetails;
+    private uk.gov.hmcts.ccd.domain.model.definition.CaseDetails caseDetails;
 
     @BeforeEach
     public void setup() {
-        caseDetails = new CaseDetails();
+        caseDetails = new uk.gov.hmcts.ccd.domain.model.definition.CaseDetails();
         Map<String, JsonNode> dataMap = buildData(CASE_DETAIL_FIELD);
         caseDetails.setData(dataMap);
     }
 
     @Test
     void testExistsInDataIsAlwaysTrueForLabels() {
-        CaseTypeTabField tabField = createCaseTypeTabField("someId", "Label");
+        uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
+                createCaseTypeTabField("someId", "Label");
 
         assertThat(caseDetails.existsInData(tabField), equalTo(true));
     }
 
     @Test
     void testExistsInDataIsAlwaysTrueForCasePaymentHistoryViewer() {
-        CaseTypeTabField tabField = createCaseTypeTabField("someId", "CasePaymentHistoryViewer");
+        uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
+                createCaseTypeTabField("someId", "CasePaymentHistoryViewer");
 
         assertThat(caseDetails.existsInData(tabField), equalTo(true));
     }
 
     @Test
     void testExistsInDataIsFalseIfTabFieldDoesNotBelongToCase() {
-        CaseTypeTabField tabField = createCaseTypeTabField("someId2", "YesOrNo");
+        uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
+                createCaseTypeTabField("someId2", "YesOrNo");
 
         assertThat(caseDetails.existsInData(tabField), equalTo(false));
     }
 
     @Test
     void testExistsInDataIsTrueIfTabFieldBelongsToCase() {
-        CaseTypeTabField tabField = createCaseTypeTabField(CASE_DETAIL_FIELD, "YesOrNo");
+        uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
+                createCaseTypeTabField(CASE_DETAIL_FIELD, "YesOrNo");
 
         assertThat(caseDetails.existsInData(tabField), equalTo(true));
     }
@@ -85,8 +89,10 @@ class CaseDetailsTest {
         assertThat(allData.get(CASE_REFERENCE.getReference()), equalTo(caseDetails.getReference()));
         assertThat(allData.get(CREATED_DATE.getReference()), equalTo(caseDetails.getCreatedDate()));
         assertThat(allData.get(LAST_MODIFIED_DATE.getReference()), equalTo(caseDetails.getLastModified()));
-        assertThat(allData.get(LAST_STATE_MODIFIED_DATE.getReference()), equalTo(caseDetails.getLastStateModifiedDate()));
-        assertThat(allData.get(SECURITY_CLASSIFICATION.getReference()), equalTo(caseDetails.getSecurityClassification()));
+        assertThat(allData.get(LAST_STATE_MODIFIED_DATE.getReference()),
+                equalTo(caseDetails.getLastStateModifiedDate()));
+        assertThat(allData.get(SECURITY_CLASSIFICATION.getReference()),
+                equalTo(caseDetails.getSecurityClassification()));
     }
 
     private Map<String, JsonNode> buildData(String... dataFieldIds) {
@@ -96,13 +102,16 @@ class CaseDetailsTest {
         return dataMap;
     }
 
-    private CaseTypeTabField createCaseTypeTabField(String id, String type) {
-        CaseFieldDefinition caseField = new CaseFieldDefinition();
+    private uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField createCaseTypeTabField(String id, String type) {
+        uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition caseField =
+                new uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition();
         caseField.setId(id);
-        FieldTypeDefinition labelFieldType = new FieldTypeDefinition();
+        uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition labelFieldType =
+                new uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition();
         labelFieldType.setType(type);
         caseField.setFieldTypeDefinition(labelFieldType);
-        CaseTypeTabField tabField = new CaseTypeTabField();
+        uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
+                new uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField();
         tabField.setCaseFieldDefinition(caseField);
         return tabField;
     }

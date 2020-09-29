@@ -18,7 +18,8 @@ public class ElasticsearchMappings {
     private final CasePredefinedMappings casePredefinedMappings;
 
     public boolean isDefaultTextCaseData(FieldTypeDefinition fieldType) {
-        return getTypeMappings().getDefaultText().contains(fieldType.getType()) || isCollectionTypeDefaultText(fieldType);
+        return getTypeMappings().getDefaultText().contains(fieldType.getType())
+            || isCollectionTypeDefaultText(fieldType);
     }
 
     public boolean isDefaultTextMetadata(String fieldId) {

@@ -17,7 +17,8 @@ public class DefaultSearchOperation implements SearchOperation {
     private final CaseDetailsRepository caseDetailsRepository;
 
     @Autowired
-    public DefaultSearchOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
+    public DefaultSearchOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                          CaseDetailsRepository caseDetailsRepository) {
         this.caseDetailsRepository = caseDetailsRepository;
     }
 

@@ -80,7 +80,8 @@ class MidEventCallbackTest {
         event.setEventId("createCase");
 
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
-        given(eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId())).willReturn(caseEventDefinition);
+        given(eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId()))
+            .willReturn(caseEventDefinition);
         given(caseTypeDefinition.getJurisdictionId()).willReturn(JURISDICTION_ID);
         caseDetails = caseDetails(data);
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
@@ -97,7 +98,8 @@ class MidEventCallbackTest {
         CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
             .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
         CaseDetails existingCaseDetails = caseDetails(data);
-        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE)).thenReturn(existingCaseDetails);
+        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE))
+            .thenReturn(existingCaseDetails);
         when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
 
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
@@ -107,7 +109,8 @@ class MidEventCallbackTest {
             caseDetails,
             IGNORE_WARNINGS)).willReturn(caseDetails);
 
-        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails)).willReturn(caseDetails);
+        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails))
+            .willReturn(caseDetails);
 
 
         midEventCallback.invoke(CASE_TYPE_ID,
@@ -133,7 +136,8 @@ class MidEventCallbackTest {
                 + "  \"PersonLastName\": \"Last Name\"\n"
                 + "}"));
         CaseDetails updatedCaseDetails = caseDetails(data);
-        CaseDataContent content = newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS)
+        CaseDataContent content = newCaseDataContent().withEvent(event).withData(data)
+            .withIgnoreWarning(IGNORE_WARNINGS)
             .build();
         when(caseService.clone(updatedCaseDetails)).thenReturn(updatedCaseDetails);
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
@@ -263,7 +267,8 @@ class MidEventCallbackTest {
         when(caseService.createNewCaseDetails(Mockito.eq(CASE_TYPE_ID), Mockito.eq(JURISDICTION_ID),
             Mockito.isA(Map.class))).thenReturn(combineCaseDetails);
         given(caseService.getCaseDetails(JURISDICTION_ID, content.getCaseReference())).willReturn(existingCaseDetails);
-        given(caseService.populateCurrentCaseDetailsWithEventFields(content, existingCaseDetails)).willReturn(combineCaseDetails);
+        given(caseService.populateCurrentCaseDetailsWithEventFields(content, existingCaseDetails))
+            .willReturn(combineCaseDetails);
 
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
@@ -293,7 +298,8 @@ class MidEventCallbackTest {
         given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
             .willReturn(asList(wizardPageWithCallback));
         CaseDetails existingCaseDetails = caseDetails(data);
-        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE)).thenReturn(existingCaseDetails);
+        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE))
+            .thenReturn(existingCaseDetails);
         when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
         wizardPageWithCallback.setOrder(1);
 
@@ -306,7 +312,8 @@ class MidEventCallbackTest {
 
         CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
             .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
-        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails)).willReturn(caseDetails);
+        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails))
+            .willReturn(caseDetails);
 
 
         midEventCallback.invoke(CASE_TYPE_ID,
@@ -328,13 +335,15 @@ class MidEventCallbackTest {
         WizardPage wizardPageWithoutCallback = createWizardPage("createCase2");
         wizardPageWithoutCallback.setOrder(2);
         WizardPageField pageField = createWizardPageField("createCase2_field1");
-        pageField.setComplexFieldOverrides(Lists.newArrayList(createComplexFieldOverrides("createCase2_field1_complex1")));
+        pageField.setComplexFieldOverrides(Lists.newArrayList(createComplexFieldOverrides(
+            "createCase2_field1_complex1")));
         wizardPageWithoutCallback.setWizardPageFields(Lists.newArrayList(pageField));
         given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
             .willReturn(asList(wizardPageWithCallback, wizardPageWithoutCallback));
         Map<String, JsonNode> data = createData();
         CaseDetails existingCaseDetails = caseDetails(data);
-        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE)).thenReturn(existingCaseDetails);
+        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE))
+            .thenReturn(existingCaseDetails);
         when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
         wizardPageWithCallback.setOrder(1);
 
@@ -347,7 +356,8 @@ class MidEventCallbackTest {
 
         CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
             .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
-        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails)).willReturn(caseDetails);
+        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails))
+            .willReturn(caseDetails);
 
 
         midEventCallback.invoke(CASE_TYPE_ID,

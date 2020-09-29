@@ -50,8 +50,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTE
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
-
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class SecurityClassificationServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -87,8 +87,10 @@ public class SecurityClassificationServiceTest {
         private static final String SC_RESTRICTED = "RESTRICTED";
         private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
         private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
-        private final CaseFieldDefinition testCaseField11 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
-        private final CaseFieldDefinition testCaseField12 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
+        private final CaseFieldDefinition testCaseField11 =
+            newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
+        private final CaseFieldDefinition testCaseField12 =
+            newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
         private final CaseTypeDefinition testCaseTypeDefinition = newCaseType()
             .withId(CASE_TYPE_ONE)
             .withField(testCaseField11)
@@ -142,7 +144,8 @@ public class SecurityClassificationServiceTest {
         }
 
         @Test
-        @DisplayName("should retrieve no security classification if empty list of classifications returned by user repository")
+        @DisplayName("should retrieve no security classification if empty list of classifications returned by user "
+            + "repository")
         public void shouldRetrieveNoSecurityClassificationIfEmptyListOfClassifications() {
             doReturn(newHashSet()).when(userRepository).getUserClassifications(JURISDICTION_ID);
 
@@ -165,9 +168,10 @@ public class SecurityClassificationServiceTest {
             caseDetails.setJurisdiction(JURISDICTION_ID);
         }
 
-        Optional<CaseDetails> applyClassification(SecurityClassification userClassification, SecurityClassification caseClassification) {
-            doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService).getUserClassification(
-                JURISDICTION_ID);
+        Optional<CaseDetails> applyClassification(SecurityClassification userClassification,
+                                                  SecurityClassification caseClassification) {
+            doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService)
+                .getUserClassification(JURISDICTION_ID);
 
             caseDetails.setSecurityClassification(caseClassification);
 
@@ -225,7 +229,8 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return empty list when given null")
         void shouldReturnEmptyListInsteadOfNull() {
-            final List<AuditEvent> classifiedEvents = securityClassificationService.applyClassification(JURISDICTION_ID, null);
+            final List<AuditEvent> classifiedEvents =
+                securityClassificationService.applyClassification(JURISDICTION_ID, null);
 
             assertAll(
                 () -> assertThat(classifiedEvents, is(notNullValue())),
@@ -236,12 +241,14 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return all events when user has higher classification")
         void shouldReturnAllEventsWhenUserHigherClassification() {
-            doReturn(Optional.of(RESTRICTED)).when(securityClassificationService).getUserClassification(JURISDICTION_ID);
+            doReturn(Optional.of(RESTRICTED)).when(securityClassificationService).getUserClassification(
+                JURISDICTION_ID);
 
-            final List<AuditEvent> classifiedEvents = securityClassificationService.applyClassification(JURISDICTION_ID,
-                Arrays.asList(publicEvent,
-                    privateEvent,
-                    restrictedEvent));
+            final List<AuditEvent> classifiedEvents =
+                securityClassificationService.applyClassification(JURISDICTION_ID,
+                                                                Arrays.asList(publicEvent,
+                                                                    privateEvent,
+                                                                    restrictedEvent));
 
             assertAll(
                 () -> assertThat(classifiedEvents, hasSize(3)),
@@ -254,10 +261,11 @@ public class SecurityClassificationServiceTest {
         void shouldFilterOutEventsHigherClassification() {
             doReturn(Optional.of(PUBLIC)).when(securityClassificationService).getUserClassification(JURISDICTION_ID);
 
-            final List<AuditEvent> classifiedEvents = securityClassificationService.applyClassification(JURISDICTION_ID,
-                Arrays.asList(publicEvent,
-                    privateEvent,
-                    restrictedEvent));
+            final List<AuditEvent> classifiedEvents =
+                securityClassificationService.applyClassification(JURISDICTION_ID,
+                                                                    Arrays.asList(publicEvent,
+                                                                        privateEvent,
+                                                                        restrictedEvent));
 
             assertAll(
                 () -> assertThat(classifiedEvents, hasSize(1)),
@@ -269,10 +277,11 @@ public class SecurityClassificationServiceTest {
         @DisplayName("should return empty list when user has no classification")
         void shouldReturnEmptyListWhenNoUserClassification() {
 
-            final List<AuditEvent> classifiedEvents = securityClassificationService.applyClassification(JURISDICTION_ID,
-                Arrays.asList(publicEvent,
-                    privateEvent,
-                    restrictedEvent));
+            final List<AuditEvent> classifiedEvents =
+                securityClassificationService.applyClassification(JURISDICTION_ID,
+                                                                    Arrays.asList(publicEvent,
+                                                                        privateEvent,
+                                                                        restrictedEvent));
 
             assertThat(classifiedEvents, hasSize(0));
         }
@@ -337,8 +346,8 @@ public class SecurityClassificationServiceTest {
         }
 
         CaseDetails applyClassification(SecurityClassification userClassification) {
-            doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService).getUserClassification(
-                JURISDICTION_ID);
+            doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService)
+                .getUserClassification(JURISDICTION_ID);
 
             caseDetails.setSecurityClassification(PRIVATE);
 
@@ -602,7 +611,8 @@ public class SecurityClassificationServiceTest {
         }
 
         @Test
-        @DisplayName("should remove complex nodes when the fields and all its nested fields have higher classification")
+        @DisplayName("should remove complex nodes when the fields and all its nested fields have higher"
+            + " classification")
         void shouldFilterOutAllFieldsForCaseWithNestedComplexTypesOfHigherClassification() throws IOException {
             final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Field\": {  \n" +
@@ -648,7 +658,8 @@ public class SecurityClassificationServiceTest {
         }
 
         @Test
-        @DisplayName("should filter out nested complex objects but leave empty top level one if classification matches")
+        @DisplayName("should filter out nested complex objects but leave empty top level one if classification "
+            + "matches")
         void shouldFilterOutNestedComplexObjectsButLeaveEmptyTopLevelOneIfClassificationMatches() throws IOException {
             final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Field\": {  \n" +
@@ -744,7 +755,8 @@ public class SecurityClassificationServiceTest {
                 () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note2"),
                     is(equalTo(getTextNode("someNote21")))),
 
-                () -> assertThat(resultNode.get("Addresses").get(1).get(ID), is(equalTo(getTextNode(SECOND_CHILD_ID)))),
+                () -> assertThat(resultNode.get("Addresses").get(1).get(ID),
+                    is(equalTo(getTextNode(SECOND_CHILD_ID)))),
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Address"),
                     is(equalTo(getTextNode("address2")))),
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").get("Note1"),
@@ -1156,7 +1168,8 @@ public class SecurityClassificationServiceTest {
                     is(equalTo(getTextNode("someNote11")))),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(false)),
 
-                () -> assertThat(resultNode.get("Addresses").get(1).get(ID), is(equalTo(getTextNode(SECOND_CHILD_ID)))),
+                () -> assertThat(resultNode.get("Addresses").get(1).get(ID),
+                    is(equalTo(getTextNode(SECOND_CHILD_ID)))),
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Address"),
                     is(equalTo(getTextNode("address2")))),
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").has("Note1"), is(false)),
@@ -1284,8 +1297,10 @@ public class SecurityClassificationServiceTest {
 
         @Test
         // TODO Target implementation, see RDM-1204
-        @DisplayName("should filter out collection itself when all collection items including collection have higher classification")
-        void shouldFilterOutAllFieldsForCollectionWhenAllItemsIncludingCollectionHaveHigherClassification() throws IOException {
+        @DisplayName("should filter out collection itself when all collection items including collection have higher "
+            + "classification")
+        void shouldFilterOutAllFieldsForCollectionWhenAllItemsIncludingCollectionHaveHigherClassification()
+                                                                                                throws IOException {
             final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[  \n" +
                     "         {  \n" +

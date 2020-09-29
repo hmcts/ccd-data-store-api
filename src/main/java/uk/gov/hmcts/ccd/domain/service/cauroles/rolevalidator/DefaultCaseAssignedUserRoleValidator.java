@@ -18,14 +18,16 @@ public class DefaultCaseAssignedUserRoleValidator implements CaseAssignedUserRol
     private ApplicationParams applicationParams;
 
     @Autowired
-    public DefaultCaseAssignedUserRoleValidator(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+    public DefaultCaseAssignedUserRoleValidator(@Qualifier(CachedUserRepository.QUALIFIER)
+                                                    final UserRepository userRepository,
                                                 ApplicationParams applicationParams) {
         this.userRepository = userRepository;
         this.applicationParams = applicationParams;
     }
 
     public boolean canAccessUserCaseRoles(List<String> userIds) {
-        boolean canAccess = userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles());
+        boolean canAccess =
+            userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles());
         if (!canAccess) {
             userIds = userIds.stream().distinct().collect(Collectors.toList());
             canAccess = userIds.size() == 1 && userIds.contains(this.userRepository.getUserId());

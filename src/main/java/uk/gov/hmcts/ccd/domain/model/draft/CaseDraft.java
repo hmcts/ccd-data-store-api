@@ -62,7 +62,8 @@ public class CaseDraft {
     @JsonIgnore
     public SecurityClassification getSecurityClassification() {
         String securityClassification = caseDataContent != null ? caseDataContent.getSecurityClassification() : null;
-        return securityClassification != null ? SecurityClassification.valueOf(caseDataContent.getSecurityClassification()) : null;
+        return securityClassification != null
+            ? SecurityClassification.valueOf(caseDataContent.getSecurityClassification()) : null;
     }
 
     @JsonIgnore

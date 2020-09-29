@@ -71,10 +71,13 @@ public class CallbackService {
         if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(), ignoreWarning);
-        final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url, CallbackResponse.class, callbackRequest);
+        final CallbackRequest callbackRequest =
+            new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(), ignoreWarning);
+        final Optional<ResponseEntity<CallbackResponse>> responseEntity =
+            sendRequest(url, CallbackResponse.class, callbackRequest);
         return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() -> {
-            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
+            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
+                caseEvent.getId());
             return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
         });
     }
@@ -87,7 +90,8 @@ public class CallbackService {
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
         final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, clazz, callbackRequest);
         return requestEntity.orElseThrow(() -> {
-            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
+            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
+                caseEvent.getId());
             return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
         });
     }
@@ -106,7 +110,8 @@ public class CallbackService {
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             return Optional.ofNullable(restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
         } catch (RestClientException e) {
-            LOG.warn("Unable to connect to callback service {} because of {} {}", url, e.getClass().getSimpleName(), e.getMessage());
+            LOG.warn("Unable to connect to callback service {} because of {} {}",
+                url, e.getClass().getSimpleName(), e.getMessage());
             LOG.debug("", e);  // debug stack trace
             return Optional.empty();
         }
