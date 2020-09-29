@@ -141,7 +141,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private String getIndexName(MultiSearchResult.MultiSearchResponse response) {
         String quotedIndexName =  response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS)
             .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
-        String unquotedIndexName = quotedIndexName.replace("\"", "");
+        String unquotedIndexName = quotedIndexName.replaceAll("\"", "");
         return unquotedIndexName;
     }
 

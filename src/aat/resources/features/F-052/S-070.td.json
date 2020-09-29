@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-070",
 	"_extends_": "F-052_Test_Data_Base",
-
 	"title": "must return 200 and a list of case data for the given search criteria",
 
 	"specs": [
@@ -9,10 +8,11 @@
 		"contains correct input path variables",
 		"contains the case details, along with an HTTP 200 OK"
 	],
+
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
-    "body" : {
-      "arrayInMap" : "[[ANYTHING_PRESENT]]"
-    }
+		"body" : {
+			"arrayInMap" : "[[ANYTHING_PRESENT]]"
+		}
 	}
 }

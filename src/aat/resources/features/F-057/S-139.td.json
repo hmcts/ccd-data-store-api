@@ -1,26 +1,28 @@
 {
-  "title": "must return appropriate negative response when request does not provide an authorized access",
   "_guid_": "S-139",
   "_extends_": "F-057_Test_Data_Base",
+  "title": "must return appropriate negative response when request does not provide an authorized access",
 
   "specs": [
     "an active profile in CCD",
     "does not provide an authorized access to the operation",
     "has the 403 return code"
   ],
+
   "request": {
     "headers": {
       "Authorization": "InvalidAuthorizationToken"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_403_Response",
-    "headers" : {
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
     },
     "body": {
-      "message" : "Access Denied"
+      "message": "Access Denied"
     }
   }
 }

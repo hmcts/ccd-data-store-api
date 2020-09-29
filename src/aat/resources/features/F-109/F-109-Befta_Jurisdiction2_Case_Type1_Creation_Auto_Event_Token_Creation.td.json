@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-109-Befta_Jurisdiction2_Case_Type1_Creation_Token_Creation",
+  "_extends_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation",
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_PWD]]"
+    }
+  }
+}

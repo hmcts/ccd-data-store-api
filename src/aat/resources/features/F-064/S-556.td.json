@@ -2,17 +2,20 @@
   "_guid_": "S-556",
   "_extends_": "F-064_Test_Data_Base",
   "title": "must return a negative response when request contains a non-existing case type id",
-	"specs": [
-		"an active profile in CCD",
-		"contains a non-existing case type id",
-		"code is HTTP-404 'Bad Request'"
-	],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a non-existing case type id",
+    "code is HTTP-404 'Bad Request'"
+  ],
+
   "request": {
     "pathVariables": {
       "ctid": "eyJhbGciOiJIUzI1NiJ9"
     }
   },
-	"expectedResponse": {
+
+  "expectedResponse": {
     "_extends_": "Common_404_Response",
     "headers": {
       "Content-Encoding" : "gzip"

@@ -1,0 +1,38 @@
+{
+  "title": "Must successfully assign a user and case role for a specific case by a user calling through/from an authorised application",
+
+  "_guid_": "S-111.2_Add_Case_Assigned_User_Roles_for_Case_C1_And_C2",
+  "_extends_": "F-111_Add_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "by Dil to add a Case Role - CR1 and CR2 on both C1 and C2 for Olawale"
+  ],
+
+  "users": {
+    "_extends_": "F-111_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        },
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment_C2][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-2]"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-111_Add_Case_Assigned_User_Roles_201_response"
+  }
+}

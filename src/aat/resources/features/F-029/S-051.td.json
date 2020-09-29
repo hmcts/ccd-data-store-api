@@ -1,22 +1,24 @@
 {
-  "title": "must return appropriate negative response when request contains an unauthorized access",
-  "_guid_": "S-051",
-  "_extends_": "F-029_Test_Data_Base",
+	"_guid_": "S-051",
+	"_extends_": "F-029_Test_Data_Base",
+	"title": "must return appropriate negative response when request contains an unauthorized access",
 
-  "specs": [
-    "an active profile in CCD",
-    "contains an unauthorized access to the operation",
-    "has the 403 return code"
-  ],
-  "request": {
-    "headers": {
-      "Authorization": "Invalid_Authorization"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_403_Response",
-    "body": {
-      "message": "Access Denied"
-    }
-  }
+	"specs": [
+		"an active profile in CCD",
+		"contains an unauthorized access to the operation",
+		"has the 403 return code"
+	],
+
+	"request": {
+		"headers": {
+			"Authorization": "Invalid_Authorization"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"body": {
+			"message": "Access Denied"
+		}
+	}
 }
