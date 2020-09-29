@@ -36,7 +36,8 @@ public abstract class FieldProcessor {
         CaseViewField caseViewField = caseViewFieldBuilder.build(caseField, caseEventField);
 
         if (caseViewField.isComplexFieldType()) {
-            return executeComplex(node, caseField.getFieldTypeDefinition().getComplexFields(), wizardPageField, caseField.getId(), caseViewField);
+            return executeComplex(node, caseField.getFieldTypeDefinition().getComplexFields(), wizardPageField,
+                caseField.getId(), caseViewField);
         } else if (caseViewField.isCollectionFieldType()) {
             return executeCollection(node, caseViewField, caseField.getId(), null, caseViewField);
         } else {
@@ -56,7 +57,8 @@ public abstract class FieldProcessor {
         ObjectNode newNode = MAPPER.createObjectNode();
         complexNode.fieldNames().forEachRemaining(fieldId -> {
             final JsonNode caseFieldNode = complexNode.get(fieldId);
-            Optional<CaseFieldDefinition> complexCaseFieldOpt = complexCaseFields.stream().filter(f -> f.getId().equals(fieldId)).findFirst();
+            Optional<CaseFieldDefinition> complexCaseFieldOpt =
+                complexCaseFields.stream().filter(f -> f.getId().equals(fieldId)).findFirst();
             if (!complexCaseFieldOpt.isPresent()) {
                 newNode.set(fieldId, caseFieldNode);
                 return;
@@ -140,7 +142,8 @@ public abstract class FieldProcessor {
                    || BaseType.get(COMPLEX) == collectionFieldType);
     }
 
-    private Optional<WizardPageComplexFieldOverride> wizardPageComplexFieldOverride(WizardPageField wizardPageField, String fieldPath) {
+    private Optional<WizardPageComplexFieldOverride> wizardPageComplexFieldOverride(WizardPageField wizardPageField,
+                                                                                    String fieldPath) {
         return wizardPageField != null
             ? wizardPageField.getComplexFieldOverride(fieldPath)
             : Optional.empty();

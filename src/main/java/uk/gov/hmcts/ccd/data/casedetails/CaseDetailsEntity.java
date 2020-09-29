@@ -1,12 +1,24 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.JsonDataConverter;
 
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Version;
+import java.time.LocalDateTime;
+
+@SuppressWarnings("checkstyle:OperatorWrap")
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @NamedQueries({
     @NamedQuery(name = CaseDetailsEntity.FIND_BY_METADATA, query =
         "SELECT cd FROM CaseDetailsEntity cd " +

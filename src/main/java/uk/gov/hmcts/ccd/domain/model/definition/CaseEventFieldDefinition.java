@@ -132,7 +132,8 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.defaultValue = defaultValue;
     }
 
-    @ApiModelProperty(value = "whether this field is data should be retained, dependant on show_condition being populated")
+    @ApiModelProperty(value = "whether this field is data should be retained, dependant on show_condition being"
+            + " populated")
     @JsonProperty("retain_hidden_value")
     public Boolean getRetainHiddenValue() {
         return retainHiddenValue;

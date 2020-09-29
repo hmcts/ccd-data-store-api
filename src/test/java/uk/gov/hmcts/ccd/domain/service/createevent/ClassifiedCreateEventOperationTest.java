@@ -49,7 +49,8 @@ class ClassifiedCreateEventOperationTest {
         classifiedCase = new CaseDetails();
         doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails);
 
-        classifiedCreateEventOperation = new ClassifiedCreateEventOperation(createEventOperation, classificationService);
+        classifiedCreateEventOperation =
+                new ClassifiedCreateEventOperation(createEventOperation, classificationService);
     }
 
     @Test

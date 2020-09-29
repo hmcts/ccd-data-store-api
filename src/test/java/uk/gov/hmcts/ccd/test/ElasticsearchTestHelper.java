@@ -98,7 +98,8 @@ public class ElasticsearchTestHelper {
     private static final String CASE_TYPE_ID_PARAM = "ctid";
     private static final String USE_CASE_PARAM = "use_case";
 
-    private ElasticsearchTestHelper() { }
+    private ElasticsearchTestHelper() {
+    }
 
     public static String caseData(String fieldPath) {
         return DATA_PREFIX + fieldPath;
@@ -113,7 +114,8 @@ public class ElasticsearchTestHelper {
     }
 
     public static MockHttpServletRequestBuilder createPostRequest(String url,
-                                                                  ElasticsearchBaseTest.ElasticsearchTestRequest searchRequest,
+                                                                  ElasticsearchBaseTest.ElasticsearchTestRequest
+                                                                          searchRequest,
                                                                   String caseTypeParam,
                                                                   String useCase) throws Exception {
         MockHttpServletRequestBuilder postRequest = post(url)

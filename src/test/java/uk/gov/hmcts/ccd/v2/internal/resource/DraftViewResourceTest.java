@@ -19,7 +19,8 @@ import java.util.Optional;
 class DraftViewResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final String LINK_SELF = String.format("/internal/case-types/%s/drafts", CASE_TYPE_ID);
-    private DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withCaseTypeId(CASE_TYPE_ID).build()).build();
+    private DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withCaseTypeId(CASE_TYPE_ID)
+            .build()).build();
 
     @BeforeEach
     void setUp() {

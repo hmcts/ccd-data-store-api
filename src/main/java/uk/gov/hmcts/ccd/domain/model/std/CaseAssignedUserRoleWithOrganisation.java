@@ -21,7 +21,8 @@ public class CaseAssignedUserRoleWithOrganisation extends CaseAssignedUserRole {
         super(caseDataId, userId, caseRole);
     }
 
-    public CaseAssignedUserRoleWithOrganisation(String caseDataId, String userId, String caseRole, String organisationId) {
+    public CaseAssignedUserRoleWithOrganisation(String caseDataId, String userId,
+                                                String caseRole, String organisationId) {
         super(caseDataId, userId, caseRole);
         this.organisationId = organisationId;
     }

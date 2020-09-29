@@ -66,10 +66,12 @@ public class DocumentSanitiser implements Sanitiser {
     private void validateBinaryLink(FieldTypeDefinition fieldTypeDefinition, Binary binary) {
         if (binary == null || StringUtils.isBlank(binary.getHref())) {
             LOG.error(String.format(
-                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary url missing",
+                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary "
+                    + "url missing",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
             throw new ValidationException(String.format(
-                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary url missing",
+                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document binary "
+                    + "url missing",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
 
         }
@@ -78,10 +80,12 @@ public class DocumentSanitiser implements Sanitiser {
     private void validateDocumentFilename(FieldTypeDefinition fieldTypeDefinition, Document document) {
         if (StringUtils.isBlank(document.getOriginalDocumentName())) {
             LOG.error(String.format(
-                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document filename missing",
+                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document "
+                    + "filename missing",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
             throw new ValidationException(String.format(
-                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document filename missing",
+                "Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of document "
+                    + "filename missing",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId()));
 
         }

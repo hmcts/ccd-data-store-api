@@ -28,7 +28,8 @@ import static uk.gov.hmcts.ccd.domain.types.PostCodeValidator.TYPE_ID;
 class PostCodeValidatorTest {
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
     private static final String FIELD_ID = "TEST_FIELD_ID";
-    private static final String POSTCODE_REGEX = "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$";
+    private static final String POSTCODE_REGEX =
+            "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$";
 
     @Mock
     private BaseType postcodeBaseType;
@@ -212,7 +213,8 @@ class PostCodeValidatorTest {
             result =
             validator.validate(FIELD_ID, NODE_FACTORY.pojoNode("EC1A 1BB"), caseFieldDefinition);
         assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is(NODE_FACTORY.pojoNode("EC1A 1BB") + " needs to be a valid " + TYPE_ID));
+        assertThat(result.get(0).getErrorMessage(),
+                is(NODE_FACTORY.pojoNode("EC1A 1BB") + " needs to be a valid " + TYPE_ID));
     }
 
     @Test

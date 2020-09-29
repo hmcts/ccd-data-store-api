@@ -18,7 +18,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 // TODO CaseService and CaseDataService could probably be merged together.
 @Service
-@SuppressWarnings("checkstyle:SummaryJavadoc") // partal javadoc attributes added prior to checkstyle implementation in module
+@SuppressWarnings("checkstyle:SummaryJavadoc")
+// partal javadoc attributes added prior to checkstyle implementation in module
 public class CaseService {
 
     private final CaseDataService caseDataService;
@@ -27,7 +28,8 @@ public class CaseService {
 
     @Autowired
     public CaseService(CaseDataService caseDataService,
-                       @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                       @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                            final CaseDetailsRepository caseDetailsRepository,
                        UIDService uidService) {
         this.caseDataService = caseDataService;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -89,12 +91,14 @@ public class CaseService {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
-        final Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
+        final Optional<CaseDetails> caseDetails =
+            caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
         return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
     }
 
     public CaseDetails getCaseDetailsByCaseReference(String caseReference) {
-        final Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReferenceWithNoAccessControl(caseReference);
+        final Optional<CaseDetails> caseDetails =
+            caseDetailsRepository.findByReferenceWithNoAccessControl(caseReference);
         return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
     }
 

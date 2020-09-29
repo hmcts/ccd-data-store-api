@@ -72,9 +72,9 @@ class DocumentControllerTest {
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
             () -> assertThat(response.getBody().getDocumentResources(), hasSize(1)),
             () -> assertThat(response.getBody().getDocumentResources(), hasItems(allOf(hasProperty("name", is("name1")),
-                                                                                 hasProperty("description", is("desc1")),
-                                                                                 hasProperty("type", is("type1")),
-                                                                                 hasProperty("url", is("url1")))))
+                                                                                hasProperty("description", is("desc1")),
+                                                                                hasProperty("type", is("type1")),
+                                                                                hasProperty("url", is("url1")))))
         );
     }
 

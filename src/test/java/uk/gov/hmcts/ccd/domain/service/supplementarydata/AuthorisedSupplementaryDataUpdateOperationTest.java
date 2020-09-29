@@ -71,8 +71,10 @@ class AuthorisedSupplementaryDataUpdateOperationTest {
         when(endpointAuthorisationService.isAccessAllowed(any())).thenReturn(true);
         SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
         SupplementaryData responseExpected = new SupplementaryData(new HashMap<>());
-        when(defaultSupplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request)).thenReturn(responseExpected);
-        SupplementaryData supplementaryData = supplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request);
+        when(defaultSupplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request))
+                .thenReturn(responseExpected);
+        SupplementaryData supplementaryData = supplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE,
+                request);
         assertNotNull(supplementaryData);
         assertEquals(responseExpected, supplementaryData);
         assertEquals(responseExpected.getResponse().size(), supplementaryData.getResponse().size());

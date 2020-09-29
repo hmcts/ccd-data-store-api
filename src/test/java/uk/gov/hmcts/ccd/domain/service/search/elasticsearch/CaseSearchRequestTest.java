@@ -26,7 +26,8 @@ class CaseSearchRequestTest {
     @BeforeEach
     void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
-        caseSearchRequest = new CaseSearchRequest(CASE_TYPE_ID, new ElasticsearchRequest(objectMapper.readValue(FULL_QUERY, JsonNode.class)));
+        caseSearchRequest = new CaseSearchRequest(CASE_TYPE_ID,
+                new ElasticsearchRequest(objectMapper.readValue(FULL_QUERY, JsonNode.class)));
     }
 
     @Test

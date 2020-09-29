@@ -36,7 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class DocumentControllerITest extends WireMockBaseTest {
 
     private static final String PRINTABLE_URL = "http://remote_host/print/cases/1565620330684549?jwt=test";
@@ -111,7 +112,8 @@ public class DocumentControllerITest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenGetValidCaseDocuments() throws Exception {
 
-        stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))
+        stubFor(com.github.tomakehurst.wiremock.client.WireMock
+            .get(urlMatching("/api/data/case-type/TestAddressBookCase"))
                     .willReturn(aResponse()
                                     .withHeader("Content-Type", "application/json")
                                     .withBody(String.format(caseTypeResponseString, super.wiremockPort))));
@@ -126,20 +128,24 @@ public class DocumentControllerITest extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final DocumentsResource documentsResource = mapper.readValue(result.getResponse().getContentAsString(), DocumentsResource.class);
+        final DocumentsResource documentsResource = mapper.readValue(result.getResponse().getContentAsString(),
+            DocumentsResource.class);
         List<Document> documentResources = documentsResource.getDocumentResources();
         Optional<Link> self = documentsResource.getLink("self");
 
         assertAll(
-            () -> assertThat(self.get().getHref(), is(String.format("http://localhost:%s/cases/" + CASE_ID + "/documents", super.wiremockPort))),
-            () -> assertThat(documentResources, hasItems(allOf(hasProperty("name", is("Claimant ID")),
-                                                               hasProperty("description", is("Document identifying identity")),
-                                                               hasProperty("type", is("ID")),
-                                                               hasProperty("url", is(PRINTABLE_URL))))),
-            () -> assertThat(documentResources, hasItems(allOf(hasProperty("name", is("Claimant Address")),
-                                                               hasProperty("description", is("Document identifying address")),
-                                                               hasProperty("type", is("Address")),
-                                                               hasProperty("url", is(PRINTABLE_URL))))));
+            () -> assertThat(self.get().getHref(),
+                is(String.format("http://localhost:%s/cases/" + CASE_ID + "/documents", super.wiremockPort))),
+            () -> assertThat(documentResources,
+                hasItems(allOf(hasProperty("name", is("Claimant ID")),
+                    hasProperty("description", is("Document identifying identity")),
+                    hasProperty("type", is("ID")),
+                    hasProperty("url", is(PRINTABLE_URL))))),
+            () -> assertThat(documentResources,
+                hasItems(allOf(hasProperty("name", is("Claimant Address")),
+                    hasProperty("description", is("Document identifying address")),
+                    hasProperty("type", is("Address")),
+                    hasProperty("url", is(PRINTABLE_URL))))));
     }
 
 }

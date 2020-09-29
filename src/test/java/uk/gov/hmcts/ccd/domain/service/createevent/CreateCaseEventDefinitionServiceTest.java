@@ -129,7 +129,8 @@ class CreateCaseEventDefinitionServiceTest {
 
         event = buildEvent();
         data = buildJsonNodeData();
-        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN).withIgnoreWarning(IGNORE_WARNING).build();
+        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN)
+                .withIgnoreWarning(IGNORE_WARNING).build();
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(JURISDICTION_ID);
         final Version version = new Version();
@@ -197,7 +198,8 @@ class CreateCaseEventDefinitionServiceTest {
         CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
-        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isEqualTo(LocalDateTime.now(clock));
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
+                .isEqualTo(LocalDateTime.now(clock));
     }
 
     @Test
