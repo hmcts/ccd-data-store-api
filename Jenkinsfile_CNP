@@ -16,7 +16,7 @@ def product = "ccd"
 def component = "data-store-api"
 
 // Variables to switch pipeline logic and wiring per type of build
-def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
+def definitionStoreDevelopPr = "PR-737"  // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-601"  // This doesn't change frequently, but when it does, only change this value.
 def prsToUseAaat             = "PR-1097" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
