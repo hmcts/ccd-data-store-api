@@ -207,7 +207,9 @@ public class DefaultDraftGateway implements DraftGateway {
 
     private Long getDraftId(HttpHeaders responseHeaders) {
         URI getLocation = responseHeaders.getLocation();
-        String path = getLocation == null ? null : getLocation.getPath();
-        return Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
+        String path = null;
+        if(getLocation != null)
+            path = getLocation.getPath();
+        return path == null ? null : Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
     }
 }
