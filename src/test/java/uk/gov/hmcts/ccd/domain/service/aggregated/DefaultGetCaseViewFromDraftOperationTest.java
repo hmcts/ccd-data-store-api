@@ -92,7 +92,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
     @Mock
     private FieldProcessorService fieldProcessorService;
 
-    private GetCaseViewOperation getDraftViewOperation;
+    private uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation getDraftViewOperation;
 
     private CaseTypeDefinition caseTypeDefinition;
     private CaseTypeTabsDefinition caseTypeTabsDefinition;
@@ -152,15 +152,16 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
         doAnswer(invocation -> invocation.getArgument(0)).when(fieldProcessorService).processCaseViewField(any());
 
-        getDraftViewOperation = new DefaultGetCaseViewFromDraftOperation(getCaseOperation,
-            uiDefinitionRepository,
-            caseTypeService,
-            uidService,
-            draftGateway,
-            draftResponseToCaseDetailsBuilder,
-            objectMapperService,
-            compoundFieldOrderService,
-            fieldProcessorService);
+        getDraftViewOperation = new uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation(
+                getCaseOperation,
+                uiDefinitionRepository,
+                caseTypeService,
+                uidService,
+                draftGateway,
+                draftResponseToCaseDetailsBuilder,
+                objectMapperService,
+                compoundFieldOrderService,
+                fieldProcessorService);
     }
 
     @Test
@@ -231,13 +232,15 @@ class DefaultGetCaseViewFromDraftOperationTest {
                     .withType(CASE_HISTORY_VIEWER)
                     .build())
                 .build()));
-            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID,
+                    JURISDICTION_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 
             assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
                 () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
-                () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
+                () -> assertThat(caseView.getTabs()[0].getFields()[0],
+                        hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
                 () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(eventsNode))),
                 () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
                 () -> assertThat(caseView.getEvents()[0],
@@ -277,7 +280,8 @@ class DefaultGetCaseViewFromDraftOperationTest {
                     .withType(CASE_HISTORY_VIEWER)
                     .build())
                 .build()));
-            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+            doReturn(caseTypeDefinition).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID,
+                    JURISDICTION_ID);
 
             final CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 

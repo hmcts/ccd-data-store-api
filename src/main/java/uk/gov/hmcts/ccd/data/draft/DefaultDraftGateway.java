@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.data.draft;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +15,22 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
-import uk.gov.hmcts.ccd.domain.model.draft.*;
+import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftList;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service
 @Qualifier(DefaultDraftGateway.QUALIFIER)
@@ -35,7 +41,8 @@ public class DefaultDraftGateway implements DraftGateway {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String DRAFT_ENCRYPTION_KEY_HEADER = "Secret";
     private static final int RESOURCE_NOT_FOUND = 404;
-    public static final String DRAFT_STORE_DOWN_ERR_MESSAGE = "The draft service is currently down, please refresh your browser or try again later";
+    public static final String DRAFT_STORE_DOWN_ERR_MESSAGE = "The draft service is currently down, please refresh "
+                                                                + "your browser or try again later";
     private static final String RESOURCE_NOT_FOUND_MSG = "No draft found ( draft reference = '%s' )";
     private static final String DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE = "Unable to read from draft service";
 
@@ -82,7 +89,8 @@ public class DefaultDraftGateway implements DraftGateway {
         headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
         final HttpEntity requestEntity = new HttpEntity(draft, headers);
         try {
-            restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.PUT, requestEntity, HttpEntity.class);
+            restTemplate.exchange(applicationParams.draftURL(draftId),
+                                  HttpMethod.PUT, requestEntity, HttpEntity.class);
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while updating draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
@@ -105,7 +113,8 @@ public class DefaultDraftGateway implements DraftGateway {
         final HttpEntity requestEntity = new HttpEntity(headers);
         Draft draft = null;
         try {
-            draft = restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, Draft.class).getBody();
+            draft = restTemplate.exchange(
+                applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, Draft.class).getBody();
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while getting draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
@@ -150,7 +159,8 @@ public class DefaultDraftGateway implements DraftGateway {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(headers);
-            DraftList getDrafts = restTemplate.exchange(getUriWithQueryParams(), HttpMethod.GET, requestEntity, DraftList.class).getBody();
+            DraftList getDrafts = restTemplate.exchange(
+                getUriWithQueryParams(), HttpMethod.GET, requestEntity, DraftList.class).getBody();
             return getDrafts.getData()
                 .stream()
                 .map(d -> assembleDraft(d, getDraftsExceptionConsumer()))

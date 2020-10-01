@@ -67,7 +67,8 @@ class CaseUpdateViewEventResourceTest {
     @Nested
     @DisplayName("Start case trigger")
     class StartTriggerForCase {
-        private final String linkSelfForCase = String.format("/internal/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, ID);
+        private final String linkSelfForCase =
+            String.format("/internal/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, ID);
 
         @Test
         @DisplayName("should copy case event trigger")
@@ -78,16 +79,23 @@ class CaseUpdateViewEventResourceTest {
             assertAll(
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getId(), equalTo(ID)),
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getName(), equalTo(NAME)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getDescription(), equalTo(DESCRIPTION)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getDescription(),
+                    equalTo(DESCRIPTION)),
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseId(), equalTo(CASE_ID)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields(),
+                    hasItems(hasProperty("id", is(FIELD_ID)))),
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getWizardPages()
+                        .get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", is(FIELD_ID))),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowSummary(),
+                    equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowEventNotes(),
+                    equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getEndButtonLabel(),
+                    equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCanSaveDraft(),
+                    equalTo(IS_SAVE_DRAFT))
             );
         }
 
@@ -107,7 +115,8 @@ class CaseUpdateViewEventResourceTest {
     @DisplayName("Start event trigger")
     class StartTriggerForEvent {
         private final Long caseReference = 1111222233334444L;
-        private final String linkSelfForEvent = String.format("/internal/cases/%s/event-triggers/%s?ignore-warning=true", caseReference, ID);
+        private final String linkSelfForEvent =
+            String.format("/internal/cases/%s/event-triggers/%s?ignore-warning=true", caseReference, ID);
 
         @Test
         @DisplayName("should copy case event trigger")
@@ -118,16 +127,22 @@ class CaseUpdateViewEventResourceTest {
             assertAll(
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getId(), equalTo(ID)),
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getName(), equalTo(NAME)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getDescription(), equalTo(DESCRIPTION)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getDescription(),
+                    equalTo(DESCRIPTION)),
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseId(), equalTo(CASE_ID)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields(),
+                    hasItems(hasProperty("id", is(FIELD_ID)))),
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
-                                 hasProperty("caseFieldId", is(FIELD_ID))),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0), hasProperty("caseFieldId", is(FIELD_ID))),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowSummary(),
+                    equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowEventNotes(),
+                    equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getEndButtonLabel(),
+                    equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCanSaveDraft(),
+                    equalTo(IS_SAVE_DRAFT))
             );
         }
 
@@ -147,7 +162,8 @@ class CaseUpdateViewEventResourceTest {
     @DisplayName("Start draft trigger")
     class StartTriggerForD {
         private final String draftReference = "DRAFT127";
-        private final String linkSelfForEvent = String.format("/internal/drafts/%s/event-trigger?ignore-warning=true", draftReference, ID);
+        private final String linkSelfForEvent =
+            String.format("/internal/drafts/%s/event-trigger?ignore-warning=true", draftReference, ID);
 
         @Test
         @DisplayName("should copy case event trigger")
@@ -158,16 +174,22 @@ class CaseUpdateViewEventResourceTest {
             assertAll(
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getId(), equalTo(ID)),
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getName(), equalTo(NAME)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getDescription(), equalTo(DESCRIPTION)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getDescription(),
+                    equalTo(DESCRIPTION)),
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseId(), equalTo(CASE_ID)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields(),
+                    hasItems(hasProperty("id", is(FIELD_ID)))),
                 () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getWizardPages().get(0).getWizardPageFields().get(0),
-                                 hasProperty("caseFieldId", is(FIELD_ID))),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0), hasProperty("caseFieldId", is(FIELD_ID))),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowSummary(),
+                    equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getShowEventNotes(),
+                    equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getEndButtonLabel(),
+                    equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(caseUpdateViewEventResource.getCaseUpdateViewEvent().getCanSaveDraft(),
+                    equalTo(IS_SAVE_DRAFT))
             );
         }
 

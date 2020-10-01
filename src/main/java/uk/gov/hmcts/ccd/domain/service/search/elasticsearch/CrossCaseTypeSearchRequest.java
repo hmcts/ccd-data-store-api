@@ -39,7 +39,9 @@ public class CrossCaseTypeSearchRequest {
     private final boolean multiCaseTypeSearch;
     private final List<String> aliasFields = new ArrayList<>();
 
-    private CrossCaseTypeSearchRequest(List<String> caseTypeIds, ElasticsearchRequest elasticsearchRequest, boolean multiCaseTypeSearch,
+    private CrossCaseTypeSearchRequest(List<String> caseTypeIds,
+                                       ElasticsearchRequest elasticsearchRequest,
+                                       boolean multiCaseTypeSearch,
                                        List<String> aliasFields) {
         this.caseTypeIds.addAll(caseTypeIds);
         this.elasticsearchRequest = elasticsearchRequest;
@@ -134,7 +136,8 @@ public class CrossCaseTypeSearchRequest {
 
         public CrossCaseTypeSearchRequest build() {
             setSourceFilterAliasFields();
-            return new CrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, multiCaseTypeSearch, sourceFilterAliasFields);
+            return new CrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, multiCaseTypeSearch,
+                                                  sourceFilterAliasFields);
         }
 
     }

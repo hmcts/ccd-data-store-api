@@ -25,7 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
@@ -40,14 +42,18 @@ class ElasticsearchQueryHelperTest {
     private static final String LAST_MODIFIED_DATE = "LAST_MODIFIED_DATE";
     private static final FieldTypeDefinition TEXT_FIELD_TYPE = aFieldType().withType("Text").withId("Text").build();
     private static final FieldTypeDefinition DATE_FIELD_TYPE = aFieldType().withType("Date").withId("Date").build();
-    private static final FieldTypeDefinition COLLECTION_TEXT_FIELD_TYPE = aFieldType().withType("Collection").withId("Collection")
-        .withCollectionFieldType(TEXT_FIELD_TYPE).build();
-    private static final FieldTypeDefinition COLLECTION_DATE_FIELD_TYPE = aFieldType().withType("Collection").withId("Collection")
-        .withCollectionFieldType(DATE_FIELD_TYPE).build();
-    private static final CommonField JURISDICTION_FIELD = newCaseField().withMetadata(true).withId(JURISDICTION).build();
-    private static final CommonField LAST_MODIFIED_DATE_FIELD = newCaseField().withMetadata(true).withId(LAST_MODIFIED_DATE).build();
-    private static final CommonField TEXT_FIELD = newCaseField().withId(TEXT_FIELD_ID).withFieldType(TEXT_FIELD_TYPE).build();
-    private static final CommonField DATE_FIELD = newCaseField().withId(DATE_FIELD_ID).withFieldType(DATE_FIELD_TYPE).build();
+    private static final FieldTypeDefinition COLLECTION_TEXT_FIELD_TYPE = aFieldType().withType("Collection")
+        .withId("Collection").withCollectionFieldType(TEXT_FIELD_TYPE).build();
+    private static final FieldTypeDefinition COLLECTION_DATE_FIELD_TYPE = aFieldType().withType("Collection")
+        .withId("Collection").withCollectionFieldType(DATE_FIELD_TYPE).build();
+    private static final CommonField JURISDICTION_FIELD =
+        newCaseField().withMetadata(true).withId(JURISDICTION).build();
+    private static final CommonField LAST_MODIFIED_DATE_FIELD =
+        newCaseField().withMetadata(true).withId(LAST_MODIFIED_DATE).build();
+    private static final CommonField TEXT_FIELD =
+        newCaseField().withId(TEXT_FIELD_ID).withFieldType(TEXT_FIELD_TYPE).build();
+    private static final CommonField DATE_FIELD =
+        newCaseField().withId(DATE_FIELD_ID).withFieldType(DATE_FIELD_TYPE).build();
     private static final CommonField COLLECTION_TEXT_FIELD = newCaseField().withId(COLLECTION_TEXT_FIELD_ID)
         .withFieldType(COLLECTION_TEXT_FIELD_TYPE).build();
     private static final CommonField COLLECTION_DATE_FIELD = newCaseField().withId(COLLECTION_DATE_FIELD_ID)
@@ -73,12 +79,18 @@ class ElasticsearchQueryHelperTest {
         doAnswer(invocation -> objectMapperES.readValue((String)invocation.getArgument(0), ObjectNode.class))
             .when(objectMapperService).convertStringToObject(anyString(), any());
         when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE_A);
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(JURISDICTION))).thenReturn(Optional.of(JURISDICTION_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(LAST_MODIFIED_DATE))).thenReturn(Optional.of(LAST_MODIFIED_DATE_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(TEXT_FIELD_ID))).thenReturn(Optional.of(TEXT_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(DATE_FIELD_ID))).thenReturn(Optional.of(DATE_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_TEXT_FIELD_ID))).thenReturn(Optional.of(COLLECTION_TEXT_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_DATE_FIELD_ID))).thenReturn(Optional.of(COLLECTION_DATE_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(JURISDICTION)))
+            .thenReturn(Optional.of(JURISDICTION_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(LAST_MODIFIED_DATE)))
+            .thenReturn(Optional.of(LAST_MODIFIED_DATE_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(TEXT_FIELD_ID)))
+            .thenReturn(Optional.of(TEXT_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(DATE_FIELD_ID)))
+            .thenReturn(Optional.of(DATE_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_TEXT_FIELD_ID)))
+            .thenReturn(Optional.of(COLLECTION_TEXT_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_DATE_FIELD_ID)))
+            .thenReturn(Optional.of(COLLECTION_DATE_FIELD));
     }
 
     @Test
@@ -124,7 +136,8 @@ class ElasticsearchQueryHelperTest {
             elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
 
         assertAll(
-            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an array of text fields."))
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an"
+                    + " array of text fields."))
         );
     }
 
@@ -136,7 +149,8 @@ class ElasticsearchQueryHelperTest {
             elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
 
         assertAll(
-            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an array of text fields."))
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an"
+                    + " array of text fields."))
         );
     }
 

@@ -38,7 +38,8 @@ class DefaultSupplementaryDataUpdateOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        this.defaultSupplementaryDataOperation = new DefaultSupplementaryDataUpdateOperation(supplementaryDataRepository);
+        this.defaultSupplementaryDataOperation =
+            new DefaultSupplementaryDataUpdateOperation(supplementaryDataRepository);
     }
 
     @Test
@@ -48,8 +49,10 @@ class DefaultSupplementaryDataUpdateOperationTest {
         this.defaultSupplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request);
 
         assertAll(
-            () -> verify(supplementaryDataRepository, times(0)).setSupplementaryData(anyString(), anyString(), any(Object.class)),
-            () -> verify(supplementaryDataRepository, times(0)).incrementSupplementaryData(anyString(), anyString(), any(Object.class)),
+            () -> verify(supplementaryDataRepository, times(0)).setSupplementaryData(anyString(), anyString(),
+                any(Object.class)),
+            () -> verify(supplementaryDataRepository, times(0)).incrementSupplementaryData(anyString(), anyString(),
+                any(Object.class)),
             () -> verify(supplementaryDataRepository, times(1)).findSupplementaryData(anyString(), anySet())
         );
     }
@@ -63,16 +66,19 @@ class DefaultSupplementaryDataUpdateOperationTest {
         resultMap.putAll(incMap.get(SupplementaryDataOperation.INC.getOperationName()));
         resultMap.putAll(setMap.get(SupplementaryDataOperation.SET.getOperationName()));
         SupplementaryData supplementaryData = new SupplementaryData(resultMap);
-        when(this.supplementaryDataRepository.findSupplementaryData(anyString(), anySet())).thenReturn(supplementaryData);
+        when(this.supplementaryDataRepository.findSupplementaryData(anyString(), anySet()))
+            .thenReturn(supplementaryData);
 
         Map<String, Map<String, Object>> supplementaryDataRequest = new HashMap<>();
         supplementaryDataRequest.putAll(setMap);
         supplementaryDataRequest.putAll(incMap);
         SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest(supplementaryDataRequest);
-        SupplementaryData response = this.defaultSupplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE, request);
+        SupplementaryData response = this.defaultSupplementaryDataOperation.updateSupplementaryData(CASE_REFERENCE,
+            request);
 
         assertAll(
-            () -> verify(supplementaryDataRepository, times(1)).incrementSupplementaryData(anyString(), anyString(), any(Object.class)),
+            () -> verify(supplementaryDataRepository, times(1)).incrementSupplementaryData(anyString(), anyString(),
+                any(Object.class)),
             () -> verify(supplementaryDataRepository, times(1)).findSupplementaryData(anyString(), anySet()),
             () -> assertThat(response.getResponse(), is(resultMap))
         );

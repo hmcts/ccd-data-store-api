@@ -43,7 +43,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
     public AuthorisedCreateEventOperation(@Qualifier("classified") final CreateEventOperation createEventOperation,
                                           @Qualifier("default") final GetCaseOperation getCaseOperation,
-                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                          final CaseDefinitionRepository caseDefinitionRepository,
                                           final AccessControlService accessControlService,
                                           CaseAccessService caseAccessService) {
 
@@ -80,7 +81,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         return verifyReadAccess(caseTypeDefinition, userRoles, caseDetails);
     }
 
-    private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseDetails caseDetails) {
+    private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
+                                         CaseDetails caseDetails) {
 
         if (caseDetails != null) {
             if (!accessControlService.canAccessCaseTypeWithCriteria(
@@ -116,7 +118,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,userRoles,CAN_UPDATE)) {
             throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
         }
-        if (!accessControlService.canAccessCaseStateWithCriteria(existingCaseDetails.getState(), caseTypeDefinition, userRoles, CAN_UPDATE)) {
+        if (!accessControlService.canAccessCaseStateWithCriteria(existingCaseDetails.getState(), caseTypeDefinition,
+            userRoles, CAN_UPDATE)) {
             throw new ResourceNotFoundException(NO_CASE_STATE_FOUND);
         }
 

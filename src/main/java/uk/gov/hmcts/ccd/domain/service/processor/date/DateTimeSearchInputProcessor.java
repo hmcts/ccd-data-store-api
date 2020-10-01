@@ -37,7 +37,8 @@ public class DateTimeSearchInputProcessor {
 
     @Autowired
     public DateTimeSearchInputProcessor(final DateTimeFormatParser dateTimeFormatParser,
-                                        @Qualifier(DefaultGetCriteriaOperation.QUALIFIER) final GetCriteriaOperation getCriteriaOperation) {
+                                        @Qualifier(DefaultGetCriteriaOperation.QUALIFIER)
+                                        final GetCriteriaOperation getCriteriaOperation) {
         this.dateTimeFormatParser = dateTimeFormatParser;
         this.getCriteriaOperation = getCriteriaOperation;
     }
@@ -47,7 +48,8 @@ public class DateTimeSearchInputProcessor {
 
         Map<String, String> newParams = new HashMap<>();
         queryParameters.forEach((fieldId, value) -> {
-            final Optional<? extends CriteriaInput> input = findCriteriaInputField(criteriaInputs, fieldId.split("\\.")[0]);
+            final Optional<? extends CriteriaInput> input =
+                findCriteriaInputField(criteriaInputs, fieldId.split("\\.")[0]);
 
             if (input.isPresent()) {
                 if (isComplexPath(fieldId) && input.get().getDisplayContextParameters().isEmpty()) {
@@ -88,7 +90,8 @@ public class DateTimeSearchInputProcessor {
         return metadata;
     }
 
-    private Optional<? extends CriteriaInput> findCriteriaInputField(List<? extends CriteriaInput> criteriaInputs, String fieldId) {
+    private Optional<? extends CriteriaInput> findCriteriaInputField(List<? extends CriteriaInput>
+                                                                         criteriaInputs, String fieldId) {
         return criteriaInputs.stream()
             .filter(i -> i.getField().getId().equals(fieldId))
             .findAny();
@@ -99,7 +102,8 @@ public class DateTimeSearchInputProcessor {
             view == null ? CriteriaType.SEARCH : CriteriaType.valueOf(view));
     }
 
-    private void handleTopLevel(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
+    private void handleTopLevel(String fieldPath, String queryValue, CriteriaInput criteriaInput,
+                                Map<String, String> newParams) {
         if (criteriaInput.hasDisplayContextParameter(DATETIMEENTRY)) {
             newParams.put(fieldPath,
                 processValue(fieldPath, criteriaInput, queryValue, criteriaInput.getField().getType()));
@@ -108,8 +112,10 @@ public class DateTimeSearchInputProcessor {
         }
     }
 
-    private void handleNested(String fieldPath, String queryValue, CriteriaInput criteriaInput, Map<String, String> newParams) {
-        final Optional<CommonField> field = criteriaInput.getField().getType().getNestedField(fieldPath, true);
+    private void handleNested(String fieldPath, String queryValue, CriteriaInput criteriaInput,
+                              Map<String, String> newParams) {
+        final Optional<CommonField> field =
+            criteriaInput.getField().getType().getNestedField(fieldPath, true);
 
         if (field.isPresent() && field.get().hasDisplayContextParameter(DATETIMEENTRY)) {
             newParams.put(fieldPath,

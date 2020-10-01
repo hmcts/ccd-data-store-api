@@ -22,16 +22,14 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
-    id 'checkstyle'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.7'
-    id 'org.owasp.dependencycheck' version '5.1.0'
-    id 'com.github.spotbugs' version '4.4.4'
     id 'net.ltgt.apt' version '0.21'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.22'
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.1.0"
+    id 'uk.gov.hmcts.java' version '0.11.0'
 }
 
 apply plugin: 'java'
@@ -44,18 +42,19 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
-apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
-apply plugin: 'org.owasp.dependencycheck'
 
 apply from: 'liquibase.gradle'
 
 pmd {
-    toolVersion = '6.11.0'
-    maxFailures = 3150 // Failures need to be reviewed/fixed before removing this property
+    toolVersion = '6.18.0'
+    // https://github.com/pmd/pmd/issues/876
+    ruleSets = []
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+    ignoreFailures = true
 }
 
 dependencyUpdates.resolutionStrategy = {
@@ -70,18 +69,9 @@ dependencyUpdates.resolutionStrategy = {
         }
     }
 }
-// https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
+
 dependencyCheck {
-    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-    // range of 0-10 fails the build, anything greater and it doesn't fail the build
-    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 11 : 0
     suppressionFile = 'dependency-check-suppressions.xml'
-    analyzers {
-        // Disable scanning of .NET related binaries
-        assemblyEnabled = false
-    }
-    // These are non-runtime configurations used during the build.
-    skipConfigurations = ['codacy', 'spotbugs', 'checkstyle']
 }
 
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
@@ -142,24 +132,9 @@ configurations {
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
-checkstyle {
-    showViolations = true
-    maxWarnings = 0
-    toolVersion = '8.18'
-}
-
-checkstyleMain.shouldRunAfter(compileJava)
-test.shouldRunAfter(checkstyleTest)
-
-tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
-
-spotbugs {
-    ignoreFailures = true
+//This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
+tasks.withType(Checkstyle) {
+    exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
 }
 
 dependencies {
@@ -266,7 +241,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.9.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.12.0'
 
 }
 // end::dependencies[]
@@ -791,9 +766,6 @@ def timestamp() {
     def date = new Date()
     return date.format('yyyy-MM-dd HH:mm:ss')
 }
-
-// for cnp pipeline
-task dependencyCheck(dependsOn: dependencyCheckAnalyze)
 
 configurations { codacy }
 repositories {

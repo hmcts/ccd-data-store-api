@@ -22,7 +22,8 @@ public class ElasticsearchSecurityClassificationFilter implements CaseSearchFilt
     private final CaseTypeService caseTypeService;
 
     @Autowired
-    public ElasticsearchSecurityClassificationFilter(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+    public ElasticsearchSecurityClassificationFilter(@Qualifier(CachedUserRepository.QUALIFIER)
+                                                             UserRepository userRepository,
                                                      CaseTypeService caseTypeService) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
@@ -30,11 +31,13 @@ public class ElasticsearchSecurityClassificationFilter implements CaseSearchFilt
 
     @Override
     public Optional<QueryBuilder> getFilter(String caseTypeId) {
-        return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, getSecurityClassifications(caseTypeId)));
+        return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL,
+            getSecurityClassifications(caseTypeId)));
     }
 
     private List<String> getSecurityClassifications(String caseTypeId) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
-        return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdictionDefinition().getId()).getClassificationsLowerOrEqualTo();
+        return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdictionDefinition().getId())
+            .getClassificationsLowerOrEqualTo();
     }
 }

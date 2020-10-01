@@ -84,8 +84,10 @@ class AuthorisedCaseSearchOperationTest {
         MockitoAnnotations.initMocks(this);
         caseTypeDefinition.setId(CASE_TYPE_ID_1);
         searchRequestJsonNode.set(QUERY, mock(ObjectNode.class));
-        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ)).thenReturn(Optional.of(caseTypeDefinition));
-        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ)).thenReturn(Optional.empty());
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ))
+            .thenReturn(Optional.of(caseTypeDefinition));
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ))
+            .thenReturn(Optional.empty());
     }
 
     @Nested
@@ -128,7 +130,8 @@ class AuthorisedCaseSearchOperationTest {
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class)),
                 () -> verify(userRepository).getUserRoles(),
                 () -> verify(objectMapperService).convertObjectToJsonNode(unFilteredData),
-                () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode, caseTypeDefinition.getCaseFieldDefinitions(), userRoles, CAN_READ, false),
+                () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode,
+                    caseTypeDefinition.getCaseFieldDefinitions(), userRoles, CAN_READ, false),
                 () -> verify(objectMapperService).convertJsonNodeToMap(jsonNode),
                 () -> verify(classificationService).applyClassification(caseDetails)
             );
@@ -141,7 +144,8 @@ class AuthorisedCaseSearchOperationTest {
                 .withCaseTypes(singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ)).thenReturn(Optional.empty());
+            when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ))
+                .thenReturn(Optional.empty());
 
             CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
 
@@ -186,7 +190,8 @@ class AuthorisedCaseSearchOperationTest {
             ObjectNode complexNode = JsonNodeFactory.instance.objectNode();
             complexNode.set("postcode", JsonNodeFactory.instance.textNode("W4"));
             dataNode.set("personAddress", complexNode);
-            when(objectMapperService.convertObjectToJsonNode(anyMapOf(String.class, JsonNode.class))).thenReturn(dataNode);
+            when(objectMapperService.convertObjectToJsonNode(anyMapOf(String.class, JsonNode.class)))
+                .thenReturn(dataNode);
 
             CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
@@ -216,7 +221,8 @@ class AuthorisedCaseSearchOperationTest {
             collectionNode.add(textNode);
             dataNode.set("collectionField", collectionNode);
 
-            when(objectMapperService.convertObjectToJsonNode(anyMapOf(String.class, JsonNode.class))).thenReturn(dataNode);
+            when(objectMapperService.convertObjectToJsonNode(anyMapOf(String.class, JsonNode.class)))
+                .thenReturn(dataNode);
 
             CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))

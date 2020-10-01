@@ -67,7 +67,8 @@ public class AuditAspect {
                 AnnotatedElementKey methodKey = new AnnotatedElementKey(method, joinPoint.getThis().getClass());
                 return evaluator.condition(condition, methodKey, evaluationContext, returnType);
             } catch (SpelEvaluationException ex) {
-                LOG.warn("Error evaluating LogAudit annotation expression:{} on method:{}", condition, method.getName(), ex);
+                LOG.warn("Error evaluating LogAudit annotation expression:{} on method:{}",
+                    condition, method.getName(), ex);
                 return null;
             }
         }
