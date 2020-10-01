@@ -9,7 +9,8 @@ java:
         - data-store-api-draft-key
         - ccd-data-s2s-secret
   environment:
-    AZURE_APPLICATION-INSIGHTS_INSTRUMENTATION-KEY: "2dcb834e-768e-4429-9050-ab15af959995"
+    AZURE_APPLICATION_INSIGHTS_INSTRUMENTATION_KEY: "2dcb834e-768e-4429-9050-ab15af959995"
+    APPINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
     DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
