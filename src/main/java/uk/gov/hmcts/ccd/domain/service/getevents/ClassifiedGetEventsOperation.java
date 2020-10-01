@@ -23,7 +23,8 @@ public class ClassifiedGetEventsOperation implements GetEventsOperation {
 
     public ClassifiedGetEventsOperation(@Qualifier("default") GetEventsOperation getEventsOperation,
                                         SecurityClassificationService classificationService,
-                                        @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation) {
+                                        @Qualifier(CreatorGetCaseOperation.QUALIFIER)
+                                        final GetCaseOperation getCaseOperation) {
 
         this.getEventsOperation = getEventsOperation;
         this.classificationService = classificationService;

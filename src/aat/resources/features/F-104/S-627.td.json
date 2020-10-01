@@ -4,7 +4,7 @@
   "specs": [
     "a valid user profile",
     "is configured to search for the previously created case via exact match",
-    "is using the query parameter usecase=orgcases",
+    "is using the query parameter use_case=orgcases",
     "contains the fields as specified in the SearchCasesResultFields only",
     "contains the field data as specified in the SearchCasesResultFields",
     "contains the field data of all meta data fields"
@@ -12,7 +12,7 @@
 
   "request": {
     "queryParams": {
-      "usecase": "ORGCASES"
+      "use_case": "ORGCASES"
     },
     "body": {
       "query": {
@@ -49,7 +49,11 @@
                 "min": null,
                 "max": null,
                 "regular_expression": null,
-                "fixed_list_items": [
+                "fixed_list_items": [{
+                  "code" : "VALUE4",
+                  "label" : "Value 4",
+                  "order" : null
+                },
                   {
                     "code": "VALUE3",
                     "label": "Value 3",

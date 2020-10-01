@@ -38,7 +38,8 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     private final Map<String, PaginatedSearchMetadata> hashToPaginatedSearchMetadata = newHashMap();
 
     @Inject
-    public CachedCaseDetailsRepository(final @Qualifier(DefaultCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
+    public CachedCaseDetailsRepository(final @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+                                               CaseDetailsRepository caseDetailsRepository) {
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
@@ -59,7 +60,8 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public CaseDetails findByReference(final Long caseReference) {
-        final Function<String, Optional<CaseDetails>> findFunction = key -> ofNullable(caseDetailsRepository.findByReference(caseReference));
+        final Function<String, Optional<CaseDetails>> findFunction = key ->
+            ofNullable(caseDetailsRepository.findByReference(caseReference));
         return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction).orElse(null);
     }
 
@@ -70,29 +72,42 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
-        return referenceToCaseDetails.computeIfAbsent(reference, key -> caseDetailsRepository.findByReference(jurisdiction, reference));
+        return referenceToCaseDetails.computeIfAbsent(reference, key ->
+            caseDetailsRepository.findByReference(jurisdiction, reference));
     }
 
     @Override
     public Optional<CaseDetails> findByReference(String reference) {
-        return referenceToCaseDetails.computeIfAbsent(reference, key -> caseDetailsRepository.findByReference(reference));
+        return referenceToCaseDetails.computeIfAbsent(reference, key ->
+            caseDetailsRepository.findByReference(reference));
     }
 
     @Override
-    public CaseDetails findUniqueCase(final String jurisdictionId, final String caseTypeId, final String caseReference) {
-        return findHashToCaseDetails.computeIfAbsent(format(FIND_HASH_FORMAT, jurisdictionId, caseTypeId, caseReference),
+    public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
+        return referenceToCaseDetails.computeIfAbsent(reference, key ->
+            caseDetailsRepository.findByReferenceWithNoAccessControl(reference));
+    }
+
+    @Override
+    public CaseDetails findUniqueCase(final String jurisdictionId,
+                                      final String caseTypeId,
+                                      final String caseReference) {
+        return findHashToCaseDetails.computeIfAbsent(
+            format(FIND_HASH_FORMAT, jurisdictionId, caseTypeId, caseReference),
             hash -> caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
     }
 
     @Override
-    public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata, final Map<String, String> dataSearchParams) {
+    public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
+                                                        final Map<String, String> dataSearchParams) {
         return metaAndFieldDataHashToCaseDetails.computeIfAbsent(
             format(META_AND_FIELD_DATA_HASH_FORMAT, metadata.hashCode(), getMapHashCode(dataSearchParams)),
             hash -> caseDetailsRepository.findByMetaDataAndFieldData(metadata, dataSearchParams));
     }
 
     @Override
-    public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metadata, Map<String, String> dataSearchParams) {
+    public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metadata,
+                                                              Map<String, String> dataSearchParams) {
         return hashToPaginatedSearchMetadata.computeIfAbsent(
             format(META_AND_FIELD_DATA_HASH_FORMAT, metadata.hashCode(), getMapHashCode(dataSearchParams)),
             hash -> caseDetailsRepository.getPaginatedSearchMetadata(metadata, dataSearchParams));

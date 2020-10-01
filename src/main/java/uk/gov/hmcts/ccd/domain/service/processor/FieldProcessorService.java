@@ -6,10 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,7 +71,8 @@ public class FieldProcessorService {
             return data;
         }
 
-        final List<WizardPageField> wizardPageFields = getWizardPageFields(caseTypeDefinition.getId(), caseEventDefinition.getId());
+        final List<WizardPageField> wizardPageFields = getWizardPageFields(caseTypeDefinition.getId(),
+            caseEventDefinition.getId());
 
         Map<String, JsonNode> processedData = new HashMap<>();
 
@@ -73,7 +82,8 @@ public class FieldProcessorService {
 
             if (!isNullOrEmpty(node) && caseField.isPresent() && caseEventField.isPresent()) {
                 for (CaseDataFieldProcessor processor : caseDataFieldProcessors) {
-                    node = processor.execute(node, caseField.get(), caseEventField.get(), wizardPageField(wizardPageFields, caseField.get().getId()));
+                    node = processor.execute(node, caseField.get(), caseEventField.get(),
+                        wizardPageField(wizardPageFields, caseField.get().getId()));
                 }
             }
 

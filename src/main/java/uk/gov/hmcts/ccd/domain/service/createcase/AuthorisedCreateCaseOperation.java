@@ -35,7 +35,8 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
 
     public AuthorisedCreateCaseOperation(@Qualifier("classified") final CreateCaseOperation createCaseOperation,
-                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                         final CaseDefinitionRepository caseDefinitionRepository,
                                          final AccessControlService accessControlService,
                                          final CaseAccessService caseAccessService) {
 
@@ -71,7 +72,8 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         return verifyReadAccess(caseTypeDefinition, userRoles, caseDetails);
     }
 
-    private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseDetails caseDetails) {
+    private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
+                                         CaseDetails caseDetails) {
 
         if (caseDetails != null) {
             if (!accessControlService.canAccessCaseTypeWithCriteria(
@@ -99,7 +101,8 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         return caseDetails;
     }
 
-    private void verifyCreateAccess(Event event, Map<String, JsonNode> data, CaseTypeDefinition caseTypeDefinition, Set<String> userRoles) {
+    private void verifyCreateAccess(Event event, Map<String, JsonNode> data, CaseTypeDefinition caseTypeDefinition,
+                                    Set<String> userRoles) {
         if (!accessControlService.canAccessCaseTypeWithCriteria(
             caseTypeDefinition,
             userRoles,

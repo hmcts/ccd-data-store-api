@@ -44,7 +44,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class CaseSearchEndpointIT extends WireMockBaseTest {
 
     private static final String POST_SEARCH_CASES = "/searchCases";
@@ -135,7 +136,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.SEARCH_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is("1535450291607660,1535450291607670"));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is("123"));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getListOfCaseTypes(), is("TestAddressBookCase,TestAddressBookCase4"));
@@ -191,7 +192,8 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             + "}";
     }
 
-    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic, String... caseDetails) throws java.io.IOException {
+    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic,
+                                                          String... caseDetails) throws java.io.IOException {
 
         JsonObject convertedObject = new Gson().fromJson(caseDetailElastic, JsonObject.class);
         MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);

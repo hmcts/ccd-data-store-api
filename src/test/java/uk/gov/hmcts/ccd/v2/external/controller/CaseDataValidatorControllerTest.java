@@ -46,7 +46,8 @@ class CaseDataValidatorControllerTest {
         .build();
     private static final JsonNode UNWRAPPED_DATA_NODE = JacksonUtils.convertValueJsonNode(UNWRAPPED_DATA);
     private static final String TOKEN = "JwtToken";
-    private static final CaseDataContent EVENT_DATA = newCaseDataContent().withEvent(EVENT).withData(DATA).withToken(TOKEN).build();
+    private static final CaseDataContent EVENT_DATA = newCaseDataContent().withEvent(EVENT).withData(DATA)
+        .withToken(TOKEN).build();
 
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
@@ -70,7 +71,8 @@ class CaseDataValidatorControllerTest {
         @Test
         @DisplayName("should return 200 when case data valid")
         void shouldPassIfCaseDataValid() {
-            final ResponseEntity<CaseDataResource> response = caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA);
+            final ResponseEntity<CaseDataResource> response =
+                caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -81,9 +83,11 @@ class CaseDataValidatorControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA)).thenThrow(RuntimeException.class);
+            when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA))
+                .thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA));
+            assertThrows(Exception.class, () -> caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID,
+                EVENT_DATA));
         }
     }
 }

@@ -8,6 +8,8 @@ public interface CaseAssignedUserRolesOperation {
 
     void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles);
 
+    void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles);
+
     List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds);
 
 }

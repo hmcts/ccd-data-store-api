@@ -1,13 +1,13 @@
 {
 	"_guid_": "S-235",
 	"_extends_": "F-049_Test_Data_Base",
-
 	"title": "must start the case creation process successfully for correct inputs",
 
 	"specs": [
 		"an active profile in CCD",
 		"code is HTTP-200"
 	],
+
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
@@ -31,6 +31,7 @@
 				"data_classification": {
 
 				},
+				"supplementary_data": null,
 				"after_submit_callback_response": null,
 				"callback_response_status_code": null,
 				"callback_response_status": null,

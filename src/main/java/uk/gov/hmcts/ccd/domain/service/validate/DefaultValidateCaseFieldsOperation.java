@@ -1,24 +1,21 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
+import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
@@ -51,7 +48,8 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
         if (!hasEventId(caseTypeDefinition, content.getEventId())) {
-            throw new ValidationException("Cannot validate case field because of event " + content.getEventId() + " is not found in case type definition");
+            throw new ValidationException("Cannot validate case field because of event " + content.getEventId()
+                + " is not found in case type definition");
         }
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, content.getEventId()));
         caseTypeService.validateData(content.getData(), caseTypeDefinition);
@@ -75,7 +73,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
                             errorList);
                     })));
         if (errorList.size() != 0) {
-            throw new ValidationException("Roles validation error: " + String.join(", ", errorList));
+            throw new BadRequestException("Roles validation error: " + String.join(", ", errorList));
         }
     }
 
@@ -127,7 +125,10 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     }
 
     @Override
-    public void validateData(Map<String, JsonNode> data, CaseTypeDefinition caseTypeDefinition) {
+    public void validateData(Map<String, JsonNode> data,
+                             CaseTypeDefinition caseTypeDefinition,
+                             final CaseDataContent content) {
         caseTypeService.validateData(data, caseTypeDefinition);
+        validateOrganisationPolicy(caseTypeDefinition.getId(), content);
     }
 }

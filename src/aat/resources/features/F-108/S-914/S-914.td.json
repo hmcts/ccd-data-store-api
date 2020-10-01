@@ -1,0 +1,88 @@
+{
+  "_guid_": "S-914",
+  "_extends_": "F-108_Test_Data_Base",
+  "specs": [
+    "restricted security classification",
+    "is configured to search for both the previously created cases",
+    "contains details of the restricted email field for the 2 previously created cases"
+  ],
+
+  "user": {
+    "username": "[[$CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL]]",
+    "password": "[[$CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD]]"
+  },
+
+  "request": {
+    "queryParams": {
+      "ctid": "AAT_PRIVATE,AAT_PRIVATE2"
+    },
+    "body": {
+      "_source": [
+        "alias.NumberFieldAlias",
+        "alias.EmailFieldAlias"
+      ],
+      "query": {
+        "match": {
+          "alias.NumberFieldAlias": 914
+        }
+      }
+    }
+  },
+
+
+  "expectedResponse": {
+    "body": {
+      "total": 2,
+      "cases": [{
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-914_Create_Case_Private_Autotest1]}",
+        "jurisdiction": "AUTOTEST1",
+        "state": "TODO",
+        "version": null,
+        "case_type_id": "AAT_PRIVATE",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PRIVATE",
+        "case_data": {
+          "NumberFieldAlias": "914",
+          "EmailFieldAlias": "fuctional@test.com"
+        },
+        "data_classification": "[[ANYTHING_PRESENT]]",
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": "[[ANYTHING_PRESENT]]"
+      },{
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-914_Create_Case_Private_Autotest2]}",
+        "jurisdiction": "AUTOTEST2",
+        "state": "TODO",
+        "version": null,
+        "case_type_id": "AAT_PRIVATE2",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PRIVATE",
+        "case_data": {
+          "NumberFieldAlias": "914",
+          "EmailFieldAlias": "fuctional@test.com"
+        },
+        "data_classification": "[[ANYTHING_PRESENT]]",
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": "[[ANYTHING_PRESENT]]"
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE"
+      },{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE2"
+      }]
+    }
+  }
+}

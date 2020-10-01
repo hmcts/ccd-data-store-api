@@ -1,33 +1,39 @@
 {
-  "_guid_": "F-047_Grant_Access",
-  "productName": "CCD Data Store",
-  "operationName": "to grant access on a case",
-  "specs": [
-    "to grant access on the case just created"
-  ],
-  "method": "POST",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
-  "user": {
-    "_extends_": "Common_User_For_Request"
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
-    },
-    "body": {
-      "id": "F047UserIdTest"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_201_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Vary": "Accept-Encoding",
-      "Content-Type": "[[ANY_STRING_NULLABLE]]"
-    }
-  }
+	"_guid_": "F-047_Grant_Access",
+
+	"productName": "CCD Data Store",
+	"operationName": "to grant access on a case",
+
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+
+	"specs": [
+		"to grant access on the case just created"
+	],
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT",
+			"cid": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+		},
+		"body": {
+			"id": "F047UserIdTest"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Vary": "Accept-Encoding",
+			"Content-Type": "[[ANY_STRING_NULLABLE]]"
+		}
+	}
 }

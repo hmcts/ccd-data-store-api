@@ -1,11 +1,13 @@
 {
-	"title": "must return the list of cases and status code 200 for correct inputs",
 	"_guid_": "S-078",
 	"_extends_": "F-026_Test_Data_Base",
+	"title": "must return the list of cases and status code 200 for correct inputs",
+
 	"specs": [
 		"an active profile in CCD",
 		"contains details of existing cases associated, along with an HTTP-200 OK"
 	],
+
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {

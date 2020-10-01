@@ -1,19 +1,24 @@
 {
   "_guid_": "S-212_Get_Case_Data",
   "title": "to get the details about case event for the case just created",
+
   "productName": "CCD Data Store",
   "operationName": "Retrieve a CaseView Event by case and event id for dynamic display",
+
   "method": "GET",
   "uri": "/internal/cases/{cid}",
+
   "specs": [
     "to get the details about case event for the case just created above"
   ],
+
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.1@gmail.com",
       "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
     }
   },
+
   "request": {
     "headers": {
       "experimental": true,
@@ -23,12 +28,13 @@
       "cid": "${[scenarioContext][parentContext][childContexts][Befta_Case_Data_Extension][testData][actualResponse][body][id]}"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
+      "Content-Encoding": "gzip"
     },
     "body": {
       "_links": {

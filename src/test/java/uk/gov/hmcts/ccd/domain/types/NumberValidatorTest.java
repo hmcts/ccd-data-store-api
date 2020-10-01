@@ -149,12 +149,12 @@ class NumberValidatorTest {
                      "-1 should not be with in range of between 0 and 0");
 
         assertEquals(0,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("0.0000000000"), caseFieldDefinition).size(),
-                     "0.0000000000 should be with in range of between 0 and 0");
+                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("0.0000000000"), caseFieldDefinition)
+                             .size(), "0.0000000000 should be with in range of between 0 and 0");
 
         assertEquals(0,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.numberNode(0.0000000000), caseFieldDefinition).size(),
-                     "0.0000000000 should be with in range of between 0 and 0");
+                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.numberNode(0.0000000000), caseFieldDefinition)
+                             .size(), "0.0000000000 should be with in range of between 0 and 0");
     }
 
     @Test
@@ -180,7 +180,8 @@ class NumberValidatorTest {
                      validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("8.20"), caseFieldDefinition).size(),
                      "regular expression check");
 
-        List<ValidationResult> results = validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("8.2"), caseFieldDefinition);
+        List<ValidationResult> results =
+                validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("8.2"), caseFieldDefinition);
         assertEquals(1, results.size(), "regular expression check");
         assertEquals(REGEX_GUIDANCE, results.get(0).getErrorMessage());
     }

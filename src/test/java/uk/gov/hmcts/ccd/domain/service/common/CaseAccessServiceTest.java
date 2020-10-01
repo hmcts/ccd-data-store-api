@@ -49,7 +49,8 @@ class CaseAccessServiceTest {
     private static final String CASE_ROLE_CREATOR_ID = "[CREATOR]";
     private static final String CASE_REVOKED_ID = "789";
 
-    private static final List<Long> CASES_GRANTED = asList(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID));
+    private static final List<Long> CASES_GRANTED =
+            asList(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID));
 
     @Mock
     private UserRepository userRepository;
@@ -542,7 +543,8 @@ class CaseAccessServiceTest {
 
             assertAll(
                 () -> assertThat(caseRoles.size(), Is.is(3)),
-                () -> assertThat(caseRoles, hasItems(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID, GlobalCaseRole.CREATOR.getRole()))
+                () -> assertThat(caseRoles, hasItems(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID,
+                        GlobalCaseRole.CREATOR.getRole()))
             );
         }
 
@@ -561,7 +563,8 @@ class CaseAccessServiceTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(Lists.newArrayList("PROBATE", "DIVORCE")).when(userRepository).getUserRolesJurisdictions();
+            doReturn(Lists.newArrayList("PROBATE", "DIVORCE")).when(userRepository)
+                    .getCaseworkerUserRolesJurisdictions();
         }
 
         @Test

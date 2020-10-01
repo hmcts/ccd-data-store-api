@@ -20,7 +20,8 @@ public class PrintableDocumentListOperation {
         this.applicationParams = applicationParams;
     }
 
-    public List<Document> getPrintableDocumentList(String jurisdictionId, String caseTypeId, CaseDetails caseDetails) throws IllegalArgumentException {
+    public List<Document> getPrintableDocumentList(String jurisdictionId, String caseTypeId,
+                                                   CaseDetails caseDetails) throws IllegalArgumentException {
         if (isBlank(jurisdictionId)) {
             throw new IllegalArgumentException("Invalid value for Jurisdiction ID");
         }

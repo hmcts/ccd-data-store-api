@@ -1,19 +1,23 @@
 {
-  "_guid_": "F-028_Test_Data_Base",
-  "productName": "CCD Data Store",
-  "operationName": "Fetch an event trigger in the context of a case for Case Worker",
-  "method": "GET",
-  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}",
-  "user": {
-    "_extends_": "Common_User_For_Request"
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "etid": "UPDATE"
-    }
-  }
+	"_guid_": "F-028_Test_Data_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Fetch an event trigger in the context of a case for Case Worker",
+
+	"method": "GET",
+	"uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT",
+			"etid": "UPDATE"
+		}
+	}
 }

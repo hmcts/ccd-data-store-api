@@ -1,10 +1,15 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SearchResultDefinition implements Serializable {
     private SearchResultField[] fields;

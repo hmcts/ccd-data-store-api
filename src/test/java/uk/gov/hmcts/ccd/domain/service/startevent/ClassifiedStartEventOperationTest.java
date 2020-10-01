@@ -86,7 +86,8 @@ class ClassifiedStartEventOperationTest {
         @Test
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
-            doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
 
             final StartEventResult output = classifiedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
@@ -95,7 +96,8 @@ class ClassifiedStartEventOperationTest {
             assertAll(
                 () -> assertThat(output, sameInstance(startEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(caseDetails)),
-                () -> verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)
+                () -> verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
         }
     }
@@ -107,7 +109,8 @@ class ClassifiedStartEventOperationTest {
         @Test
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
-            doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
 
             final StartEventResult output = classifiedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
@@ -116,7 +119,8 @@ class ClassifiedStartEventOperationTest {
             assertAll(
                 () -> assertThat(output, sameInstance(startEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(caseDetails)),
-                () -> verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)
+                () -> verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
         }
     }
@@ -204,7 +208,8 @@ class ClassifiedStartEventOperationTest {
 
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> verify(caseDataService).getDefaultSecurityClassifications(eq(caseTypeDefinition), eq(caseDetails.getData()), eq(Maps.newHashMap()))
+                () -> verify(caseDataService).getDefaultSecurityClassifications(eq(caseTypeDefinition),
+                    eq(caseDetails.getData()), eq(Maps.newHashMap()))
             );
         }
 
