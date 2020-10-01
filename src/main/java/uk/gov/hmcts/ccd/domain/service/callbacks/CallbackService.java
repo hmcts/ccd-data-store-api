@@ -99,6 +99,10 @@ public class CallbackService {
             LOG.debug("Invoking callback {}", url);
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
+
+            httpHeaders.add("Request-Context", "key1=value1, callback=true");
+            httpHeaders.add("Correlation-Context", "key2=value2, callback=false");
+
             final HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
             if (null != securityHeaders) {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
