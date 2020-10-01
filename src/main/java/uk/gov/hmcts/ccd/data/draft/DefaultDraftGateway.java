@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -161,7 +162,7 @@ public class DefaultDraftGateway implements DraftGateway {
             final HttpEntity requestEntity = new HttpEntity(headers);
             DraftList getDrafts = restTemplate.exchange(
                 getUriWithQueryParams(), HttpMethod.GET, requestEntity, DraftList.class).getBody();
-            return getDrafts.getData()
+            return getDrafts == null ? null : getDrafts.getData()
                 .stream()
                 .map(d -> assembleDraft(d, getDraftsExceptionConsumer()))
                 .collect(Collectors.toList());
@@ -205,7 +206,8 @@ public class DefaultDraftGateway implements DraftGateway {
 
 
     private Long getDraftId(HttpHeaders responseHeaders) {
-        String path = responseHeaders.getLocation().getPath();
+        URI getLocation = responseHeaders.getLocation();
+        String path = getLocation == null ? null : getLocation.getPath();
         return Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
     }
 }
