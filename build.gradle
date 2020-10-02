@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.2.5.RELEASE'
+        springBootVersion = '2.2.10.RELEASE'
     }
     dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.0.2'
