@@ -449,5 +449,6 @@
    ]]></notes>
         <cve>CVE-2020-10518</cve>
         <cve>CVE-2020-10517</cve>
+        <cve>CVE-2020-5421</cve>
     </suppress>
 </suppressions>
