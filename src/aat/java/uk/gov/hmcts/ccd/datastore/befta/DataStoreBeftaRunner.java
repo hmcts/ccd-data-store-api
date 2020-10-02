@@ -15,7 +15,7 @@ import uk.gov.hmcts.befta.BeftaMain;
 public class DataStoreBeftaRunner {
 
     private DataStoreBeftaRunner() {
-        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
+      // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     }
 
     @BeforeClass

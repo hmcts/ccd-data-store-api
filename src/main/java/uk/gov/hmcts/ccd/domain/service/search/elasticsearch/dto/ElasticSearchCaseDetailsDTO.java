@@ -24,6 +24,7 @@ public class ElasticSearchCaseDetailsDTO {
     private SecurityClassification securityClassification;
     private Map<String, JsonNode> data;
     private Map<String, JsonNode> dataClassification;
+    private Map<String, JsonNode> supplementaryData;
 
     public String getId() {
         return id;
@@ -111,5 +112,13 @@ public class ElasticSearchCaseDetailsDTO {
 
     public void setDataClassification(Map<String, JsonNode> dataClassification) {
         this.dataClassification = dataClassification;
+    }
+
+    public Map<String, JsonNode> getSupplementaryData() {
+        return supplementaryData;
+    }
+
+    public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
+        this.supplementaryData = supplementaryData;
     }
 }

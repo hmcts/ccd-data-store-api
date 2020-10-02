@@ -46,7 +46,8 @@ class DefaultCaseAssignedUserRolesOperationTest {
 
     @Test
     void findCaseUserRoles() {
-        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(createCaseAssignedUserRoles());
+        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(
+                createCaseAssignedUserRoles());
 
         List<CaseAssignedUserRole> caseAssignedUserRoles = caseAssignedUserRolesOperation
             .findCaseUserRoles(Lists.newArrayList(), Lists.newArrayList());

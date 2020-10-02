@@ -1,0 +1,39 @@
+{
+  "title": "must return negative response for a case creation attempt with an invalid data in ChangeOrganisationRequest Complex Fields",
+  "_guid_": "S-114.2",
+  "_extends_": "F-114_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains ChangeOrganisationRequest complex with invalid approval status"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "ChangeOrganisationRequestField": {
+          "ApprovalStatus": "22"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 422,
+      "error" : "Unprocessable Entity",
+      "message" : "[[ANYTHING_PRESENT]]",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : {
+        "field_errors" : [ {
+          "id" : "ChangeOrganisationRequestField.ApprovalStatus",
+          "message" : "Invalid Approval Status Value, Valid values are 0,1 and 2. 0 = ‘Not considered’, 1 = ‘Approved’, 2 = ‘Rejected’"
+        } ]
+      },
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

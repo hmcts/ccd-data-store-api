@@ -87,6 +87,7 @@ class DynamicListValidatorTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long regex expressions
     public void invalidValue() throws Exception {
         JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
             + "            \"code\": \"FixedList1\",\n"

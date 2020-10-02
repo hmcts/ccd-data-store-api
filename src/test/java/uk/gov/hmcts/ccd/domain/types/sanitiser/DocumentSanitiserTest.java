@@ -28,8 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser.DOCUMENT_BINARY_URL;
+import static uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser.DOCUMENT_FILENAME;
+import static uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser.DOCUMENT_URL;
 
 @DisplayName("DocumentSanitiser")
 class DocumentSanitiserTest {
@@ -97,7 +101,8 @@ class DocumentSanitiserTest {
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValue);
 
         assertAll(
-            () -> verify(documentManagementRestClient, never()).getDocument(any(FieldTypeDefinition.class), anyString()),
+            () -> verify(documentManagementRestClient, never()).getDocument(any(FieldTypeDefinition.class),
+                    anyString()),
             () -> assertThat(sanitisedDocument, is(documentValue))
         );
     }

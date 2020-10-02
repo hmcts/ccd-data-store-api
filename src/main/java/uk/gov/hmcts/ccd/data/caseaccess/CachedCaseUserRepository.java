@@ -20,7 +20,8 @@ public class CachedCaseUserRepository implements CaseUserRepository {
     private final Map<String, List<Long>> casesUserHasAccess = newHashMap();
     private final Map<String, List<String>> caseUserRoles = newHashMap();
 
-    public CachedCaseUserRepository(@Qualifier(DefaultCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository) {
+    public CachedCaseUserRepository(@Qualifier(DefaultCaseUserRepository.QUALIFIER)
+                                        CaseUserRepository caseUserRepository) {
         this.caseUserRepository = caseUserRepository;
     }
 

@@ -136,8 +136,10 @@ class CaseTypeServiceTest {
 
             // ARRANGE
             List<ValidationResult> validationResults = new ArrayList<>();
-            validationResults.add(new ValidationResultBuilder().setErrorMessage("message 1").setFieldId("field 1").build());
-            validationResults.add(new ValidationResultBuilder().setErrorMessage("message 2").setFieldId("field 2").build());
+            validationResults.add(new ValidationResultBuilder().setErrorMessage("message 1").setFieldId("field 1")
+                    .build());
+            validationResults.add(new ValidationResultBuilder().setErrorMessage("message 2").setFieldId("field 2")
+                    .build());
 
             when(caseDataValidator.validate(any(), any())).thenReturn(validationResults); // i.e. two errors
 

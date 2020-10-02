@@ -31,7 +31,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     @ResponseBody
-    public ResponseEntity<HttpError> handleApiException(final HttpServletRequest request, final ApiException exception) {
+    public ResponseEntity<HttpError> handleApiException(final HttpServletRequest request,
+                                                        final ApiException exception) {
         LOG.error(exception.getMessage(), exception);
         appInsights.trackException(exception);
         final HttpError<Serializable> error = new HttpError<>(exception, request)
@@ -56,13 +57,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CaseValidationException.class)
     @ResponseBody
-    public ResponseEntity<HttpError> handleCaseValidationException(HttpServletRequest request, CaseValidationException exception) {
+    public ResponseEntity<HttpError> handleCaseValidationException(HttpServletRequest request,
+                                                                   CaseValidationException exception) {
 
         // NB: only recording field IDs as some validation messages contain user data
         Map<String, String> customProperties = new HashMap<>();
         customProperties.put("CaseValidationError field IDs", StringUtils.join(exception.getFields(), ", "));
 
-        LOG.warn("{}: The following list of fields are in an invalid state: {}", exception.getMessage(), exception.getFields(), exception);
+        LOG.warn("{}: The following list of fields are in an invalid state: {}", exception.getMessage(),
+            exception.getFields(), exception);
         appInsights.trackException(exception, customProperties, SeverityLevel.Warning);
         final HttpError<Serializable> error = new HttpError<>(exception, request)
             .withDetails(exception.getDetails());

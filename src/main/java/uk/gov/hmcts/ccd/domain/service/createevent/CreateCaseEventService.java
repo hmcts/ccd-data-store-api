@@ -76,8 +76,10 @@ public class CreateCaseEventService {
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                  @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
-                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                  @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                  final CaseDetailsRepository caseDetailsRepository,
+                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                      final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
                                   final EventTriggerService eventTriggerService,
                                   final EventTokenService eventTokenService,
@@ -117,7 +119,8 @@ public class CreateCaseEventService {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-        final CaseEventDefinition caseEventDefinition = findAndValidateCaseEvent(caseTypeDefinition, content.getEvent());
+        final CaseEventDefinition caseEventDefinition =
+            findAndValidateCaseEvent(caseTypeDefinition, content.getEvent());
         final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
         String uid = userAuthorisation.getUserId();
 
@@ -131,7 +134,8 @@ public class CreateCaseEventService {
         validatePreState(caseDetails, caseEventDefinition);
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, caseEventDefinition, caseTypeDefinition);
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition,
+        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
+            callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition,
             caseDetailsBefore,
             caseDetails,
             caseTypeDefinition,
@@ -142,8 +146,10 @@ public class CreateCaseEventService {
 
         validateCaseFieldsOperation.validateData(caseDetails.getData(), caseTypeDefinition, content);
         LocalDateTime timeNow = now();
-        final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, caseEventDefinition, newState, timeNow);
-        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), caseEventDefinition, savedCaseDetails, caseTypeDefinition, timeNow);
+        final CaseDetails savedCaseDetails =
+            saveCaseDetails(caseDetailsBefore, caseDetails, caseEventDefinition, newState, timeNow);
+        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), caseEventDefinition,
+            savedCaseDetails, caseTypeDefinition, timeNow);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
@@ -154,9 +160,11 @@ public class CreateCaseEventService {
 
     private CaseEventDefinition findAndValidateCaseEvent(final CaseTypeDefinition caseTypeDefinition,
                                                          final Event event) {
-        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
+        final CaseEventDefinition caseEventDefinition =
+            eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
         if (caseEventDefinition == null) {
-            throw new ValidationException(format("%s is not a known event ID for the specified case type %s", event.getEventId(), caseTypeDefinition.getId()));
+            throw new ValidationException(format("%s is not a known event ID for the specified case type %s",
+                event.getEventId(), caseTypeDefinition.getId()));
         }
         return caseEventDefinition;
     }
@@ -179,7 +187,8 @@ public class CreateCaseEventService {
             throw new BadRequestException("Case reference is not valid");
         }
         return caseDetailsRepository.findByReference(caseReference)
-            .orElseThrow(() -> new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
+            .orElseThrow(() ->
+                new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
 
     private CaseDetails saveCaseDetails(CaseDetails caseDetailsBefore, final CaseDetails caseDetails,
@@ -224,7 +233,8 @@ public class CreateCaseEventService {
                                               final CaseDetails caseDetails,
                                               final CaseTypeDefinition caseTypeDefinition, LocalDateTime timeNow) {
         final IdamUser user = userRepository.getUser();
-        final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
+        final CaseStateDefinition caseStateDefinition =
+            caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
 
         auditEvent.setEventId(event.getEventId());
@@ -241,7 +251,8 @@ public class CreateCaseEventService {
         auditEvent.setUserLastName(user.getSurname());
         auditEvent.setUserFirstName(user.getForename());
         auditEvent.setCreatedDate(timeNow);
-        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition));
+        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
+            caseEventDefinition));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 

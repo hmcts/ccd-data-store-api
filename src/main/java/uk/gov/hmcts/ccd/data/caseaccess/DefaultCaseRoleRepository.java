@@ -36,7 +36,8 @@ public class DefaultCaseRoleRepository implements CaseRoleRepository {
     public Set<String> getCaseRoles(String caseTypeId) {
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
         String caseRolesUrl = String.format("%s/%s/roles", applicationParams.caseRolesURL(), caseTypeId);
-        CaseRoleDefinition[] caseRoleDefinitions = restTemplate.exchange(caseRolesUrl, GET, requestEntity, CaseRoleDefinition[].class).getBody();
+        CaseRoleDefinition[] caseRoleDefinitions =
+            restTemplate.exchange(caseRolesUrl, GET, requestEntity, CaseRoleDefinition[].class).getBody();
 
         return Arrays.stream(caseRoleDefinitions).map(CaseRoleDefinition::getId).collect(Collectors.toSet());
     }

@@ -115,11 +115,16 @@ public class EventTokenService {
         try {
             final EventTokenProperties eventTokenProperties = parseToken(token);
 
-            if (!(eventTokenProperties.getEventId() == null || eventTokenProperties.getEventId().equalsIgnoreCase(event.getId())
-                && eventTokenProperties.getCaseId() == null || eventTokenProperties.getCaseId().equalsIgnoreCase(caseDetails.getId().toString())
-                && eventTokenProperties.getJurisdictionId() == null || eventTokenProperties.getJurisdictionId().equalsIgnoreCase(jurisdictionDefinition.getId())
-                && eventTokenProperties.getCaseTypeId() == null || eventTokenProperties.getCaseTypeId().equalsIgnoreCase(caseTypeDefinition.getId())
-                && eventTokenProperties.getUid() == null || eventTokenProperties.getUid().equalsIgnoreCase(uid))) {
+            if (!(eventTokenProperties.getEventId() == null
+                || eventTokenProperties.getEventId().equalsIgnoreCase(event.getId())
+                && eventTokenProperties.getCaseId() == null
+                || eventTokenProperties.getCaseId().equalsIgnoreCase(caseDetails.getId().toString())
+                && eventTokenProperties.getJurisdictionId() == null
+                || eventTokenProperties.getJurisdictionId().equalsIgnoreCase(jurisdictionDefinition.getId())
+                && eventTokenProperties.getCaseTypeId() == null
+                || eventTokenProperties.getCaseTypeId().equalsIgnoreCase(caseTypeDefinition.getId())
+                && eventTokenProperties.getUid() == null
+                || eventTokenProperties.getUid().equalsIgnoreCase(uid))) {
                 throw new ResourceNotFoundException("Cannot find matching start trigger");
             }
 
