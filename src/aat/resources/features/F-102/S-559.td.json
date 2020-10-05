@@ -1,31 +1,31 @@
 {
-  "_guid_": "S-559",
-  "_extends_": "F-102_Test_Data_Base",
-  "title": "must return 400 if access type is not in create, read or update",
-  "specs": [
-    "a detailed profile in CCD having create case access for a jurisdiction",
-    "contains HTTP 400 Bad Request",
-    "has DELETE as case access parameter",
-    "contains an error message : Access can only be 'create', 'read' or 'update'"
-  ],
-  "request": {
-    "queryParams": {
-      "access": "delete"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_400_Response",
-    "headers": {
-      "_extends_": "Common_400_Response_Headers"
-    },
-    "body": {
-      "_extends_": "Common_400_Response_Body",
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message": "Access can only be 'create', 'read' or 'update'",
-      "path": "[[ANYTHING_PRESENT]]",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
-  }
+	"_guid_": "S-559",
+	"_extends_": "F-102_Test_Data_Base",
+	"title": "must return 400 if access type is not in create, read or update",
+	"specs": [
+		"a detailed profile in CCD having create case access for a jurisdiction",
+		"contains HTTP 400 Bad Request",
+		"has DELETE as case access parameter",
+		"contains an error message : Access can only be 'create', 'read' or 'update'"
+	],
+	"request": {
+		"queryParams": {
+			"access": "delete"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_400_Response",
+		"headers": {
+			"_extends_": "Common_400_Response_Headers"
+		},
+		"body": {
+			"_extends_": "Common_400_Response_Body",
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+			"message": "Access can only be 'create', 'read' or 'update'",
+			"path": "[[ANYTHING_PRESENT]]",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
 }

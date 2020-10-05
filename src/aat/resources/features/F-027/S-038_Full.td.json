@@ -1,1247 +1,1374 @@
 {
-  "title": "must return status 200 along with the CaseView object successfully",
-  "_guid_": "S-038_Full",
-  "_extends_": "F-027_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "uses the case-reference of the case just created",
-    "contains the details of the case just created"
-  ],
-  "request": {
-    "pathVariables": {
-      "cid": "[[DEFAULT_AUTO_VALUE]]"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Transfer-Encoding": "chunked"
-    },
-    "body" : {
-      "tabs" : [ {
-        "id" : "FirstTab",
-        "label" : "First tab",
-        "order" :"[[ANYTHING_PRESENT]]",
-        "fields" : [ {
-          "id" : "TextField",
-          "label" : "A `Text` field",
-          "hidden" : false,
-          "value" : "Some Text",
-          "metadata" : false,
-          "hint_text" : "Some generic textual data.",
-          "field_type" : {
-            "id" : "Text",
-            "type" : "Text",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "NumberField",
-          "label" : "A `Number` field",
-          "hidden" : false,
-          "value" : "[[ANYTHING_PRESENT]]",
-          "metadata" : false,
-          "hint_text" : "A numeric data.",
-          "field_type" : {
-            "id" : "Number",
-            "type" : "Number",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "YesOrNoField",
-          "label" : "A `YesOrNo` field",
-          "hidden" : false,
-          "value" : "Yes",
-          "metadata" : false,
-          "hint_text" : "A simple boolean.",
-          "field_type" : {
-            "id" : "YesOrNo",
-            "type" : "YesOrNo",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "PhoneUKField",
-          "label" : "A `PhoneUK` field",
-          "hidden" : false,
-          "value" : "[[ANYTHING_PRESENT]]",
-          "metadata" : false,
-          "hint_text" : "A UK phone number.",
-          "field_type" : {
-            "id" : "PhoneUK",
-            "type" : "PhoneUK",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$",
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$",
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "EmailField",
-          "label" : "An `Email` field",
-          "hidden" : false,
-          "value" : "[[ANYTHING_PRESENT]]",
-          "metadata" : false,
-          "hint_text" : "A valid email address.",
-          "field_type" : {
-            "id" : "Email",
-            "type" : "Email",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        } ],
-        "role" : null,
-        "show_condition" : null
-      }, {
-        "id" : "HistoryTab",
-        "label" : "History Tab",
-        "order" : "[[ANYTHING_PRESENT]]",
-        "fields" : [ {
-          "id" : "HistoryComponentField",
-          "label" : "A `HistoryComponent` field",
-          "hidden" : false,
-          "value" : [ {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "timestamp" : "[[ANYTHING_PRESENT]]",
-            "summary" : null,
-            "comment" : null,
-            "event_id" : "CREATE",
-            "event_name" : "Create a new case",
-            "user_id" : "[[ANYTHING_PRESENT]]",
-            "user_last_name" : "Auto Test",
-            "user_first_name" : "CCD",
-            "state_name" : "[[ANYTHING_PRESENT]]",
-            "state_id" : "[[ANYTHING_PRESENT]]",
-            "significant_item" : null
-          } ],
-          "metadata" : false,
-          "hint_text" : "History tab component",
-          "field_type" : {
-            "id" : "CaseHistoryViewer",
-            "type" : "CaseHistoryViewer",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        } ],
-        "role" : null,
-        "show_condition" : null
-      }, {
-        "id" : "[[ANYTHING_PRESENT]]",
-        "label" : "[[ANYTHING_PRESENT]]",
-        "order" : "[[ANYTHING_PRESENT]]",
-        "fields" : [ {
-          "id" : "MoneyGBPField",
-          "label" : "A `MoneyGBP` field",
-          "hidden" : false,
-          "value" : "[[ANYTHING_PRESENT]]",
-          "metadata" : false,
-          "hint_text" : "A monetary value.",
-          "field_type" : {
-            "id" : "MoneyGBP",
-            "type" : "MoneyGBP",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "DateField",
-          "label" : "A `Date` field",
-          "hidden" : false,
-          "value" : "[[ANYTHING_PRESENT]]",
-          "metadata" : false,
-          "hint_text" : "A temporal value without time.",
-          "field_type" : {
-            "id" : "Date",
-            "type" : "Date",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "DateTimeField",
-          "label" : "A `DateTime` field",
-          "hidden" : false,
-          "value" : "[[ANYTHING_PRESENT]]",
-          "metadata" : false,
-          "hint_text" : "A temporal value with time.",
-          "field_type" : {
-            "id" : "DateTime",
-            "type" : "DateTime",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "TextAreaField",
-          "label" : "A `TextArea` field",
-          "hidden" : false,
-          "value" : "Line1\nLine2",
-          "metadata" : false,
-          "hint_text" : "Multiple lines of text.",
-          "field_type" : {
-            "id" : "TextArea",
-            "type" : "TextArea",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "FixedListField",
-          "label" : "A `FixedList` field",
-          "hidden" : false,
-          "value" : "[[ANYTHING_PRESENT]]",
-          "metadata" : false,
-          "hint_text" : "A dropdown to select one value out of many.",
-          "field_type" : {
-            "id" : "FixedList-FixedListType",
-            "type" : "FixedList",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ {
-              "code" : "[[ANYTHING_PRESENT]]",
-              "label" : "[[ANYTHING_PRESENT]]",
-              "order" : null
-            }, {
-              "code" : "[[ANYTHING_PRESENT]]",
-              "label" : "[[ANYTHING_PRESENT]]",
-              "order" : null
-            }, {
-              "code" : "[[ANYTHING_PRESENT]]",
-              "label" : "[[ANYTHING_PRESENT]]",
-              "order" : null
-            } ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "MultiSelectListField",
-          "label" : "A `MultiSelectList` field",
-          "hidden" : false,
-          "value" : [ "OPTION2", "OPTION4" ],
-          "metadata" : false,
-          "hint_text" : "Checkboxes to select many values.",
-          "field_type" : {
-            "id" : "MultiSelectList-MultiSelectListType",
-            "type" : "MultiSelectList",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ {
-              "code" : "[[ANYTHING_PRESENT]]",
-              "label" : "[[ANYTHING_PRESENT]]",
-              "order" : null
-            }, {
-              "code" : "[[ANYTHING_PRESENT]]",
-              "label" : "[[ANYTHING_PRESENT]]",
-              "order" : null
-            }, {
-              "code" : "[[ANYTHING_PRESENT]]",
-              "label" : "[[ANYTHING_PRESENT]]",
-              "order" : null
-            }, {
-              "code" : "[[ANYTHING_PRESENT]]",
-              "label" : "[[ANYTHING_PRESENT]]",
-              "order" : null
-            }, {
-              "code" : "[[ANYTHING_PRESENT]]",
-              "label" : "[[ANYTHING_PRESENT]]",
-              "order" : null
-            } ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        } ],
-        "role" : null,
-        "show_condition" : null
-      }, {
-        "id" : "ThirdTab",
-        "label" : "Third tab",
-        "order" : "[[ANYTHING_PRESENT]]",
-        "fields" : [ {
-          "id" : "CollectionField",
-          "label" : "A `Collection` of `Text` fields",
-          "hidden" : false,
-          "value" : [ {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "value" : "[[ANYTHING_PRESENT]]"
-          }, {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "value" : "[[ANYTHING_PRESENT]]"
-          } ],
-          "metadata" : false,
-          "hint_text" : "Zero to many items, here of type `Text`",
-          "field_type" : {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "type" : "Collection",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : {
-              "id" : "Text",
-              "type" : "Text",
-              "min" : null,
-              "max" : null,
-              "regular_expression" : null,
-              "fixed_list_items" : [ ],
-              "complex_fields" : [ ],
-              "collection_field_type" : null
-            }
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "ComplexField",
-          "label" : "A `Complex` field",
-          "hidden" : false,
-          "value" : {
-            "ComplexTextField" : "Nested text",
-            "ComplexFixedListField" : "VALUE2"
-          },
-          "metadata" : false,
-          "hint_text" : "Aggregate of fields",
-          "field_type" : {
-            "id" : "ComplexType",
-            "type" : "Complex",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ {
-              "id" : "ComplexTextField",
-              "label" : "A `Text` field inside a complex",
-              "hidden" : false,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "Text",
-                "type" : "Text",
-                "min" : null,
-                "max" : null,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            }, {
-              "id" : "ComplexFixedListField",
-              "label" : "A `FixedList` field inside a complex",
-              "hidden" : false,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "FixedList-FixedListType",
-                "type" : "FixedList",
-                "min" : null,
-                "max" : null,
-                "regular_expression" : null,
-                "fixed_list_items" : [ {
-                  "code" : "[[ANYTHING_PRESENT]]",
-                  "label" : "[[ANYTHING_PRESENT]]",
-                  "order" : null
-                }, {
-                  "code" : "[[ANYTHING_PRESENT]]",
-                  "label" : "[[ANYTHING_PRESENT]]",
-                  "order" : null
-                }, {
-                  "code" : "[[ANYTHING_PRESENT]]",
-                  "label" : "[[ANYTHING_PRESENT]]",
-                  "order" : null
-                } ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            }, {
-              "id" : "ComplexNestedField",
-              "label" : "A `Complex` field inside a complex",
-              "hidden" : false,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "NestedComplexType",
-                "type" : "Complex",
-                "min" : null,
-                "max" : null,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ {
-                  "id" : "NestedNumberField",
-                  "label" : "A `Number` field inside a nested complex",
-                  "hidden" : false,
-                  "metadata" : false,
-                  "case_type_id" : null,
-                  "hint_text" : null,
-                  "field_type" : {
-                    "id" : "Number",
-                    "type" : "Number",
-                    "min" : null,
-                    "max" : null,
-                    "regular_expression" : null,
-                    "fixed_list_items" : [ ],
-                    "complex_fields" : [ ],
-                    "collection_field_type" : null
-                  },
-                  "security_classification" : "PUBLIC",
-                  "live_from" : null,
-                  "live_until" : null,
-                  "show_condition" : null,
-                  "acls" : null,
-                  "complexACLs" : [ ],
-                  "display_context" : null
-                }, {
-                  "id" : "NestedCollectionTextField",
-                  "label" : "A `Collection` field of `Text` inside a nested complex",
-                  "hidden" : false,
-                  "metadata" : false,
-                  "case_type_id" : null,
-                  "hint_text" : null,
-                  "field_type" : {
-                    "id" : "[[ANYTHING_PRESENT]]",
-                    "type" : "Collection",
-                    "min" : null,
-                    "max" : null,
-                    "regular_expression" : null,
-                    "fixed_list_items" : [ ],
-                    "complex_fields" : [ ],
-                    "collection_field_type" : {
-                      "id" : "Text",
-                      "type" : "Text",
-                      "min" : null,
-                      "max" : null,
-                      "regular_expression" : null,
-                      "fixed_list_items" : [ ],
-                      "complex_fields" : [ ],
-                      "collection_field_type" : null
-                    }
-                  },
-                  "security_classification" : "PUBLIC",
-                  "live_from" : null,
-                  "live_until" : null,
-                  "show_condition" : null,
-                  "acls" : null,
-                  "complexACLs" : [ ],
-                  "display_context" : null
-                } ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            } ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        }, {
-          "id" : "AddressUKField",
-          "label" : "A `AddressUK` field",
-          "hidden" : false,
-          "value" : {
-            "County" : "Greater London",
-            "Country" : "UK",
-            "PostCode" : "SW1H 9AJ",
-            "PostTown" : "Westminster",
-            "AddressLine1" : "102 Petty France",
-            "AddressLine2" : "CCD",
-            "AddressLine3" : "c/o HMCTS Reform"
-          },
-          "metadata" : false,
-          "hint_text" : "A UK address.",
-          "field_type" : {
-            "id" : "AddressUK",
-            "type" : "Complex",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ {
-              "id" : "AddressLine1",
-              "label" : "Building and Street",
-              "hidden" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "TextMax150",
-                "type" : "Text",
-                "min" : null,
-                "max" : 150,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            }, {
-              "id" : "AddressLine2",
-              "label" : "Address Line 2",
-              "hidden" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "TextMax50",
-                "type" : "Text",
-                "min" : null,
-                "max" : 50,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            }, {
-              "id" : "AddressLine3",
-              "label" : "Address Line 3",
-              "hidden" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "TextMax50",
-                "type" : "Text",
-                "min" : null,
-                "max" : 50,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            }, {
-              "id" : "PostTown",
-              "label" : "Town or City",
-              "hidden" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "TextMax50",
-                "type" : "Text",
-                "min" : null,
-                "max" : 50,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            }, {
-              "id" : "County",
-              "label" : "County",
-              "hidden" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "TextMax50",
-                "type" : "Text",
-                "min" : null,
-                "max" : 50,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            }, {
-              "id" : "PostCode",
-              "label" : "Postcode/Zipcode",
-              "hidden" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "TextMax14",
-                "type" : "Text",
-                "min" : null,
-                "max" : 14,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            }, {
-              "id" : "Country",
-              "label" : "Country",
-              "hidden" : null,
-              "metadata" : false,
-              "case_type_id" : null,
-              "hint_text" : null,
-              "field_type" : {
-                "id" : "TextMax50",
-                "type" : "Text",
-                "min" : null,
-                "max" : 50,
-                "regular_expression" : null,
-                "fixed_list_items" : [ ],
-                "complex_fields" : [ ],
-                "collection_field_type" : null
-              },
-              "security_classification" : "PUBLIC",
-              "live_from" : null,
-              "live_until" : null,
-              "show_condition" : null,
-              "acls" : null,
-              "complexACLs" : [ ],
-              "display_context" : null
-            } ],
-            "collection_field_type" : null
-          },
-          "validation_expr" : null,
-          "security_label" : "PUBLIC",
-          "order" : "[[ANYTHING_PRESENT]]",
-          "display_context" : null,
-          "display_context_parameter" : null,
-          "show_condition" : null,
-          "show_summary_change_option" : null,
-          "show_summary_content_option" : null,
-          "acls" : [ {
-            "role" : "caseworker-autotest1",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          }, {
-            "role" : "caseworker-autotest1-private",
-            "create" : true,
-            "read" : true,
-            "update" : true,
-            "delete" : true
-          } ]
-        } ],
-        "role" : null,
-        "show_condition" : null
-      } ],
-      "metadataFields" : [ {
-        "id" : "[STATE]",
-        "label" : "State",
-        "hidden" : false,
-        "value" : "TODO",
-        "metadata" : true,
-        "hint_text" : null,
-        "field_type" : {
-          "id" : "[[ANYTHING_PRESENT]]",
-          "type" : "[[ANYTHING_PRESENT]]",
-          "min" : null,
-          "max" : null,
-          "regular_expression" : null,
-          "fixed_list_items" : [ {
-            "code" : "[[ANYTHING_PRESENT]]",
-            "label" : "[[ANYTHING_PRESENT]]",
-            "order" : null
-          }, {
-            "code" : "[[ANYTHING_PRESENT]]",
-            "label" : "[[ANYTHING_PRESENT]]",
-            "order" : null
-          }, {
-            "code" : "[[ANYTHING_PRESENT]]",
-            "label" : "[[ANYTHING_PRESENT]]",
-            "order" : null
-          } ],
-          "complex_fields" : [ ],
-          "collection_field_type" : null
-        },
-        "validation_expr" : null,
-        "security_label" : "PUBLIC",
-        "order" : null,
-        "display_context" : null,
-        "display_context_parameter" : null,
-        "show_condition" : null,
-        "show_summary_change_option" : null,
-        "show_summary_content_option" : null,
-        "acls" : [ ]
-      }, {
-        "id" : "[JURISDICTION]",
-        "label" : "Jurisdiction",
-        "hidden" : false,
-        "value" : "[[ANYTHING_PRESENT]]",
-        "metadata" : true,
-        "hint_text" : null,
-        "field_type" : {
-          "id" : "Text",
-          "type" : "Text",
-          "min" : null,
-          "max" : null,
-          "regular_expression" : null,
-          "fixed_list_items" : [ ],
-          "complex_fields" : [ ],
-          "collection_field_type" : null
-        },
-        "validation_expr" : null,
-        "security_label" : "PUBLIC",
-        "order" : null,
-        "display_context" : null,
-        "display_context_parameter" : null,
-        "show_condition" : null,
-        "show_summary_change_option" : null,
-        "show_summary_content_option" : null,
-        "acls" : [ ]
-      }, {
-        "id" : "[CASE_TYPE]",
-        "label" : "Case Type",
-        "hidden" : false,
-        "value" : "[[ANYTHING_PRESENT]]",
-        "metadata" : true,
-        "hint_text" : null,
-        "field_type" : {
-          "id" : "Text",
-          "type" : "Text",
-          "min" : null,
-          "max" : null,
-          "regular_expression" : null,
-          "fixed_list_items" : [ ],
-          "complex_fields" : [ ],
-          "collection_field_type" : null
-        },
-        "validation_expr" : null,
-        "security_label" : "PUBLIC",
-        "order" : null,
-        "display_context" : null,
-        "display_context_parameter" : null,
-        "show_condition" : null,
-        "show_summary_change_option" : null,
-        "show_summary_content_option" : null,
-        "acls" : [ ]
-      }, {
-        "id" : "[SECURITY_CLASSIFICATION]",
-        "label" : "Security Classification",
-        "hidden" : false,
-        "value" : "PUBLIC",
-        "metadata" : true,
-        "hint_text" : null,
-        "field_type" : {
-          "id" : "Text",
-          "type" : "Text",
-          "min" : null,
-          "max" : null,
-          "regular_expression" : null,
-          "fixed_list_items" : [ ],
-          "complex_fields" : [ ],
-          "collection_field_type" : null
-        },
-        "validation_expr" : null,
-        "security_label" : "PUBLIC",
-        "order" : null,
-        "display_context" : null,
-        "display_context_parameter" : null,
-        "show_condition" : null,
-        "show_summary_change_option" : null,
-        "show_summary_content_option" : null,
-        "acls" : [ ]
-      }, {
-        "id" : "[CASE_REFERENCE]",
-        "label" : "Case Reference",
-        "hidden" : false,
-        "value" : "[[ANYTHING_PRESENT]]",
-        "metadata" : true,
-        "hint_text" : null,
-        "field_type" : {
-          "id" : "Number",
-          "type" : "Number",
-          "min" : null,
-          "max" : null,
-          "regular_expression" : null,
-          "fixed_list_items" : [ ],
-          "complex_fields" : [ ],
-          "collection_field_type" : null
-        },
-        "validation_expr" : null,
-        "security_label" : "PUBLIC",
-        "order" : null,
-        "display_context" : null,
-        "display_context_parameter" : null,
-        "show_condition" : null,
-        "show_summary_change_option" : null,
-        "show_summary_content_option" : null,
-        "acls" : [ ]
-      }, {
-        "id" : "[CREATED_DATE]",
-        "label" : "Created Date",
-        "hidden" : false,
-        "value" : "[[ANYTHING_PRESENT]]",
-        "metadata" : true,
-        "hint_text" : null,
-        "field_type" : {
-          "id" : "DateTime",
-          "type" : "DateTime",
-          "min" : null,
-          "max" : null,
-          "regular_expression" : null,
-          "fixed_list_items" : [ ],
-          "complex_fields" : [ ],
-          "collection_field_type" : null
-        },
-        "validation_expr" : null,
-        "security_label" : "PUBLIC",
-        "order" : null,
-        "display_context" : null,
-        "display_context_parameter" : null,
-        "show_condition" : null,
-        "show_summary_change_option" : null,
-        "show_summary_content_option" : null,
-        "acls" : [ ]
-      }, {
-        "id" : "[LAST_MODIFIED_DATE]",
-        "label" : "Last Modified Date",
-        "hidden" : false,
-        "value" : "[[ANYTHING_PRESENT]]",
-        "metadata" : true,
-        "hint_text" : null,
-        "field_type" : {
-          "id" : "DateTime",
-          "type" : "DateTime",
-          "min" : null,
-          "max" : null,
-          "regular_expression" : null,
-          "fixed_list_items" : [ ],
-          "complex_fields" : [ ],
-          "collection_field_type" : null
-        },
-        "validation_expr" : null,
-        "security_label" : "PUBLIC",
-        "order" : null,
-        "display_context" : null,
-        "display_context_parameter" : null,
-        "show_condition" : null,
-        "show_summary_change_option" : null,
-        "show_summary_content_option" : null,
-        "acls" : [ ]
-      } ],
-      "state" : {
-        "id" : "TODO",
-        "name" : "To do",
-        "description" : null,
-        "title_display" : null
-      },
-      "channels" : "[[ANYTHING_PRESENT]]",
-      "triggers" : [ {
-        "id" : "[[ANYTHING_PRESENT]]",
-        "name" : "[[ANYTHING_PRESENT]]",
-        "description" : null,
-        "order" : "[[ANYTHING_PRESENT]]"
-      }, {
-        "id" : "[[ANYTHING_PRESENT]]",
-        "name" : "[[ANYTHING_PRESENT]]",
-        "description" : null,
-        "order" : "[[ANYTHING_PRESENT]]"
-      }, {
-        "id" : "[[ANYTHING_PRESENT]]",
-        "name" : "[[ANYTHING_PRESENT]]",
-        "description" : null,
-        "order" : "[[ANYTHING_PRESENT]]"
-      } ],
-      "events" : [ {
-        "id" : "[[ANYTHING_PRESENT]]",
-        "timestamp" : "[[ANYTHING_PRESENT]]",
-        "summary" : null,
-        "comment" : null,
-        "event_id" : "CREATE",
-        "event_name" : "Create a new case",
-        "user_id" : "[[ANYTHING_PRESENT]]",
-        "user_last_name" : "Auto Test",
-        "user_first_name" : "CCD",
-        "state_name" : "[[ANYTHING_PRESENT]]",
-        "state_id" : "[[ANYTHING_PRESENT]]",
-        "significant_item" : null
-      } ],
-      "case_id" : "[[ANYTHING_PRESENT]]",
-      "case_type" : {
-        "id" : "[[ANYTHING_PRESENT]]",
-        "name" : "Demo case AAT_AUTH_15",
-        "description" : "Demonstrate everything CCD can do!",
-        "jurisdiction" : {
-          "id" : "[[ANYTHING_PRESENT]]",
-          "name" : "Auto Test 1",
-          "description" : "Content for the Test Jurisdiction."
-        },
-        "printEnabled" : false
-      }
-    }
-  }
+	"_guid_": "S-038_Full",
+	"_extends_": "F-027_Test_Data_Base",
+	"title": "must return status 200 along with the CaseView object successfully",
+
+	"specs": [
+		"an active profile in CCD",
+		"uses the case-reference of the case just created",
+		"contains the details of the case just created"
+	],
+
+	"request": {
+		"pathVariables": {
+			"cid": "[[DEFAULT_AUTO_VALUE]]"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Transfer-Encoding": "chunked"
+		},
+		"body": {
+			"tabs": [
+				{
+					"id": "FirstTab",
+					"label": "First tab",
+					"order": "[[ANYTHING_PRESENT]]",
+					"fields": [
+						{
+							"id": "TextField",
+							"label": "A `Text` field",
+							"hidden": false,
+							"value": "Some Text",
+							"metadata": false,
+							"hint_text": "Some generic textual data.",
+							"field_type": {
+								"id": "Text",
+								"type": "Text",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "NumberField",
+							"label": "A `Number` field",
+							"hidden": false,
+							"value": "[[ANYTHING_PRESENT]]",
+							"metadata": false,
+							"hint_text": "A numeric data.",
+							"field_type": {
+								"id": "Number",
+								"type": "Number",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "YesOrNoField",
+							"label": "A `YesOrNo` field",
+							"hidden": false,
+							"value": "Yes",
+							"metadata": false,
+							"hint_text": "A simple boolean.",
+							"field_type": {
+								"id": "YesOrNo",
+								"type": "YesOrNo",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "PhoneUKField",
+							"label": "A `PhoneUK` field",
+							"hidden": false,
+							"value": "[[ANYTHING_PRESENT]]",
+							"metadata": false,
+							"hint_text": "A UK phone number.",
+							"field_type": {
+								"id": "PhoneUK",
+								"type": "PhoneUK",
+								"min": null,
+								"max": null,
+								"regular_expression": "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$",
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$",
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "EmailField",
+							"label": "An `Email` field",
+							"hidden": false,
+							"value": "[[ANYTHING_PRESENT]]",
+							"metadata": false,
+							"hint_text": "A valid email address.",
+							"field_type": {
+								"id": "Email",
+								"type": "Email",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						}
+					],
+					"role": null,
+					"show_condition": null
+				},
+				{
+					"id": "HistoryTab",
+					"label": "History Tab",
+					"order": "[[ANYTHING_PRESENT]]",
+					"fields": [
+						{
+							"id": "HistoryComponentField",
+							"label": "A `HistoryComponent` field",
+							"hidden": false,
+							"value": [
+								{
+									"id": "[[ANYTHING_PRESENT]]",
+									"timestamp": "[[ANYTHING_PRESENT]]",
+									"summary": null,
+									"comment": null,
+									"event_id": "CREATE",
+									"event_name": "Create a new case",
+									"user_id": "[[ANYTHING_PRESENT]]",
+									"user_last_name": "Auto Test",
+									"user_first_name": "CCD",
+									"state_name": "[[ANYTHING_PRESENT]]",
+									"state_id": "[[ANYTHING_PRESENT]]",
+									"significant_item": null
+								}
+							],
+							"metadata": false,
+							"hint_text": "History tab component",
+							"field_type": {
+								"id": "CaseHistoryViewer",
+								"type": "CaseHistoryViewer",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						}
+					],
+					"role": null,
+					"show_condition": null
+				},
+				{
+					"id": "[[ANYTHING_PRESENT]]",
+					"label": "[[ANYTHING_PRESENT]]",
+					"order": "[[ANYTHING_PRESENT]]",
+					"fields": [
+						{
+							"id": "MoneyGBPField",
+							"label": "A `MoneyGBP` field",
+							"hidden": false,
+							"value": "[[ANYTHING_PRESENT]]",
+							"metadata": false,
+							"hint_text": "A monetary value.",
+							"field_type": {
+								"id": "MoneyGBP",
+								"type": "MoneyGBP",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "DateField",
+							"label": "A `Date` field",
+							"hidden": false,
+							"value": "[[ANYTHING_PRESENT]]",
+							"metadata": false,
+							"hint_text": "A temporal value without time.",
+							"field_type": {
+								"id": "Date",
+								"type": "Date",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "DateTimeField",
+							"label": "A `DateTime` field",
+							"hidden": false,
+							"value": "[[ANYTHING_PRESENT]]",
+							"metadata": false,
+							"hint_text": "A temporal value with time.",
+							"field_type": {
+								"id": "DateTime",
+								"type": "DateTime",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "TextAreaField",
+							"label": "A `TextArea` field",
+							"hidden": false,
+							"value": "Line1\nLine2",
+							"metadata": false,
+							"hint_text": "Multiple lines of text.",
+							"field_type": {
+								"id": "TextArea",
+								"type": "TextArea",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "FixedListField",
+							"label": "A `FixedList` field",
+							"hidden": false,
+							"value": "[[ANYTHING_PRESENT]]",
+							"metadata": false,
+							"hint_text": "A dropdown to select one value out of many.",
+							"field_type": {
+								"id": "FixedList-FixedListType",
+								"type": "FixedList",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [
+									{
+										"code": "[[ANYTHING_PRESENT]]",
+										"label": "[[ANYTHING_PRESENT]]",
+										"order": null
+									},
+									{
+										"code": "[[ANYTHING_PRESENT]]",
+										"label": "[[ANYTHING_PRESENT]]",
+										"order": null
+									},
+									{
+										"code": "[[ANYTHING_PRESENT]]",
+										"label": "[[ANYTHING_PRESENT]]",
+										"order": null
+									}
+								],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "MultiSelectListField",
+							"label": "A `MultiSelectList` field",
+							"hidden": false,
+							"value": [
+								"OPTION2",
+								"OPTION4"
+							],
+							"metadata": false,
+							"hint_text": "Checkboxes to select many values.",
+							"field_type": {
+								"id": "MultiSelectList-MultiSelectListType",
+								"type": "MultiSelectList",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [
+									{
+										"code": "[[ANYTHING_PRESENT]]",
+										"label": "[[ANYTHING_PRESENT]]",
+										"order": null
+									},
+									{
+										"code": "[[ANYTHING_PRESENT]]",
+										"label": "[[ANYTHING_PRESENT]]",
+										"order": null
+									},
+									{
+										"code": "[[ANYTHING_PRESENT]]",
+										"label": "[[ANYTHING_PRESENT]]",
+										"order": null
+									},
+									{
+										"code": "[[ANYTHING_PRESENT]]",
+										"label": "[[ANYTHING_PRESENT]]",
+										"order": null
+									},
+									{
+										"code": "[[ANYTHING_PRESENT]]",
+										"label": "[[ANYTHING_PRESENT]]",
+										"order": null
+									}
+								],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						}
+					],
+					"role": null,
+					"show_condition": null
+				},
+				{
+					"id": "ThirdTab",
+					"label": "Third tab",
+					"order": "[[ANYTHING_PRESENT]]",
+					"fields": [
+						{
+							"id": "CollectionField",
+							"label": "A `Collection` of `Text` fields",
+							"hidden": false,
+							"value": [
+								{
+									"id": "[[ANYTHING_PRESENT]]",
+									"value": "[[ANYTHING_PRESENT]]"
+								},
+								{
+									"id": "[[ANYTHING_PRESENT]]",
+									"value": "[[ANYTHING_PRESENT]]"
+								}
+							],
+							"metadata": false,
+							"hint_text": "Zero to many items, here of type `Text`",
+							"field_type": {
+								"id": "[[ANYTHING_PRESENT]]",
+								"type": "Collection",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": {
+									"id": "Text",
+									"type": "Text",
+									"min": null,
+									"max": null,
+									"regular_expression": null,
+									"fixed_list_items": [],
+									"complex_fields": [],
+									"collection_field_type": null
+								}
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "ComplexField",
+							"label": "A `Complex` field",
+							"hidden": false,
+							"value": {
+								"ComplexTextField": "Nested text",
+								"ComplexFixedListField": "VALUE2"
+							},
+							"metadata": false,
+							"hint_text": "Aggregate of fields",
+							"field_type": {
+								"id": "ComplexType",
+								"type": "Complex",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [
+									{
+										"id": "ComplexTextField",
+										"label": "A `Text` field inside a complex",
+										"hidden": false,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "Text",
+											"type": "Text",
+											"min": null,
+											"max": null,
+											"regular_expression": null,
+											"fixed_list_items": [],
+											"complex_fields": [],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									},
+									{
+										"id": "ComplexFixedListField",
+										"label": "A `FixedList` field inside a complex",
+										"hidden": false,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "FixedList-FixedListType",
+											"type": "FixedList",
+											"min": null,
+											"max": null,
+											"regular_expression": null,
+											"fixed_list_items": [
+												{
+													"code": "[[ANYTHING_PRESENT]]",
+													"label": "[[ANYTHING_PRESENT]]",
+													"order": null
+												},
+												{
+													"code": "[[ANYTHING_PRESENT]]",
+													"label": "[[ANYTHING_PRESENT]]",
+													"order": null
+												},
+												{
+													"code": "[[ANYTHING_PRESENT]]",
+													"label": "[[ANYTHING_PRESENT]]",
+													"order": null
+												}
+											],
+											"complex_fields": [],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									},
+									{
+										"id": "ComplexNestedField",
+										"label": "A `Complex` field inside a complex",
+										"hidden": false,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "NestedComplexType",
+											"type": "Complex",
+											"min": null,
+											"max": null,
+											"regular_expression": null,
+											"fixed_list_items": [],
+											"complex_fields": [
+												{
+													"id": "NestedNumberField",
+													"label": "A `Number` field inside a nested complex",
+													"hidden": false,
+													"metadata": false,
+													"case_type_id": null,
+													"hint_text": null,
+													"field_type": {
+														"id": "Number",
+														"type": "Number",
+														"min": null,
+														"max": null,
+														"regular_expression": null,
+														"fixed_list_items": [],
+														"complex_fields": [],
+														"collection_field_type": null
+													},
+													"security_classification": "PUBLIC",
+													"live_from": null,
+													"live_until": null,
+													"show_condition": null,
+													"acls": null,
+													"complexACLs": [],
+													"display_context": null
+												},
+												{
+													"id": "NestedCollectionTextField",
+													"label": "A `Collection` field of `Text` inside a nested complex",
+													"hidden": false,
+													"metadata": false,
+													"case_type_id": null,
+													"hint_text": null,
+													"field_type": {
+														"id": "[[ANYTHING_PRESENT]]",
+														"type": "Collection",
+														"min": null,
+														"max": null,
+														"regular_expression": null,
+														"fixed_list_items": [],
+														"complex_fields": [],
+														"collection_field_type": {
+															"id": "Text",
+															"type": "Text",
+															"min": null,
+															"max": null,
+															"regular_expression": null,
+															"fixed_list_items": [],
+															"complex_fields": [],
+															"collection_field_type": null
+														}
+													},
+													"security_classification": "PUBLIC",
+													"live_from": null,
+													"live_until": null,
+													"show_condition": null,
+													"acls": null,
+													"complexACLs": [],
+													"display_context": null
+												}
+											],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									}
+								],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						},
+						{
+							"id": "AddressUKField",
+							"label": "A `AddressUK` field",
+							"hidden": false,
+							"value": {
+								"County": "Greater London",
+								"Country": "UK",
+								"PostCode": "SW1H 9AJ",
+								"PostTown": "Westminster",
+								"AddressLine1": "102 Petty France",
+								"AddressLine2": "CCD",
+								"AddressLine3": "c/o HMCTS Reform"
+							},
+							"metadata": false,
+							"hint_text": "A UK address.",
+							"field_type": {
+								"id": "AddressUK",
+								"type": "Complex",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [
+									{
+										"id": "AddressLine1",
+										"label": "Building and Street",
+										"hidden": null,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "TextMax150",
+											"type": "Text",
+											"min": null,
+											"max": 150,
+											"regular_expression": null,
+											"fixed_list_items": [],
+											"complex_fields": [],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									},
+									{
+										"id": "AddressLine2",
+										"label": "Address Line 2",
+										"hidden": null,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "TextMax50",
+											"type": "Text",
+											"min": null,
+											"max": 50,
+											"regular_expression": null,
+											"fixed_list_items": [],
+											"complex_fields": [],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									},
+									{
+										"id": "AddressLine3",
+										"label": "Address Line 3",
+										"hidden": null,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "TextMax50",
+											"type": "Text",
+											"min": null,
+											"max": 50,
+											"regular_expression": null,
+											"fixed_list_items": [],
+											"complex_fields": [],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									},
+									{
+										"id": "PostTown",
+										"label": "Town or City",
+										"hidden": null,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "TextMax50",
+											"type": "Text",
+											"min": null,
+											"max": 50,
+											"regular_expression": null,
+											"fixed_list_items": [],
+											"complex_fields": [],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									},
+									{
+										"id": "County",
+										"label": "County",
+										"hidden": null,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "TextMax50",
+											"type": "Text",
+											"min": null,
+											"max": 50,
+											"regular_expression": null,
+											"fixed_list_items": [],
+											"complex_fields": [],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									},
+									{
+										"id": "PostCode",
+										"label": "Postcode/Zipcode",
+										"hidden": null,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "TextMax14",
+											"type": "Text",
+											"min": null,
+											"max": 14,
+											"regular_expression": null,
+											"fixed_list_items": [],
+											"complex_fields": [],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									},
+									{
+										"id": "Country",
+										"label": "Country",
+										"hidden": null,
+										"metadata": false,
+										"case_type_id": null,
+										"hint_text": null,
+										"field_type": {
+											"id": "TextMax50",
+											"type": "Text",
+											"min": null,
+											"max": 50,
+											"regular_expression": null,
+											"fixed_list_items": [],
+											"complex_fields": [],
+											"collection_field_type": null
+										},
+										"security_classification": "PUBLIC",
+										"live_from": null,
+										"live_until": null,
+										"show_condition": null,
+										"acls": null,
+										"complexACLs": [],
+										"display_context": null
+									}
+								],
+								"collection_field_type": null
+							},
+							"validation_expr": null,
+							"security_label": "PUBLIC",
+							"order": "[[ANYTHING_PRESENT]]",
+							"display_context": null,
+							"display_context_parameter": null,
+							"show_condition": null,
+							"show_summary_change_option": null,
+							"show_summary_content_option": null,
+							"acls": [
+								{
+									"role": "caseworker-autotest1",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								},
+								{
+									"role": "caseworker-autotest1-private",
+									"create": true,
+									"read": true,
+									"update": true,
+									"delete": true
+								}
+							]
+						}
+					],
+					"role": null,
+					"show_condition": null
+				}
+			],
+			"metadataFields": [
+				{
+					"id": "[STATE]",
+					"label": "State",
+					"hidden": false,
+					"value": "TODO",
+					"metadata": true,
+					"hint_text": null,
+					"field_type": {
+						"id": "[[ANYTHING_PRESENT]]",
+						"type": "[[ANYTHING_PRESENT]]",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [
+							{
+								"code": "[[ANYTHING_PRESENT]]",
+								"label": "[[ANYTHING_PRESENT]]",
+								"order": null
+							},
+							{
+								"code": "[[ANYTHING_PRESENT]]",
+								"label": "[[ANYTHING_PRESENT]]",
+								"order": null
+							},
+							{
+								"code": "[[ANYTHING_PRESENT]]",
+								"label": "[[ANYTHING_PRESENT]]",
+								"order": null
+							}
+						],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"validation_expr": null,
+					"security_label": "PUBLIC",
+					"order": null,
+					"display_context": null,
+					"display_context_parameter": null,
+					"show_condition": null,
+					"show_summary_change_option": null,
+					"show_summary_content_option": null,
+					"acls": []
+				},
+				{
+					"id": "[JURISDICTION]",
+					"label": "Jurisdiction",
+					"hidden": false,
+					"value": "[[ANYTHING_PRESENT]]",
+					"metadata": true,
+					"hint_text": null,
+					"field_type": {
+						"id": "Text",
+						"type": "Text",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"validation_expr": null,
+					"security_label": "PUBLIC",
+					"order": null,
+					"display_context": null,
+					"display_context_parameter": null,
+					"show_condition": null,
+					"show_summary_change_option": null,
+					"show_summary_content_option": null,
+					"acls": []
+				},
+				{
+					"id": "[CASE_TYPE]",
+					"label": "Case Type",
+					"hidden": false,
+					"value": "[[ANYTHING_PRESENT]]",
+					"metadata": true,
+					"hint_text": null,
+					"field_type": {
+						"id": "Text",
+						"type": "Text",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"validation_expr": null,
+					"security_label": "PUBLIC",
+					"order": null,
+					"display_context": null,
+					"display_context_parameter": null,
+					"show_condition": null,
+					"show_summary_change_option": null,
+					"show_summary_content_option": null,
+					"acls": []
+				},
+				{
+					"id": "[SECURITY_CLASSIFICATION]",
+					"label": "Security Classification",
+					"hidden": false,
+					"value": "PUBLIC",
+					"metadata": true,
+					"hint_text": null,
+					"field_type": {
+						"id": "Text",
+						"type": "Text",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"validation_expr": null,
+					"security_label": "PUBLIC",
+					"order": null,
+					"display_context": null,
+					"display_context_parameter": null,
+					"show_condition": null,
+					"show_summary_change_option": null,
+					"show_summary_content_option": null,
+					"acls": []
+				},
+				{
+					"id": "[CASE_REFERENCE]",
+					"label": "Case Reference",
+					"hidden": false,
+					"value": "[[ANYTHING_PRESENT]]",
+					"metadata": true,
+					"hint_text": null,
+					"field_type": {
+						"id": "Number",
+						"type": "Number",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"validation_expr": null,
+					"security_label": "PUBLIC",
+					"order": null,
+					"display_context": null,
+					"display_context_parameter": null,
+					"show_condition": null,
+					"show_summary_change_option": null,
+					"show_summary_content_option": null,
+					"acls": []
+				},
+				{
+					"id": "[CREATED_DATE]",
+					"label": "Created Date",
+					"hidden": false,
+					"value": "[[ANYTHING_PRESENT]]",
+					"metadata": true,
+					"hint_text": null,
+					"field_type": {
+						"id": "DateTime",
+						"type": "DateTime",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"validation_expr": null,
+					"security_label": "PUBLIC",
+					"order": null,
+					"display_context": null,
+					"display_context_parameter": null,
+					"show_condition": null,
+					"show_summary_change_option": null,
+					"show_summary_content_option": null,
+					"acls": []
+				},
+				{
+					"id": "[LAST_MODIFIED_DATE]",
+					"label": "Last Modified Date",
+					"hidden": false,
+					"value": "[[ANYTHING_PRESENT]]",
+					"metadata": true,
+					"hint_text": null,
+					"field_type": {
+						"id": "DateTime",
+						"type": "DateTime",
+						"min": null,
+						"max": null,
+						"regular_expression": null,
+						"fixed_list_items": [],
+						"complex_fields": [],
+						"collection_field_type": null
+					},
+					"validation_expr": null,
+					"security_label": "PUBLIC",
+					"order": null,
+					"display_context": null,
+					"display_context_parameter": null,
+					"show_condition": null,
+					"show_summary_change_option": null,
+					"show_summary_content_option": null,
+					"acls": []
+				}
+			],
+			"state": {
+				"id": "TODO",
+				"name": "To do",
+				"description": null,
+				"title_display": null
+			},
+			"channels": "[[ANYTHING_PRESENT]]",
+			"triggers": [
+				{
+					"id": "[[ANYTHING_PRESENT]]",
+					"name": "[[ANYTHING_PRESENT]]",
+					"description": null,
+					"order": "[[ANYTHING_PRESENT]]"
+				},
+				{
+					"id": "[[ANYTHING_PRESENT]]",
+					"name": "[[ANYTHING_PRESENT]]",
+					"description": null,
+					"order": "[[ANYTHING_PRESENT]]"
+				},
+				{
+					"id": "[[ANYTHING_PRESENT]]",
+					"name": "[[ANYTHING_PRESENT]]",
+					"description": null,
+					"order": "[[ANYTHING_PRESENT]]"
+				}
+			],
+			"events": [
+				{
+					"id": "[[ANYTHING_PRESENT]]",
+					"timestamp": "[[ANYTHING_PRESENT]]",
+					"summary": null,
+					"comment": null,
+					"event_id": "CREATE",
+					"event_name": "Create a new case",
+					"user_id": "[[ANYTHING_PRESENT]]",
+					"user_last_name": "Auto Test",
+					"user_first_name": "CCD",
+					"state_name": "[[ANYTHING_PRESENT]]",
+					"state_id": "[[ANYTHING_PRESENT]]",
+					"significant_item": null
+				}
+			],
+			"case_id": "[[ANYTHING_PRESENT]]",
+			"case_type": {
+				"id": "[[ANYTHING_PRESENT]]",
+				"name": "Demo case AAT_AUTH_15",
+				"description": "Demonstrate everything CCD can do!",
+				"jurisdiction": {
+					"id": "[[ANYTHING_PRESENT]]",
+					"name": "Auto Test 1",
+					"description": "Content for the Test Jurisdiction."
+				},
+				"printEnabled": false
+			}
+		}
+	}
 }

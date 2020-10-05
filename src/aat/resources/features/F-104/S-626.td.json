@@ -4,14 +4,14 @@
   "specs": [
     "a valid user profile",
     "is configured to search for the previously created case via exact match",
-    "is using the query parameter usecase=workbasket",
+    "is using the query parameter use_case=workbasket",
     "contains the field headers as specified in the WorkbasketResultsFields only",
     "contains the field data as specified in the WorkbasketResultsFields",
     "contains the field data of all meta data fields" ],
 
   "request": {
     "queryParams": {
-      "usecase": "WORKBASKET"
+      "use_case": "WORKBASKET"
     },
     "body": {
       "query": {

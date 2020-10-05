@@ -1,0 +1,14 @@
+{
+  "_guid_": "S-111.13_Verify_Counter_2",
+  "_extends_": "S-111.13_Check_Orgs_assigned_Users_Base",
+
+  "specs": [
+    "to verify the count of users assigned to C1 has decreased by 1"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.S-111\\.13_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation.childContexts.F-111_Prerequisite_Counter_Check_Call.childContexts.F-111_Get_Organisation_Identifier_Dil|siblingContexts.S-111\\.13_Verify_Counter_1|-1]}"
+    }
+  }
+}

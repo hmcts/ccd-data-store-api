@@ -1,30 +1,32 @@
 {
+  "_guid_": "S-177",
+  "_extends_": "F-066_Test_Data_Base",
   "title": "must return negative response when request contains an invalid case reference",
-	"_guid_": "S-177",
-	"_extends_": "F-066_Test_Data_Base",
 
-	"specs": [
-		"an active profile in CCD",
-		"contains an invalid case reference",
-		"includes a HTTP 400 'Bad Request'"
-	],
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid case reference",
+    "includes a HTTP 400 'Bad Request'"
+  ],
+
   "request": {
     "pathVariables": {
       "cid": "eyJhbGciOiJIUzI1NiJ9"
     }
-    },
-	"expectedResponse": {
+  },
+
+  "expectedResponse": {
     "_extends_": "Common_400_Response",
-		"headers": {
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
     },
-    "body" : {
-      "exception" : "[[ANYTHING_PRESENT]]",
-      "message" : "Case ID is not valid",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+    "body": {
+      "exception": "[[ANYTHING_PRESENT]]",
+      "message": "Case ID is not valid",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }

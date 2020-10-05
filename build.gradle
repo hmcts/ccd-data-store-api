@@ -273,7 +273,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.1.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.3.0'
 
     compile 'io.cucumber:cucumber-java:6.0.0'
 
@@ -292,7 +292,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:24.1.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.36') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.37') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -732,55 +732,71 @@ sourceSets {
         }
     }
 }
-task smoke(type: Test) {
-    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-    setClasspath(sourceSets.aat.runtimeClasspath)
-    include "uk/gov/hmcts/ccd/datastore/befta/**"
-    useJUnitPlatform {
-        includeTags 'smoke'
+
+task smoke() {
+    description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
+    dependsOn aatClasses
+
+    new File("$buildDir/test-results/test").mkdirs()
+    copy {
+        from "src/aat/resources/DummyTest.xml"
+        into "$buildDir/test-results/test"
     }
 
     doLast {
         generateCucumberReports.enabled = true
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
-            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '@Smoke', '--glue',
+            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
+            args = ['--plugin', "json:${rootDir}/target/cucumber.json", '--tags', '@Smoke', '--glue',
                     'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
     }
 
+    finalizedBy {
+        generateCucumberReports {
+            doLast{
+                new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
+                file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
+            }
+        }
+    }
+
+    outputs.upToDateWhen { false }
 }
 
-task functional(type: Test) {
-    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
-    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
-    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
-    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
+task functional() {
+    description = 'Executes functional tests against an the CCD Data Store API instance just deployed'
 
-    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-
-    group = 'Delivery pipeline'
-    description = 'Executes functional tests against an AAT CCD Data Store instance'
-    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-    setClasspath(sourceSets.aat.runtimeClasspath)
-    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
-    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-    useJUnitPlatform()
+    new File("$buildDir/test-results/test").mkdirs()
+    copy {
+        from "src/aat/resources/DummyTest.xml"
+        into "$buildDir/test-results/test"
+    }
 
     doFirst {
         generateCucumberReports.enabled = true
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', '(not @Ignore) and (not @elasticsearch)', '--glue', "uk.gov.hmcts.ccd.datastore.befta",
-                    '--glue','uk.gov.hmcts.befta.player', 'src/aat/resources/features']
+            args = ['--plugin', "json:${rootDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
+                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
     }
-}
 
+    finalizedBy {
+        generateCucumberReports {
+            doLast{
+                new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
+                file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
+            }
+        }
+    }
+
+    outputs.upToDateWhen { false }
+}
 
 def timestamp() {
     def date = new Date()

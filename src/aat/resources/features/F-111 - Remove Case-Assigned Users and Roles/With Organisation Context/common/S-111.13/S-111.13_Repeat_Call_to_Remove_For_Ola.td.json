@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-111.13_Repeat_Call_to_Remove_For_Ola",
+  "_extends_": "F-111_Remove_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "to repeat the same request as above"
+  ],
+
+  "users": {
+    "_extends_": "F-111_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": "${[scenarioContext][parentContext][testData][request][body][case_users]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-111_Remove_Case_Assigned_User_Roles_200_response"
+  }
+}

@@ -122,7 +122,7 @@ public class CaseSearchEndpoint {
     }
 
     private List<String> getCaseTypesFromIdamRoles() {
-        List<String> jurisdictions = userRepository.getUserRolesJurisdictions();
+        List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
         return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
     }
 
