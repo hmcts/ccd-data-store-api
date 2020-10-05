@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,8 @@ import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocume
 @Service
 public class CallbackInvoker {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CallbackInvoker.class);
+
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;
@@ -59,6 +63,7 @@ public class CallbackInvoker {
                                            final CaseTypeDefinition caseTypeDefinition,
                                            final CaseDetails caseDetails,
                                            final Boolean ignoreWarning) {
+        LOG.info("AboutToStart event");
         final Optional<CallbackResponse> callbackResponse;
         final Instant start = Instant.now();
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutAboutToStartEvent())) {
