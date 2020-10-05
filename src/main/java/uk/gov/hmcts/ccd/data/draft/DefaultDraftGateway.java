@@ -126,6 +126,7 @@ public class DefaultDraftGateway implements DraftGateway {
             LOG.warn("Error while getting draftId={}", draftId, e);
             throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
+
         return assembleDraft(draft, getDraftExceptionConsumer());
     }
 
@@ -193,11 +194,13 @@ public class DefaultDraftGateway implements DraftGateway {
     private DraftResponse assembleDraft(Draft getDraft, Consumer<Exception> exceptionConsumer) {
         final DraftResponse draftResponse = new DraftResponse();
         try {
-            draftResponse.setId(getDraft.getId());
-            draftResponse.setDocument(MAPPER.treeToValue(getDraft.getDocument(), CaseDraft.class));
-            draftResponse.setType(getDraft.getType());
-            draftResponse.setCreated(getDraft.getCreated().toLocalDateTime());
-            draftResponse.setUpdated(getDraft.getUpdated().toLocalDateTime());
+            if (getDraft != null) {
+                draftResponse.setId(getDraft.getId());
+                draftResponse.setDocument(MAPPER.treeToValue(getDraft.getDocument(), CaseDraft.class));
+                draftResponse.setType(getDraft.getType());
+                draftResponse.setCreated(getDraft.getCreated().toLocalDateTime());
+                draftResponse.setUpdated(getDraft.getUpdated().toLocalDateTime());
+            }
         } catch (IOException e) {
             exceptionConsumer.accept(e);
         }
