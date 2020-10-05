@@ -792,7 +792,7 @@ def timestamp() {
     return date.format('yyyy-MM-dd HH:mm:ss')
 }
 
-// for cnp pipeline
+// for cnp pipeline --
 task dependencyCheck(dependsOn: dependencyCheckAnalyze)
 
 configurations { codacy }
