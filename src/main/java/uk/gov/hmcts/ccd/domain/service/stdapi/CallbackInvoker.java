@@ -60,6 +60,7 @@ public class CallbackInvoker {
                                            final CaseDetails caseDetails,
                                            final Boolean ignoreWarning) {
         final Optional<CallbackResponse> callbackResponse;
+        final Instant start = Instant.now();
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutAboutToStartEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToStartEvent(),
                     caseEventDefinition, null, caseDetails, false);
@@ -68,6 +69,9 @@ public class CallbackInvoker {
                 caseEventDefinition.getCallBackURLAboutToStartEvent(),
                     caseEventDefinition, null, caseDetails, false);
         }
+
+        final Duration duration = Duration.between(start, Instant.now());
+        appinsights.trackCallbackEvent("AboutToStart", duration);
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseTypeDefinition,
             caseDetails,
