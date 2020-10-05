@@ -23,6 +23,9 @@
     <cve>CVE-2019-11358</cve><!-- liquibase -->
     <cve>CVE-2020-11022</cve><!-- liquibase -->
     <cve>CVE-2020-11023</cve><!-- liquibase -->
+    <cve>CVE-2017-18640</cve> <!-- hazelcast -->
+    <cve>CVE-2016-10750</cve><!-- hazelcast -->
+
   </suppress>
 
 </suppressions>
