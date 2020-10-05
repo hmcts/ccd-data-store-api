@@ -16,6 +16,8 @@ import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.casestate.EnablingConditionFormatter;
@@ -25,6 +27,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Component
 @Qualifier("jexl")
 public class JexlEnablingConditionParser implements EnablingConditionParser {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JexlEnablingConditionParser.class);
 
     private final JexlEngine engine;
 
@@ -41,11 +45,15 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     @Override
     public Boolean evaluate(String enablingCondition, Map<String, JsonNode> caseEventData) {
-        String expression = this.enablingConditionFormatter.format(enablingCondition);
-        if (expression != null) {
-            JexlScript expressionScript = engine.createScript(expression);
-            Map<String, Object> data = retrieveContextData(caseEventData, expressionScript.getVariables());
-            return (Boolean) expressionScript.execute(new MapContext(data));
+        try {
+            String expression = this.enablingConditionFormatter.format(enablingCondition);
+            if (expression != null) {
+                JexlScript expressionScript = engine.createScript(expression);
+                Map<String, Object> data = retrieveContextData(caseEventData, expressionScript.getVariables());
+                return (Boolean) expressionScript.execute(new MapContext(data));
+            }
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
         }
         return false;
     }

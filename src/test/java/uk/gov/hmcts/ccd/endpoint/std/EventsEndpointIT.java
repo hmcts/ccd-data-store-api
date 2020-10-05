@@ -80,7 +80,7 @@ public class EventsEndpointIT extends WireMockBaseTest {
      */
     private void assertCaseDataResultSetSize() {
         final int count = template.queryForObject("SELECT count(1) as n FROM case_data", Integer.class);
-        assertEquals("Incorrect case data size", 18, count);
+        assertEquals("Incorrect case data size", NUMBER_OF_CASES, count);
     }
 
 }
