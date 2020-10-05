@@ -179,6 +179,7 @@
     <cve>CVE-2020-11022</cve>
     <cve>CVE-2020-11023</cve>
     <cve>CVE-2016-10750</cve>
+    <cve>CVE-2020-5421</cve>
   </suppress>
   <suppress>
     <notes>
