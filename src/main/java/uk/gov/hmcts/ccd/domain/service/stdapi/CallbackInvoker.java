@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -17,6 +18,8 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +38,7 @@ public class CallbackInvoker {
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
+    private final AppInsights appinsights;
 
 
     @Autowired
@@ -42,12 +46,13 @@ public class CallbackInvoker {
                            final CaseTypeService caseTypeService,
                            final CaseDataService caseDataService,
                            final CaseSanitiser caseSanitiser,
-                           final SecurityValidationService securityValidationService) {
+                           final SecurityValidationService securityValidationService, AppInsights appinsights) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.caseSanitiser = caseSanitiser;
         this.securityValidationService = securityValidationService;
+        this.appinsights = appinsights;
     }
 
     public void invokeAboutToStartCallback(final CaseEventDefinition caseEventDefinition,
@@ -125,6 +130,7 @@ public class CallbackInvoker {
                                               final Boolean ignoreWarning) {
 
         Optional<CallbackResponse> callbackResponseOptional;
+        final Instant start = Instant.now();
         if (isRetriesDisabled(wizardPage.getRetriesTimeoutMidEvent())) {
             callbackResponseOptional = callbackService.sendSingleRequest(wizardPage.getCallBackURLMidEvent(),
                     caseEventDefinition,
@@ -136,6 +142,8 @@ public class CallbackInvoker {
                 caseDetailsBefore,
                 caseDetails, false);
         }
+        final Duration duration = Duration.between(start, Instant.now());
+        appinsights.trackCallbackEvent("MidEvent", duration);
 
         if (callbackResponseOptional.isPresent()) {
             CallbackResponse callbackResponse = callbackResponseOptional.get();

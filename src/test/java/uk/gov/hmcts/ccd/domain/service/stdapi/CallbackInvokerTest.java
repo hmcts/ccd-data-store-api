@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -84,6 +85,9 @@ class CallbackInvokerTest {
 
     @Mock
     private SecurityValidationService securityValidationService;
+
+    @Mock
+    private AppInsights appinsights;
 
     @InjectMocks
     private CallbackInvoker callbackInvoker;

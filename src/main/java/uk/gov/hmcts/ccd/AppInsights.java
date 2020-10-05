@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd;
 
+import com.google.common.collect.ImmutableMap;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+
+import static java.util.Collections.singletonMap;
 
 @Component
 public class AppInsights {
@@ -60,4 +63,18 @@ public class AppInsights {
     public void trackDependency(String dependencyName, String commandName, long duration, boolean success) {
         telemetry.trackDependency(dependencyName, commandName, new Duration(duration), success);
     }
+
+    public void trackEvent(String name, Map<String, String> properties) {
+        telemetry.trackEvent(name, properties, null);
+    }
+
+    public void trackCallbackEvent(String callbackType, java.time.Duration duration) {
+        Map<String, String> properties = ImmutableMap.of(
+            "Callback type", callbackType,
+            "Callback duration", String.valueOf(duration.toMillis())
+        );
+        telemetry.trackEvent("CALLBACK", properties,
+            singletonMap("duration", (double) duration.toMillis()));
+    }
+
 }
