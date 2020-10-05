@@ -64,7 +64,8 @@ class CaseStateUpdateServiceTest extends BaseStateReferenceTest {
         CaseEventDefinition caseEventDefinition = mockCaseEventDefinition();
         doReturn(new ArrayList<>()).when(caseEventDefinition).getPostStates();
         CaseDetails caseDetails = new CaseDetails();
-        doReturn(Optional.of("TestReference")).when(this.stateReferenceService).evaluatePostStateCondition(anyList(), anyMap());
+        doReturn(Optional.of("TestReference")).when(this.stateReferenceService)
+            .evaluatePostStateCondition(anyList(), anyMap());
         Optional<String> postState = this.caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
         assertEquals("TestReference", postState.get());
     }
@@ -75,7 +76,8 @@ class CaseStateUpdateServiceTest extends BaseStateReferenceTest {
         List<EventPostStateDefinition> postStates = createPostStates();
         doReturn(postStates).when(caseEventDefinition).getPostStates();
         CaseDetails caseDetails = new CaseDetails();
-        doReturn(Optional.of("Test125")).when(this.stateReferenceService).evaluatePostStateCondition(anyList(), anyMap());
+        doReturn(Optional.of("Test125")).when(this.stateReferenceService)
+            .evaluatePostStateCondition(anyList(), anyMap());
         Optional<String> postState = this.caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
         assertEquals("Test125", postState.get());
     }

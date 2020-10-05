@@ -34,7 +34,8 @@ public class CaseStateUpdateService {
         return postStateReference;
     }
 
-    private Map<String, JsonNode> caseEventData(CaseEventDefinition caseEventDefinition, Map<String, JsonNode> caseData) {
+    private Map<String, JsonNode> caseEventData(CaseEventDefinition caseEventDefinition,
+                                                Map<String, JsonNode> caseData) {
         Map<String, JsonNode> caseEventData = new HashMap<>();
         if (caseData != null) {
             caseEventDefinition
