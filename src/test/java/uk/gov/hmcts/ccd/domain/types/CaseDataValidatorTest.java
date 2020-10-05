@@ -24,9 +24,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private static final String CASE_FIELD_JSON = "/tests/CaseDataValidator_CaseField.json";
@@ -360,7 +365,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final ValidationResult result0 = results.get(0);
         assertThat(result0.getFieldId(), equalTo("CaseReference"));
         assertThat(result0.getErrorMessage(),
-            equalTo("The data entered is not valid for this type of field, please delete and re-enter using only valid data")
+            equalTo("The data entered is not valid for this type of field, please delete and re-enter using only valid"
+                + " data")
         );
     }
 
@@ -380,7 +386,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
 
         assertEquals(results.toString(), 0, results.size());
-        verify(textCaseReferenceCaseLinkValidator).validate(anyString(),any(JsonNode.class),any(CaseFieldDefinition.class));
+        verify(textCaseReferenceCaseLinkValidator).validate(anyString(),any(JsonNode.class),
+            any(CaseFieldDefinition.class));
     }
 
     @Test
@@ -431,7 +438,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "  }\n" +
             "}]";
         final List<CaseFieldDefinition> caseFields =
-            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
+                CaseFieldDefinition.class));
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
@@ -440,7 +448,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     }
 
     /**
-     * This test is only meant to ensure that validators are invoked and not to test the TextValidator which has it own test.
+     * This test is only meant to ensure that validators are invoked and not to test the TextValidator which has
+     * it own test.
      */
     @Test
     public void textFieldWithInvalidMaxMin() throws Exception {
@@ -456,10 +465,12 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "  }\n" +
             "}]";
         final List<CaseFieldDefinition> caseFields =
-            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
+                CaseFieldDefinition.class));
 
         final Map<String, JsonNode> invalidMaxVal =
-            MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}", new TypeReference<HashMap<String, JsonNode>>() {});
+            MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}",
+                new TypeReference<HashMap<String, JsonNode>>() {});
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(invalidMaxVal, caseFields).size());
 
         final Map<String, JsonNode> invalidMinVal =

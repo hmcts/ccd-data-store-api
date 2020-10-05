@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 import java.util.Map;
@@ -12,7 +12,8 @@ import java.util.Map;
 public class SearchResultUtil {
 
     private SearchResultUtil() {
-        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor
+        // (squid:S1118)
     }
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);

@@ -39,9 +39,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_EXTERNAL = "/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_EXTERNAL =
+            "/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
 
     private static JsonNode CALLBACK_DATA = null;
     private static final String CALLBACK_DATA_JSON_STRING =
@@ -100,7 +102,8 @@ public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
 
-        final StartEventResource startEventResource = mapper.readValue(result.getResponse().getContentAsString(), StartEventResource.class);
+        final StartEventResource startEventResource = mapper.readValue(result.getResponse().getContentAsString(),
+                StartEventResource.class);
         assertNotNull("UI Start Trigger Resource is null", startEventResource);
 
         assertEquals("Unexpected CaseDetails.data size", 1, startEventResource.getCaseDetails().getData().size());

@@ -56,7 +56,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                      final CaseDefinitionRepository caseDefinitionRepository,
                                       final EventTriggerService eventTriggerService,
                                       final EventTokenService eventTokenService,
                                       final CaseDataService caseDataService,
@@ -95,13 +96,16 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
 
-        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
+        final CaseEventDefinition caseEventDefinition =
+            eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
         if (caseEventDefinition == null) {
-            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeId);
+            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type "
+                + caseTypeId);
         }
 
         if (!eventTriggerService.isPreStateValid(null, caseEventDefinition)) {
-            throw new ValidationException("Cannot create case because of " + caseEventDefinition.getId() + " has pre-states defined");
+            throw new ValidationException("Cannot create case because of " + caseEventDefinition.getId()
+                + " has pre-states defined");
         }
 
         String token = caseDataContent.getToken();
@@ -152,7 +156,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         if (StringUtils.isNotBlank(caseDataContent.getDraftId())) {
             try {
                 draftGateway.delete(Draft.stripId(caseDataContent.getDraftId()));
-                savedCaseDetails.setDeleteDraftResponseEntity(caseDataContent.getDraftId(), ResponseEntity.ok().build());
+                savedCaseDetails.setDeleteDraftResponseEntity(caseDataContent.getDraftId(),
+                    ResponseEntity.ok().build());
             } catch (Exception e) {
                 savedCaseDetails.setIncompleteDeleteDraftResponse();
             }

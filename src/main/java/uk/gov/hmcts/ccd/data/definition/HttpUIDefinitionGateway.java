@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import java.net.URI;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +10,23 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 
 /**
  * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway.
@@ -53,7 +60,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final SearchResultDefinition
                     searchResult =
-                    restTemplate.exchange(withVersionQueryParam(applicationParams.displaySearchResultDefURL(caseTypeId), version),
+                    restTemplate.exchange(
+                            withVersionQueryParam(applicationParams.displaySearchResultDefURL(caseTypeId), version),
                             HttpMethod.GET,
                             requestEntity,
                             SearchResultDefinition.class).getBody();
@@ -77,7 +85,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final SearchInputFieldsDefinition
                     definition =
-                    restTemplate.exchange(withVersionQueryParam(applicationParams.searchInputDefinition(caseTypeId), version),
+                    restTemplate.exchange(
+                        withVersionQueryParam(applicationParams.searchInputDefinition(caseTypeId), version),
                             HttpMethod.GET,
                             requestEntity,
                             SearchInputFieldsDefinition.class).getBody();
@@ -101,7 +110,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final WorkbasketInputFieldsDefinition
                     definition =
-                    restTemplate.exchange(withVersionQueryParam(applicationParams.workbasketInputDefinition(caseTypeId), version),
+                    restTemplate.exchange(
+                        withVersionQueryParam(applicationParams.workbasketInputDefinition(caseTypeId), version),
                             HttpMethod.GET,
                             requestEntity,
                             WorkbasketInputFieldsDefinition.class).getBody();
@@ -124,7 +134,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
         final CaseTypeTabsDefinition
                 collection =
-                restTemplate.exchange(withVersionQueryParam(applicationParams.displayCaseTabCollection(caseTypeId), version),
+                restTemplate.exchange(
+                        withVersionQueryParam(applicationParams.displayCaseTabCollection(caseTypeId), version),
                         HttpMethod.GET,
                         requestEntity,
                         CaseTypeTabsDefinition.class).getBody();
@@ -141,7 +152,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
         final WizardPageCollection
                 wpc =
-                restTemplate.exchange(withVersionQueryParam(applicationParams.displayWizardPageCollection(caseTypeId, eventId), version),
+                restTemplate.exchange(
+                    withVersionQueryParam(applicationParams.displayWizardPageCollection(caseTypeId, eventId), version),
                         HttpMethod.GET,
                         requestEntity,
                         WizardPageCollection.class).getBody();
@@ -159,7 +171,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final SearchResultDefinition
                     searchResult =
-                    restTemplate.exchange(withVersionQueryParam(applicationParams.displayWorkbasketDefURL(caseTypeId), version),
+                    restTemplate.exchange(
+                            withVersionQueryParam(applicationParams.displayWorkbasketDefURL(caseTypeId), version),
                             HttpMethod.GET,
                             requestEntity,
                             SearchResultDefinition.class).getBody();
@@ -183,7 +196,9 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             SearchResultDefinition
                 searchResult =
-                restTemplate.exchange(withVersionQueryParam(applicationParams.displaySearchCasesResultDefURL(caseTypeId, useCase), version),
+                restTemplate.exchange(
+                    withVersionQueryParam(applicationParams.displaySearchCasesResultDefURL(caseTypeId, useCase),
+                        version),
                     HttpMethod.GET,
                     requestEntity,
                     SearchResultDefinition.class).getBody();
@@ -206,7 +221,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     private URI withJurisdictionIds(String url, final List<String> jurisdictionIds) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url).queryParam("ids", String.join(",", jurisdictionIds));
+        UriComponentsBuilder builder =
+            UriComponentsBuilder.fromHttpUrl(url).queryParam("ids", String.join(",", jurisdictionIds));
         return builder.build().encode().toUri();
     }
 
@@ -239,7 +255,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final JurisdictionUiConfigResult
                 jurisdictionUiConfigResult =
-                restTemplate.exchange(withJurisdictionIds(applicationParams.jurisdictionUiConfigsURL(), jurisdictionIds),
+                restTemplate.exchange(
+                    withJurisdictionIds(applicationParams.jurisdictionUiConfigsURL(), jurisdictionIds),
                     HttpMethod.GET,
                     requestEntity,
                     JurisdictionUiConfigResult.class).getBody();

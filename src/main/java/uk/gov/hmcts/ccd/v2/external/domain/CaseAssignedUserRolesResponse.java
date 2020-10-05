@@ -17,7 +17,8 @@ public class CaseAssignedUserRolesResponse {
     }
 
     @JsonProperty("status_message")
-    @ApiModelProperty(value = "Domain Status Message", required = true, example = CaseAssignedUserRolesController.ADD_SUCCESS_MESSAGE)
+    @ApiModelProperty(value = "Domain Status Message", required = true,
+        example = CaseAssignedUserRolesController.ADD_SUCCESS_MESSAGE)
     private String status;
 
 }

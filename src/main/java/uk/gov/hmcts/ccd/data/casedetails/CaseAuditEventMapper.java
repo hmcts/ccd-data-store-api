@@ -74,7 +74,8 @@ public class CaseAuditEventMapper {
             newCaseAuditEventEntity.setDataClassification(MAPPER.createObjectNode());
         } else {
             newCaseAuditEventEntity.setData(JacksonUtils.convertValueJsonNode(auditEvent.getData()));
-            newCaseAuditEventEntity.setDataClassification(JacksonUtils.convertValueJsonNode(auditEvent.getDataClassification()));
+            newCaseAuditEventEntity.setDataClassification(
+                JacksonUtils.convertValueJsonNode(auditEvent.getDataClassification()));
         }
         newCaseAuditEventEntity.setEventId(auditEvent.getEventId());
         newCaseAuditEventEntity.setEventName(auditEvent.getEventName());

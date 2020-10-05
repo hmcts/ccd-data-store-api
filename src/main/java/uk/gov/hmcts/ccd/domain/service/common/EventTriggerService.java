@@ -20,7 +20,8 @@ public class EventTriggerService {
     public Boolean isPreStateValid(final String preStateId,
                                    final CaseEventDefinition caseEventDefinition) {
         if (caseEventDefinition.getPreStates() == null) {
-            throw new InvalidDefinitionException(caseEventDefinition.getId() + " does not have any pre-states defined.");
+            throw new InvalidDefinitionException(caseEventDefinition.getId()
+                + " does not have any pre-states defined.");
         }
         return (preStateId == null && caseEventDefinition.getPreStates().isEmpty())
             || caseEventDefinition.getPreStates()
@@ -32,7 +33,8 @@ public class EventTriggerService {
 
     public Boolean isPreStateEmpty(final CaseEventDefinition caseEventDefinition) {
         if (caseEventDefinition.getPreStates() == null) {
-            throw new InvalidDefinitionException(caseEventDefinition.getId() + " does not have any pre-states defined.");
+            throw new InvalidDefinitionException(caseEventDefinition.getId()
+                + " does not have any pre-states defined.");
         }
         return caseEventDefinition.getPreStates().isEmpty();
     }

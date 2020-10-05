@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint;
 
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class CallbackTestData {
 
     private CallbackTestData() {

@@ -61,17 +61,22 @@ class YesNoValidatorTest {
         final JsonNode lowerNo = NODE_FACTORY.textNode("no");
 
         assertAll(
-            () -> assertEquals(0, validator.validate(FIELD_ID, upperYes, caseFieldDefinition).size(), "YES should be valid"),
-            () -> assertEquals(0, validator.validate(FIELD_ID, upperNo, caseFieldDefinition).size(), "NO should be valid"),
-            () -> assertEquals(0, validator.validate(FIELD_ID, lowerYes, caseFieldDefinition).size(), "yes should be valid"),
-            () -> assertEquals(0, validator.validate(FIELD_ID, lowerNo, caseFieldDefinition).size(), "no should be valid")
+            () -> assertEquals(0, validator.validate(FIELD_ID, upperYes, caseFieldDefinition).size(),
+                "YES should be valid"),
+            () -> assertEquals(0, validator.validate(FIELD_ID, upperNo, caseFieldDefinition).size(),
+                "NO should be valid"),
+            () -> assertEquals(0, validator.validate(FIELD_ID, lowerYes, caseFieldDefinition).size(),
+                "yes should be valid"),
+            () -> assertEquals(0, validator.validate(FIELD_ID, lowerNo, caseFieldDefinition).size(),
+                "no should be valid")
         );
     }
 
     @Test
     void incorrectValue() {
         final JsonNode anything = NODE_FACTORY.textNode("dasdahsaAAA");
-        assertEquals(1, validator.validate(FIELD_ID, anything, caseFieldDefinition).size(), "Did not catch non YES/NO");
+        assertEquals(1, validator.validate(FIELD_ID, anything, caseFieldDefinition).size(),
+            "Did not catch non YES/NO");
     }
 
     @Test

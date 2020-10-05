@@ -120,8 +120,8 @@ class AuthorisedGetEventTriggerOperationTest {
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType),
                                                                 eq(userRoles),
                                                                 eq(CAN_CREATE))).thenReturn(true);
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ))).thenReturn(
-            true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)))
+            .thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID),
                                                                  eq(events),
                                                                  eq(userRoles),
@@ -155,10 +155,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      events,
                                                                                      createCaseUserRoles,
                                                                                      CAN_CREATE);
-            doReturn(caseEventTrigger).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                                                                                                        caseFields,
-                                                                                                        createCaseUserRoles,
-                                                                                                        CAN_CREATE);
+            doReturn(caseEventTrigger).when(accessControlService)
+                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, createCaseUserRoles, CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService).filterCaseViewFieldsByAccess(caseEventTrigger,
                                                                                                caseFields,
                                                                                                createCaseUserRoles,
@@ -226,9 +224,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      CAN_READ);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
-                                                                                                             EVENT_TRIGGER_ID,
-                                                                                                             IGNORE)
+                ResourceNotFoundException.class, () ->
+                    authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE)
             );
         }
 
@@ -240,9 +237,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      CAN_CREATE);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
-                                                                                                             EVENT_TRIGGER_ID,
-                                                                                                             IGNORE)
+                ResourceNotFoundException.class, () ->
+                    authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE)
             );
         }
 
@@ -255,9 +251,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                       CAN_CREATE);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
-                                                                                                             EVENT_TRIGGER_ID,
-                                                                                                             IGNORE)
+                ResourceNotFoundException.class, () ->
+                    authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE)
             );
         }
     }
@@ -288,10 +283,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      eq(caseType),
                                                                                      eq(userRoles),
                                                                                      eq(CAN_UPDATE));
-            doReturn(caseEventTrigger).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                                                                                                        caseFields,
-                                                                                                        userRoles,
-                                                                                                        CAN_UPDATE);
+            doReturn(caseEventTrigger).when(accessControlService)
+                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, userRoles, CAN_UPDATE);
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
         }
@@ -356,9 +349,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      CAN_READ);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
-                                                                                                         EVENT_TRIGGER_ID,
-                                                                                                         IGNORE)
+                ResourceNotFoundException.class, () ->
+                    authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE)
             );
         }
 
@@ -370,9 +362,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      CAN_UPDATE);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
-                                                                                                         EVENT_TRIGGER_ID,
-                                                                                                         IGNORE)
+                ResourceNotFoundException.class, () ->
+                    authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE)
             );
         }
 
@@ -385,9 +376,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                       CAN_CREATE);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
-                                                                                                         EVENT_TRIGGER_ID,
-                                                                                                         IGNORE)
+                ResourceNotFoundException.class, () ->
+                    authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE)
             );
         }
 
@@ -400,9 +390,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                       CAN_UPDATE);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
-                                                                                                         EVENT_TRIGGER_ID,
-                                                                                                         IGNORE)
+                ResourceNotFoundException.class, () ->
+                    authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE)
             );
         }
 
@@ -411,9 +400,8 @@ class AuthorisedGetEventTriggerOperationTest {
         void shouldThrowExceptionIfCaseReferenceNotFound() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
-                                                                                                         EVENT_TRIGGER_ID,
-                                                                                                         IGNORE)
+                ResourceNotFoundException.class, () ->
+                    authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE)
             );
         }
 
@@ -422,9 +410,9 @@ class AuthorisedGetEventTriggerOperationTest {
         void shouldThrowExceptionIfCaseReferenceInvalid() {
             doThrow(NumberFormatException.class).when(caseDetailsRepository).findByReference("invalidReference");
             assertThrows(
-                BadRequestException.class, () -> authorisedGetEventTriggerOperation.executeForCase("invalidReference",
-                                                                                                   EVENT_TRIGGER_ID,
-                                                                                                   IGNORE)
+                BadRequestException.class, () ->
+                    authorisedGetEventTriggerOperation.executeForCase("invalidReference", EVENT_TRIGGER_ID,
+                        IGNORE)
             );
         }
 

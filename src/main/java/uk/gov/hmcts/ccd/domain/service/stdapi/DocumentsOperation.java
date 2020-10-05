@@ -39,7 +39,8 @@ public class DocumentsOperation {
     @Inject
     public DocumentsOperation(final SecurityUtils securityUtils,
                               final CaseTypeService caseTypeService,
-                              @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                              @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                  final CaseDetailsRepository caseDetailsRepository,
                               final UIDService uidService) {
         this.securityUtils = securityUtils;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -55,20 +56,23 @@ public class DocumentsOperation {
         String caseTypeId = caseDetails.getCaseTypeId();
         String jurisdictionId = caseDetails.getJurisdiction();
         try {
-            final CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
+            final CaseTypeDefinition caseTypeDefinition =
+                caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
             final String documentListUrl = caseTypeDefinition.getPrintableDocumentsUrl();
             final RestTemplate restTemplate = new RestTemplate();
             final HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             final HttpEntity<CaseDetails> requestEntity = new HttpEntity<>(caseDetails, headers);
-            final Document[] documents = restTemplate.exchange(documentListUrl, HttpMethod.POST, requestEntity, Document[].class).getBody();
+            final Document[] documents =
+                restTemplate.exchange(documentListUrl, HttpMethod.POST, requestEntity, Document[].class).getBody();
 
             return Arrays.asList(documents);
         } catch (Exception e) {
             LOG.error(String.format(
                 "Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s",
                 jurisdictionId, caseTypeId, caseReference), e);
-            throw new ServiceException(String.format("Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s, because of %s",
+            throw new ServiceException(String.format("Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, "
+                    + "Case Reference:%s, because of %s",
                 jurisdictionId, caseTypeId, caseReference, e));
         }
     }

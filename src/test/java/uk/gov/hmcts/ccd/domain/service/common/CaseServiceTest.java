@@ -65,7 +65,8 @@ class CaseServiceTest {
         caseDetails = buildCaseDetails();
         caseDetails.setId(CASE_ID);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReferenceWithNoAccessControl(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReferenceWithNoAccessControl(
+            CASE_REFERENCE);
 
         caseDataService = new CaseDataService();
         caseService = new CaseService(caseDataService, caseDetailsRepository, uidService);
@@ -99,7 +100,8 @@ class CaseServiceTest {
         void shoudThrowResourceNotFoundException() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
-            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
+            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION,
+                CASE_REFERENCE));
         }
     }
 
@@ -122,7 +124,8 @@ class CaseServiceTest {
         void shoudThrowResourceNotFoundException() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReferenceWithNoAccessControl(CASE_REFERENCE);
 
-            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetailsByCaseReference(CASE_REFERENCE));
+            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetailsByCaseReference(
+                CASE_REFERENCE));
         }
     }
 
@@ -259,7 +262,8 @@ class CaseServiceTest {
         void shoudThrowResourceNotFoundException() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
-            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
+            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION,
+                CASE_REFERENCE));
         }
     }
 

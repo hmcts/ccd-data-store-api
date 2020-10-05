@@ -45,8 +45,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
     @Autowired
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
-                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                      @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                          final CaseDefinitionRepository caseDefinitionRepository,
+                                      @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                          final CaseDetailsRepository caseDetailsRepository,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                       final EventTriggerService eventTriggerService,
                                       final CaseService caseService,
@@ -78,7 +80,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
             caseTypeDefinition,
             eventId,
             ignoreWarning,
-            (() -> caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), Maps.newHashMap())));
+            (() -> caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(),
+                Maps.newHashMap())));
     }
 
     @Override
@@ -136,8 +139,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(caseEventDefinition));
 
-        // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the relevant draft payload
-        final String eventToken = eventTokenService.generateToken(uid, caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
+        // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the
+        //  relevant draft payload
+        final String eventToken = eventTokenService.generateToken(uid, caseEventDefinition,
+            caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
 
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
@@ -164,7 +169,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private CaseEventDefinition getCaseEventDefinition(String eventId, CaseTypeDefinition caseTypeDefinition) {
         final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
         if (caseEventDefinition == null) {
-            throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());
+            throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition
+                .getId());
         }
         return caseEventDefinition;
     }

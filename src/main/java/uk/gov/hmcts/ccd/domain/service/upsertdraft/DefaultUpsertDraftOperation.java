@@ -34,7 +34,8 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
 
     @Inject
     public DefaultUpsertDraftOperation(@Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
-                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                       final CaseDefinitionRepository caseDefinitionRepository,
                                        final CaseSanitiser caseSanitiser,
                                        final UserAuthorisation userAuthorisation,
                                        ApplicationParams applicationParams) {
@@ -51,24 +52,24 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         final String eventId = caseDataContent.getEventId();
         if (!caseTypeDefinition.hasEventId(eventId)) {
-            throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type definition");
+            throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type "
+                + "definition");
         }
         draftResponse.setId(createDraft(caseDataContent, caseTypeDefinition, eventId));
         return draftResponse;
     }
 
     @Override
-    public DraftResponse executeUpdate(final String caseTypeId, final String draftId, final CaseDataContent caseDataContent) {
+    public DraftResponse executeUpdate(final String caseTypeId, final String draftId,
+                                       final CaseDataContent caseDataContent) {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         final String eventId = caseDataContent.getEventId();
         if (!caseTypeDefinition.hasEventId(eventId)) {
-            throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type definition");
+            throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type "
+                + "definition");
         }
         return draftGateway.update(buildUpdateCaseDraft(userAuthorisation.getUserId(),
-            caseTypeDefinition,
-                                                        eventId,
-                                                        caseDataContent),
-                                   draftId);
+            caseTypeDefinition, eventId, caseDataContent), draftId);
     }
 
     private String createDraft(CaseDataContent caseDataContent, CaseTypeDefinition caseTypeDefinition, String eventId) {

@@ -85,7 +85,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false);
 
         final Duration between = Duration.between(start, Instant.now());
-        // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.49s readTimeout
+        // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.49s
+        // readTimeout
         assertThat((int) between.toMillis(), greaterThan(5500));
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
@@ -104,7 +105,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false));
-        Assert.assertThat(callbackException.getMessage(), is("Callback to service has been unsuccessful for event Test"));
+        Assert.assertThat(callbackException.getMessage(), is("Callback to service has been unsuccessful for "
+                + "event Test"));
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout and no follow up retries
         assertThat((int) between.toMillis(), lessThan(1500));

@@ -92,7 +92,8 @@ public class AccessControlServiceTest {
     private static final String EVENT_ID_WITHOUT_ACCESS = "EVENT_ID_WITHOUT_ACCESS";
     private static final String EVENT_ID_WITHOUT_ACCESS_2 = "EVENT_ID_WITHOUT_ACCESS_2";
     private static final String EVENT_ID_WITH_ACCESS_2 = "EVENT_ID_WITH_ACCESS_2";
-    static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP =
+        new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final ObjectMapper MAPPER = new ObjectMapper();
     static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
@@ -240,7 +241,8 @@ public class AccessControlServiceTest {
         + "        ]\n";
     static final String p2End = "      }\n"
         + "    }\n";
-    static final String person2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + arrayEnd + p2Notes + p2End;
+    static final String person2 =
+        p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + arrayEnd + p2Notes + p2End;
 
     @BeforeEach
     void setUp() {
@@ -268,8 +270,10 @@ public class AccessControlServiceTest {
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES, CAN_CREATE), is(false)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES, CAN_CREATE), is(false))
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                    CAN_CREATE), is(false)),
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,
+                    CAN_CREATE), is(false))
             );
         }
 
@@ -288,8 +292,10 @@ public class AccessControlServiceTest {
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES, CAN_CREATE), is(false)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES, CAN_CREATE), is(false))
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                    CAN_CREATE), is(false)),
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,
+                    CAN_CREATE), is(false))
             );
         }
 
@@ -308,8 +314,10 @@ public class AccessControlServiceTest {
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES, CAN_CREATE), is(true)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES, CAN_CREATE), is(true))
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                    CAN_CREATE), is(true)),
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,
+                    CAN_CREATE), is(true))
             );
         }
 
@@ -318,7 +326,8 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToStateIfStateIsNotPresentInDefinition() throws IOException {
             CaseTypeDefinition caseType = newCaseType().build();
 
-            assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES, CAN_CREATE), is(false));
+            assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                CAN_CREATE), is(false));
         }
 
         @Test
@@ -338,7 +347,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
             List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2));
-            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
+            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStates,
+                USER_ROLES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(1)),
@@ -369,7 +379,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
             List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2, caseState3));
-            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
+            final List<CaseStateDefinition> states =
+                accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(0)),
@@ -1740,12 +1751,15 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").textValue(), is("Fatih")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("LastName"), is(nullValue())),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value").get("Name").textValue(), is("home")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value")
+                    .get("Name").textValue(), is("home")),
                 () -> assertThat(
-                    jsonNode.get("People").get(0).get("value").get("Addresses").get(1).get("value").get("Address").get("Line1").textValue(),
+                    jsonNode.get("People").get(0).get("value").get("Addresses").get(1).get("value").get("Address")
+                        .get("Line1").textValue(),
                     is("41 Kings Road")
                 ),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Txt").textValue(), is("someNote11")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Txt")
+                    .textValue(), is("someNote11")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").size(), is(3))
             );
         }
@@ -1831,16 +1845,23 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").textValue(), is("Fatih")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("LastName"), is(nullValue())),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCity").textValue(), is("Salihli")),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCountry"), is(nullValue())),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCity")
+                    .textValue(), is("Salihli")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCountry"),
+                    is(nullValue())),
                 () -> assertThat(
-                    jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornAddress").get("Address").get("Line1").textValue(),
+                    jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornAddress").get("Address")
+                        .get("Line1").textValue(),
                     is("23 Lampton Road")
                 ),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value").get("Name").textValue(), is("home")),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value").get("Address"), is(nullValue())),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Note"), is(nullValue())),
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Txt").textValue(), is("someNote11")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value")
+                    .get("Name").textValue(), is("home")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value")
+                    .get("Address"), is(nullValue())),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value")
+                    .get("Note"), is(nullValue())),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value")
+                    .get("Txt").textValue(), is("someNote11")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").size(), is(4))
             );
         }
@@ -2330,7 +2351,8 @@ public class AccessControlServiceTest {
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                is(READONLY))));
         }
 
         @Test
@@ -2418,9 +2440,12 @@ public class AccessControlServiceTest {
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"), hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"), hasProperty("displayContext", is(READONLY)))
+                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                    is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
+                    hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
+                    hasProperty("displayContext", is(READONLY)))
             );
         }
 
@@ -2509,13 +2534,16 @@ public class AccessControlServiceTest {
 
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1"), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2"), not(hasProperty("displayContext", is(READONLY))))
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1"),
+                    not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2"),
+                    not(hasProperty("displayContext", is(READONLY))))
             );
         }
 
         @Test
-        @DisplayName("Should set readonly flag for complex children and complex field overrides if relevant acl is missing")
+        @DisplayName("Should set readonly flag for complex children and complex field overrides if relevant acl is "
+            + "missing")
         void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclIsMissing() throws IOException {
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
@@ -2613,19 +2641,23 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
                 () -> assertThat(
-                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").orElseThrow(() -> new RuntimeException("Line 2 is not there")),
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").orElseThrow(() ->
+                        new RuntimeException("Line 2 is not there")),
                     not(hasProperty("displayContext", is(READONLY)))
                 ),
                 () -> assertThat(
-                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").orElseThrow(() -> new RuntimeException("Line 2 is not there")),
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").orElseThrow(() ->
+                        new RuntimeException("Line 2 is not there")),
                     hasProperty("displayContext", is(READONLY))
                 ),
                 () -> assertThat(
-                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(0).getDisplayContext(),
+                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(0)
+                        .getDisplayContext(),
                     is(OPTIONAL)
                 ),
                 () -> assertThat(
-                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1).getDisplayContext(),
+                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1)
+                        .getDisplayContext(),
                     is(READONLY)
                 )
             );
@@ -2723,10 +2755,14 @@ public class AccessControlServiceTest {
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses"), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"), hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"), hasProperty("displayContext", is(READONLY)))
+                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext",
+                    is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses"),
+                    not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"),
+                    hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"),
+                    hasProperty("displayContext", is(READONLY)))
             );
         }
 
@@ -2822,14 +2858,18 @@ public class AccessControlServiceTest {
                 CAN_UPDATE);
 
             assertAll(
-                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext",
+                    is(READONLY)))),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses"),
+                    not(hasProperty("displayContext", is(READONLY)))),
                 () -> assertThat(
-                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line1"), not(hasProperty("displayContext",
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line1"),
+                    not(hasProperty("displayContext",
                     is(READONLY)))
                 ),
                 () -> assertThat(
-                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line2"), not(hasProperty("displayContext",
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line2"),
+                    not(hasProperty("displayContext",
                     is(READONLY)))
                 )
             );
@@ -2861,7 +2901,8 @@ public class AccessControlServiceTest {
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                is(READONLY))));
         }
 
         @Test
@@ -2889,7 +2930,8 @@ public class AccessControlServiceTest {
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                is(READONLY))));
         }
 
         @Test
@@ -2919,7 +2961,8 @@ public class AccessControlServiceTest {
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext", is(READONLY)))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext",
+                is(READONLY)))));
         }
 
         @Test
@@ -2951,12 +2994,14 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext", is(READONLY)))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext",
+                is(READONLY)))));
 
         }
 
@@ -3030,9 +3075,11 @@ public class AccessControlServiceTest {
                 () -> assertThat(actual.getCaseFields(), hasSize(4)),
                 () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is("Addresses")),
                     not(hasProperty("displayContext", is(READONLY)))))),
-                () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is("AddressesNoAccess")),
+                () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id",
+                    is("AddressesNoAccess")),
                     hasProperty("displayContext", is(READONLY))))),
-                () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is("AddressesNoAccess2")),
+                () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id",
+                    is("AddressesNoAccess2")),
                     hasProperty("displayContext", is(READONLY))))),
                 () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is("Addresses2")),
                     not(hasProperty("displayContext", is(READONLY))))))
@@ -3525,7 +3572,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow update of items on collection along with creation")
         void shouldGrantUpdateAndCreateAccessToCollectionType() throws IOException {
-            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).withUpdate(true).build()));
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true)
+                .withUpdate(true).build()));
             caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
@@ -3571,7 +3619,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow deletion of items on collection along with creation")
         void shouldGrantDeleteAndCreateAccessToCollectionType() throws IOException {
-            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).withDelete(true).build()));
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true)
+                .withDelete(true).build()));
             caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
@@ -3602,7 +3651,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow creation, updating and deletion of items on collection")
         void shouldGrantUpdateDeleteAndCreateAccessToCollectionType() throws IOException {
-            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).withUpdate(true).withDelete(true).build()));
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true)
+                .withUpdate(true).withDelete(true).build()));
             caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
@@ -3621,7 +3671,8 @@ public class AccessControlServiceTest {
         return JacksonUtils.convertValueJsonNode(newData);
     }
 
-    private void assertFieldsAccess(boolean hasFieldAccess, CaseTypeDefinition caseType, JsonNode newDataNode, JsonNode existingDataNode) {
+    private void assertFieldsAccess(boolean hasFieldAccess, CaseTypeDefinition caseType, JsonNode newDataNode,
+                                    JsonNode existingDataNode) {
         assertThat(
             accessControlService.canAccessCaseFieldsForUpsert(
                 newDataNode,
