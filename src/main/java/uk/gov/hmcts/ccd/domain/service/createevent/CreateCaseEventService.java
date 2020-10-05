@@ -1,8 +1,17 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
+import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -21,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseStateUpdateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -35,21 +45,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.inject.Inject;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 @Service
 public class CreateCaseEventService {
@@ -73,6 +70,7 @@ public class CreateCaseEventService {
     private final UserAuthorisation userAuthorisation;
     private final FieldProcessorService fieldProcessorService;
     private final Clock clock;
+    private final CaseStateUpdateService caseStateUpdateService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -91,6 +89,7 @@ public class CreateCaseEventService {
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,
+                                  final CaseStateUpdateService caseStateUpdateService,
                                   @Qualifier("utcClock") final Clock clock) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -108,6 +107,7 @@ public class CreateCaseEventService {
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.userAuthorisation = userAuthorisation;
         this.fieldProcessorService = fieldProcessorService;
+        this.caseStateUpdateService = caseStateUpdateService;
         this.clock = clock;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -137,13 +137,21 @@ public class CreateCaseEventService {
             caseTypeDefinition,
             content.getIgnoreWarning());
 
-        final Optional<String>
-            newState = aboutToSubmitCallbackResponse.getState();
+        final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
         validateCaseFieldsOperation.validateData(caseDetails.getData(), caseTypeDefinition, content);
         LocalDateTime timeNow = now();
-        final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, caseEventDefinition, newState, timeNow);
-        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), caseEventDefinition, savedCaseDetails, caseTypeDefinition, timeNow);
+        final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore,
+            caseDetails,
+            caseEventDefinition,
+            newState,
+            timeNow);
+        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse,
+            content.getEvent(),
+            caseEventDefinition,
+            savedCaseDetails,
+            caseTypeDefinition,
+            timeNow);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
@@ -185,8 +193,9 @@ public class CreateCaseEventService {
     private CaseDetails saveCaseDetails(CaseDetails caseDetailsBefore, final CaseDetails caseDetails,
                                         final CaseEventDefinition caseEventDefinition,
                                         final Optional<String> state, LocalDateTime timeNow) {
-        if (!state.isPresent() && !equalsIgnoreCase(CaseStateDefinition.ANY, caseEventDefinition.getPostState())) {
-            caseDetails.setState(caseEventDefinition.getPostState());
+
+        if (!state.isPresent()) {
+            this.updateCaseState(caseDetails, caseEventDefinition);
         }
         if (!caseDetails.getState().equalsIgnoreCase(caseDetailsBefore.getState())) {
             caseDetails.setLastStateModifiedDate(timeNow);
@@ -213,8 +222,13 @@ public class CreateCaseEventService {
                 caseDetails.getDataClassification()));
         }
         caseDetails.setLastModified(now());
-        if (!StringUtils.equalsAnyIgnoreCase(CaseStateDefinition.ANY, caseEventDefinition.getPostState())) {
-            caseDetails.setState(caseEventDefinition.getPostState());
+        updateCaseState(caseDetails, caseEventDefinition);
+    }
+
+    private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {
+        Optional<String> postState = this.caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
+        if (postState.isPresent() && !equalsIgnoreCase(CaseStateDefinition.ANY, postState.get())) {
+            caseDetails.setState(postState.get());
         }
     }
 
