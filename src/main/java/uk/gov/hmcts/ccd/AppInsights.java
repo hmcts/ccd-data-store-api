@@ -68,13 +68,14 @@ public class AppInsights {
         telemetry.trackEvent(name, properties, null);
     }
 
-    public void trackCallbackEvent(String callbackType, java.time.Duration duration) {
+    public void trackCallbackEvent(String callbackType, String url, java.time.Duration duration) {
         Map<String, String> properties = ImmutableMap.of(
+            "Method", "POST",
+            "URI", url,
             "Callback type", callbackType,
-            "Callback duration", String.valueOf(duration.toMillis())
+            "Callback duration", String.valueOf(duration.toMillis() + " ms")
         );
-        telemetry.trackEvent("CALLBACK", properties,
-            singletonMap("duration", (double) duration.toMillis()));
+        telemetry.trackEvent("CALLBACK", properties, null);
     }
 
 }

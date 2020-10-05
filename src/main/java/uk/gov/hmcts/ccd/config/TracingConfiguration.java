@@ -15,7 +15,6 @@ public class TracingConfiguration {
                 RemoteDependencyTelemetry dependencyTel = (RemoteDependencyTelemetry) telemetry;
                 if (dependencyTel.getType().startsWith("Http") && dependencyTel.getName().startsWith("POST")) {
                     dependencyTel.getProperties().put("callback", "true");
-                    dependencyTel.setType("callback");
                 }
             }
             return true;

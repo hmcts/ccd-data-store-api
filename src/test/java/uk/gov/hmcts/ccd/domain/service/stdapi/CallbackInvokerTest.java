@@ -15,8 +15,6 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -60,6 +58,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker.ABOUT_TO_START;
+import static uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker.MID_EVENT;
+import static uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker.SUBMITTED;
 
 class CallbackInvokerTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -86,9 +88,6 @@ class CallbackInvokerTest {
     @Mock
     private SecurityValidationService securityValidationService;
 
-    @Mock
-    private AppInsights appinsights;
-
     @InjectMocks
     private CallbackInvoker callbackInvoker;
 
@@ -113,9 +112,9 @@ class CallbackInvokerTest {
         wizardPage = new WizardPage();
         wizardPage.setCallBackURLMidEvent(URL_MID_EVENT);
 
-        doReturn(Optional.empty()).when(callbackService).send(any(), same(caseEventDefinition), any(),
+        doReturn(Optional.empty()).when(callbackService).send(any(), any(), same(caseEventDefinition), any(),
             same(caseDetails), anyBoolean());
-        doReturn(Optional.empty()).when(callbackService).send(any(),
+        doReturn(Optional.empty()).when(callbackService).send(any(), any(),
             same(caseEventDefinition),
             same(caseDetailsBefore),
             same(caseDetails),
@@ -138,7 +137,7 @@ class CallbackInvokerTest {
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails,
                 IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
+            verify(callbackService).send(URL_ABOUT_TO_START, ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
             verifyNoMoreInteractions(callbackService);
         }
 
@@ -151,7 +150,7 @@ class CallbackInvokerTest {
                 IGNORE_WARNING);
 
             verify(callbackService, times(1)).sendSingleRequest(URL_ABOUT_TO_START,
-                caseEventDefinition, null, caseDetails, false);
+                ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
             verifyNoMoreInteractions(callbackService);
         }
     }
@@ -171,7 +170,7 @@ class CallbackInvokerTest {
                     caseTypeDefinition,
                     IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT, ABOUT_TO_SUBMIT,
                     caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -193,7 +192,7 @@ class CallbackInvokerTest {
                     caseTypeDefinition,
                     IGNORE_WARNING);
 
-            verify(callbackService).sendSingleRequest(URL_ABOUT_TO_SUBMIT,
+            verify(callbackService).sendSingleRequest(URL_ABOUT_TO_SUBMIT, ABOUT_TO_SUBMIT,
                     caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -207,7 +206,7 @@ class CallbackInvokerTest {
         void sendCallbackAndGetState() {
             final String expectedState = "uNiCORn";
             doReturn(Optional.of(mockCallbackResponse(expectedState))).when(callbackService)
-                .send(any(),
+                .send(any(), any(),
                     same(caseEventDefinition),
                     same(caseDetailsBefore),
                     same(caseDetails),
@@ -219,7 +218,7 @@ class CallbackInvokerTest {
                     caseTypeDefinition,
                     IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT, ABOUT_TO_SUBMIT,
                     caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -231,7 +230,7 @@ class CallbackInvokerTest {
         @DisplayName("should send callback and get no state")
         void sendCallbackAndGetNoState() {
             doReturn(Optional.of(mockCallbackResponseWithNoState())).when(callbackService)
-                .send(any(),
+                .send(any(), any(),
                     same(caseEventDefinition),
                     same(caseDetailsBefore),
                     same(caseDetails),
@@ -243,7 +242,7 @@ class CallbackInvokerTest {
                     caseTypeDefinition,
                     IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT, ABOUT_TO_SUBMIT,
                     caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -256,7 +255,7 @@ class CallbackInvokerTest {
         void sendCallbackAndGetStateAndSignificantDocument() {
             final String expectedState = "uNiCORn";
             doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
-                .send(any(),
+                .send(any(), any(),
                     same(caseEventDefinition),
                     same(caseDetailsBefore),
                     same(caseDetails),
@@ -269,7 +268,7 @@ class CallbackInvokerTest {
                     caseTypeDefinition,
                     IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT, ABOUT_TO_SUBMIT,
                     caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -285,7 +284,7 @@ class CallbackInvokerTest {
         void sendCallbackAndGetStateAndSignificantDocumentWithInvalidURL() {
             final String expectedState = "uNiCORn";
             doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
-                .send(any(),
+                .send(any(), any(),
                     same(caseEventDefinition),
                     same(caseDetailsBefore),
                     same(caseDetails),
@@ -298,7 +297,7 @@ class CallbackInvokerTest {
                     caseTypeDefinition,
                     IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT, ABOUT_TO_SUBMIT,
                     caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -315,7 +314,7 @@ class CallbackInvokerTest {
             final String expectedState = "uNiCORn";
             CallbackResponse callbackResponse = mockCallbackResponseWithIncorrectSignificantItem(expectedState);
             doReturn(Optional.of(callbackResponse)).when(callbackService)
-                .send(any(),
+                .send(any(), any(),
                     same(caseEventDefinition),
                     same(caseDetailsBefore),
                     same(caseDetails),
@@ -328,7 +327,7 @@ class CallbackInvokerTest {
                     caseTypeDefinition,
                     IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT, ABOUT_TO_SUBMIT,
                     caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -387,7 +386,7 @@ class CallbackInvokerTest {
         void shouldSendCallback() {
             callbackInvoker.invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore, caseDetails);
 
-            verify(callbackService).send(URL_AFTER_SUBMIT,
+            verify(callbackService).send(URL_AFTER_SUBMIT, SUBMITTED,
                     caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -402,7 +401,7 @@ class CallbackInvokerTest {
 
             callbackInvoker.invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore, caseDetails);
 
-            verify(callbackService).sendSingleRequest(URL_AFTER_SUBMIT,
+            verify(callbackService).sendSingleRequest(URL_AFTER_SUBMIT, SUBMITTED,
                     caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
@@ -425,7 +424,7 @@ class CallbackInvokerTest {
                 caseDetails,
                 IGNORE_WARNINGS);
 
-            verify(callbackService).send(URL_MID_EVENT, caseEventDefinition, caseDetailsBefore, caseDetails, false);
+            verify(callbackService).send(URL_MID_EVENT, MID_EVENT, caseEventDefinition, caseDetailsBefore, caseDetails, false);
         }
 
         @Test
@@ -440,7 +439,7 @@ class CallbackInvokerTest {
                 caseDetails,
                 IGNORE_WARNINGS);
 
-            verify(callbackService).sendSingleRequest(URL_MID_EVENT, caseEventDefinition, caseDetailsBefore,
+            verify(callbackService).sendSingleRequest(URL_MID_EVENT, MID_EVENT, caseEventDefinition, caseDetailsBefore,
                 caseDetails, false);
             verifyNoMoreInteractions(callbackService);
         }
@@ -466,7 +465,7 @@ class CallbackInvokerTest {
                     caseDetails.getDataClassification())).thenReturn(
                     currentDataClassification);
                 when(callbackService.send(caseEventDefinition.getCallBackURLAboutToStartEvent(),
-                        caseEventDefinition,
+                        ABOUT_TO_START, caseEventDefinition,
                     null,
                     caseDetails,
                     false)).thenReturn(Optional.of(callbackResponse));
@@ -492,7 +491,7 @@ class CallbackInvokerTest {
             void validateAndDoNotSetData() {
                 final CallbackResponse callbackResponse = new CallbackResponse();
                 when(callbackService.send(caseEventDefinition.getCallBackURLAboutToStartEvent(),
-                        caseEventDefinition,
+                    ABOUT_TO_START, caseEventDefinition,
                     null,
                     caseDetails,
                     false)).thenReturn(Optional.of(callbackResponse));
@@ -518,7 +517,7 @@ class CallbackInvokerTest {
             void validateAndSetDataMetError() throws ApiException {
                 final CallbackResponse callbackResponse = new CallbackResponse();
                 when(callbackService.send(caseEventDefinition.getCallBackURLAboutToStartEvent(),
-                        caseEventDefinition,
+                    ABOUT_TO_START, caseEventDefinition,
                     null,
                     caseDetails,
                     false)).thenReturn(Optional.of(callbackResponse));
@@ -575,7 +574,7 @@ class CallbackInvokerTest {
                 callbackResponse.setSecurityClassification(SecurityClassification.PRIVATE);
                 callbackResponse.setDataClassification(allFieldsDataClassification);
                 when(callbackService.send(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
-                        caseEventDefinition,
+                    ABOUT_TO_SUBMIT, caseEventDefinition,
                     caseDetailsBefore,
                     caseDetails,
                     TRUE)).thenReturn(Optional.of(callbackResponse));
@@ -768,7 +767,7 @@ class CallbackInvokerTest {
                 when(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, data,
                     caseDetails.getDataClassification())).thenReturn(currentDataClassification);
                 when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
-                        caseEventDefinition,
+                    MID_EVENT, caseEventDefinition,
                     caseDetailsBefore,
                     caseDetails,
                     false)).thenReturn(Optional.of(callbackResponse));
@@ -797,7 +796,7 @@ class CallbackInvokerTest {
             void validateAndDoNotSetData() {
                 final CallbackResponse callbackResponse = new CallbackResponse();
                 when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
-                        caseEventDefinition,
+                    MID_EVENT, caseEventDefinition,
                     caseDetailsBefore,
                     caseDetails,
                     false)).thenReturn(Optional.of(callbackResponse));
@@ -825,7 +824,7 @@ class CallbackInvokerTest {
             void validateAndSetDataMetError() throws ApiException {
                 final CallbackResponse callbackResponse = new CallbackResponse();
                 when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
-                        caseEventDefinition,
+                    MID_EVENT, caseEventDefinition,
                     caseDetailsBefore,
                     caseDetails, false)).thenReturn(Optional.of(callbackResponse));
                 final Map<String, JsonNode> data = new HashMap<>();

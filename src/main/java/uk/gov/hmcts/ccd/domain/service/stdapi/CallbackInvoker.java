@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,8 +18,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +30,12 @@ import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocume
 @Service
 public class CallbackInvoker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CallbackInvoker.class);
-
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
+    public static final String ABOUT_TO_START = "AboutToStart";
+    public static final String ABOUT_TO_SUBMIT = "AboutToSubmit";
+    public static final String SUBMITTED = "Submitted";
+    public static final String MID_EVENT = "MidEvent";
+
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;
     private final CaseDataService caseDataService;
@@ -63,20 +62,15 @@ public class CallbackInvoker {
                                            final CaseTypeDefinition caseTypeDefinition,
                                            final CaseDetails caseDetails,
                                            final Boolean ignoreWarning) {
-        LOG.info("AboutToStart event");
         final Optional<CallbackResponse> callbackResponse;
-        final Instant start = Instant.now();
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutAboutToStartEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToStartEvent(),
-                    caseEventDefinition, null, caseDetails, false);
+                ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
         } else {
             callbackResponse = callbackService.send(
-                caseEventDefinition.getCallBackURLAboutToStartEvent(),
+                caseEventDefinition.getCallBackURLAboutToStartEvent(), ABOUT_TO_START,
                     caseEventDefinition, null, caseDetails, false);
         }
-
-        final Duration duration = Duration.between(start, Instant.now());
-        appinsights.trackCallbackEvent("AboutToStart", duration);
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseTypeDefinition,
             caseDetails,
@@ -92,10 +86,10 @@ public class CallbackInvoker {
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
-                caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
+                ABOUT_TO_SUBMIT, caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         } else {
             callbackResponse = callbackService.send(
-                caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
+                caseEventDefinition.getCallBackURLAboutToSubmitEvent(), ABOUT_TO_SUBMIT,
                 caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         }
 
@@ -117,13 +111,13 @@ public class CallbackInvoker {
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLSubmittedEvent())) {
             afterSubmitCallbackResponseEntity =
                 callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLSubmittedEvent(),
-                caseEventDefinition,
+                    SUBMITTED, caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
                 AfterSubmitCallbackResponse.class);
         } else {
             afterSubmitCallbackResponseEntity = callbackService.send(caseEventDefinition.getCallBackURLSubmittedEvent(),
-                caseEventDefinition,
+                SUBMITTED, caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
                 AfterSubmitCallbackResponse.class);
@@ -139,20 +133,19 @@ public class CallbackInvoker {
                                               final Boolean ignoreWarning) {
 
         Optional<CallbackResponse> callbackResponseOptional;
-        final Instant start = Instant.now();
         if (isRetriesDisabled(wizardPage.getRetriesTimeoutMidEvent())) {
             callbackResponseOptional = callbackService.sendSingleRequest(wizardPage.getCallBackURLMidEvent(),
-                    caseEventDefinition,
+                MID_EVENT,
+                caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails, false);
         } else {
             callbackResponseOptional = callbackService.send(wizardPage.getCallBackURLMidEvent(),
-                    caseEventDefinition,
+                MID_EVENT,
+                caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails, false);
         }
-        final Duration duration = Duration.between(start, Instant.now());
-        appinsights.trackCallbackEvent("MidEvent", duration);
 
         if (callbackResponseOptional.isPresent()) {
             CallbackResponse callbackResponse = callbackResponseOptional.get();
