@@ -49,9 +49,7 @@ public class CaseDetailsEndpointPostStateIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldChangeCaseStateWhenPostStateConditionMatches() throws Exception {
-        final JsonNode DATA = mapper.readTree("{" +
-            "\"PersonLastName\":\"Test Last\"," +
-            "\"PersonFirstName\":\"Test First\"}");
+        final JsonNode DATA = createData();
         performRequestAndValidate(DATA, TEST_EVENT_ID, "state4");
     }
 
@@ -59,9 +57,7 @@ public class CaseDetailsEndpointPostStateIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldChangeCaseStateBasedOnPriorityWhenPostStateConditionMatches() throws Exception {
-        final JsonNode DATA = mapper.readTree("{" +
-            "\"PersonLastName\":\"Test Last\"," +
-            "\"PersonFirstName\":\"Test First\"}");
+        final JsonNode DATA = createData();
         performRequestAndValidate(DATA, NO_PRE_STATES_EVENT, "CaseEnteredIntoLegacy");
     }
 
@@ -79,9 +75,7 @@ public class CaseDetailsEndpointPostStateIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldStayInThePreviousStateWhenWildcardUsedInPostConditionState() throws Exception {
-        final JsonNode DATA = mapper.readTree("{" +
-            "\"PersonLastName\":\"Test Last\"," +
-            "\"PersonFirstName\":\"Test First\"}");
+        final JsonNode DATA = createData();
         performRequestAndValidate(DATA, HAS_PRE_STATES_EVENT, "CaseCreated");
     }
 
@@ -89,10 +83,14 @@ public class CaseDetailsEndpointPostStateIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldIgnorePostStateConditionWhenFieldNotAssignedToEvent() throws Exception {
-        final JsonNode DATA = mapper.readTree("{" +
-            "\"PersonLastName\":\"Test Last\"," +
-            "\"PersonFirstName\":\"Test First\"}");
+        final JsonNode DATA = createData();
         performRequestAndValidate(DATA, "Goodness", "CaseEnteredIntoLegacy");
+    }
+
+    private JsonNode createData() throws com.fasterxml.jackson.core.JsonProcessingException {
+        return mapper.readTree("{" +
+                "\"PersonLastName\":\"Test Last\"," +
+                "\"PersonFirstName\":\"Test First\"}");
     }
 
     private void performRequestAndValidate(JsonNode DATA, String eventId, String expectedCaseState) throws Exception {
