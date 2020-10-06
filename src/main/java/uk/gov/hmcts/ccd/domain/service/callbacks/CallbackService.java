@@ -15,6 +15,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryContext;
+import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryThreadContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -125,6 +127,8 @@ public class CallbackService {
 
             startTime = Instant.now();
 
+            CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
+
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
 
             return Optional.ofNullable(responseEntity);
@@ -134,6 +138,8 @@ public class CallbackService {
             LOG.debug("", e);  // debug stack trace
             return Optional.empty();
         } finally {
+            CallbackTelemetryThreadContext.remove();
+
             final Duration duration = Duration.between(startTime, Instant.now());
             appinsights.trackCallbackEvent(callbackType, url, duration);
         }
