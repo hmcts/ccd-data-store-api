@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
@@ -106,7 +105,7 @@ public class CaseDetailsEndpointPostStateIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
-        final MvcResult mvcResult = mockMvc.perform(post(URL)
+        mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
         ).andExpect(status().is(201))

@@ -203,7 +203,7 @@ public class CreateCaseEventService {
                                         final Optional<String> state, LocalDateTime timeNow) {
 
         if (!state.isPresent()) {
-            this.updateCaseState(caseDetails, caseEventDefinition);
+            updateCaseState(caseDetails, caseEventDefinition);
         }
         if (!caseDetails.getState().equalsIgnoreCase(caseDetailsBefore.getState())) {
             caseDetails.setLastStateModifiedDate(timeNow);
@@ -234,7 +234,7 @@ public class CreateCaseEventService {
     }
 
     private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {
-        Optional<String> postState = this.caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
+        Optional<String> postState = caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
         if (postState.isPresent() && !equalsIgnoreCase(CaseStateDefinition.ANY, postState.get())) {
             caseDetails.setState(postState.get());
         }

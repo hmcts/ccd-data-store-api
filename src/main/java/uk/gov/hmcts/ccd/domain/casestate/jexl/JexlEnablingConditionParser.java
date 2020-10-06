@@ -38,9 +38,14 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     @Inject
     public JexlEnablingConditionParser(EnablingConditionFormatter enablingConditionFormatter) {
+        this(enablingConditionFormatter, new ObjectMapper());
+    }
+
+    protected JexlEnablingConditionParser(EnablingConditionFormatter enablingConditionFormatter,
+                                          ObjectMapper objectMapper) {
         this.enablingConditionFormatter = enablingConditionFormatter;
         this.engine = new JexlBuilder().create();
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -75,9 +80,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
     private Set<String> getVariableNames(Set<List<String>> variableLists) {
         return variableLists
             .stream()
-            .map(list -> list
-                .stream()
-                .collect(Collectors.joining(".")))
+            .map(list -> String.join(".", list))
             .collect(Collectors.toSet());
     }
 

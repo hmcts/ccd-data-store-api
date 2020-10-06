@@ -22,8 +22,6 @@ import static org.mockito.Mockito.doReturn;
 
 class CaseStateUpdateServiceTest extends BaseStateReferenceTest {
 
-    private EnablingConditionSorter enablingConditionSorter;
-
     @Mock
     private StateReferenceService stateReferenceService;
 
@@ -32,9 +30,8 @@ class CaseStateUpdateServiceTest extends BaseStateReferenceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.enablingConditionSorter = new EnablingConditionSorter();
 
-        this.caseStateUpdateService = new CaseStateUpdateService(this.enablingConditionSorter,
+        caseStateUpdateService = new CaseStateUpdateService(new EnablingConditionSorter(),
             this.stateReferenceService);
     }
 

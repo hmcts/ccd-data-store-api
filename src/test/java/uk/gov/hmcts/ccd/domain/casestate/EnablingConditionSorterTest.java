@@ -39,9 +39,26 @@ class EnablingConditionSorterTest {
         assertEquals(99, eventPostStateDefinitionList.get(2).getPriority());
     }
 
+    @Test
+    void sortEventPostStatesWhenPriorityIsNull() {
+        List<EventPostStateDefinition> eventPostStateDefinitionList = new ArrayList<>();
+
+        eventPostStateDefinitionList.add(createEventPostState(
+            "FieldA!=\"\" AND FieldB=\"I'm innocent\"",
+            "ApprovalRequired", null));
+
+        eventPostStateDefinitionList.add(createEventPostState(
+            "FieldC=\"*\" AND FieldD=\"Plea Entered\"",
+            "ScheduleForHearing", null));
+        this.enablingConditionSorter.sortEventPostStates(eventPostStateDefinitionList);
+
+        assertEquals(2, eventPostStateDefinitionList.size());
+        assertEquals(null, eventPostStateDefinitionList.get(0).getPriority());
+    }
+
     private EventPostStateDefinition createEventPostState(String enablingCondition,
                                                           String postStateReference,
-                                                          int priority) {
+                                                          Integer priority) {
         EventPostStateDefinition eventPostStateDefinition = new EventPostStateDefinition();
         eventPostStateDefinition.setEnablingCondition(enablingCondition);
         eventPostStateDefinition.setPostStateReference(postStateReference);

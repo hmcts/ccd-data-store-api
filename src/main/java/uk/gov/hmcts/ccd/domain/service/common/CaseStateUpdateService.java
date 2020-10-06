@@ -40,7 +40,6 @@ public class CaseStateUpdateService {
         if (caseData != null) {
             caseEventDefinition
                 .getCaseFields()
-                .stream()
                 .forEach(caseEventFieldDefinition -> {
                     String key = caseEventFieldDefinition.getCaseFieldId();
                     Optional<JsonNode> value = Optional.ofNullable(caseData.get(key));
