@@ -1,22 +1,26 @@
 {
-  "_guid_": "F-046_Base_Request_Data",
-  "productName": "CCD Data Store",
-  "operationName": "Revoke access to case",
-  "method": "DELETE",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users/{idToDelete}",
-  "users": {
-    "invokingUser": {
-      "_extends_": "Common_User_For_Request"
-    }
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "[[DEFAULT_AUTO_VALUE]]",
-      "idToDelete": "${[scenarioContext][theInvokingUser][id]}"
-    }
-  }
+	"_guid_": "F-046_Base_Request_Data",
+
+	"productName": "CCD Data Store",
+	"operationName": "Revoke access to case",
+
+	"method": "DELETE",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users/{idToDelete}",
+
+	"users": {
+		"invokingUser": {
+			"_extends_": "Common_User_For_Request"
+		}
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT",
+			"cid": "[[DEFAULT_AUTO_VALUE]]",
+			"idToDelete": "${[scenarioContext][theInvokingUser][id]}"
+		}
+	}
 }

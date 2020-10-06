@@ -1,15 +1,18 @@
 {
-  "_guid_": "F-027_Test_Data_Base",
-  "_extends_": "Base-Root",
-  "productName": "CCD Data Store",
-  "operationName": "Fetch a case for display for Case Worker",
-  "request": {
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT"
-    }
-  },
-  "method": "GET",
-  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}"
+	"_guid_": "F-027_Test_Data_Base",
+	"_extends_": "Base-Root",
+
+	"productName": "CCD Data Store",
+	"operationName": "Fetch a case for display for Case Worker",
+
+	"method": "GET",
+	"uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
+
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT"
+		}
+	}
 }

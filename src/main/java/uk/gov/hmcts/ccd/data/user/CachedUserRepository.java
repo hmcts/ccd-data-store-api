@@ -76,8 +76,8 @@ public class CachedUserRepository implements UserRepository {
     }
 
     @Override
-    public List<String> getUserRolesJurisdictions() {
-        return userRepository.getUserRolesJurisdictions();
+    public List<String> getCaseworkerUserRolesJurisdictions() {
+        return userRepository.getCaseworkerUserRolesJurisdictions();
     }
 
     @Override
@@ -93,5 +93,10 @@ public class CachedUserRepository implements UserRepository {
     @Override
     public boolean anyRoleMatches(Pattern rolesPattern) {
         return userRepository.anyRoleMatches(rolesPattern);
+    }
+
+    @Override
+    public boolean isCrossJurisdictionRole(String role) {
+        return userRepository.isCrossJurisdictionRole(role);
     }
 }

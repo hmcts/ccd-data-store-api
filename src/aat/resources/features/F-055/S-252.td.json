@@ -1,25 +1,24 @@
 {
-  "title": "must return 401 when request does not provide valid authentication credentials",
+	"_guid_": "S-252",
+	"_extends_": "F-055_Base_Test_Data",
+	"title": "must return 401 when request does not provide valid authentication credentials",
 
-  "_guid_": "S-252",
-  "_extends_": "F-055_Base_Test_Data",
+	"specs": [
+		"an active profile in CCD",
+		"includes an invalid user authorisation token",
+		"contains a HTTP 401 Unauthorised"
+	],
 
-  "specs": [
-    "an active profile in CCD",
-    "includes an invalid user authorisation token",
-    "contains a HTTP 401 Unauthorised"
-  ],
+	"request": {
+		"headers": {
+			"Authorization": "abc"
+		},
+		"pathVariables": {
+			"cid": "1234567890123456"
+		}
+	},
 
-  "request": {
-    "headers": {
-      "Authorization": "abc"
-    },
-    "pathVariables": {
-      "cid": "1234567890123456"
-    }
-  },
-
-  "expectedResponse": {
-    "_extends_": "Common_401_Response"
-  }
+	"expectedResponse": {
+		"_extends_": "Common_401_Response"
+	}
 }
