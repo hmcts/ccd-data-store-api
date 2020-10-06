@@ -9,15 +9,18 @@ import org.springframework.context.annotation.Configuration;
 public class TracingConfiguration {
 
     @Bean
-    public TelemetryProcessor healthRecognitionProcessor() {
+    // Custom TelemetryProcessor which tags the type of {@link RemoteDependencyTelemetry} as callback before publishing.
+    public TelemetryProcessor callbackRecognitionProcessor() {
         return telemetry -> {
             if (telemetry instanceof RemoteDependencyTelemetry) {
-                RemoteDependencyTelemetry dependencyTel = (RemoteDependencyTelemetry) telemetry;
-                if (dependencyTel.getType().startsWith("Http") && dependencyTel.getName().startsWith("POST")) {
-                    dependencyTel.getProperties().put("callback", "true");
+                RemoteDependencyTelemetry dependency = (RemoteDependencyTelemetry) telemetry;
+                if (dependency.getType().startsWith("Http") && dependency.getName().startsWith("POST")
+                    && !dependency.getName().contains("/lease")) { // ignore S2S path
+                    dependency.getProperties().put("callback", "true");
                 }
             }
             return true;
         };
     }
+
 }

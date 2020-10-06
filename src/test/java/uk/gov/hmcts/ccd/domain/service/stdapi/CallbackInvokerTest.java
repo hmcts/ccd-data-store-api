@@ -137,7 +137,8 @@ class CallbackInvokerTest {
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails,
                 IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_START, ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
+            verify(callbackService).send(URL_ABOUT_TO_START, ABOUT_TO_START, caseEventDefinition,
+                null, caseDetails, false);
             verifyNoMoreInteractions(callbackService);
         }
 
@@ -424,7 +425,8 @@ class CallbackInvokerTest {
                 caseDetails,
                 IGNORE_WARNINGS);
 
-            verify(callbackService).send(URL_MID_EVENT, MID_EVENT, caseEventDefinition, caseDetailsBefore, caseDetails, false);
+            verify(callbackService).send(URL_MID_EVENT, MID_EVENT, caseEventDefinition, caseDetailsBefore,
+                caseDetails, false);
         }
 
         @Test

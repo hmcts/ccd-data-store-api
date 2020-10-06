@@ -135,7 +135,7 @@ public class CallbackService {
             return Optional.empty();
         } finally {
             final Duration duration = Duration.between(startTime, Instant.now());
-            appinsights.trackCallbackEvent("AboutToStart", url, duration);
+            appinsights.trackCallbackEvent(callbackType, url, duration);
         }
     }
 

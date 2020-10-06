@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-import static java.util.Collections.singletonMap;
-
 @Component
 public class AppInsights {
     private static final String MODULE = "CASE_DATA";
@@ -70,10 +68,10 @@ public class AppInsights {
 
     public void trackCallbackEvent(String callbackType, String url, java.time.Duration duration) {
         Map<String, String> properties = ImmutableMap.of(
-            "Method", "POST",
-            "URI", url,
             "Callback type", callbackType,
-            "Callback duration", String.valueOf(duration.toMillis() + " ms")
+            "Callback duration", String.valueOf(duration.toMillis()) + " ms",
+            "Method", "POST",
+            "URI", url
         );
         telemetry.trackEvent("CALLBACK", properties, null);
     }
