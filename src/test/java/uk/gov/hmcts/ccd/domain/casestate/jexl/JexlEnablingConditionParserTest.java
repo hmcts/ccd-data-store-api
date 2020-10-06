@@ -87,7 +87,7 @@ class JexlEnablingConditionParserTest {
 
     @Test
     void shouldReturnFalseWhenConditionHasUnKnownField() {
-        String enablingCondition = "FieldC!=\"*\" AND FieldB=\"I'm innocent\")";
+        String enablingCondition = "FieldC=\"\" AND FieldB=\"I'm innocent\")";
         Boolean isValid = enablingConditionParser.evaluate(enablingCondition, createCaseData(
             "Test",
             "I'm innocent"
