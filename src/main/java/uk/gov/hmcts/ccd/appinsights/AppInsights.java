@@ -1,5 +1,6 @@
-package uk.gov.hmcts.ccd;
+package uk.gov.hmcts.ccd.appinsights;
 
+import com.google.common.collect.ImmutableMap;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
@@ -16,6 +17,14 @@ public class AppInsights {
     public static final String CASE_DEFINITION = "CASE_DEFINITION";
     public static final String DOC_MANAGEMENT = "DOCUMENT_MANAGEMENT";
     public static final String DRAFT_STORE = "DRAFT_STORE";
+
+    public static final String TYPE = "Callback type";
+    public static final String CALLBACK_DURATION = "Callback duration";
+    public static final String METHOD = "Method";
+    public static final String URI = "URI";
+    public static final String STATUS = "Http Status";
+    public static final String CALLBACK_EVENT_NAME = "CALLBACK";
+
     private final TelemetryClient telemetry;
 
     @Autowired
@@ -59,5 +68,20 @@ public class AppInsights {
 
     public void trackDependency(String dependencyName, String commandName, long duration, boolean success) {
         telemetry.trackDependency(dependencyName, commandName, new Duration(duration), success);
+    }
+
+    public void trackEvent(String name, Map<String, String> properties) {
+        telemetry.trackEvent(name, properties, null);
+    }
+
+    public void trackCallbackEvent(String callbackType, String url, String httpStatus, java.time.Duration duration) {
+        Map<String, String> properties = ImmutableMap.of(
+            TYPE, callbackType,
+            CALLBACK_DURATION, String.valueOf(duration.toMillis()) + " ms",
+            METHOD, "POST",
+            URI, url,
+            STATUS, httpStatus
+        );
+        telemetry.trackEvent(CALLBACK_EVENT_NAME, properties, null);
     }
 }
