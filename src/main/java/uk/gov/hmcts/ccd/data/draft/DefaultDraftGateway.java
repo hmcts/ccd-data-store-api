@@ -161,9 +161,9 @@ public class DefaultDraftGateway implements DraftGateway {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(headers);
-            DraftList getDrafts = restTemplate.exchange(
+            DraftList drafts = restTemplate.exchange(
                 getUriWithQueryParams(), HttpMethod.GET, requestEntity, DraftList.class).getBody();
-            return getDrafts == null ? null : getDrafts.getData()
+            return drafts == null ? null : drafts.getData()
                 .stream()
                 .map(d -> assembleDraft(d, getDraftsExceptionConsumer()))
                 .collect(Collectors.toList());
@@ -191,15 +191,15 @@ public class DefaultDraftGateway implements DraftGateway {
             .queryParam("limit", Integer.MAX_VALUE).toUriString();
     }
 
-    private DraftResponse assembleDraft(Draft getDraft, Consumer<Exception> exceptionConsumer) {
+    private DraftResponse assembleDraft(Draft draft, Consumer<Exception> exceptionConsumer) {
         final DraftResponse draftResponse = new DraftResponse();
         try {
-            if (getDraft != null) {
-                draftResponse.setId(getDraft.getId());
-                draftResponse.setDocument(MAPPER.treeToValue(getDraft.getDocument(), CaseDraft.class));
-                draftResponse.setType(getDraft.getType());
-                draftResponse.setCreated(getDraft.getCreated().toLocalDateTime());
-                draftResponse.setUpdated(getDraft.getUpdated().toLocalDateTime());
+            if (draft != null) {
+                draftResponse.setId(draft.getId());
+                draftResponse.setDocument(MAPPER.treeToValue(draft.getDocument(), CaseDraft.class));
+                draftResponse.setType(draft.getType());
+                draftResponse.setCreated(draft.getCreated().toLocalDateTime());
+                draftResponse.setUpdated(draft.getUpdated().toLocalDateTime());
             }
         } catch (IOException e) {
             exceptionConsumer.accept(e);
@@ -209,10 +209,10 @@ public class DefaultDraftGateway implements DraftGateway {
 
 
     private Long getDraftId(HttpHeaders responseHeaders) {
-        URI getLocation = responseHeaders.getLocation();
+        URI location = responseHeaders.getLocation();
         String path = null;
-        if (getLocation != null) {
-            path = getLocation.getPath();
+        if (location != null) {
+            path = location.getPath();
         }
         return path == null ? null : Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
     }
