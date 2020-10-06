@@ -1,13 +1,12 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.ToString;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.ToString;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 @ToString
 public class CaseEventDefinition implements Serializable {
@@ -21,8 +20,8 @@ public class CaseEventDefinition implements Serializable {
     private List<CaseEventFieldDefinition> caseFields = new ArrayList<>();
     @JsonProperty("pre_states")
     private List<String> preStates = new ArrayList<>();
-    @JsonProperty("post_state")
-    private String postState = null;
+    @JsonProperty("post_states")
+    private List<EventPostStateDefinition> postStates = new ArrayList<>();
     @JsonProperty("callback_url_about_to_start_event")
     private String callBackURLAboutToStartEvent;
     @JsonProperty("retries_timeout_about_to_start_event")
@@ -96,12 +95,12 @@ public class CaseEventDefinition implements Serializable {
         this.preStates = preStates;
     }
 
-    public String getPostState() {
-        return postState;
+    public List<EventPostStateDefinition> getPostStates() {
+        return postStates;
     }
 
-    public void setPostState(String postState) {
-        this.postState = postState;
+    public void setPostStates(List<EventPostStateDefinition> postStates) {
+        this.postStates = postStates;
     }
 
     public String getCallBackURLAboutToStartEvent() {

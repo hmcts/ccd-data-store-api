@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/data/case-type/TestAddressBookCaseNoCreateFieldAccess"
+    "url": "/api/data/case-type/TestAddressBookPostState"
   },
   "response": {
     "status": 200,
@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "id": "TestAddressBookCase",
+      "id": "TestAddressBookPostState",
       "version": {
         "number": 1,
         "live_from": "2017-01-01"
@@ -26,7 +26,21 @@
         {
           "role": "caseworker-probate-public",
           "create": true,
-          "read": false,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-probate-private",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "citizen",
+          "create": true,
+          "read": true,
           "update": true,
           "delete": false
         }],
@@ -39,31 +53,42 @@
           "case_fields": [
             {
               "case_field_id": "PersonFirstName",
-              "display_context": "READONLY"
+              "display_context": "OPTIONAL",
+              "show_summary_content_option": 2
             },
             {
               "case_field_id": "PersonLastName",
-              "display_context": "OPTIONAL"
+              "display_context": "OPTIONAL",
+              "show_summary_content_option": 1
             }
           ],
           "pre_states": [
-            "some-state",
-            "CaseCreated"
+            "*",
+            "* overwrites this one",
+            "CaseCreated",
+            "some-state"
           ],
           "post_states": [{
             "enabling_condition" : null,
             "priority" : 99,
             "post_state_reference" : "state4"
-          }],
+          },
+            {
+              "enabling_condition" : "PersonLastName=\"Test Last\" AND PersonFirstName=\"Test First\"",
+              "priority" : 1,
+              "post_state_reference" : "*"
+            }],
           "security_classification": "PRIVATE",
           "acls": [
             {
               "role": "caseworker-probate-public",
               "create": true,
-              "read": false,
-              "update": false,
+              "read": true,
+              "update": true,
               "delete": false
-            }]
+            }],
+          "show_event_notes": false,
+          "can_save_draft": false
         },
         {
           "id": "NO_PRE_STATES_EVENT",
@@ -73,7 +98,7 @@
           "case_fields": [
             {
               "case_field_id": "PersonFirstName",
-              "display_context": "READONLY"
+              "display_context": "OPTIONAL"
             },
             {
               "case_field_id": "PersonLastName",
@@ -81,53 +106,148 @@
             }
           ],
           "pre_states": [
+            "*",
+            "* overwrites this one",
+            "CaseCreated",
+            "some-state"
           ],
           "post_states": [{
             "enabling_condition" : null,
             "priority" : 99,
             "post_state_reference" : "state4"
-          }],
+          },
+            {
+              "enabling_condition" : "PersonLastName=\"Test Last\" AND PersonFirstName=\"Test First\"",
+              "priority" : 1,
+              "post_state_reference" : "CaseEnteredIntoLegacy"
+            },
+            {
+              "enabling_condition" : "PersonLastName=\"Test Last\" AND PersonFirstName=\"Test First\"",
+              "priority" : 2,
+              "post_state_reference" : "state4"
+            }],
           "security_classification": "PRIVATE",
           "acls": [
             {
               "role": "caseworker-probate-public",
               "create": true,
-              "read": false,
-              "update": false,
+              "read": true,
+              "update": true,
               "delete": false
-            }]
+            }],
+          "show_event_notes": true,
+          "can_save_draft": true
         },
         {
           "id": "TEST_EVENT",
           "name": "TEST EVENT NAME",
           "description": "Just a test",
           "case_fields": [
+            {
+              "case_field_id": "PersonFirstName",
+              "display_context": "OPTIONAL"
+            },
+            {
+              "case_field_id": "PersonLastName",
+              "display_context": "OPTIONAL"
+            }
           ],
           "pre_states": [
+            "*",
+            "* overwrites this one",
+            "CaseCreated",
+            "some-state"
           ],
           "post_states": [{
             "enabling_condition" : null,
             "priority" : 99,
             "post_state_reference" : "state3"
-          }],
+          },
+            {
+              "enabling_condition" : "PersonLastName=\"Test Last\" AND PersonFirstName=\"Test First\"",
+              "priority" : 1,
+              "post_state_reference" : "state4"
+            }],
           "security_classification": "PRIVATE",
           "acls": [
             {
               "role": "caseworker-probate-public",
               "create": true,
-              "read": false,
-              "update": false,
+              "read": true,
+              "update": true,
               "delete": false
-            }]
+            }],
+          "show_event_notes": true,
+          "can_save_draft": true
         },
         {
           "id": "Goodness",
           "name": "GRACIOUS",
           "description": "This is an event",
           "order": 3,
-          "case_fields": [],
+          "case_fields": [
+            {
+              "case_field_id": "PersonFirstName",
+              "display_context": "OPTIONAL"
+            },
+            {
+              "case_field_id": "PersonLastName",
+              "display_context": "OPTIONAL"
+            }
+          ],
           "pre_states": [
-            "CaseCreated"
+            "*",
+            "* overwrites this one",
+            "CaseCreated",
+            "some-state"
+          ],
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state4"
+          },
+            {
+              "enabling_condition" : "PersonLastName11=\"Test Last\" AND PersonFirstName=\"Test First\"",
+              "priority" : 1,
+              "post_state_reference" : "CaseEnteredIntoLegacy"
+            },
+            {
+              "enabling_condition" : "PersonLastName=\"Test Last\" AND PersonFirstName=\"Test First\"",
+              "priority" : 2,
+              "post_state_reference" : "CaseEnteredIntoLegacy"
+            }],
+          "security_classification": "PRIVATE",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "show_event_notes": true,
+          "can_save_draft": false
+        },
+        {
+          "id": "Create2",
+          "name": "CREATE_2",
+          "description": "Another creation event",
+          "order": 4,
+          "case_fields": [
+            {
+              "case_field_id": "PersonFirstName",
+              "display_context": "OPTIONAL"
+            },
+            {
+              "case_field_id": "PersonLastName",
+              "display_context": "OPTIONAL"
+            }
+          ],
+          "pre_states": [
+            "*",
+            "* overwrites this one",
+            "CaseCreated",
+            "some-state"
           ],
           "post_states": [{
             "enabling_condition" : null,
@@ -139,32 +259,12 @@
             {
               "role": "caseworker-probate-public",
               "create": true,
-              "read": false,
-              "update": false,
+              "read": true,
+              "update": true,
               "delete": false
-            }]
-        },
-        {
-          "id": "Create2",
-          "name": "CREATE_2",
-          "description": "Another creation event",
-          "order": 4,
-          "case_fields": [],
-          "pre_states": [],
-          "post_states": [{
-            "enabling_condition" : null,
-            "priority" : 99,
-            "post_state_reference" : "state4"
-          }],
-          "security_classification": "PRIVATE",
-          "acls": [
-            {
-              "role": "caseworker-probate-public",
-              "create": true,
-              "read": false,
-              "update": false,
-              "delete": false
-            }]
+            }],
+          "show_event_notes": true,
+          "can_save_draft": true
         }
       ],
       "states": [
@@ -174,6 +274,13 @@
           "acls": [
             {
               "role": "caseworker-probate-public",
+              "create": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
               "create": false,
               "read": true,
               "update": true,
@@ -227,19 +334,52 @@
               "update": true,
               "delete": false
             }]
+        },
+        {
+          "id": "some-state",
+          "name": "Case in some state",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": false,
+              "read": true,
+              "update": false,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
         }
       ],
       "case_fields": [
         {
           "id": "PersonFirstName",
-          "case_type_id": "TestAddressBookCase",
+          "case_type_id": "TestAddressBookPostState",
           "label": "First name",
           "security_classification": "PUBLIC",
           "acls": [
             {
               "role": "caseworker-probate-public",
               "create": false,
-              "read": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": false,
+              "read": true,
+              "update": false,
+              "delete": false
+            },
+            {
+              "role": "[CREATOR]",
+              "create": false,
+              "read": true,
               "update": false,
               "delete": false
             }],
@@ -250,14 +390,28 @@
         },
         {
           "id": "PersonLastName",
-          "case_type_id": "TestAddressBookCase",
+          "case_type_id": "TestAddressBookPostState",
           "label": "Last name",
           "security_classification": "PUBLIC",
           "acls": [
             {
               "role": "caseworker-probate-public",
               "create": false,
-              "read": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": false,
+              "read": true,
+              "update": false,
+              "delete": false
+            },
+            {
+              "role": "[CREATOR]",
+              "create": false,
+              "read": true,
               "update": false,
               "delete": false
             }],
@@ -268,15 +422,22 @@
         },
         {
           "id": "PersonAddress",
-          "case_type_id": "TestAddressBookCase",
+          "case_type_id": "TestAddressBookPostState",
           "label": "Address",
           "security_classification": "PUBLIC",
           "acls": [
             {
               "role": "caseworker-probate-public",
-              "create": false,
-              "read": false,
-              "update": false,
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
               "delete": false
             }],
           "field_type": {
@@ -315,8 +476,8 @@
                 "label": "Postcode",
                 "security_classification": "PUBLIC",
                 "field_type": {
-                  "id": "Text",
-                  "type": "Text"
+                  "id": "Postcode",
+                  "type": "Postcode"
                 }
               },
               {
@@ -332,16 +493,52 @@
           }
         },
         {
+          "id": "Aliases",
+          "case_type_id": "TestAddressBookPostState",
+          "label": "Aliases",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Collection",
+            "id": "Collection",
+            "collection_field_type": {
+              "type": "Text",
+              "id": "Text"
+            }
+          }
+        },
+        {
           "id": "D8Document",
-          "case_type_id": "TestAddressBookCase",
+          "case_type_id": "TestAddressBookPostState",
           "label": "Document",
           "security_classification": "PUBLIC",
           "acls": [
             {
               "role": "caseworker-probate-public",
-              "create": false,
-              "read": false,
-              "update": false,
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
               "delete": false
             }],
           "field_type": {
