@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.3.4.RELEASE'
+        springBootVersion = '2.2.10.RELEASE'
     }
     dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.0.2'
@@ -193,10 +193,10 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:2.10.3"
 
     // use the latest org.springframework.security
-    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.3.2.RELEASE'
-    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.3.2.RELEASE'
-    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.3.2.RELEASE'
-    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.3.2.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.3.4.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.3.4.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.3.4.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.3.4.RELEASE'
 
     compile group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.3.2'
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
