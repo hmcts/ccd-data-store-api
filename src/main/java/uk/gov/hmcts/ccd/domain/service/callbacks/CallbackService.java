@@ -128,6 +128,7 @@ public class CallbackService {
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
 
             startTime = Instant.now();
+
             CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
 
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);

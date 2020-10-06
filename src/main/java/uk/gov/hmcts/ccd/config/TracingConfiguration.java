@@ -16,12 +16,11 @@ public class TracingConfiguration {
         return telemetry -> {
             if (telemetry instanceof RemoteDependencyTelemetry) {
                 RemoteDependencyTelemetry dependency = (RemoteDependencyTelemetry) telemetry;
-                CallbackTelemetryContext callbackTelemetryContext = CallbackTelemetryThreadContext.getTelemetryContext();
-                if (dependency.getType().startsWith("Http") && callbackTelemetryContext != null) {
+                CallbackTelemetryContext telemetryContext = CallbackTelemetryThreadContext.getTelemetryContext();
+                if (dependency.getType().startsWith("Http") && telemetryContext != null) {
                     dependency.getProperties().put("callback", "true");
-                    dependency.getProperties().put("callbackType", callbackTelemetryContext.getCallbackType());
-
-                    // clean up
+                    dependency.getProperties().put("callbackType", telemetryContext.getCallbackType());
+                    // clean up after retrieval
                     CallbackTelemetryThreadContext.remove();
                 }
             }
