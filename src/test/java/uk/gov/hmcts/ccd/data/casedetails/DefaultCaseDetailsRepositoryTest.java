@@ -55,7 +55,6 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final Long REFERENCE = 1504259907353529L;
     private static final Long WRONG_REFERENCE = 9999999999999999L;
-    public static final int NUMBER_OF_CASES = 18;
 
     private JdbcTemplate template;
 

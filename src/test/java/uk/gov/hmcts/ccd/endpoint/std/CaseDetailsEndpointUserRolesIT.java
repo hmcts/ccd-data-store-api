@@ -38,7 +38,6 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     private static final String GET_PAGINATED_SEARCH_METADATA_CITIZENS
         = "/citizens/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
     private static final String UID = "123";
-    private static final int NUMBER_OF_CASES = 18;
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
     private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
 
