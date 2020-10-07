@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+
   <suppress>
     <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258
       False positive confirmed.</notes>
     <cve>CVE-2018-1258</cve>
-  </suppress>
-
-  <suppress>
-    <!-- Temporary suppressions to allow continued development -->
-    <cve>CVE-2017-18640</cve> <!-- Resolution : not available until hazelcast bump jackson version. -->
   </suppress>
 
 </suppressions>
