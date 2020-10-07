@@ -1,0 +1,18 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    
+    <changeSet id="RDM-9052-1" author="henry">
+	    <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(c.relname) FROM pg_class c WHERE c.relkind = 'S' and c.relname = 'case_event_id_seq'</sqlCheck>
+	    </preConditions>
+		<addAutoIncrement columnDataType="int" columnName="id" tableName="case_event"/>  
+	</changeSet>
+    <changeSet id="RDM-9052-2" author="henry">
+	    <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(c.relname) FROM pg_class c WHERE c.relkind = 'S' and c.relname = 'case_data_id_seq'</sqlCheck>
+	    </preConditions>
+		<addAutoIncrement columnDataType="int" columnName="id" tableName="case_data"/>  
+	</changeSet>
+</databaseChangeLog>
