@@ -9,7 +9,7 @@ public class CaseEventFieldComplexDefinitionTest {
     private CaseEventFieldComplexDefinition caseEventFieldComplexDefinition;
 
     @Test
-    void testDataIsSetCorrectly() {
+    void testDataIsSetCorrectlyUsingBuilder() {
         caseEventFieldComplexDefinition = CaseEventFieldComplexDefinition
             .builder()
             .defaultValue("")
@@ -24,6 +24,19 @@ public class CaseEventFieldComplexDefinitionTest {
         assertThat(caseEventFieldComplexDefinition.getDisplayContextParameter(), equalTo("#DATETIMEDISPLAY(d M yy)"));
         assertThat(caseEventFieldComplexDefinition.getOrder(), equalTo(1));
         assertThat(caseEventFieldComplexDefinition.getReference(), equalTo("Reference"));
+
+    }
+
+    @Test
+    void testDataIsSetCorrectly() {
+        caseEventFieldComplexDefinition = new CaseEventFieldComplexDefinition("reference",
+            1, "", true);
+
+
+        assertThat(caseEventFieldComplexDefinition.getRetainHiddenValue(), equalTo(true));
+        assertThat(caseEventFieldComplexDefinition.getDefaultValue(), equalTo(""));
+        assertThat(caseEventFieldComplexDefinition.getOrder(), equalTo(1));
+        assertThat(caseEventFieldComplexDefinition.getReference(), equalTo("reference"));
 
     }
 }
