@@ -4,27 +4,10 @@
       False positive confirmed.</notes>
     <cve>CVE-2018-1258</cve>
   </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[file name: liquibase-core-3.6.3.jar: bootstrap.*]]>
-    </notes>
-    <packageUrl regex="true">^pkg:javascript/bootstrap@.*$</packageUrl>
-    <cve>CVE-2019-8331</cve>
-    <cve>CVE-2018-14040</cve>
-    <cve>CVE-2018-14041</cve>
-    <cve>CVE-2018-14042</cve>
-  </suppress>
-
 
   <suppress>
     <!-- Temporary suppressions to allow continued development -->
-
-    <cve>CVE-2015-9251</cve><!-- liquibase -->
-    <cve>CVE-2019-11358</cve><!-- liquibase -->
-    <cve>CVE-2020-11022</cve><!-- liquibase -->
-    <cve>CVE-2020-11023</cve><!-- liquibase -->
     <cve>CVE-2017-18640</cve> <!-- Resolution : not available until hazelcast bump jackson version. -->
-    <cve>CVE-2016-10750</cve><!-- hazelcast -->
-
   </suppress>
+
 </suppressions>
