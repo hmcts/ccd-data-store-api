@@ -134,7 +134,7 @@ public class CallbackService {
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
 
             httpStatus = responseEntity.getStatusCodeValue();
-            return Optional.ofNullable(responseEntity);
+            return Optional.of(responseEntity);
         } catch (RestClientException e) {
             LOG.warn("Unable to connect to callback service {} because of {} {}",
                 url, e.getClass().getSimpleName(), e.getMessage());
