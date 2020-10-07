@@ -18,7 +18,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
-import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryThreadContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
