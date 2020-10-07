@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.appInsights;
+package uk.gov.hmcts.ccd.appinsights;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
@@ -11,7 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.appinsights.AppInsights;
 
 import java.util.HashMap;
 import java.util.Map;
