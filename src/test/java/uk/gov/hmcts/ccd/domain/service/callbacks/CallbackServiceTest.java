@@ -15,17 +15,23 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
+import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryThreadContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+
+import java.time.Duration;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doReturn;
@@ -108,6 +114,30 @@ class CallbackServiceTest {
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
         assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", nullValue()));
+    }
+
+    @Test
+    @DisplayName("Should track callback event")
+    public void shouldTrackCallbackEvent() throws Exception {
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+
+        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+    }
+
+    @Test
+    @DisplayName("Should track callback event on exception")
+    public void shouldTrackCallbackEventOnException() throws Exception {
+        when(restTemplate
+            .exchange(eq(URL), eq(HttpMethod.POST), isA(HttpEntity.class), eq(CallbackResponse.class)))
+            .thenThrow(new HttpStatusCodeException(HttpStatus.BAD_REQUEST) {
+            });
+
+        try {
+            callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+        } catch (CallbackException ex) {
+            verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("400"), any(Duration.class));
+        }
+
     }
 
     private void initSecurityContext() {
