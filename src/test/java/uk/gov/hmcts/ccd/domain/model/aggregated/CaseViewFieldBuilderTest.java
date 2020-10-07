@@ -70,6 +70,7 @@ public class CaseViewFieldBuilderTest {
         CASE_FIELD.setSecurityLabel("LO1");
         CASE_FIELD.setMetadata(false);
         CASE_FIELD.setFormattedValue("DisplayValue");
+        CASE_FIELD.setRetainHiddenValue(Boolean.TRUE);
 
         CASE_FIELD_2.setId("PersonLastName");
 
@@ -109,6 +110,7 @@ public class CaseViewFieldBuilderTest {
             assertThat(field.isHidden(), equalTo(CASE_FIELD.getHidden()));
             assertThat(field.getHintText(), equalTo(CASE_FIELD.getHintText()));
             assertThat(field.getLabel(), equalTo(CASE_FIELD.getLabel()));
+            assertThat(field.getRetainHiddenValue(), equalTo(CASE_FIELD.getRetainHiddenValue()));
             assertThat(field.getOrder(), is(nullValue()));
             assertThat(field.getSecurityLabel(), equalTo(CASE_FIELD.getSecurityLabel()));
             assertThat(field.getValidationExpression(), is(nullValue()));
