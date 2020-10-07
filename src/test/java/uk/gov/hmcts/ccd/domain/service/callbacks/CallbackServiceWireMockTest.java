@@ -8,6 +8,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -285,7 +286,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final ApplicationParams applicationParams = Mockito.mock(ApplicationParams.class);
         given(applicationParams.getCallbackRetries()).willReturn(Arrays.asList(3, 5));
-        given(restTemplate.exchange(anyString(), eq(POST), isA(HttpEntity.class), eq(CallbackResponse.class)))
+        given(restTemplate.exchange(anyString(), eq(POST), isA(HttpEntity.class), eq(String.class)))
             .willThrow(new RestClientException("Fail to process"));
 
         // Builds a new callback service to avoid wiremock exception to get in the way
