@@ -185,7 +185,7 @@ class CreateCaseEventDefinitionServiceTest {
             any(),
             any(),
             any())).willReturn(aboutToSubmitCallbackResponse);
-        doReturn(Optional.of(POST_STATE)).when(this.caseStateUpdateService)
+        doReturn(POST_STATE).when(this.caseStateUpdateService)
             .retrieveCaseState(any(CaseEventDefinition.class), any(CaseDetails.class));
     }
 
@@ -228,7 +228,7 @@ class CreateCaseEventDefinitionServiceTest {
         caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore.setState(PRE_STATE_ID);
         caseEventDefinition = new CaseEventDefinition();
-        doReturn(Optional.of(PRE_STATE_ID)).when(this.caseStateUpdateService)
+        doReturn(PRE_STATE_ID).when(this.caseStateUpdateService)
             .retrieveCaseState(any(CaseEventDefinition.class), any(CaseDetails.class));
 
         CaseStateDefinition state = new CaseStateDefinition();
