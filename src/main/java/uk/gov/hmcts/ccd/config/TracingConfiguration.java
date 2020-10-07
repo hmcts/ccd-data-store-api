@@ -30,5 +30,4 @@ public class TracingConfiguration {
             return true;
         };
     }
-
 }
