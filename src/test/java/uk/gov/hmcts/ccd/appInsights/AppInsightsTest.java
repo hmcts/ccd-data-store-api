@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd;
+package uk.gov.hmcts.ccd.appInsights;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
@@ -24,6 +24,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.CALLBACK_DURATION;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.CALLBACK_EVENT_NAME;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.METHOD;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.STATUS;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.TYPE;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.URI;
 
 public class AppInsightsTest {
 
@@ -208,6 +214,29 @@ public class AppInsightsTest {
         verify(telemetryClient, times(1)).trackDependency(eq(dependencyName), eq(commandName),
             durationCaptor.capture(), eq(false));
         assertThat(durationCaptor.getValue().getTotalMilliseconds(), is(equalTo(duration)));
+    }
+
+    @Test
+    public void trackCallBackDependency() {
+
+        // ARRANGE
+        String callbackType = "about to start";
+        String url = "http://ccd-test-stub";
+        String status = "200";
+        java.time.Duration duration = java.time.Duration.ofMillis(1200);
+
+        // ACT
+        classUnderTest.trackCallbackEvent(callbackType, url, status, duration);
+
+        // ASSERT
+        ArgumentCaptor<Map<String, String>> captor = ArgumentCaptor.forClass(Map.class);
+        verify(telemetryClient).trackEvent(eq(CALLBACK_EVENT_NAME), captor.capture(), eq(null));
+
+        assertThat(captor.getValue().get(TYPE), is(equalTo(callbackType)));
+        assertThat(captor.getValue().get(URI), is(equalTo(url)));
+        assertThat(captor.getValue().get(STATUS), is(equalTo(status)));
+        assertThat(captor.getValue().get(METHOD), is(equalTo("POST")));
+        assertThat(captor.getValue().get(CALLBACK_DURATION), is(equalTo("1200 ms")));
     }
 
 }
