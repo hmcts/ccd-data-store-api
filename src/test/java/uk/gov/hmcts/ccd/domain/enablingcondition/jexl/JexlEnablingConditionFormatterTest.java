@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.casestate.jexl;
+package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

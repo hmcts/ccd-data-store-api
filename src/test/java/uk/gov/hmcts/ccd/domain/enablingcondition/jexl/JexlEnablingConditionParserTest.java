@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.casestate.jexl;
+package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

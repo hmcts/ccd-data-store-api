@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.casestate.jexl;
+package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.jexl3.JexlOperator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.casestate.EnablingConditionFormatter;
+import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionFormatter;
 
 @Component
 @Qualifier("jexl")

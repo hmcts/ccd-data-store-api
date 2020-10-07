@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.casestate;
+package uk.gov.hmcts.ccd.domain.enablingcondition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;

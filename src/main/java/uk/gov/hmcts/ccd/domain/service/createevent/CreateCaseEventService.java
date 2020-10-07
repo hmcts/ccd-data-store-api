@@ -234,9 +234,9 @@ public class CreateCaseEventService {
     }
 
     private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {
-        Optional<String> postState = caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
-        if (postState.isPresent() && !equalsIgnoreCase(CaseStateDefinition.ANY, postState.get())) {
-            caseDetails.setState(postState.get());
+        String postState = caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
+        if (!equalsIgnoreCase(CaseStateDefinition.ANY, postState)) {
+            caseDetails.setState(postState);
         }
     }
 

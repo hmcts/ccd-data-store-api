@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -145,11 +144,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     }
 
     private void updateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails newCaseDetails) {
-        Optional<String> postState = this.caseStateUpdateService
-            .retrieveCaseState(caseEventDefinition, newCaseDetails);
-        if (postState.isPresent()) {
-            newCaseDetails.setState(postState.get());
-        }
+        newCaseDetails.setState(this.caseStateUpdateService
+            .retrieveCaseState(caseEventDefinition, newCaseDetails));
     }
 
     private void deleteDraft(CaseDataContent caseDataContent, CaseDetails savedCaseDetails) {
