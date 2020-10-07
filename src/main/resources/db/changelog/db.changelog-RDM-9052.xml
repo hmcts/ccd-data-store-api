@@ -15,4 +15,10 @@
 	    </preConditions>
 		<addAutoIncrement columnDataType="int" columnName="id" tableName="case_data"/>  
 	</changeSet>
+    <changeSet id="RDM-9052-3" author="henry">
+	    <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(c.relname) FROM pg_class c WHERE c.relkind = 'S' and c.relname = 'case_users_audit_id_seq'</sqlCheck>
+	    </preConditions>
+		<addAutoIncrement columnDataType="int" columnName="id" tableName="case_users_audit"/>  
+	</changeSet>
 </databaseChangeLog>
