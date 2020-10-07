@@ -29,7 +29,9 @@ import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import javax.transaction.Transactional;
 import java.time.Duration;
@@ -49,15 +51,18 @@ public class DraftsEndpoint {
     private final UpsertDraftOperation upsertDraftOperation;
     private final GetCaseViewOperation getDraftViewOperation;
     private final DraftGateway draftGateway;
+    private final UIDService uidService;
 
     @Autowired
     public DraftsEndpoint(@Qualifier("default") final UpsertDraftOperation upsertDraftOperation,
                           @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER)
                               GetCaseViewOperation getDraftViewOperation,
-                          @Qualifier(CachedDraftGateway.QUALIFIER) DraftGateway draftGateway) {
+                          @Qualifier(CachedDraftGateway.QUALIFIER) DraftGateway draftGateway,
+                          final UIDService uidService) {
         this.upsertDraftOperation = upsertDraftOperation;
         this.getDraftViewOperation = getDraftViewOperation;
         this.draftGateway = draftGateway;
+        this.uidService = uidService;
     }
 
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts")
@@ -105,7 +110,8 @@ public class DraftsEndpoint {
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent);
+        String validDraftId = validateDraftId(draftId);
+        return upsertDraftOperation.executeUpdate(caseTypeId, validDraftId, caseDataContent);
     }
 
     @Transactional
@@ -134,10 +140,18 @@ public class DraftsEndpoint {
     public void deleteDraft(@PathVariable("uid") final String uid,
                             @PathVariable("jid") final String jurisdictionId,
                             @PathVariable("ctid") final String caseTypeId,
-                            @PathVariable("did") final String did) {
+                            @PathVariable("did")  final String did) {
         Instant start = Instant.now();
-        draftGateway.delete(did);
+        String validDraftId = validateDraftId(did);
+        draftGateway.delete(validDraftId);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("deleteDraft has been completed in {} millisecs...", between.toMillis());
+    }
+
+    private String validateDraftId(String did) {
+        if (!uidService.validateUID(did)) {
+            throw new BadRequestException("Invalid Draft Id");
+        }
+        return did.trim();
     }
 }

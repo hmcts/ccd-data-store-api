@@ -21,7 +21,9 @@ import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftList;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -52,6 +54,7 @@ public class DefaultDraftGateway implements DraftGateway {
     private final SecurityUtils securityUtils;
     private final ApplicationParams applicationParams;
     private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+    private final UIDService uidService;
 
     @Inject
     public DefaultDraftGateway(
@@ -59,12 +62,14 @@ public class DefaultDraftGateway implements DraftGateway {
         @Qualifier("draftsRestTemplate") final RestTemplate restTemplate,
         final SecurityUtils securityUtils,
         final ApplicationParams applicationParams,
-        final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
+        final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder,
+        final UIDService uidService) {
         this.createDraftRestTemplate = createDraftRestTemplate;
         this.restTemplate = restTemplate;
         this.securityUtils = securityUtils;
         this.applicationParams = applicationParams;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
+        this.uidService = uidService;
     }
 
     @Override
@@ -142,7 +147,8 @@ public class DefaultDraftGateway implements DraftGateway {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(headers);
-            restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.DELETE, requestEntity, Draft.class);
+            restTemplate.exchange(applicationParams.draftURL(validateDraftId(draftId + "")), HttpMethod.DELETE,
+                requestEntity, Draft.class);
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while deleting draftId=" + draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
@@ -215,5 +221,12 @@ public class DefaultDraftGateway implements DraftGateway {
             path = location.getPath();
         }
         return path == null ? null : Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
+    }
+
+    private String validateDraftId(String did) {
+        if (!uidService.validateUID(did)) {
+            throw new BadRequestException("Invalid Draft Id");
+        }
+        return did.trim();
     }
 }

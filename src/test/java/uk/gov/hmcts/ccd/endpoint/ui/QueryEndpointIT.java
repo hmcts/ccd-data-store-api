@@ -80,7 +80,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES_NO_READ_CASE_TYPE_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/"
         + "case-types/TestAddressBookCase4/cases";
     private static final String GET_DRAFT = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/"
-        + "drafts/5";
+        + "drafts/4444333322221111";
     private static final String GET_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCase/cases/1504259907353529";
     private static final String GET_CASE_NO_EVENT_READ_ACCESS =
@@ -247,7 +247,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.SEARCH_CASE.getLabel()));
         assertThat(captor.getValue().getJurisdiction(), is(TEST_JURISDICTION));
         assertThat(captor.getValue().getCaseType(), is(TEST_CASE_TYPE));
-        assertThat(captor.getValue().getCaseId(), is("DRAFT5,1504259907353529,1504259907353545"));
+        assertThat(captor.getValue().getCaseId(), is("DRAFT4444333322221111,1504259907353529,1504259907353545"));
     }
 
     @Test
