@@ -161,7 +161,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         LOG.debug("Rest API getWizardPageCollectionGetHttp called for {}, finished in {}",
                 caseTypeId,
                 duration.toMillis());
-        return wpc.getWizardPages();
+        return wpc == null ? null : wpc.getWizardPages();
     }
 
     @Override

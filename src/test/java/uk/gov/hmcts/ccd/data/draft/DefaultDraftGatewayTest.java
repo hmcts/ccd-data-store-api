@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -71,7 +72,7 @@ class DefaultDraftGatewayTest {
     private static final String JID = "TEST";
     private static final String CTID = "TestAddressBookCase";
     private static final String ETID = "createCase";
-    private static final String DID = "5";
+    private static final String DID = "4444333322221111";
     public static final String TYPE = "caseDataContent";
     public static final ZonedDateTime NOW = ZonedDateTime.now();
     public static final ZonedDateTime NOW_PLUS_5_MIN = ZonedDateTime.now().plus(5, ChronoUnit.MINUTES);
@@ -93,6 +94,9 @@ class DefaultDraftGatewayTest {
 
     @Mock
     private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+
+    @Mock
+    private UIDService uidService;
 
     private DraftGateway draftGateway;
 
@@ -118,6 +122,7 @@ class DefaultDraftGatewayTest {
         when(applicationParams.draftBaseURL()).thenReturn(draftBaseURL);
         when(applicationParams.draftURL(DID)).thenReturn(draftURL5);
         when(applicationParams.getDraftMaxTTLDays()).thenReturn(7);
+        when(uidService.validateUID(DID)).thenReturn(true);
 
         data.put(KEY, VALUE);
         dataClassification.put(KEY_CLASS, VALUE_CLASS);
@@ -154,7 +159,7 @@ class DefaultDraftGatewayTest {
             .withType(CASE_DATA_CONTENT)
             .build();
         draftGateway = new DefaultDraftGateway(createDraftRestTemplate, restTemplate, securityUtils, applicationParams,
-            draftResponseToCaseDetailsBuilder);
+            draftResponseToCaseDetailsBuilder,uidService);
     }
 
     @Test
@@ -238,7 +243,7 @@ class DefaultDraftGatewayTest {
 
         final ResourceNotFoundException actualException =
             assertThrows(ResourceNotFoundException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
-        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '4444333322221111' )"));
     }
 
     @Test
@@ -320,7 +325,7 @@ class DefaultDraftGatewayTest {
 
         final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () ->
             draftGateway.get(DID));
-        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '4444333322221111' )"));
     }
 
     @Test
@@ -366,7 +371,7 @@ class DefaultDraftGatewayTest {
 
         final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () ->
             draftGateway.delete(DID));
-        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '4444333322221111' )"));
     }
 
 }
