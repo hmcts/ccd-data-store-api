@@ -114,25 +114,22 @@ public class CallbackService {
                                                         final Class<T> clazz,
 
                                                         final CallbackRequest callbackRequest) {
-        Instant startTime = null;
+
+        HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
+
+        CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
         int httpStatus = 0;
+        Instant startTime = Instant.now();
+
         try {
             LOG.debug("Invoking callback {}", url);
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
-
-            final HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
             if (null != securityHeaders) {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
-
-            startTime = Instant.now();
-
-            CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
-
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
-
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
