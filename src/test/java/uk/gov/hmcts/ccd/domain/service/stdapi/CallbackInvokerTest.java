@@ -58,10 +58,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker.ABOUT_TO_START;
-import static uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker.MID_EVENT;
-import static uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker.SUBMITTED;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.SUBMITTED;
 
 class CallbackInvokerTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);

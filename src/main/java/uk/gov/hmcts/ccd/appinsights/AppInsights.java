@@ -8,6 +8,7 @@ import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType;
 
 import java.util.Map;
 
@@ -74,9 +75,10 @@ public class AppInsights {
         telemetry.trackEvent(name, properties, null);
     }
 
-    public void trackCallbackEvent(String callbackType, String url, String httpStatus, java.time.Duration duration) {
+    public void trackCallbackEvent(
+        CallbackType callbackType, String url, String httpStatus, java.time.Duration duration) {
         Map<String, String> properties = ImmutableMap.of(
-            TYPE, callbackType,
+            TYPE, callbackType.getValue(),
             CALLBACK_DURATION, String.valueOf(duration.toMillis()) + " ms",
             METHOD, "POST",
             URI, url,

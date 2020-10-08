@@ -1,14 +1,16 @@
 package uk.gov.hmcts.ccd.appinsights;
 
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType;
+
 public class CallbackTelemetryContext {
 
-    private final String callbackType;
+    private final CallbackType callbackType;
 
-    public CallbackTelemetryContext(String callbackType) {
+    public CallbackTelemetryContext(CallbackType callbackType) {
         this.callbackType = callbackType;
     }
 
-    public String getCallbackType() {
+    public CallbackType getCallbackType() {
         return callbackType;
     }
 }

@@ -54,7 +54,7 @@ public class CallbackService {
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public Optional<CallbackResponse> send(final String url,
-                                           final String callbackType,
+                                           final CallbackType callbackType,
                                            final CaseEventDefinition caseEvent,
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails,
@@ -66,7 +66,7 @@ public class CallbackService {
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public <T> ResponseEntity<T> send(final String url,
-                                      final String callbackType,
+                                      final CallbackType callbackType,
                                       final CaseEventDefinition caseEvent,
                                       final CaseDetails caseDetailsBefore,
                                       final CaseDetails caseDetails,
@@ -75,7 +75,7 @@ public class CallbackService {
     }
 
     public Optional<CallbackResponse> sendSingleRequest(final String url,
-                                                        final String callbackType,
+                                                        final CallbackType callbackType,
                                                         final CaseEventDefinition caseEvent,
                                                         final CaseDetails caseDetailsBefore,
                                                         final CaseDetails caseDetails,
@@ -95,7 +95,7 @@ public class CallbackService {
     }
 
     public <T> ResponseEntity<T> sendSingleRequest(final String url,
-                                                   final String callbackType,
+                                                   final CallbackType callbackType,
                                                    final CaseEventDefinition caseEvent,
                                                    final CaseDetails caseDetailsBefore,
                                                    final CaseDetails caseDetails,
@@ -110,7 +110,7 @@ public class CallbackService {
     }
 
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
-                                                        final String callbackType,
+                                                        final CallbackType callbackType,
                                                         final Class<T> clazz,
 
                                                         final CallbackRequest callbackRequest) {

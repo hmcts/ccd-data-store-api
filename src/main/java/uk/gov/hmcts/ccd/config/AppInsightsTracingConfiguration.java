@@ -18,11 +18,11 @@ public class AppInsightsTracingConfiguration {
                 RemoteDependencyTelemetry dependency = (RemoteDependencyTelemetry) telemetry;
                 if (dependency.getType().startsWith("Http")
                     && CallbackTelemetryThreadContext.getTelemetryContext() != null) {
-
                     CallbackTelemetryContext telemetryContext = CallbackTelemetryThreadContext.getTelemetryContext();
-                    dependency.getProperties().put("callback", "true");
-                    dependency.getProperties().put("callbackType", telemetryContext.getCallbackType());
-
+                    if (telemetryContext.getCallbackType() != null) {
+                        dependency.getProperties().put("callback", "true");
+                        dependency.getProperties().put("callbackType", telemetryContext.getCallbackType().getValue());
+                    }
                     // clean up after retrieval
                     CallbackTelemetryThreadContext.remove();
                 }

@@ -24,16 +24,16 @@ import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocument.validateSignificantItem;
 
 @Service
 public class CallbackInvoker {
 
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
-    public static final String ABOUT_TO_START = "AboutToStart";
-    public static final String ABOUT_TO_SUBMIT = "AboutToSubmit";
-    public static final String SUBMITTED = "Submitted";
-    public static final String MID_EVENT = "MidEvent";
 
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;

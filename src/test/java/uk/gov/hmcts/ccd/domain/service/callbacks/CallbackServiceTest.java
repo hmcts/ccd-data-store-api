@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 class CallbackServiceTest {
 
     public static final String URL = "/test-callback.*";
-    public static final String CALLBACK_TYPE = "callbackType";
+    public static final CallbackType CALLBACK_TYPE = CallbackType.ABOUT_TO_START;
     @Mock
     private SecurityUtils securityUtils;
 

@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -219,7 +220,7 @@ public class AppInsightsTest {
     public void trackCallBackDependency() {
 
         // ARRANGE
-        String callbackType = "about to start";
+        CallbackType callbackType = CallbackType.ABOUT_TO_START;
         String url = "http://ccd-test-stub";
         String status = "200";
         java.time.Duration duration = java.time.Duration.ofMillis(1200);
@@ -231,7 +232,7 @@ public class AppInsightsTest {
         ArgumentCaptor<Map<String, String>> captor = ArgumentCaptor.forClass(Map.class);
         verify(telemetryClient).trackEvent(eq(CALLBACK_EVENT_NAME), captor.capture(), eq(null));
 
-        assertThat(captor.getValue().get(TYPE), is(equalTo(callbackType)));
+        assertThat(captor.getValue().get(TYPE), is(equalTo(callbackType.getValue())));
         assertThat(captor.getValue().get(URI), is(equalTo(url)));
         assertThat(captor.getValue().get(STATUS), is(equalTo(status)));
         assertThat(captor.getValue().get(METHOD), is(equalTo("POST")));

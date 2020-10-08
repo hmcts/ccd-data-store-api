@@ -56,7 +56,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
     })
 public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
-    public static final String TEST_CALLBACK = "testCallback";
+    public static final CallbackType TEST_CALLBACK = CallbackType.ABOUT_TO_START;
 
     @Inject
     private CallbackService callbackService;
