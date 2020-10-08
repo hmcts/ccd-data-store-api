@@ -7,19 +7,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class JexlEnablingConditionFormatterTest {
+class JexlEnablingConditionConverterTest {
 
-    private JexlEnablingConditionFormatter enablingConditionFormatter;
+    private JexlEnablingConditionConverter enablingConditionFormatter;
 
     @BeforeEach
     void setUp() {
-        enablingConditionFormatter = new JexlEnablingConditionFormatter();
+        enablingConditionFormatter = new JexlEnablingConditionConverter();
     }
 
     @Test
     void formatEnablingConditionWithAndOperator() {
         String formatString = this.enablingConditionFormatter
-            .format("FieldA!=\"\" AND FieldB=\"I'm innocent\"");
+            .convert("FieldA!=\"\" AND FieldB=\"I'm innocent\"");
 
         assertNotNull(formatString);
         assertEquals("FieldA!=\"\" and FieldB==\"I'm innocent\"", formatString);
@@ -28,7 +28,7 @@ class JexlEnablingConditionFormatterTest {
     @Test
     void formatEnablingConditionWithOrOperator() {
         String formatString = this.enablingConditionFormatter
-            .format("FieldA!=\"\" OR FieldB!=\"I'm innocent\"");
+            .convert("FieldA!=\"\" OR FieldB!=\"I'm innocent\"");
 
         assertNotNull(formatString);
         assertEquals("FieldA!=\"\" or FieldB!=\"I'm innocent\"", formatString);
@@ -36,7 +36,7 @@ class JexlEnablingConditionFormatterTest {
 
     @Test
     void formatEmptyEnablingCondition() {
-        String formatString = this.enablingConditionFormatter.format("");
+        String formatString = this.enablingConditionFormatter.convert("");
 
         assertNotNull(formatString);
         assertEquals("", formatString);
@@ -44,14 +44,14 @@ class JexlEnablingConditionFormatterTest {
 
     @Test
     void formatNullEnablingCondition() {
-        String formatString = this.enablingConditionFormatter.format(null);
+        String formatString = this.enablingConditionFormatter.convert(null);
         assertNull(formatString);
     }
 
     @Test
     void formatEnablingConditionWithRegularExpression() {
         String formatString = this.enablingConditionFormatter
-            .format("FieldA!=\"*\" AND FieldB=\"I'm innocent\"");
+            .convert("FieldA!=\"*\" AND FieldB=\"I'm innocent\"");
 
         assertNotNull(formatString);
         assertEquals("FieldA!~\".*\" and FieldB==\"I'm innocent\"", formatString);
@@ -60,7 +60,7 @@ class JexlEnablingConditionFormatterTest {
     @Test
     void formatEnablingConditionWithEqualityRegularExpression() {
         String formatString = this.enablingConditionFormatter
-            .format("FieldA=\"*\" AND FieldB=\"I'm innocent\"");
+            .convert("FieldA=\"*\" AND FieldB=\"I'm innocent\"");
 
         assertNotNull(formatString);
         assertEquals("FieldA=~\".*\" and FieldB==\"I'm innocent\"", formatString);

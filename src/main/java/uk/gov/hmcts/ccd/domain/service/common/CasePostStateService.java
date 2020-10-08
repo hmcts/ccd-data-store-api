@@ -13,19 +13,19 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
 
 @Service
-public class CaseStateUpdateService {
+public class CasePostStateService {
 
     private final PrioritiseEnablingCondition prioritiseEnablingCondition;
     private CasePostStateEvaluationService casePostStateEvaluationService;
 
     @Inject
-    public CaseStateUpdateService(PrioritiseEnablingCondition prioritiseEnablingCondition,
-                                  CasePostStateEvaluationService casePostStateEvaluationService) {
+    public CasePostStateService(PrioritiseEnablingCondition prioritiseEnablingCondition,
+                                CasePostStateEvaluationService casePostStateEvaluationService) {
         this.prioritiseEnablingCondition = prioritiseEnablingCondition;
         this.casePostStateEvaluationService = casePostStateEvaluationService;
     }
 
-    public String retrieveCaseState(CaseEventDefinition caseEventDefinition, CaseDetails caseDetails) {
+    public String evaluateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails caseDetails) {
         List<EventPostStateDefinition> eventPostStateDefinitions = prioritiseEnablingCondition
             .prioritiseEventPostStates(caseEventDefinition.getPostStates());
         Map<String, JsonNode> caseEventData = caseDetails.getCaseEventData(getCaseFieldIds(caseEventDefinition));

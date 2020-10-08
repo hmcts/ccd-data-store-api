@@ -18,18 +18,18 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doReturn;
 
-class CaseStateUpdateServiceTest extends BaseStateReferenceTest {
+class CasePostStateServiceTest extends BaseStateReferenceTest {
 
     @Mock
     private CasePostStateEvaluationService casePostStateEvaluationService;
 
-    private CaseStateUpdateService caseStateUpdateService;
+    private CasePostStateService casePostStateService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseStateUpdateService = new CaseStateUpdateService(new PrioritiseEnablingCondition(),
+        casePostStateService = new CasePostStateService(new PrioritiseEnablingCondition(),
             this.casePostStateEvaluationService);
     }
 
@@ -40,7 +40,7 @@ class CaseStateUpdateServiceTest extends BaseStateReferenceTest {
         CaseDetails caseDetails = mockCaseDetails();
         doReturn("*").when(this.casePostStateEvaluationService)
             .evaluatePostStateCondition(anyList(), anyMap());
-        String postState = this.caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
+        String postState = this.casePostStateService.evaluateCaseState(caseEventDefinition, caseDetails);
         assertNotNull(postState);
         assertEquals("*", postState);
     }
@@ -52,7 +52,7 @@ class CaseStateUpdateServiceTest extends BaseStateReferenceTest {
         CaseDetails caseDetails = new CaseDetails();
         doReturn("TestReference").when(this.casePostStateEvaluationService)
             .evaluatePostStateCondition(anyList(), anyMap());
-        String postState = this.caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
+        String postState = this.casePostStateService.evaluateCaseState(caseEventDefinition, caseDetails);
         assertEquals("TestReference", postState);
     }
 
@@ -64,7 +64,7 @@ class CaseStateUpdateServiceTest extends BaseStateReferenceTest {
         CaseDetails caseDetails = new CaseDetails();
         doReturn("Test125").when(this.casePostStateEvaluationService)
             .evaluatePostStateCondition(anyList(), anyMap());
-        String postState = this.caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
+        String postState = this.casePostStateService.evaluateCaseState(caseEventDefinition, caseDetails);
         assertEquals("Test125", postState);
     }
 

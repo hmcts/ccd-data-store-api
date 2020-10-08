@@ -23,7 +23,7 @@ class JexlEnablingConditionParserTest {
 
     @BeforeEach
     void setUp() {
-        this.enablingConditionParser = new JexlEnablingConditionParser(new JexlEnablingConditionFormatter());
+        this.enablingConditionParser = new JexlEnablingConditionParser(new JexlEnablingConditionConverter());
     }
 
     @Test
@@ -101,7 +101,7 @@ class JexlEnablingConditionParserTest {
     void shouldThrowExceptionWhenDataIsNotValidJson() throws JsonProcessingException {
         ObjectMapper objectMapper = mock(ObjectMapper.class);
         when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
-        enablingConditionParser = new JexlEnablingConditionParser(new JexlEnablingConditionFormatter(),
+        enablingConditionParser = new JexlEnablingConditionParser(new JexlEnablingConditionConverter(),
             objectMapper);
         String enablingCondition = "FieldA!=\"\" AND FieldB=\"I'm innocent\")";
         Boolean isValid = enablingConditionParser.evaluate(enablingCondition, createCaseData(
