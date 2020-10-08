@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import org.testng.annotations.DataProvider;
+import io.cucumber.testng.AbstractTestNGCucumberTests;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -9,6 +12,7 @@ import io.cucumber.junit.CucumberOptions;
 import uk.gov.hmcts.befta.BeftaMain;
 
 @RunWith(Cucumber.class)
+@DataProvider(parallel = true)
 @CucumberOptions(plugin = "json:target/cucumber.json",
     glue = {"uk.gov.hmcts.befta.player"},
     features = { "classpath:features" }, tags = { "(not @Ignore) or (not @elasticsearch)" })
