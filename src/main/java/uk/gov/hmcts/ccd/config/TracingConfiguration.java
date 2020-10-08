@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryContext;
 import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryThreadContext;
 
 @Configuration
-public class TracingConfiguration {
+public class AppInsightsTracingConfiguration {
 
     @Bean
     // Custom TelemetryProcessor which tags the type of {@link RemoteDependencyTelemetry} as callback before publishing.
