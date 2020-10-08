@@ -173,7 +173,7 @@ dependencies {
     testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
 
     compile('org.springframework.boot:spring-boot-starter-actuator')
-
+    compile('org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M5')
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile('org.springframework.boot:spring-boot-starter-hateoas')
     compile group: 'org.springframework.plugin', name: 'spring-plugin-core', version: '2.0.0.RELEASE'
