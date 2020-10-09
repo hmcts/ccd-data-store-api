@@ -6,16 +6,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -354,6 +353,23 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     public boolean hasCaseReference() {
         return getReference() != null;
+    }
+
+    @JsonIgnore
+    public Map<String, JsonNode> getCaseEventData(CaseEventDefinition caseEventDefinition) {
+        Map<String, JsonNode> caseEventData = new HashMap<>();
+        if (this.data != null) {
+            caseEventDefinition
+                .getCaseFields()
+                .forEach(caseEventFieldDefinition -> {
+                    String key = caseEventFieldDefinition.getCaseFieldId();
+                    JsonNode value = this.data.get(key);
+                    if (value != null) {
+                        caseEventData.put(key, value);
+                    }
+                });
+        }
+        return caseEventData;
     }
 
 }

@@ -7,7 +7,7 @@ Background:
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-000 @Smoke
+@S-000
 Scenario: must return default user setting successfully for a user having a profile in CCD
 
     Given a successful call [to retrieve a user profile] as in [S-000-Prerequisite],

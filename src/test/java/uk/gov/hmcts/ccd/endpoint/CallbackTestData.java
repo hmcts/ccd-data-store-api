@@ -57,7 +57,13 @@ public class CallbackTestData {
             "      \"pre_states\": [\n" +
             "        \"CaseCreated\"\n" +
             "      ],\n" +
-            "      \"post_state\": \"CaseUpdated\",\n" +
+            "      \"post_states\": [\n" +
+            "         {" +
+            "            \"enabling_condition\": null,\n" +
+            "            \"priority\": 99,\n" +
+            "            \"post_state_reference\": \"CaseUpdated\"\n" +
+            "         }" +
+            "      ],\n" +
             "      \"security_classification\": \"PUBLIC\",\n" +
             "      \"acls\": [\n" +
             "        {\n" +
@@ -93,7 +99,13 @@ public class CallbackTestData {
             "        \"OtherState\",\n" +
             "        \"OtherStateTwo\"\n" +
             "      ],\n" +
-            "      \"post_state\": \"CaseUpdated\",\n" +
+            "      \"post_states\": [\n" +
+            "         {" +
+            "            \"enabling_condition\": null,\n" +
+            "            \"priority\": 99,\n" +
+            "            \"post_state_reference\": \"CaseUpdated\"\n" +
+            "         }" +
+            "      ],\n" +
             "      \"security_classification\": \"PUBLIC\",\n" +
             "      \"acls\": [\n" +
             "        {\n" +
@@ -127,7 +139,13 @@ public class CallbackTestData {
             "      ],\n" +
             "      \"pre_states\": [\n" +
             "      ],\n" +
-            "      \"post_state\": \"CaseCreated\",\n" +
+            "      \"post_states\": [\n" +
+            "         {" +
+            "            \"enabling_condition\": null,\n" +
+            "            \"priority\": 99,\n" +
+            "            \"post_state_reference\": \"CaseCreated\"\n" +
+            "         }" +
+            "      ],\n" +
             "      \"security_classification\": \"PUBLIC\",\n" +
             "      \"acls\": [\n" +
             "        {\n" +
@@ -160,7 +178,13 @@ public class CallbackTestData {
             "         }" +
             "      ],\n" +
             "      \"pre_states\": null,\n" +
-            "      \"post_state\": \"CaseCreated\",\n" +
+            "      \"post_states\": [\n" +
+            "         {" +
+            "            \"enabling_condition\": null,\n" +
+            "            \"priority\": 99,\n" +
+            "            \"post_state_reference\": \"CaseCreated\"\n" +
+            "         }" +
+            "      ],\n" +
             "      \"security_classification\": \"PUBLIC\",\n" +
             "      \"acls\": [\n" +
             "        {\n" +

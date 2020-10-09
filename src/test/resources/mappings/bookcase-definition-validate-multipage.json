@@ -66,7 +66,11 @@
             "some-state",
             "CaseCreated"
           ],
-          "post_state": "state4",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state4"
+          }],
           "security_classification": "PRIVATE",
           "acls": [
             {
@@ -96,7 +100,11 @@
           ],
           "pre_states": [
           ],
-          "post_state": "state4",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state4"
+          }],
           "security_classification": "PRIVATE",
           "acls": [
             {
@@ -117,7 +125,11 @@
           ],
           "pre_states": [
           ],
-          "post_state": "state3",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state3"
+          }],
           "security_classification": "PRIVATE",
           "acls": [
             {
@@ -139,7 +151,11 @@
           "pre_states": [
             "CaseCreated"
           ],
-          "post_state": "state4",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state4"
+          }],
           "security_classification": "PRIVATE",
           "acls": [
             {
@@ -159,7 +175,11 @@
           "order": 4,
           "case_fields": [],
           "pre_states": [],
-          "post_state": "state4",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state4"
+          }],
           "security_classification": "PRIVATE",
           "acls": [
             {

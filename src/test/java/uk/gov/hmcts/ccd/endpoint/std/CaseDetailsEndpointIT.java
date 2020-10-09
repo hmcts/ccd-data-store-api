@@ -111,7 +111,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String TEST_STATE = "CaseCreated";
     private static final String UID = "123";
     private static final String DRAFT_ID = "5";
-    private static final int NUMBER_OF_CASES = 18;
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
     private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
     private static final String DESCRIPTION = "A very long comment.......";
