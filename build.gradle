@@ -42,20 +42,11 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
-apply plugin: 'pmd'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 
 apply from: 'liquibase.gradle'
-
-pmd {
-    toolVersion = '6.18.0'
-    // https://github.com/pmd/pmd/issues/876
-    ruleSets = []
-    ruleSetFiles = files("config/pmd/ruleset.xml")
-    ignoreFailures = true
-}
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
