@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.Arrays;
 
@@ -15,14 +16,13 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 import uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint;
 import uk.gov.hmcts.ccd.endpoint.ui.QueryEndpoint;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
 import uk.gov.hmcts.ccd.v2.internal.controller.UICaseController;
 
 @Configuration
-@EnableSwagger2WebMvc
+@EnableWebMvc
 public class SwaggerConfiguration {
 
     @Bean
