@@ -1,11 +1,8 @@
 package uk.gov.hmcts.ccd.config;
 
+import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import java.util.Arrays;
-
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -22,7 +19,6 @@ import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
 import uk.gov.hmcts.ccd.v2.internal.controller.UICaseController;
 
 @Configuration
-@EnableWebMvc
 public class SwaggerConfiguration {
 
     @Bean

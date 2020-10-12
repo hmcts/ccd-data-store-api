@@ -55,7 +55,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/health/liveness",
         "/status/health",
         "/loggers/**",
-        "/"
+        "/",
+        "/swagger-ui/**",
+        "/swagger-ui/index.html**",
+        "/webjars/**"
     };
 
     @Inject
