@@ -32,10 +32,12 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
 
 
     public AuthorisedGetCaseOperation(@Qualifier("classified") final GetCaseOperation getCaseOperation,
-                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                      final CaseDefinitionRepository caseDefinitionRepository,
                                       final AccessControlService accessControlService,
                                       @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                      @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository) {
+                                      @Qualifier(CachedCaseUserRepository.QUALIFIER)
+                                          CaseUserRepository caseUserRepository) {
         this.getCaseOperation = getCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
@@ -71,14 +73,16 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
                 .collect(Collectors.toSet()));
     }
 
-    private Optional<CaseDetails> verifyReadAccess(CaseTypeDefinition caseType, Set<String> userRoles, CaseDetails caseDetails) {
+    private Optional<CaseDetails> verifyReadAccess(CaseTypeDefinition caseType, Set<String> userRoles,
+                                                   CaseDetails caseDetails) {
 
         if (caseType == null || caseDetails == null || CollectionUtils.isEmpty(userRoles)) {
             return Optional.empty();
         }
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)
-            || !accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseType, userRoles, CAN_READ)) {
+            || !accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseType, userRoles,
+            CAN_READ)) {
             return Optional.empty();
         }
 

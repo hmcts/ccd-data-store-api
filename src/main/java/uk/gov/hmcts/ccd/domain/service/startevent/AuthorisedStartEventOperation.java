@@ -39,8 +39,10 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     private final DraftGateway draftGateway;
 
     public AuthorisedStartEventOperation(@Qualifier("classified") final StartEventOperation startEventOperation,
-                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                         @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                         final CaseDefinitionRepository caseDefinitionRepository,
+                                         @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                         final CaseDetailsRepository caseDetailsRepository,
                                          final AccessControlService accessControlService,
                                          final UIDService uidService,
                                          @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
@@ -70,9 +72,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         }
 
         return caseDetailsRepository.findByReference(caseReference)
-            .map(caseDetails -> verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForCase(caseReference,
-                                                                                                                      eventId,
-                                                                                                                      ignoreWarning)))
+            .map(caseDetails -> verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation
+                .triggerStartForCase(caseReference, eventId, ignoreWarning)))
             .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
@@ -105,7 +106,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
-        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventResult.getCaseDetails()));
+        Set<String> userRoles =
+            Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventResult.getCaseDetails()));
 
         CaseDetails caseDetails = startEventResult.getCaseDetails();
 

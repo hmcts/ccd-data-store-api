@@ -26,7 +26,8 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
     private TextValidator textValidator;
 
     @Inject
-    public TextCaseReferenceCaseLinkValidator(@Qualifier("TextValidator") TextValidator textValidator, CaseService caseService) {
+    public TextCaseReferenceCaseLinkValidator(@Qualifier("TextValidator") TextValidator textValidator,
+                                              CaseService caseService) {
         this.caseService = caseService;
         this.textValidator = textValidator;
     }

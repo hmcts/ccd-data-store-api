@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-024
+@S-024 @Smoke
 Scenario: should create event successfully for an existing case
 
     Given a user with [an active profile in CCD],

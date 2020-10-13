@@ -86,6 +86,7 @@ public class ElasticsearchTestHelper {
     public static final String LAST_STATE_MODIFIED_DATE_VALUE = "2020-05-07T17:42:00.527";
     public static final String LAST_MODIFIED_DATE_VALUE = "2020-06-09T13:17:06.542";
     public static final String NESTED_NUMBER_FIELD_VALUE = "567";
+    public static final String COMPLEX_FIXED_LIST_VALUE = "VALUE3";
 
     public static final String AUTOTEST1_PUBLIC = "caseworker-autotest1";
     public static final String AUTOTEST2_PUBLIC = "caseworker-autotest2";
@@ -97,7 +98,8 @@ public class ElasticsearchTestHelper {
     private static final String CASE_TYPE_ID_PARAM = "ctid";
     private static final String USE_CASE_PARAM = "use_case";
 
-    private ElasticsearchTestHelper() { }
+    private ElasticsearchTestHelper() {
+    }
 
     public static String caseData(String fieldPath) {
         return DATA_PREFIX + fieldPath;
@@ -112,7 +114,8 @@ public class ElasticsearchTestHelper {
     }
 
     public static MockHttpServletRequestBuilder createPostRequest(String url,
-                                                                  ElasticsearchBaseTest.ElasticsearchTestRequest searchRequest,
+                                                                  ElasticsearchBaseTest.ElasticsearchTestRequest
+                                                                          searchRequest,
                                                                   String caseTypeParam,
                                                                   String useCase) throws Exception {
         MockHttpServletRequestBuilder postRequest = post(url)

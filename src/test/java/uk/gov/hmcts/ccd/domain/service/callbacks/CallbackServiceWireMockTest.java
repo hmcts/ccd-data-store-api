@@ -70,7 +70,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, caseEventDefinition, null, caseDetails, false);
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, caseEventDefinition, null, caseDetails,
+            false);
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
         assertTrue(response.getErrors().isEmpty());
@@ -94,7 +95,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(1500)));
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, caseEventDefinition, null, caseDetails, false);
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, caseEventDefinition, null, caseDetails,
+            false);
 
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
         verify(exactly(2), postRequestedFor(urlMatching("/test-callback.*")));
@@ -118,7 +120,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, caseEventDefinition, null, caseDetails, false);
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, caseEventDefinition, null, caseDetails,
+            false);
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
         assertThat(response.getErrors(), Matchers.contains("Test message"));
@@ -239,7 +242,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         assertAll(
             () -> assertThat(result.getStatusCodeValue(), is(201)),
             () -> JSONAssert.assertEquals(
-                "{\"data\":null,\"errors\":[],\"warnings\":[],\"data_classification\":null,\"security_classification\":null}",
+                "{\"data\":null,\"errors\":[],\"warnings\":[],\"data_classification\":null,\"security_classification\""
+                    + ":null}",
                 result.getBody(),
                 JSONCompareMode.LENIENT)
         );
@@ -283,7 +287,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         try {
             underTest.send(testUrl, caseEventDefinition, null, caseDetails, String.class);
         } catch (CallbackException ex) {
-            assertThat(ex.getMessage(), is("Callback to service has been unsuccessful for event " + caseEventDefinition.getName()));
+            assertThat(ex.getMessage(), is("Callback to service has been unsuccessful for event "
+                + caseEventDefinition.getName()));
             throw ex;
         }
     }

@@ -51,7 +51,8 @@ public class DateTimeFormatParser {
         return date.format(DateTimeFormatter.ofPattern(dateFormat));
     }
 
-    public TextNode valueToTextNode(String valueToConvert, BaseType baseType, String fieldPath, String format, boolean toIso) {
+    public TextNode valueToTextNode(String valueToConvert, BaseType baseType, String fieldPath,
+                                    String format, boolean toIso) {
         if (Strings.isNullOrEmpty(valueToConvert)) {
             return new TextNode(valueToConvert);
         }

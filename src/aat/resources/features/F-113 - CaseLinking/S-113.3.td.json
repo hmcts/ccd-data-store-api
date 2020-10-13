@@ -1,7 +1,7 @@
 {
 	"title": "must successfully save CaseLink when a valid reference is entered",
-	"_guid_": "S-112.3",
-	"_extends_": "F-112_Test_Data_Base",
+	"_guid_": "S-113.3",
+	"_extends_": "F-113_Test_Data_Base",
 
 	"specs": [
 		"an active profile in CCD",
@@ -12,7 +12,7 @@
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][childContexts][S-112.3_Create_Case_Data][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][childContexts][S-113.3_Create_Case_Data][testData][actualResponse][body][id]}"
         }
       }
     }
@@ -155,6 +155,7 @@
           "value" : [ ]
         }
       },
+      "supplementary_data": null,
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
       "callback_response_status" : null,

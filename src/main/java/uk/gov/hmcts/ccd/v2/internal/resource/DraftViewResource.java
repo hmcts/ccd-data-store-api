@@ -26,7 +26,8 @@ public class DraftViewResource extends RepresentationModel {
     public DraftViewResource(@NonNull DraftResponse draftResponse, String caseTypeId) {
         copyProperties(draftResponse);
 
-        add(linkTo(methodOn(UIDraftsController.class).saveDraft(caseTypeId, draftResponse.getCaseDataContent())).withSelfRel());
+        add(linkTo(methodOn(UIDraftsController.class).saveDraft(caseTypeId, draftResponse.getCaseDataContent()))
+            .withSelfRel());
     }
 
     private void copyProperties(DraftResponse draftResponse) {

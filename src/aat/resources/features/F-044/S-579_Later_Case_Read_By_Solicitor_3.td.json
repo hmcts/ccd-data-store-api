@@ -80,6 +80,7 @@
 					"classification": "PUBLIC"
 				}
 			},
+			"supplementary_data": null,
 			"security_classifications": {
 				"DocumentField4": "PUBLIC",
 				"MoneyGBPField": "PUBLIC",

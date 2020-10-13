@@ -43,8 +43,10 @@ public class CaseAccessOperation {
     private final CaseRoleRepository caseRoleRepository;
     private final SupplementaryDataRepository supplementaryDataRepository;
 
-    public CaseAccessOperation(final @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository,
-                               @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+    public CaseAccessOperation(final @Qualifier(CachedCaseUserRepository.QUALIFIER)
+                                   CaseUserRepository caseUserRepository,
+                               @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                   final CaseDetailsRepository caseDetailsRepository,
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository,
                                @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository) {
         this.caseUserRepository = caseUserRepository;
@@ -96,19 +98,22 @@ public class CaseAccessOperation {
     @Transactional
     public void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
 
-        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId =
+            getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
 
         Map<String, Map<String, Long>> newUserCounts = getUserCountByCaseAndOrganisation(cauRolesByCaseId);
 
         cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
-                caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(), requestedAssignment.getCaseRole())
+                caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(),
+                                               requestedAssignment.getCaseRole())
             )
         );
 
         newUserCounts.forEach((caseReference, orgNewUserCountMap) ->
             orgNewUserCountMap.forEach((organisationId, newUserCount) ->
-                supplementaryDataRepository.incrementSupplementaryData(caseReference, ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount)
+                supplementaryDataRepository.incrementSupplementaryData(caseReference,
+                    ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount)
             )
         );
     }
@@ -116,18 +121,23 @@ public class CaseAccessOperation {
     @Transactional
     public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
 
-        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId =
+            getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
 
-        // Ignore case user role mappings that are NOT exist in the database silently. Also they shouldn't effect counters.
-        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseId = filterExistingCauRoles(cauRolesByCaseId);
+        // Ignore case user role mappings that are NOT exist in the database silently.
+        // Also they shouldn't effect counters.
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseId =
+            filterExistingCauRoles(cauRolesByCaseId);
 
         filteredCauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
-                caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(), requestedAssignment.getCaseRole())
+                caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
+                    requestedAssignment.getCaseRole())
             )
         );
 
-        // determine counters after removal of requested mappings so that same function can be re-used (i.e user still has an association to a case).
+        // determine counters after removal of requested mappings so that same function can be re-used
+        // (i.e user still has an association to a case).
         Map<String, Map<String, Long>> removeUserCounts = getUserCountByCaseAndOrganisation(filteredCauRolesByCaseId);
 
         removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
@@ -154,7 +164,8 @@ public class CaseAccessOperation {
 
         return cauRolesByCaseId.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey,
-                entry -> filterExistingCauRoles(entry.getValue(), existingCaseUserRolesByCaseId.getOrDefault(entry.getKey(), new ArrayList<>()))));
+                entry -> filterExistingCauRoles(entry.getValue(),
+                    existingCaseUserRolesByCaseId.getOrDefault(entry.getKey(), new ArrayList<>()))));
     }
 
     private List<CaseAssignedUserRoleWithOrganisation> filterExistingCauRoles(
@@ -210,10 +221,12 @@ public class CaseAccessOperation {
         return cauRolesByCaseId;
     }
 
-    private Map<String, Map<String, Long>> getUserCountByCaseAndOrganisation(Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
+    private Map<String, Map<String, Long>> getUserCountByCaseAndOrganisation(Map<Long,
+        List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
         Map<String, Map<String, Long>> result = new HashMap<>();
 
-        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId = cauRolesByCaseId.entrySet().stream()
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId =
+            cauRolesByCaseId.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                 // filter out no organisation_id
                 .filter(caseUserRole -> StringUtils.isNoneBlank(caseUserRole.getOrganisationId()))

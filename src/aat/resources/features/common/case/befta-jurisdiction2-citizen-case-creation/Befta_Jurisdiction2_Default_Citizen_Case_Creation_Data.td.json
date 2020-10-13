@@ -54,6 +54,7 @@
 			"data_classification" : {
 				"_extends_": "Befta_Citizen_Data_Securities_Classification"
 			},
+			"supplementary_data": null,
 			"security_classifications" : {
 				"_extends_": "Befta_Citizen_Data_Securities_Classification"
 			},
