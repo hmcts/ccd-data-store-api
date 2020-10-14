@@ -20,6 +20,17 @@ public class BaseStateReferenceTest {
     }
 
     protected List<EventPostStateDefinition> createPostStates() {
+        List<EventPostStateDefinition> postStates = createEventPostStates();
+
+        EventPostStateDefinition eventPostStateDefinition = createEventPostStateDefinition(
+            "Test125",
+            null,
+            99);
+        postStates.add(eventPostStateDefinition);
+        return postStates;
+    }
+
+    protected List<EventPostStateDefinition> createEventPostStates() {
         List<EventPostStateDefinition> postStates = new ArrayList<>();
         EventPostStateDefinition eventPostStateDefinition = createEventPostStateDefinition(
             "Test123",
@@ -30,12 +41,6 @@ public class BaseStateReferenceTest {
             "Test124",
             "Field3=\'334\"",
             2);
-        postStates.add(eventPostStateDefinition);
-
-        eventPostStateDefinition = createEventPostStateDefinition(
-            "Test125",
-            null,
-            99);
         postStates.add(eventPostStateDefinition);
         return postStates;
     }

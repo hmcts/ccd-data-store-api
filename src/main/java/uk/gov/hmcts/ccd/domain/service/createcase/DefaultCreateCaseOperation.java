@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,7 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseStateUpdateService;
+import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -52,7 +51,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final CallbackInvoker callbackInvoker;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final DraftGateway draftGateway;
-    private final CaseStateUpdateService caseStateUpdateService;
+    private final CasePostStateService casePostStateService;
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -66,7 +65,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
                                       final ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                      final CaseStateUpdateService caseStateUpdateService,
+                                      final CasePostStateService casePostStateService,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -78,7 +77,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.caseDataService = caseDataService;
         this.callbackInvoker = callbackInvoker;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
-        this.caseStateUpdateService = caseStateUpdateService;
+        this.casePostStateService = casePostStateService;
         this.draftGateway = draftGateway;
     }
 
@@ -145,11 +144,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     }
 
     private void updateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails newCaseDetails) {
-        Optional<String> postState = this.caseStateUpdateService
-            .retrieveCaseState(caseEventDefinition, newCaseDetails);
-        if (postState.isPresent()) {
-            newCaseDetails.setState(postState.get());
-        }
+        newCaseDetails.setState(this.casePostStateService
+            .evaluateCaseState(caseEventDefinition, newCaseDetails));
     }
 
     private void deleteDraft(CaseDataContent caseDataContent, CaseDetails savedCaseDetails) {

@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -356,18 +357,15 @@ public class CaseDetails implements Cloneable {
     }
 
     @JsonIgnore
-    public Map<String, JsonNode> getCaseEventData(CaseEventDefinition caseEventDefinition) {
+    public Map<String, JsonNode> getCaseEventData(Set<String> caseFieldIds) {
         Map<String, JsonNode> caseEventData = new HashMap<>();
         if (this.data != null) {
-            caseEventDefinition
-                .getCaseFields()
-                .forEach(caseEventFieldDefinition -> {
-                    String key = caseEventFieldDefinition.getCaseFieldId();
-                    JsonNode value = this.data.get(key);
-                    if (value != null) {
-                        caseEventData.put(key, value);
-                    }
-                });
+            for (String caseFieldId : caseFieldIds) {
+                JsonNode value = this.data.get(caseFieldId);
+                if (value != null) {
+                    caseEventData.put(caseFieldId, value);
+                }
+            }
         }
         return caseEventData;
     }

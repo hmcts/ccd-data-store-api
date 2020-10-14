@@ -30,7 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseStateUpdateService;
+import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -70,7 +70,7 @@ public class CreateCaseEventService {
     private final UserAuthorisation userAuthorisation;
     private final FieldProcessorService fieldProcessorService;
     private final Clock clock;
-    private final CaseStateUpdateService caseStateUpdateService;
+    private final CasePostStateService casePostStateService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -91,7 +91,7 @@ public class CreateCaseEventService {
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,
-                                  final CaseStateUpdateService caseStateUpdateService,
+                                  final CasePostStateService casePostStateService,
                                   @Qualifier("utcClock") final Clock clock) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -109,7 +109,7 @@ public class CreateCaseEventService {
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.userAuthorisation = userAuthorisation;
         this.fieldProcessorService = fieldProcessorService;
-        this.caseStateUpdateService = caseStateUpdateService;
+        this.casePostStateService = casePostStateService;
         this.clock = clock;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -234,10 +234,14 @@ public class CreateCaseEventService {
     }
 
     private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {
-        Optional<String> postState = caseStateUpdateService.retrieveCaseState(caseEventDefinition, caseDetails);
-        if (postState.isPresent() && !equalsIgnoreCase(CaseStateDefinition.ANY, postState.get())) {
-            caseDetails.setState(postState.get());
+        String postState = casePostStateService.evaluateCaseState(caseEventDefinition, caseDetails);
+        if (!shouldRemainOnCurrentState(postState)) {
+            caseDetails.setState(postState);
         }
+    }
+
+    private boolean shouldRemainOnCurrentState(String postState) {
+        return equalsIgnoreCase(CaseStateDefinition.ANY, postState);
     }
 
     private void saveAuditEventForCaseDetails(final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse,
