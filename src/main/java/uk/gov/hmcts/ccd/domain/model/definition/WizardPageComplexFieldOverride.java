@@ -13,6 +13,7 @@ public class WizardPageComplexFieldOverride implements Serializable {
     private String label;
     private String hintText;
     private String showCondition;
+    private Boolean retainHiddenValue;
     private String defaultValue;
 
     @JsonProperty("complex_field_element_id")
@@ -31,6 +32,15 @@ public class WizardPageComplexFieldOverride implements Serializable {
 
     public void setDisplayContext(String displayContext) {
         this.displayContext = displayContext;
+    }
+
+    @JsonProperty("retain_hidden_value")
+    public Boolean getRetainHiddenValue() {
+        return retainHiddenValue;
+    }
+
+    public void setRetainHiddenValue(Boolean retainHiddenValue) {
+        this.retainHiddenValue = retainHiddenValue;
     }
 
     @JsonProperty("label")
