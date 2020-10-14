@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
@@ -42,5 +43,10 @@ public class EventPostStateDefinition implements Serializable {
 
     public void setPostStateReference(String postStateReference) {
         this.postStateReference = postStateReference;
+    }
+
+    @JsonIgnore
+    public boolean isDefault() {
+        return enablingCondition == null;
     }
 }

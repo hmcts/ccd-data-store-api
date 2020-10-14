@@ -1,21 +1,23 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import java.util.HashMap;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.casestate.EnablingConditionParser;
+import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionParser;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
-class StateReferenceServiceTest extends BaseStateReferenceTest {
+class CasePostStateEvaluationServiceTest extends BaseStateReferenceTest {
 
-    private StateReferenceService stateReferenceService;
+    private CasePostStateEvaluationService casePostStateEvaluationService;
 
     @Mock
     private EnablingConditionParser enablingConditionParser;
@@ -23,41 +25,44 @@ class StateReferenceServiceTest extends BaseStateReferenceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.stateReferenceService = new StateReferenceService(this.enablingConditionParser);
-    }
-
-    @Test
-    void shouldReturnEmptyReferenceWhenNullPostStateReferenceIsPassed() {
-        Optional<String> postStateReference = this.stateReferenceService
-            .evaluatePostStateCondition(null, new HashMap<>());
-        assertEquals(true, postStateReference.isEmpty());
+        this.casePostStateEvaluationService = new CasePostStateEvaluationService(this.enablingConditionParser);
     }
 
     @Test
     void shouldReturnDefaultStateReferenceWhenNoPostStateConditionIsValid() {
-        Optional<String> postStateReference = this.stateReferenceService
+        String postStateReference = this.casePostStateEvaluationService
             .evaluatePostStateCondition(createPostStates(), new HashMap<>());
         assertEquals(false, postStateReference.isEmpty());
-        assertEquals("Test125", postStateReference.get());
+        assertEquals("Test125", postStateReference);
     }
 
     @Test
     void shouldReturnStateReferenceWhenPostStateConditionIsValid() {
         doReturn(true).when(this.enablingConditionParser)
             .evaluate(anyString(), anyMap());
-        Optional<String> postStateReference = this.stateReferenceService
+        String postStateReference = this.casePostStateEvaluationService
             .evaluatePostStateCondition(createPostStates(), new HashMap<>());
         assertEquals(false, postStateReference.isEmpty());
-        assertEquals("Test123", postStateReference.get());
+        assertEquals("Test123", postStateReference);
     }
 
     @Test
     void shouldReturnDefaultStateReferenceWhenPostStateConditionsAreNotValid() {
         doReturn(false).when(this.enablingConditionParser)
             .evaluate(anyString(), anyMap());
-        Optional<String> postStateReference = this.stateReferenceService
+        String postStateReference = this.casePostStateEvaluationService
             .evaluatePostStateCondition(createPostStates(), new HashMap<>());
         assertEquals(false, postStateReference.isEmpty());
-        assertEquals("Test125", postStateReference.get());
+        assertEquals("Test125", postStateReference);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDefaultStateReferenceNotFound() {
+        doReturn(false).when(this.enablingConditionParser)
+            .evaluate(anyString(), anyMap());
+        ServiceException serviceException = assertThrows(ServiceException.class,
+            () -> this.casePostStateEvaluationService
+            .evaluatePostStateCondition(createEventPostStates(), new HashMap<>()));
+        assertNotNull(serviceException);
     }
 }
