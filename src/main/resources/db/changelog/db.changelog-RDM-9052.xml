@@ -5,20 +5,23 @@
     
     <changeSet id="RDM-9052-1" author="henry">
 	    <preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">SELECT count(c.relname) FROM pg_class c WHERE c.relkind = 'S' and c.relname = 'case_event_id_seq'</sqlCheck>
+			<sqlCheck expectedResult="1">select count (a.relname) from pg_class a where a.relname ='case_event' and Not Exists (SELECT c.relname FROM pg_class c WHERE c.relkind = 'S' and c.relname = 'case_event_id_seq')</sqlCheck>
 	    </preConditions>
 		<addAutoIncrement columnDataType="int" columnName="id" tableName="case_event"/>  
 	</changeSet>
     <changeSet id="RDM-9052-2" author="henry">
 	    <preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">SELECT count(c.relname) FROM pg_class c WHERE c.relkind = 'S' and c.relname = 'case_data_id_seq'</sqlCheck>
+			<sqlCheck expectedResult="1">select count (a.relname) from pg_class a where a.relname ='case_data' and Not Exists (SELECT c.relname FROM pg_class c WHERE c.relkind = 'S' and c.relname = 'case_data_id_seq')</sqlCheck>
 	    </preConditions>
 		<addAutoIncrement columnDataType="int" columnName="id" tableName="case_data"/>  
 	</changeSet>
     <changeSet id="RDM-9052-3" author="henry">
 	    <preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">SELECT count(c.relname) FROM pg_class c WHERE c.relkind = 'S' and c.relname = 'case_users_audit_id_seq'</sqlCheck>
+			<sqlCheck expectedResult="1">select count (a.relname) from pg_class a where a.relname ='case_users_audit' and Not Exists (SELECT c.relname FROM pg_class c WHERE c.relkind = 'S' and c.relname = 'case_users_audit_id_seq')</sqlCheck>
 	    </preConditions>
 		<addAutoIncrement columnDataType="int" columnName="id" tableName="case_users_audit"/>  
 	</changeSet>
 </databaseChangeLog>
+
+
+
