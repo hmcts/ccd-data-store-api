@@ -2,11 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.validate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -17,6 +12,12 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 @Service
 public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOperation {
@@ -61,14 +62,12 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         caseDefinitionRepository.getCaseType(caseTypeId)
             .findCaseEvent(content.getEventId())
             .ifPresent(caseEventDefinition -> caseEventDefinition.getCaseFields()
-                .stream()
                 .forEach(eventFieldDefinition -> eventFieldDefinition.getCaseEventFieldComplexDefinitions().stream()
                     .filter(cefcDefinition -> isOrgPolicyCaseAssignedRole(cefcDefinition.getReference()))
                     .forEach(cefcDefinition -> {
                         String reference = cefcDefinition.getReference();
                         validateContent(content, eventFieldDefinition.getCaseFieldId(),
                             reference,
-                            cefcDefinition.getDefaultValue(),
                             errorList);
                     })));
         if (errorList.size() != 0) {
@@ -88,7 +87,6 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     private void validateContent(final CaseDataContent content,
                                  final String caseFieldId,
                                  final String reference,
-                                 final String defaultValue,
                                  final List<String> errorList) {
         final JsonNode existingData = new ObjectMapper().convertValue(content.getData(), JsonNode.class);
         JsonNode caseFieldNode = existingData.findPath(caseFieldId);
@@ -97,12 +95,10 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
             int length = referenceArray.length;
             String nodeReference = length > 1 ? referenceArray[length - 2] : referenceArray[length - 1];
             List<JsonNode> parentNodes = caseFieldNode.findParents(nodeReference);
-            parentNodes.stream().forEach(parentNode -> {
+            parentNodes.forEach(parentNode -> {
                 JsonNode orgPolicyNode = findOrgPolicyNode(nodeReference, parentNode, length);
                 if (orgPolicyNode.isNull()) {
                     errorList.add(caseFieldId + " cannot have an empty value.");
-                } else if (!defaultValue.equalsIgnoreCase(orgPolicyNode.textValue())) {
-                    errorList.add(caseFieldId + " has an incorrect value " + orgPolicyNode.textValue());
                 }
             });
         }

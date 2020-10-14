@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -27,6 +28,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+
+import java.util.Map;
+import java.util.function.Supplier;
 
 
 @Service
@@ -74,11 +78,22 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
+        final Map<String, JsonNode> data = Maps.newHashMap();
+
+        CaseDetails newCaseDetails = caseService
+            .createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), data);
         return buildStartEventTrigger(uid,
+<<<<<<< HEAD
             caseTypeDefinition,
             eventId,
             ignoreWarning,
             (() -> caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), Maps.newHashMap())));
+=======
+                                      caseTypeDefinition,
+                                      eventId,
+                                      ignoreWarning,
+                                      newCaseDetails);
+>>>>>>> 6c9457483... RDM-9868 Always populate defaultValue in event triggers
     }
 
     @Override
@@ -95,6 +110,9 @@ public class DefaultStartEventOperation implements StartEventOperation {
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition));
+
+        Map<String, JsonNode> defaultValueData = caseEventDefinition.buildJsonNodeFromCaseFieldsWithDefaultValue();
+        JacksonUtils.merge(defaultValueData, caseDetails.getData());
 
         final String eventToken = eventTokenService.generateToken(uid,
             caseDetails,
@@ -119,20 +137,21 @@ public class DefaultStartEventOperation implements StartEventOperation {
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
 
         return buildStartEventTrigger(uid,
-            caseTypeDefinition,
+                                      caseTypeDefinition,
                                       draftResponse.getDocument().getEventId(),
                                       ignoreWarning,
-                                      (() -> caseDetails));
+                                      caseDetails);
     }
 
     private StartEventResult buildStartEventTrigger(final String uid,
                                                     final CaseTypeDefinition caseTypeDefinition,
                                                     final String eventId,
                                                     final Boolean ignoreWarning,
-                                                    final Supplier<CaseDetails> caseDetailsSupplier) {
+                                                    final CaseDetails caseDetails) {
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        final CaseDetails caseDetails = caseDetailsSupplier.get();
+        Map<String, JsonNode> defaultValueData = caseEventDefinition.buildJsonNodeFromCaseFieldsWithDefaultValue();
+        JacksonUtils.merge(defaultValueData, caseDetails.getData());
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(caseEventDefinition));
 
