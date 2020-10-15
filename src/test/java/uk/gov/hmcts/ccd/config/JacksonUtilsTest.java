@@ -32,12 +32,12 @@ class JacksonUtilsTest {
 
     @Test
     public void shouldMergeIntoEmptyCaseData() throws Exception {
-        Map<String, JsonNode> emptyCaseData = Maps.newHashMap();
+        Map<String, JsonNode> caseData = Maps.newHashMap();
         Map<String, JsonNode> defaultValueData = organisationPolicyDefaultValue("[Claimant]");
 
-        Map<String, JsonNode> mergeResult = JacksonUtils.merge(defaultValueData, emptyCaseData);
+        JacksonUtils.merge(defaultValueData, caseData);
 
-        assertEquals("Merged result does not match expected", defaultValueData, mergeResult);
+        assertEquals("Merged result does not match expected", defaultValueData, caseData);
     }
 
     @Test
@@ -45,10 +45,10 @@ class JacksonUtilsTest {
         Map<String, JsonNode> caseData = organisationPolicyCaseData("[Defendant]");
         Map<String, JsonNode> defaultValueData = organisationPolicyDefaultValue("[Claimant]");
 
-        Map<String, JsonNode> mergeResult = JacksonUtils.merge(defaultValueData, caseData);
+        JacksonUtils.merge(defaultValueData, caseData);
 
         Map<String, JsonNode> expectedData = organisationPolicyCaseData("[Claimant]");
-        assertEquals("Merged defaultValue does not match expected", expectedData, mergeResult);
+        assertEquals("Merged defaultValue does not match expected", expectedData, caseData);
     }
 
     @Test
@@ -56,9 +56,9 @@ class JacksonUtilsTest {
         Map<String, JsonNode> caseData = topLevelCollectionCaseData();
         Map<String, JsonNode> defaultValueData = topLevelCollectionDefaultValue();
 
-        Map<String, JsonNode> mergeResult = JacksonUtils.merge(defaultValueData, caseData);
+        JacksonUtils.merge(defaultValueData, caseData);
 
-        assertEquals("Merged defaultValue does not match expected", caseData, mergeResult);
+        assertEquals("Merged defaultValue does not match expected", topLevelCollectionCaseData(), caseData);
     }
 
     @Test
@@ -67,10 +67,10 @@ class JacksonUtilsTest {
         Map<String, JsonNode> caseData = mySchoolDataWithNestedCollection("Test school name", "Class Name 1", "Class Name 2");
         Map<String, JsonNode> defaultValueData = mySchoolDefaultValueData("Updated name", "Updated Class Name");
 
-        Map<String, JsonNode> mergeResult = JacksonUtils.merge(defaultValueData, caseData);
+        JacksonUtils.merge(defaultValueData, caseData);
 
         Map<String, JsonNode> expectedData = mySchoolDataWithNestedCollection("Updated name", "Class Name 1", "Class Name 2");
-        assertEquals("Merged defaultValue does not match expected", expectedData, mergeResult);
+        assertEquals("Merged defaultValue does not match expected", expectedData, caseData);
 
     }
 

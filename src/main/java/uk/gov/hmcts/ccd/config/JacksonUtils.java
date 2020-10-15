@@ -80,7 +80,7 @@ public final class JacksonUtils {
         }
     }
 
-    public static Map<String, JsonNode> merge(Map<String, JsonNode> mergeFrom, Map<String, JsonNode> mergeInto) {
+    public static void merge(Map<String, JsonNode> mergeFrom, Map<String, JsonNode> mergeInto) {
 
         for (String key : mergeFrom.keySet()) {
             JsonNode value = mergeFrom.get(key);
@@ -90,8 +90,6 @@ public final class JacksonUtils {
                 mergeInto.put(key, merge(mergeInto.get(key), value));
             }
         }
-
-        return mergeInto;
     }
 
     private static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
