@@ -1,5 +1,5 @@
 #===================================================================
-@F-029
+@F-029 @vamshi
 Feature: F-029: Fetch an event trigger in the context of a case type
 #===================================================================
 
@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-049
+@S-049 @vamshi
 Scenario: must return successfully the current case event data filtered by case type ID
 
     Given a user with [an active profile in CCD],
@@ -49,7 +49,7 @@ Scenario: must return appropriate negative response when request contains an una
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-052
+@S-052 @vamshi
 Scenario: must return appropriate negative response when request contains a non-existing case-type
 
     Given a user with [an active profile in CCD],
@@ -63,7 +63,7 @@ Scenario: must return appropriate negative response when request contains a non-
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-053
+@S-053 @vamshi
 Scenario: must return appropriate negative response when request contains a non-existing event-id
 
     Given a user with [an active profile in CCD],
@@ -77,7 +77,7 @@ Scenario: must return appropriate negative response when request contains a non-
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-551
+@S-551 @vamshi
 Scenario: must return appropriate negative response when request contains a non-existing Jurisdiction
 
     Given a user with [an active profile in CCD],
