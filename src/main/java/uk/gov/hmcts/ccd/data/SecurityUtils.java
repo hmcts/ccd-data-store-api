@@ -75,7 +75,8 @@ public class SecurityUtils {
     }
 
     public String getUserRolesHeader() {
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        Collection<? extends GrantedAuthority> authorities =
+            SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         return authorities.stream()
                              .map(GrantedAuthority::getAuthority)
                              .collect(Collectors.joining(","));

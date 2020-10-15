@@ -1056,7 +1056,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public WizardPageBuilder withField(CaseViewField caseField, List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+        public WizardPageBuilder withField(CaseViewField caseField,
+                                           List<WizardPageComplexFieldOverride> complexFieldOverrides) {
             WizardPageField wizardPageField = new WizardPageField();
             wizardPageField.setCaseFieldId(caseField.getId());
             wizardPageField.setPageColumnNumber(1);
@@ -1781,7 +1782,8 @@ public class TestBuildersUtil {
             return new UserProfileBuilder();
         }
 
-        public UserProfileBuilder withJurisdictionDisplayProperties(JurisdictionDisplayProperties[] jurisdictionDisplayProperties) {
+        public UserProfileBuilder withJurisdictionDisplayProperties(JurisdictionDisplayProperties[]
+                                                                            jurisdictionDisplayProperties) {
             userProfile.setJurisdictions(jurisdictionDisplayProperties);
             return this;
         }

@@ -34,7 +34,8 @@ class CreateCaseTest extends BaseTest {
     @Test
     @DisplayName("should create case")
     void shouldCreateCase() {
-        String eventToken = aat.getCcdHelper().generateTokenCreateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, CREATE);
+        String eventToken = aat.getCcdHelper().generateTokenCreateCase(asAutoTestCaseworker(),
+                                                                        JURISDICTION, CASE_TYPE, CREATE);
 
         callCreateCase(CASE_TYPE, getBody(CREATE, eventToken, FullCase::build))
             .when()
@@ -86,7 +87,8 @@ class CreateCaseTest extends BaseTest {
     @Test
     @DisplayName("should get 404 when event trigger id invalid")
     void should404WhenEventTriggerIdInvalid() {
-        String eventToken = aat.getCcdHelper().generateTokenCreateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, CREATE);
+        String eventToken = aat.getCcdHelper().generateTokenCreateCase(asAutoTestCaseworker(),
+                                                                       JURISDICTION, CASE_TYPE, CREATE);
 
         callCreateCase(CASE_TYPE, getBody(INVALID_EVENT_TRIGGER_ID, eventToken, FullCase::build))
             .when()
@@ -108,7 +110,8 @@ class CreateCaseTest extends BaseTest {
             .header("experimental", "true");
     }
 
-    private Supplier<String> getBody(String eventId, String eventToken, Supplier<AATCaseType.CaseData> caseDataSupplier) {
+    private Supplier<String> getBody(String eventId, String eventToken,
+                                     Supplier<AATCaseType.CaseData> caseDataSupplier) {
         CaseDataContent caseDataContent = Event.create()
             .as(asAutoTestCaseworker())
             .withData(caseDataSupplier.get())

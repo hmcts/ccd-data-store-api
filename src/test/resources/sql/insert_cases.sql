@@ -193,6 +193,40 @@ VALUES (18, 'bookcase-default-pre-state-test', 'PROBATE', 'CaseCreated', 'PUBLIC
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
+VALUES (19, 'TestAddressBookPostState', 'PROBATE', 'CaseCreated', 'PUBLIC',
+'{
+  "PersonFirstName": "George",
+  "PersonLastName": "Roof",
+  "PersonAddress": {
+    "AddressLine1": "Flat 9",
+    "AddressLine2": "2 Hubble Avenue",
+    "AddressLine3": "ButtonVillie",
+    "Country": "Wales",
+    "Postcode": "W11 5DF"
+  }
+}',
+'{
+  "PersonFirstName": "PUBLIC",
+  "PersonLastName": "PUBLIC",
+  "PersonAddress": {
+    "classification" : "PUBLIC",
+    "value" : {
+      "AddressLine1": "PUBLIC",
+      "AddressLine2": "PUBLIC",
+      "AddressLine3": "PUBLIC",
+      "Country": "PUBLIC",
+      "Postcode": "PUBLIC"
+    }
+  },
+  "D8Document": "PUBLIC"
+}',
+'1601933818308168',
+'2016-08-22 20:44:52.824',
+'2016-08-24 20:44:52.824',
+'2016-08-24 20:44:52.824'
+);
+
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
 VALUES (14, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PRIVATE',
         '{
           "PersonFirstName": "Angel",

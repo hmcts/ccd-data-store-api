@@ -18,8 +18,10 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
     private CaseAssignedUserRoleValidator cauRoleValidator;
 
     @Autowired
-    public AuthorisedCaseAssignedUserRolesOperation(final @Qualifier("default") CaseAssignedUserRolesOperation cauRolesOperation,
-                                                    @Qualifier("default") final CaseAssignedUserRoleValidator cauRoleValidator) {
+    public AuthorisedCaseAssignedUserRolesOperation(final @Qualifier("default")
+                                                            CaseAssignedUserRolesOperation cauRolesOperation,
+                                                    @Qualifier("default")
+                                                            final CaseAssignedUserRoleValidator cauRoleValidator) {
         this.cauRolesOperation = cauRolesOperation;
         this.cauRoleValidator = cauRoleValidator;
     }

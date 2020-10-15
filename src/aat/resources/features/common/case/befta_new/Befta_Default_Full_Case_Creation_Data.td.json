@@ -36,6 +36,7 @@
 				"EmailField": "PUBLIC",
 				"TextField": "PUBLIC"
 			},
+			"supplementary_data": null,
 			"security_classifications": {
 				"MoneyGBPField": "PUBLIC",
 				"PhoneUKField": "PUBLIC",

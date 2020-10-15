@@ -42,13 +42,14 @@ class CaseStateAuthorisationSecurityTest {
         void shouldSecureWithAuthorisedCaseStates() {
             List<String> caseStates = asList("state1", "state2");
             MetaData metaData = new MetaData("CaseType", "Jurisdiction");
-            when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metaData.getJurisdiction(), metaData.getCaseTypeId(), CAN_READ)).thenReturn(
-                caseStates);
+            when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metaData.getJurisdiction(),
+                metaData.getCaseTypeId(), CAN_READ)).thenReturn(caseStates);
 
             caseStateAuthorisationSecurity.secure(builder, metaData);
 
             assertAll(
-                () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds(metaData.getJurisdiction(), metaData.getCaseTypeId(), CAN_READ),
+                () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds(
+                    metaData.getJurisdiction(), metaData.getCaseTypeId(), CAN_READ),
                 () -> verify(builder).whereStates(caseStates));
         }
     }
