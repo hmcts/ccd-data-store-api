@@ -740,6 +740,7 @@ task functional() {
                     'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
+
     }
 
     finalizedBy {
