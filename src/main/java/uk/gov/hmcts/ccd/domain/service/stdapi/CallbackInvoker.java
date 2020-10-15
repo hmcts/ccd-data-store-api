@@ -24,12 +24,17 @@ import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocument.validateSignificantItem;
 
 @Service
 public class CallbackInvoker {
 
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
+
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;
     private final CaseDataService caseDataService;
@@ -57,11 +62,11 @@ public class CallbackInvoker {
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutAboutToStartEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToStartEvent(),
-                    caseEventDefinition, null, caseDetails, false);
+                ABOUT_TO_START, caseEventDefinition, null, caseDetails, false);
         } else {
             callbackResponse = callbackService.send(
-                caseEventDefinition.getCallBackURLAboutToStartEvent(),
-                    caseEventDefinition, null, caseDetails, false);
+                caseEventDefinition.getCallBackURLAboutToStartEvent(), ABOUT_TO_START,
+                caseEventDefinition, null, caseDetails, false);
         }
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseTypeDefinition,
@@ -78,10 +83,10 @@ public class CallbackInvoker {
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
-                caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
+                ABOUT_TO_SUBMIT, caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         } else {
             callbackResponse = callbackService.send(
-                caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
+                caseEventDefinition.getCallBackURLAboutToSubmitEvent(), ABOUT_TO_SUBMIT,
                 caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         }
 
@@ -103,13 +108,13 @@ public class CallbackInvoker {
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLSubmittedEvent())) {
             afterSubmitCallbackResponseEntity =
                 callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLSubmittedEvent(),
-                caseEventDefinition,
-                caseDetailsBefore,
-                caseDetails,
-                AfterSubmitCallbackResponse.class);
+                    SUBMITTED, caseEventDefinition,
+                    caseDetailsBefore,
+                    caseDetails,
+                    AfterSubmitCallbackResponse.class);
         } else {
             afterSubmitCallbackResponseEntity = callbackService.send(caseEventDefinition.getCallBackURLSubmittedEvent(),
-                caseEventDefinition,
+                SUBMITTED, caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails,
                 AfterSubmitCallbackResponse.class);
@@ -127,12 +132,14 @@ public class CallbackInvoker {
         Optional<CallbackResponse> callbackResponseOptional;
         if (isRetriesDisabled(wizardPage.getRetriesTimeoutMidEvent())) {
             callbackResponseOptional = callbackService.sendSingleRequest(wizardPage.getCallBackURLMidEvent(),
-                    caseEventDefinition,
+                MID_EVENT,
+                caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails, false);
         } else {
             callbackResponseOptional = callbackService.send(wizardPage.getCallBackURLMidEvent(),
-                    caseEventDefinition,
+                MID_EVENT,
+                caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails, false);
         }
@@ -202,7 +209,7 @@ public class CallbackInvoker {
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseTypeDefinition caseTypeDefinition,
                                                                                CaseDetails caseDetails) {
         Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
-                caseTypeDefinition,
+            caseTypeDefinition,
             caseDetails.getData(),
             EMPTY_DATA_CLASSIFICATION);
         return defaultSecurityClassifications;
@@ -218,7 +225,7 @@ public class CallbackInvoker {
 
     private void deduceDataClassificationForNewFields(CaseTypeDefinition caseTypeDefinition, CaseDetails caseDetails) {
         Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
-                caseTypeDefinition,
+            caseTypeDefinition,
             caseDetails.getData(),
             ofNullable(caseDetails.getDataClassification()).orElse(
                 newHashMap()));
