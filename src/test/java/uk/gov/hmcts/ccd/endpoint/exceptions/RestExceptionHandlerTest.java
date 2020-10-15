@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
