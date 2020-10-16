@@ -114,7 +114,8 @@ public class CaseService {
      * Builds a json representation of the caseFields with a defaultValue present.
      * Has no knowledge of the collections, hence all ArrayNodes are represented as an ObjectNode.
      */
-    public Map<String, JsonNode> buildJsonFromCaseFieldsWithDefaultValue(List<CaseEventFieldDefinition> caseEventDefinition) {
+    public Map<String, JsonNode> buildJsonFromCaseFieldsWithDefaultValue(
+        List<CaseEventFieldDefinition> caseEventDefinition) {
         Map<String, JsonNode> data = new HashMap<>();
 
         caseEventDefinition.forEach(
@@ -123,15 +124,16 @@ public class CaseService {
                 List<JsonNode> collect = caseField.getCaseEventFieldComplexDefinitions().stream()
                     .filter(e -> e.getDefaultValue() != null)
                     .filter(e -> !e.getReference().isBlank())
-                    .map(caseEventFieldComplex -> JacksonUtils.buildFromDottedPath(caseEventFieldComplex.getReference(),
-                                                                                   caseEventFieldComplex.getDefaultValue())).collect(toList());
+                    .map(caseEventFieldComplex -> JacksonUtils
+                        .buildFromDottedPath(caseEventFieldComplex.getReference(),
+                                             caseEventFieldComplex.getDefaultValue())).collect(toList());
 
-                ObjectNode objectNode = MAPPER.getNodeFactory().objectNode();
-                collect.forEach(e -> {
-                    String next = e.fieldNames().next();
-                    objectNode.set(next, e.findValue(next));
-                });
                 if (!collect.isEmpty()) { // to prevent construct like "FieldA": {}
+                    ObjectNode objectNode = MAPPER.getNodeFactory().objectNode();
+                    collect.forEach(e -> {
+                        String next = e.fieldNames().next();
+                        objectNode.set(next, e.findValue(next));
+                    });
                     data.put(caseField.getCaseFieldId(), objectNode);
                 }
             });
