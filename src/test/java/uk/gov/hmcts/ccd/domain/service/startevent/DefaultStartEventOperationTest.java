@@ -72,6 +72,7 @@ public class DefaultStartEventOperationTest {
     private static final String PRIVATE = SecurityClassification.PRIVATE.name();
     private static final Map<String, JsonNode> DATA_CLASSIFICATION = Maps.newHashMap();
     private static final Map<String, JsonNode> DEFAULT_VALUE_DATA = expectedDefaultValue();
+
     static Map<String, JsonNode> expectedDefaultValue() {
         Map<String, JsonNode> data = new HashMap<>();
         try {
@@ -367,7 +368,8 @@ public class DefaultStartEventOperationTest {
                     eq(caseTypeDefinition), any(CaseDetails.class), eq(IGNORE_WARNING)),
                 () -> assertThat(actual.getCaseDetails(), hasProperty("securityClassification",
                     is(SecurityClassification.PRIVATE))),
-                () -> assertThat(actual.getCaseDetails(), hasProperty("data", is(expectedAfterMergeWithDefaultValue()))),
+                () -> assertThat(actual.getCaseDetails(), hasProperty("data",
+                                                                      is(expectedAfterMergeWithDefaultValue()))),
                 () -> assertThat(actual.getCaseDetails(), hasProperty("dataClassification",
                     is(DATA_CLASSIFICATION))),
                 () -> assertThat(actual.getCaseDetails(), hasProperty("caseTypeId",
