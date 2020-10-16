@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,11 +14,15 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,7 +32,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -260,6 +268,57 @@ class CaseServiceTest {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
             assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
+        }
+    }
+
+    @Nested
+    @DisplayName("buildJsonFromCaseFieldsWithDefaultValue()")
+    class BuildJsonFromCaseFieldsWithDefaultValue {
+        @Test
+        @DisplayName("builds a Json representation from CaseEventDefinition caseFields")
+        void buildsJsonRepresentationFromEventCaseFields() throws Exception {
+
+            final List<CaseEventFieldDefinition> caseFields = Arrays.asList(
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("ChangeOrganisationRequestField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                             .reference("Reason")
+                                                             .defaultValue("SomeReasonX")
+                                                             .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                             .reference("CaseRoleId")
+                                                             .defaultValue(null)
+                                                             .build())
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                             .reference("OrganisationToAdd.OrganisationID")
+                                                             .defaultValue("Solicitor firm 1")
+                                                             .build())
+                    .build(),
+                TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField()
+                    .withCaseFieldId("OrganisationPolicyField")
+                    .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                             .reference("OrgPolicyCaseAssignedRole")
+                                                             .defaultValue("[Claimant]")
+                                                             .build())
+                    .build()
+            );
+
+            Map<String, JsonNode> result = caseService.buildJsonFromCaseFieldsWithDefaultValue(caseFields);
+
+            assertAll(
+                () -> Assert.assertThat(result.size(), is(2)),
+
+                () -> assertTrue(result.containsKey("ChangeOrganisationRequestField")),
+                () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("Reason")),
+                () -> assertNull(result.get("ChangeOrganisationRequestField").get("CaseRoleId")),
+                () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd").get("OrganisationID")),
+                () -> Assert.assertThat(result.get("ChangeOrganisationRequestField").get("Reason").asText(), is("SomeReasonX")),
+                () -> Assert.assertThat(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd").get("OrganisationID").asText(), is("Solicitor firm 1")),
+
+                () -> assertTrue(result.containsKey("OrganisationPolicyField")),
+                () -> assertNotNull(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole")),
+                () -> Assert.assertThat(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole").asText(), is("[Claimant]"))
+            );
         }
     }
 

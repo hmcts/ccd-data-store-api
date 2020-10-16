@@ -1,21 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.ToString;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @ToString
 public class CaseEventDefinition implements Serializable {
@@ -213,30 +205,5 @@ public class CaseEventDefinition implements Serializable {
         return getCaseFields().stream()
             .filter(f -> f.getCaseFieldId().equals(caseFieldId))
             .findFirst();
-    }
-
-    public Map<String, JsonNode> buildJsonNodeFromCaseFieldsWithDefaultValue() {
-        Map<String, JsonNode> data = new HashMap<>();
-
-        getCaseFields().forEach(
-            caseField -> {
-
-                List<JsonNode> collect = caseField.getCaseEventFieldComplexDefinitions().stream()
-                    .filter(e -> e.getDefaultValue() != null)
-                    .filter(e -> !e.getReference().isBlank())
-                    .map(caseEventFieldComplex -> JacksonUtils.buildFromDottedPath(caseEventFieldComplex.getReference(),
-                                                                                   caseEventFieldComplex.getDefaultValue())).collect(toList());
-
-                ObjectNode objectNode = MAPPER.getNodeFactory().objectNode();
-                collect.forEach(e -> {
-                    String next = e.fieldNames().next();
-                    objectNode.set(next, e.findValue(next));
-                });
-                if (!collect.isEmpty()) { // to prevent construct like "FieldA": {}
-                    data.put(caseField.getCaseFieldId(), objectNode);
-                }
-            });
-
-        return data;
     }
 }
