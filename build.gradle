@@ -29,7 +29,7 @@ plugins {
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.1.0"
-    id 'uk.gov.hmcts.java' version '0.11.0'
+    id 'uk.gov.hmcts.java' version '0.12.0'
 }
 
 apply plugin: 'java'
