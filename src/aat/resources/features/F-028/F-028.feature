@@ -1,5 +1,5 @@
 #==============================================================================
-@F-028 @vamshi
+@F-028
 Feature: F-028: Fetch an event trigger in the context of a case for Case Worker
 #==============================================================================
 
@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-044 @vamshi
+@S-044
 Scenario: must return event trigger data successfully for valid pre-state conditions
 
     Given a user with [an active profile in CCD],
@@ -50,7 +50,7 @@ Scenario: must return negative response when request provides authentic credenti
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-547 @vamshi
+@S-547
 Scenario: must return appropriate negative response when case-reference does not exists
 
     Given a user with [an active profile in CCD],
@@ -64,7 +64,7 @@ Scenario: must return appropriate negative response when case-reference does not
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-548 @vamshi
+@S-548
 Scenario: must return appropriate negative response when event-id does not exists
 
     Given a user with [an active profile in CCD],
@@ -78,7 +78,7 @@ Scenario: must return appropriate negative response when event-id does not exist
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-549 @vamshi
+@S-549
 Scenario: must return appropriate negative response when case-reference is non-numeric
 
       Given a user with [an active profile in CCD],
@@ -92,7 +92,7 @@ Scenario: must return appropriate negative response when case-reference is non-n
         And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-550 @vamshi
+@S-550
 Scenario: must return appropriate negative response when Jurisdiction is invalid
 
     Given a user with [an active profile in CCD],

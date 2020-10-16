@@ -1,5 +1,5 @@
 #=======================================================
-@F-027 @vamshi
+@F-027
 Feature: F-027: Fetch a case for display for Case Worker
 #=======================================================
 
@@ -22,7 +22,7 @@ Scenario: must return status 200 along with the case-view object successfully
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-035 @vamshi
+@S-035
 Scenario: must return appropriate negative response when case id is structurally valid but not exist in CCD
 
     Given a user with [an active profile in CCD],
@@ -64,7 +64,7 @@ Scenario: must return appropriate negative response when request does not provid
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-034 @vamshi
+@S-034
 Scenario: must return appropriate negative response for a user not having a profile in CCD
 
   Given a user with [no profile in CCD],
@@ -77,7 +77,7 @@ Scenario: must return appropriate negative response for a user not having a prof
     And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-590 @vamshi
+@S-590
 Scenario: must return status 200 along with the case-view object successfully
 
     Given a user with [an active profile in CCD],

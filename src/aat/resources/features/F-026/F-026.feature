@@ -1,5 +1,5 @@
 #===========================================
-@F-026 @vamshi
+@F-026
 Feature: F-026: Get case data with UI layout
 #===========================================
 
@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-078 @vamshi
+@S-078
 Scenario: must return the list of cases and status code 200 for correct inputs
 
     Given a user with [an active profile in CCD],
@@ -20,7 +20,7 @@ Scenario: must return the list of cases and status code 200 for correct inputs
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-077 @vamshi
+@S-077
 Scenario: must return an empty SearchResultView envelope and status code 200 if case type has no associated cases
 
     Given a user with [an active profile in CCD],
@@ -76,7 +76,7 @@ Scenario: must return 412 when the case type is not present in Definition store 
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-587 @RDM-7793 @vamshi # Get cases with Last State Modified Date field as a column # Also update this with data ordering when FW support is available
+@S-587 @RDM-7793  # Get cases with Last State Modified Date field as a column # Also update this with data ordering when FW support is available
 Scenario: must return the list of cases and status code 200 for correct inputs
 
     Given a user with [an active profile in CCD],
@@ -109,7 +109,7 @@ Scenario: must return the list of cases and status code 200 for correct inputs
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-589 @vamshi #Get cases list from Last State Modified Date filter - when data list empty
+@S-589  #Get cases list from Last State Modified Date filter - when data list empty
 Scenario: must return the list of cases and status code 200 for correct inputs
 
     Given a user with [an active profile in CCD],
