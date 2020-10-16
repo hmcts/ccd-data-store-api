@@ -56,15 +56,15 @@ public final class JacksonUtils {
     }
 
     /**
-     * Builds a JsonNode from a path and puts the value to the last node
+     * Builds a JsonNode from a path and puts the value to the last node.
      * @param path Eg. "OrganisationPolicyField.OrgPolicyCaseAssignedRole"
      * @param value eg. "[Claimant]"
      * @return JsonNode where it represents the following structure:
-     * {
-     *     "OrganisationPolicyField": {
-     *         "OrgPolicyCaseAssignedRole": "[Claimant]"
+     *     {
+     *         "OrganisationPolicyField": {
+     *             "OrgPolicyCaseAssignedRole": "[Claimant]"
+     *         }
      *     }
-     * }
      */
     public static JsonNode buildFromDottedPath(String path, String value) {
         List<String> pathElements = Arrays.stream(path.split("\\.")).collect(toList());
@@ -72,7 +72,7 @@ public final class JacksonUtils {
     }
 
     private static JsonNode addNode(List<String> pathElements, String value) {
-        if( pathElements.isEmpty()) {
+        if (pathElements.isEmpty()) {
             return MAPPER.getNodeFactory().textNode(value);
         } else {
             String first = pathElements.remove(0);
