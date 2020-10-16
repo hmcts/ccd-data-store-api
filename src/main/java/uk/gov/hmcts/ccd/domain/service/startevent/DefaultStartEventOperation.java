@@ -106,7 +106,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition));
 
-        Map<String, JsonNode> defaultValueData = caseEventDefinition.buildJsonNodeFromCaseFieldsWithDefaultValue();
+        Map<String, JsonNode> defaultValueData = caseService
+            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
         JacksonUtils.merge(defaultValueData, caseDetails.getData());
 
         final String eventToken = eventTokenService.generateToken(uid,
@@ -145,7 +146,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                     final CaseDetails caseDetails) {
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        Map<String, JsonNode> defaultValueData = caseEventDefinition.buildJsonNodeFromCaseFieldsWithDefaultValue();
+        Map<String, JsonNode> defaultValueData = caseService
+            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
         JacksonUtils.merge(defaultValueData, caseDetails.getData());
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(caseEventDefinition));
