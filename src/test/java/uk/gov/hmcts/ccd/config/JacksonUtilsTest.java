@@ -64,12 +64,16 @@ class JacksonUtilsTest {
     @Test
     public void shouldOmitNestedCollectionOnMerge() throws Exception {
 
-        Map<String, JsonNode> caseData = mySchoolDataWithNestedCollection("Test school name", "Class Name 1", "Class Name 2");
+        Map<String, JsonNode> caseData = mySchoolDataWithNestedCollection("Test school name",
+                                                                          "Class Name 1",
+                                                                          "Class Name 2");
         Map<String, JsonNode> defaultValueData = mySchoolDefaultValueData("Updated name", "Updated Class Name");
 
         JacksonUtils.merge(defaultValueData, caseData);
 
-        Map<String, JsonNode> expectedData = mySchoolDataWithNestedCollection("Updated name", "Class Name 1", "Class Name 2");
+        Map<String, JsonNode> expectedData = mySchoolDataWithNestedCollection("Updated name",
+                                                                              "Class Name 1",
+                                                                              "Class Name 2");
         assertEquals("Merged defaultValue does not match expected", expectedData, caseData);
 
     }
@@ -78,24 +82,24 @@ class JacksonUtilsTest {
         throws JsonProcessingException {
 
         JsonNode data = MAPPER.readTree(""
-        + "{"
-        + "  \"Name\": \""+ name +"\","
-        + "  \"Class\": ["
-        + "    {"
-        + "      \"id\": \"6da7a0cf-8186-49d4-813d-c299d8f3491b\","
-        + "      \"value\": {"
-        + "        \"ClassName\": \"" + className1 + "\""
-        + "      }"
-        + "    },"
-        + "    {"
-        + "      \"id\": \"b7662626-b640-48bb-8afa-9fa78dcbd2ec\","
-        + "      \"value\": {"
-        + "        \"ClassName\": \"" + className2 + "\""
-        + "      }"
-        + "    }"
-        + "  ],"
-        + "  \"Number\": null"
-        + "}");
+            + "{"
+            + "  \"Name\": \"" + name + "\","
+            + "  \"Class\": ["
+            + "    {"
+            + "      \"id\": \"6da7a0cf-8186-49d4-813d-c299d8f3491b\","
+            + "      \"value\": {"
+            + "        \"ClassName\": \"" + className1 + "\""
+            + "      }"
+            + "    },"
+            + "    {"
+            + "      \"id\": \"b7662626-b640-48bb-8afa-9fa78dcbd2ec\","
+            + "      \"value\": {"
+            + "        \"ClassName\": \"" + className2 + "\""
+            + "      }"
+            + "    }"
+            + "  ],"
+            + "  \"Number\": null"
+            + "}");
 
         Map<String, JsonNode> result = new HashMap<>();
         result.put("MySchool", data);
@@ -106,12 +110,12 @@ class JacksonUtilsTest {
         throws JsonProcessingException {
 
         JsonNode data = MAPPER.readTree(""
-        + "{"
-        + "    \"Name\": \"" + name + "\","
-        + "    \"Class\": {"
-        + "        \"ClassName\": \"" + className + "\""
-        + "    }"
-        + "}");
+            + "{"
+            + "    \"Name\": \"" + name + "\","
+            + "    \"Class\": {"
+            + "        \"ClassName\": \"" + className + "\""
+            + "    }"
+            + "}");
 
         Map<String, JsonNode> result = new HashMap<>();
         result.put("MySchool", data);

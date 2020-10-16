@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -310,18 +309,22 @@ class CaseServiceTest {
             Map<String, JsonNode> result = caseService.buildJsonFromCaseFieldsWithDefaultValue(caseFields);
 
             assertAll(
-                () -> Assert.assertThat(result.size(), is(2)),
+                () -> assertThat(result.size(), is(2)),
 
                 () -> assertTrue(result.containsKey("ChangeOrganisationRequestField")),
                 () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("Reason")),
                 () -> assertNull(result.get("ChangeOrganisationRequestField").get("CaseRoleId")),
-                () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd").get("OrganisationID")),
-                () -> Assert.assertThat(result.get("ChangeOrganisationRequestField").get("Reason").asText(), is("SomeReasonX")),
-                () -> Assert.assertThat(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd").get("OrganisationID").asText(), is("Solicitor firm 1")),
+                () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd")
+                                        .get("OrganisationID")),
+                () -> assertThat(result.get("ChangeOrganisationRequestField").get("Reason").asText(),
+                                 is("SomeReasonX")),
+                () -> assertThat(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd")
+                                     .get("OrganisationID").asText(), is("Solicitor firm 1")),
 
                 () -> assertTrue(result.containsKey("OrganisationPolicyField")),
                 () -> assertNotNull(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole")),
-                () -> Assert.assertThat(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole").asText(), is("[Claimant]"))
+                () -> assertThat(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole").asText(),
+                                 is("[Claimant]"))
             );
         }
     }
