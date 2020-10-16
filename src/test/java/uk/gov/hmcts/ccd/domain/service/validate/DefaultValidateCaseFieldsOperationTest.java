@@ -258,8 +258,8 @@ class DefaultValidateCaseFieldsOperationTest {
 
         BadRequestException exception =
             assertThrows(BadRequestException.class,
-                         () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition,
-                                                                        caseDataContent));
+                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition,
+                                                               caseDataContent));
 
         assertThat(exception.getMessage(),
                    containsString("has an incorrect value"));
@@ -276,8 +276,8 @@ class DefaultValidateCaseFieldsOperationTest {
 
         BadRequestException exception =
             assertThrows(BadRequestException.class,
-                         () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition,
-                                                                        caseDataContent));
+                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition,
+                                                               caseDataContent));
 
         assertThat(exception.getMessage(),
                    containsString("has an incorrect value"));

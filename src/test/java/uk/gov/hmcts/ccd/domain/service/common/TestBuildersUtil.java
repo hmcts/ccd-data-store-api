@@ -850,7 +850,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseEventFieldDefinitionBuilder addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition complexFieldDefinition) {
+        public CaseEventFieldDefinitionBuilder addCaseEventFieldComplexDefinitions(
+            CaseEventFieldComplexDefinition complexFieldDefinition) {
             complexFieldDefinitions.add(complexFieldDefinition);
             return this;
         }
