@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 
 import javax.servlet.http.HttpServletRequest;
