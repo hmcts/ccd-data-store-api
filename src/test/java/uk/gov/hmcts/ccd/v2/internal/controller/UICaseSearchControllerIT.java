@@ -79,6 +79,7 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PARTIAL_PHONE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE_WITH_SPACE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_AREA_FIELD;
