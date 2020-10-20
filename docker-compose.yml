@@ -10,10 +10,10 @@ services:
     environment:
       - DATA_STORE_DB_HOST=ccd-data-store-database
       - DATA_STORE_DB_PORT=5432
-      - DATA_STORE_DB_USERNAME
-      - DATA_STORE_DB_PASSWORD
+      - DATA_STORE_DB_USERNAME=data_store
+      - DATA_STORE_DB_PASSWORD=data_store
       - DATA_STORE_IDAM_KEY
-      - DATA_STORE_TOKEN_SECRET
+      - DATA_STORE_TOKEN_SECRET=iuasbcuasdcbasdgcasdgcuysachjsacyasdgjcgasdj
       - DATA_STORE_S2S_AUTHORISED_SERVICES=ccd_gw
       - DEFINITION_STORE_HOST
       - USER_PROFILE_HOST
@@ -39,8 +39,8 @@ services:
       timeout: 10s
       retries: 10
     environment:
-      - DATA_STORE_DB_USERNAME
-      - DATA_STORE_DB_PASSWORD
+      - DATA_STORE_DB_USERNAME=data_store
+      - DATA_STORE_DB_PASSWORD=data_store
     ports:
       - 5452:5432
     volumes:
