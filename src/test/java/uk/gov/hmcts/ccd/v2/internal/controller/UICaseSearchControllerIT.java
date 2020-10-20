@@ -79,7 +79,6 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PARTIAL_PHONE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE_WITH_SPACE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_AREA_FIELD;
@@ -147,52 +146,6 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertExampleCaseData(caseDetails.getFields(), false),
             () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
         );
-    }
-
-    @Test
-    void shouldReturnAllCaseDetailsForPhoneValueWithSpace() throws Exception {
-        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
-            .query(boolQuery()
-                .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
-                .must(matchQuery(caseData(YES_OR_NO_FIELD), YES_OR_NO_VALUE)) // ES Keyword
-                .must(matchQuery(caseData(TEXT_FIELD), TEXT_VALUE)) // ES Text
-                .must(matchQuery(caseData(DATE_FIELD), DATE_VALUE)) // ES Date
-                .must(matchQuery(caseData(PHONE_FIELD), PHONE_VALUE_WITH_SPACE)) // ES Phone
-                .must(matchQuery(caseData(COUNTRY_FIELD), ElasticsearchTestHelper.COUNTRY_VALUE)) // Complex
-                .must(matchQuery(caseData(COLLECTION_FIELD) + VALUE_SUFFIX, COLLECTION_VALUE)) // Collection
-                .must(matchQuery(STATE, STATE_VALUE))) // Metadata
-            .build();
-
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-            null);
-
-        SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
-        assertAll(
-            () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-            () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
-            () -> assertExampleCaseData(caseDetails.getFields(), false),
-            () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
-        );
-    }
-
-    @Test
-    void shouldNotReturnCaseDetailsForPartialPhoneValue() throws Exception {
-        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
-            .query(boolQuery()
-                .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
-                .must(matchQuery(caseData(YES_OR_NO_FIELD), YES_OR_NO_VALUE)) // ES Keyword
-                .must(matchQuery(caseData(TEXT_FIELD), TEXT_VALUE)) // ES Text
-                .must(matchQuery(caseData(DATE_FIELD), DATE_VALUE)) // ES Date
-                .must(matchQuery(caseData(PHONE_FIELD), PARTIAL_PHONE_VALUE)) // ES Phone
-                .must(matchQuery(caseData(COUNTRY_FIELD), ElasticsearchTestHelper.COUNTRY_VALUE)) // Complex
-                .must(matchQuery(caseData(COLLECTION_FIELD) + VALUE_SUFFIX, COLLECTION_VALUE)) // Collection
-                .must(matchQuery(STATE, STATE_VALUE))) // Metadata
-            .build();
-
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-            null);
-
-        assertThat(caseSearchResultViewResource.getCases().size(),is(0));
     }
 
     @Test

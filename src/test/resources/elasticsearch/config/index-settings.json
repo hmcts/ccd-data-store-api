@@ -5,11 +5,18 @@
         "type": "custom",
         "tokenizer": "keyword",
         "filter": [
+          "custom_shingle",
           "whitespace_remove"
         ]
       }
     },
     "filter": {
+      "custom_shingle": {
+        "type": "shingle",
+        "min_shingle_size": 2,
+        "max_shingle_size": 3,
+        "output_unigrams": true
+      },
       "whitespace_remove": {
         "type": "pattern_replace",
         "pattern": " ",
