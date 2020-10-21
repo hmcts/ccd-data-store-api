@@ -37,7 +37,9 @@ public class ElasticSearchConfiguration {
                                         .readTimeout(applicationParams.getElasticSearchRequestTimeout())
                                         .gson(gson)
                                         .discoveryEnabled(applicationParams.isElasticsearchNodeDiscoveryEnabled())
-                                        .discoveryFrequency(applicationParams.getElasticsearchNodeDiscoveryFrequencyMillis(), TimeUnit.MILLISECONDS)
+                                        .discoveryFrequency(
+                                            applicationParams.getElasticsearchNodeDiscoveryFrequencyMillis(),
+                                            TimeUnit.MILLISECONDS)
                                         .discoveryFilter(applicationParams.getElasticsearchNodeDiscoveryFilter())
                                         .build());
         return factory.getObject();

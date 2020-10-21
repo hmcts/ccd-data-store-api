@@ -24,14 +24,16 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Named
 @Singleton
-@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
+@SuppressWarnings("checkstyle:SummaryJavadoc")
+// partial javadoc attributes added prior to checkstyle implementation in module
 public class CaseTypeService {
     private final CaseDataValidator caseDataValidator;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
     @Inject
     public CaseTypeService(final CaseDataValidator caseDataValidator,
-                           @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
+                           @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDataValidator = caseDataValidator;
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
@@ -56,10 +58,12 @@ public class CaseTypeService {
 
     public void validateData(final Map<String, JsonNode> data,
                              final CaseTypeDefinition caseTypeDefinition) {
-        final List<ValidationResult> dataValidationResults = caseDataValidator.validate(data, caseTypeDefinition.getCaseFieldDefinitions());
+        final List<ValidationResult> dataValidationResults =
+            caseDataValidator.validate(data, caseTypeDefinition.getCaseFieldDefinitions());
         if (!dataValidationResults.isEmpty()) {
             final List<CaseFieldValidationError> fieldErrors = dataValidationResults.stream()
-                .map(validationResult -> new CaseFieldValidationError(validationResult.getFieldId(), validationResult.getErrorMessage()))
+                .map(validationResult ->
+                    new CaseFieldValidationError(validationResult.getFieldId(), validationResult.getErrorMessage()))
                 .collect(Collectors.toList());
             throw new CaseValidationException(fieldErrors);
         }
@@ -69,7 +73,8 @@ public class CaseTypeService {
                                                          final String jurisdictionId) {
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
-        if (null == jurisdictionId || !jurisdictionId.equalsIgnoreCase(caseTypeDefinition.getJurisdictionDefinition().getId())) {
+        if (null == jurisdictionId
+            || !jurisdictionId.equalsIgnoreCase(caseTypeDefinition.getJurisdictionDefinition().getId())) {
             throw new ResourceNotFoundException(
                 String.format(
                     "Case type with id %s could not be found for jurisdiction %s",
@@ -83,7 +88,8 @@ public class CaseTypeService {
 
     public CaseTypeDefinition getCaseType(String caseTypeId) {
         return ofNullable(caseDefinitionRepository.getCaseType(caseTypeId))
-            .orElseThrow(() -> new ResourceNotFoundException(String.format("Case type with id %s could not be found", caseTypeId)));
+            .orElseThrow(() ->
+                new ResourceNotFoundException(String.format("Case type with id %s could not be found", caseTypeId)));
     }
 
     /**
@@ -93,7 +99,8 @@ public class CaseTypeService {
     @Deprecated
     @SuppressWarnings("squid:S1133")
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
-        final List<CaseTypeDefinition> caseTypeDefinitions = caseDefinitionRepository.getCaseTypesForJurisdiction(jurisdictionId);
+        final List<CaseTypeDefinition> caseTypeDefinitions =
+            caseDefinitionRepository.getCaseTypesForJurisdiction(jurisdictionId);
 
         if (null == caseTypeDefinitions
             || null == jurisdictionId) {

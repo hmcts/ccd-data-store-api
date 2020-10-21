@@ -9,6 +9,7 @@ java:
         - data-store-api-draft-key
         - ccd-data-s2s-secret
   environment:
+    AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
     DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
@@ -47,7 +48,7 @@ elasticsearch:
       - es-${SERVICE_FQDN}
 logstash:
   image:
-    repository: hmcts/ccd-logstash
+    repository: hmctspublic.azurecr.io/ccd/logstash
     tag: latest
     pullPolicy: IfNotPresent
   logstashJavaOpts: -Xmx1g -Xms512M

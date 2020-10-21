@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
@@ -141,9 +141,11 @@ class CaseDetailsEndpointTest {
         @Test
         @DisplayName("should throw Not Found exception when no case found")
         void shouldThrowExceptionWhenNoCaseFound() {
-            doReturn(Optional.empty()).when(classifiedGetCaseOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID);
+            doReturn(Optional.empty()).when(classifiedGetCaseOperation).execute(JURISDICTION_ID, CASE_TYPE_ID,
+                CASE_ID);
 
-            assertThrows(CaseNotFoundException.class, () -> endpoint.findCaseDetailsForCaseworker(UID, JURISDICTION_ID, CASE_TYPE_ID, CASE_ID));
+            assertThrows(CaseNotFoundException.class, () -> endpoint.findCaseDetailsForCaseworker(UID, JURISDICTION_ID,
+                CASE_TYPE_ID, CASE_ID));
         }
     }
 
@@ -288,9 +290,11 @@ class CaseDetailsEndpointTest {
         params.put("notExisting2", "y");
         params.put("state", "z");
         BadRequestException badRequestException =
-            assertThrows(BadRequestException.class, () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "", params));
+            assertThrows(BadRequestException.class, () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "",
+                params));
 
-        assertThat(badRequestException.getMessage(), is("unknown metadata search parameters: notExisting2,notExisting1"));
+        assertThat(badRequestException.getMessage(),
+            is("unknown metadata search parameters: notExisting2,notExisting1"));
     }
 
     @Test
@@ -299,7 +303,8 @@ class CaseDetailsEndpointTest {
 
         params.put("security_classification", "XX");
         BadRequestException badRequestException =
-            assertThrows(BadRequestException.class, () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "", params));
+            assertThrows(BadRequestException.class, () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "",
+                params));
 
         assertThat(badRequestException.getMessage(), is("unknown security classification 'XX'"));
     }
@@ -310,7 +315,8 @@ class CaseDetailsEndpointTest {
 
         params.put("sortDirection", "XX");
         BadRequestException badRequestException =
-            assertThrows(BadRequestException.class, () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "", params));
+            assertThrows(BadRequestException.class, () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "",
+                params));
 
         assertThat(badRequestException.getMessage(), is("Unknown sort direction: XX"));
     }

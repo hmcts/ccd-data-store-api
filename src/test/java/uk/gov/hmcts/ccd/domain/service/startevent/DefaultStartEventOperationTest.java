@@ -119,8 +119,10 @@ public class DefaultStartEventOperationTest {
         MockitoAnnotations.initMocks(this);
 
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
-        doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, TEST_EVENT_TRIGGER_ID);
-        doNothing().when(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, IGNORE_WARNING);
+        doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition,
+            TEST_EVENT_TRIGGER_ID);
+        doNothing().when(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition,
+            caseDetails, IGNORE_WARNING);
 
         defaultStartEventOperation = new DefaultStartEventOperation(eventTokenService,
                                                                     caseDefinitionRepository,
@@ -139,7 +141,8 @@ public class DefaultStartEventOperationTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(caseDetails).when(caseService).createNewCaseDetails(eq(TEST_CASE_TYPE_ID), eq(TEST_JURISDICTION_ID), eq(Maps.newHashMap()));
+            doReturn(caseDetails).when(caseService).createNewCaseDetails(eq(TEST_CASE_TYPE_ID),
+                eq(TEST_JURISDICTION_ID), eq(Maps.newHashMap()));
             doReturn(true).when(eventTriggerService).isPreStateEmpty(caseEventDefinition);
             doReturn(UID).when(userAuthorisation).getUserId();
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(
@@ -156,10 +159,13 @@ public class DefaultStartEventOperationTest {
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID),
                 () -> verify(eventTriggerService).findCaseEvent(caseTypeDefinition, TEST_EVENT_TRIGGER_ID),
-                () -> verify(caseService).createNewCaseDetails(eq(TEST_CASE_TYPE_ID), eq(TEST_JURISDICTION_ID), eq(Maps.newHashMap())),
+                () -> verify(caseService).createNewCaseDetails(eq(TEST_CASE_TYPE_ID), eq(TEST_JURISDICTION_ID),
+                    eq(Maps.newHashMap())),
                 () -> verify(eventTriggerService).isPreStateEmpty(caseEventDefinition),
-                () -> verify(eventTokenService).generateToken(UID, caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition),
-                () -> verify(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, IGNORE_WARNING),
+                () -> verify(eventTokenService).generateToken(UID, caseEventDefinition, caseTypeDefinition
+                    .getJurisdictionDefinition(), caseTypeDefinition),
+                () -> verify(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition,
+                    caseDetails, IGNORE_WARNING),
                 () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),
                 () -> assertThat(actual.getEventId(), is(equalTo(TEST_EVENT_TRIGGER_ID)))
@@ -172,9 +178,9 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
             final Exception exception =
-                assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID,
-                                                                                                                       TEST_EVENT_TRIGGER_ID,
-                                                                                                                       IGNORE_WARNING)
+                assertThrows(ResourceNotFoundException.class, () ->
+                    defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID, TEST_EVENT_TRIGGER_ID,
+                        IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot find case type definition for TestCaseTypeId"));
         }
@@ -183,13 +189,15 @@ public class DefaultStartEventOperationTest {
         @DisplayName("Should fail to trigger if event trigger not found")
         void shouldFailToTriggerIfEventTriggerNotFound() {
 
-            doReturn(null).when(eventTriggerService).findCaseEvent(caseTypeDefinition, TEST_EVENT_TRIGGER_ID);
+            doReturn(null).when(eventTriggerService).findCaseEvent(caseTypeDefinition,
+                TEST_EVENT_TRIGGER_ID);
 
-            Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID,
-                                                                                                                                         TEST_EVENT_TRIGGER_ID,
-                                                                                                                                         IGNORE_WARNING)
+            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+                defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID, TEST_EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
-            assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type TestCaseTypeId"));
+            assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type "
+                + "TestCaseTypeId"));
         }
 
         @Test
@@ -198,9 +206,9 @@ public class DefaultStartEventOperationTest {
 
             doReturn(false).when(eventTriggerService).isPreStateEmpty(caseEventDefinition);
 
-            Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID,
-                                                                                                                                   TEST_EVENT_TRIGGER_ID,
-                                                                                                                                   IGNORE_WARNING)
+            Exception exception = assertThrows(ValidationException.class, () ->
+                defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID, TEST_EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("The case status did not qualify for the event"));
         }
@@ -236,14 +244,19 @@ public class DefaultStartEventOperationTest {
                 () -> verify(eventTriggerService).findCaseEvent(caseTypeDefinition, TEST_EVENT_TRIGGER_ID),
                 () -> verify(draftGateway).getCaseDetails(TEST_DRAFT_ID),
                 () -> verify(eventTriggerService).isPreStateEmpty(caseEventDefinition),
-                () -> verify(eventTokenService).generateToken(UID, caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition),
+                () -> verify(eventTokenService).generateToken(UID, caseEventDefinition, caseTypeDefinition
+                    .getJurisdictionDefinition(), caseTypeDefinition),
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(eq(caseEventDefinition),
                     eq(caseTypeDefinition), any(CaseDetails.class), eq(IGNORE_WARNING)),
-                () -> assertThat(actual.getCaseDetails(), hasProperty("securityClassification", is(SecurityClassification.PRIVATE))),
+                () -> assertThat(actual.getCaseDetails(), hasProperty("securityClassification",
+                    is(SecurityClassification.PRIVATE))),
                 () -> assertThat(actual.getCaseDetails(), hasProperty("data", is(DATA))),
-                () -> assertThat(actual.getCaseDetails(), hasProperty("dataClassification", is(DATA_CLASSIFICATION))),
-                () -> assertThat(actual.getCaseDetails(), hasProperty("caseTypeId", is(TEST_CASE_TYPE_ID))),
-                () -> assertThat(actual.getCaseDetails(), hasProperty("jurisdiction", is(TEST_JURISDICTION_ID))),
+                () -> assertThat(actual.getCaseDetails(), hasProperty("dataClassification",
+                    is(DATA_CLASSIFICATION))),
+                () -> assertThat(actual.getCaseDetails(), hasProperty("caseTypeId",
+                    is(TEST_CASE_TYPE_ID))),
+                () -> assertThat(actual.getCaseDetails(), hasProperty("jurisdiction",
+                    is(TEST_JURISDICTION_ID))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),
                 () -> assertThat(actual.getEventId(), is(equalTo(TEST_EVENT_TRIGGER_ID)))
             );
@@ -255,8 +268,8 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
             final Exception exception =
-                assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
-                                                                                                                    IGNORE_WARNING)
+                assertThrows(ResourceNotFoundException.class, () ->
+                    defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID, IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot find case type definition for TestCaseTypeId"));
         }
@@ -265,11 +278,13 @@ public class DefaultStartEventOperationTest {
         @DisplayName("Should fail to trigger if event trigger not found")
         void shouldFailToTriggerIfEventTriggerNotFound() {
 
-            doReturn(null).when(eventTriggerService).findCaseEvent(caseTypeDefinition, TEST_EVENT_TRIGGER_ID);
+            doReturn(null).when(eventTriggerService).findCaseEvent(caseTypeDefinition,
+                TEST_EVENT_TRIGGER_ID);
 
-            Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
-                                                                                                                                      IGNORE_WARNING));
-            assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type TestCaseTypeId"));
+            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+                defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID, IGNORE_WARNING));
+            assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type "
+                + "TestCaseTypeId"));
         }
 
         @Test
@@ -278,8 +293,8 @@ public class DefaultStartEventOperationTest {
 
             doReturn(false).when(eventTriggerService).isPreStateEmpty(caseEventDefinition);
 
-            Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
-                                                                                                                                IGNORE_WARNING)
+            Exception exception = assertThrows(ValidationException.class, () ->
+                defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID, IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("The case status did not qualify for the event"));
         }
@@ -295,7 +310,8 @@ public class DefaultStartEventOperationTest {
             caseDetails.setState(TEST_CASE_STATE);
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
             doReturn(true).when(uidService).validateUID(TEST_CASE_REFERENCE);
-            doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(TEST_JURISDICTION_ID, TEST_CASE_TYPE_ID, TEST_CASE_REFERENCE);
+            doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(TEST_JURISDICTION_ID, TEST_CASE_TYPE_ID,
+                TEST_CASE_REFERENCE);
             doReturn(true).when(eventTriggerService).isPreStateValid(TEST_CASE_STATE, caseEventDefinition);
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(
                 UID, caseDetails, caseEventDefinition,
@@ -321,7 +337,8 @@ public class DefaultStartEventOperationTest {
                 () -> verify(eventTriggerService).isPreStateValid(TEST_CASE_STATE, caseEventDefinition),
                 () -> verify(eventTokenService).generateToken(UID, caseDetails,
                     caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition),
-                () -> verify(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, IGNORE_WARNING),
+                () -> verify(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition,
+                    caseDetails, IGNORE_WARNING),
                 () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),
                 () -> assertThat(actual.getEventId(), is(equalTo(TEST_EVENT_TRIGGER_ID)))
@@ -333,9 +350,9 @@ public class DefaultStartEventOperationTest {
         void shouldFailToTriggerIfCaseReferenceInvalid() {
             doReturn(false).when(uidService).validateUID(TEST_CASE_REFERENCE);
 
-            final Exception exception = assertThrows(BadRequestException.class, () -> defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE,
-                                                                                                                                     TEST_EVENT_TRIGGER_ID,
-                                                                                                                                     IGNORE_WARNING)
+            final Exception exception = assertThrows(BadRequestException.class, () ->
+                defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE, TEST_EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Case reference is not valid"));
         }
@@ -346,9 +363,9 @@ public class DefaultStartEventOperationTest {
             doReturn(true).when(uidService).validateUID(TEST_CASE_REFERENCE);
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(TEST_CASE_REFERENCE);
 
-            final Exception exception = assertThrows(CaseNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE,
-                                                                                                                                       TEST_EVENT_TRIGGER_ID,
-                                                                                                                                       IGNORE_WARNING)
+            final Exception exception = assertThrows(CaseNotFoundException.class, () ->
+                defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE, TEST_EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("No case found for reference: " + TEST_CASE_REFERENCE));
         }
@@ -359,9 +376,9 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
             final Exception exception =
-                assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE,
-                                                                                                                   TEST_EVENT_TRIGGER_ID,
-                                                                                                                   IGNORE_WARNING)
+                assertThrows(ResourceNotFoundException.class, () ->
+                    defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE, TEST_EVENT_TRIGGER_ID,
+                        IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot find case type definition for TestCaseTypeId"));
         }
@@ -369,13 +386,15 @@ public class DefaultStartEventOperationTest {
         @Test
         @DisplayName("Should fail to trigger if event trigger not found")
         void shouldFailToTriggerIfEventTriggerNotFound() {
-            doReturn(null).when(eventTriggerService).findCaseEvent(caseTypeDefinition, TEST_EVENT_TRIGGER_ID);
+            doReturn(null).when(eventTriggerService).findCaseEvent(caseTypeDefinition,
+                TEST_EVENT_TRIGGER_ID);
 
-            Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE,
-                                                                                                                                     TEST_EVENT_TRIGGER_ID,
-                                                                                                                                     IGNORE_WARNING)
+            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+                defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE, TEST_EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
-            assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type TestCaseTypeId"));
+            assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type "
+                + "TestCaseTypeId"));
         }
 
         @Test
@@ -383,9 +402,9 @@ public class DefaultStartEventOperationTest {
         void shouldFailToTriggerIfInvalidCaseReference() {
             doReturn(false).when(uidService).validateUID(TEST_CASE_REFERENCE);
 
-            Exception exception = assertThrows(BadRequestException.class, () -> defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE,
-                                                                                                                               TEST_EVENT_TRIGGER_ID,
-                                                                                                                               IGNORE_WARNING)
+            Exception exception = assertThrows(BadRequestException.class, () ->
+                defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE, TEST_EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Case reference is not valid"));
         }
@@ -395,9 +414,9 @@ public class DefaultStartEventOperationTest {
         void shouldFailToTriggerIfNoCaseFound() {
             doReturn(false).when(uidService).validateUID(TEST_CASE_REFERENCE);
 
-            Exception exception = assertThrows(BadRequestException.class, () -> defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE,
-                                                                                                                               TEST_EVENT_TRIGGER_ID,
-                                                                                                                               IGNORE_WARNING)
+            Exception exception = assertThrows(BadRequestException.class, () ->
+                defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE, TEST_EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Case reference is not valid"));
         }
@@ -407,9 +426,9 @@ public class DefaultStartEventOperationTest {
         void shouldFailToTriggerIfInvalidEventTrigger() {
             doReturn(false).when(eventTriggerService).isPreStateValid(TEST_CASE_STATE, caseEventDefinition);
 
-            Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE,
-                                                                                                                               TEST_EVENT_TRIGGER_ID,
-                                                                                                                               IGNORE_WARNING)
+            Exception exception = assertThrows(ValidationException.class, () ->
+                defaultStartEventOperation.triggerStartForCase(TEST_CASE_REFERENCE, TEST_EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("The case status did not qualify for the event"));
         }

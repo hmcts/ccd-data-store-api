@@ -46,7 +46,8 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedC
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 @RestController
-@RequestMapping(path = "/internal/searchCases", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/internal/searchCases", consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = {"Elastic Based Search API"})
 @SwaggerDefinition(tags = {
     @Tag(name = "Elastic Based Search API", description = "Internal ElasticSearch based case search API, "
@@ -61,6 +62,8 @@ public class UICaseSearchController {
     private final ElasticsearchSortService elasticsearchSortService;
 
     @Autowired
+    @SuppressWarnings("checkstyle:LineLength") //don't want to break message
+
     public UICaseSearchController(
         @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
         ElasticsearchQueryHelper elasticsearchQueryHelper,
@@ -74,7 +77,8 @@ public class UICaseSearchController {
 
     @PostMapping(path = "")
     @ApiOperation(
-        value = "Search cases according to the provided ElasticSearch query. Supports searching a single case type and a use case."
+        value = "Search cases according to the provided ElasticSearch query. Supports searching a single case type and"
+            + " a use case."
     )
     @ApiResponses({
         @ApiResponse(
@@ -90,7 +94,8 @@ public class UICaseSearchController {
                       + "- No case type query parameter `ctid` provided.\n"
                       + "- Query is missing required `query` field.\n"
                       + "- Query includes blacklisted type.\n"
-                      + "- Query has failed in ElasticSearch - for example, a sort is attempted on an unknown/unmapped field."
+                      + "- Query has failed in ElasticSearch - for example, a sort is attempted on an unknown/unmapped field.\n"
+                      + "- Query includes supplementary_data which is NOT an array of text values.\n"
         ),
         @ApiResponse(
             code = 401,
@@ -109,25 +114,29 @@ public class UICaseSearchController {
         ),
         @ApiResponse(
             code = 500,
-            message = "An unexpected situation that is not attributable to the user or API Client; or request is invalid. "
-                      + "For some other types HTTP code 400 is returned instead.\n"
+            message = "An unexpected situation that is not attributable to the user or API Client; "
+                      + "or request is invalid. For some other types HTTP code 400 is returned instead.\n"
                       + "Invalid request examples include:\n"
                       + "- Malformed JSON request."
         )
     })
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break message
     @ApiImplicitParams(
         @ApiImplicitParam(
             name = "jsonSearchRequest",
-            value = "Native ElasticSearch Search API request as a JSON string. "
+            value = "A wrapped native ElasticSearch Search API request as a JSON string. "
                     + "Please refer to the following for further information:\n"
                     + "- [Official ElasticSearch Documentation - Search APIs]"
                     + "(https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)\n"
                     + "- [Official ElasticSearch Documentation - Query DSL]"
                     + "(https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)\n"
                     + "- [CCD ElasticSearch API LLD]"
-                    + "(https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=843514186)",
-            example = "{\n\t\"query\": { \n\t\t\"match_all\": {} \n\t},\n\t\"sort\": [\n\t\t{ \"reference.keyword\": \"asc\" }\n\t],"
-                      + "\n\t\"size\": 20,\n\t\"from\": 1\n}",
+                    + "(https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=843514186)\n\n"
+                    + "Note that for backward compatibility this API also supports unwrapped native ElasticSearch requests "
+                    + "(i.e. requests consisting of a native query instead of being wrapped in a `native_es_query` object).",
+            example = "{\n\t\"native_es_query\": {\n\t\t\"query\": { \n\t\t\t\"match_all\": {} \n\t\t},\n\t\t\"sort\": "
+                    + "[\n\t\t\t{ \"reference.keyword\": \"asc\" }\n\t\t],\n\t\t\"size\": 20,\n\t\t\"from\": 1\n\t},"
+                    + "\n\t\"supplementary_data\": [\n\t\t\"orgs_assigned_users\"\n\t]\n}",
             required = true
         )
     )
@@ -136,17 +145,22 @@ public class UICaseSearchController {
     public ResponseEntity<CaseSearchResultViewResource> searchCases(
                                      @ApiParam(value = "Case type ID for search.", required = true)
                                      @RequestParam(value = "ctid") String caseTypeId,
-                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` or `orgCases`. "
-                                         + "Used when the list of fields to return is configured in the CCD definition.\n"
-                                         + "If omitted, all case fields are returned.")
+                                     @ApiParam(value = "Use case for search. Examples include `WORKBASKET`, `SEARCH` "
+                                         + "or `orgCases`. Used when the list of fields to return is configured in the "
+                                         + "CCD definition.\nIf omitted, all case fields are returned.")
                                      @RequestParam(value = "use_case", required = false) final String useCase,
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
-        String useCaseUppercase = Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields() ? null : useCase.toUpperCase();
+        String useCaseUppercase =
+            Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields() ? null : useCase.toUpperCase();
         elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCaseUppercase);
         List<String> requestedFields = searchRequest.getRequestedFields();
+
+        if (useCaseUppercase == null && !searchRequest.hasRequestedSupplementaryData()) {
+            searchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
+        }
 
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(Collections.singletonList(caseTypeId))

@@ -36,20 +36,23 @@ public class NumberValidator implements BaseTypeValidator {
                 numberValue = dataValue.decimalValue();
             } else if (null == value) {
                 // dataValue may be a boolean, array or pojo node
-                return Collections.singletonList(new ValidationResult(dataValue + " is not a number", dataFieldId));
+                return Collections.singletonList(new ValidationResult(dataValue + " is not a number",
+                    dataFieldId));
             } else {
                 numberValue = new BigDecimal(value);
             }
             LOG.info("Number field text value {} & number value {}", value, numberValue);
             if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), numberValue)) {
                 return Collections.singletonList(
-                    new ValidationResult("Should be less than or equal to " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
+                    new ValidationResult("Should be less than or equal to " + caseFieldDefinition
+                        .getFieldTypeDefinition().getMax(), dataFieldId)
                 );
             }
 
             if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), numberValue)) {
                 return Collections.singletonList(
-                    new ValidationResult("Should be more than or equal to " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId)
+                    new ValidationResult("Should be more than or equal to " + caseFieldDefinition
+                        .getFieldTypeDefinition().getMin(), dataFieldId)
                 );
             }
 

@@ -68,6 +68,11 @@ class CaseDetailsUtil extends CaseDetails {
             return this;
         }
 
+        public CaseDetailsBuilder withSupplementaryData(Map<String, JsonNode> supplementaryData) {
+            caseDetails.setSupplementaryData(supplementaryData);
+            return this;
+        }
+
         public CaseDetails build() {
             return caseDetails;
         }

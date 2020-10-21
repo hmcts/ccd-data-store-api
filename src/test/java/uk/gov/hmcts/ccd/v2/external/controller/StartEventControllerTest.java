@@ -61,8 +61,10 @@ class StartEventControllerTest {
         startEventResult.setToken(TOKEN);
         startEventResult.setEventId(EVENT_TRIGGER_ID);
 
-        when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(startEventResult);
-        when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(startEventResult);
+        when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING))
+            .thenReturn(startEventResult);
+        when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING))
+            .thenReturn(startEventResult);
         when(caseReferenceService.validateUID(CASE_ID)).thenReturn(true);
     }
 
@@ -73,7 +75,8 @@ class StartEventControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<StartEventResource> response = startEventController.getStartCaseEvent(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<StartEventResource> response =
+                startEventController.getStartCaseEvent(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -86,9 +89,11 @@ class StartEventControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
+            when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING))
+                .thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> startEventController.getStartCaseEvent(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () ->
+                startEventController.getStartCaseEvent(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
 
@@ -102,7 +107,8 @@ class StartEventControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<StartEventResource> response = startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<StartEventResource> response =
+                startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -115,9 +121,11 @@ class StartEventControllerTest {
         @Test
         @DisplayName("should propagate exception from downstream operation")
         void shouldPropagateExceptionFromOperationWhenThrown() {
-            when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
+            when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING))
+                .thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () ->
+                startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
         @Test
@@ -125,7 +133,8 @@ class StartEventControllerTest {
         void shouldFailWithBadRequestException() {
             when(caseReferenceService.validateUID(CASE_ID)).thenReturn(false);
 
-            assertThrows(BadRequestException.class, () -> startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(BadRequestException.class, () ->
+                startEventController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
     }
 }
