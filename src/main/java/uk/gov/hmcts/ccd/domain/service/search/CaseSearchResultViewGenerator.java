@@ -97,6 +97,7 @@ public class CaseSearchResultViewGenerator {
 
         List<SearchResultViewItem> items = new ArrayList<>();
         caseSearchResult.getCases().forEach(caseDetails -> {
+
             filterUnauthorisedFieldsByUseCaseAndUserRole(useCase, caseDetails, caseTypeDefinition, requestedFields);
             items.add(buildSearchResultViewItem(caseDetails, searchResultDefinition));
         });
@@ -191,6 +192,7 @@ public class CaseSearchResultViewGenerator {
             ? commonField.getDisplayContextParameter()
             : searchResultField.getDisplayContextParameter();
     }
+
 
     private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseDetails,
                                                            SearchResultDefinition searchResult) {
