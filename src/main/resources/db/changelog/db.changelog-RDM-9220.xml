@@ -1,0 +1,41 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-9220" runInTransaction="false" author="suman.sreenivasan@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS case_field_field_type_id_id_idx ON public.case_field USING btree (field_type_id, id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS case_field_field_type_id_idx ON public.case_field USING btree (field_type_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS case_type_jurisdiction_id_version_reference_idx ON public.case_type USING btree (jurisdiction_id, version, reference);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS case_type_reference_idx ON public.case_type USING btree (reference);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS complex_field_complex_field_type_id_field_type_id_idx ON public.complex_field USING btree (complex_field_type_id, field_type_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS event_case_type_id_idx ON public.event USING btree (case_type_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS event_post_state_id_idx ON public.event USING btree (post_state_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS event_case_field_case_field_id_event_id_idx ON public.event_case_field USING btree (case_field_id, event_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS event_case_field_case_field_id_idx ON public.event_case_field USING btree (case_field_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS event_case_field_event_id_idx ON public.event_case_field USING btree (event_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS event_pre_state_state_id_event_id_idx ON public.event_pre_state USING btree (state_id, event_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS field_type_id_base_field_type_id_collection_field_type_id_idx ON public.field_type USING btree (id, base_field_type_id, collection_field_type_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS field_type_list_item_field_type_id_idx ON public.field_type_list_item USING btree (field_type_id);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS jurisdiction_id_reference_idx ON public.jurisdiction USING btree (id, reference);
+            DROP INDEX IF EXISTS event_case_field_case_field_id_idx;
+            DROP INDEX IF EXISTS case_field_field_type_id_idx;
+            DROP INDEX IF EXISTS case_field_id_field_type_id_idx;
+            DROP INDEX IF EXISTS event_case_type_id_idx;
+            DROP INDEX IF EXISTS event_case_field_case_field_id_event_id_idx;
+            DROP INDEX IF EXISTS case_field_id_field_type_id_idx1;
+            DROP INDEX IF EXISTS complex_field_complex_field_type_id_field_type_id_idx;
+            DROP INDEX IF EXISTS field_type_list_item_field_type_id_idx;
+            DROP INDEX IF EXISTS event_case_field_case_field_id_event_id_idx1;
+            DROP INDEX IF EXISTS case_field_id_field_type_id_idx2;
+            DROP INDEX IF EXISTS event_pre_state_state_id_event_id_idx;
+            DROP INDEX IF EXISTS jurisdiction_id_reference_idx;
+            DROP INDEX IF EXISTS idx_event_case_field__case_field_id__event_id;
+            DROP INDEX IF EXISTS idx_complex_field__id__complex_field_type_id__field_type_id;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
