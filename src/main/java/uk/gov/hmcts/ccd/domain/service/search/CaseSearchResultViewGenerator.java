@@ -77,7 +77,8 @@ public class CaseSearchResultViewGenerator {
     }
 
     public CaseDetails filterUnauthorisedFieldsByUseCaseAndUserRole(String useCase, CaseDetails caseDetails,
-                                                                    CaseTypeDefinition caseTypeDefinition, List<String> requestedFields) {
+                                                                    CaseTypeDefinition caseTypeDefinition,
+                                                                    List<String> requestedFields) {
         caseDetails.getData().entrySet().removeIf(
             caseField -> !caseSearchesViewAccessControl.filterResultsBySearchResultsDefinition(
                 useCase, caseTypeDefinition, requestedFields, caseField.getKey()));
@@ -192,7 +193,6 @@ public class CaseSearchResultViewGenerator {
             ? commonField.getDisplayContextParameter()
             : searchResultField.getDisplayContextParameter();
     }
-
 
     private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseDetails,
                                                            SearchResultDefinition searchResult) {
