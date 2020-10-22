@@ -187,7 +187,8 @@ class CaseSearchesViewAccessControlTest {
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
         List<String> requestedFields = new ArrayList<>();
 
-        assertTrue(classUnderTest.filterResultsBySearchResultsDefinition("ORGCASES", caseTypeDefinition1, requestedFields, CASE_FIELD_1));
+        assertTrue(classUnderTest
+            .filterResultsBySearchResultsDefinition("ORGCASES", caseTypeDefinition1, requestedFields, CASE_FIELD_1));
     }
 
     @Test
@@ -218,7 +219,8 @@ class CaseSearchesViewAccessControlTest {
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
         List<String> requestedFields = new ArrayList<>();
 
-        assertTrue(classUnderTest.filterResultsBySearchResultsDefinition(null, caseTypeDefinition1, requestedFields, CASE_FIELD_1));
+        assertTrue(classUnderTest
+            .filterResultsBySearchResultsDefinition(null, caseTypeDefinition1, requestedFields, CASE_FIELD_1));
     }
 
     @Test
@@ -250,7 +252,8 @@ class CaseSearchesViewAccessControlTest {
         List<String> requestedFields = new ArrayList<>();
 
 
-        assertFalse(classUnderTest.filterResultsBySearchResultsDefinition("ORGCASES", caseTypeDefinition1, requestedFields, CASE_FIELD_2));
+        assertFalse(classUnderTest
+            .filterResultsBySearchResultsDefinition("ORGCASES", caseTypeDefinition1, requestedFields, CASE_FIELD_2));
     }
 
     @Test
