@@ -49,8 +49,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
     @Autowired
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
-                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                      @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                          final CaseDefinitionRepository caseDefinitionRepository,
+                                      @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                          final CaseDetailsRepository caseDetailsRepository,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                       final EventTriggerService eventTriggerService,
                                       final CaseService caseService,
@@ -83,17 +85,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
         CaseDetails newCaseDetails = caseService
             .createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), data);
         return buildStartEventTrigger(uid,
-<<<<<<< HEAD
-            caseTypeDefinition,
-            eventId,
-            ignoreWarning,
-            (() -> caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), Maps.newHashMap())));
-=======
                                       caseTypeDefinition,
                                       eventId,
                                       ignoreWarning,
                                       newCaseDetails);
->>>>>>> 6c9457483... RDM-9868 Always populate defaultValue in event triggers
     }
 
     @Override
@@ -111,8 +106,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition));
 
-        Map<String, JsonNode> defaultValueData = caseService
-            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
+        Map<String, JsonNode> defaultValueData = caseEventDefinition.buildJsonNodeFromCaseFieldsWithDefaultValue();
         JacksonUtils.merge(defaultValueData, caseDetails.getData());
 
         final String eventToken = eventTokenService.generateToken(uid,
@@ -151,14 +145,15 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                     final CaseDetails caseDetails) {
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        Map<String, JsonNode> defaultValueData = caseService
-            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
+        Map<String, JsonNode> defaultValueData = caseEventDefinition.buildJsonNodeFromCaseFieldsWithDefaultValue();
         JacksonUtils.merge(defaultValueData, caseDetails.getData());
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(caseEventDefinition));
 
-        // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the relevant draft payload
-        final String eventToken = eventTokenService.generateToken(uid, caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
+        // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the
+        //  relevant draft payload
+        final String eventToken = eventTokenService.generateToken(uid, caseEventDefinition,
+            caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
 
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
@@ -185,7 +180,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private CaseEventDefinition getCaseEventDefinition(String eventId, CaseTypeDefinition caseTypeDefinition) {
         final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
         if (caseEventDefinition == null) {
-            throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());
+            throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition
+                .getId());
         }
         return caseEventDefinition;
     }
