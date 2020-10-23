@@ -47,16 +47,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private JwtAuthenticationConverter jwtAuthenticationConverter;
 
     private static final String[] AUTH_WHITELIST = {
-        "/swagger-ui.html",
-        "/webjars/springfox-swagger-ui/**",
-        "/swagger-resources/**",
         "/v2/**",
-        "/health",
         "/health/liveness",
         "/health/readiness",
-        "/status/health",
+        "/health",
         "/loggers/**",
-        "/"
+        "/",
+        "/swagger-resources/**",
+        "/swagger-ui/**",
+        "/webjars/**"
     };
 
     @Inject
