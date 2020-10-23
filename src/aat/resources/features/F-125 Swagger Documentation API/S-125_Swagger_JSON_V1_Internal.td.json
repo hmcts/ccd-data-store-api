@@ -1,17 +1,17 @@
 {
-  "_guid_": "S-125-Swagger-JSON-V1-Internal",
-  "title": "Must return a positive appropriate response when Swagger JSON V1 is accessed",
-  "_extends_": "F-125-Swagger_JSON",
+  "_guid_": "S-125_Swagger_JSON_V1_Internal",
+  "title": "Must return a positive appropriate response when Swagger JSON Internal V1 URL is accessed",
+  "_extends_": "F-125_Swagger_JSON",
 
   "specs": [
     "to observe the swagger json content"
   ],
 
-"request" :{
-  "pathVariables" : {
-    "ccd-data-store-api-version": "ccd-data-store-api.v1_internal.json"
-  }
-},
+  "request" :{
+    "pathVariables" : {
+      "ccd-data-store-api-version": "ccd-data-store-api.v1_internal.json"
+    }
+  },
 
 
   "expectedResponse": {
@@ -34,4 +34,4 @@
       }
     }
   }
- }
+}
