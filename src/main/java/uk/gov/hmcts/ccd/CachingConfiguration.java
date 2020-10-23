@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MaxSizeConfig;
+import com.hazelcast.config.EvictionConfig;
+import com.hazelcast.config.MaxSizePolicy;
 import com.hazelcast.config.NetworkConfig;
 
 @Configuration
@@ -55,10 +56,12 @@ public class CachingConfiguration {
     }
 
     private MapConfig newMapConfig(final String name) {
+        EvictionConfig evictionConfig = new EvictionConfig()
+                .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
+                .setMaxSizePolicy(MaxSizePolicy.PER_NODE)
+                .setSize(applicationParams.getDefinitionCacheMaxSize());
         MapConfig mapConfig = new MapConfig().setName(name)
-                .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(),
-                                                    MaxSizeConfig.MaxSizePolicy.PER_NODE))
-                .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy());
+                .setEvictionConfig(evictionConfig);
         return mapConfig;
     }
 
