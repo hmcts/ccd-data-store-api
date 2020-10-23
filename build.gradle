@@ -232,7 +232,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.16.0-RDM-7484.2'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.17.0.rdm.7484.1'
 
 
 }
