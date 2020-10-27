@@ -12,4 +12,12 @@
     <cve>CVE-2007-1652</cve>  <!-- new, temporary -->
   </suppress>
 
+  <suppress>
+    <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.37.jar
+   HTTP V2 protocol is not used in this project
+   ]]></notes>
+    <cve>CVE-2020-13943</cve>
+  </suppress>
+
 </suppressions>
