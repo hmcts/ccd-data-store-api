@@ -1,0 +1,68 @@
+{
+  "title": "should create a case with organisation policy",
+	"_guid_": "F-107_Test_Data_Base",
+	"productName": "CCD Data Store",
+	"operationName": "Submit Case Creation as Caseworker",
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+  "specs": [
+    "to create a full case"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.caa@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+	"user": {
+		"username": "befta.caseworker.caa@gmail.com",
+		"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_MasterCaseType"
+		},
+		"body": {
+			"data": {
+        "TextField": "textField1",
+        "TextAreaField": "textAreaField1",
+        "AddressField": {
+          "AddressLine1": "102 Petty France",
+          "AddressLine2": "CCD",
+          "AddressLine3": "c/o HMCTS Reform",
+          "Country": "UK"
+        },
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID2",
+            "OrganisationName": "orgName2"
+          }
+        }
+			},
+			"event": {
+				"id": "createCase",
+				"summary": "",
+				"description": ""
+			},
+			"event_token": "${[scenarioContext][childContexts][F-107_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
+			"ignore_warning": false,
+			"draft_id": null
+		}
+	}
+}

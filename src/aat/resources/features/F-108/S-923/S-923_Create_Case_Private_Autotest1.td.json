@@ -1,0 +1,12 @@
+{
+	"_guid_": "S-923_Create_Case_Private_Autotest1",
+	"_extends_": "Private_Case_Creation_Autotest1_Data",
+	"request": {
+		"body": {
+			"event_token": "${[scenarioContext][parentContext][childContexts][S-923_Create_Case_Private_Autotest1_Token_Creation][testData][actualResponse][body][token]}",
+			"data": {
+				"TextAreaField": "asdfghjkl"
+			}
+		}
+	}
+}

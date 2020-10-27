@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment",
+  "_extends_": "F-111_Case_Data_Create_C1",
+
+  "specs": [
+    "by Richard to create a case - C1"
+  ],
+
+  "prerequisites": [
+    "F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment_Token_Creation"
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

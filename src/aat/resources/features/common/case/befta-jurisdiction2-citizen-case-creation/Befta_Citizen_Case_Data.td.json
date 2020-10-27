@@ -1,38 +1,38 @@
 {
-  "_guid_": "Befta_Citizen_Case_Data",
+	"_guid_": "Befta_Citizen_Case_Data",
 
-  "MoneyGBPField": "111100",
-  "FixedListField": "VALUE3",
-  "AddressUKField": {
-    "AddressLine1": null,
-    "AddressLine2": null,
-    "AddressLine3": null,
-    "PostTown": null,
-    "County": null,
-    "PostCode": null,
-    "Country": null
-  },
-  "ComplexField": {
-    "ComplexTextField": null,
-    "ComplexFixedListField": null,
-    "ComplexNestedField": {
-      "NestedNumberField": null,
-      "NestedCollectionTextField": []
-    }
-  },
-  "FixedRadioListField": "RADIOVALUE2",
-  "DateTimeField": null,
-  "PhoneUKField": null,
-  "NumberField": "111111222222",
-  "MultiSelectListField": [
-    "OPTION5",
-    "OPTION4",
-    "OPTION3"
-  ],
-  "YesOrNoField": "Yes",
-  "EmailField": "testemail@gmail.com",
-  "TextField": "sometextfield",
-  "DateField": "2222-01-02",
-  "TextAreaField": "textarea",
-  "CollectionField": []
+	"MoneyGBPField": "111100",
+	"FixedListField": "VALUE3",
+	"AddressUKField": {
+		"AddressLine1": null,
+		"AddressLine2": null,
+		"AddressLine3": null,
+		"PostTown": null,
+		"County": null,
+		"PostCode": null,
+		"Country": null
+	},
+	"ComplexField": {
+		"ComplexTextField": null,
+		"ComplexFixedListField": null,
+		"ComplexNestedField": {
+			"NestedNumberField": null,
+			"NestedCollectionTextField": []
+		}
+	},
+	"FixedRadioListField": "RADIOVALUE2",
+	"DateTimeField": null,
+	"PhoneUKField": null,
+	"NumberField": "111111222222",
+	"MultiSelectListField": [
+		"OPTION5",
+		"OPTION4",
+		"OPTION3"
+	],
+	"YesOrNoField": "Yes",
+	"EmailField": "testemail@gmail.com",
+	"TextField": "sometextfield",
+	"DateField": "2222-01-02",
+	"TextAreaField": "textarea",
+	"CollectionField": []
 }

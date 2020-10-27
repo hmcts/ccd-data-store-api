@@ -421,6 +421,193 @@ class CaseAccessOperationTest {
     }
 
     @Nested()
+    @DisplayName("removeCaseUserRoles(caseUserRoles)")
+    class RemoveCaseAssignUserRoles {
+
+        @BeforeEach
+        void setUp() {
+            configureCaseRepository(null);
+        }
+
+        @Test
+        @DisplayName("should remove single case user role")
+        void shouldRemoveSingleCaseUserRole() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(caseUserRepository, times(1)).revokeAccess(CASE_ID, USER_ID, CASE_ROLE);
+        }
+
+        @Test
+        @DisplayName("should remove multiple case user roles")
+        void shouldRemoveMultipleCaseUserRoles() {
+            // ARRANGE
+            final CaseDetails caseDetailsOther = new CaseDetails();
+            caseDetailsOther.setId(String.valueOf(CASE_ID_OTHER));
+            caseDetailsOther.setReference(CASE_REFERENCE_OTHER);
+            doReturn(Optional.of(caseDetailsOther)).when(caseDetailsRepository).findByReference(null, CASE_REFERENCE_OTHER);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
+            );
+
+            // for an existing relation and then after removal
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID) && arg.contains(CASE_ID_OTHER)),
+                argThat(arg -> arg.contains(USER_ID))
+            )).thenReturn(List.of(createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID),
+                createCaseUserEntity(CASE_ID_OTHER, CASE_ROLE, USER_ID)));
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(caseUserRepository, times(1)).revokeAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(caseUserRepository, times(1)).revokeAccess(CASE_ID_OTHER, USER_ID, CASE_ROLE);
+        }
+
+        @Test
+        @DisplayName("should throw not found exception when case not found")
+        void shouldThrowNotFound() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_NOT_FOUND.toString(), USER_ID, CASE_ROLE)
+            );
+
+            // ACT / ASSERT
+            assertThrows(CaseNotFoundException.class, () -> caseAccessOperation.removeCaseUserRoles(caseUserRoles));
+        }
+
+        @Test
+        @DisplayName("should decrement organisation user count for single new case-user relationship")
+        void shouldDecrementOrganisationUserCountForSingleNewRelationship() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+            // for an existing relation and then after removal
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID)),
+                argThat(arg -> arg.contains(USER_ID))
+            )).thenReturn(List.of(createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID)))
+            .thenReturn(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
+        }
+
+        @Test
+        @DisplayName("should not decrement organisation user count for non-existing case-user relationship")
+        void shouldNotDecrementOrganisationUserCountForExistingRelationship() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+            // no existing relationship
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID)),
+                argThat(arg -> arg.contains(USER_ID))
+            )).thenReturn(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
+        }
+
+        @Test
+        @DisplayName("should decrement organisation user count only once for repeat remove case-user relationship")
+        void shouldDecrementOrganisationUserCountOnlyOnceForRepeatRelationship() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+
+            // for an existing relation and then after removal
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID)),
+                argThat(arg -> arg.contains(USER_ID))
+            )).thenReturn(List.of(createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID)))
+                .thenReturn(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
+        }
+
+        @Test
+        @DisplayName("should not decrement organisation user count for an existing relationship with another role")
+        void shouldNotDecrementOrganisationUserCountForAnExistingRelationshipWithOtherRole() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+
+            // for an existing relation and then after removal
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID)),
+                argThat(arg -> arg.contains(USER_ID))
+            )).thenReturn(List.of(createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID), createCaseUserEntity(CASE_ID, CASE_ROLE_OTHER, USER_ID)))
+                .thenReturn(List.of(createCaseUserEntity(CASE_ID, CASE_ROLE_OTHER, USER_ID)));
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
+        }
+
+        @Test
+        @DisplayName("should decrement organisation user count for multiple case-user relationship")
+        void shouldDecrementOrganisationUserCountForMultipleRelationships() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                // CASE_REFERENCE/CASE_ID
+                // (2 orgs with 2 users with 2 roles >> 2 org counts decremented by 1)
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER, ORGANISATION_OTHER)
+
+            );
+            // for an existing relation and then after removal
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID)),
+                argThat(arg -> arg.contains(USER_ID) && arg.contains(USER_ID_OTHER))
+            )).thenReturn(List.of(
+                createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID), createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID_OTHER),
+                createCaseUserEntity(CASE_ID, CASE_ROLE_OTHER, USER_ID), createCaseUserEntity(CASE_ID, CASE_ROLE_OTHER, USER_ID_OTHER)
+            ))
+                .thenReturn(List.of(createCaseUserEntity(CASE_ID, CASE_ROLE_OTHER, USER_ID_OTHER)));
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            // verify CASE_REFERENCE/CASE_ID
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION_OTHER), -1L);
+        }
+    }
+
+    @Nested()
     @DisplayName("findCaseUserRoles(caseReferences, userIds)")
     class GetCaseAssignUserRoles {
 

@@ -140,7 +140,7 @@ public class CreateCaseEventService {
         final Optional<String>
             newState = aboutToSubmitCallbackResponse.getState();
 
-        validateCaseFieldsOperation.validateData(caseDetails.getData(), caseTypeDefinition);
+        validateCaseFieldsOperation.validateData(caseDetails.getData(), caseTypeDefinition, content);
         LocalDateTime timeNow = now();
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, caseEventDefinition, newState, timeNow);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), caseEventDefinition, savedCaseDetails, caseTypeDefinition, timeNow);

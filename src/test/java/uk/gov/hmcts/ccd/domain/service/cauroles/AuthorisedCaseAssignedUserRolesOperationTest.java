@@ -80,6 +80,18 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
         );
     }
 
+    @Test
+    void shouldCallDefaultremoveCaseUserRoles() {
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRolesRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(),
+                new CaseAssignedUserRoleWithOrganisation()
+        );
+
+        authorisedCaseAssignedUserRolesOperation.removeCaseUserRoles(caseUserRolesRequests);
+
+        verify(defaultCaseAssignedUserRolesOperation).removeCaseUserRoles(caseUserRolesRequests);
+    }
+
     private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {
         List<CaseAssignedUserRole> caseAssignedUserRoles = Lists.newArrayList();
 
