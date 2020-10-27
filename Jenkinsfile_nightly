@@ -89,10 +89,6 @@ withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableDbMigration('ccd')
     disableLegacyDeployment()
-    
-    if (params.ENVIRONMENT == 'aat') {
-        enableSecurityScan()
-    }
 
     after('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
@@ -104,15 +100,8 @@ withNightlyPipeline(type, product, component) {
     enableFullFunctionalTest(200)
     
     after('fullFunctionalTest') {
-steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
     }
 
-    //after('functionalTest:preview') {
-    //  steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
-   // }
-
-    //after('functionalTest:aat') {
-      //  steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
-    //}
     enableSlackNotifications('#ccd-nightly-builds')
 }
