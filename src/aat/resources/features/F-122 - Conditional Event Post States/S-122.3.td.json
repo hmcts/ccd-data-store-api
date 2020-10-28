@@ -1,7 +1,7 @@
 {
-	"_guid_": "S-122.1",
+	"_guid_": "S-122.3",
   "_extends_": "F-122-UpdateEventBase",
-  "title": "Defaults the state when none of post state conditions resolves using AND operator (End state: CaseDeleted)",
+  "title": "EmailField=\"*\" operator should not match when field is not defined (End state: CaseDeleted)",
 
   "productName": "CCD data store",
   "operationName": "submit updateCase event with TextField and EmailField values",
@@ -14,8 +14,8 @@
     "body": {
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "non-matching text",
-        "EmailField": "test@test.com"
+        "TextField": "amended",
+        "EmailField": null
       },
       "event": {
         "id": "updateCase",
@@ -32,8 +32,8 @@
       "state": "CaseDeleted",
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "non-matching text",
-        "EmailField": "test@test.com"
+        "TextField": "amended",
+        "EmailField": null
       }
     }
   }

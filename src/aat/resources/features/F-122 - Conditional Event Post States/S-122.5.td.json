@@ -1,21 +1,21 @@
 {
-	"_guid_": "S-122.2",
+	"_guid_": "S-122.5",
   "_extends_": "F-122-UpdateEventBase",
-  "title": "Sets the state defined with a matching post state condition using AND operator (End state: CaseAmended)",
+  "title": "Sets the state defined with a matching post state condition using OR operator (End state: CaseAmended2)",
 
   "productName": "CCD data store",
-  "operationName": "submit updateCase event with TextField and EmailField values",
+  "operationName": "submit updateCase2 event with TextField and EmailField values",
 
   "specs": [
-    "contains state: CaseAmended, updated values for TextField, EmailField along with an HTTP-201 Created"
+    "contains state: CaseAmended2, updated values for TextField, EmailField along with an HTTP-201 Created"
   ],
 
   "request": {
     "body": {
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "amended",
-        "EmailField": "test@test.com"
+        "TextField": "amended2",
+        "EmailField": "anything@test.com"
       },
       "event": {
         "id": "updateCase",
@@ -29,11 +29,11 @@
     "responseCode": 201,
     "responseMessage": "OK",
     "body": {
-      "state": "CaseAmended",
+      "state": "CaseAmended2",
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "amended",
-        "EmailField": "test@test.com"
+        "TextField": "amended2",
+        "EmailField": "anything@test.com"
       }
     }
   }

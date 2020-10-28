@@ -1,13 +1,13 @@
 {
-	"_guid_": "S-122.1",
+	"_guid_": "S-122.7",
   "_extends_": "F-122-UpdateEventBase",
-  "title": "Defaults the state when none of post state conditions resolves using AND operator (End state: CaseDeleted)",
+  "title": "Sets the state defined with a matching post state condition using != operator (End state: CaseRevoked2)",
 
   "productName": "CCD data store",
-  "operationName": "submit updateCase event with TextField and EmailField values",
+  "operationName": "submit updateCase2 event with TextField and EmailField values",
 
   "specs": [
-    "contains state: CaseDeleted, updated values for TextField, EmailField along with an HTTP-201 Created"
+    "contains state: CaseRevoked2, updated values for TextField, EmailField along with an HTTP-201 Created"
   ],
 
   "request": {
@@ -15,7 +15,7 @@
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
         "TextField": "non-matching text",
-        "EmailField": "test@test.com"
+        "EmailField": "anything@test.com"
       },
       "event": {
         "id": "updateCase",
@@ -29,11 +29,11 @@
     "responseCode": 201,
     "responseMessage": "OK",
     "body": {
-      "state": "CaseDeleted",
+      "state": "CaseRevoked2",
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
         "TextField": "non-matching text",
-        "EmailField": "test@test.com"
+        "EmailField": "anything@test.com"
       }
     }
   }
