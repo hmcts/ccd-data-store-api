@@ -1,21 +1,27 @@
 {
 	"_guid_": "S-122.4",
   "_extends_": "F-122-UpdateEventBase",
-  "title": "Ordering should take precedence when both conditions resolve (End state: CaseUpdated2)",
+  "title": "Sets the state defined with a matching post state condition using a complex field (End state: CaseRevoked)",
 
   "productName": "CCD data store",
-  "operationName": "submit updateCase2 event with TextField and EmailField values",
+  "operationName": "submit updateCase event with AddressField.AddressLine1 and EmailField values",
 
   "specs": [
-    "contains state: CaseUpdated2, updated values for TextField, EmailField along with an HTTP-201 Created"
+    "contains state: CaseRevoked, updated values for AddressField.AddressLine1, EmailField along with an HTTP-201 Created"
   ],
 
   "request": {
     "body": {
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "updated2",
-        "EmailField": "matched@test.com"
+        "TextField": null,
+        "EmailField": "matched@test.com",
+        "AddressField": {
+          "AddressLine1": "Some address",
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        }
       },
       "event": {
         "id": "updateCase",
@@ -29,11 +35,17 @@
     "responseCode": 201,
     "responseMessage": "OK",
     "body": {
-      "state": "CaseUpdated2",
+      "state": "CaseUpdated",
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "updated2",
-        "EmailField": "matched@test.com"
+        "TextField": null,
+        "EmailField": "matched@test.com",
+        "AddressField": {
+          "AddressLine1": "Some address",
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        }
       }
     }
   }

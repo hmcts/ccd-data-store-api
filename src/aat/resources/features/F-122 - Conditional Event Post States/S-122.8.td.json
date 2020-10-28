@@ -1,21 +1,21 @@
 {
-	"_guid_": "S-122.5",
+	"_guid_": "S-122.8",
   "_extends_": "F-122-UpdateEventBase",
-  "title": "Ordering should take precedence when both conditions resolve (End state: CaseUpdated2)",
+  "title": "Sets the state defined with a matching post state condition using != operator (End state: CaseRevoked2)",
 
   "productName": "CCD data store",
   "operationName": "submit updateCase2 event with TextField and EmailField values",
 
   "specs": [
-    "contains state: CaseUpdated2, updated values for TextField, EmailField along with an HTTP-201 Created"
+    "contains state: CaseRevoked2, updated values for TextField, EmailField along with an HTTP-201 Created"
   ],
 
   "request": {
     "body": {
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "updated2",
-        "EmailField": "matched@test.com"
+        "TextField": "non-matching text",
+        "EmailField": "anything@test.com"
       },
       "event": {
         "id": "updateCase",
@@ -29,11 +29,11 @@
     "responseCode": 201,
     "responseMessage": "OK",
     "body": {
-      "state": "CaseUpdated2",
+      "state": "CaseRevoked2",
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "updated2",
-        "EmailField": "matched@test.com"
+        "TextField": "non-matching text",
+        "EmailField": "anything@test.com"
       }
     }
   }
