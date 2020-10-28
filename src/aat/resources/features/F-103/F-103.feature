@@ -1,4 +1,4 @@
-@F-103 @Ignore
+@F-103
 Feature: F-103: Get Case-Assigned Users and Roles
 
   Background: Load test data for the scenario
