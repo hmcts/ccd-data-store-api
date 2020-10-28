@@ -35,8 +35,8 @@ public class CaseSearchesViewAccessControl {
     public Boolean filterResultsBySearchResultsDefinition(String useCase, CaseTypeDefinition caseTypeDefinition,
                                                           List<String> requestedFields, String caseFieldId) {
         Set<String> roles = userRepository.getUserRoles();
-        SearchResultDefinition searchResultDefinition = searchResultDefinitionService.getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
-
+        SearchResultDefinition searchResultDefinition = searchResultDefinitionService
+            .getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
 
         if (useCase != null) {
             return searchResultDefinition.fieldExists(caseFieldId)
