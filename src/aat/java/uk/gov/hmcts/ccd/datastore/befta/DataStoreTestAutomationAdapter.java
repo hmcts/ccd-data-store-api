@@ -78,12 +78,16 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 try {
                     String actualValue = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
                         "testData.actualResponse.body.__plainTextValue__");
-                    String expectedValue = key.toString().replace("approximately ", "");
+                    String expectedSizeStr = key.toString().replace("approximately ", "");
+
                     int actualSize = actualValue.length();
-                    int expectedSize = Integer.parseInt(expectedValue);
-                    if (Math.abs(actualSize-expectedSize)<50)
+                    int expectedSize = Integer.parseInt(expectedSizeStr);
+
+                    if (Math.abs(actualSize - expectedSize) < (actualSize * 10 / 100))
                         return actualValue;
-                    return "expected size "+ expectedSize+ " got actual size "+actualSize + " with Value "+actualValue;
+
+                    return "expected size " + expectedSize + " got actual size " + actualSize + " with Value "
+                        + actualValue;
                 } catch (Exception e) {
                     throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
                 }
