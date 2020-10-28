@@ -36,25 +36,21 @@
           "ApprovalRejectionTimestamp" : null,
           "NotesReason" : null,
           "OrganisationToAdd" : {
-            "OrganisationID" : null,
-            "OrganisationName" : null
+            "OrganisationID" : null
           },
           "OrganisationToRemove" : {
-            "OrganisationID" : null,
-            "OrganisationName" : null
+            "OrganisationID" : null
           }
         },
         "OrganisationPolicyField" : {
           "OrgPolicyCaseAssignedRole" : "[Claimant]",
           "OrgPolicyReference" : null,
           "Organisation" : {
-            "OrganisationID" : null,
-            "OrganisationName" : null
+            "OrganisationID" : null
           }
         },
         "OrganisationField" : {
-          "OrganisationID" : null,
-          "OrganisationName" : null
+          "OrganisationID" : null
         }
       },
       "data_classification" : {
@@ -70,15 +66,13 @@
             "OrganisationToAdd" : {
               "classification" : "PUBLIC",
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               }
             },
             "OrganisationToRemove" : {
               "classification" : "PUBLIC",
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               }
             }
           }
@@ -86,8 +80,7 @@
         "OrganisationField" : {
           "classification" : "PUBLIC",
           "value" : {
-            "OrganisationID" : "PUBLIC",
-            "OrganisationName" : "PUBLIC"
+            "OrganisationID" : "PUBLIC"
           }
         }
       },
@@ -110,15 +103,13 @@
             "OrganisationToAdd" : {
               "classification" : "PUBLIC",
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               }
             },
             "OrganisationToRemove" : {
               "classification" : "PUBLIC",
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               }
             }
           }
@@ -126,8 +117,7 @@
         "OrganisationField" : {
           "classification" : "PUBLIC",
           "value" : {
-            "OrganisationID" : "PUBLIC",
-            "OrganisationName" : "PUBLIC"
+            "OrganisationID" : "PUBLIC"
           }
         }
       }

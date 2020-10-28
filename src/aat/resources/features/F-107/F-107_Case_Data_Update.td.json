@@ -26,16 +26,14 @@
           "OrgPolicyCaseAssignedRole": "[Defendant]",
           "OrgPolicyReference": "ref",
           "Organisation": {
-            "OrganisationID": "orgID1",
-            "OrganisationName": "orgName1"
+            "OrganisationID": "orgID1"
           }
         },
         "OrganisationPolicyField2": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": "ref",
           "Organisation": {
-            "OrganisationID": "orgID2",
-            "OrganisationName": "orgName2"
+            "OrganisationID": "orgID2"
           }
         }
       },
