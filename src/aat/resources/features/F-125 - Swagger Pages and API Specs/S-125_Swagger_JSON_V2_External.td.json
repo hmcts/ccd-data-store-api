@@ -13,7 +13,6 @@
     }
   },
 
-
   "expectedResponse": {
     "responseCode" : 200,
     "responseMessage" : "OK",

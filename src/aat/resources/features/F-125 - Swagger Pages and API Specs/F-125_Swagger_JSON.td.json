@@ -8,6 +8,12 @@
   "method": "GET",
   "uri": "https://hmcts.github.io/reform-api-docs/specs/{ccd-data-store-api-version}",
 
+  "request": {
+    "headers": {
+      "experimental": "true"
+    }
+  },
+
   "expectedResponse": {
     "headers" : {
       "Content-Encoding" : "gzip",

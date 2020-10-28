@@ -8,14 +8,7 @@
   "method": "GET",
   "uri": "/swagger-ui.html",
 
-  "user": {
-    "_extends_": "Common_User_For_Request",
-    "username": "master.caseworker@gmail.com",
-    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
-  },
-
   "request": {
-    "_extends_": "Common_Request",
     "headers": {
       "experimental": "true"
     }
