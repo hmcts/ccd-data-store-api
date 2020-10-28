@@ -1,4 +1,4 @@
-@F-105 @Ignore
+@F-105
 Feature: F-105: Add Case-Assigned Users and Roles
 
   Background: Load test data for the scenario
