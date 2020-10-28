@@ -4,7 +4,7 @@ Feature: F-125 Test to verify Swagger documentation is not broken
 #================================================================
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-125.1  @Smoke
+@S-125.1
 Scenario: Must return a positive appropriate response when valid Swagger Internal V1 URL is accessed
 
     Given an appropriate test context as detailed in the test data source,
@@ -17,7 +17,7 @@ Scenario: Must return a positive appropriate response when valid Swagger Interna
       And a call [to observe the swagger json content] will get the expected response as in [S-125_Swagger_JSON_V1_Internal].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-125.2  @Smoke
+@S-125.2
 Scenario: Must return a positive appropriate response when valid Swagger External V1 URL is accessed
 
     Given an appropriate test context as detailed in the test data source,
@@ -30,7 +30,7 @@ Scenario: Must return a positive appropriate response when valid Swagger Externa
       And a call [to observe the swagger json content] will get the expected response as in [S-125_Swagger_JSON_V1_External].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-125.3  @Smoke
+@S-125.3
 Scenario: Must return a positive appropriate response when valid Swagger Internal V2 URL is accessed
 
     Given an appropriate test context as detailed in the test data source,
@@ -43,7 +43,7 @@ Scenario: Must return a positive appropriate response when valid Swagger Interna
       And a call [to observe the swagger json content] will get the expected response as in [S-125_Swagger_JSON_V2_Internal].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-125.4  @Smoke
+@S-125.4
 Scenario: Must return a positive appropriate response when valid Swagger External V2 URL is accessed
 
     Given an appropriate test context as detailed in the test data source,

@@ -74,6 +74,20 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                     .computeIfAbsent(scenarioContext.getContextId(), k ->
                     UUID.randomUUID().toString());
         }
+        else if (key.toString().startsWith("contains ")) {
+                try {
+                    System.out.println(ReflectionUtils.deepGetFieldInObject(scenarioContext, "testData.actualResponse.body"));
+                    String actualValue = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext, "testData.actualResponse.body.__plainTextValue__");
+                    String expectedValue = key.toString().replace("contains ", "");
+                    System.out.println(expectedValue);
+                    if (actualValue.contains(expectedValue))
+                        return actualValue;
+                    return actualValue;
+                } catch (Exception e) {
+                    throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+                }
+            }
+
         return super.calculateCustomValue(scenarioContext, key);
     }
 
