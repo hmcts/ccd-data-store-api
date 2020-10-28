@@ -6,7 +6,7 @@
   "operationName": "Get Swagger UI Page",
 
   "method": "GET",
-  "uri": "/swagger-ui.html",
+  "uri": "/swagger-ui/index.html",
 
   "expectedResponse": {
     "responseCode" : 200,
