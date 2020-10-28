@@ -1,9 +1,7 @@
 {
-  "_guid_": "S-125.2",
-  "title": "Must return a positive appropriate response when Swagger UI External V1 is accessed",
+  "_guid_": "S-125.1",
+  "title": "must show Swagger UI page for Internal V1 APIs",
   "_extends_": "F-125_Swagger_UI",
-
-  "operationName": "Swagger API External V1",
 
   "specs": [
     "to observe the swagger UI content"

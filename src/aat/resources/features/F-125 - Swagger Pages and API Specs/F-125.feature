@@ -1,16 +1,16 @@
-#================================================================
+#===============================================
 @F-125
-Feature: F-125 Test to verify Swagger documentation is not broken
-#================================================================
+Feature: F-125: Swagger Pages and Open API Specs
+#===============================================
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-125.1
-Scenario: Must return a positive appropriate response when valid Swagger Internal V1 URL is accessed
+Scenario: must show Swagger UI page for Internal V1 APIs
 
     Given an appropriate test context as detailed in the test data source,
 
      When a request is prepared with appropriate values,
-      And it is submitted to call the [Swagger API Internal V1] operation of [CCD Data Store],
+      And it is submitted to call the [Get Swagger UI Page] operation of [CCD Data Store],
 
      Then a positive response is received,
       And the response has all the details as expected
@@ -18,12 +18,12 @@ Scenario: Must return a positive appropriate response when valid Swagger Interna
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-125.2
-Scenario: Must return a positive appropriate response when valid Swagger External V1 URL is accessed
+Scenario: must show Swagger UI page for External V1 APIs
 
     Given an appropriate test context as detailed in the test data source,
 
      When a request is prepared with appropriate values,
-      And it is submitted to call the [Swagger API External V1] operation of [CCD Data Store],
+      And it is submitted to call the [Get Swagger UI Page] operation of [CCD Data Store],
 
      Then a positive response is received,
       And the response has all the details as expected
@@ -31,12 +31,12 @@ Scenario: Must return a positive appropriate response when valid Swagger Externa
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-125.3
-Scenario: Must return a positive appropriate response when valid Swagger Internal V2 URL is accessed
+Scenario: must show Swagger UI page for Internal V2 APIs
 
     Given an appropriate test context as detailed in the test data source,
 
      When a request is prepared with appropriate values,
-      And it is submitted to call the [Swagger API Internal V2] operation of [CCD Data Store],
+      And it is submitted to call the [Get Swagger UI Page] operation of [CCD Data Store],
 
      Then a positive response is received,
       And the response has all the details as expected
@@ -44,12 +44,12 @@ Scenario: Must return a positive appropriate response when valid Swagger Interna
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-125.4
-Scenario: Must return a positive appropriate response when valid Swagger External V2 URL is accessed
+Scenario: must show Swagger UI page for External V2 APIs
 
     Given an appropriate test context as detailed in the test data source,
 
      When a request is prepared with appropriate values,
-      And it is submitted to call the [Swagger API External V2] operation of [CCD Data Store],
+      And it is submitted to call the [Get Swagger UI Page] operation of [CCD Data Store],
 
      Then a positive response is received,
       And the response has all the details as expected

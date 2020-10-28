@@ -3,6 +3,7 @@
   "title": "Verify swagger UI Content",
 
   "productName": "CCD Data Store",
+  "operationName": "Get Swagger UI Page",
 
   "method": "GET",
   "uri": "/swagger-ui.html",
