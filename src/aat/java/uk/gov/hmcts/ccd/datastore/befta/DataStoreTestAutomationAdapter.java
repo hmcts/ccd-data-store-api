@@ -98,7 +98,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 if (actualValueStr.contains(expectedValueStr)) {
                     return actualValueStr;
                 }
-                return "expectedValueStr " + expectedValueStr +" not present in response";
+                return "expectedValueStr " + expectedValueStr + " not present in response ";
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
             }
