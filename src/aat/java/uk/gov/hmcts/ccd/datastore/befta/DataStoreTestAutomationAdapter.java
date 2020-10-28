@@ -77,23 +77,28 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             try {
                 String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
                         "testData.actualResponse.headers.Content-Length");
-                String actualValueFromBody = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                        "testData.actualResponse.body.__plainTextValue__");
                 String expectedSizeStr = key.toString().replace("approximately ", "");
-                String actualValue = actualSizeFromHeaderStr != null
-                                                                ? actualSizeFromHeaderStr
-                                                                : actualValueFromBody;
 
-                int actualSize = actualSizeFromHeaderStr != null
-                                                            ? Integer.parseInt(actualSizeFromHeaderStr)
-                                                            : actualValueFromBody.length();
+                int actualSize =  Integer.parseInt(actualSizeFromHeaderStr);
                 int expectedSize = Integer.parseInt(expectedSizeStr);
 
                 if (Math.abs(actualSize - expectedSize) < (actualSize * 10 / 100)) {
-                    return actualValue;
+                    return actualSizeFromHeaderStr;
                 }
-                return "expected size " + expectedSize + " got actual size " + actualSize + " with Value "
-                        + actualValue;
+                return expectedSize;
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
+        } else if (key.toString().startsWith("contains ")) {
+            try {
+                String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                    "testData.actualResponse.body.__plainTextValue__");
+                String expectedValueStr = key.toString().replace("contains ", "");
+
+                if (actualValueStr.contains(expectedValueStr)) {
+                    return actualValueStr;
+                }
+                return "expectedValueStr " + expectedValueStr +" not present in response";
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
             }
