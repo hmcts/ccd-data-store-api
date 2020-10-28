@@ -76,7 +76,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         }
         else if (key.toString().startsWith("approximately ")) {
                 try {
-                    String actualValue = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext, "testData.actualResponse.body.__plainTextValue__");
+                    String actualValue = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                        "testData.actualResponse.body.__plainTextValue__");
                     String expectedValue = key.toString().replace("approximately ", "");
                     int actualSize = actualValue.length();
                     int expectedSize = Integer.parseInt(expectedValue);
