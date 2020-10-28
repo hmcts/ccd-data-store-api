@@ -76,11 +76,18 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         }
         else if (key.toString().startsWith("approximately ")) {
                 try {
-                    String actualValue = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                    String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                        "testData.actualResponse.headers.Content-Length");
+                    String actualValueFromBody = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
                         "testData.actualResponse.body.__plainTextValue__");
                     String expectedSizeStr = key.toString().replace("approximately ", "");
+                    String actualValue = actualSizeFromHeaderStr != null ?
+                                                                  actualSizeFromHeaderStr :
+                                                                  actualValueFromBody;
 
-                    int actualSize = actualValue.length();
+                    int actualSize = actualSizeFromHeaderStr != null ?
+                                                                  Integer.parseInt(actualSizeFromHeaderStr) :
+                                                                  actualValueFromBody.length();
                     int expectedSize = Integer.parseInt(expectedSizeStr);
 
                     if (Math.abs(actualSize - expectedSize) < (actualSize * 10 / 100))

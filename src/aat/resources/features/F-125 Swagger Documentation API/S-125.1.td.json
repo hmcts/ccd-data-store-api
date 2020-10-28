@@ -13,14 +13,6 @@
     "queryParams": {
       "urls.primaryName": "v1_internal"
     }
-  },
-
-  "expectedResponse": {
-    "responseCode" : 200,
-    "responseMessage" : "OK",
-    "body" : {
-      "__plainTextValue__": "${[scenarioContext][customValues][approximately 3250]}"
-    }
   }
 
 }
