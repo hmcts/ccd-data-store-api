@@ -1,5 +1,5 @@
 #==============================================
-@F-122 @focus
+@F-122
 Feature: F-122: Conditional Event Post States
 #==============================================
 #  Tests 1-3 use updateCase event with the post state condition:
