@@ -35,11 +35,6 @@
         "TextField": "updated testing 1234",
         "EmailField": null
       },
-      "event": {
-        "id": "updateCase",
-        "summary": "",
-        "description": ""
-      },
       "security_classification": "PUBLIC",
       "event_token": "${[scenarioContext][childContexts][S-122-GetToken_UpdateCase][testData][actualResponse][body][token]}",
       "ignore_warning": true
@@ -54,64 +49,41 @@
       "Vary": "Accept-Encoding"
     },
     "body": {
-      "_links": {
-        "self": {
-          "href": "[[ANYTHING_PRESENT]]"
-        }
-      },
       "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "[[ANYTHING_PRESENT]]",
-      "case_type": "[[ANYTHING_PRESENT]]",
-      "created_on": "[[ANYTHING_PRESENT]]",
-      "last_modified_on": "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "state": "[[ANYTHING_PRESENT]]",
-      "security_classification": "[[ANYTHING_PRESENT]]",
-      "data": {
-        "TextField": "updated testing 1234",
-        "TextAreaField": null,
-        "DateField": null,
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseUpdated2",
+      "version": "[[ANYTHING_PRESENT]]",
+      "case_type_id": "FT_ConditionalPostState",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
         "AddressField": {
           "AddressLine1": null,
           "AddressLine2": null,
           "AddressLine3": null,
           "Country": null
         },
-        "PhoneField": null,
-        "NumberField": null,
-        "YesNoField": null,
-        "MarritalStatus": null,
         "MoneyField": null,
-        "EmailField": null,
-        "MultiSelectField": []
+        "MultiSelectField": [],
+        "EmailField": "matched@test.com",
+        "YesNoField": null,
+        "TextField": "updated2",
+        "PhoneField": null,
+        "MarritalStatus": null,
+        "DateField": null,
+        "TextAreaField": null,
+        "NumberField": null
       },
-      "data_classification": {
-        "AddressField": {
-          "classification": "PUBLIC",
-          "value": {
-            "AddressLine1": "PUBLIC",
-            "AddressLine2": "PUBLIC",
-            "AddressLine3": "PUBLIC",
-            "Country": "PUBLIC"
-          }
-        },
-        "MoneyField": "PUBLIC",
-        "MultiSelectField": "PUBLIC",
-        "YesNoField": "PUBLIC",
-        "EmailField": "PUBLIC",
-        "TextField": "PUBLIC",
-        "PhoneField": "PUBLIC",
-        "MarritalStatus": "PUBLIC",
-        "DateField": "PUBLIC",
-        "TextAreaField": "PUBLIC",
-        "NumberField": "PUBLIC"
-      },
+      "data_classification": "[[ANYTHING_PRESENT]]",
       "supplementary_data": null,
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,
       "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null
+      "delete_draft_response_status": null,
+      "security_classifications": "[[ANYTHING_PRESENT]]"
     }
   }
 }

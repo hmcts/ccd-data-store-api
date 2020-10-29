@@ -14,11 +14,11 @@
     "body": {
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "amended2",
+        "TextField": "updated2",
         "EmailField": "anything@test.com"
       },
       "event": {
-        "id": "updateCase",
+        "id": "updateCase2",
         "summary": "",
         "description": ""
       }
@@ -29,10 +29,10 @@
     "responseCode": 201,
     "responseMessage": "OK",
     "body": {
-      "state": "CaseAmended2",
-      "data": {
+      "state": "CaseUpdated2",
+      "case_data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "amended2",
+        "TextField": "updated2",
         "EmailField": "anything@test.com"
       }
     }

@@ -30,7 +30,7 @@
     "responseMessage": "OK",
     "body": {
       "state": "CaseAmended",
-      "data": {
+      "case_data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
         "TextField": "amended",
         "EmailField": "test@test.com"

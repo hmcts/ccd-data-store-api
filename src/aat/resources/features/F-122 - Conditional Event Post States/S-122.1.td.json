@@ -30,7 +30,7 @@
     "responseMessage": "OK",
     "body": {
       "state": "CaseDeleted",
-      "data": {
+      "case_data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
         "TextField": "non-matching text",
         "EmailField": "test@test.com"

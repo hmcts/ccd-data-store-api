@@ -35,8 +35,8 @@
     "responseCode": 201,
     "responseMessage": "OK",
     "body": {
-      "state": "CaseUpdated",
-      "data": {
+      "state": "CaseRevoked",
+      "case_data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
         "TextField": null,
         "EmailField": "matched@test.com",

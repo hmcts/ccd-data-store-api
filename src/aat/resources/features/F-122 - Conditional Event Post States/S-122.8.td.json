@@ -18,7 +18,7 @@
         "EmailField": "anything@test.com"
       },
       "event": {
-        "id": "updateCase",
+        "id": "updateCase2",
         "summary": "",
         "description": ""
       }
@@ -30,7 +30,7 @@
     "responseMessage": "OK",
     "body": {
       "state": "CaseRevoked2",
-      "data": {
+      "case_data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
         "TextField": "non-matching text",
         "EmailField": "anything@test.com"
