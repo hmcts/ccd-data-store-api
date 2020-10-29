@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -24,7 +23,6 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     private String label = null;
     private String hintText = null;
     private Boolean retainHiddenValue;
-    private String defaultValue;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
 
     @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
@@ -121,16 +119,6 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
     public void setCaseEventFieldComplexDefinitions(List<CaseEventFieldComplexDefinition> eventComplexTypeEntities) {
         this.caseEventFieldComplexDefinitions = eventComplexTypeEntities;
-    }
-
-    @ApiModelProperty(value = "Default value coming from the Event that overwrites complex fields.")
-    @JsonIgnore("defaultValue")
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
     }
 
     @ApiModelProperty(value = "whether this field is data should be retained, dependant on show_condition being"
