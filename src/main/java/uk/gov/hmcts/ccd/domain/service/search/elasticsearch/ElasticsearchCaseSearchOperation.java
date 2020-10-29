@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
@@ -12,6 +14,7 @@ import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
@@ -47,6 +50,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private final ApplicationParams applicationParams;
     private final CaseSearchRequestSecurity caseSearchRequestSecurity;
 
+    private StopWatch sw;
+
     @Autowired
     public ElasticsearchCaseSearchOperation(JestClient jestClient,
                                             @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
@@ -62,18 +67,30 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest request) {
+        sw = new StopWatch(QUALIFIER);
+
         MultiSearchResult result = search(request);
+
+        CaseSearchResult returnValue;
+
         if (result.isSucceeded()) {
-            return toCaseDetailsSearchResult(result, request);
+            returnValue = toCaseDetailsSearchResult(result, request);
         } else {
             throw new BadSearchRequest(result.getErrorMessage());
         }
+        log.debug(sw.prettyPrint());
+        return returnValue;
     }
 
     private MultiSearchResult search(CrossCaseTypeSearchRequest request) {
+        sw.start("secureAndTransformSearchRequest()");
         MultiSearch multiSearch = secureAndTransformSearchRequest(request);
+        sw.stop();
         try {
-            return jestClient.execute(multiSearch);
+            sw.start("jestClient.execute()");
+            MultiSearchResult result = jestClient.execute(multiSearch);
+            sw.stop();
+            return result;
         } catch (IOException e) {
             throw new ServiceException("Exception executing search : " + e.getMessage(), e);
         }
@@ -114,7 +131,10 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 throw new BadSearchRequest(errMsg);
             }
             if (response.searchResult != null) {
+                sw.start("buildCaseTypesResults()");
                 buildCaseTypesResults(response, caseTypeResults, crossCaseTypeSearchRequest);
+                sw.stop();
+
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
                 totalHits += response.searchResult.getTotal();
             }
@@ -172,8 +192,14 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
         List<String> casesAsString = searchResult.getSourceAsStringList();
+        sw.start("toElasticSearchCasesDTO()");
         List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
-        return caseDetailsMapper.dtosToCaseDetailsList(dtos);
+        sw.stop();
+
+        sw.start("caseDetailsMapper.dtosToCaseDetailsList()");
+        List<CaseDetails> result = caseDetailsMapper.dtosToCaseDetailsList(dtos);
+        sw.stop();
+        return result;
     }
 
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {

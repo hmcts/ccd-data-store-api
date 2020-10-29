@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -53,6 +54,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private final ObjectMapperService objectMapperService;
     private final UserRepository userRepository;
 
+    private StopWatch sw;
+
     @Autowired
     public AuthorisedCaseSearchOperation(
         @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
@@ -72,11 +75,21 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
+        sw = new StopWatch(QUALIFIER);
+
+        sw.start("getAuthorisedCaseTypes()");
         List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
+        sw.stop();
+
+        sw.start("createAuthorisedSearchRequest()");
         CrossCaseTypeSearchRequest authorisedSearchRequest =
             createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
+        sw.stop();
 
-        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
+        CaseSearchResult caseSearchResult = searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
+
+        log.debug(sw.prettyPrint());
+        return caseSearchResult;
     }
 
     private List<CaseTypeDefinition> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
@@ -107,7 +120,10 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             return CaseSearchResult.EMPTY;
         }
 
+        sw.start("caseSearchOperation.execute()");
         CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
+        sw.stop();
+
         filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest);
 
         return result;
@@ -116,15 +132,19 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,
                                           List<CaseDetails> cases,
                                           CrossCaseTypeSearchRequest authorisedSearchRequest) {
+        sw.start("filterCaseDataByCaseType() loop 1");
         Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypes
             .stream()
             .collect(Collectors.toMap(CaseTypeDefinition::getId, Function.identity()));
+        sw.stop();
 
+        sw.start("filterCaseDataByCaseType() loop 2");
         cases.stream()
             .filter(caseDetails -> caseTypeIdByCaseType.containsKey(caseDetails.getCaseTypeId()))
             .forEach(caseDetails -> filterCaseData(caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()),
                                                    caseDetails,
                                                    authorisedSearchRequest));
+        sw.stop();
     }
 
     private void filterCaseData(CaseTypeDefinition authorisedCaseType,
