@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
