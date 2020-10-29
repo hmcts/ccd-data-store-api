@@ -55,8 +55,6 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private Boolean retainHiddenValue;
     @JsonProperty("formatted_value")
     private Object formattedValue;
-    @JsonIgnore()
-    private String defaultValue;
 
     @Override
     public String getId() {
@@ -146,14 +144,6 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     public void setShowConditon(String showConditon) {
         this.showConditon = showConditon;
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
     }
 
     @Override
