@@ -37,7 +37,7 @@ public class CaseSearchesViewAccessControl {
         Set<String> roles = userRepository.getUserRoles();
         SearchResultDefinition searchResultDefinition = searchResultDefinitionService
             .getSearchResultDefinition(caseTypeDefinition, useCase, requestedFields);
-
+        
         if (useCase != null) {
             return searchResultDefinition.fieldExists(caseFieldId)
                 && searchResultDefinition.fieldHasRole(caseFieldId, roles);

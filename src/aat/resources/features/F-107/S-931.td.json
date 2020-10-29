@@ -12,14 +12,14 @@
     "body": {
       "data": {
         "OrganisationPolicyField1": {
-          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyCaseAssignedRole": "[Invalid]",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1"
           }
         },
         "OrganisationPolicyField2": {
-          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyCaseAssignedRole": "[Invalid]",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID2"
