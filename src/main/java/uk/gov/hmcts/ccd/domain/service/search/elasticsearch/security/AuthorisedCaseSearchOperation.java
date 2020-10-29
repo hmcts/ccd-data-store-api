@@ -86,7 +86,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
         sw.stop();
 
-        CaseSearchResult caseSearchResult = searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
+        CaseSearchResult caseSearchResult =
+            searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
 
         log.debug(sw.prettyPrint());
         return caseSearchResult;
