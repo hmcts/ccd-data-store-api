@@ -76,7 +76,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         } else {
             throw new BadSearchRequest(result.getErrorMessage());
         }
-        log.debug(sw.prettyPrint());
+        log.debug(String.format("%s: %s ms - %s", QUALIFIER, sw.getTotalTimeMillis(), sw.prettyPrint()));
         return returnValue;
     }
 

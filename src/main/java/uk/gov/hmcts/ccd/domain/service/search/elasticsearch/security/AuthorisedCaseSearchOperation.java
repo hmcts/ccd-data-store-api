@@ -89,7 +89,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         CaseSearchResult caseSearchResult =
             searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
 
-        log.debug(sw.prettyPrint());
+        log.debug(String.format("%s: %s ms - %s", QUALIFIER, sw.getTotalTimeMillis(), sw.prettyPrint()));
         return caseSearchResult;
     }
 
