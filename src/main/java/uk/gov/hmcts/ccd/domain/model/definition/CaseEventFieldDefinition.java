@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -123,7 +124,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     }
 
     @ApiModelProperty(value = "Default value coming from the Event that overwrites complex fields.")
-    @JsonProperty("defaultValue")
+    @JsonIgnore("defaultValue")
     public String getDefaultValue() {
         return defaultValue;
     }
