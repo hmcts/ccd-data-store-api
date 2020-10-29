@@ -55,7 +55,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private Boolean retainHiddenValue;
     @JsonProperty("formatted_value")
     private Object formattedValue;
-    @JsonProperty("default_value")
+    @JsonIgnore()
     private String defaultValue;
 
     @Override
