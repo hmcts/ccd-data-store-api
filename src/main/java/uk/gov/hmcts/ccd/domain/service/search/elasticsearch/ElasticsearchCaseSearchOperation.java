@@ -48,8 +48,6 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private final ApplicationParams applicationParams;
     private final CaseSearchRequestSecurity caseSearchRequestSecurity;
 
-    private StopWatch sw;
-
     @Autowired
     public ElasticsearchCaseSearchOperation(JestClient jestClient,
                                             @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
@@ -65,22 +63,22 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest request) {
-        sw = new StopWatch(QUALIFIER);
+        StopWatch sw = new StopWatch(QUALIFIER);
 
-        MultiSearchResult result = search(request);
+        MultiSearchResult result = search(request, sw);
 
         CaseSearchResult returnValue;
 
         if (result.isSucceeded()) {
-            returnValue = toCaseDetailsSearchResult(result, request);
+            returnValue = toCaseDetailsSearchResult(result, request, sw);
         } else {
             throw new BadSearchRequest(result.getErrorMessage());
         }
-        log.debug(String.format("%s: %s ms - %s", QUALIFIER, sw.getTotalTimeMillis(), sw.prettyPrint()));
+        log.debug(String.format("%s execute(): %s ms - %s", QUALIFIER, sw.getTotalTimeMillis(), sw.prettyPrint()));
         return returnValue;
     }
 
-    private MultiSearchResult search(CrossCaseTypeSearchRequest request) {
+    private MultiSearchResult search(CrossCaseTypeSearchRequest request, StopWatch sw) {
         sw.start("secureAndTransformSearchRequest()");
         MultiSearch multiSearch = secureAndTransformSearchRequest(request);
         sw.stop();
@@ -113,7 +111,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult,
-                                                       CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
+                                                       CrossCaseTypeSearchRequest crossCaseTypeSearchRequest,
+                                                       StopWatch sw) {
         final List<CaseDetails> caseDetails = new ArrayList<>();
         final List<CaseTypeResults> caseTypeResults = new ArrayList<>();
         long totalHits = 0L;
@@ -133,7 +132,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 buildCaseTypesResults(response, caseTypeResults, crossCaseTypeSearchRequest);
                 sw.stop();
 
-                caseDetails.addAll(searchResultToCaseList(response.searchResult));
+                caseDetails.addAll(searchResultToCaseList(response.searchResult, sw));
                 totalHits += response.searchResult.getTotal();
             }
         }
@@ -188,7 +187,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
+    private List<CaseDetails> searchResultToCaseList(SearchResult searchResult, StopWatch sw) {
         List<String> casesAsString = searchResult.getSourceAsStringList();
         sw.start("toElasticSearchCasesDTO()");
         List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);

@@ -54,8 +54,6 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private final ObjectMapperService objectMapperService;
     private final UserRepository userRepository;
 
-    private StopWatch sw;
-
     @Autowired
     public AuthorisedCaseSearchOperation(
         @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
@@ -75,7 +73,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
-        sw = new StopWatch(QUALIFIER);
+        StopWatch sw = new StopWatch(QUALIFIER);
 
         sw.start("getAuthorisedCaseTypes()");
         List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
@@ -87,9 +85,9 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         sw.stop();
 
         CaseSearchResult caseSearchResult =
-            searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
+            searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest, sw);
 
-        log.debug(String.format("%s: %s ms - %s", QUALIFIER, sw.getTotalTimeMillis(), sw.prettyPrint()));
+        log.debug(String.format("%s execute(): %s ms - %s", QUALIFIER, sw.getTotalTimeMillis(), sw.prettyPrint()));
         return caseSearchResult;
     }
 
@@ -116,7 +114,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseTypeDefinition> authorisedCaseTypes,
-                                                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                                                CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                                                StopWatch sw) {
         if (authorisedCaseTypes.isEmpty()) {
             return CaseSearchResult.EMPTY;
         }
@@ -125,14 +124,15 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
         sw.stop();
 
-        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest);
+        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest, sw);
 
         return result;
     }
 
     private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,
                                           List<CaseDetails> cases,
-                                          CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                          CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                          StopWatch sw) {
         sw.start("filterCaseDataByCaseType() loop 1");
         Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypes
             .stream()
