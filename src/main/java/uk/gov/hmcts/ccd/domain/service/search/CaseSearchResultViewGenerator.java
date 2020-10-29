@@ -98,6 +98,7 @@ public class CaseSearchResultViewGenerator {
 
         List<SearchResultViewItem> items = new ArrayList<>();
         caseSearchResult.getCases().forEach(caseDetails -> {
+
             filterUnauthorisedFieldsByUseCaseAndUserRole(useCase, caseDetails, caseTypeDefinition, requestedFields);
             items.add(buildSearchResultViewItem(caseDetails, searchResultDefinition));
         });

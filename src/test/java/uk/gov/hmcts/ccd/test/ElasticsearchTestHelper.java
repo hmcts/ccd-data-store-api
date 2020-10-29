@@ -66,7 +66,6 @@ public class ElasticsearchTestHelper {
     public static final String DATE_VALUE = "2007-12-17";
     public static final String PHONE_VALUE = "01234567890";
     public static final String PHONE_VALUE_WITH_SPACE = "01234 567890";
-    public static final String PARTIAL_PHONE_VALUE = "01234";
     public static final String COUNTRY_VALUE = "CountryValue";
     public static final String COLLECTION_VALUE = "CollectionTextValue2";
     public static final String STATE_VALUE = "TODO";
