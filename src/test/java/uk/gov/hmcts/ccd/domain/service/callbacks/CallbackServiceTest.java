@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -46,6 +47,8 @@ class CallbackServiceTest {
 
     @Mock
     private RestTemplate restTemplate;
+    @Mock
+    private ApplicationParams applicationParams;
     @Mock
     private AppInsights appinsights;
 
@@ -80,7 +83,7 @@ class CallbackServiceTest {
         callbackResponse.setData(caseDetails.getData());
 
         initSecurityContext();
-        callbackService = new CallbackService(securityUtils, restTemplate, appinsights);
+        callbackService = new CallbackService(securityUtils, restTemplate, applicationParams, appinsights);
 
         final ResponseEntity<CallbackResponse> responseEntity = new ResponseEntity<>(callbackResponse, HttpStatus.OK);
         when(restTemplate

@@ -135,16 +135,17 @@ public class CallbackService {
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             List<String> ccdCallbackLogControl = applicationParams.getCcdCallbackLogControl();
-            String allStar ="*";
+            String allStar = "*";
             boolean match = false;
-            if(allStar.equals(ccdCallbackLogControl.get(0)) || ccdCallbackLogControl.stream().anyMatch(url::contains)){
+            if (ccdCallbackLogControl.size() > 0 && (allStar.equals(ccdCallbackLogControl.get(0))
+                || ccdCallbackLogControl.stream().anyMatch(url::contains))) {
                 match = true;
             }
-            if(match) {
+            if (match) {
                 LOG.debug(" Sending callback Request {}", requestEntity);
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
-            if(match) {
+            if (match) {
                 LOG.debug(" Received callback Response {}", responseEntity);
             }
             httpStatus = responseEntity.getStatusCodeValue();
