@@ -15,6 +15,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryContext;
 import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryThreadContext;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -40,14 +42,17 @@ public class CallbackService {
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
+    private final ApplicationParams applicationParams;
     private final AppInsights appinsights;
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
                            @Qualifier("restTemplate") final RestTemplate restTemplate,
+                           final ApplicationParams applicationParams,
                            AppInsights appinsights) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
+        this.applicationParams = applicationParams;
         this.appinsights = appinsights;
     }
 
@@ -122,14 +127,26 @@ public class CallbackService {
         Instant startTime = Instant.now();
 
         try {
-            LOG.debug("Invoking callback {}", url);
+            LOG.debug("Invoking callback {} of CallbackType {} at {}", url, callbackType, startTime);
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
             if (null != securityHeaders) {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
+            List<String> ccdCallbackLogControl = applicationParams.getCcdCallbackLogControl();
+            String allStar ="*";
+            boolean match = false;
+            if(allStar.equals(ccdCallbackLogControl.get(0)) || ccdCallbackLogControl.stream().anyMatch(url::contains)){
+                match = true;
+            }
+            if(match) {
+                LOG.debug(" Sending callback Request {}", requestEntity);
+            }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
+            if(match) {
+                LOG.debug(" Received callback Response {}", responseEntity);
+            }
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
