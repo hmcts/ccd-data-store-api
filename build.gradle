@@ -25,7 +25,6 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.7'
     id 'org.owasp.dependencycheck' version '6.0.2'
-    id 'com.github.spotbugs' version '4.4.4'
     id 'net.ltgt.apt' version '0.21'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.22'
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
