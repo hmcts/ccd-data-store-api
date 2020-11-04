@@ -26,6 +26,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -140,6 +142,39 @@ class CallbackServiceTest {
             verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("400"), any(Duration.class));
         }
 
+    }
+
+    @Test
+    @DisplayName("Should LogAll callback event")
+    public void shouldLogAllCallbackEvent() throws Exception {
+        List<String> ccdCallbackLogControl = new ArrayList<String>();
+        ccdCallbackLogControl.add("*");
+        doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+
+        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+    }
+
+    @Test
+    @DisplayName("Should Log callback event")
+    public void shouldLogCallbackEvent() throws Exception {
+        List<String> ccdCallbackLogControl = new ArrayList<String>();
+        ccdCallbackLogControl.add("test-callback");
+        doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+
+        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+    }
+
+    @Test
+    @DisplayName("Should Log callback event")
+    public void shouldNotLogCallbackEvent() throws Exception {
+        List<String> ccdCallbackLogControl = new ArrayList<String>();
+        ccdCallbackLogControl.add("Notest-callback");
+        doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+
+        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
     }
 
     private void initSecurityContext() {

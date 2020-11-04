@@ -123,30 +123,30 @@ public class CallbackService {
         HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
 
         CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
+        List<String> ccdCallbackLogControl = applicationParams.getCcdCallbackLogControl();
+        boolean match = false;
+        String starStr = "*";//to match any call back
+        if (ccdCallbackLogControl.size() > 0 && (starStr.equals(ccdCallbackLogControl.get(0))
+            || ccdCallbackLogControl.stream().anyMatch(url::contains))) {
+            match = true;
+        }
         int httpStatus = 0;
         Instant startTime = Instant.now();
 
         try {
-            LOG.debug("Invoking callback {} of CallbackType {} at {}", url, callbackType, startTime);
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
             if (null != securityHeaders) {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
-            List<String> ccdCallbackLogControl = applicationParams.getCcdCallbackLogControl();
-            String allStar = "*";
-            boolean match = false;
-            if (ccdCallbackLogControl.size() > 0 && (allStar.equals(ccdCallbackLogControl.get(0))
-                || ccdCallbackLogControl.stream().anyMatch(url::contains))) {
-                match = true;
-            }
             if (match) {
-                LOG.debug(" Sending callback Request {}", requestEntity);
+                LOG.info("Invoking callback {} of CallbackType {} at {} with Request {}",
+                    url, callbackType, startTime, requestEntity);
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
             if (match) {
-                LOG.debug(" Received callback Response {}", responseEntity);
+                LOG.info(" Received callback Response {}", responseEntity);
             }
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
